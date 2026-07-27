@@ -1098,6 +1098,9 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(upload_steps).to include("Upload coverage to Coveralls")
       expect(upload_steps).to include("Upload coverage to QLTY")
       expect(upload_steps).to include("Upload coverage to CodeCov")
+      expect(upload_steps).to include("fail-on-error: false")
+      expect(upload_steps).to include("skip-errors: true")
+      expect(upload_steps.scan("continue-on-error: true").length).to be >= 3
 
       template_paths = described_class.template_source_preferences(root, config).map { |preference| preference.fetch(:target_path) }
       expect(template_paths).to include(".github/.codecov.yml", ".qlty/qlty.toml")

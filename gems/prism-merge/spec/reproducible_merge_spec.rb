@@ -64,4 +64,13 @@ RSpec.describe 'Prism reproducible merge' do
       expect(merged).to include('NOTE: This gem has "runtime" dependencies')
     end
   end
+
+  describe 'Ruby merge with template leading comments on matched destination nodes' do
+    context 'when destination kept the matched call and template added an adjacent comment' do
+      it_behaves_like 'a reproducible merge', '06_matched_destination_template_leading_comment', {
+        preference: :template,
+        add_template_only_nodes: true
+      }
+    end
+  end
 end

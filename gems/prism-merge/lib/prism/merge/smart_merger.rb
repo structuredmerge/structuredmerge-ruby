@@ -1002,8 +1002,8 @@ module Prism
         begin_node_structure(template_node).line_map_for(begin_node_structure(dest_node))
       end
 
-      def external_trailing_comments_for(node)
-        wrapper_comment_support.external_trailing_comments_for(node)
+      def external_trailing_comments_for(node, analysis: nil)
+        wrapper_comment_support.external_trailing_comments_for(node, analysis: analysis)
       end
 
       # Determines if two matching nodes should be recursively merged.

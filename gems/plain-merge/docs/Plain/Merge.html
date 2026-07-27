@@ -6,7 +6,7 @@
 <title>
   Module: Plain::Merge
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -80,19 +80,29 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/plain/merge.rb<span class="defines">,<br>
-  lib/plain/merge/version.rb</span>
+    <dd>lib/plain/merge/backend.rb<span class="defines">,<br>
+  lib/plain/merge.rb,<br> lib/plain/merge/version.rb</span>
 
 </dd>
   </dl>
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>StructuredMerge plain text fallback behavior.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Merge/Version.html" title="Plain::Merge::Version (module)">Version</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Merge/Backend.html" title="Plain::Merge::Backend (module)">Backend</a></span>, <span class='object_link'><a href="Merge/Version.html" title="Plain::Merge::Version (module)">Version</a></span>
     
   
     
@@ -110,7 +120,7 @@
         <dt id="PACKAGE_NAME-constant" class="">PACKAGE_NAME =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>plain-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plain-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
         <dt id="DEFAULT_TEXT_REFINEMENT_THRESHOLD-constant" class="">DEFAULT_TEXT_REFINEMENT_THRESHOLD =
           
@@ -125,6 +135,11 @@
   <span class='label'>length:</span> <span class='float'>0.15</span><span class='comma'>,</span>
   <span class='label'>position:</span> <span class='float'>0.15</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="BACKEND_REFERENCE-constant" class="">BACKEND_REFERENCE =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendReference</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plain-line</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>line</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span></pre></dd>
       
         <dt id="VERSION-constant" class="">VERSION =
           <div class="docstring">
@@ -299,6 +314,52 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_language!-class_method" title="register_language! (class method)">.<strong>register_language!</strong>(language_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#similarity_score-class_method" title="similarity_score (class method)">.<strong>similarity_score</strong>(left_source, right_source)  &#x21d2; Object </a>
     
 
@@ -441,7 +502,7 @@
   <span class='kw'>end</span>
 
   <span class='lbrace'>{</span>
-    <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>text</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>normalized_source:</span> <span class='id identifier rubyid_normalized_source'>normalized_source</span><span class='comma'>,</span>
     <span class='label'>blocks:</span> <span class='id identifier rubyid_blocks'>blocks</span>
   <span class='rbrace'>}</span>
@@ -589,7 +650,7 @@
     <span class='id identifier rubyid_matched'>matched</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span>
       <span class='label'>template_index:</span> <span class='id identifier rubyid_template_index'>template_index</span><span class='comma'>,</span>
       <span class='label'>destination_index:</span> <span class='id identifier rubyid_destination_index'>destination_index</span><span class='comma'>,</span>
-      <span class='label'>phase:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>exact</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>phase:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>exact</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>score:</span> <span class='float'>1.0</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
@@ -621,7 +682,7 @@
     <span class='id identifier rubyid_matched'>matched</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span>
       <span class='label'>template_index:</span> <span class='id identifier rubyid_best_template_index'>best_template_index</span><span class='comma'>,</span>
       <span class='label'>destination_index:</span> <span class='id identifier rubyid_destination_index'>destination_index</span><span class='comma'>,</span>
-      <span class='label'>phase:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>refined</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>phase:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>refined</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>score:</span> <span class='id identifier rubyid_best_score'>best_score</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
@@ -732,7 +793,7 @@
     <span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\r\n?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
     <span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
     <span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\n\s*\n+</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
-    <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_block'>block</span><span class='op'>|</span> <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_block'>block</span><span class='op'>|</span> <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
     <span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span>
     <span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -767,12 +828,14 @@
 186
 187
 188
-189</pre>
+189
+190</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/plain/merge.rb', line 178</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_refined_text_similarity'>refined_text_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_template_block'>template_block</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_block'>destination_block</span><span class='comma'>,</span> <span class='id identifier rubyid_template_total'>template_total</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_total'>destination_total</span><span class='comma'>,</span> <span class='id identifier rubyid_weights'>weights</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_TEXT_REFINEMENT_WEIGHTS-constant" title="Plain::Merge::DEFAULT_TEXT_REFINEMENT_WEIGHTS (constant)">DEFAULT_TEXT_REFINEMENT_WEIGHTS</a></span></span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_refined_text_similarity'>refined_text_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_template_block'>template_block</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_block'>destination_block</span><span class='comma'>,</span> <span class='id identifier rubyid_template_total'>template_total</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_total'>destination_total</span><span class='comma'>,</span>
+                            <span class='id identifier rubyid_weights'>weights</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_TEXT_REFINEMENT_WEIGHTS-constant" title="Plain::Merge::DEFAULT_TEXT_REFINEMENT_WEIGHTS (constant)">DEFAULT_TEXT_REFINEMENT_WEIGHTS</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_string_similarity'>string_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_template_block'>template_block</span><span class='lbracket'>[</span><span class='symbol'>:normalized</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_block'>destination_block</span><span class='lbracket'>[</span><span class='symbol'>:normalized</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_length'>length</span> <span class='op'>=</span> <span class='id identifier rubyid_length_similarity'>length_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_template_block'>template_block</span><span class='lbracket'>[</span><span class='symbol'>:normalized</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_block'>destination_block</span><span class='lbracket'>[</span><span class='symbol'>:normalized</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_position'>position</span> <span class='op'>=</span> <span class='id identifier rubyid_position_similarity'>position_similarity</span><span class='lparen'>(</span>
@@ -783,6 +846,86 @@
   <span class='rparen'>)</span>
 
   <span class='lparen'>(</span><span class='id identifier rubyid_weights'>weights</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span> <span class='op'>*</span> <span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='id identifier rubyid_weights'>weights</span><span class='lbracket'>[</span><span class='symbol'>:length</span><span class='rbracket'>]</span> <span class='op'>*</span> <span class='id identifier rubyid_length'>length</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='id identifier rubyid_weights'>weights</span><span class='lbracket'>[</span><span class='symbol'>:position</span><span class='rbracket'>]</span> <span class='op'>*</span> <span class='id identifier rubyid_position'>position</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_backend!-class_method">
+  
+    .<strong>register_backend!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+40
+41
+42
+43
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/plain/merge/backend.rb', line 40</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_register_backend!'>register_backend!</span>
+  <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendRegistry</span><span class='period'>.</span><span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Plain::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rparen'>)</span>
+  <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>text</span><span class='words_sep'> </span><span class='tstring_content'>plain</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_language_name'>language_name</span><span class='op'>|</span>
+    <span class='id identifier rubyid_register_language!'>register_language!</span><span class='lparen'>(</span><span class='id identifier rubyid_language_name'>language_name</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_language!-class_method">
+  
+    .<strong>register_language!</strong>(language_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/plain/merge/backend.rb', line 48</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_register_language!'>register_language!</span><span class='lparen'>(</span><span class='id identifier rubyid_language_name'>language_name</span><span class='rparen'>)</span>
+  <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_register_language'>register_language</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_language_name'>language_name</span><span class='comma'>,</span>
+    <span class='label'>backend_module:</span> <span class='const'><span class='object_link'><a href="Merge/Backend.html" title="Plain::Merge::Backend (module)">Backend</a></span></span><span class='comma'>,</span>
+    <span class='label'>backend_type:</span> <span class='symbol'>:line</span><span class='comma'>,</span>
+    <span class='label'>gem_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plain-merge</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>contract:</span> <span class='symbol'>:line</span>
+  <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -875,7 +1018,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text_feature_profile'>text_feature_profile</span>
   <span class='lbrace'>{</span>
-    <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>text</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>supported_dialects:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>supported_policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
@@ -908,7 +1051,7 @@
       <pre class="code"><span class="info file"># File 'lib/plain/merge.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text_parse_request'>text_parse_request</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
-  <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>ParserRequest</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>language:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>text</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>ParserRequest</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>language:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -920,9 +1063,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:08 2026 by
+  Generated on Fri Jul 24 19:49:16 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

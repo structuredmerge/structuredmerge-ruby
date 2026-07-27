@@ -51,6 +51,7 @@
 # rake spec                                   # Run RSpec code examples
 # rake test                                   # Run tests
 # rake yard                                   # Generate YARD Documentation
+# rake yard:lint                              # Lint YARD Documentation
 #
 
 # simplecov:disable

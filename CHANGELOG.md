@@ -22,6 +22,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - `ast-crispr` now provides `Ast::Crispr::DeleteBatch` for deleting matches from
   multiple structural selectors through one parsed document context.
+- `zip-merge` now registers a Kaitai-backed `TreeHaver.parser_for(:zip)` path
+  for ZIP inventory analysis.
+- `plain-merge` now registers `TreeHaver.parser_for(:text)` and
+  `TreeHaver.parser_for(:plain)` line-backed parser paths for normalized text
+  block analysis.
+- `dotenv-merge` now registers `TreeHaver.parser_for(:dotenv)` and
+  `TreeHaver.parser_for(:env)` line-backed parser paths built on the
+  `plain-merge` line substrate.
+- `zip-merge` now depends on `binary-merge` for shared Kaitai/binary-family
+  report and diagnostic construction.
 - Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
   HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
   structural edit adapter.
@@ -33,6 +43,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Documented the StructuredMerge Ruby merge-gem family model, including
+  substrate/provider behavior sharing and the requirement that partial document
+  insertion, replacement, and removal flow through `ast-crispr` instead of
+  parser-specific object round-trips.
+- Clarified that `zip-merge` is a Kaitai-family binary AST integration and
+  should not be categorized with byte or line oriented merge gems.
+- Clarified that `binary-merge` is the Kaitai/binary-family substrate for
+  concrete schema parser gems such as `zip-merge`.
+- The `smorg-rb` executable now supports `-v` / `--version` and prints a
+  standard startup header on normal runs.
 - `kettle-jem` now migrates existing SimpleCov bootstrap files for packaged
   monorepo subgems even when the selected template profile does not otherwise
   manage per-gem harness files.
@@ -50,6 +70,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem` main Gemfile templating now removes repeated direct sibling
   execution blocks left behind by older `nomono` bootstrap output while applying
   the simplified `require "nomono/bundler"` loader.
+- `html-merge` now follows the shared root changelog used by the other
+  monorepo `*-merge` gems instead of carrying a member-local changelog.
 - `smorg-rb` diff-driver output now appends a unified review hunk with exact
   removed and added source text after the semantic structured-diff summary.
 - Retemplated generated project metadata, support documentation, CI workflows,
@@ -102,6 +124,15 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `prism-merge` now preserves template-owned trailing comment lines attached to
+  matched Ruby statements, including comments adjacent to generated `require`
+  calls during template merges.
+- `kettle-jem` local Gemfile templating now removes obsolete nomono activation
+  ceremony from existing destination files while retaining the simple
+  `require "nomono/bundler"` loader.
+- `kettle-jem` bootstrap commits can now be serialized by monorepo family
+  templating, preventing concurrent member template jobs from racing while
+  updating the shared `HEAD`.
 - TreeHaver now smoke-tests `tree_sitter_language_pack` parser execution for the
   requested language before registering the TSLP backend, so broken native gem
   artifacts fail closed with a useful reason instead of surfacing parser
@@ -139,6 +170,8 @@ Please file a bug if you notice a violation of semantic versioning.
   integrations in the current process.
 - Ast-merge changed-gem CI no longer times out or fails when exercising
   isolated fixture integrations that require Prism-backed Ruby merging.
+- TreeHaver's Prism parser backend no longer depends on the removed upstream
+  `Prism.available?` API, allowing Prism 1.9+ to parse during templating.
 - Changed-gem CI suites now pass in isolated gem bundles by loading required
   adapter gems explicitly, avoiding Ruby 4 `Pathname#find` assumptions, and
   keeping Prism merge tests on the local TreeHaver capability registry.

@@ -213,8 +213,10 @@ module Prism
           dest_line: node_preference == :destination ? source_node.location.end_line : nil
         )
 
-        template_trailing_comments = merger.send(:external_trailing_comments_for, actual_template)
-        dest_trailing_comments = merger.send(:external_trailing_comments_for, actual_dest)
+        template_trailing_comments = merger.send(:external_trailing_comments_for, actual_template,
+                                                 analysis: merger.template_analysis)
+        dest_trailing_comments = merger.send(:external_trailing_comments_for, actual_dest,
+                                             analysis: merger.dest_analysis)
 
         if node_preference == :template
           trailing_comments = template_trailing_comments.any? ? template_trailing_comments : dest_trailing_comments

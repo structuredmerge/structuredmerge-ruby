@@ -7,6 +7,7 @@ require "digest"
 require "json"
 require "net/http"
 require "open3"
+require "parslet"
 require "rbconfig"
 require "time"
 require "uri"
@@ -14,6 +15,8 @@ require "addressable/uri"
 require "token/resolver"
 require "yaml"
 require "ast/merge"
+require "ast/crispr/markdown/markly"
+require "kettle/ndjson"
 require "rbs"
 require "kettle/dev"
 require "kettle/rb/compat_matrix"
@@ -33,6 +36,8 @@ module Kettle
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
+    KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
+    LEGACY_KETTLE_LOCK_PATH = ".kettle-jem.lock"
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
@@ -133,9 +138,11 @@ module Kettle
         "Rakefile",
         ".rspec",
         ".simplecov",
+        ".yard-lint.yml",
         ".yardignore",
         ".yardopts",
         "bin/setup",
+        "spec/README.md",
         "spec/spec_helper.rb"
       ] + PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES
     ).freeze
@@ -173,6 +180,7 @@ module Kettle
       "Appraisals",
       "Guardfile",
       ".simplecov",
+      ".yard-lint.yml",
       ".yardignore",
       ".yardopts",
       ".github/FUNDING.yml",
@@ -380,6 +388,12 @@ module Kettle
     CHANGELOG_TRANSFER_KEY_SEPARATOR = /\s+-\s+/
     CHANGELOG_TRANSFER_KEY_PATTERN = /\Akettle-jem-template-\d{8}-\d{3}\z/
     CHANGELOG_TRANSFER_KEY_SCAN_PATTERN = /\bkettle-jem-template-\d{8}-\d{3}\b/
+    CHANGELOG_INITIAL_TEMPLATE_KEY = "kettle-jem-template-initial"
+    CHANGELOG_INITIAL_TEMPLATE_ENTRY = {
+      key: CHANGELOG_INITIAL_TEMPLATE_KEY,
+      section: "### Added",
+      lines: ["- #{CHANGELOG_INITIAL_TEMPLATE_KEY} - Initial templating by kettle-jem."]
+    }.freeze
     README_KLOC_BADGE_PATTERN = /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/
     CHANGELOG_COVERAGE_KLOC_PATTERN = /-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i
     RUBY_TEMPLATE_BASENAMES = %w[Gemfile Rakefile Appraisals Appraisal.root.gemfile .simplecov].freeze
@@ -404,6 +418,7 @@ module Kettle
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
       KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP
+      KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM
       KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK
       KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MIN_DIVERGENCE_THRESHOLD
@@ -687,6 +702,18 @@ module Kettle
 
         severity_value
       end
+    end
+
+    class TransferChangelogLineParser < Parslet::Parser
+      rule(:space) { match('\s') }
+      rule(:digit) { match("[0-9]") }
+      rule(:date) { digit.repeat(8, 8).as(:date) }
+      rule(:sequence) { digit.repeat(3, 3).as(:sequence) }
+      rule(:key) { (str("kettle-jem-template-") >> date >> str("-") >> sequence).as(:key) }
+      rule(:separator) { space.repeat(1) >> str("-") >> space.repeat(1) }
+      rule(:message) { any.repeat(1).as(:message) }
+      rule(:entry) { key >> separator >> message >> any.absent? }
+      root(:entry)
     end
 
     module ReadmePostProcessor
@@ -1687,10 +1714,70 @@ module Kettle
       end
     end
 
+    class ChecksumMode
+      VALID_TOKENS = %w[dest template ignore-dest ignore-template off].freeze
+      DEFAULT = "template,ignore-dest"
+
+      attr_reader :tokens
+
+      def self.parse(value)
+        new(value)
+      end
+
+      def initialize(value)
+        raw_tokens = value.to_s.strip.empty? ? DEFAULT.split(",") : value.to_s.split(",")
+        normalized = raw_tokens.map { |token| token.to_s.strip.downcase }.reject(&:empty?)
+        normalized = DEFAULT.split(",") if normalized.empty?
+        unknown = normalized - VALID_TOKENS
+        raise ArgumentError, "unknown --checksums mode(s): #{unknown.join(", ")}" unless unknown.empty?
+
+        if normalized.include?("off")
+          raise ArgumentError, "--checksums=off cannot be combined with other checksum modes" if normalized.length > 1
+
+          @tokens = ["off"]
+          return
+        end
+
+        normalized << "template" if normalized.include?("dest") && !normalized.include?("ignore-template") && !normalized.include?("template")
+        normalized << "ignore-dest" if normalized.include?("template") && !normalized.include?("dest") && !normalized.include?("ignore-dest")
+        if normalized.include?("dest") && normalized.include?("ignore-dest")
+          raise ArgumentError, "--checksums cannot combine dest and ignore-dest"
+        end
+        if normalized.include?("template") && normalized.include?("ignore-template")
+          raise ArgumentError, "--checksums cannot combine template and ignore-template"
+        end
+        if normalized.include?("ignore-dest") && normalized.include?("ignore-template")
+          raise ArgumentError, "--checksums=ignore-dest,ignore-template is equivalent to off; use --checksums=off"
+        end
+
+        @tokens = normalized.uniq
+      end
+
+      def off?
+        tokens.include?("off")
+      end
+
+      def check_template?
+        !off? && tokens.include?("template")
+      end
+
+      def check_destination?
+        !off? && tokens.include?("dest")
+      end
+
+      def to_s
+        tokens.join(",")
+      end
+    end
+
     module TemplateChecksums
       YAML_KEY = "kettle-jem"
       CHECKSUMS_SUBKEY = "checksums"
       VERSION_SUBKEY = "version"
+      APPLIED_AT_SUBKEY = "applied_at"
+      CHANGELOG_REPLAY_SUBKEY = "changelog_replay"
+      LAST_ENTRY_KEY_SUBKEY = "last_entry_key"
+      LAST_ENTRY_DATE_SUBKEY = "last_entry_date"
 
       module_function
 
@@ -1709,12 +1796,34 @@ module Kettle
       def load_stored(config_path:)
         return {} unless File.exist?(config_path.to_s)
 
-        data = YAML.safe_load_file(config_path.to_s, permitted_classes: [], aliases: false)
-        entry = data.is_a?(Hash) ? data[YAML_KEY] : nil
+        entry = load_state(config_path: config_path)
         stored = entry.is_a?(Hash) ? entry[CHECKSUMS_SUBKEY] : nil
         stored.is_a?(Hash) ? stored : {}
       rescue
         {}
+      end
+
+      def load_state(config_path:)
+        return {} unless File.exist?(config_path.to_s)
+
+        data = YAML.safe_load_file(config_path.to_s, permitted_classes: [], aliases: false)
+        entry = data.is_a?(Hash) ? data[YAML_KEY] : nil
+        entry.is_a?(Hash) ? entry : {}
+      rescue
+        {}
+      end
+
+      def remove_from_config(config_path:)
+        return false unless File.exist?(config_path.to_s)
+
+        content = File.read(config_path.to_s)
+        range = yaml_state_node_range(content)
+        return false unless range
+
+        lines = content.to_s.lines
+        updated = [*lines[0...range.begin], *lines[range.end..].to_a].join
+        File.write(config_path.to_s, updated.gsub(/\n{3,}/, "\n\n"))
+        true
       end
 
       def diff(current:, stored:)
@@ -1751,46 +1860,163 @@ module Kettle
         ]
       end
 
-      def build_yaml_block(checksums:, version: nil)
+      def build_yaml_block(checksums:, version: nil, applied_at: nil, changelog_replay: nil)
         lines = [YAML_KEY]
         lines[0] = "#{lines[0]}:"
-        lines << "  #{VERSION_SUBKEY}: #{version.to_s.dump}" if version
-        lines << "  #{CHECKSUMS_SUBKEY}:"
-        checksums.sort.each do |path, sha|
-          lines << "    #{path.dump}: #{sha.dump}"
-        end
+        lines.concat(build_yaml_state_lines(checksums: checksums, version: version, applied_at: applied_at, changelog_replay: changelog_replay).map { |line| "  #{line}" })
         lines.join("\n")
       end
 
-      def write_to_config(config_path:, checksums:, version: nil)
+      def build_yaml_state(checksums:, version: nil, applied_at: nil, changelog_replay: nil)
+        build_yaml_state_lines(
+          checksums: checksums,
+          version: version,
+          applied_at: applied_at,
+          changelog_replay: changelog_replay
+        ).join("\n")
+      end
+
+      def build_yaml_state_lines(checksums:, version: nil, applied_at: nil, changelog_replay: nil)
+        lines = []
+        lines << "#{VERSION_SUBKEY}: #{version.to_s.dump}" if version
+        lines << "#{APPLIED_AT_SUBKEY}: #{applied_at.to_s.dump}" if applied_at
+        if changelog_replay.is_a?(Hash) && !changelog_replay.empty?
+          lines << "#{CHANGELOG_REPLAY_SUBKEY}:"
+          last_entry_key = changelog_replay[LAST_ENTRY_KEY_SUBKEY] || changelog_replay[:last_entry_key]
+          last_entry_date = changelog_replay[LAST_ENTRY_DATE_SUBKEY] || changelog_replay[:last_entry_date]
+          lines << "  #{LAST_ENTRY_KEY_SUBKEY}: #{last_entry_key.to_s.dump}" if last_entry_key
+          lines << "  #{LAST_ENTRY_DATE_SUBKEY}: #{last_entry_date.to_s.dump}" if last_entry_date
+        end
+        lines << "#{CHECKSUMS_SUBKEY}:"
+        checksums.sort.each do |path, sha|
+          lines << "  #{path.dump}: #{sha.dump}"
+        end
+        lines
+      end
+
+      def write_to_config(config_path:, checksums:, version: nil, applied_at: nil, changelog_replay: nil)
         return unless File.exist?(config_path.to_s)
 
         content = File.read(config_path.to_s)
-        new_block = build_yaml_block(checksums: checksums, version: version)
-        updated = replace_top_level_yaml_block(content, YAML_KEY, "#{new_block}\n")
-        updated = "#{content.rstrip}\n\n#{new_block}\n" if updated == content
+        state = build_yaml_state(
+          checksums: checksums,
+          version: version,
+          applied_at: applied_at,
+          changelog_replay: changelog_replay
+        )
+        updated = merge_yaml_state(content, "#{YAML_KEY}:\n#{state.lines.map { |line| "  #{line}" }.join}")
         File.write(config_path.to_s, updated)
       end
 
-      def replace_top_level_yaml_block(content, key, replacement)
+      def merge_yaml_state(content, state_block)
+        range = yaml_state_node_range(content)
+        return "#{content.to_s.rstrip}\n\n#{state_block}\n" unless range
+
         lines = content.to_s.lines
-        document = Psych.parse_stream(content.to_s).children.first
-        root = document&.root
-        return content unless root.is_a?(Psych::Nodes::Mapping)
+        [*lines[0...range.begin], "#{state_block}\n", *lines[range.end..].to_a].join
+      end
 
-        pairs = root.children.each_slice(2).to_a
-        pairs.each_with_index do |(key_node, value_node), index|
-          next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+      def yaml_state_node_range(content)
+        require "yaml/merge"
 
-          next_key = pairs[index + 1]&.first
-          end_line = next_key&.start_line || value_node.end_line
-          end_line += 1 if end_line <= key_node.start_line
-          return [*lines[0...key_node.start_line], replacement, *lines[end_line..].to_a].join
+        analysis = Yaml::Merge::FileAnalysis.new(content.to_s)
+        raise Error, "could not parse kettle-jem config as YAML" unless analysis.valid?
+
+        body = analysis.documents.first&.body_node
+        return unless body&.mapping?
+
+        pairs = body.mapping_pairs
+        pairs.each_with_index do |pair, index|
+          next unless pair.key_name == YAML_KEY
+
+          start_index = pair.start_line.to_i - 1
+          next_pair = pairs[index + 1]
+          end_index = next_pair ? next_pair.start_line.to_i - 1 : [pair.end_line.to_i - 1, content.to_s.lines.length].min
+          return start_index...end_index
         end
 
-        content
-      rescue Psych::Exception
-        content
+        nil
+      end
+    end
+
+    module TemplateLock
+      VERSION = 1
+      TEMPLATE_STATE_KEY = "template_state"
+      FILES_KEY = "files"
+
+      module_function
+
+      def path(project_root)
+        File.join(project_root.to_s, KETTLE_LOCK_PATH)
+      end
+
+      def legacy_path(project_root)
+        File.join(project_root.to_s, LEGACY_KETTLE_LOCK_PATH)
+      end
+
+      def load(project_root:, config_path: nil)
+        lock_path = path(project_root)
+        legacy_lock_path = legacy_path(project_root)
+        lock = if File.exist?(lock_path)
+          data = YAML.safe_load_file(lock_path, permitted_classes: [], aliases: false)
+          data.is_a?(Hash) ? data : {}
+        elsif File.exist?(legacy_lock_path)
+          data = YAML.safe_load_file(legacy_lock_path, permitted_classes: [], aliases: false)
+          data.is_a?(Hash) ? data : {}
+        else
+          {}
+        end
+        legacy = config_path ? TemplateChecksums.load_state(config_path: config_path) : {}
+        merge_legacy(lock, legacy)
+      rescue
+        {}
+      end
+
+      def merge_legacy(lock, legacy)
+        return lock unless legacy.is_a?(Hash) && !legacy.empty?
+
+        merged = lock.dup
+        state = (merged[TEMPLATE_STATE_KEY].is_a?(Hash) ? merged[TEMPLATE_STATE_KEY].dup : {})
+        state["version"] ||= legacy[TemplateChecksums::VERSION_SUBKEY]
+        state["applied_at"] ||= legacy[TemplateChecksums::APPLIED_AT_SUBKEY]
+        state["changelog_replay"] ||= legacy[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY] if legacy[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
+        state["checksums"] ||= legacy[TemplateChecksums::CHECKSUMS_SUBKEY] if legacy[TemplateChecksums::CHECKSUMS_SUBKEY]
+        merged["version"] ||= VERSION
+        merged[TEMPLATE_STATE_KEY] = state unless state.empty?
+        merged[FILES_KEY] ||= {}
+        merged
+      end
+
+      def write(project_root:, lock:)
+        lock_path = path(project_root)
+        FileUtils.mkdir_p(File.dirname(lock_path))
+        File.write(lock_path, "#{YAML.dump(lock)}")
+      end
+
+      def remove_legacy(project_root)
+        legacy_lock_path = legacy_path(project_root)
+        return false unless File.exist?(legacy_lock_path)
+
+        File.delete(legacy_lock_path)
+        true
+      end
+
+      def files(lock)
+        value = lock.is_a?(Hash) ? lock[FILES_KEY] : nil
+        value.is_a?(Hash) ? value : {}
+      end
+
+      def file_record(lock, relative_path)
+        record = files(lock)[relative_path.to_s]
+        record.is_a?(Hash) ? record : {}
+      end
+
+      def build_lock(template_state:, file_records:)
+        {
+          "version" => VERSION,
+          TEMPLATE_STATE_KEY => template_state,
+          FILES_KEY => file_records.sort.to_h
+        }
       end
     end
 
@@ -3201,8 +3427,8 @@ module Kettle
         )
         facts[:readme_style] = readme_style unless readme_style.empty?
         facts[:ruby_style] = ruby_style_facts(project_root)
-        changelog_transfers = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
-        facts[:changelog] = {transfer_entries: changelog_transfers} unless changelog_transfers.empty?
+        changelog = changelog_transfer_facts(project_root, changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT))
+        facts[:changelog] = changelog unless changelog.empty?
         gemspec_facts = gemspec_template_facts(kettle_config)
         facts[:gemspec] = gemspec_facts unless gemspec_facts.empty?
         template_tokens = template_tokens(facts, funding)
@@ -3528,6 +3754,7 @@ module Kettle
       with_event_phase(events, "runtime_dependencies") { ensure_runtime_dependencies! }
       with_event_phase(events, "preflight") { preflight_project!(project_root) }
       template_selection = with_event_phase(events, "template_selection") { template_selection_for(env, run_options) }
+      checksum_mode = with_event_phase(events, "checksum_mode") { checksum_mode_for(env, run_options) }
       decision_policy = with_event_phase(events, "decision_policy") { decision_policy_for(env, run_options) }
       git_preflight = with_event_phase(events, "git_preflight") do
         git_preflight_report(project_root, template_selection: template_selection)
@@ -3561,6 +3788,10 @@ module Kettle
           stats: recipe_planning_execution
         )
       end
+      template_lock = with_event_phase(events, "template_lock") { template_lock_state(project_root) }
+      recipe_reports = with_event_phase(events, "checksum_skip") do
+        apply_checksum_skips(project_root, recipe_reports, checksum_mode: checksum_mode, template_lock: template_lock)
+      end
       plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
       changed_files = changed_files_from_recipe_reports(recipe_reports)
       diagnostics = recipe_reports.flat_map { |report| report[:diagnostics] }
@@ -3592,6 +3823,8 @@ module Kettle
           recipe_planning_thread_workers: recipe_planning_thread_workers,
           recipe_planning_execution: recipe_planning_execution,
           decision_policy: decision_policy.to_h,
+          checksum_mode: checksum_mode.to_s,
+          template_lock: template_lock,
           template_selection: template_selection,
           git_preflight: git_preflight,
           decision_evaluations: decision_evaluations,
@@ -3614,6 +3847,137 @@ module Kettle
         latest_by_path[path] = report if path
       end
       latest_by_path.values.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
+    end
+
+    def checksum_mode_for(env, run_options)
+      raw = (run_options || {})[:checksums] ||
+        (run_options || {})["checksums"] ||
+        (env || {})["KETTLE_JEM_CHECKSUMS"]
+      ChecksumMode.parse(raw)
+    end
+
+    def template_lock_state(project_root)
+      TemplateLock.load(project_root: project_root, config_path: kettle_jem_config_path(project_root))
+    end
+
+    def apply_checksum_skips(project_root, recipe_reports, checksum_mode:, template_lock:)
+      return recipe_reports if checksum_mode.off?
+
+      recipe_reports.map do |report|
+        next report unless checksum_skip_report?(project_root, report, checksum_mode: checksum_mode, template_lock: template_lock)
+
+        skipped = deep_dup(report)
+        skipped[:changed] = false
+        skipped[:checksum_skipped] = true
+        skipped[:metadata] = deep_dup(skipped.fetch(:metadata, {})).merge(
+          checksum_skip: {
+            mode: checksum_mode.to_s,
+            reason: "lock_match"
+          }
+        )
+        skipped
+      end
+    end
+
+    def checksum_skip_report?(project_root, report, checksum_mode:, template_lock:)
+      return false unless report[:changed]
+      return false unless checksum_cache_safe_report?(report)
+
+      relative_path = report.fetch(:relative_path).to_s
+      record = TemplateLock.file_record(template_lock, relative_path)
+      return false if record.empty?
+
+      if checksum_mode.check_template?
+        expected = record["input_fingerprint"].to_s
+        return false if expected.empty?
+        return false unless expected == template_input_fingerprint(project_root, report)
+      end
+      if checksum_mode.check_destination?
+        expected = record["dest_sha256"].to_s
+        return false if expected.empty?
+        return false unless expected == destination_file_sha256(project_root, relative_path).to_s
+      end
+      true
+    end
+
+    def checksum_cache_safe_report?(report)
+      metadata = report.fetch(:metadata, {})
+      preference = metadata[:template_source_preference] || metadata["template_source_preference"]
+      return false unless preference.is_a?(Hash)
+      return false if report.dig(:metadata, :delete_file) || report.dig(:metadata, "delete_file")
+
+      primitive = report.dig(:request_envelope, :request, :recipe_name).to_s
+      primitive == "supplied_template_source_application"
+    end
+
+    def template_input_fingerprint(project_root, report)
+      Digest::SHA256.hexdigest(JSON.generate(template_input_fingerprint_payload(project_root, report)))
+    end
+
+    def template_input_fingerprint_payload(project_root, report)
+      metadata = report.fetch(:metadata, {})
+      preference = metadata[:template_source_preference] || metadata["template_source_preference"] || {}
+      tokens = stringify_keys_for_json(metadata[:template_tokens] || metadata["template_tokens"] || {})
+      source_path = template_source_absolute_path(project_root, preference)
+      # This payload is the per-destination "template checksum" used by
+      # --checksums=template. It intentionally includes the selected template
+      # source SHA, recipe identity/version, resolved token digest, and
+      # kettle-jem implementation SHA. The coarse template_state.checksums
+      # inventory records whole-template-tree drift, but it is not consulted
+      # for skip decisions because unrelated template files should not force a
+      # destination file to retemplate.
+      {
+        kettle_jem_version: VERSION,
+        kettle_jem_implementation_sha256: Digest::SHA256.file(__FILE__).hexdigest,
+        recipe_name: report[:recipe_name].to_s,
+        request_recipe_name: report.dig(:request_envelope, :request, :recipe_name).to_s,
+        recipe_version: report.dig(:request_envelope, :request, :recipe_version).to_s,
+        relative_path: report.fetch(:relative_path).to_s,
+        template_source: template_source_lock_path(preference),
+        template_source_sha256: (source_path && File.file?(source_path)) ? Digest::SHA256.file(source_path).hexdigest : "",
+        template_source_preference: stringify_keys_for_json(preference),
+        template_token_keys: tokens.keys.sort,
+        template_tokens_sha256: Digest::SHA256.hexdigest(JSON.generate(tokens))
+      }
+    end
+
+    def template_source_absolute_path(project_root, preference)
+      return unless preference.is_a?(Hash)
+
+      root = preference[:source_root_path] || preference["source_root_path"] || project_root
+      relative = preference[:source_relative_path] || preference["source_relative_path"] ||
+        preference[:selected_source] || preference["selected_source"]
+      return if relative.to_s.empty?
+
+      File.join(root.to_s, relative.to_s)
+    end
+
+    def template_source_lock_path(preference)
+      return "" unless preference.is_a?(Hash)
+
+      (preference[:source_relative_path] || preference["source_relative_path"] ||
+        preference[:selected_source] || preference["selected_source"]).to_s
+    end
+
+    def destination_file_sha256(project_root, relative_path)
+      path = File.join(project_root.to_s, relative_path.to_s)
+      return unless File.file?(path)
+
+      Digest::SHA256.file(path).hexdigest
+    end
+
+    def stringify_keys_for_json(value)
+      case value
+      when Hash
+        value.keys.map(&:to_s).sort.to_h do |key|
+          raw_value = value.key?(key) ? value[key] : value[key.to_sym]
+          [key, stringify_keys_for_json(raw_value)]
+        end
+      when Array
+        value.map { |entry| stringify_keys_for_json(entry) }
+      else
+        value
+      end
     end
 
     def recipe_planning_strategy_for(env, run_options)
@@ -4023,7 +4387,7 @@ module Kettle
         emit_step_events(events, "post_apply_step", report.fetch(:post_apply_steps), phase: "post_apply")
       end
       report[:changed_files] = (report.fetch(:changed_files, []) + report.fetch(:post_apply_steps).flat_map do |step|
-        step.fetch(:changed_files, [])
+        reported_post_apply_changed_files(step)
       end).uniq.sort
       report[:duplicate_drift] = with_event_phase(events, "duplicate_drift") do
         if DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
@@ -4046,20 +4410,22 @@ module Kettle
     end
 
     def event_stream(io, types: nil)
-      EventStream.new(io, types: parse_event_types(types))
+      Kettle::Ndjson.event_stream(
+        io,
+        types: types,
+        event_types: EVENT_TYPES,
+        aliases: EVENT_TYPE_ALIASES
+      )
     end
 
     def parse_event_types(types)
-      tokens = Array(types).flat_map { |value| value.to_s.split(",") }.map(&:strip).reject(&:empty?)
-      tokens = ["default"] if tokens.empty?
-      expanded = tokens.flat_map do |token|
-        normalized = token.tr("-", "_")
-        EVENT_TYPE_ALIASES.fetch(normalized, normalized)
-      end.uniq
-      unknown = expanded - EVENT_TYPES
-      raise ArgumentError, "Unknown event type(s): #{unknown.join(", ")}. Supported event types: #{EVENT_TYPES.join(", ")}" unless unknown.empty?
-
-      expanded
+      Kettle::Ndjson.normalize_event_types(
+        Array(types).join(","),
+        event_types: EVENT_TYPES,
+        aliases: EVENT_TYPE_ALIASES
+      )
+    rescue Kettle::Ndjson::UnknownEventTypeError => error
+      raise ArgumentError, "#{error.message}. Supported event types: #{EVENT_TYPES.join(", ")}"
     end
 
     def event_stream_from_options(run_options)
@@ -4069,7 +4435,7 @@ module Kettle
 
       stream = options[:event_stream] || options["event_stream"]
       phase_timings = options[:phase_timings] ||= []
-      recorder = EventRecorder.new(stream.respond_to?(:emit) ? stream : nil, phase_timings)
+      recorder = Kettle::Ndjson.event_recorder(stream.respond_to?(:emit) ? stream : nil, phase_timings: phase_timings)
       options[:event_recorder] = recorder if options.respond_to?(:[]=)
       recorder
     end
@@ -4098,20 +4464,11 @@ module Kettle
     end
 
     def record_phase_timing(events, phase, status:, duration_ms:, payload:)
-      return unless events.respond_to?(:record_phase_timing)
-
-      events.record_phase_timing(
-        payload.merge(
-          phase: phase.to_s,
-          status: status,
-          duration_ms: duration_ms
-        )
-      )
+      Kettle::Ndjson.record_phase_timing(events, phase, status: status, duration_ms: duration_ms, payload: payload)
     end
 
     def emit_phase_event(events, phase, status:, **payload)
-      event_type = (status == "started") ? "phase_start" : "phase_finish"
-      emit_event(events, event_type, payload.merge(phase: phase.to_s, status: status))
+      Kettle::Ndjson.emit_phase_event(events, phase, status: status, **payload)
     end
 
     def emit_recipe_event(events, report, index:, total:)
@@ -4233,6 +4590,12 @@ module Kettle
       payload.fetch(key, payload.fetch(key.to_s, nil))
     end
 
+    def reported_post_apply_changed_files(step)
+      return [] if event_payload_value(step, :metadata_only)
+
+      Array(event_payload_value(step, :changed_files) || [])
+    end
+
     def emit_summary_event(events, report)
       emit_event(
         events,
@@ -4247,40 +4610,7 @@ module Kettle
     end
 
     def emit_event(events, type, payload = {})
-      return unless events
-
-      events.emit(payload.merge(type: type, event_version: 1))
-    end
-
-    class EventStream
-      def initialize(io, types:)
-        @io = io
-        @types = types
-      end
-
-      def emit(payload)
-        return unless @types.include?(payload.fetch(:type).to_s)
-
-        @io.puts(JSON.generate(payload.compact))
-        @io.flush if @io.respond_to?(:flush)
-      end
-    end
-
-    class EventRecorder
-      def initialize(stream, phase_timings)
-        @stream = stream
-        @phase_timings = phase_timings
-      end
-
-      attr_reader :phase_timings
-
-      def emit(payload)
-        @stream.emit(payload) if @stream
-      end
-
-      def record_phase_timing(payload)
-        @phase_timings << payload.compact
-      end
+      Kettle::Ndjson.emit_event(events, type, payload)
     end
 
     def snapshot_changed_files(project_root, changed_files)
@@ -4304,11 +4634,12 @@ module Kettle
 
     def post_apply_steps(project_root, report)
       [
-        template_version_gem_bootstrap_step(project_root, report),
+        *[template_version_gem_bootstrap_step(project_root, report)].flatten,
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
         git_hooks_executable_step(project_root),
         github_actions_pin_sync_step(project_root),
-        monorepo_subgem_kettle_config_profile_sync_step(project_root, report)
+        monorepo_subgem_kettle_config_profile_sync_step(project_root, report),
+        kettle_jem_state_sync_step(project_root, report)
       ].compact
     end
 
@@ -4371,6 +4702,98 @@ module Kettle
         status: (after == before) ? "already_current" : "applied",
         changed_files: (after == before) ? [] : [KETTLE_CONFIG_PATH]
       }
+    end
+
+    def kettle_jem_state_sync_step(project_root, report)
+      config_path = kettle_jem_config_path(project_root)
+      return unless File.file?(config_path)
+
+      relative_config_path = config_path.delete_prefix("#{project_root}/")
+      lock_path = TemplateLock.path(project_root)
+      relative_lock_path = lock_path.delete_prefix("#{project_root}/")
+      legacy_lock_path = TemplateLock.legacy_path(project_root)
+      relative_legacy_lock_path = legacy_lock_path.delete_prefix("#{project_root}/")
+      legacy_lock_existed = File.exist?(legacy_lock_path)
+      before_config = File.read(config_path)
+      before_lock = File.exist?(lock_path) ? File.read(lock_path) : nil
+      latest_replay = report.dig(:facts, :changelog, :latest_transfer_entry)
+      existing_state = TemplateLock.load(project_root: project_root, config_path: config_path)
+      existing_replay = existing_state.dig(TemplateLock::TEMPLATE_STATE_KEY, TemplateChecksums::CHANGELOG_REPLAY_SUBKEY)
+      changelog_replay = if latest_replay
+        {
+          TemplateChecksums::LAST_ENTRY_KEY_SUBKEY => latest_replay.fetch(:key),
+          TemplateChecksums::LAST_ENTRY_DATE_SUBKEY => changelog_transfer_key_date(latest_replay.fetch(:key))
+        }
+      elsif existing_replay.is_a?(Hash)
+        existing_replay
+      end
+      template_state = {
+        "version" => VERSION,
+        "applied_at" => Time.now.utc.strftime("%Y-%m-%d"),
+        TemplateChecksums::CHANGELOG_REPLAY_SUBKEY => changelog_replay,
+        TemplateChecksums::CHECKSUMS_SUBKEY => TemplateChecksums.compute(
+          template_root: template_root_path(project_root, config: kettle_jem_config(project_root))
+        )
+      }.compact
+      file_records = checksum_file_records(project_root, report, existing_state)
+      TemplateLock.write(
+        project_root: project_root,
+        lock: TemplateLock.build_lock(template_state: template_state, file_records: file_records)
+      )
+      TemplateLock.remove_legacy(project_root)
+      TemplateChecksums.remove_from_config(config_path: config_path)
+      after_config = File.read(config_path)
+      after_lock = File.read(lock_path)
+      if after_config != before_config
+        config_report = report.fetch(:recipe_reports, []).find { |entry| entry.fetch(:relative_path, nil) == relative_config_path }
+        config_report[:final_content] = after_config if config_report
+        config_report&.dig(:report_envelope, :report)&.[]=(:final_content, after_config)
+      end
+      changed_files = []
+      changed_files << relative_config_path if after_config != before_config
+      changed_files << relative_lock_path if after_lock != before_lock
+      changed_files << relative_legacy_lock_path if legacy_lock_existed
+      {
+        name: "kettle_jem_state_sync",
+        path: relative_lock_path,
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files,
+        metadata_only: true
+      }
+    end
+
+    def checksum_file_records(project_root, report, existing_state)
+      existing_records = TemplateLock.files(existing_state)
+      report.fetch(:recipe_reports, []).each_with_object(existing_records.dup) do |recipe_report, records|
+        next unless checksum_cache_safe_report?(recipe_report)
+
+        relative_path = recipe_report.fetch(:relative_path).to_s
+        existing = records[relative_path].is_a?(Hash) ? records[relative_path].dup : {}
+        if recipe_report[:checksum_skipped]
+          records[relative_path] = existing.merge(
+            "recipe" => recipe_report[:recipe_name].to_s,
+            "input_fingerprint" => template_input_fingerprint(project_root, recipe_report),
+            "template_sources" => [template_source_lock_path(
+              recipe_report.dig(:metadata, :template_source_preference) ||
+                recipe_report.dig(:metadata, "template_source_preference") ||
+                {}
+            )].reject(&:empty?)
+          )
+          next
+        end
+
+        records[relative_path] = {
+          "recipe" => recipe_report[:recipe_name].to_s,
+          "action" => recipe_report.dig(:metadata, :delete_file) ? "delete" : "write",
+          "dest_sha256" => destination_file_sha256(project_root, relative_path),
+          "input_fingerprint" => template_input_fingerprint(project_root, recipe_report),
+          "template_sources" => [template_source_lock_path(
+            recipe_report.dig(:metadata, :template_source_preference) ||
+              recipe_report.dig(:metadata, "template_source_preference") ||
+              {}
+          )].reject(&:empty?)
+        }.compact
+      end
     end
 
     def sync_kettle_config_monorepo_subgem_profile(content, gemspec_path, profile)
@@ -4477,14 +4900,15 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.0"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.3", ">= 2.3.9"\n)},
-        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.6"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.5", ">= 2.5.0"\n)},
+        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.7"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.0"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
-        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.12"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.15"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
-        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.6"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.0"\n)}
+        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.7"\n)},
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.3"\n)}
       ].freeze
     end
 
@@ -4526,7 +4950,10 @@ module Kettle
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
       unless project_gemspec_declares_version_gem?(project_root)
-        return legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
+        return [
+          version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: false),
+          legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
+        ].compact
       end
 
       return version_gem_cleanup_step(project_root, facts) unless version_gem_runtime_compatible?(facts)
@@ -4562,23 +4989,28 @@ module Kettle
       }
     end
 
-    def version_gem_cleanup_step(project_root, facts)
+    def version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: true)
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_gem_cleanup", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
 
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
+      changed_files = []
       current = read_project_file(project_root, entrypoint_path)
-      return {name: "version_gem_cleanup", status: "already_current", changed_files: []} if current.empty?
-
-      cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
-      changed = write_if_changed(project_root, entrypoint_path, cleaned)
+      if cleanup_entrypoint && !current.empty?
+        cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
+        changed_files << write_if_changed(project_root, entrypoint_path, cleaned)
+      end
+      changed_files << cleanup_version_gem_version_spec(project_root, version_spec_path)
+      changed_files.compact!
       {
         name: "version_gem_cleanup",
-        status: changed ? "applied" : "already_current",
-        changed_files: changed ? [changed] : [],
-        entrypoint_path: entrypoint_path
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files,
+        entrypoint_path: entrypoint_path,
+        version_spec_path: version_spec_path
       }
     end
 
@@ -5025,32 +5457,165 @@ module Kettle
       lines
     end
 
+    def changelog_transfer_facts(project_root, entries)
+      all_entries = Array(entries)
+      latest = latest_changelog_transfer_entry(all_entries)
+      lock = TemplateLock.load(project_root: project_root, config_path: kettle_jem_config_path(project_root))
+      state = lock[TemplateLock::TEMPLATE_STATE_KEY]
+      state = state.is_a?(Hash) ? state : {}
+      replay = state[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
+      replay = replay.is_a?(Hash) ? replay : {}
+      last_key = replay[TemplateChecksums::LAST_ENTRY_KEY_SUBKEY].to_s
+      applied_keys = changelog_transfer_applied_keys(project_root)
+      selected_entries = if state.empty?
+        [CHANGELOG_INITIAL_TEMPLATE_ENTRY]
+      elsif !last_key.empty?
+        all_entries.select do |entry|
+          key = entry.fetch(:key).to_s
+          key > last_key || !applied_keys.include?(key)
+        end
+      else
+        all_entries
+      end
+
+      {
+        transfer_entries: selected_entries,
+        latest_transfer_entry: latest,
+        first_template: state.empty?
+      }.compact
+    end
+
+    def transfer_changelog_lag(last_entry_key = nil, verbose: false)
+      all_entries = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
+      latest = latest_changelog_transfer_entry(all_entries)
+      missing = if last_entry_key.to_s.empty?
+        all_entries
+      else
+        changelog_transfer_entries_after(all_entries, last_entry_key)
+      end
+      result = {
+        last_entry_key: last_entry_key.to_s.empty? ? nil : last_entry_key.to_s,
+        latest_entry_key: latest&.fetch(:key),
+        missing_count: missing.size
+      }.compact
+      result[:missing_entries] = missing if verbose
+      result
+    end
+
+    def transfer_changelog_entries
+      changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
+    end
+
+    def latest_changelog_transfer_entry(entries)
+      Array(entries).last
+    end
+
+    def changelog_transfer_applied_keys(project_root)
+      path = File.join(project_root.to_s, "CHANGELOG.md")
+      return Set.new unless File.file?(path)
+
+      changelog_transfer_keys(File.read(path))
+    end
+
+    def changelog_transfer_entries_after(entries, key)
+      all_entries = Array(entries)
+      index = all_entries.index { |entry| entry.fetch(:key).to_s == key.to_s }
+      return all_entries if index.nil?
+
+      all_entries[(index + 1)..].to_a
+    end
+
+    def changelog_transfer_key_date(key)
+      parsed = parse_changelog_transfer_key(key)
+      return nil unless parsed
+
+      date = parsed.fetch(:date)
+      "#{date[0, 4]}-#{date[4, 2]}-#{date[6, 2]}"
+    end
+
     def changelog_transfer_entries(template_root)
       path = File.join(template_root, TRANSFER_CHANGELOG_TEMPLATE_PATH)
       return [] unless File.file?(path)
 
-      lines = markdown_source_lines(File.read(path))
-      entries = []
-      index = 0
-      while index < lines.length
-        line = lines.fetch(index)
-        unless changelog_bullet_line?(line)
-          index += 1
-          next
-        end
-
-        item_lines, index = collect_changelog_list_item(lines, index)
-        key = changelog_transfer_key(item_lines.first)
-        next unless key
-
-        entries << {key: key, lines: item_lines}
+      content = File.read(path)
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: path)
+      sections = context.structural_owners(owner_scope: :heading_sections).select do |owner|
+        owner.level == 2 && changelog_transfer_section_map.key?(owner.heading_text.to_s.strip)
       end
-      entries
+      list_items = context.structural_owners(owner_scope: :list_items)
+      ordered_sections = sections.sort_by { |section| section.location.start_line }
+      entries = ordered_sections.each_with_index.flat_map do |section, index|
+        heading = changelog_transfer_section_map.fetch(section.heading_text.to_s.strip)
+        next_section = ordered_sections[index + 1]
+        section_end_line = next_section ? next_section.location.start_line - 1 : section.location.end_line
+        list_items.filter_map do |item|
+          next unless item.depth == 1
+          next unless item.location.start_line > section.location.start_line
+          next unless item.location.end_line <= section_end_line
+
+          payload = changelog_transfer_list_item_payload(item.source)
+          parsed = parse_changelog_transfer_line(payload)
+          {
+            key: parsed.fetch(:key),
+            section: heading,
+            lines: item.source.lines.map { |line| line.chomp.rstrip }
+          }
+        end
+      end
+      validate_changelog_transfer_entries!(entries, path)
+      entries.sort_by { |entry| entry.fetch(:key).to_s }
+    end
+
+    def changelog_transfer_section_map
+      CHANGELOG_STANDARD_HEADINGS.to_h do |heading|
+        [heading.delete_prefix("### ").strip, heading]
+      end
+    end
+
+    def changelog_transfer_line_parser
+      @changelog_transfer_line_parser ||= TransferChangelogLineParser.new
+    end
+
+    def changelog_transfer_list_item_payload(source)
+      stripped = source.to_s.lines.first.to_s.lstrip.chomp
+      %w[- *].each do |marker|
+        prefix = "#{marker} "
+        return stripped.delete_prefix(prefix) if stripped.start_with?(prefix)
+      end
+
+      stripped
+    end
+
+    def parse_changelog_transfer_line(payload)
+      parsed = changelog_transfer_line_parser.parse(payload.to_s)
+      key_data = parsed.fetch(:key)
+      date = key_data.fetch(:date).to_s
+      sequence = key_data.fetch(:sequence).to_s
+      {
+        key: "kettle-jem-template-#{date}-#{sequence}",
+        date: date,
+        sequence: sequence,
+        message: parsed.fetch(:message).to_s
+      }
+    end
+
+    def parse_changelog_transfer_key(key)
+      parse_changelog_transfer_line("#{key} - placeholder")
+    rescue Parslet::ParseFailed
+      nil
+    end
+
+    def validate_changelog_transfer_entries!(entries, path)
+      keys = entries.map { |entry| entry.fetch(:key).to_s }
+      duplicates = keys.tally.select { |_key, count| count > 1 }.keys
+      raise Error, "Duplicate transfer changelog key(s) in #{path}: #{duplicates.join(", ")}" if duplicates.any?
     end
 
     def changelog_transfer_key(line)
-      key = line.to_s.lstrip.delete_prefix("- ").delete_prefix("* ").split(CHANGELOG_TRANSFER_KEY_SEPARATOR, 2).first.to_s
-      key.match?(CHANGELOG_TRANSFER_KEY_PATTERN) ? key : nil
+      payload = changelog_transfer_list_item_payload(line)
+      parse_changelog_transfer_line(payload)&.fetch(:key)
+    rescue Parslet::ParseFailed
+      nil
     end
 
     def apply_changelog_transfer_entries(content, entries)
@@ -5060,6 +5625,7 @@ module Kettle
       return ensure_trailing_newline(content) if transfer_entries.empty?
 
       normalized = normalize_changelog(content, {})
+      normalized = refresh_existing_changelog_transfer_entries(normalized, transfer_entries)
       existing_keys = changelog_transfer_keys(normalized)
       missing = transfer_entries.reject { |entry| existing_keys.include?(entry.fetch(:key)) }
       return ensure_trailing_newline(normalized) if missing.empty?
@@ -5071,17 +5637,119 @@ module Kettle
       destination_end = changelog_unreleased_end_index(lines, unreleased)
       destination_body = lines[(unreleased + 1)...destination_end] || []
       items = changelog_unreleased_items(destination_body)
-      items["### Changed"] ||= []
-      items["### Changed"].pop while items["### Changed"].any? && items["### Changed"].last.to_s.strip.empty?
-      items["### Changed"] << "" if items["### Changed"].any?
-      missing.each do |entry|
-        items["### Changed"].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+      missing.group_by { |entry| entry.fetch(:section, "### Changed") }.each do |section, section_entries|
+        section = CHANGELOG_STANDARD_HEADINGS.include?(section) ? section : "### Changed"
+        items[section] ||= []
+        items[section].pop while items[section].any? && items[section].last.to_s.strip.empty?
+        items[section] << "" if items[section].any?
+        section_entries.each do |entry|
+          items[section].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+        end
       end
 
       merged_lines = lines[0...unreleased] +
         build_changelog_unreleased_section(lines.fetch(unreleased), items) +
         lines[destination_end..].to_a
       ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def refresh_existing_changelog_transfer_entries(content, entries)
+      entry_by_key = entries.to_h { |entry| [entry.fetch(:key).to_s, entry] }
+      lines = markdown_source_lines(content)
+      found = {}
+      removals = changelog_existing_transfer_occurrences(content).filter_map do |occurrence|
+        key = occurrence.fetch(:key).to_s
+        next unless entry_by_key.key?(key)
+
+        found[key] = occurrence.fetch(:release_heading)
+        (occurrence.fetch(:start_line)..occurrence.fetch(:end_line))
+      end
+      return content if found.empty?
+
+      cleaned = lines.each_with_index.reject do |_line, index|
+        line_number = index + 1
+        removals.any? { |range| range.cover?(line_number) }
+      end.map(&:first)
+      grouped_entries = found.each_with_object({}) do |(key, heading), grouped|
+        grouped[heading] ||= []
+        grouped[heading] << entry_by_key.fetch(key)
+      end
+      grouped_entries.reduce(cleaned) do |current_lines, (heading, heading_entries)|
+        insert_changelog_transfer_entries_in_release(current_lines, heading, heading_entries)
+      end.join("\n").then { |text| ensure_trailing_newline(text.gsub(/\n{3,}/, "\n\n")) }
+    end
+
+    def changelog_existing_transfer_occurrences(content)
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "CHANGELOG.md")
+      release_sections = context.structural_owners(owner_scope: :heading_sections)
+        .select { |owner| owner.level == 2 }
+        .sort_by { |owner| owner.location.start_line }
+      list_items = context.structural_owners(owner_scope: :list_items)
+      list_items.filter_map do |item|
+        next unless item.depth == 1
+
+        key = changelog_transfer_key(item.source)
+        next unless key
+
+        release = changelog_release_section_for_item(release_sections, item)
+        next unless release
+
+        {
+          key: key,
+          release_heading: "## #{release.heading_text}",
+          start_line: item.location.start_line,
+          end_line: item.location.end_line
+        }
+      end
+    end
+
+    def changelog_release_section_for_item(release_sections, item)
+      release_sections.each_with_index.find do |section, index|
+        next_section = release_sections[index + 1]
+        section_end_line = next_section ? next_section.location.start_line - 1 : section.location.end_line
+        item.location.start_line > section.location.start_line &&
+          item.location.end_line <= section_end_line
+      end&.first
+    end
+
+    def insert_changelog_transfer_entries_in_release(lines, heading, entries)
+      heading_index = lines.index { |line| line.to_s == heading.to_s }
+      heading_index = changelog_unreleased_line_index(lines) if heading_index.nil?
+      return lines if heading_index.nil?
+
+      release_end = changelog_unreleased_end_index(lines, heading_index)
+      release_body = lines[(heading_index + 1)...release_end] || []
+      release_preamble = changelog_section_preamble(release_body)
+      items = changelog_unreleased_items(release_body)
+      entries.group_by { |entry| entry.fetch(:section, "### Changed") }.each do |section, section_entries|
+        section = CHANGELOG_STANDARD_HEADINGS.include?(section) ? section : "### Changed"
+        items[section] ||= []
+        items[section].pop while items[section].any? && items[section].last.to_s.strip.empty?
+        items[section] << "" if items[section].any?
+        section_entries.each do |entry|
+          items[section].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+        end
+      end
+
+      lines[0...heading_index] +
+        build_changelog_section(lines.fetch(heading_index), release_preamble, items) +
+        lines[release_end..].to_a
+    end
+
+    def changelog_section_preamble(body_lines)
+      body_lines.take_while { |line| !line.to_s.start_with?("### ") }.map(&:rstrip)
+    end
+
+    def build_changelog_section(heading, preamble, items)
+      lines = [heading.rstrip, ""]
+      preamble_lines = Array(preamble).map(&:rstrip)
+      preamble_lines.pop while preamble_lines.any? && preamble_lines.last.to_s.strip.empty?
+      if preamble_lines.any?
+        lines.concat(preamble_lines)
+        lines << ""
+      end
+      section_lines = build_changelog_unreleased_section(heading, items)
+      lines.concat(section_lines.drop(2))
     end
 
     def changelog_transfer_keys(content)
@@ -5102,7 +5770,7 @@ module Kettle
       while index < lines.length
         current = lines.fetch(index).to_s
         current_indent = current.length - current.lstrip.length
-        break if !in_fence && current.start_with?("### ")
+        break if !in_fence && changelog_heading_line?(current)
         break if !in_fence && changelog_bullet_line?(current) && current_indent <= base_indent
 
         if current.lstrip.start_with?("```")
@@ -5118,6 +5786,12 @@ module Kettle
         index += 1
       end
       [item_lines, index]
+    end
+
+    def changelog_heading_line?(line)
+      stripped = line.to_s.lstrip
+      marker, text = stripped.split(" ", 2)
+      !text.to_s.empty? && marker.to_s.each_char.all? { |char| char == "#" }
     end
 
     def changelog_unreleased_heading?(heading_text)
@@ -6264,6 +6938,7 @@ module Kettle
 
         output = finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(output, facts), facts) if github_workflow_template_recipe?(recipe)
         output = normalize_simplecov_template_source(output) if recipe.fetch(:target_path).to_s == ".simplecov"
+        output = normalize_spec_helper_simplecov_template_source(output) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
         return output
       end
 
@@ -6287,9 +6962,11 @@ module Kettle
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
         output = deduplicate_main_gemfile_direct_sibling_blocks(output)
         output = ensure_main_gemfile_nomono_bootstrap(output, template_content)
-        output = normalize_main_gemfile_nomono_requirements(output)
+        output = normalize_main_gemfile_nomono_declaration(output)
+        output = deduplicate_main_gemfile_eval_gemfiles(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
+      output = normalize_local_gemfile_nomono_bootstrap(output) if local_gemfile_template_recipe?(recipe)
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
@@ -6389,12 +7066,11 @@ module Kettle
 
     def main_gemfile_nomono_bootstrap_source(template_content)
       records = main_gemfile_nomono_requirement_records(template_content)
-      assignment = records.fetch(:assignments).first
       call = records.fetch(:calls).first
-      return "" unless assignment && call
+      return "" unless call
 
       lines = template_content.to_s.lines
-      start_line = assignment.fetch(:start_line)
+      start_line = call.fetch(:start_line)
       previous = lines[start_line - 2].to_s
       start_line -= 1 if previous.strip.start_with?("# Local workspace dependency wiring")
       lines[(start_line - 1)..(call.fetch(:end_line) - 1)].join.rstrip + "\n\n"
@@ -6416,11 +7092,45 @@ module Kettle
       ruby_call_records(content, :gemspec).map { |call| ruby_node_source_end_line(call) + 1 }.min
     end
 
-    def normalize_main_gemfile_nomono_requirements(content)
-      records = main_gemfile_nomono_requirement_records(content)
-      return content if records.fetch(:calls).empty? || records.fetch(:assignments).empty?
+    def deduplicate_main_gemfile_eval_gemfiles(content)
+      records = ruby_call_records(content, :eval_gemfile).filter_map do |call|
+        path = ruby_string_argument(call)
+        next unless path
 
-      assignment_source = records.fetch(:assignments).first.fetch(:source).strip
+        {
+          path: path,
+          start_line: gemfile_eval_comment_start_line(content.to_s.lines, call.location.start_line),
+          end_line: ruby_node_source_end_line(call)
+        }
+      end
+      return content if records.length <= 1
+
+      seen = Set.new
+      duplicate_records = []
+      records.reverse_each do |record|
+        path = record.fetch(:path)
+        if seen.include?(path)
+          duplicate_records << record
+        else
+          seen.add(path)
+        end
+      end
+      return content if duplicate_records.empty?
+
+      duplicate_records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
+    end
+
+    def normalize_main_gemfile_nomono_declaration(content)
+      records = main_gemfile_nomono_requirement_records(content)
+      return content if records.fetch(:calls).empty?
+
       output = records.fetch(:assignments).sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |memo, record|
         replace_source_range_lines(
           memo,
@@ -6429,13 +7139,11 @@ module Kettle
           ""
         )
       end
-      call = main_gemfile_nomono_requirement_records(output).fetch(:calls).first
-      return output unless call
+      main_gemfile_nomono_requirement_records(output).fetch(:calls).sort_by { |record| -record.fetch(:start_line) }.reduce(output) do |memo, record|
+        next memo unless record.fetch(:source).include?("*nomono_requirements")
 
-      lines = output.lines
-      insert_at = call.fetch(:start_line) - 1
-      lines.insert(insert_at, "#{assignment_source}\n")
-      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+        replace_source_range_lines(memo, record.fetch(:start_line), record.fetch(:end_line), "#{nomono_gemfile_declaration}\n")
+      end
     end
 
     def main_gemfile_nomono_requirement_records(content)
@@ -6454,7 +7162,8 @@ module Kettle
 
         {
           start_line: call.location.start_line,
-          end_line: ruby_node_source_end_line(call)
+          end_line: ruby_node_source_end_line(call),
+          source: call.location.slice
         }
       end
       {assignments: assignments, calls: calls.sort_by { |record| record.fetch(:start_line) }}
@@ -6926,6 +7635,69 @@ module Kettle
 
     def local_gemfile_template_recipe?(recipe)
       recipe.fetch(:target_path).to_s.end_with?("_local.gemfile")
+    end
+
+    def normalize_local_gemfile_nomono_bootstrap(content)
+      output = remove_obsolete_local_gemfile_nomono_activation(content)
+      return output if ruby_call_records(output, :require).any? { |call| ruby_string_argument(call) == "nomono/bundler" }
+
+      insertion = %(require "nomono/bundler"\n\n)
+      if (record = local_gems_assignment_record(output))
+        insert_lines_before(output, record.fetch(:start_line), insertion)
+      else
+        ensure_trailing_newline([output.to_s.rstrip, insertion.rstrip].reject(&:empty?).join("\n\n"))
+      end
+    end
+
+    def remove_obsolete_local_gemfile_nomono_activation(content)
+      records = obsolete_local_gemfile_nomono_activation_records(content)
+      return content if records.empty?
+
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
+    end
+
+    def obsolete_local_gemfile_nomono_activation_records(content)
+      result = prism_parse_success(content)
+      body = result&.value&.statements&.body || []
+      assignments = body.select do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_activation_requirements
+      end
+      return [] if assignments.empty?
+
+      lines = content.to_s.lines
+      assignments.filter_map do |assignment|
+        kernel_gem_call = body.find do |node|
+          local_gemfile_nomono_kernel_activation_call?(node) &&
+            node.location.start_line > assignment.location.start_line
+        end
+        next unless kernel_gem_call
+
+        {
+          start_line: preceding_comment_block_start_line(lines, assignment.location.start_line),
+          end_line: ruby_node_source_end_line(kernel_gem_call)
+        }
+      end
+    end
+
+    def local_gemfile_nomono_kernel_activation_call?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :send &&
+        node.receiver&.slice == "Kernel" &&
+        node.arguments&.arguments&.[](0)&.location&.slice == ":gem" &&
+        ruby_string_argument_at(node, 1) == "nomono"
+    end
+
+    def preceding_comment_block_start_line(lines, line_number)
+      line = line_number
+      line -= 1 while line > 1 && lines[line - 2].to_s.strip.start_with?("#")
+      line
     end
 
     def merge_local_gem_overrides(content, destination_content, facts:, template_content: nil)
@@ -11111,6 +11883,7 @@ module Kettle
         .reek.yml
         .standard.yml
         .simplecov
+        .yard-lint.yml
         .yardopts
         Rakefile
       ].include?(path)
@@ -11508,7 +12281,9 @@ module Kettle
 
     def shim_version_file_content(namespace:, replacement_namespace:, replacement_require:)
       body = [
+        "# Version namespace delegated to the replacement gem.",
         "Version = #{replacement_namespace}::Version unless const_defined?(:Version, false)",
+        "# Current gem version delegated to the replacement gem.",
         "VERSION = #{replacement_namespace}::VERSION unless const_defined?(:VERSION, false)"
       ]
 
@@ -11887,6 +12662,7 @@ module Kettle
         kettle_dev_gem: "kettle-dev",
         kettle_dev_local_gems: kettle_dev_local_gems(config),
         local_gemfile_nomono_bootstrap: local_gemfile_nomono_bootstrap(package_name),
+        main_gemfile_kettle_family_gem: main_gemfile_kettle_family_gem(package_name),
         main_gemfile_nomono_bootstrap: main_gemfile_nomono_bootstrap(package_name),
         package_name: package_name.to_s,
         yard_host: yard_host,
@@ -12183,6 +12959,7 @@ module Kettle
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|KETTLE_DEV_LOCAL_GEMS" => project_runtime[:kettle_dev_local_gems].to_s,
         "KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:local_gemfile_nomono_bootstrap].to_s,
+        "KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM" => project_runtime[:main_gemfile_kettle_family_gem].to_s,
         "KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:main_gemfile_nomono_bootstrap].to_s,
         "KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK" => project_runtime[:main_gemfile_direct_sibling_block].to_s,
         "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
@@ -12199,10 +12976,16 @@ module Kettle
     end
 
     def kettle_dev_local_gems(config)
-      gems = %w[kettle-dev kettle-test kettle-soup-cover]
+      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover]
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
       gems.uniq.join(" ")
+    end
+
+    def main_gemfile_kettle_family_gem(package_name)
+      return "" if package_name.to_s == "kettle-family"
+
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.0"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -12210,9 +12993,12 @@ module Kettle
 
       <<~RUBY.rstrip
         # Local workspace dependency wiring for *_local.gemfile overrides
-        nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-        gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
+        #{nomono_gemfile_declaration}
       RUBY
+    end
+
+    def nomono_gemfile_declaration
+      %(gem "nomono", "~> 1.1", ">= 1.1.0", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
@@ -12279,7 +13065,13 @@ module Kettle
         version_gem_bootstrap_entrypoint_content(current_entrypoint, namespace: namespace, entrypoint_require: entrypoint_require)
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
-      changes << normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require) if non_default_version_gem
+      changes << normalize_version_gem_version_spec(
+        project_root,
+        version_spec_path,
+        entrypoint_require,
+        namespace,
+        ensure_version_gem_require: non_default_version_gem
+      )
       if manage_signature_file || !legacy_signature_paths.empty?
         changes.concat(
           write_consolidated_version_signature(
@@ -12334,16 +13126,78 @@ module Kettle
       namespace.start_with?("#{parent}::")
     end
 
-    def normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require)
+    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:)
       current = read_project_file(project_root, version_spec_path)
       return if current.empty?
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
-      return if ruby_top_level_require?(current, "require", require_path)
+      requirements = []
+      requirements << %(require "anonymous_loader"\n) unless ruby_top_level_require?(current, "require", "anonymous_loader")
+      if ensure_version_gem_require && !ruby_top_level_require?(current, "require", require_path)
+        requirements << %(require "#{require_path}"\n)
+      end
 
-      lines = current.lines
-      lines.insert(version_spec_require_insertion_index(current), %(require "#{require_path}"\n))
-      write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(lines.join))
+      updated = current
+      if requirements.any?
+        lines = updated.lines
+        lines.insert(version_spec_require_insertion_index(updated), *requirements)
+        updated = lines.join
+      end
+      updated = normalize_version_spec_anonymous_loader_example(
+        updated,
+        version_spec_path: version_spec_path,
+        entrypoint_require: entrypoint_require,
+        namespace: namespace
+      )
+      write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(updated))
+    end
+
+    def cleanup_version_gem_version_spec(project_root, version_spec_path)
+      current = read_project_file(project_root, version_spec_path)
+      return if current.empty? || !managed_version_gem_version_spec?(current)
+
+      delete_project_file(project_root, version_spec_path)
+    end
+
+    def managed_version_gem_version_spec?(content)
+      content.to_s.include?('it_behaves_like "a Version module"') ||
+        version_spec_anonymous_loader_call?(content)
+    end
+
+    def normalize_version_spec_anonymous_loader_example(content, version_spec_path:, entrypoint_require:, namespace:)
+      return content if version_spec_anonymous_loader_call?(content)
+
+      describe_call = version_spec_rspec_describe_call(content)
+      return content unless describe_call&.block
+
+      version_path = version_spec_relative_version_path(version_spec_path, entrypoint_require)
+      clean_namespace = namespace.to_s.start_with?("::") ? namespace.to_s[2..] : namespace.to_s
+      example = <<~RUBY
+
+        it "executes the version file for coverage without redefining constants" do
+          path = File.expand_path("#{version_path}", __dir__)
+          anonymous_namespace = AnonymousLoader.load(files: path)
+
+          expect(anonymous_namespace::#{clean_namespace}::Version::VERSION).to eq(described_class::VERSION)
+        end
+      RUBY
+
+      insert_lines_before(content, describe_call.block.closing_loc.start_line, example)
+    end
+
+    def version_spec_anonymous_loader_call?(content)
+      ruby_call_records(content, :load).any? { |call| call.receiver&.slice == "AnonymousLoader" }
+    end
+
+    def version_spec_rspec_describe_call(content)
+      top_level_ruby_call_records(content, :describe).find do |call|
+        call.receiver&.slice == "RSpec" && call.block
+      end
+    end
+
+    def version_spec_relative_version_path(version_spec_path, entrypoint_require)
+      spec_depth = File.dirname(version_spec_path.to_s).split(File::SEPARATOR).reject(&:empty?).length
+      "#{"../" * spec_depth}lib/#{entrypoint_require}/version.rb"
     end
 
     def legacy_rbs_signature_paths(project_root, entrypoint_require)
@@ -12417,9 +13271,12 @@ module Kettle
     def version_gem_version_file_content(existing_version:, namespace:, version:)
       resolved_version = existing_version.to_s.empty? ? version.to_s : existing_version.to_s
       body = [
+        "# Version namespace for this gem.",
         "module Version",
+        "  # Current gem version.",
         "  VERSION = #{resolved_version.dump}",
         "end",
+        "# Current gem version exposed at the traditional constant location.",
         "VERSION = Version::VERSION # Traditional Constant Location"
       ]
 
@@ -15363,17 +16220,18 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0
+          uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
             bundler: "${{ matrix.bundler }}"
-            bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' }}
+            bundler-cache: ${{ matrix.ruby != 'ruby-2.4' && matrix.ruby != 'ruby-2.5' && matrix.ruby != 'ruby-2.6' && matrix.ruby != 'ruby-2.7' && matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' }}
 
         - name: Bundle install for legacy Ruby engine
-          if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}
+          if: ${{ matrix.ruby == 'ruby-2.4' || matrix.ruby == 'ruby-2.5' || matrix.ruby == 'ruby-2.6' || matrix.ruby == 'ruby-2.7' || matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}
           run: |
             bundle config set --local path "${RUNNER_TEMP}/bundle"
+            bundle config set --local mirror.https://gem.coop https://rubygems.org
             bundle install --jobs 1
       YAML
       yaml.lines.map { |line| line.strip.empty? ? line : "#{indent}#{line}" }.join.rstrip
@@ -15474,7 +16332,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0",
+        "        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -15611,7 +16469,8 @@ module Kettle
               github-token: ${{ secrets.GITHUB_TOKEN }}
               file: coverage/lcov.info
               format: lcov
-            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+              fail-on-error: false
+            continue-on-error: true
         YAML
       end
 
@@ -15624,8 +16483,8 @@ module Kettle
               oidc: true
               files: coverage/lcov.info
               format: lcov
-              skip-errors: false
-            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+              skip-errors: true
+            continue-on-error: true
         YAML
       end
 
@@ -15633,13 +16492,14 @@ module Kettle
         steps << <<~YAML
           - name: Upload coverage to CodeCov
             if: ${{ !env.ACT }}
-            uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
+            uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
             with:
               use_oidc: true
               disable_search: true
               fail_ci_if_error: false
               files: coverage/lcov.info,coverage/coverage.xml
               verbose: true
+            continue-on-error: true
         YAML
       end
 
@@ -15912,18 +16772,18 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "ruby/setup-ruby" => "ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0",
+        "ruby/setup-ruby" => "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
-        "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7",
+        "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5",
         "actions/upload-artifact" => "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1",
         "amancevice/setup-code-climate" => "amancevice/setup-code-climate@0daf2985a225e8ac15975b4d233010e94d65b76a # v2",
         "actions/dependency-review-action" => "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0",
-        "github/codeql-action/init" => "github/codeql-action/init@e0647621c2984b5ed2f768cb892365bf2a616ad1 # v4.37.2",
-        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@e0647621c2984b5ed2f768cb892365bf2a616ad1 # v4.37.2",
-        "github/codeql-action/analyze" => "github/codeql-action/analyze@e0647621c2984b5ed2f768cb892365bf2a616ad1 # v4.37.2",
+        "github/codeql-action/init" => "github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3",
+        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3",
+        "github/codeql-action/analyze" => "github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3",
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@af6beea6bdf1e8eb373f061c5bc168681fc6d011 # v4.0.1",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0"

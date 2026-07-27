@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "open3"
 require "optparse"
 require "pathname"
 
@@ -33,6 +34,7 @@ class KettleJemDepsFloor
     @options = {
       write: false,
       check: false,
+      commit: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }.merge(options.transform_keys(&:to_sym))
@@ -44,6 +46,7 @@ class KettleJemDepsFloor
     if options[:json]
       out.puts(JSON.pretty_generate(result))
     else
+      out.puts("deps-floor: mode=#{result.fetch(:mode)} upgrade=#{result.fetch(:upgrade)}")
       out.puts("deps-floor: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
       result.fetch(:planned_changes, []).each do |change|
         out.puts(
@@ -51,6 +54,11 @@ class KettleJemDepsFloor
             "#{change.fetch(:current_pessimistic)}, >= #{change.fetch(:current_floor)} -> " \
             "#{change.fetch(:new_pessimistic)}, >= #{change.fetch(:new_floor)}"
         )
+      end
+      if result[:commit]
+        out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
+      elsif !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
+        out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
       end
     end
     0
@@ -68,6 +76,7 @@ class KettleJemDepsFloor
       project_root: DEFAULT_PROJECT_ROOT,
       write: false,
       check: false,
+      commit: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }
@@ -80,9 +89,10 @@ class KettleJemDepsFloor
 
   def self.parser
     OptionParser.new do |opts|
-      opts.banner = "Usage: bin/kettle-jem-deps-floor [PROJECT_ROOT] [--json] [--write] [--check] [--upgrade LEVEL]"
+      opts.banner = "Usage: bin/kettle-jem-deps-floor [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--upgrade LEVEL]"
       opts.on("-w", "--write", "Write updates to kettle-jem template sources.") { |value| value }
       opts.on("--check", "Fail when managed dependency floors are stale.") { |value| value }
+      opts.on("--[no-]commit", "Commit written updates (default with --write).") { |value| value }
       opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
       opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
     end
@@ -96,7 +106,9 @@ class KettleJemDepsFloor
 
     records = dependency_records
     planned_changes = planned_dependency_changes(records, upgrade)
+    preexisting_dirty_paths = preexisting_dirty_target_paths(planned_changes)
     apply_changes(planned_changes) if @options[:write] && planned_changes.any?
+    commit_result = commit_changes(planned_changes, preexisting_dirty_paths) if @options[:write] && @options[:commit] && planned_changes.any?
 
     if @options[:check] && planned_changes.any?
       raise "Managed dependency floors are stale; run bin/kettle-jem-deps-floor --write --upgrade #{upgrade}"
@@ -109,6 +121,7 @@ class KettleJemDepsFloor
       discovered_dependencies: records.map { |record| record.fetch(:name) }.uniq.sort,
       updates: planned_changes.length,
       updated_dependencies: planned_changes.map { |change| change.fetch(:name) }.uniq.sort,
+      commit: commit_result,
       planned_changes: planned_changes.map { |change| serializable_change(change) }
     }
   end
@@ -332,6 +345,74 @@ class KettleJemDepsFloor
       updated = Kettle::Jem.replace_source_offsets(original, replacements)
       File.write(path, updated) if updated != original
     end
+  end
+
+  def preexisting_dirty_target_paths(changes)
+    relative_paths = changed_relative_paths(changes)
+    return [] if relative_paths.empty? || !git_repository?
+
+    dirty_paths(relative_paths)
+  end
+
+  def commit_changes(changes, preexisting_dirty_paths)
+    relative_paths = changed_relative_paths(changes)
+    return {status: "skipped", reason: "no_updates"} if relative_paths.empty?
+    return {status: "unavailable", reason: "not_git_repository"} unless git_repository?
+    unless preexisting_dirty_paths.empty?
+      raise "Refusing to commit dependency floor updates because target files were already dirty: #{preexisting_dirty_paths.join(", ")}"
+    end
+
+    changed_paths = dirty_paths(relative_paths)
+    return {status: "clean_noop", reason: "no_file_changes"} if changed_paths.empty?
+
+    run_git!("add", "--", *changed_paths.map { |path| worktree_relative_path(path) })
+    run_git!("commit", "-m", "⬆️ Raise kettle-jem dependency floors")
+    {status: "committed", files: changed_paths}
+  end
+
+  def changed_relative_paths(changes)
+    changes.map { |change| change.fetch(:relative_path) }.uniq.sort
+  end
+
+  def git_repository?
+    !!git_worktree_root
+  end
+
+  def dirty_paths(relative_paths)
+    stdout, _stderr, _status = Open3.capture3("git", "status", "--porcelain", "--", *relative_paths, chdir: project_root)
+    stdout.lines.filter_map do |line|
+      path = line[3..].to_s.chomp
+      next if path.empty?
+
+      project_relative_path(path)
+    end
+  end
+
+  def run_git!(*args)
+    stdout, stderr, status = Open3.capture3("git", *args, chdir: git_worktree_root || project_root)
+    return stdout if status.success?
+
+    raise "git #{args.join(" ")} failed: #{stderr.empty? ? stdout : stderr}"
+  end
+
+  def git_worktree_root
+    stdout, _stderr, status = Open3.capture3("git", "rev-parse", "--show-toplevel", chdir: project_root)
+    return unless status.success?
+
+    stdout.strip unless stdout.strip.empty?
+  end
+
+  def project_relative_path(path)
+    return path if File.file?(File.join(project_root, path))
+
+    absolute_path = File.expand_path(path, git_worktree_root || project_root)
+    Pathname(absolute_path).relative_path_from(Pathname(project_root)).to_s
+  rescue ArgumentError
+    path
+  end
+
+  def worktree_relative_path(path)
+    Pathname(File.join(project_root, path)).relative_path_from(Pathname(git_worktree_root || project_root)).to_s
   end
 
   def serializable_change(change)

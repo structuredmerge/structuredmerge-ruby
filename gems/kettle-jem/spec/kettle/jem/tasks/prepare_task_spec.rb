@@ -8,6 +8,11 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
   it "updates critical templating gems after applying the dependency bootstrap payload" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            nomono (1.0.8)
+      LOCK
       command_runner = double("command_runner")
       setup_env = {"BUNDLE_GEMFILE" => File.join(root, "Gemfile")}
       update_step = {
@@ -76,6 +81,61 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "installs once for cold-start projects without a lockfile" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
+      command_runner = double("command_runner")
+      setup_env = {"BUNDLE_GEMFILE" => File.join(root, "Gemfile")}
+      bootstrap_step = {
+        name: "bundle_install_templating_bootstrap",
+        status: "succeeded",
+        changed_files: ["Gemfile.lock"]
+      }
+
+      allow(Kettle::Jem).to receive(:apply_project).and_return(
+        mode: "apply",
+        changed_files: ["Gemfile"],
+        diagnostics: []
+      )
+      allow(Kettle::Jem::Tasks::InstallTask).to receive_messages(
+        setup_command_env: setup_env
+      )
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step)
+        .with(
+          "bundle_install_templating_bootstrap",
+          %w[bundle install],
+          project_root: root,
+          env: setup_env,
+          quiet: false,
+          command_runner: command_runner
+        )
+        .and_return(bootstrap_step)
+
+      result = described_class.run(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: {force: true},
+        command_runner: command_runner
+      )
+
+      expect(result).to include(
+        mode: "prepare",
+        prepared: true,
+        prepare_only: described_class::PREPARE_ONLY_PATHS
+      )
+      expect(result.fetch(:prepare_steps)).to eq([
+        bootstrap_step,
+        {
+          name: "bundle_install",
+          command: %w[bundle install],
+          status: "skipped",
+          reason: "already_ran_as_templating_bootstrap"
+        }
+      ])
+      expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run_command_step).once
+    end
+  end
+
   it "updates lockfile-safe templating bootstrap gems before the full template run" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
@@ -105,11 +165,10 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
-  it "keeps the cold-start update command minimal when no lockfile exists" do
+  it "uses bundle install as the cold-start bootstrap command when no lockfile exists" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
-      expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
-        %w[bundle update nomono]
-      )
+      expect(described_class.templating_bootstrap_command(root)).to eq(%w[bundle install])
+      expect(described_class.templating_bootstrap_step_name(root)).to eq("bundle_install_templating_bootstrap")
     end
   end
 

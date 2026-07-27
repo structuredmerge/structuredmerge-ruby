@@ -95,3 +95,16 @@ RSpec.describe Plain::Merge do
     expect(json_ready(described_class.text_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
   end
 end
+
+RSpec.describe 'Plain::Merge TreeHaver backend registration' do
+  it 'registers text and plain line backends through TreeHaver parser lookup' do
+    source = "First paragraph\n\nSecond paragraph\n"
+
+    text_analysis = TreeHaver.parser_for(:text, backend_type: :line).parse(source)
+    plain_analysis = TreeHaver.parser_for(:plain, backend_type: :line).parse(source)
+
+    expect(text_analysis[:kind]).to eq('text')
+    expect(text_analysis[:blocks].map { |block| block[:normalized] }).to eq(['First paragraph', 'Second paragraph'])
+    expect(plain_analysis).to eq(text_analysis)
+  end
+end

@@ -314,6 +314,31 @@ RSpec.describe Kettle::Jem::CLI do
     end
   end
 
+  it "accepts checksum modes with space, equals, and ignore alias forms" do
+    allow(Kettle::Jem).to receive(:plan_project) do |_root, env:, run_options:|
+      {
+        mode: "plan",
+        env: env,
+        run_options: run_options,
+        checksum_mode: Kettle::Jem::ChecksumMode.parse(run_options[:checksums]).to_s
+      }
+    end
+
+    space_status, space_out, space_err = run_cli(["plan", "--json", "--checksums", "dest,template"])
+    equals_status, equals_out, equals_err = run_cli(["plan", "--json", "--checksums=dest,ignore-template"])
+    ignore_status, ignore_out, ignore_err = run_cli(["plan", "--json", "--ignore-checksums"])
+
+    expect(space_status).to eq(0)
+    expect(space_err).to eq("")
+    expect(JSON.parse(space_out).fetch("checksum_mode")).to eq("dest,template")
+    expect(equals_status).to eq(0)
+    expect(equals_err).to eq("")
+    expect(JSON.parse(equals_out).fetch("checksum_mode")).to eq("dest,ignore-template")
+    expect(ignore_status).to eq(0)
+    expect(ignore_err).to eq("")
+    expect(JSON.parse(ignore_out).fetch("checksum_mode")).to eq("off")
+  end
+
   it "aliases bare template to the full install task" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       allow(Kettle::Jem::Tasks::InstallTask).to receive(:run).and_return(

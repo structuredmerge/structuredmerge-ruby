@@ -135,13 +135,13 @@ to build <code>kettle-jem</code> extension gems against the supported plugin sea
     <tr>
       <td>Support &amp; Community</td>
       <td>
-<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
+<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://www.rubyforum.org/c/help/8"><img src="https://img.shields.io/badge/RubyForum-Help-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Get help from RubyForum"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
 </td>
     </tr>
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=Github&amp;logoColor=green" alt="Source on Github.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -254,6 +254,8 @@ not practical for the current toolchain.</p>
   <summary>StructuredMerge package family</summary>
 
   <p>This gem is part of the StructuredMerge Ruby package family. The implementation inventory, layering model, and backend notes live in the <a href="https://github.com/structuredmerge/structuredmerge-ruby#package-family">root package-family guide</a>. Shared behavior is defined by the <a href="https://github.com/structuredmerge/structuredmerge-fixtures">StructuredMerge fixtures</a> and implemented by the <a href="https://github.com/structuredmerge/structuredmerge-go">Go</a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby">Ruby</a>, <a href="https://github.com/structuredmerge/structuredmerge-rust">Rust</a>, and <a href="https://github.com/structuredmerge/structuredmerge-typescript">TypeScript</a> repositories.</p>
+
+  <p>Merge analysis must enter parsing through <code>tree_haver</code>. Parser-specific gems register concrete TreeHaver backends; substrate gems register grammar mappings and keep shared format or language merge behavior in one place. Missing backends fail closed instead of falling back to direct parser-library calls.</p>
 
 </details>
 
@@ -1106,7 +1108,7 @@ read this article from the creator of SemVer:</p>
 
 <h2 id="-license">📄 License</h2>
 
-<p>The gem is available under the following licenses: <a href="AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
+<p>The gem is available under the following licenses: <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
 See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
 
 <p>If none of the available licenses suit your use case, please <a href="mailto:floss@galtzo.com">contact us</a> to discuss a custom commercial license.</p>
@@ -1160,7 +1162,7 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Mon Jul 20 00:27:53 2026 by
+  Generated on Fri Jul 24 22:24:26 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

@@ -67,11 +67,11 @@ The family is intentionally layered:
 
 | Gem | Family | What it provides |
 | --- | --- | --- |
-| [`plain-merge`][ruby-plain-merge] | Text | Plain-text fallback contracts and conflict-preserving merge behavior. |
+| [`plain-merge`][ruby-plain-merge] | Text | Line-backed TreeHaver parser registration, plain-text fallback contracts, and conflict-preserving merge behavior. |
 | [`json-merge`][ruby-json-merge] | JSON and JSONC | Object/array-aware JSON merge behavior using the shared StructuredMerge merge substrate and [tree-sitter JSON][ts-json] grammar coverage where the selected backend supplies it. |
 | [`yaml-merge`][ruby-yaml-merge] | YAML | YAML-family merge contracts, shared provider tags, and provider-neutral behavior. |
 | [`toml-merge`][ruby-toml-merge] | TOML | TOML-family merge contracts and provider-neutral behavior. |
-| [`dotenv-merge`][ruby-dotenv-merge] | dotenv | Environment-file merge behavior for key/value configuration files. |
+| [`dotenv-merge`][ruby-dotenv-merge] | dotenv | Dotenv line parser registration and key/value configuration merge behavior built on the plain text substrate. |
 | [`markdown-merge`][ruby-markdown-merge] | Markdown | Markdown-family merge contracts, heading/table/list matching, link-reference handling, fenced-code flow, and provider-neutral behavior. |
 | [`ruby-merge`][ruby-ruby-merge] | Ruby source | Ruby source merge contracts and parser-backed source-language behavior. |
 | [`rbs-merge`][ruby-rbs-merge] | RBS | Ruby signature merge behavior, declaration matching, and template-owned signature updates using [RBS][rbs] and tree-sitter RBS grammar coverage where available. |
@@ -79,8 +79,8 @@ The family is intentionally layered:
 | [`go-merge`][ruby-go-merge] | Go source | Go source merge contracts for the cross-language StructuredMerge family. |
 | [`rust-merge`][ruby-rust-merge] | Rust source | Rust source merge contracts for the cross-language StructuredMerge family. |
 | [`typescript-merge`][ruby-typescript-merge] | TypeScript source | TypeScript source merge contracts for the cross-language StructuredMerge family. |
-| [`binary-merge`][ruby-binary-merge] | Binary | Binary tree planning contracts, byte-range ownership, diagnostics, and [Kaitai Struct][kaitai] oriented structured binary support. |
-| [`zip-merge`][ruby-zip-merge] | Archives | ZIP archive planning helpers, archive member ownership, and archive-aware merge contracts. |
+| [`binary-merge`][ruby-binary-merge] | Binary | Kaitai/binary-family substrate for byte-range ownership, preservation reports, unsafe diagnostics, and renderer planning. |
+| [`zip-merge`][ruby-zip-merge] | Archives | ZIP parser registration and archive-aware merge contracts built on the binary-family substrate. |
 
 ### Provider Gems
 
@@ -119,7 +119,7 @@ tags are capability names, not package preferences.
 | [RBS][rbs] | `rbs-merge` | Ruby signature parser path. |
 | [CommonMarker][commonmarker], [Markly][markly], [Kramdown][kramdown] | `markdown-merge` providers | Markdown parser families with different CommonMark/GFM/Ruby-native tradeoffs. |
 | [Citrus][citrus], [Parslet][parslet] | `toml-merge` providers | Pure-Ruby TOML parser families exposed as provider-specific TreeHaver backend paths. |
-| [Kaitai Struct][kaitai] | `binary-merge` | Schema-oriented binary parsing support for structured binary work. |
+| [Kaitai Struct][kaitai] | `binary-merge`, `zip-merge` | Schema-oriented binary parsing support and shared binary-family merge behavior. |
 
 #### Backend Platform Compatibility
 

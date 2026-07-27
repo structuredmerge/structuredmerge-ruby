@@ -184,13 +184,15 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(config.fetch("yard_host")).to eq("docs.env.test")
       expect(config.fetch("homepage_uri")).to eq("https://homepage.env.test")
       expect(config.dig("rubygems", "min_ruby")).to eq("1.8.7")
-      expect(config.dig("kettle-jem", "version")).to eq(Kettle::Jem::Version::VERSION)
+      expect(config).not_to have_key("kettle-jem")
       expect(config.dig("tokens", "forge", "gh_user")).to eq("env-user")
+      lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+      expect(lock.dig("template_state", "version")).to eq(Kettle::Jem::Version::VERSION)
       expect(report.fetch(:final_content)).to include("min_divergence_threshold: 12 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD")
       expect(report.fetch(:final_content)).to include('yard_host: "docs.env.test" # ENV override: KJ_YARD_HOST')
       expect(report.fetch(:final_content)).to include('homepage_uri: "https://homepage.env.test" # ENV override: KJ_HOMEPAGE_URI')
       expect(report.fetch(:final_content)).to include('min_ruby: "1.8.7" # ENV override: KJ_MIN_RUBY')
-      expect(report.fetch(:final_content)).to include(%(version: "#{Kettle::Jem::Version::VERSION}"))
+      expect(report.fetch(:final_content)).not_to include("kettle-jem:")
       expect(report.fetch(:final_content)).to include('gh_user: "env-user" # GitHub username only. ENV: KJ_GH_USER')
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to eq(report.fetch(:final_content))
     end
@@ -1439,11 +1441,190 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       described_class::TemplateChecksums.write_to_config(
         config_path: File.join(root, ".kettle-jem.yml"),
         checksums: current,
-        version: "1.2.3"
+        version: "1.2.3",
+        applied_at: "2026-07-24",
+        changelog_replay: {
+          "last_entry_key" => "kettle-jem-template-20260720-005",
+          "last_entry_date" => "2026-07-20"
+        }
       )
       rewritten = YAML.safe_load_file(File.join(root, ".kettle-jem.yml"))
       expect(rewritten.fetch("kettle-jem").fetch("version")).to eq("1.2.3")
+      expect(rewritten.fetch("kettle-jem").fetch("applied_at")).to eq("2026-07-24")
+      expect(rewritten.fetch("kettle-jem").fetch("changelog_replay")).to eq(
+        "last_entry_key" => "kettle-jem-template-20260720-005",
+        "last_entry_date" => "2026-07-20"
+      )
       expect(rewritten.fetch("kettle-jem").fetch("checksums")).to eq(current)
+    end
+  end
+
+  it "migrates legacy config checksum state into a kettle-jem lockfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-lock-migration", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+
+          kettle-jem:
+            version: "0.1.0"
+            applied_at: "2026-07-01"
+            checksums:
+              "config.yml.example": "old"
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+      config = YAML.safe_load_file(File.join(root, ".kettle-jem.yml"))
+
+      expect(apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "kettle_jem_state_sync" }).to include(
+        changed_files: include(Kettle::Jem::KETTLE_LOCK_PATH, ".kettle-jem.yml")
+      )
+      expect(config).not_to have_key("kettle-jem")
+      expect(lock.fetch("template_state").fetch("checksums")).to include("config.yml.example")
+      expect(lock.fetch("files").fetch("config.yml")).to include("input_fingerprint", "dest_sha256")
+    end
+  end
+
+  it "moves a legacy root kettle-jem lockfile into the structuredmerge directory" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-root-lock-migration", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.lock" => <<~YAML,
+          ---
+          version: 1
+          template_state:
+            version: 7.1.0
+            changelog_replay:
+              last_entry_key: kettle-jem-template-20260720-001
+            checksums:
+              config.yml.example: old
+          files: {}
+        YAML
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+
+      expect(File).not_to exist(File.join(root, Kettle::Jem::LEGACY_KETTLE_LOCK_PATH))
+      expect(lock.fetch("template_state")).to include("changelog_replay", "checksums")
+      expect(apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "kettle_jem_state_sync" }).to include(
+        changed_files: include(Kettle::Jem::KETTLE_LOCK_PATH, Kettle::Jem::LEGACY_KETTLE_LOCK_PATH)
+      )
+    end
+  end
+
+  it "skips unchanged template inputs by default but honors destination checksum mode" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-skip", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      File.write(File.join(root, "config.yml"), "name: local\n")
+
+      default_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      default_report = default_apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "config.yml" }
+
+      expect(default_report.fetch(:checksum_skipped)).to be(true)
+      expect(File.read(File.join(root, "config.yml"))).to eq("name: local\n")
+
+      dest_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true, checksums: "dest,template"})
+      dest_report = dest_apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "config.yml" }
+
+      expect(dest_report).not_to include(:checksum_skipped)
+      expect(File.read(File.join(root, "config.yml"))).to eq("name: template\n")
+    end
+  end
+
+  it "does not write template token values to the checksum lockfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-token-redaction", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "freeze: {KJ|FREEZE_TOKEN}\n",
+        ".kettle-jem.yml" => <<~YAML
+          defaults:
+            freeze_token: "ghp_sensitive-example-value"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock_content = File.read(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+
+      expect(lock_content).to include("input_fingerprint")
+      expect(lock_content).not_to include("ghp_sensitive-example-value")
+      expect(lock_content).not_to include("freeze: ghp_sensitive-example-value")
     end
   end
 
@@ -2050,7 +2231,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
-      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).not_to include("nomono_requirements")
       expect(direct_block).to include('require "nomono/bundler"')
       expect(direct_block).not_to include("nomono_activation_requirements")
       expect(direct_block).not_to include("nomono_lockfile")
@@ -2109,8 +2291,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-          gem "nomono", *nomono_requirements, require: false
+          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
 
           # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
           direct_sibling_gems = %w[
@@ -2212,8 +2393,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-          gem "nomono", *nomono_requirements, require: false
+          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
 
           # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
           direct_sibling_gems = %w[
@@ -2310,8 +2490,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-          gem "nomono", *nomono_requirements, require: false
+          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
 
           # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
           direct_sibling_gems = %w[
@@ -2360,7 +2539,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-  it "keeps the nomono requirements assignment before an existing nomono gem call" do
+  it "replaces legacy nomono requirements assignments with a plain dependency declaration" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-main-gemfile-nomono-order", tmp_root) do |root|
@@ -2379,6 +2558,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           source "https://gem.coop"
 
           # Local workspace dependency wiring for *_local.gemfile overrides
+          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
           gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
           gem "progress_bar"
 
@@ -2392,8 +2572,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           )
 
           gemspec
-
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
@@ -2411,12 +2589,10 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         run_options: {accept: true, force: true, skip_commit: true}
       )
       gemfile = File.read(File.join(root, "Gemfile"))
-      requirement_line = gemfile.lines.index { |line| line.include?("nomono_requirements =") }
-      gem_line = gemfile.lines.index { |line| line.include?('gem "nomono", *nomono_requirements') }
 
-      expect(requirement_line).not_to be_nil
-      expect(gem_line).not_to be_nil
-      expect(requirement_line).to be < gem_line
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).not_to include("nomono_requirements")
+      expect(gemfile).not_to include('gem "nomono", *nomono_requirements')
     end
   end
 

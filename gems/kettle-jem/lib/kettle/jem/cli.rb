@@ -149,6 +149,12 @@ module Kettle
           opts.on("--skip-binstubs", "Skip post-template curated Bundler binstub generation.") do
             options[:run_options][:skip_binstubs] = true
           end
+          opts.on("--checksums VALUE", "Set checksum skip mode: template, dest, ignore-template, ignore-dest, or off.") do |value|
+            options[:run_options][:checksums] = value
+          end
+          opts.on("--ignore-checksums", "Alias for --checksums off.") do
+            options[:run_options][:checksums] = "off"
+          end
           opts.on("--accept-config", "Accept first-run template config bootstrap.") do
             options[:run_options][:accept_config] = true
           end

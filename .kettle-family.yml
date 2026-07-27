@@ -1,9 +1,43 @@
 ---
 family:
   name: structuredmerge-ruby
+  mode: monorepo
+  local_path_env: STRUCTUREDMERGE_DEV
   members_root: gems
 
 members:
+  roots:
+    - gems/tree_haver
+    - gems/ast-merge
+    - gems/ast-crispr
+    - gems/ast-crispr-ruby-prism
+    - gems/ast-crispr-markdown-markly
+    - gems/ast-merge-git
+    - gems/plain-merge
+    - gems/bash-merge
+    - gems/dotenv-merge
+    - gems/rbs-merge
+    - gems/html-merge
+    - gems/json-merge
+    - gems/yaml-merge
+    - gems/toml-merge
+    - gems/markdown-merge
+    - gems/ruby-merge
+    - gems/go-merge
+    - gems/rust-merge
+    - gems/typescript-merge
+    - gems/ast-template
+    - gems/binary-merge
+    - gems/zip-merge
+    - gems/psych-merge
+    - gems/citrus-toml-merge
+    - gems/parslet-toml-merge
+    - gems/commonmarker-merge
+    - gems/kramdown-merge
+    - gems/markly-merge
+    - gems/prism-merge
+    - gems/smorg-rb
+    - gems/kettle-jem
   exclude:
     - "**/benchmarks/**"
   order:
@@ -115,6 +149,8 @@ install:
 release:
   build_command: bundle exec rake build
   publish_command: bundle exec kettle-release
+  disable_local_path_env:
+    - TSLP_DEV
   env:
     GALTZO_FLOSS_DEV: false
     KETTLE_DEV_DEV: false

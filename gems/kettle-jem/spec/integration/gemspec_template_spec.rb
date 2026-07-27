@@ -524,6 +524,13 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
             VERSION = Version::VERSION # Traditional Constant Location
           end
         RUBY
+        "spec/legacy/version_spec.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          RSpec.describe Legacy::Version do
+            it_behaves_like "a Version module", described_class
+          end
+        RUBY
         "gemfiles/modular/runtime_heads.gemfile" => <<~RUBY,
           # frozen_string_literal: true
 
@@ -574,13 +581,14 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       entrypoint_content = File.read(File.join(root, "lib", "legacy.rb"))
       version_content = File.read(File.join(root, "lib", "legacy", "version.rb"))
       runtime_heads_content = File.read(File.join(root, "gemfiles", "modular", "runtime_heads.gemfile"))
+      version_spec_path = File.join(root, "spec", "legacy", "version_spec.rb")
 
       expect(gemspec_content).not_to include("version_gem")
       expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7" # rubocop:disable Gemspec/RequiredRubyVersion')
       expect(apply.fetch(:post_apply_steps)).to include(hash_including(
         name: "version_gem_cleanup",
         status: "applied",
-        changed_files: ["lib/legacy.rb"]
+        changed_files: contain_exactly("lib/legacy.rb", "spec/legacy/version_spec.rb")
       ))
       expect(entrypoint_content).not_to include("version_gem")
       expect(entrypoint_content).not_to include("VersionGem")
@@ -589,6 +597,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(version_content).to include("module Version")
       expect(version_content).to include('VERSION = "0.1.0"')
       expect(version_content).to include("VERSION = Version::VERSION # Traditional Constant Location")
+      expect(File).not_to exist(version_spec_path)
       expect(runtime_heads_content).not_to include("version_gem")
       expect(runtime_heads_content).to include('eval_gemfile("x_std_libs/vHEAD.gemfile")')
       expect(File.read(File.join(root, "legacy.gemspec"))).to eq(gemspec_content)

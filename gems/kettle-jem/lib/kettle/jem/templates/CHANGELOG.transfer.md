@@ -1,16 +1,39 @@
 # kettle-jem Transferable Changelog
 
-- kettle-jem-template-20260716-001 - Shim gemspec manifests now include
-  `LICENSE.md` instead of nonexistent `LICENSE.txt`.
-- kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer
-  repository-only files by default to reduce downstream distro packaging churn.
-- kettle-jem-template-20260720-001 - Generated READMEs can now render
-  template-managed corporate sponsor logos from project or family config.
-- kettle-jem-template-20260720-002 - Generated development Gemfiles now use the
-  released `tree_sitter_language_pack` gem 1.13.3 or newer by default.
-- kettle-jem-template-20260720-003 - Generated StructuredMerge Git diff driver
-  config now uses the installed `smorg-rb` Ruby driver name.
-- kettle-jem-template-20260720-004 - Generated multi-engine workflow files now
-  omit JRuby and TruffleRuby jobs when project config declares MRI-only engines.
-- kettle-jem-template-20260720-005 - Generated README Support & Community rows
-  now include a RubyForum help badge.
+## Added
+
+- kettle-jem-template-20260720-001 - READMEs can now display configured
+  corporate sponsor logos.
+- kettle-jem-template-20260720-005 - README Support & Community links now
+  include RubyForum.
+- kettle-jem-template-20260726-001 - Projects now include YARD lint
+  configuration and documentation dependencies so documentation issues fail
+  before generated docs are refreshed.
+- kettle-jem-template-20260727-001 - Spec harness documentation now lists the
+  RSpec helpers provided by `kettle-test`.
+
+## Changed
+
+- kettle-jem-template-20260716-002 - Gemspecs now ship fewer repository-only
+  files, reducing package noise for downstream packagers.
+- kettle-jem-template-20260720-002 - Development Gemfiles now use the released
+  `tree_sitter_language_pack` gem 1.13.3 or newer by default.
+- kettle-jem-template-20260725-002 - Version specs now use `anonymous_loader` to
+  cover `version.rb` without redefining constants, or are removed when version
+  specs are not managed for the project.
+
+## Fixed
+
+- kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
+  of a missing `LICENSE.txt` file.
+- kettle-jem-template-20260720-003 - StructuredMerge Git diff driver config now
+  uses the installed `smorg-rb` driver command.
+- kettle-jem-template-20260720-004 - MRI-only projects now omit JRuby and
+  TruffleRuby workflow jobs.
+- kettle-jem-template-20260725-001 - Release pull request branches beginning
+  with `feature/release` now run JRuby and TruffleRuby workflows.
+- kettle-jem-template-20260726-002 - Generated version files now document their
+  version namespace and constants, reducing warning-only YARD lint output.
+- kettle-jem-template-20260726-003 - Coverage upload steps now treat Coveralls,
+  QLTY, and Codecov as optional, so provider outages do not fail CI when local
+  coverage thresholds still pass.

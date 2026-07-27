@@ -594,11 +594,11 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-  it "serializes legacy engine setup-ruby workaround in generated CI workflows" do
+  it "serializes legacy Ruby setup-ruby workaround in generated CI workflows" do
     ci = {
       default_branch: "main",
       exec_cmd: "kettle-test",
-      ruby_versions: ["truffleruby-25.0", "jruby-9.2", "jruby-9.3"]
+      ruby_versions: ["ruby-2.7", "truffleruby-25.0", "jruby-9.2", "jruby-9.3"]
     }
     workflows = [
       described_class.send(:synchronize_github_actions_ci, "", {package: {name: "example"}, ci: ci}),
@@ -640,11 +640,21 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
     expect(workflows + [coverage_workflow]).not_to include(include('      - "r*_*-*-v*"'))
     expect(preserved_workflows).to all(include('      - "r*_*-*-v*"'))
-    expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' }}"))
+    expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'ruby-2.4' && matrix.ruby != 'ruby-2.5' && matrix.ruby != 'ruby-2.6' && matrix.ruby != 'ruby-2.7' && matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' }}"))
     expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
-    expect(workflows).to all(include("        if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}"))
+    expect(workflows).to all(include("        if: ${{ matrix.ruby == 'ruby-2.4' || matrix.ruby == 'ruby-2.5' || matrix.ruby == 'ruby-2.6' || matrix.ruby == 'ruby-2.7' || matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}"))
     expect(workflows).to all(include('          bundle config set --local path "${RUNNER_TEMP}/bundle"'))
+    expect(workflows).to all(include("          bundle config set --local mirror.https://gem.coop https://rubygems.org"))
     expect(workflows).to all(include("          bundle install --jobs 1"))
+
+    %w[2.4 2.5 2.6 2.7].each do |version|
+      packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/ruby-#{version}.yml.example"))
+      expect(packaged_workflow).to include("bundler-cache: false")
+      expect(packaged_workflow).to include("      - name: Bundle install for Ruby #{version}")
+      expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+      expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
+      expect(packaged_workflow).to include("          bundle install --jobs 1")
+    end
 
     packaged_rubocop = File.read(project_root.join("lib/kettle/jem/templates/.rubocop.yml.example"))
     expect(packaged_rubocop).to include('    - "**/vendor/**/*"')
@@ -653,18 +663,21 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
     expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
 
     packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby-9.2.yml.example"))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.2")
     expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
 
     packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby-9.3.yml.example"))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.3")
     expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
   end
 
@@ -703,8 +716,10 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")
+    expect(jruby_workflow).to include("startsWith(github.head_ref, 'feature/release')")
     expect(truffleruby_workflow).to include("rspec-status-truffleruby-25.0-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(truffleruby_workflow).to include("startsWith(github.head_ref, 'truffleruby/')")
+    expect(truffleruby_workflow).to include("startsWith(github.head_ref, 'feature/release')")
     expect(framework_workflow).to include(
       "rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-"
     )
@@ -805,6 +820,63 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
       expect(content).to include("# Test HTTP Interaction Recording")
       expect(content.scan('eval_gemfile "gemfiles/modular/recording/r3/recording.gemfile"').size).to eq(1)
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "removes duplicate main Gemfile eval_gemfile declarations for the same path" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-duplicate-eval-gemfile", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Modular sibling dependencies
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Debugging
+          eval_gemfile "gemfiles/modular/debug.gemfile"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Debugging
+          eval_gemfile "gemfiles/modular/debug.gemfile"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }
+      content = report.fetch(:final_content)
+
+      expect(content.scan('eval_gemfile "gemfiles/modular/coverage.gemfile"').size).to eq(1)
+      expect(content).not_to include("# Modular sibling dependencies")
+      expect(content).to include("# Code Coverage")
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
   end
@@ -998,9 +1070,28 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
-    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-family kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM")).to include('gem "kettle-family"')
     expect(tokens.fetch("KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP")).to include('gem "nomono"')
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
+  end
+
+  it "omits kettle-family from its own main Gemfile dependency token" do
+    runtime = described_class.send(
+      :project_runtime_facts,
+      {},
+      {},
+      package_name: "kettle-family",
+      source_url: "https://github.com/kettle-dev/kettle-family",
+      author_domain: "example.test",
+      min_ruby: ">= 3.2",
+      test_min_ruby: Gem::Version.new("3.2"),
+      version: "1.2.0"
+    )
+    tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to include("kettle-family")
+    expect(tokens.fetch("KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM")).to eq("")
   end
 
   it "exposes package summary and description tokens for generated metadata" do
@@ -1070,6 +1161,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
       expect(content).to include("SimpleCov.start")
       expect(content).to include('require "kettle/test/rspec"')
+      expect(content).to include("installs harness helpers documented in spec/README.md")
       expect(content.scan('require "example/custom"').size).to eq(1)
     end
   end
@@ -1132,6 +1224,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
       expect(content).to include("SimpleCov.start")
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
+      expect(content).to include("installs harness helpers documented in spec/README.md")
       expect(content.scan('require "example-gem"').size).to eq(1)
       expect(content).not_to include('require "example/gem"')
       expect(content).not_to include("require \"kettle/test/rspec\"\n\n\n# Internal ENV config")
@@ -1140,6 +1233,58 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include('require_relative "support/shared_contexts/with_rake"')
       expect(content).to include('require_relative "support/shared_contexts/with_mocked_git_adapter"')
       expect(content).to include('config.include_context "with mocked git adapter"')
+    end
+  end
+
+  it "adds the kettle-test helper documentation comment when merging an existing spec helper" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-spec-helper-helper-doc-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: 🧪
+          rubygems:
+            entrypoint_require: "example"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - spec/spec_helper.rb
+        YAML
+        "spec/spec_helper.rb" => <<~RUBY
+          # frozen_string_literal: true
+
+          # External RSpec & related config
+          require "kettle/test/rspec"
+
+          require "example"
+
+          RSpec.configure do |config|
+            config.disable_monkey_patching!
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "spec/spec_helper.rb"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.fetch(:changed)).to be(true)
+      expect(content).to include(<<~RUBY)
+        require "kettle/test/rspec"
+        # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
+      RUBY
+      expect(File.read(File.join(root, "spec", "spec_helper.rb"))).to eq(content)
     end
   end
 
@@ -1191,6 +1336,73 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "removes obsolete nomono activation ceremony from merged local Gemfiles" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-local-gemfile-nomono-loader-cleanup", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          files:
+            gemfiles/modular/coverage_local.gemfile:
+              strategy: merge
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/coverage_local.gemfile
+        YAML
+        "gemfiles/modular/coverage_local.gemfile" => <<~RUBY
+          # frozen_string_literal: true
+
+          # Local path overrides for development.
+          # Loaded by the associated non-local gemfile when KETTLE_DEV_DEV != "false".
+
+          # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
+          # Bundler records that dependency during Gemfile evaluation, but it does not
+          # activate that exact version before the immediate `require "nomono/bundler"`.
+          nomono_activation_requirements = ["~> 1.0", ">= 1.0.8"]
+          nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
+          if File.file?(nomono_lockfile)
+            nomono_locked_spec = Bundler::LockfileParser
+              .new(Bundler.read_file(nomono_lockfile))
+              .specs
+              .find { |spec| spec.name == "nomono" }
+            nomono_locked = nomono_locked_spec &&
+              Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
+            if nomono_locked
+              nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"]
+            end
+          end
+          Kernel.send(:gem, "nomono", *nomono_activation_requirements)
+          require "nomono/bundler"
+
+          local_gems = %w[
+            custom-local
+          ]
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/coverage_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content.scan('require "nomono/bundler"').size).to eq(1)
+      expect(content).not_to include("nomono_activation_requirements")
+      expect(content).not_to include("nomono_lockfile")
+      expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).not_to include('Kernel.send(:gem, "nomono"')
+      expect(content).to include('root: ["src", "my", "kettle-dev"]')
+    end
+  end
+
   it "loads nomono's own local Gemfiles from the local source tree" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1222,6 +1434,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).not_to include("nomono_activation_requirements")
       expect(content).not_to include("nomono_lockfile")
       expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).to include('root: ["src", "my", "kettle-dev"]')
     end
   end
 
@@ -1284,8 +1497,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
-      expect(content).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(content).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(content).not_to include("nomono_requirements")
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
@@ -1314,7 +1527,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       apply = described_class.apply_project(root, env: {})
       content = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }.fetch(:final_content)
 
-      expect(content).not_to include('gem "nomono", *nomono_requirements')
+      expect(content).not_to include('gem "nomono"')
       expect(content).not_to include("nomono_requirements =")
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
@@ -1353,8 +1566,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(apply.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
-      expect(gemfile).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).not_to include("nomono_requirements")
       expect(gemfile.index('gem "nomono"')).to be < gemfile.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
     end
   end
@@ -1511,6 +1724,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).not_to include('gem "yaml-converter"')
       expect(File.read(File.join(root, "gemfiles/modular/documentation.gemfile"))).to eq(content)
     end
+  end
+
+  it "keeps YARD linting in the documentation modular Gemfile" do
+    content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
+
+    expect(content).to include('gem "yard-lint", "~> 1.10", ">= 1.10.2", require: false')
   end
 
   it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do

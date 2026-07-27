@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -59,7 +59,7 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><div id='filecontents'><p><a href="https://discord.gg/3qme4XHNKN"><img src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-192px.svg" alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://www.ruby-lang.org/"><img src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-192px.svg" alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"></a> <a href="https://github.com/structuredmerge"><img src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-192px.svg" alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0"></a></p>
+      <div id="content"><div id='filecontents'><p><a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" width="14%" align="right"></a></p>
 
 <h1 id="️-zipmerge">☯️ Zip::Merge</h1>
 
@@ -71,23 +71,34 @@
 
 <p><code>if ci_badges.map(&amp;:color).all? { it == "green"}</code> 👇️ send money so I can do more of this. FLOSS maintenance is now my full-time job.</p>
 
-<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://polar.sh/pboling"><img src="https://img.shields.io/badge/polar-donate-a51611.svg?style=flat" alt="Donate on Polar"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
+<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
 
 <details>
- <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
+  <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
 
-I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo).
+  <p>I’ve summarized my thoughts in <a href="https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo">this blog post</a>.</p>
 
 </details>
 
-<h2 id="-synopsis">🌻 Synopsis</h2>
+<h2 id="-synopsis--">🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"></a>
+</h2>
 
-<p><code>Zip::Merge</code> plans ZIP archive merges by member path and raw byte ranges. It identifies safe preservation cases, unsafe entries, members that need structured nested merges, and archive metadata that must be rewritten by a renderer.</p>
+<p><code>Zip::Merge</code> plans ZIP archive merges by member path and raw byte ranges. It is<br>
+a Kaitai-family binary AST integration in the StructuredMerge stack: ZIP<br>
+inventories are represented with TreeHaver ZIP report nodes, and analysis enters<br>
+through a <code>parser_for(:zip)</code> Kaitai path. It depends on <code>binary-merge</code> for the<br>
+shared binary-family substrate: preservation reports, unsafe diagnostics,<br>
+byte-range ownership, and renderer planning vocabulary.<br>
+It identifies safe preservation cases, unsafe entries, members that need<br>
+structured nested merges, and archive metadata that must be rewritten by a<br>
+renderer.</p>
 
 <h3 id="key-features">Key Features</h3>
 
 <ul>
   <li>Central directory and local header inventory parsing.</li>
+  <li>Kaitai-family binary AST reporting through TreeHaver ZIP structures.</li>
+  <li>Shared binary-family report and diagnostic helpers from <code>binary-merge</code>.</li>
   <li>Member decisions for preserve, add, delete, rewrite, delegate, and reject operations.</li>
   <li>Nested family dispatch for structured archive members.</li>
   <li>Raw-preserving renderer for safe unchanged members.</li>
@@ -108,20 +119,18 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
   <tbody>
     <tr>
       <td>Works with MRI Ruby 4</td>
-      <td>
-<a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-4.0-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Ruby 4.0 Compat"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a>
-</td>
+      <td><a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a></td>
     </tr>
     <tr>
       <td>Support &amp; Community</td>
       <td>
-<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
+<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://www.rubyforum.org/c/help/8"><img src="https://img.shields.io/badge/RubyForum-Help-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Get help from RubyForum"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
 </td>
     </tr>
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/zip-merge"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/zip-merge"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/zip-merge"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=Github&amp;logoColor=green" alt="Source on Github.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/zip-merge"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/zip-merge"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/zip-merge"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -166,20 +175,75 @@ This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle
 may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
 not practical for the current toolchain.</p>
 
-<table>
-  <thead>
-    <tr>
-      <th>🚚 <em>Amazing</em> test matrix was brought to you by</th>
-      <th>🔎 appraisal2 🔎 and the color 💚 green 💚</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>👟 Check it out!</td>
-      <td>✨ <a href="https://github.com/appraisal-rb/appraisal2">github.com/appraisal-rb/appraisal2</a> ✨</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://github.com/kettle-dev"><img alt="kettle-dev Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/kettle-dev/avatar-128px.svg" width="14%" align="right"></a></p>
+
+<p>The <em>amazing</em> test matrix is powered by the kettle-dev stack.</p>
+
+<details>
+  <summary>How kettle-dev manages complexity in tests</summary>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Gem</th>
+        <th>Source</th>
+        <th>Role</th>
+        <th>Daily download rank</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://bestgems.org/gems/appraisal2">appraisal2</a></td>
+        <td><a href="https://github.com/appraisal-rb/appraisal2">GitHub</a></td>
+        <td>multi-dependency Appraisal matrix generation</td>
+        <td><a href="https://bestgems.org/gems/appraisal2"><img src="https://img.shields.io/gem/rd/appraisal2.svg?style=flat-square" alt="Daily download rank for appraisal2"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/appraisal2-rubocop">appraisal2-rubocop</a></td>
+        <td><a href="https://github.com/appraisal-rb/appraisal2-rubocop">GitHub</a></td>
+        <td>RuboCop Appraisal generator integration</td>
+        <td><a href="https://bestgems.org/gems/appraisal2-rubocop"><img src="https://img.shields.io/gem/rd/appraisal2-rubocop.svg?style=flat-square" alt="Daily download rank for appraisal2-rubocop"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-dev">kettle-dev</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-dev">GitHub</a></td>
+        <td>development, release, and CI workflow tooling</td>
+        <td><a href="https://bestgems.org/gems/kettle-dev"><img src="https://img.shields.io/gem/rd/kettle-dev.svg?style=flat-square" alt="Daily download rank for kettle-dev"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-jem">kettle-jem</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-jem">GitHub</a></td>
+        <td>Appraisals &amp; CI workflow templates</td>
+        <td><a href="https://bestgems.org/gems/kettle-jem"><img src="https://img.shields.io/gem/rd/kettle-jem.svg?style=flat-square" alt="Daily download rank for kettle-jem"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-soup-cover">kettle-soup-cover</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-soup-cover">GitHub</a></td>
+        <td>SimpleCov coverage policy and reporting</td>
+        <td><a href="https://bestgems.org/gems/kettle-soup-cover"><img src="https://img.shields.io/gem/rd/kettle-soup-cover.svg?style=flat-square" alt="Daily download rank for kettle-soup-cover"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-test">kettle-test</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-test">GitHub</a></td>
+        <td>standard test runner and coverage harness</td>
+        <td><a href="https://bestgems.org/gems/kettle-test"><img src="https://img.shields.io/gem/rd/kettle-test.svg?style=flat-square" alt="Daily download rank for kettle-test"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/rubocop-lts">rubocop-lts</a></td>
+        <td><a href="https://github.com/rubocop-lts/rubocop-lts">GitHub</a></td>
+        <td>Ruby-version-aware linting</td>
+        <td><a href="https://bestgems.org/gems/rubocop-lts"><img src="https://img.shields.io/gem/rd/rubocop-lts.svg?style=flat-square" alt="Daily download rank for rubocop-lts"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/turbo_tests2">turbo_tests2</a></td>
+        <td><a href="https://github.com/galtzo-floss/turbo_tests2">GitHub</a></td>
+        <td>parallel test execution</td>
+        <td><a href="https://bestgems.org/gems/turbo_tests2"><img src="https://img.shields.io/gem/rd/turbo_tests2.svg?style=flat-square" alt="Daily download rank for turbo_tests2"></a></td>
+      </tr>
+    </tbody>
+  </table>
+
+</details>
 
 <h2 id="-installation">✨ Installation</h2>
 
@@ -209,9 +273,10 @@ plan = Zip::Merge.plan_zip_merge(ancestor, current, incoming)
 
 <pre class="code language-ruby"><code class="language-ruby">require &quot;zip/merge&quot;
 
-ancestor = Zip::Merge.parse_zip_inventory(File.binread(&quot;base.zip&quot;))
-current = Zip::Merge.parse_zip_inventory(File.binread(&quot;ours.zip&quot;))
-incoming = Zip::Merge.parse_zip_inventory(File.binread(&quot;theirs.zip&quot;))
+zip_parser = TreeHaver.parser_for(:zip, backend_type: :kaitai)
+ancestor = zip_parser.parse(File.binread(&quot;base.zip&quot;))
+current = zip_parser.parse(File.binread(&quot;ours.zip&quot;))
+incoming = zip_parser.parse(File.binread(&quot;theirs.zip&quot;))
 
 plan = Zip::Merge.plan_zip_merge(ancestor, current, incoming)
 plan.member_decisions.each do |decision|
@@ -262,7 +327,7 @@ read this article from the creator of SemVer:</p>
 
 <h2 id="-license">📄 License</h2>
 
-<p>The gem is available under the following licenses: <a href="AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
+<p>The gem is available under the following licenses: <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
 See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
 
 <p>If none of the available licenses suit your use case, please <a href="mailto:floss@galtzo.com">contact us</a> to discuss a custom commercial license.</p>
@@ -270,9 +335,9 @@ See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:18 2026 by
+  Generated on Fri Jul 24 19:54:57 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

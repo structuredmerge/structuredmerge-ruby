@@ -301,7 +301,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
   it "runs install as active apply plus local post-template checks" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
-    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
+    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
     Dir.mktmpdir("kettle-jem-install-post-template-slice", tmp_root) do |root|
       write_tree(root, {
         "example.gemspec" => <<~RUBY,
@@ -476,6 +476,40 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
 
+      Dir.mktmpdir("kettle-jem-locked-bootstrap", tmp_root) do |locked_root|
+        expect(system("git", "init", locked_root, out: File::NULL, err: File::NULL)).to be(true)
+        File.write(File.join(locked_root, "tracked.txt"), "changed\n")
+        lock_path = File.join(locked_root, ".git", "kettle-family-template-commit.lock")
+        lock_observations = []
+        locked_runner = lambda do |command, chdir:, env:, quiet:|
+          commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+          File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
+            locked = !lock.flock(File::LOCK_EX | File::LOCK_NB)
+            lock_observations << locked if command.first == "git"
+          end
+          {success: true, exitstatus: 0, stdout: "", stderr: ""}
+        end
+
+        locked_step = Kettle::Jem::Tasks::InstallTask.send(
+          :execute_ready_commands_step,
+          {
+            name: "bootstrap_commit",
+            status: "ready",
+            dirty_entries: ["?? tracked.txt"],
+            commands: [%w[git add -A], ["git", "commit", "-m", "locked"]]
+          },
+          project_root: locked_root,
+          env: {"KETTLE_JEM_GIT_COMMIT_LOCK" => lock_path},
+          quiet: false,
+          command_runner: locked_runner
+        )
+        expect(locked_step).to include(
+          status: "succeeded",
+          git_commit_lock: lock_path
+        )
+        expect(lock_observations).to all(be(true))
+      end
+
       Dir.mktmpdir("kettle-jem-clean-bootstrap", tmp_root) do |clean_root|
         expect(system("git", "init", clean_root, out: File::NULL, err: File::NULL)).to be(true)
         stale_commit_step = Kettle::Jem::Tasks::InstallTask.send(
@@ -612,7 +646,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
   it "applies full templates after accepting a newly bootstrapped config before bundled handoff" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
-    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
+    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
     Dir.mktmpdir("kettle-jem-install-bootstrap-followup", tmp_root) do |root|
       write_tree(root, {
         "Gemfile" => <<~RUBY,
@@ -737,7 +771,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     allow(Open3).to receive(:capture3).and_return(["", "", status])
 
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
-      %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
+      %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
     )
   end
 
@@ -1615,6 +1649,60 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "serializes local semantic Git driver setup with the shared Git operation lock" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-lock", tmp_root) do |root|
+      lock_path = File.join(root, ".git", "kettle-family-template-git.lock")
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      command_runner = lambda do |_command, **|
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: root,
+        env: {"KETTLE_JEM_GIT_LOCK" => lock_path},
+        run_options: {},
+        command_runner: command_runner
+      ).first
+
+      expect(result).to include(
+        status: "succeeded",
+        git_lock: lock_path
+      )
+    end
+  end
+
+  it "retries local semantic Git driver setup after transient Git lock conflicts" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-lock-retry", tmp_root) do |root|
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      calls = 0
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:sleep)
+      command_runner = lambda do |_command, **|
+        calls += 1
+        if calls == 1
+          {success: false, exitstatus: 1, stdout: "", stderr: "error: could not lock config file .git/config: File exists"}
+        else
+          {success: true, exitstatus: 0, stdout: "", stderr: ""}
+        end
+      end
+
+      result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: root,
+        env: {},
+        run_options: {},
+        command_runner: command_runner
+      ).first
+
+      expect(result).to include(status: "succeeded")
+      expect(result.fetch(:command_results).first).to include(attempts: 2)
+    end
+  end
+
   it "reports conflicting unmanaged .gitattributes entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -2096,7 +2184,11 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
-        env: {"FORGE_ORG" => "example-org"},
+        env: {
+          "FORGE_ORG" => "example-org",
+          "KJ_GH_ORG" => "ignored-gh-org",
+          "KJ_GH_USER" => "personal-user"
+        },
         run_options: {only: "README.md", skip_commit: true},
         command_runner: command_runner
       )
@@ -2153,6 +2245,43 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         statuses: include("applied" => be >= 4),
         summary: include("install steps")
       )
+    end
+  end
+
+  it "keeps maintainer GitHub user separate from scaffold repository owner" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-gh-org", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.description = "Example description"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.homepage = "https://example.test"
+          end
+        RUBY
+      })
+      command_runner = lambda do |_command, **|
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {"KJ_GH_USER" => "personal-user"},
+        run_options: {skip_commit: true},
+        command_runner: command_runner
+      )
+
+      expect(install.fetch(:install_steps)).to include(hash_including(
+        name: "gemspec_homepage_literal",
+        path: "example.gemspec",
+        status: "skipped",
+        reason: "missing_github_org"
+      ))
+      expect(File.read(File.join(root, "example.gemspec"))).to include('spec.homepage = "https://example.test"')
     end
   end
 end

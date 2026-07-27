@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "open3"
+require "stringio"
+
 load File.expand_path("../../bin/kettle-jem-deps-floor", __dir__)
 
 RSpec.describe KettleJemDepsFloor do
@@ -94,10 +97,43 @@ RSpec.describe KettleJemDepsFloor do
     File.read(File.join(project_root, relative_path))
   end
 
+  def init_git_repository
+    run_git("init", project_root)
+    run_git("-C", project_root, "config", "user.name", "Spec User")
+    run_git("-C", project_root, "config", "user.email", "spec@example.com")
+    run_git("-C", project_root, "add", ".")
+    run_git("-C", project_root, "commit", "-m", "initial")
+  end
+
+  def run_git(*args)
+    _stdout, stderr, status = Open3.capture3("git", *args)
+    raise stderr unless status.success?
+  end
+
+  def git_status
+    stdout, _stderr, status = Open3.capture3("git", "-C", project_root, "status", "--short")
+    raise "git status failed" unless status.success?
+
+    stdout
+  end
+
+  def git_subject
+    stdout, _stderr, status = Open3.capture3("git", "-C", project_root, "log", "-1", "--format=%s")
+    raise "git log failed" unless status.success?
+
+    stdout.chomp
+  end
+
   it "defaults the project root to the gem root relative to the bin script" do
     options = described_class.parse_options([])
 
     expect(options.fetch(:project_root)).to eq(File.expand_path("../..", __dir__))
+  end
+
+  it "allows dependency floor writes to opt out of default commits" do
+    options = described_class.parse_options(%w[--write --no-commit])
+
+    expect(options).to include(write: true, commit: false)
   end
 
   it "reports patch updates without writing files" do
@@ -125,10 +161,25 @@ RSpec.describe KettleJemDepsFloor do
     expect(read_file("template/valid.gemfile.example")).to include('gem "example_dep", "~> 1.2", ">= 1.2.3"')
   end
 
+  it "prints dry-run mode and a write hint when stale floors are found" do
+    out = StringIO.new
+    err = StringIO.new
+    allow(described_class).to receive(:new)
+      .and_return(described_class.new(project_root: project_root, resolver: resolver, options: {upgrade: "patch"}))
+
+    status = described_class.run(%w[--upgrade patch], out: out, err: err)
+
+    expect(status).to eq(0)
+    expect(out.string).to include("deps-floor: mode=dry-run upgrade=patch")
+    expect(out.string).to include("hint: rerun with --write --upgrade patch")
+    expect(err.string).to eq("")
+  end
+
   it "updates parseable Ruby and tokenized template files when writing" do
     result = described_class.new(project_root: project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
 
     expect(result[:updates]).to eq(6)
+    expect(result[:commit]).to include(status: "unavailable", reason: "not_git_repository")
     expect(read_file("lib/embedded.rb")).to include('{name: "embedded_dep", source: %(gem "embedded_dep", "~> 4.5", ">= 4.5.7"\\n)}')
     expect(read_file("lib/embedded.rb")).to include('nomono_requirements = ["~> 1.0", ">= 1.0.9"]')
     expect(read_file("template/valid.gemfile.example")).to include('gem "example_dep", "~> 1.3", ">= 1.3.0"')
@@ -138,6 +189,71 @@ RSpec.describe KettleJemDepsFloor do
     expect(read_file("template/tokenized.gemspec.example")).to include('spec.add_development_dependency("{KJ|TOKENIZED_GEM}", "~> 9.0", ">= 9.0.0")')
     expect(read_file("template/local.gemfile.example")).to include('require "nomono/bundler"')
     expect(read_file("template/documentation.gemfile.example")).to include('gem "yard-timekeeper", "~> 0.2", ">= 0.2.4", require: false')
+  end
+
+  it "commits written updates by default inside git repositories" do
+    init_git_repository
+
+    result = described_class.new(project_root: project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
+
+    expect(result[:commit]).to include(status: "committed")
+    expect(result[:commit].fetch(:files)).to include(
+      "lib/embedded.rb",
+      "template/documentation.gemfile.example",
+      "template/tokenized.gemspec.example",
+      "template/valid.gemfile.example"
+    )
+    expect(git_status).to eq("")
+    expect(git_subject).to eq("⬆️ Raise kettle-jem dependency floors")
+  end
+
+  it "commits written updates from a project nested below the git worktree root" do
+    monorepo_root = Dir.mktmpdir
+    nested_project_root = File.join(monorepo_root, "gems", "kettle-jem")
+    FileUtils.mkdir_p(nested_project_root)
+    begin
+      described_class::SOURCE_GLOBS.each do |pattern|
+        source = File.join(project_root, pattern)
+        next unless File.file?(source)
+
+        destination = File.join(nested_project_root, pattern)
+        FileUtils.mkdir_p(File.dirname(destination))
+        FileUtils.cp(source, destination)
+      end
+      run_git("init", monorepo_root)
+      run_git("-C", monorepo_root, "config", "user.name", "Spec User")
+      run_git("-C", monorepo_root, "config", "user.email", "spec@example.com")
+      run_git("-C", monorepo_root, "add", ".")
+      run_git("-C", monorepo_root, "commit", "-m", "initial")
+
+      result = described_class.new(project_root: nested_project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
+      stdout, _stderr, status = Open3.capture3("git", "-C", monorepo_root, "status", "--short")
+
+      expect(result[:commit]).to include(status: "committed")
+      expect(result[:commit].fetch(:files)).to include("lib/embedded.rb")
+      expect(stdout).to eq("")
+      expect(status).to be_success
+    ensure
+      FileUtils.rm_rf(monorepo_root)
+    end
+  end
+
+  it "leaves written updates uncommitted when commit is disabled" do
+    init_git_repository
+
+    result = described_class.new(project_root: project_root, resolver: resolver, options: {write: true, commit: false, upgrade: "minor"}).run
+
+    expect(result[:commit]).to be_nil
+    expect(git_status).to include(" M lib/embedded.rb")
+  end
+
+  it "refuses to commit when target files were already dirty before writing" do
+    init_git_repository
+    write_file("template/valid.gemfile.example", "#{read_file("template/valid.gemfile.example")}\n# local edit\n")
+
+    expect {
+      described_class.new(project_root: project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
+    }.to raise_error(RuntimeError, /target files were already dirty/)
   end
 
   it "allows the caller to select major updates" do

@@ -439,6 +439,38 @@ Rake task arguments) and CLI flags passed to `kettle-jem setup`.
 | `only` | `--only=VAL` | _(all)_ | Comma-separated glob patterns — only template files matching at least one pattern are processed. |
 | `include` | `--include=VAL` | _(all)_ | Comma-separated glob patterns — additional files to include beyond the default set. |
 | `hook_templates` | `--hook_templates=VAL` | _(prompt)_ | Git hook install location: `l`/`local`, `g`/`global`, or `n`/`none`. Also via `KETTLE_DEV_HOOK_TEMPLATES`. |
+| `KETTLE_JEM_CHECKSUMS` | `--checksums=VAL` | `template,ignore-dest` | Checksum skip mode. See "Checksum Skip Modes" below. |
+| — | `--ignore-checksums` | _(off)_ | Alias for `--checksums=off`; disables checksum-based skipping. |
+
+#### Checksum Skip Modes
+
+Kettle::Jem writes managed template state to
+`.structuredmerge/kettle-jem.lock`. The legacy whole-template checksum
+inventory now lives under `template_state.checksums`.
+That inventory is useful for coarse template drift state, but it is not used to
+skip individual files. File skipping uses `files.*.input_fingerprint`, a
+per-destination digest that includes the selected template source SHA, recipe
+identity/version, resolved token digest, and kettle-jem implementation SHA.
+Token values are hashed into the fingerprint and are not written to the lockfile.
+
+`--checksums` accepts comma-separated modes:
+
+| Mode | Behavior |
+|------|----------|
+| `template` | Skip a destination file only when its `input_fingerprint` matches the lock. This is the default template-input check. |
+| `ignore-dest` | Do not compare the destination file checksum. This is the default destination behavior. |
+| `dest` | Also require the destination file checksum to match the lock before skipping. `dest` implies `template` unless `ignore-template` is present. |
+| `ignore-template` | Do not compare `input_fingerprint`; useful only with `dest` when local destination state should be the only skip gate. |
+| `off` | Disable checksum-based skipping. This cannot be combined with other modes. |
+
+Common combinations:
+
+| Value | Result |
+|-------|--------|
+| `template,ignore-dest` | Default. Retemplate when relevant template input changes; ignore local destination edits. |
+| `dest,template` | Retemplate when relevant template input changes or the destination differs from the prior templated result. |
+| `dest,ignore-template` | Skip only when the destination checksum matches; ignore template input changes. |
+| `off` | Run normal templating without checksum skip shortcuts. |
 
 #### Config & Identity (KJ_ prefix)
 
@@ -455,7 +487,9 @@ fill missing keys during config sync, and act as runtime overrides.
 | `KJ_AUTHOR_GIVEN_NAMES` | First/given names |
 | `KJ_AUTHOR_FAMILY_NAMES` | Last/family names |
 | `KJ_AUTHOR_ORCID` | ORCID identifier |
-| `KJ_GH_USER` | GitHub username |
+| `FORGE_ORG` | Preferred forge organization or owner used for scaffolded repository URLs when no forge remote is available |
+| `KJ_GH_ORG` | GitHub-specific organization or owner fallback for scaffolded repository URLs |
+| `KJ_GH_USER` | GitHub username used for maintainer profile and sponsor links |
 | `KJ_GL_USER` | GitLab username |
 | `KJ_CB_USER` | Codeberg username |
 | `KJ_SH_USER` | SourceHut username |
@@ -488,6 +522,12 @@ K_JEM_TEMPLATING=true KETTLE_JEM_VERBOSE=true bundle exec kettle-jem install
 
 # Interactive mode (prompts before each change)
 K_JEM_TEMPLATING=true bundle exec kettle-jem install --interactive
+
+# Force re-evaluation of every selected template file
+K_JEM_TEMPLATING=true bundle exec kettle-jem install --ignore-checksums
+
+# Retemplate when either template inputs or destination checksums changed
+K_JEM_TEMPLATING=true bundle exec kettle-jem install --checksums=dest,template
 
 # Only workflow files, skip unparseable. Scoped template runs skip install
 # finishing steps and are intended for surgical file updates.

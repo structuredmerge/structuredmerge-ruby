@@ -50,25 +50,74 @@ Ast::Merge builds on tree\_haver to provide:
 - **Region Detection**: `RegionDetectorBase`, `FencedCodeBlockDetector` for text-based analysis
 - **RSpec Shared Examples**: Test helpers for implementing new merge gems
 
-### Merge Gem Backend Patterns
+### Merge Gem Backend and Behavior Patterns
 
 Every merge gem in this family must enter parsing through `tree_haver`. Do not add direct parser fallbacks in merge gems. If a requested backend or grammar is unavailable, fail closed with an unsupported feature or parse diagnostic instead of switching to another parser outside `tree_haver`.
 
-The current merge gems fit three backend patterns:
+Merge gems also form language or format families. Each family has a substrate
+gem that owns shared merge behavior for that language or format. Provider gems
+register alternate AST backends and delegate family-specific behavior back to the
+substrate. This keeps parser differences behind TreeHaver while preserving one
+place for the merge semantics that make a format peculiar.
 
-- **Provider-only merge gems** register a concrete TreeHaver backend and use that backend exclusively. Use this for gems whose purpose is to expose a specific parser provider, such as `prism-merge`, `psych-merge`, `citrus-toml-merge`, and `parslet-toml-merge`.
-- **Hybrid provider plus TSLP merge gems** register their provider backend, and may also register a TSLP/tree-sitter grammar mapping for the same language when both surfaces are intended and tested. `rbs-merge` is the model for this category.
-- **Substrate mapping merge gems** do not own a parser. They register the format grammar with `TreeHaver::GrammarFinder` and use the normal `TreeHaver.parser_for(:format)` API for analysis and merge behavior. `json-merge`, `toml-merge`, `yaml-merge`, and `ruby-merge` follow this pattern.
+These are two separate axes:
+
+- **Behavior role** answers where shared merge semantics live. A substrate gem
+  owns common behavior for a language or format family. A provider gem exposes a
+  backend and delegates family behavior to the substrate when one exists.
+- **Backend role** answers how parsing is registered. A gem may register a
+  TSLP/tree-sitter grammar, a native/provider backend, both, or no parser at all
+  for byte or line oriented merge behavior.
+
+Current examples:
+
+- **Substrate with TSLP/tree-sitter registration**: `markdown-merge`,
+  `yaml-merge`, `ruby-merge`, and `toml-merge` register tree-sitter grammar
+  paths and host shared family behavior. `json-merge`, `bash-merge`,
+  `go-merge`, `html-merge`, `rust-merge`, and `typescript-merge` currently use
+  the same TSLP-backed shape for formats without alternate provider gems.
+- **Provider backed by a native or Ruby parser**: `commonmarker-merge`,
+  `kramdown-merge`, and `markly-merge` provide Markdown backends and share
+  behavior with `markdown-merge`; `psych-merge` provides a YAML backend and
+  should share behavior with `yaml-merge`; `prism-merge` provides a Ruby backend
+  and shares behavior with `ruby-merge`; `citrus-toml-merge` and
+  `parslet-toml-merge` provide TOML backends and share behavior with
+  `toml-merge`.
+- **Dual-backend single gem**: `rbs-merge` registers the official RBS parser
+  backend and the tree-sitter RBS grammar in one gem because both surfaces are
+  intentional and tested there.
+- **Kaitai/binary family**: `binary-merge` is the shared substrate for
+  schema-aware binary merge behavior: byte ranges, preservation reports, unsafe
+  diagnostics, render policies, and nested dispatch conventions. Concrete
+  parser gems such as `zip-merge` depend on that substrate, register their
+  schema parser path, and produce normalized TreeHaver binary report nodes.
+- **Synthetic line AST merge gems**: `plain-merge` registers `:text` and
+  `:plain` line-backed parser paths for normalized block analysis, and
+  `dotenv-merge` registers `:dotenv` and `:env` parser paths that build dotenv
+  ownership on the plain line substrate.
+- **Thin substrates are still substrates**: `binary-merge` is intentionally thin
+  while ZIP is the only Kaitai-backed family member. Shared binary behavior
+  should move there as additional binary schema gems prove common patterns.
 
 Backend fallback inside `tree_haver` is allowed when it is explicit TreeHaver backend selection. Backend fallback outside `tree_haver` is not allowed, because it bypasses owner identity, backend diagnostics, parser capability reporting, and shared merge-stack behavior.
+
+Partial document insertion, replacement, and removal belong in `ast-crispr`.
+`PartialTemplateMerger` classes should be adapters over structural owners and
+source-preserving edit plans, not native object round-trips. A YAML partial merge
+must not parse to Ruby Hashes and emit with `Psych.dump`; a Markdown partial
+merge must not slice headings with regular expressions; and a tree-sitter-backed
+merge must not call the grammar library directly outside TreeHaver.
 
 ### Creating a New Merge Gem
 
 Pick the merge-gem shape before writing parser code:
 
-- Use a substrate mapping gem when the format can use an existing TreeHaver grammar/backend. Register the grammar, parse through `TreeHaver.parser_for`, and keep merge behavior in the substrate.
-- Use a provider-only gem when the gem exists to expose one concrete parser backend. Register that backend with `TreeHaver.register_language`, then delegate shared language or format behavior back to the substrate gem.
-- Use a hybrid provider gem only when both the native provider and TSLP/tree-sitter path are intentional, tested TreeHaver backends.
+- Use a substrate gem when the format needs shared behavior across one or more
+  backends. Register the TSLP/tree-sitter grammar there when that backend is
+  supported, parse through `TreeHaver.parser_for`, and keep shared merge
+  behavior in the substrate.
+- Use a provider gem when the gem exists to expose one concrete parser backend. Register that backend with `TreeHaver.register_language`, then delegate shared language or format behavior back to the substrate gem.
+- Use a dual-backend gem only when both the native provider and TSLP/tree-sitter path are intentional, tested TreeHaver backends in that same gem.
 
 Merge gems should not call parser libraries directly during merge analysis. Direct parser calls belong inside TreeHaver backend adapters.
 
@@ -308,7 +357,7 @@ The `Ast::Merge` module is organized into several namespaces, each with detailed
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Works with MRI Ruby 4 | [![Ruby current Compat][💎ruby-c-i]][🚎11-c-wf]|
 | Support & Community | [![Join Me on Daily.dev's RubyFriends][✉️ruby-friends-img]][✉️ruby-friends] [![Get help from RubyForum][✉️ruby-forum-img]][✉️ruby-forum] [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite] [![Get help from me on Upwork][👨🏼‍🏫expsup-upwork-img]][👨🏼‍🏫expsup-upwork] [![Get help from me on Codementor][👨🏼‍🏫expsup-codementor-img]][👨🏼‍🏫expsup-codementor] |
-| Source | [![Source on GitLab.com][📜src-gl-img]][📜src-gl] [![Source on CodeBerg.org][📜src-cb-img]][📜src-cb] [![Source on Github.com][📜src-gh-img]][📜src-gh] [![The best SHA: dQw4w9WgXcQ!][🧮kloc-img]][🧮kloc] |
+| Source | [![Source on GitLab.com][📜src-gl-img]][📜src-gl] [![Source on CodeBerg.org][📜src-cb-img]][📜src-cb] [![Source on GitHub.com][📜src-gh-img]][📜src-gh] [![The best SHA: dQw4w9WgXcQ!][🧮kloc-img]][🧮kloc] |
 | Documentation | [![Current release on RubyDoc.info][📜docs-cr-rd-img]][🚎yard-current] [![YARD on Galtzo.com][📜docs-head-rd-img]][🚎yard-head] [![Maintainer Blog][🚂maint-blog-img]][🚂maint-blog] [![GitLab Wiki][📜gl-wiki-img]][📜gl-wiki] [![GitHub Wiki][📜gh-wiki-img]][📜gh-wiki] |
 | Compliance | [![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0][📄license-img]][📄license] [![Apache license compatibility: Category X][📄license-compat-img]][📄license-compat] [![📄ilo-declaration-img]][📄ilo-declaration] [![Security Policy][🔐security-img]][🔐security] [![Contributor Covenant 2.1][🪇conduct-img]][🪇conduct] [![SemVer 2.0.0][📌semver-img]][📌semver] |
 | Style | [![Enforced Code Style Linter][💎rlts-img]][💎rlts] [![Keep-A-Changelog 1.0.0][📗keep-changelog-img]][📗keep-changelog] [![Gitmoji Commits][📌gitmoji-img]][📌gitmoji] [![Compatibility appraised by: appraisal2][💎appraisal2-img]][💎appraisal2] |
@@ -500,7 +549,7 @@ See [CHANGELOG.md][📌changelog] for a list of releases.
 
 ## 📄 License
 
-The gem is available under the following licenses: [AGPL-3.0-only](AGPL-3.0-only.md), [PolyForm-Small-Business-1.0.0](PolyForm-Small-Business-1.0.0.md).
+The gem is available under the following licenses: [AGPL-3.0-only](https://github.com/structuredmerge/structuredmerge-ruby/blob/main/AGPL-3.0-only.md), [PolyForm-Small-Business-1.0.0](https://github.com/structuredmerge/structuredmerge-ruby/blob/main/PolyForm-Small-Business-1.0.0.md).
 See [LICENSE.md][📄license] for details.
 
 If none of the available licenses suit your use case, please [contact us](mailto:floss@galtzo.com) to discuss a custom commercial license.
@@ -572,7 +621,7 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [📜src-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/ast-merge
 [📜src-cb-img]: https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&logo=CodeBerg&logoColor=blue
 [📜src-cb]: https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/ast-merge
-[📜src-gh-img]: https://img.shields.io/badge/GitHub-238636?style=for-the-badge&logo=Github&logoColor=green
+[📜src-gh-img]: https://img.shields.io/badge/GitHub-238636?style=for-the-badge&logo=GitHub&logoColor=green
 [📜src-gh]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge
 [📜docs-cr-rd-img]: https://img.shields.io/badge/RubyDoc-Current_Release-943CD2?style=for-the-badge&logo=readthedocs&logoColor=white
 [📜docs-head-rd-img]: https://img.shields.io/badge/YARD_on_Galtzo.com-HEAD-943CD2?style=for-the-badge&logo=readthedocs&logoColor=white

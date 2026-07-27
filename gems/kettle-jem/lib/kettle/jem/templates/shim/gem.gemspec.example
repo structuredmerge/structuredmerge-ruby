@@ -35,10 +35,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 13.0"
 
   # Testing
-  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.12")            # ruby >= {KJ|MIN_TEST_RUBY}
+  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.15")            # ruby >= {KJ|MIN_TEST_RUBY}
   spec.add_development_dependency "rspec", "~> 3.12"
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0
-  spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.6")          # ruby >= 2.2.0
+  spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.7")          # ruby >= 2.2.0
 end

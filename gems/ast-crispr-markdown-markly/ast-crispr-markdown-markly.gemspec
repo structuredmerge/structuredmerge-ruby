@@ -96,6 +96,7 @@ Gem::Specification.new do |spec|
 
   # Utilities
   spec.add_dependency 'ast-crispr', "= #{spec.version}"
+  spec.add_dependency 'markdown-merge', "= #{spec.version}"
   spec.add_dependency 'markly-merge', "= #{spec.version}"
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.9') # ruby >= 2.2.0
 

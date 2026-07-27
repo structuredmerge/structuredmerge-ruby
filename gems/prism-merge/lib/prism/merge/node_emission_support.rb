@@ -127,7 +127,7 @@ module Prism
         end
 
         trailing_comments = filter_rehomed_removed_owner_comments(
-          merger.send(:external_trailing_comments_for, node),
+          merger.send(:external_trailing_comments_for, node, analysis: analysis),
           rehomed_orphan_lines: rehomed_orphan_lines,
           comment_role: :external_trailing
         )
@@ -214,8 +214,8 @@ module Prism
         # Bidirectional dedup: filter out leading comments whose text was
         # already emitted by a preceding dest-only or template-only node.
         if leading_comments.any?
+          leading_comments, last_filtered_leading_line = filter_emitted_template_trailing_comments(leading_comments)
           if leading_analysis.equal?(dest_analysis)
-            leading_comments, last_filtered_leading_line = filter_emitted_template_trailing_comments(leading_comments)
             leading_comments, last_filtered_leading_line = filter_emitted_template_leading_comments(
               leading_comments,
               last_filtered_line: last_filtered_leading_line
@@ -295,10 +295,13 @@ module Prism
         template_claimed = template_analysis.respond_to?(:claimed_lines) ? template_analysis.claimed_lines : Set.new
         dest_claimed = dest_analysis.respond_to?(:claimed_lines) ? dest_analysis.claimed_lines : Set.new
         template_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(
-          template_node, claimed_lines: template_claimed
+          template_node, analysis: template_analysis, claimed_lines: template_claimed
         )
-        dest_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(dest_node,
-                                                                                                      claimed_lines: dest_claimed)
+        dest_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(
+          dest_node,
+          analysis: dest_analysis,
+          claimed_lines: dest_claimed
+        )
         trailing_comments = template_trailing_comments.any? ? template_trailing_comments : dest_trailing_comments
         trailing_analysis = template_trailing_comments.any? ? template_analysis : dest_analysis
         trailing_source = trailing_analysis.equal?(template_analysis) ? :template : :destination
@@ -384,11 +387,15 @@ module Prism
             matched_template_node
           )
           leading_comments, last_filtered_leading_line = filter_emitted_template_trailing_comments(leading_comments)
-          leading_comments, last_filtered_leading_line = filter_emitted_template_leading_comments(leading_comments,
-                                                                                                  last_filtered_line: last_filtered_leading_line)
+          leading_comments, last_filtered_leading_line = filter_emitted_template_leading_comments(
+            leading_comments,
+            last_filtered_line: last_filtered_leading_line
+          )
           track_emitted_dest_leading_comments(leading_comments)
         elsif source == :template
-          leading_comments, last_filtered_leading_line = filter_already_emitted_leading_comments(leading_comments)
+          leading_comments, trailing_filtered_line = filter_emitted_template_trailing_comments(leading_comments)
+          leading_comments, emitted_leading_line = filter_already_emitted_leading_comments(leading_comments)
+          last_filtered_leading_line = emitted_leading_line || trailing_filtered_line
           track_emitted_template_leading_comments(leading_comments)
         end
 
@@ -454,7 +461,33 @@ module Prism
         end
         result_line_span = [node_result_start_line, result.line_count] if source_lines.any?
 
-        trailing_comments = node.location.respond_to?(:trailing_comments) ? node.location.trailing_comments : []
+        claimed = analysis.respond_to?(:claimed_lines) ? analysis.claimed_lines : Set.new
+        trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(
+          node,
+          analysis: analysis,
+          claimed_lines: claimed
+        )
+        trailing_analysis = analysis
+        trailing_source = source
+        trailing_node = node
+        if source == :destination && matched_template_node
+          template_claimed = if merger.template_analysis.respond_to?(:claimed_lines)
+                               merger.template_analysis.claimed_lines
+                             else
+                               Set.new
+                             end
+          template_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(
+            matched_template_node,
+            analysis: merger.template_analysis,
+            claimed_lines: template_claimed
+          )
+          if template_trailing_comments.any?
+            trailing_comments = template_trailing_comments
+            trailing_analysis = merger.template_analysis
+            trailing_source = :template
+            trailing_node = matched_template_node
+          end
+        end
         orphan_regions = orphan_regions_for(node, analysis: analysis, source: source)
 
         if trailing_comments.empty? && orphan_regions.empty?
@@ -472,7 +505,8 @@ module Prism
           if emitted_trailing_gap_line.nil?
             # When layout ownership assigns the gap to a later sibling's leading gap,
             # do not emit a single synthetic blank separator here and truncate the run.
-            gap_owned_by_later_destination_sibling = source == :destination && trailing_gap && !trailing_gap.controls_output_for?(node)
+            gap_owned_by_later_destination_sibling =
+              source == :destination && trailing_gap && !trailing_gap.controls_output_for?(node)
 
             unless gap_owned_by_later_destination_sibling
               trailing_line = effective_end_line(node) + 1
@@ -491,24 +525,18 @@ module Prism
           end
         end
 
-        # Lines claimed by promoted BlockDirective nodes should not be re-emitted
-        # as trailing comments of an adjacent code node.
-        claimed = analysis.respond_to?(:claimed_lines) ? analysis.claimed_lines : Set.new
-
-        node_line_range = node.location.start_line..effective_end_line(node)
         trailing_comments.each do |comment|
           line_num = comment.location.start_line
-          next if node_line_range.cover?(line_num)
-          next if claimed.include?(line_num)
 
           line = required_comment_line(
-            analysis,
+            trailing_analysis,
             comment,
             context: 'emitting external trailing comment'
           )
 
-          if source == :template
+          if trailing_source == :template
             result.add_line(line, decision: decision, template_line: line_num)
+            track_emitted_template_trailing_comments([comment])
           else
             result.add_line(line, decision: decision, dest_line: line_num)
             last_emitted_dest_line = line_num
@@ -516,7 +544,11 @@ module Prism
         end
 
         if orphan_regions.any?
-          orphan_previous_line = trailing_comments.any? ? trailing_comments.last.location.start_line : effective_end_line(node)
+          orphan_previous_line = if trailing_comments.any?
+                                   trailing_comments.last.location.start_line
+                                 else
+                                   effective_end_line(trailing_node)
+                                 end
           emitted_orphan_line = merger.send(:wrapper_comment_support).emit_orphan_regions(
             result,
             orphan_regions,

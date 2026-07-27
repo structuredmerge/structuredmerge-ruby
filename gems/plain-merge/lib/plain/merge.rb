@@ -266,6 +266,9 @@ module Plain
   end
 end
 
+require_relative 'merge/backend'
+Plain::Merge.register_backend!
+
 Plain::Merge::Version.class_eval do
   extend VersionGem::Basic
 end

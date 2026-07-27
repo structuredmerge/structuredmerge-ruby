@@ -71,6 +71,7 @@ module Markdown
       HeadingSectionOwner = Struct.new(:location, :heading_text, :heading_source, :level, :base, keyword_init: true)
       LinkDefinitionOwner = Struct.new(:location, :label, :url, :title, :source, keyword_init: true)
       HtmlCommentOwner = Struct.new(:location, :text, :source, keyword_init: true)
+      ListItemOwner = Struct.new(:location, :source, :text, :depth, :marker, keyword_init: true)
       InlineReferenceOwner = Struct.new(
         :location,
         :line,
@@ -339,6 +340,12 @@ module Markdown
         end
       end
 
+      def list_item_owners
+        Array(statements).flat_map do |statement|
+          collect_list_item_owners(unwrap_markdown_statement(statement), depth: 0)
+        end.sort_by { |owner| [owner.location.start_line, owner.location.end_line] }
+      end
+
       def inline_reference_owners
         source.to_s.lines.each_with_index.flat_map do |line, index|
           inline_references_for_line(line.chomp, index + 1)
@@ -393,6 +400,40 @@ module Markdown
         return false unless stripped.start_with?('|')
 
         stripped.include?(' |') || stripped.include?('| ')
+      end
+
+      def collect_list_item_owners(node, depth:)
+        return [] unless node.respond_to?(:type)
+
+        canonical_type = NodeTypeNormalizer.canonical_type(node.type, @backend)
+        next_depth = %i[list].include?(canonical_type) ? depth + 1 : depth
+        owners = []
+        if canonical_type == :list_item
+          position = node.source_position if node.respond_to?(:source_position)
+          if position
+            source_text = source_range(position[:start_line], position[:end_line])
+            owners << ListItemOwner.new(
+              location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
+              source: source_text,
+              text: source_text,
+              depth: depth,
+              marker: list_item_marker(source_text)
+            )
+          end
+        end
+
+        Array(node.children).each do |child|
+          owners.concat(collect_list_item_owners(child, depth: next_depth))
+        end
+        owners
+      end
+
+      def list_item_marker(source_text)
+        stripped = source_text.to_s.lines.first.to_s.lstrip
+        return stripped[0, 2].strip if stripped.start_with?('- ', '* ')
+
+        marker = stripped.split(' ', 2).first.to_s
+        marker.end_with?('.') ? marker : nil
       end
 
       def heading_statement?(statement)

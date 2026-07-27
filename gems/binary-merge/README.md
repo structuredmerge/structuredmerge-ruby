@@ -21,7 +21,11 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
-`Binary::Merge` provides shared binary-family report helpers. It does not pretend arbitrary bytes are structurally mergeable; instead, it records byte ranges, render policies, preservation decisions, and unsafe mutation diagnostics for callers that understand a binary schema.
+`Binary::Merge` is the StructuredMerge substrate for Kaitai-style binary merge
+families. It does not pretend arbitrary bytes are structurally mergeable;
+instead, it records byte ranges, render policies, preservation decisions, and
+unsafe mutation diagnostics for schema-specific parser gems such as
+`zip-merge`.
 
 ### Key Features
 
@@ -29,6 +33,8 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 - Render policy helpers for schema-aware binary renderers.
 - Unsafe mutation diagnostics with byte ranges.
 - Preservation reports for callers that can safely retain raw byte ranges.
+- Shared substrate vocabulary for Kaitai-family parser gems such as
+  `zip-merge`.
 
 ## 💡 Info you can shake a stick at
 
@@ -87,9 +93,9 @@ gem install binary-merge
 
 ## ⚙️ Configuration
 
-`Binary::Merge` has no global parser configuration. Callers pass schema paths, byte ranges, operations, dispositions, and reasons into the helper methods they need.
-
-Use this package as a substrate for schema-specific binary families such as `zip-merge`.
+`Binary::Merge` has no global parser configuration. Schema-specific parser gems
+register their own TreeHaver parser paths and use this package for shared
+binary-family reporting and renderer-planning behavior.
 
 ## 🔧 Basic Usage
 

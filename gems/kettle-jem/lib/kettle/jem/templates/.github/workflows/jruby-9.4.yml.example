@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   test:
-    if: "(github.event_name != 'push' || (!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]'))) && (github.event_name != 'pull_request' || startsWith(github.head_ref, 'engines/') || startsWith(github.head_ref, 'jruby/'))"
+    if: "(github.event_name != 'push' || (!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]'))) && (github.event_name != 'pull_request' || startsWith(github.head_ref, 'engines/') || startsWith(github.head_ref, 'jruby/') || startsWith(github.head_ref, 'feature/release'))"
     name: Specs ${{ matrix.ruby }}@${{ matrix.appraisal }}
     runs-on: ubuntu-22.04
     continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT }}
-        uses: ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: ${{ matrix.ruby }}
           rubygems: ${{ matrix.rubygems }}

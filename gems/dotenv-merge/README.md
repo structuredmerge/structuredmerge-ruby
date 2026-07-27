@@ -21,7 +21,7 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
-Dotenv::Merge intelligently merges two versions of a dotenv (`.env`) file. It is built on [ast-merge][ast-merge] and [tree_haver][tree_haver], and keeps dotenv-specific ownership rules separate from the parser/backend substrate.
+Dotenv::Merge intelligently merges two versions of a dotenv (`.env`) file. It is built on [ast-merge][ast-merge], [plain-merge][plain-merge], and [tree_haver][tree_haver]. Its parser enters through `TreeHaver.parser_for(:dotenv, backend_type: :line)` and builds dotenv-specific ownership rules on the shared plain line substrate.
 
 ### Key Features
 
@@ -31,6 +31,8 @@ Dotenv::Merge intelligently merges two versions of a dotenv (`.env`) file. It is
 - **Freeze Block Support**: Respects freeze markers (default: `dotenv-merge:freeze` / `dotenv-merge:unfreeze`) for merge control - customizable to match your project's conventions
 - **Full Provenance**: Tracks origin of every line
 - **StructuredMerge Native**: Depends on `ast-merge` and `tree_haver`, matching the rest of the Ruby merge family
+- **Line Backend**: Registers `:dotenv` and `:env` parser paths through
+  `TreeHaver.parser_for` and carries the underlying plain line analysis.
 - **Customizable**:
     - `signature_generator` - callable custom signature generators
     - `preference` - setting of `:template`, `:destination`, or a Hash for per-node-type preferences
@@ -65,6 +67,7 @@ File.write("merged.env", result.to_s)
 ```
 
 [ast-merge]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge
+[plain-merge]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/plain-merge
 [tree_haver]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver
 
 ## 💡 Info you can shake a stick at

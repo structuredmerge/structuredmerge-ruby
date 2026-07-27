@@ -20,6 +20,43 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Generated spec harness files now document the RSpec helpers made available by
+  `kettle-test`.
+- Generated main Gemfiles now include `kettle-family`, except when templating
+  the `kettle-family` gem itself.
+- Added `.structuredmerge/kettle-jem.lock` for template application state and
+  checksum-based template skipping, with `--checksums` modes and
+  `--ignore-checksums` as an alias for `--checksums=off`.
+- Documented checksum skip modes and the per-destination `input_fingerprint`
+  used by template-based skipping.
+- `kettle-jem` now uses the shared `kettle-ndjson` event toolkit for NDJSON
+  progress stream filtering, emission, recording, and phase timing.
+- Added `KJ_GH_ORG` as a GitHub-specific repository-owner override for
+  scaffolded GitHub URLs, while keeping generic `FORGE_ORG` at highest
+  precedence so personal `KJ_GH_USER` maintainer settings do not seed org-owned
+  repos.
+- Changelog replay now records a cursor in the managed `kettle-jem` config
+  state so first-time templated projects receive only an initial templating
+  changelog entry, while previously templated projects replay only missed
+  template-impacting entries.
+- Curated Bundler binstub generation now includes `kettle-gha-pins` when it is
+  present in the destination bundle.
+- Generated gemspec templates now include `anonymous_loader` as a development
+  dependency, and version spec normalization uses it to execute generated
+  `version.rb` files for coverage without redefining package constants.
+- Added a transfer changelog query API so family tooling can report how many
+  template-impacting changelog replay entries a project has not yet applied.
+- Generated documentation tooling now includes `yard-lint` and a
+  `.yard-lint.yml` config for kettle-dev's documentation lint task.
+
+### Fixed
+
+- Existing generated `spec/spec_helper.rb` files now receive the
+  `kettle-test` helper documentation comment when structural merge preserves
+  their existing `require "kettle/test/rspec"` line.
+- Version spec normalization now removes managed version specs when
+  `version_gem` is disabled or incompatible with the project's runtime Ruby
+  floor.
 - Templating plan reports now include per-recipe duration metadata, template
   planning deduplicates destination and template-source file reads, and runtime
   loading is reduced to explicit main-Ractor extension points. A disabled
@@ -54,6 +91,9 @@ Please file a bug if you notice a violation of semantic versioning.
   per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
   across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
   matrix runs.
+- Generated JRuby and TruffleRuby workflow templates now run when pull request
+  head branches start with `feature/release`, so `kettle-release` CI monitoring
+  does not treat intentionally skipped engine workflows as release failures.
 - Generated dep-heads workflows now document why every engine job runs directly
   from `gemfiles/dep_heads.gemfile`, making that generated Appraisal file
   required checked-in output for the workflow.
@@ -77,6 +117,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated local Gemfile templates now use a simple `require "nomono/bundler"`
   loader, with a provider-relative loader for `nomono` itself, instead of
   emitting runtime lockfile parsing or explicit gem activation ceremony.
+- Generated root Gemfiles now declare `nomono` with a plain dependency line
+  requiring `nomono` 1.1.0 or newer, and retemplating removes the older
+  `nomono_requirements` helper block.
 - Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
   dependency-bearing kettle-jem templates and update their dependency floors.
 - `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
@@ -104,8 +147,39 @@ Please file a bug if you notice a violation of semantic versioning.
   `KETTLE_JEM_SHIMMED_GEM`, generates only the shim runtime/docs/specs/CI, and
   deletes obsolete implementation code, behavior specs, workflows, and gemfiles.
 
+- kettle-jem-template-20260726-001 - Projects now include an optional
+  `yard:lint` task and YARD lint configuration for documentation quality checks.
+
 ### Changed
 
+- The `kettle-jem` executable startup header is now shown only when
+  `--verbose` is passed, while `version`, `-v`, and `--version` still print
+  just the executable version and exit.
+- Transfer changelog replay now reads sectioned Markdown structurally and
+  applies transferred entries to the matching destination changelog section.
+- Transfer changelog entries now use concise destination-project wording,
+  focusing on what maintainers see after templating.
+- `kettle-jem-deps-floor --write` now commits its managed dependency floor
+  updates by default, with `--no-commit` available for callers that need the
+  previous uncommitted write behavior.
+- `kettle-jem-deps-floor` now labels text reports with dry-run/write mode and
+  prints the exact `--write` hint when stale floors are found in dry-run mode.
+- `kettle-jem-deps-floor --write` now stages dependency floor updates correctly
+  when `kettle-jem` is nested below a monorepo Git worktree root.
+- `kettle-jem-workflow-pins` now labels text reports with dry-run/write mode
+  and prints the exact `--write` hint when stale workflow pins are found in
+  dry-run mode.
+- `kettle-jem-workflow-pins --write` now commits managed workflow pin updates
+  by default, with `--no-commit` available for uncommitted writes.
+- `kettle-jem-workflow-pins` now detects and updates stale version comments
+  when a pinned GitHub Action SHA is already current.
+- Generated Kettle local Gemfiles now resolve `KETTLE_DEV_DEV=true` to the
+  `kettle-dev` workspace family root instead of sibling directories directly
+  under `~/src/my`.
+- Runtime dependency metadata now requires `kettle-gha-pins` 0.3.1 or newer.
+- `bin/kettle-jem-workflow-pins` now calls the shared `kettle-gha-pins` API
+  directly for cache, GitHub ref resolution, and upgrade planning instead of
+  shelling out to `kettle-gha-sha-pins`.
 - Templating now reuses static, shareable regexes and small lookup lists in the
   recipe dispatch and template-policy paths instead of reallocating them during
   each recipe execution.
@@ -211,21 +285,27 @@ Please file a bug if you notice a violation of semantic versioning.
   `yard-timekeeper` >= 0.2.3, and `yard-yaml` >= 0.2.3.
 - kettle-jem now requires `kettle-rb` >= 0.1.2.
 
-- kettle-jem-template-20260716-001 - Shim gemspec manifests now include
-  `LICENSE.md` instead of nonexistent `LICENSE.txt`.
-- kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer
-  repository-only files by default to reduce downstream distro packaging churn.
+- kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
+  of a missing `LICENSE.txt` file.
+- kettle-jem-template-20260716-002 - Gemspecs now ship fewer repository-only
+  files, reducing package noise for downstream packagers.
 
-- kettle-jem-template-20260720-001 - Generated READMEs can now render
-  template-managed corporate sponsor logos from project or family config.
-- kettle-jem-template-20260720-002 - Generated development Gemfiles now use the
-  released `tree_sitter_language_pack` gem 1.13.3 or newer by default.
-- kettle-jem-template-20260720-003 - Generated StructuredMerge Git diff driver
-  config now uses the installed `smorg-rb` Ruby driver name.
-- kettle-jem-template-20260720-004 - Generated multi-engine workflow files now
-  omit JRuby and TruffleRuby jobs when project config declares MRI-only engines.
-- kettle-jem-template-20260720-005 - Generated README Support & Community rows
-  now include a RubyForum help badge.
+- kettle-jem-template-20260720-001 - READMEs can now display configured
+  corporate sponsor logos.
+- kettle-jem-template-20260720-002 - Development Gemfiles now use the released
+  `tree_sitter_language_pack` gem 1.13.3 or newer by default.
+- kettle-jem-template-20260720-003 - StructuredMerge Git diff driver config now
+  uses the installed `smorg-rb` driver command.
+- kettle-jem-template-20260720-004 - MRI-only projects now omit JRuby and
+  TruffleRuby workflow jobs.
+- kettle-jem-template-20260720-005 - README Support & Community links now
+  include RubyForum.
+
+- kettle-jem-template-20260725-001 - Release pull request branches beginning
+  with `feature/release` now run JRuby and TruffleRuby workflows.
+- kettle-jem-template-20260725-002 - Version specs now use `anonymous_loader` to
+  cover `version.rb` without redefining constants, or are removed when version
+  specs are not managed for the project.
 
 ### Deprecated
 
@@ -233,6 +313,59 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated coverage workflows now treat Coveralls, QLTY, and Codecov uploads
+  as optional so third-party coverage outages do not fail CI while the internal
+  coverage threshold check remains authoritative.
+- Generated version files now document their version namespace and constants,
+  reducing warning-only `yard-lint` output in templated gems.
+- Existing managed checksum state is now migrated out of the user-managed
+  kettle-jem config and into `.structuredmerge/kettle-jem.lock` automatically.
+- Legacy root `.kettle-jem.lock` files are now moved to
+  `.structuredmerge/kettle-jem.lock` automatically.
+- Changelog transfer replay now reads migrated `.structuredmerge/kettle-jem.lock`
+  state, so projects do not fall back to first-template changelog behavior after
+  checksum-state migration.
+- Template checksum fingerprints now hash template token values without writing
+  those values into `.structuredmerge/kettle-jem.lock`.
+- Generated `.yard-lint.yml` files now use yard-lint's current schema for
+  severity gating and tag ordering, so documentation lint can boot before docs
+  are regenerated.
+- The packaged transfer changelog is now actually grouped by changelog section,
+  while replay still treats entries as a key-sorted stack for cursor tracking.
+- Changelog replay now corrects stale transfer entries already present in
+  released changelog sections by stable transfer ID, preserving release metadata
+  and project-authored entries.
+- Monorepo templating now serializes local Git driver configuration with the
+  shared family Git operation lock and retries transient Git lock conflicts,
+  preventing parallel `git config --local` workers from racing on `.git/config`.
+- Changelog replay now cross-checks stored replay cursors against the
+  destination changelog contents, so legacy templated projects whose cursor was
+  stamped before transfer entries landed receive the missing transfer entries
+  on the next template run.
+
+- Raised the `kettle-ndjson` runtime dependency floor to v0.1.1 so template
+  tooling can install it on the Ruby 2.4+ Kettle support floor.
+
+- The `kettle-jem` executable now uses normal `require` loading and suppresses
+  its startup header for `--json` / `--events` machine-readable output.
+- Generated MRI 2.4 through 2.7 workflows now bypass `ruby/setup-ruby`
+  Bundler caching and run an explicit bundle install, avoiding `bundle lock`
+  failures against gem.coop's missing legacy specs index.
+- Generated legacy-engine workflows now configure Bundler to mirror gem.coop to
+  RubyGems.org during explicit CI installs, avoiding old Bundler full-index
+  requests that gem.coop does not support.
+- Main Gemfile templating now removes duplicate `eval_gemfile` declarations
+  for the same modular dependency file, avoiding duplicate Bundler dependency
+  warnings after repeated templating.
+- Generated templating workflows now update the root `nomono` bootstrap
+  dependency before enabling `K_JEM_TEMPLATING`, so cold CI runners can install
+  `nomono` before local templating gemfiles require its Bundler DSL.
+- Local Gemfile templating now removes obsolete nomono activation ceremony from
+  existing destination files while retaining the simple
+  `require "nomono/bundler"` loader.
+- Bootstrap commit execution now honors `KETTLE_JEM_GIT_COMMIT_LOCK` by locking
+  around the dirty recheck, `git add`, and `git commit` sequence for monorepo
+  family templating.
 - Generated license summaries now link split license detail files to the
   repository `blob/main` copy instead of packaging-relative files that are
   intentionally excluded from gem manifests.
@@ -960,6 +1093,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - VersionGem-managed `version.rb` and `version.rbs` packaged template targets
   now default to whole-file replacement, preventing legacy version constants
   from being merged into the generated shape.
+
+- kettle-jem-template-20260726-002 - Generated version files now document their
+  version namespace and constants, reducing warning-only YARD lint output.
 
 ### Security
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "fileutils"
 require "json"
 require "open3"
 require "optparse"
-require "securerandom"
+require "pathname"
 
+require "kettle/gha/pins"
 require_relative "../lib/kettle/jem"
 
 # Repository-local maintenance tool for updating kettle-jem workflow template pins.
@@ -22,6 +22,7 @@ class KettleJemWorkflowPins
     @options = {
       write: false,
       check: false,
+      commit: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }.merge(options.transform_keys(&:to_sym))
@@ -33,8 +34,15 @@ class KettleJemWorkflowPins
     if options[:json]
       out.puts(JSON.pretty_generate(result))
     else
+      out.puts("workflow-pins: mode=#{result.fetch(:mode)} upgrade=#{result.fetch(:upgrade)}")
       out.puts("workflow-pins: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
       result.fetch(:updated_actions, []).each { |action| out.puts("  #{action}") }
+      if result[:commit]
+        out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
+      end
+      if !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
+        out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
+      end
     end
     0
   rescue OptionParser::ParseError, ArgumentError => error
@@ -51,6 +59,7 @@ class KettleJemWorkflowPins
       project_root: DEFAULT_PROJECT_ROOT,
       write: false,
       check: false,
+      commit: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }
@@ -63,9 +72,10 @@ class KettleJemWorkflowPins
 
   def self.parser
     OptionParser.new do |opts|
-      opts.banner = "Usage: bin/kettle-jem-workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--upgrade LEVEL]"
+      opts.banner = "Usage: bin/kettle-jem-workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--upgrade LEVEL]"
       opts.on("-w", "--write", "Write updates to kettle-jem template sources.") { |value| value }
       opts.on("--check", "Fail when template workflow pins are stale.") { |value| value }
+      opts.on("--[no-]commit", "Commit written updates (default with --write).") { |value| value }
       opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
       opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
     end
@@ -86,7 +96,12 @@ class KettleJemWorkflowPins
     source_pin_replacements(pins, desired_pins_by_action(pins, replacements)).each do |old_pin, replacement|
       replacements[old_pin] = replacement
     end
-    apply_replacements(replacements.values) if @options[:write] && replacements.any?
+    if @options[:write] && replacements.any?
+      target_paths = replacement_target_paths(replacements.values)
+      preexisting_dirty_paths = preexisting_dirty_target_paths(target_paths)
+      apply_replacements(replacements.values)
+      commit_result = commit_changes(target_paths, preexisting_dirty_paths) if @options[:commit]
+    end
 
     if @options[:check] && replacements.any?
       raise "GitHub Actions pins are stale; run bin/kettle-jem-workflow-pins --write --upgrade #{upgrade}"
@@ -99,6 +114,7 @@ class KettleJemWorkflowPins
       pin_count: pins.length,
       updates: replacements.length,
       updated_actions: replacements.values.map { |replacement| replacement.fetch(:action) }.uniq.sort,
+      commit: commit_result,
       planned_changes: report.fetch("planned_changes", []),
       outdated_pins: report.fetch("outdated_pins", [])
     }
@@ -138,48 +154,100 @@ class KettleJemWorkflowPins
   end
 
   def resolve_updates(pins, upgrade)
-    temp_root = File.join(@project_root, "tmp", "kettle-jem-workflow-pins-#{Process.pid}-#{SecureRandom.hex(4)}")
-    workflow_dir = File.join(temp_root, ".github", "workflows")
-    FileUtils.mkdir_p(workflow_dir)
-    File.write(File.join(workflow_dir, "action-pin-index.yml"), synthetic_workflow(pins))
+    persistent_cache = Kettle::Gha::Pins::PersistentActionCache.new(
+      path: @env["KETTLE_GHA_SHA_PINS_CACHE"] || Kettle::Gha::Pins::PersistentActionCache.default_path
+    )
+    client = Kettle::Gha::Pins::GitHubClient.new(
+      token: github_token,
+      api_base: Kettle::Gha::Pins::API_BASE,
+      user_agent: "kettle-jem-workflow-pins",
+      persistent_cache: persistent_cache
+    )
+    action_versions = {}
+    planned_changes = []
+    outdated_pins = []
 
-    command = [
-      "kettle-gha-sha-pins",
-      "--root", workflow_dir,
-      "--upgrade", upgrade,
-      "--json",
-      "--no-progress"
-    ]
-    stdout, stderr, status = Open3.capture3(@env.to_hash, *command, chdir: @project_root)
-    unless status.success? || status.exitstatus == 3
-      details = [stderr, stdout].map(&:to_s).map(&:strip).reject(&:empty?).join("\n")
-      raise "kettle-gha-sha-pins failed with exit #{status.exitstatus}: #{details}"
+    pins.sort.each do |action, pin|
+      parsed = parse_pin(pin)
+      next unless parsed
+
+      repo_ref = action_repo_ref(action)
+      plan = Kettle::Gha::Pins.resolve_action_plan(
+        cache: action_versions,
+        client: client,
+        repo_ref: repo_ref,
+        old_ref: parsed.fetch(:ref),
+        upgrade_level: upgrade
+      )
+
+      if plan[:updates]
+        planned_changes << {
+          "action" => repo_ref,
+          "old_value" => "#{action}@#{parsed.fetch(:ref)}",
+          "old_ref" => parsed.fetch(:ref),
+          "old_version" => plan[:current_version],
+          "new_ref" => plan[:updates][:sha],
+          "new_version" => plan[:updates][:version],
+          "reason" => plan[:updates][:reason]
+        }
+      end
+      if !plan[:updates] && plan[:current_version] && !parsed[:version].to_s.empty? && parsed[:version] != plan[:current_version]
+        planned_changes << {
+          "action" => repo_ref,
+          "old_value" => "#{action}@#{parsed.fetch(:ref)}",
+          "old_ref" => parsed.fetch(:ref),
+          "old_version" => parsed[:version],
+          "new_ref" => parsed.fetch(:ref),
+          "new_version" => plan[:current_version],
+          "reason" => "update_version_comment"
+        }
+      end
+
+      next unless plan[:is_outdated]
+
+      latest_outdated = plan[:latest_outdated]
+      outdated_pins << {
+        "action" => repo_ref,
+        "old_value" => "#{action}@#{parsed.fetch(:ref)}",
+        "old_ref" => parsed.fetch(:ref),
+        "old_version" => plan[:current_version],
+        "new_ref" => latest_outdated ? latest_outdated[:sha] : nil,
+        "new_version" => latest_outdated ? latest_outdated[:version] : nil,
+        "upgrade_level" => upgrade,
+        "reason" => plan[:reason]
+      }
     end
 
-    JSON.parse(stdout)
-  ensure
-    FileUtils.rm_rf(temp_root) if temp_root && File.directory?(temp_root)
+    {
+      "planned_changes" => planned_changes,
+      "outdated_pins" => outdated_pins
+    }
   end
 
-  def synthetic_workflow(pins)
-    steps = pins.sort.map.with_index do |(action, pin), index|
-      <<~YAML
-        - name: #{action}
-          id: action_#{index}
-          uses: #{pin}
-      YAML
-    end.join
-    indented_steps = steps.lines.map { |line| "      #{line}" }.join
+  def parse_pin(pin)
+    value = pin.to_s.strip
+    old_value, comment = value.split(/[ \t]+#/, 2)
+    action, separator, ref = old_value.rpartition("@")
+    return nil unless separator == "@" && !action.empty? && !ref.empty?
 
-    <<~YAML
-      name: kettle-jem action pin index
-      on: workflow_dispatch
-      jobs:
-        pins:
-          runs-on: ubuntu-latest
-          steps:
-      #{indented_steps}
-    YAML
+    {action: action, ref: ref, version: comment.to_s.strip.delete_prefix("v")}
+  end
+
+  def action_repo_ref(action)
+    action.to_s.split("/").first(2).join("/")
+  end
+
+  def github_token
+    token = @env["GITHUB_TOKEN"] || @env["GH_TOKEN"]
+    return token unless token.to_s.empty?
+
+    stdout, _stderr, status = Open3.capture3(@env.to_hash, "gh", "auth", "token", chdir: @project_root)
+    return nil unless status.success?
+
+    token = stdout.to_s.strip
+    token.empty? ? nil : token
+  rescue Errno::ENOENT
+    nil
   end
 
   def replacement_map(planned_changes, pins)
@@ -244,6 +312,77 @@ class KettleJemWorkflowPins
       end
       File.write(path, updated) if updated != original
     end
+  end
+
+  def replacement_target_paths(replacements)
+    return [] if replacements.empty?
+
+    source_paths.select do |path|
+      original = File.read(path)
+      replacements.any? { |replacement| original.include?(replacement.fetch(:old_pin)) }
+    end.map { |path| project_relative_path(path) }.uniq.sort
+  end
+
+  def preexisting_dirty_target_paths(relative_paths)
+    return [] if relative_paths.empty? || !git_repository?
+
+    dirty_paths(relative_paths)
+  end
+
+  def commit_changes(relative_paths, preexisting_dirty_paths)
+    return {status: "skipped", reason: "no_updates"} if relative_paths.empty?
+    return {status: "unavailable", reason: "not_git_repository"} unless git_repository?
+    unless preexisting_dirty_paths.empty?
+      raise "Refusing to commit workflow pin updates because target files were already dirty: #{preexisting_dirty_paths.join(", ")}"
+    end
+
+    changed_paths = dirty_paths(relative_paths)
+    return {status: "clean_noop", reason: "no_file_changes"} if changed_paths.empty?
+
+    run_git!("add", "--", *changed_paths.map { |path| worktree_relative_path(path) })
+    run_git!("commit", "-m", "📌 Update kettle-jem workflow pins")
+    {status: "committed", files: changed_paths}
+  end
+
+  def git_repository?
+    !!git_worktree_root
+  end
+
+  def dirty_paths(relative_paths)
+    stdout, _stderr, _status = Open3.capture3("git", "status", "--porcelain", "--", *relative_paths, chdir: @project_root)
+    stdout.lines.filter_map do |line|
+      path = line[3..].to_s.chomp
+      next if path.empty?
+
+      project_relative_path(path)
+    end
+  end
+
+  def run_git!(*args)
+    stdout, stderr, status = Open3.capture3("git", *args, chdir: git_worktree_root || @project_root)
+    return stdout if status.success?
+
+    raise "git #{args.join(" ")} failed: #{stderr.empty? ? stdout : stderr}"
+  end
+
+  def git_worktree_root
+    stdout, _stderr, status = Open3.capture3("git", "rev-parse", "--show-toplevel", chdir: @project_root)
+    return unless status.success?
+
+    stdout.strip unless stdout.strip.empty?
+  end
+
+  def project_relative_path(path)
+    return path if File.file?(File.join(@project_root, path))
+
+    absolute_path = (File.absolute_path(path) == path) ? path : File.expand_path(path, git_worktree_root || @project_root)
+    Pathname(absolute_path).relative_path_from(Pathname(@project_root)).to_s
+  rescue ArgumentError
+    path
+  end
+
+  def worktree_relative_path(path)
+    Pathname(File.join(@project_root, path)).relative_path_from(Pathname(git_worktree_root || @project_root)).to_s
   end
 end
 

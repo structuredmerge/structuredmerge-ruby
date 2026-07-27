@@ -112,6 +112,58 @@ Git diff driver setup
 K_JEM_TEMPLATING=true kettle-jem install
 ```
 
+## Merge gem architecture
+
+Merge gems are parser-backed, but merge behavior must not call parser libraries
+directly. Parsing enters through `tree_haver`; structural edits enter through
+`ast-crispr`; common merge orchestration enters through `ast-merge`.
+
+Language and format families have a substrate gem that owns shared merge
+behavior for that family. A substrate gem may also register the tree-sitter
+grammar interface for the same format. Provider gems register an alternate AST
+backend and delegate family behavior back to the substrate gem.
+
+Do not infer backend registration from the behavior role. A substrate often does
+register a TSLP/tree-sitter grammar, and may still share behavior with provider
+gems that register native or Ruby parser backends.
+
+Examples:
+
+- `markdown-merge` registers the tree-sitter Markdown path and owns shared
+  Markdown merge behavior. `commonmarker-merge`, `kramdown-merge`, and
+  `markly-merge` provide backend-specific AST integrations and share that
+  Markdown behavior.
+- `yaml-merge` is the YAML substrate. It registers the tree-sitter YAML path and
+  should own shared YAML merge behavior, including key-path partial merge
+  semantics. `psych-merge` provides the Psych-backed YAML AST integration and
+  should share those YAML behaviors.
+- `ruby-merge` registers the tree-sitter Ruby path and owns shared Ruby merge
+  behavior. `prism-merge` provides the Prism-backed Ruby AST integration.
+- `toml-merge` registers the tree-sitter TOML path and owns shared TOML merge
+  behavior. `citrus-toml-merge` and `parslet-toml-merge` provide alternate TOML
+  parser integrations.
+- `rbs-merge` intentionally registers both the official RBS parser backend and
+  the tree-sitter RBS grammar in one gem.
+- `zip-merge` is a Kaitai-family binary AST integration. It registers and
+  consumes a `parser_for(:zip)` Kaitai path so ZIP analysis enters through the
+  normalized TreeHaver API, and depends on `binary-merge` for shared
+  binary-family report and renderer-planning behavior.
+- `binary-merge` is the Kaitai/binary substrate. It hosts common byte-range,
+  preservation, unsafe-diagnostic, render-policy, and nested-dispatch vocabulary
+  for concrete schema parser gems such as `zip-merge`.
+- `plain-merge` is the line/text substrate. It registers `:text` and `:plain`
+  parser paths through the `:line` backend.
+- `dotenv-merge` builds dotenv assignment and comment ownership on top of the
+  plain line substrate, and registers `:dotenv` and `:env` parser paths through
+  the same `:line` backend family.
+
+Partial document insertion, replacement, and removal are `ast-crispr` work.
+`PartialTemplateMerger` should normalize the API used by merge gems and route
+those operations through structural owners and source-preserving edit plans. Do
+not implement partial merges by converting documents to native Ruby objects and
+serializing them back out; that bypasses owner identity, comments, layout, and
+backend diagnostics.
+
 Troubleshooting Git diffs
 - Use `git diff --no-ext-diff` to compare against Git's built-in diff output.
 - Use `git diff --no-textconv` when a textconv projection obscures the raw file bytes you need to inspect.
