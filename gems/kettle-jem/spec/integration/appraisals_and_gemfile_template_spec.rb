@@ -1236,6 +1236,58 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "adds the kettle-test helper documentation comment when merging an existing spec helper" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-spec-helper-helper-doc-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: 🧪
+          rubygems:
+            entrypoint_require: "example"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - spec/spec_helper.rb
+        YAML
+        "spec/spec_helper.rb" => <<~RUBY
+          # frozen_string_literal: true
+
+          # External RSpec & related config
+          require "kettle/test/rspec"
+
+          require "example"
+
+          RSpec.configure do |config|
+            config.disable_monkey_patching!
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "spec/spec_helper.rb"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.fetch(:changed)).to be(true)
+      expect(content).to include(<<~RUBY)
+        require "kettle/test/rspec"
+        # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
+      RUBY
+      expect(File.read(File.join(root, "spec", "spec_helper.rb"))).to eq(content)
+    end
+  end
+
   it "treats packaged local Gemfiles as template-owned by default" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

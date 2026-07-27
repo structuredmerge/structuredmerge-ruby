@@ -48,6 +48,12 @@ Please file a bug if you notice a violation of semantic versioning.
   template-impacting changelog replay entries a project has not yet applied.
 - Generated documentation tooling now includes `yard-lint` and a
   `.yard-lint.yml` config for kettle-dev's documentation lint task.
+
+### Fixed
+
+- Existing generated `spec/spec_helper.rb` files now receive the
+  `kettle-test` helper documentation comment when structural merge preserves
+  their existing `require "kettle/test/rspec"` line.
 - Version spec normalization now removes managed version specs when
   `version_gem` is disabled or incompatible with the project's runtime Ruby
   floor.
