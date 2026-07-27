@@ -7294,29 +7294,7 @@ module Kettle
       output = remove_obsolete_simplecov_rescue_bootstrap_blocks(output)
       output = remove_duplicate_simplecov_requires(output)
       output = ensure_spec_helper_simplecov_config_require(output)
-      output = ensure_spec_helper_simplecov_start(output)
-      ensure_spec_helper_kettle_test_helper_comment(output)
-    end
-
-    def ensure_spec_helper_kettle_test_helper_comment(content)
-      comment = "# `kettle/test/rspec` installs harness helpers documented in spec/README.md.\n"
-      return content if content.to_s.include?(comment)
-
-      record = kettle_test_rspec_require_call_records(content).first
-      return content unless record
-
-      insert_lines_after(content, record.fetch(:end_line), comment)
-    end
-
-    def kettle_test_rspec_require_call_records(content)
-      ruby_call_records(content, :require).filter_map do |call|
-        next unless ruby_string_argument(call) == "kettle/test/rspec"
-
-        {
-          start_line: call.location.start_line,
-          end_line: ruby_node_source_end_line(call)
-        }
-      end
+      ensure_spec_helper_simplecov_start(output)
     end
 
     def remove_obsolete_simplecov_rescue_bootstrap_blocks(content)

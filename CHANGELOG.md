@@ -124,6 +124,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `prism-merge` now preserves template-owned trailing comment lines attached to
+  matched Ruby statements, including comments adjacent to generated `require`
+  calls during template merges.
 - `kettle-jem` local Gemfile templating now removes obsolete nomono activation
   ceremony from existing destination files while retaining the simple
   `require "nomono/bundler"` loader.

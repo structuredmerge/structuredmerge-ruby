@@ -315,12 +315,21 @@ module Prism
       # @param claimed_lines [Set<Integer>] Line numbers claimed by promoted BlockDirective
       #   nodes. Trailing comments at claimed lines are excluded to prevent duplication
       #   when those lines are already emitted as part of a BlockDirective node's source.
-      def external_trailing_comments_for(node, claimed_lines: Set.new)
+      def external_trailing_comments_for(node, analysis: nil, claimed_lines: Set.new)
         trailing_comments = node.location.respond_to?(:trailing_comments) ? node.location.trailing_comments : []
         node_line_range = node.location.start_line..node.location.end_line
-        trailing_comments.reject do |comment|
+        prism_trailing_comments = trailing_comments.reject do |comment|
           ln = comment.location.start_line
           node_line_range.cover?(ln) || claimed_lines.include?(ln)
+        end
+
+        inferred_trailing_comments = if analysis
+                                       inferred_external_trailing_comments_for(node, analysis, claimed_lines)
+                                     else
+                                       []
+                                     end
+        (prism_trailing_comments + inferred_trailing_comments).uniq do |comment|
+          [comment.location.start_line, comment.slice]
         end
       end
 
@@ -334,6 +343,38 @@ module Prism
       end
 
       private
+
+      def inferred_external_trailing_comments_for(node, analysis, claimed_lines)
+        return [] unless analysis.respond_to?(:parse_result) && analysis.respond_to?(:line_at)
+
+        line_number = node.location.end_line + 1
+        comments = []
+        comments_by_line = Array(analysis.parse_result.comments).each_with_object({}) do |comment, by_line|
+          by_line[comment.location.start_line] = comment
+        end
+
+        while (comment = comments_by_line[line_number])
+          break if claimed_lines.include?(line_number)
+          break unless full_line_comment_at?(analysis, line_number)
+
+          comments << comment
+          line_number += 1
+        end
+
+        return [] if comments.empty?
+        return [] unless trailing_comment_boundary_after?(analysis, comments.last.location.start_line)
+
+        comments
+      end
+
+      def full_line_comment_at?(analysis, line_number)
+        analysis.line_at(line_number).to_s.lstrip.start_with?('#')
+      end
+
+      def trailing_comment_boundary_after?(analysis, line_number)
+        next_line = analysis.line_at(line_number + 1)
+        next_line.nil? || next_line.strip.empty?
+      end
 
       def runtime_comment_attachment_for(node, source:, analysis:, base_attachment:)
         return unless base_attachment
