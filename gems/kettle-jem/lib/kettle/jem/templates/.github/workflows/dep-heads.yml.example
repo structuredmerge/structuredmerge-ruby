@@ -103,8 +103,8 @@ jobs:
             # for repositories using this generated workflow.
             bundle_gemfile: "gemfiles/dep_heads.gemfile"
             direct_bundle: true
-            rubygems: default
-            bundler: default
+            rubygems: latest
+            bundler: latest
 
     steps:
       - name: Checkout

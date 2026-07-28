@@ -63,6 +63,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated dep-heads workflows now run TruffleRuby jobs with current RubyGems
+  and Bundler, avoiding setup failures before the test suite starts.
 - `kettle-jem-workflow-pins --write` now refreshes GitHub Actions release
   metadata instead of trusting a fresh persistent cache entry, so newly
   published action releases are detected immediately.
