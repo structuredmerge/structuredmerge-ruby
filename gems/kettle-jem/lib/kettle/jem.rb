@@ -16220,7 +16220,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # setup-ruby-flash main b22cb58
+          uses: appraisal-rb/setup-ruby-flash@64c76fed965a5d481a8f19fee429437d9e2e9f01 # v1
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -16332,7 +16332,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # setup-ruby-flash main b22cb58",
+        "        uses: appraisal-rb/setup-ruby-flash@64c76fed965a5d481a8f19fee429437d9e2e9f01 # v1",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -16464,7 +16464,7 @@ module Kettle
         steps << <<~YAML
           - name: Upload coverage to Coveralls
             if: ${{ !env.ACT }}
-            uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+            uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
             with:
               github-token: ${{ secrets.GITHUB_TOKEN }}
               file: coverage/lcov.info
@@ -16772,9 +16772,9 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # setup-ruby-flash main b22cb58",
+        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@64c76fed965a5d481a8f19fee429437d9e2e9f01 # v1",
         "ruby/setup-ruby" => "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
-        "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
+        "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
         "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
