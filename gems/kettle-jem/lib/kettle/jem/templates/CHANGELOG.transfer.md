@@ -40,3 +40,6 @@
 - kettle-jem-template-20260726-003 - Coverage upload steps now treat Coveralls,
   QLTY, and Codecov as optional, so provider outages do not fail CI when local
   coverage thresholds still pass.
+- kettle-jem-template-20260728-002 - Generated RuboCop configs now ignore the
+  same `gemfiles/vendor/bundle` tree as `.gitignore`, so vendored dependency
+  installs are not reported as project lint debt.

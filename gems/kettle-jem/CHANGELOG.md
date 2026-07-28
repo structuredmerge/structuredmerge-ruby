@@ -62,6 +62,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- kettle-jem-template-20260728-002 - Generated RuboCop configs now ignore the
+  same `gemfiles/vendor/bundle` tree as `.gitignore`, so vendored dependency
+  installs are not reported as project lint debt.
 - Existing generated `spec/spec_helper.rb` files now receive the
   `kettle-test` helper documentation comment when structural merge preserves
   their existing `require "kettle/test/rspec"` line.
