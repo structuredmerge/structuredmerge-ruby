@@ -46,3 +46,6 @@
 - kettle-jem-template-20260728-003 - Generated dep-heads workflows now run
   TruffleRuby jobs with current RubyGems and Bundler, avoiding setup failures
   before the test suite starts.
+- kettle-jem-template-20260728-004 - Generated dep-heads workflows now use the
+  setup-ruby Bundler install path for direct appraisal Gemfiles, avoiding rv
+  lockfile parser failures on Git and path dependencies.

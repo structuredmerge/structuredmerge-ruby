@@ -583,6 +583,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(template).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.bundle_gemfile || 'Appraisal.root.gemfile' }}")
     expect(template).not_to include("bundle exec appraisal ${{ matrix.appraisal }}")
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
+    expect(template).to include('use-setup-ruby: "3.2 3.3 3.4 4.0"')
 
     expect(jobs.keys).to include("ruby", "truffleruby", "jruby")
     jobs.each_value do |job|
