@@ -12985,7 +12985,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.0"\n)
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.1"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -12998,7 +12998,7 @@ module Kettle
     end
 
     def nomono_gemfile_declaration
-      %(gem "nomono", "~> 1.1", ">= 1.1.0", require: false # ruby >= 3.2.0)
+      %(gem "nomono", "~> 1.1", ">= 1.1.1", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)

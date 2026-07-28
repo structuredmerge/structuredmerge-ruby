@@ -262,24 +262,24 @@ class KettleJemWorkflowPins
   end
 
   def planned_change_replacement(change, pins)
-      action = pin_action_key(change, pins)
-      return nil unless pins.key?(action)
+    action = pin_action_key(change, pins)
+    return nil unless pins.key?(action)
 
-      new_ref = change.fetch("new_ref").to_s
-      new_version = change["new_version"].to_s
-      return nil if new_ref.empty?
+    new_ref = change.fetch("new_ref").to_s
+    new_version = change["new_version"].to_s
+    return nil if new_ref.empty?
 
-      desired = "#{action}@#{new_ref}"
-      desired += " # v#{new_version}" unless new_version.empty?
-      old_pin = pins.fetch(action)
-      desired = old_pin if version_comment_downgrade?(old_pin, desired)
-      return nil if old_pin == desired
+    desired = "#{action}@#{new_ref}"
+    desired += " # v#{new_version}" unless new_version.empty?
+    old_pin = pins.fetch(action)
+    desired = old_pin if version_comment_downgrade?(old_pin, desired)
+    return nil if old_pin == desired
 
-      {
-        action: action,
-        old_pin: old_pin,
-        new_pin: desired
-      }
+    {
+      action: action,
+      old_pin: old_pin,
+      new_pin: desired
+    }
   end
 
   def source_pin_replacements(pins, desired_pins)

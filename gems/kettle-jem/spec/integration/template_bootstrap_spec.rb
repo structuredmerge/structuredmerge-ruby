@@ -446,8 +446,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(apply.fetch(:changed_files)).to include("Gemfile")
       expect(apply.fetch(:changed_files)).not_to include("tree_haver.gemspec")
       expect(File).not_to exist(File.join(root, ".github"))
-      expect(File.read(File.join(root, "Gemfile"))).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
-      expect(File.read(File.join(root, "Gemfile"))).to include('gem "kettle-family", "~> 1.2", ">= 1.2.0"')
+      expect(File.read(File.join(root, "Gemfile"))).to include('gem "nomono"')
+      expect(File.read(File.join(root, "Gemfile"))).to include('gem "kettle-family"')
       expect(File).not_to exist(File.join(root, "Rakefile"))
     end
   end

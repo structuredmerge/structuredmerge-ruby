@@ -10,6 +10,7 @@ RSpec.describe KettleJemDepsFloor do
   let(:resolver) do
     FakeDepsFloorResolver.new(
       "example_dep" => %w[1.2.3 1.2.9 1.3.0 2.0.0],
+      "bare_embedded_dep" => %w[5.6.7 5.6.8],
       "embedded_dep" => %w[4.5.6 4.5.7],
       "other_dep" => %w[3.0.0 3.0.1 3.1.0],
       "nomono" => %w[1.0.8 1.0.9],
@@ -79,6 +80,7 @@ RSpec.describe KettleJemDepsFloor do
       # frozen_string_literal: true
 
       {name: "embedded_dep", source: %(gem "embedded_dep", "~> 4.5", ">= 4.5.6"\\n)}
+      %(gem "bare_embedded_dep", "~> 5.6", ">= 5.6.7"\\n)
       nomono_requirements = ["~> 1.0", ">= 1.0.8"]
     RUBY
   end
@@ -139,8 +141,8 @@ RSpec.describe KettleJemDepsFloor do
   it "reports patch updates without writing files" do
     result = described_class.new(project_root: project_root, resolver: resolver, options: {upgrade: "patch"}).run
 
-    expect(result[:updates]).to eq(6)
-    expect(result[:updated_dependencies]).to eq(%w[embedded_dep example_dep nomono other_dep yard-timekeeper])
+    expect(result[:updates]).to eq(7)
+    expect(result[:updated_dependencies]).to eq(%w[bare_embedded_dep embedded_dep example_dep nomono other_dep yard-timekeeper])
     expect(result[:planned_changes]).to include(
       hash_including(
         name: "example_dep",
@@ -178,9 +180,10 @@ RSpec.describe KettleJemDepsFloor do
   it "updates parseable Ruby and tokenized template files when writing" do
     result = described_class.new(project_root: project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
 
-    expect(result[:updates]).to eq(6)
+    expect(result[:updates]).to eq(7)
     expect(result[:commit]).to include(status: "unavailable", reason: "not_git_repository")
     expect(read_file("lib/embedded.rb")).to include('{name: "embedded_dep", source: %(gem "embedded_dep", "~> 4.5", ">= 4.5.7"\\n)}')
+    expect(read_file("lib/embedded.rb")).to include('%(gem "bare_embedded_dep", "~> 5.6", ">= 5.6.8"\\n)')
     expect(read_file("lib/embedded.rb")).to include('nomono_requirements = ["~> 1.0", ">= 1.0.9"]')
     expect(read_file("template/valid.gemfile.example")).to include('gem "example_dep", "~> 1.3", ">= 1.3.0"')
     expect(read_file("template/valid.gemfile.example")).to include('spec.add_development_dependency("other_dep", "~> 3.1", ">= 3.1.0")')
@@ -278,7 +281,7 @@ RSpec.describe KettleJemDepsFloor do
   it "reports discovered dependencies without requiring an allow-list" do
     result = described_class.new(project_root: project_root, resolver: resolver, options: {upgrade: "patch"}).run
 
-    expect(result[:discovered_dependencies]).to eq(%w[embedded_dep example_dep nomono other_dep yard-timekeeper])
+    expect(result[:discovered_dependencies]).to eq(%w[bare_embedded_dep embedded_dep example_dep nomono other_dep yard-timekeeper])
   end
 
   it "rejects unsupported upgrade levels" do

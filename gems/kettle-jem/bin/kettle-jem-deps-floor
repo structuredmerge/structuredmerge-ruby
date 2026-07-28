@@ -247,7 +247,7 @@ class KettleJemDepsFloor
     match = stripped.match(/\A(?:gem|spec\.add_dependency|spec\.add_runtime_dependency|spec\.add_development_dependency)\(?\s*"([^"]+)"/)
     return match[1] if match
 
-    match = stripped.match(/source:\s*%\(gem "([^"]+)"/)
+    match = stripped.match(/(?:source:\s*)?%\(gem "([^"]+)"/)
     match && match[1]
   end
 

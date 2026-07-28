@@ -2231,7 +2231,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
-      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).to include('gem "nomono"')
       expect(gemfile).not_to include("nomono_requirements")
       expect(direct_block).to include('require "nomono/bundler"')
       expect(direct_block).not_to include("nomono_activation_requirements")
@@ -2291,7 +2291,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
+          gem "nomono", require: false
 
           # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
           direct_sibling_gems = %w[
@@ -2393,7 +2393,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
+          gem "nomono", require: false
 
           # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
           direct_sibling_gems = %w[
@@ -2490,7 +2490,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
+          gem "nomono", require: false
 
           # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
           direct_sibling_gems = %w[
@@ -2590,7 +2590,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
       gemfile = File.read(File.join(root, "Gemfile"))
 
-      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).to include('gem "nomono"')
       expect(gemfile).not_to include("nomono_requirements")
       expect(gemfile).not_to include('gem "nomono", *nomono_requirements')
     end

@@ -52,6 +52,10 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.3 or newer.
+- Generated main Gemfiles now require `kettle-family` 1.2.1 or newer, so
+  gem-root family commands use the reset helper that runs outside broken
+  member bundles.
+- Generated main Gemfiles now require `nomono` 1.1.1 or newer.
 - Generated Ruby workflow templates now use `appraisal-rb/setup-ruby-flash` for
   Ruby setup, including the workflow summary improvements for resolved Ruby
   versions and head-build revisions.
