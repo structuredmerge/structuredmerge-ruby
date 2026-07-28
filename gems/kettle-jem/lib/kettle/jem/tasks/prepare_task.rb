@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require "bundler"
+require "kettle/dev/lockfile_reset"
+require "pathname"
+require "shellwords"
 
 module Kettle
   module Jem
@@ -27,6 +30,14 @@ module Kettle
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
+          reset_step = reset_release_lockfiles_step(
+            project_root: project_root,
+            setup_env: setup_env,
+            quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
+            command_runner: command_runner,
+            events: events
+          )
+          Kettle::Jem.emit_step_event(events, "command_step", reset_step, phase: "prepare")
           bootstrap_name = templating_bootstrap_step_name(project_root)
           bootstrap_command = templating_bootstrap_command(project_root)
           Kettle::Jem.emit_step_event(
@@ -57,11 +68,13 @@ module Kettle
           final_report = report.merge(
             mode: "prepare",
             prepared: bootstrap_step.fetch(:status) == "succeeded" &&
+              %w[skipped succeeded].include?(reset_step.fetch(:status)) &&
               %w[skipped succeeded].include?(bundle_step.fetch(:status)),
             prepare_only: PREPARE_ONLY_PATHS,
-            prepare_steps: [bootstrap_step, bundle_step],
+            prepare_steps: [reset_step, bootstrap_step, bundle_step],
             changed_files: (
               report.fetch(:changed_files, []) +
+                reset_step.fetch(:changed_files, []) +
                 bootstrap_step.fetch(:changed_files, []) +
                 bundle_step.fetch(:changed_files, [])
             ).uniq.sort,
@@ -73,6 +86,42 @@ module Kettle
           )
           Kettle::Jem.emit_summary_event(events, final_report)
           final_report
+        end
+
+        def reset_release_lockfiles_step(project_root:, setup_env:, quiet:, command_runner:, events:)
+          reset_command_runner = lambda do |command|
+            command_runner.call(Shellwords.split(command), chdir: project_root, env: setup_env, quiet: quiet)
+          end
+          resetter = Kettle::Dev::LockfileReset.new(
+            root: project_root,
+            command_runner: reset_command_runner
+          )
+          paths = resetter.lockfile_paths
+          if paths.empty?
+            return {
+              name: "reset_release_lockfiles",
+              command: %w[kettle-reset release-lockfiles],
+              status: "skipped",
+              reason: "no_release_lockfiles"
+            }
+          end
+
+          Kettle::Jem.emit_step_event(
+            events,
+            "command_step",
+            {name: "reset_release_lockfiles", status: "started", command: %w[kettle-reset release-lockfiles]},
+            phase: "prepare"
+          )
+          before = snapshot_files(paths)
+          resetter.reset(Kettle::Dev::LockfileReset::RELEASE_LOCKFILES_TARGET)
+          changed_files = changed_files_since(project_root, before)
+          {
+            name: "reset_release_lockfiles",
+            command: %w[kettle-reset release-lockfiles],
+            status: "succeeded",
+            changed_files: changed_files,
+            quiet: quiet
+          }
         end
 
         def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)
@@ -123,6 +172,21 @@ module Kettle
 
           locked_names = Bundler::LockfileParser.new(Bundler.read_file(lock_path)).specs.map(&:name)
           LOCKED_TEMPLATING_GEMS & locked_names
+        end
+
+        def snapshot_files(paths)
+          paths.each_with_object({}) do |path, snapshot|
+            snapshot[path] = File.file?(path) ? File.binread(path) : nil
+          end
+        end
+
+        def changed_files_since(project_root, snapshot)
+          snapshot.filter_map do |path, before|
+            after = File.file?(path) ? File.binread(path) : nil
+            next if before == after
+
+            Pathname.new(path).relative_path_from(Pathname.new(project_root)).to_s
+          end.sort
         end
       end
     end
