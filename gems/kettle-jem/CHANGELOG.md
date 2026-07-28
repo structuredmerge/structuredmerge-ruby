@@ -49,6 +49,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated documentation tooling now includes `yard-lint` and a
   `.yard-lint.yml` config for kettle-dev's documentation lint task.
 
+### Changed
+
+- Generated Ruby workflow templates now use `appraisal-rb/setup-ruby-flash` for
+  Ruby setup, including the workflow summary improvements for resolved Ruby
+  versions and head-build revisions.
+
 ### Fixed
 
 - Existing generated `spec/spec_helper.rb` files now receive the

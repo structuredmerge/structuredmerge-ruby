@@ -473,7 +473,7 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
 
       expect(report.fetch(:recipe_name)).to start_with("template_source_application_")
       expect_pinned_action(content, "actions/checkout")
-      expect_pinned_action(content, "ruby/setup-ruby")
+      expect_pinned_action(content, "appraisal-rb/setup-ruby-flash")
       expect(content).not_to include("actions/checkout@v6")
       expect(content).not_to include("ruby/setup-ruby@v1")
     end
@@ -857,6 +857,8 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
 
       expect(configured_plan.fetch(:changed_files)).to include(".github/workflows/framework-ci.yml")
       expect(content).to include("name: Rails CI")
+      expect_pinned_action(content, "appraisal-rb/setup-ruby-flash")
+      expect(content).not_to include("ruby/setup-ruby")
       expect(content).to include('          - "3.2"')
       expect(content).to include("        framework:")
       expect(content).to include('          - framework_version: "7.0"')
@@ -931,6 +933,12 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(paths).not_to include(".github/workflows/truffle.yml")
       expect(plan.fetch(:changed_files)).to include(".github/workflows/ruby-3.2.yml")
       expect(plan.fetch(:changed_files)).not_to include(".github/workflows/ruby-2.7.yml")
+
+      ruby_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:relative_path) == ".github/workflows/ruby-3.2.yml"
+      end
+      expect_pinned_action(ruby_report.fetch(:final_content), "appraisal-rb/setup-ruby-flash")
+      expect(ruby_report.fetch(:final_content)).not_to include("ruby/setup-ruby")
     end
   end
 
