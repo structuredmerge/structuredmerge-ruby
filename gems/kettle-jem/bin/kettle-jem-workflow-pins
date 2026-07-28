@@ -92,7 +92,8 @@ class KettleJemWorkflowPins
 
     validate_template_pin_coverage!(pins)
     report = resolve_updates(pins, upgrade)
-    replacements = replacement_map(report.fetch("planned_changes", []), pins)
+    planned_changes = report.fetch("planned_changes", [])
+    replacements = replacement_map(planned_changes, pins)
     source_pin_replacements(pins, desired_pins_by_action(pins, replacements)).each do |old_pin, replacement|
       replacements[old_pin] = replacement
     end
@@ -115,7 +116,7 @@ class KettleJemWorkflowPins
       updates: replacements.length,
       updated_actions: replacements.values.map { |replacement| replacement.fetch(:action) }.uniq.sort,
       commit: commit_result,
-      planned_changes: report.fetch("planned_changes", []),
+      planned_changes: planned_changes.select { |change| planned_change_replacement(change, pins) },
       outdated_pins: report.fetch("outdated_pins", [])
     }
   end
@@ -161,7 +162,8 @@ class KettleJemWorkflowPins
       token: github_token,
       api_base: Kettle::Gha::Pins::API_BASE,
       user_agent: "kettle-jem-workflow-pins",
-      persistent_cache: persistent_cache
+      persistent_cache: persistent_cache,
+      refresh_cache: @options[:write] || @options[:check]
     )
     action_versions = {}
     planned_changes = []
@@ -252,22 +254,32 @@ class KettleJemWorkflowPins
 
   def replacement_map(planned_changes, pins)
     planned_changes.each_with_object({}) do |change, replacements|
+      replacement = planned_change_replacement(change, pins)
+      next unless replacement
+
+      replacements[replacement.fetch(:old_pin)] = replacement
+    end
+  end
+
+  def planned_change_replacement(change, pins)
       action = pin_action_key(change, pins)
-      next unless pins.key?(action)
+      return nil unless pins.key?(action)
 
       new_ref = change.fetch("new_ref").to_s
       new_version = change["new_version"].to_s
-      next if new_ref.empty?
+      return nil if new_ref.empty?
 
       desired = "#{action}@#{new_ref}"
       desired += " # v#{new_version}" unless new_version.empty?
       old_pin = pins.fetch(action)
-      replacements[old_pin] = {
+      desired = old_pin if version_comment_downgrade?(old_pin, desired)
+      return nil if old_pin == desired
+
+      {
         action: action,
         old_pin: old_pin,
         new_pin: desired
       }
-    end
   end
 
   def source_pin_replacements(pins, desired_pins)
@@ -302,6 +314,33 @@ class KettleJemWorkflowPins
     return old_action if separator == "@" && pins.key?(old_action)
 
     action
+  end
+
+  def version_comment_downgrade?(old_pin, desired_pin)
+    old = parse_pin(old_pin)
+    desired = parse_pin(desired_pin)
+    return false unless old && desired
+    return false unless old.fetch(:ref) == desired.fetch(:ref)
+
+    old_version = parsed_comment_version(old.fetch(:version))
+    desired_version = parsed_comment_version(desired.fetch(:version))
+    return false unless old_version && desired_version
+    return false unless old_version == desired_version
+
+    version_comment_specificity(old.fetch(:version)) > version_comment_specificity(desired.fetch(:version))
+  end
+
+  def parsed_comment_version(version)
+    value = version.to_s.delete_prefix("v")
+    return nil if value.empty?
+
+    Gem::Version.new(value)
+  rescue ArgumentError
+    nil
+  end
+
+  def version_comment_specificity(version)
+    version.to_s.delete_prefix("v").split(".").count { |part| part.match?(/\A\d+\z/) }
   end
 
   def apply_replacements(replacements)

@@ -259,6 +259,44 @@ RSpec.describe KettleJemWorkflowPins do
     expect(File.read(workflow_path)).to include("uses: #{new_comment_pin}")
   end
 
+  it "does not downgrade equivalent version comments to less specific release tags" do
+    explicit_pin = "appraisal-rb/setup-ruby-flash@#{new_sha} # v2.0"
+    allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"appraisal-rb/setup-ruby-flash" => explicit_pin})
+    File.write(pin_index_path, %(def github_actions_step_pins\n  {"appraisal-rb/setup-ruby-flash" => "#{explicit_pin}"}\nend\n))
+    File.write(workflow_path, "steps:\n  - uses: #{explicit_pin}\n")
+    allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(
+      {
+        is_outdated: false,
+        current_version: "2",
+        latest_outdated: nil,
+        reason: nil,
+        updates: nil
+      }
+    )
+
+    result = described_class.new(project_root: project_root, env: env, options: {write: true, commit: false}).run
+
+    expect(result[:updates]).to eq(0)
+    expect(File.read(pin_index_path)).to include(explicit_pin)
+    expect(File.read(workflow_path)).to include("uses: #{explicit_pin}")
+  end
+
+  it "refreshes the persistent action cache when writing updates" do
+    described_class.new(project_root: project_root, env: env, options: {write: true, commit: false}).run
+
+    expect(Kettle::Gha::Pins::GitHubClient).to have_received(:new).with(
+      hash_including(refresh_cache: true)
+    )
+  end
+
+  it "uses the persistent action cache for dry-run reports" do
+    described_class.new(project_root: project_root, env: env).run
+
+    expect(Kettle::Gha::Pins::GitHubClient).to have_received(:new).with(
+      hash_including(refresh_cache: false)
+    )
+  end
+
   it "fails check mode when template sources drift from the canonical pin index" do
     stale_pin = "actions/checkout@#{old_sha} # v1.0.0"
     canonical_pin = "actions/checkout@#{new_sha} # v1.0.1"

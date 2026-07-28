@@ -52,7 +52,7 @@ jobs:
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT }}
-        uses: appraisal-rb/setup-ruby-flash@64c76fed965a5d481a8f19fee429437d9e2e9f01 # v1 main ef0ca95
+        uses: appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # v2.0
         with:
           ruby-version: ${{ matrix.ruby }}
           rubygems: ${{ matrix.rubygems }}

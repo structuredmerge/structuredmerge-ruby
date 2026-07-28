@@ -62,6 +62,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem-workflow-pins --write` now refreshes GitHub Actions release
+  metadata instead of trusting a fresh persistent cache entry, so newly
+  published action releases are detected immediately.
+- `kettle-jem-workflow-pins` no longer downgrades an existing version comment
+  such as `# v2.0` to an equivalent but less specific evergreen tag like
+  `# v2`.
 - kettle-jem-template-20260728-002 - Generated RuboCop configs now ignore the
   same `gemfiles/vendor/bundle` tree as `.gitignore`, so vendored dependency
   installs are not reported as project lint debt.
