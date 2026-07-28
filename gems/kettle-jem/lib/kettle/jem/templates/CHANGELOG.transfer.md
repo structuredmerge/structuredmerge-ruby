@@ -21,6 +21,9 @@
 - kettle-jem-template-20260725-002 - Version specs now use `anonymous_loader` to
   cover `version.rb` without redefining constants, or are removed when version
   specs are not managed for the project.
+- kettle-jem-template-20260728-001 - Generated Ruby workflows now use clearer
+  setup-ruby-flash planning and can prepare appraisal-only jobs without
+  installing the main Gemfile bundle.
 
 ## Fixed
 

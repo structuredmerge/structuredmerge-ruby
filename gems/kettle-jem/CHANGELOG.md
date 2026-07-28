@@ -54,6 +54,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated Ruby workflow templates now use `appraisal-rb/setup-ruby-flash` for
   Ruby setup, including the workflow summary improvements for resolved Ruby
   versions and head-build revisions.
+- Generated Ruby workflow templates now pin the setup-ruby-flash revision that
+  supports appraisal-only setup without installing the main Gemfile bundle.
+- kettle-jem-template-20260728-001 - Generated Ruby workflows now use clearer
+  setup-ruby-flash planning and can prepare appraisal-only jobs without
+  installing the main Gemfile bundle.
 
 ### Fixed
 
