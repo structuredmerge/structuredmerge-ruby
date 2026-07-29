@@ -209,6 +209,8 @@ module Kettle
       %w[min_divergence_threshold] => "KJ_MIN_DIVERGENCE_THRESHOLD",
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
+      %w[rubyforum family_tag] => "KJ_RUBYFORUM_FAMILY_TAG",
+      %w[rubyforum project_tag] => "KJ_RUBYFORUM_PROJECT_TAG",
       %w[rubygems min_ruby] => "KJ_MIN_RUBY",
       %w[rubygems version_gem_entrypoint] => "KJ_VERSION_GEM_ENTRYPOINT",
       %w[templates profile] => "KETTLE_JEM_TEMPLATE_PROFILE",
@@ -3264,6 +3266,7 @@ module Kettle
         project_root: project_root,
         gemspec_metadata: gemspec_metadata
       )
+      rubyforum = rubyforum_facts(kettle_config, env, package_name: name)
       shim = shim_facts(
         kettle_config,
         env,
@@ -3293,6 +3296,7 @@ module Kettle
           engines: ruby_engines_config(kettle_config)
         )
       }
+      facts[:rubyforum] = rubyforum unless rubyforum.empty?
       version_gem_facts = version_gem_facts_for_project(
         project_root,
         entrypoint_require,
@@ -3319,6 +3323,7 @@ module Kettle
         bootstrap[:test_min_ruby] = config_test_min_ruby(kettle_config, min_ruby).to_s
         bootstrap[:yard_host] = project_runtime[:yard_host].to_s
         bootstrap[:homepage_uri] = project_runtime[:homepage_uri].to_s
+        bootstrap[:rubyforum] = rubyforum if rubyforum && !rubyforum.empty?
         project_emoji = preferred_template_token_value(nil, nil, env, "KJ_PROJECT_EMOJI")
         project_emoji ||= readme_project_emoji(project_root)
         project_emoji ||= gemspec_project_emoji(gemspec_metadata)
@@ -9019,6 +9024,7 @@ module Kettle
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, facts: facts, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
       merged = apply_configured_gemspec_required_ruby_version(merged, facts, receiver: template_receiver)
+      merged = apply_configured_gemspec_metadata(merged, facts, receiver: template_receiver)
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
       merged = remove_gemspec_version_gem_dependency_when_runtime_incompatible(merged, facts, receiver: template_receiver)
@@ -9210,6 +9216,51 @@ module Kettle
       " # rubocop:disable Gemspec/RequiredRubyVersion"
     rescue ArgumentError
       ""
+    end
+
+    def apply_configured_gemspec_metadata(content, facts, receiver:)
+      mailing_list_uri = facts.to_h.dig(:rubyforum, :url).to_s
+      return content if mailing_list_uri.empty?
+
+      ensure_gemspec_metadata_assignment(content, receiver: receiver, key: "mailing_list_uri", value: mailing_list_uri)
+    end
+
+    def ensure_gemspec_metadata_assignment(content, receiver:, key:, value:)
+      replacement = %(#{receiver}.metadata[#{key.to_s.dump}] = #{value.to_s.dump})
+      record = gemspec_metadata_assignment_records(content, receiver: receiver).find { |candidate| candidate.fetch(:key) == key.to_s }
+      return replace_source_range_lines(content, record.fetch(:start_line), record.fetch(:end_line), "#{leading_whitespace(record.fetch(:source))}#{replacement}\n") if record
+
+      anchor = %w[discord_uri news_uri wiki_uri funding_uri documentation_uri].filter_map do |metadata_key|
+        gemspec_metadata_assignment_records(content, receiver: receiver).find { |candidate| candidate.fetch(:key) == metadata_key }
+      end.first
+      return insert_lines_after(content, anchor.fetch(:end_line), "  #{replacement}\n") if anchor
+
+      homepage = gemspec_assignment_records(content, receiver: receiver).find { |candidate| candidate.fetch(:field) == "homepage" }
+      return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
+
+      content
+    end
+
+    def gemspec_metadata_assignment_records(content, receiver:)
+      lines = content.to_s.lines
+      ruby_call_records(content, :[]=).filter_map do |call|
+        next unless call.receiver&.slice.to_s == "#{receiver}.metadata"
+
+        args = call.arguments&.arguments.to_a
+        key = ruby_static_string_value(args.first)
+        next if key.to_s.empty?
+
+        start_line = call.location.start_line
+        end_line = ruby_node_source_end_line(call)
+        {
+          key: key,
+          start_line: start_line,
+          end_line: end_line,
+          source: lines[(start_line - 1)..(end_line - 1)].to_a.join
+        }
+      end
+    rescue Ast::Crispr::Error
+      []
     end
 
     def remove_gemspec_version_gem_dependency_when_runtime_incompatible(content, facts, receiver:)
@@ -10431,6 +10482,7 @@ module Kettle
       bootstrap_licenses = Array(recipe[:bootstrap_licenses]).map(&:to_s).reject(&:empty?)
       content = replace_kettle_config_bootstrap_licenses(content, bootstrap_licenses) unless bootstrap_licenses.empty?
       content = replace_kettle_config_bootstrap_project_emoji(content, recipe[:bootstrap_project_emoji]) unless recipe[:bootstrap_project_emoji].to_s.empty?
+      content = replace_kettle_config_bootstrap_rubyforum(content, recipe[:bootstrap_rubyforum]) if recipe[:bootstrap_rubyforum].is_a?(Hash)
       content = apply_kettle_config_bootstrap_profile(content, recipe[:bootstrap_template_profile], recipe[:bootstrap_gemspec_path])
       content = add_shim_bootstrap_config(content, recipe[:bootstrap_shim]) if recipe[:bootstrap_shim].is_a?(Hash)
       sync_kettle_config_env_overrides(content, env)
@@ -10449,6 +10501,15 @@ module Kettle
       return updated unless updated == content
 
       raise Error, "Could not replace licenses block in .kettle-jem.yml bootstrap template"
+    end
+
+    def replace_kettle_config_bootstrap_rubyforum(content, rubyforum)
+      updated = content
+      family_tag = rubyforum[:family_tag].to_s
+      project_tag = rubyforum[:project_tag].to_s
+      updated = replace_yaml_scalar_path(updated, %w[rubyforum family_tag], yaml_config_scalar_literal(family_tag, path: %w[rubyforum family_tag])) unless family_tag.empty?
+      updated = replace_yaml_scalar_path(updated, %w[rubyforum project_tag], yaml_config_scalar_literal(project_tag, path: %w[rubyforum project_tag])) unless project_tag.empty?
+      updated
     end
 
     def replace_yaml_scalar_line(content, key, value)
@@ -12189,6 +12250,7 @@ module Kettle
         readme_family_intro_and_backend_matrix(facts.fetch(:readme_style, {}))
       tokens["KJ|README:DEV_TEST_STACK_TABLE"] = readme_dev_test_stack_table(package.fetch(:name).to_s)
       tokens.merge!(readme_fossa_template_tokens(facts.fetch(:readme_style, {})))
+      tokens.merge!(rubyforum_template_tokens(facts.fetch(:rubyforum, {})))
       tokens.merge!(version_gem_template_tokens(facts))
       tokens.merge!(shim_template_tokens(facts.fetch(:shim, {})))
 
@@ -12241,6 +12303,53 @@ module Kettle
           "[🧪fossa]: https://app.fossa.com/projects/#{encoded_project}?ref=badge_shield",
           "[🧪fossa-img]: https://app.fossa.com/api/projects/#{encoded_project}.svg?type=shield"
         ].join("\n")
+      }
+    end
+
+    def rubyforum_facts(config, env, package_name:)
+      rubyforum_config = config["rubyforum"].is_a?(Hash) ? config["rubyforum"] : {}
+      family_tag = preferred_template_token_value(nil, rubyforum_config["family_tag"], env, "KJ_RUBYFORUM_FAMILY_TAG").to_s
+      project_tag = preferred_template_token_value(nil, rubyforum_config["project_tag"], env, "KJ_RUBYFORUM_PROJECT_TAG").to_s
+      family_tag = normalize_rubyforum_tag(family_tag)
+      project_tag = normalize_rubyforum_tag(project_tag)
+      tag = project_tag.empty? ? family_tag : project_tag
+      tag = normalize_rubyforum_tag(package_name) if tag.empty?
+      return {} if tag.empty?
+
+      url = rubyforum_tag_url(tag)
+      {
+        family_tag: family_tag,
+        project_tag: project_tag,
+        tag: tag,
+        url: url,
+        badge_img: rubyforum_badge_image_url,
+        badge_img_ftb: rubyforum_badge_image_url(style: "for-the-badge")
+      }
+    end
+
+    def normalize_rubyforum_tag(value)
+      value.to_s.strip.delete_prefix("#").delete_suffix("/").split("/").last.to_s
+    end
+
+    def rubyforum_tag_url(tag)
+      "https://www.rubyforum.org/tag/#{URI.encode_www_form_component(tag.to_s)}"
+    end
+
+    def rubyforum_badge_image_url(style: "flat")
+      "https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=#{style}&logo=discourse&label=Ruby%20Users%20Forum"
+    end
+
+    def rubyforum_template_tokens(rubyforum)
+      url = rubyforum[:url].to_s
+      badge_img = rubyforum[:badge_img].to_s
+      badge_img_ftb = rubyforum[:badge_img_ftb].to_s
+      {
+        "KJ|RUBYFORUM:TAG" => rubyforum[:tag].to_s,
+        "KJ|RUBYFORUM:FAMILY_TAG" => rubyforum[:family_tag].to_s,
+        "KJ|RUBYFORUM:PROJECT_TAG" => rubyforum[:project_tag].to_s,
+        "KJ|RUBYFORUM:URL" => url,
+        "KJ|RUBYFORUM:BADGE_IMG" => badge_img,
+        "KJ|RUBYFORUM:BADGE_IMG_FTB" => badge_img_ftb
       }
     end
 
@@ -15480,12 +15589,15 @@ module Kettle
         "KJ|MIN_RUBY" => bootstrap[:min_ruby].to_s,
         "KJ|MIN_TEST_RUBY" => bootstrap[:test_min_ruby].to_s,
         "KJ|YARD_HOST" => bootstrap[:yard_host].to_s,
-        "KJ|HOMEPAGE_URI" => bootstrap[:homepage_uri].to_s
+        "KJ|HOMEPAGE_URI" => bootstrap[:homepage_uri].to_s,
+        "KJ|RUBYFORUM:FAMILY_TAG" => bootstrap.dig(:rubyforum, :family_tag).to_s,
+        "KJ|RUBYFORUM:PROJECT_TAG" => bootstrap.dig(:rubyforum, :project_tag).to_s
       }
       recipe[:bootstrap_licenses] = Array(bootstrap[:licenses]).map(&:to_s).reject(&:empty?)
       recipe[:bootstrap_template_profile] = bootstrap[:template_profile].to_s unless bootstrap[:template_profile].to_s.empty?
       recipe[:bootstrap_gemspec_path] = bootstrap[:gemspec_path].to_s unless bootstrap[:gemspec_path].to_s.empty?
       recipe[:bootstrap_project_emoji] = bootstrap[:project_emoji].to_s unless bootstrap[:project_emoji].to_s.empty?
+      recipe[:bootstrap_rubyforum] = bootstrap[:rubyforum] if bootstrap[:rubyforum].is_a?(Hash)
       recipe[:bootstrap_shim] = bootstrap[:shim] if bootstrap[:shim].is_a?(Hash)
       recipe
     end

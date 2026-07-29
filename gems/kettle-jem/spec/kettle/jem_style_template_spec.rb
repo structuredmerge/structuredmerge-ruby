@@ -14,10 +14,9 @@ RSpec.describe Kettle::Jem do
     readme_template = File.read(File.join(template_root, "README.md.example"))
 
     expect(readme_template).to include("[![Get help from RubyForum][✉️ruby-forum-img]][✉️ruby-forum]")
-    expect(readme_template).to include("[✉️ruby-forum]: https://www.rubyforum.org/c/help/8")
-    expect(readme_template).to include(
-      "[✉️ruby-forum-img]: https://img.shields.io/badge/RubyForum-Help-CC342D"
-    )
+    expect(readme_template).to include("[✉️ruby-forum]: {KJ|RUBYFORUM:URL}")
+    expect(readme_template).to include("[✉️ruby-forum-top-img]: {KJ|RUBYFORUM:BADGE_IMG}")
+    expect(readme_template).to include("[✉️ruby-forum-img]: {KJ|RUBYFORUM:BADGE_IMG_FTB}")
   end
 
   it "projects RuboCop LTS template tokens from minimum Ruby" do

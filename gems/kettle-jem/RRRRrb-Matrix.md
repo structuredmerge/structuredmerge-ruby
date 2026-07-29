@@ -82,7 +82,7 @@ update_rubygems > /dev/null 2>&1
 
 I am a full-time FLOSS maintainer. If you find [my work](github.com/pboling) valuable I ask that you become a sponsor. Every dollar helps!
 
-| 🥰 Support FLOSS work 🥰                                                                                                   | Get access                                                                                    | "Sponsors" channel                            | on Galtzo FLOSS                            | Discord 👇️ [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite]                            |
+| 🥰 Support FLOSS work 🥰                                                                                                   | Get access                                                                                    | "Sponsors" channel                            | on Galtzo FLOSS                            | RubyForum 👇️ [![Ruby Users Forum][✉️ruby-forum-img-ftb]][✉️ruby-forum] <br/> Discord 👇️ [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite] |
 |----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | [![OpenCollective Backers][🖇osc-backers-i]][🖇osc-backers] [![OpenCollective Sponsors][🖇osc-sponsors-i]][🖇osc-sponsors] | [![Buy me a coffee][🖇buyme-small-img]][🖇buyme] [![Donate at ko-fi.com][🖇kofi-img]][🖇kofi] | [![Donate on PayPal][🖇paypal-img]][🖇paypal] | [![Sponsor Me on Github][🖇sponsor-img]][🖇sponsor] [![Liberapay Goal Progress][⛳liberapay-img]][⛳liberapay] |
 
@@ -102,5 +102,7 @@ I am a full-time FLOSS maintainer. If you find [my work](github.com/pboling) val
 [🖇paypal]: https://www.paypal.com/paypalme/peterboling
 [✉️discord-invite]: https://discord.gg/3qme4XHNKN
 [✉️discord-invite-img-ftb]: https://raster.shields.io/discord/1373797679469170758?style=for-the-badge
+[✉️ruby-forum]: https://www.rubyforum.org/tag/structuredmerge
+[✉️ruby-forum-img-ftb]: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=for-the-badge&logo=discourse&label=Ruby%20Users%20Forum
 
 > [Cover Photo](https://unsplash.com/photos/A7EhsPtM14A) by [Sufyan](https://unsplash.com/@blenderdesigner_1688)

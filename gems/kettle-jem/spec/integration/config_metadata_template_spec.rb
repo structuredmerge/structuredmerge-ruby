@@ -25,6 +25,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           min_divergence_threshold: "{KJ|MIN_DIVERGENCE_THRESHOLD}"
           defaults:
             freeze_token: custom-freeze
+          rubyforum:
+            family_tag: structuredmerge
+            project_tag: ast-merge
           templates:
             root: template
             apply: true
@@ -47,6 +50,10 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           Homepage URI: {KJ|HOMEPAGE_URI}
           Emoji: {KJ|PROJECT_EMOJI}
           Divergence: {KJ|MIN_DIVERGENCE_THRESHOLD}
+          RubyForum tag: {KJ|RUBYFORUM:TAG}
+          RubyForum URL: {KJ|RUBYFORUM:URL}
+          RubyForum badge: {KJ|RUBYFORUM:BADGE_IMG}
+          RubyForum badge FTB: {KJ|RUBYFORUM:BADGE_IMG_FTB}
         MARKDOWN
       })
 
@@ -77,6 +84,10 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content).to include("Homepage URI: https://homepage.example.test")
       expect(final_content).to include("Emoji: 🫖")
       expect(final_content).to include("Divergence: 12")
+      expect(final_content).to include("RubyForum tag: ast-merge")
+      expect(final_content).to include("RubyForum URL: https://www.rubyforum.org/tag/ast-merge")
+      expect(final_content).to include("RubyForum badge: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=flat&logo=discourse&label=Ruby%20Users%20Forum")
+      expect(final_content).to include("RubyForum badge FTB: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=for-the-badge&logo=discourse&label=Ruby%20Users%20Forum")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|FREEZE_TOKEN" => "custom-freeze",
         "KJ|GEM_MAJOR" => "2",
@@ -87,6 +98,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         "KJ|NAMESPACE_SHIELD" => "Example::Gem",
         "KJ|PROJECT_EMOJI" => "🫖",
         "KJ|HOMEPAGE_URI" => "https://homepage.example.test",
+        "KJ|RUBYFORUM:TAG" => "ast-merge",
+        "KJ|RUBYFORUM:URL" => "https://www.rubyforum.org/tag/ast-merge",
         "KJ|YARD_HOST" => "docs.example.test"
       )
     end
@@ -153,6 +166,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           homepage_uri: https://homepage.config.test # ENV override: KJ_HOMEPAGE_URI
           rubygems:
             min_ruby: "3.1" # ENV override: KJ_MIN_RUBY
+          rubyforum:
+            family_tag: old-family # ENV override: KJ_RUBYFORUM_FAMILY_TAG
+            project_tag: old-project # ENV override: KJ_RUBYFORUM_PROJECT_TAG
           kettle-jem:
             version: "1.0.0"
           tokens:
@@ -173,7 +189,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           "KJ_YARD_HOST" => "docs.env.test",
           "KJ_HOMEPAGE_URI" => "https://homepage.env.test",
           "KJ_MIN_RUBY" => "1.8.7",
-          "KJ_GH_USER" => "env-user"
+          "KJ_GH_USER" => "env-user",
+          "KJ_RUBYFORUM_FAMILY_TAG" => "structuredmerge",
+          "KJ_RUBYFORUM_PROJECT_TAG" => "ast-merge"
         },
         run_options: {skip_commit: true}
       )
@@ -184,6 +202,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(config.fetch("yard_host")).to eq("docs.env.test")
       expect(config.fetch("homepage_uri")).to eq("https://homepage.env.test")
       expect(config.dig("rubygems", "min_ruby")).to eq("1.8.7")
+      expect(config.dig("rubyforum", "family_tag")).to eq("structuredmerge")
+      expect(config.dig("rubyforum", "project_tag")).to eq("ast-merge")
       expect(config).not_to have_key("kettle-jem")
       expect(config.dig("tokens", "forge", "gh_user")).to eq("env-user")
       lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
@@ -192,9 +212,55 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(report.fetch(:final_content)).to include('yard_host: "docs.env.test" # ENV override: KJ_YARD_HOST')
       expect(report.fetch(:final_content)).to include('homepage_uri: "https://homepage.env.test" # ENV override: KJ_HOMEPAGE_URI')
       expect(report.fetch(:final_content)).to include('min_ruby: "1.8.7" # ENV override: KJ_MIN_RUBY')
+      expect(report.fetch(:final_content)).to include('family_tag: "structuredmerge" # ENV override: KJ_RUBYFORUM_FAMILY_TAG')
+      expect(report.fetch(:final_content)).to include('project_tag: "ast-merge" # ENV override: KJ_RUBYFORUM_PROJECT_TAG')
       expect(report.fetch(:final_content)).not_to include("kettle-jem:")
       expect(report.fetch(:final_content)).to include('gh_user: "env-user" # GitHub username only. ENV: KJ_GH_USER')
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to eq(report.fetch(:final_content))
+    end
+  end
+
+  it "sets gemspec mailing_list_uri from the effective RubyForum tag" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rubyforum-gemspec-metadata", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/structuredmerge/example"
+            spec.metadata["source_code_uri"] = "\#{spec.homepage}/tree/v\#{spec.version}"
+            spec.metadata["mailing_list_uri"] = "https://groups.google.com/g/example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubyforum:
+            family_tag: structuredmerge
+            project_tag: ast-merge
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/structuredmerge/example"
+            spec.metadata["source_code_uri"] = "\#{spec.homepage}/tree/v\#{spec.version}"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "example.gemspec" }
+      final_content = report.fetch(:final_content)
+
+      expect(Prism.parse(final_content)).to be_success
+      expect(final_content).to include('spec.metadata["mailing_list_uri"] = "https://www.rubyforum.org/tag/ast-merge"')
+      expect(final_content).not_to include("groups.google.com")
     end
   end
 
