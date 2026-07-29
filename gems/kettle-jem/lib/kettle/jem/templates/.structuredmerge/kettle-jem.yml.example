@@ -106,6 +106,18 @@ rubygems:
   # compatibility text. Omit this to derive the value from the gemspec.
   # ENV override: KJ_MIN_RUBY
   min_ruby: "{KJ|MIN_RUBY}"
+  # VersionGem loading pattern.
+  # auto      - preserve an existing lib/<entrypoint>/version_gem.rb dedicated
+  #             entrypoint; otherwise use the inline main-entrypoint pattern
+  #             when the runtime Ruby floor supports version_gem.
+  # inline    - require version_gem from lib/<entrypoint>.rb.
+  # dedicated - generate lib/<entrypoint>/version_gem.rb and keep
+  #             lib/<entrypoint>.rb free of version_gem. Use this for gems in
+  #             the version_gem test/tooling dependency graph.
+  # disabled  - do not depend on version_gem or generate VersionGem entrypoints.
+  #             Ruby floors below 2.2 use this effective behavior.
+  # ENV override: KJ_VERSION_GEM_ENTRYPOINT
+  version_gem_entrypoint: auto
 
 # RubyGems package manifest additions.
 # The generated gemspec owns the default package manifest. Add entries here only

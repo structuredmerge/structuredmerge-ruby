@@ -426,6 +426,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config).to include(
         "    - source: lib/gem/version.rb\n      " \
           "target: lib/tree_haver/version.rb\n    " \
+          "- source: lib/gem/version_gem.rb\n      " \
+          "target: lib/tree_haver/version_gem.rb\n    " \
           "- source: sig/gem.rbs\n      " \
           "target: sig/tree_haver.rbs\n"
       )
@@ -556,6 +558,92 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(version_rbs).not_to end_with("\n\n")
       post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "version_gem_bootstrap" }
       expect(post_step.fetch(:changed_files)).to eq(["lib/example/gem.rb", "spec/example/gem/version_spec.rb"])
+    end
+  end
+
+  it "renders a configured dedicated version_gem entrypoint from packaged templates" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-dedicated-template", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.version = "1.2.3"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.2"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          rubygems:
+            version_gem_entrypoint: dedicated
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - source: lib/gem/version.rb
+              - source: lib/gem/version_gem.rb
+              - source: sig/gem.rbs
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+
+      expect(apply.fetch(:changed_files)).to include(
+        "lib/example/gem/version.rb",
+        "lib/example/gem/version_gem.rb",
+        "lib/example/gem.rb"
+      )
+      version_gem_rb = File.read(File.join(root, "lib", "example", "gem", "version_gem.rb"))
+      expect(version_gem_rb).to include('require "version_gem"')
+      expect(version_gem_rb).to include('require_relative "version"')
+      expect(version_gem_rb).to include("Example::Gem::Version.class_eval do")
+      entrypoint = File.read(File.join(root, "lib", "example", "gem.rb"))
+      expect(entrypoint).to include('require_relative "gem/version"')
+      expect(entrypoint).not_to include('require "version_gem"')
+      expect(entrypoint).not_to include("VersionGem::Basic")
+    end
+  end
+
+  it "skips dedicated version_gem templates for Ruby floors below 2.2" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-old-ruby-template", tmp_root) do |root|
+      write_tree(root, {
+        "legacy-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "legacy-gem"
+            spec.version = "1.2.3"
+            spec.summary = "Legacy gem"
+            spec.required_ruby_version = ">= 1.8.7"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          rubygems:
+            min_ruby: "1.8.7"
+            version_gem_entrypoint: dedicated
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - source: lib/gem/version.rb
+              - source: lib/gem/version_gem.rb
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+
+      expect(apply.fetch(:changed_files)).to include("lib/legacy/gem/version.rb")
+      expect(apply.fetch(:changed_files)).not_to include("lib/legacy/gem/version_gem.rb")
+      expect(File).not_to exist(File.join(root, "lib", "legacy", "gem", "version_gem.rb"))
+      version_rb = File.read(File.join(root, "lib", "legacy", "gem", "version.rb"))
+      expect(version_rb).to include("module Version")
+      expect(version_rb).to include("VERSION = Version::VERSION # Traditional Constant Location")
+      expect(version_rb).not_to include("VersionGem")
     end
   end
 

@@ -233,9 +233,9 @@ Please file a bug if you notice a violation of semantic versioning.
   legacy manual bundle install path, avoiding setup-time Bundler full-index
   failures against `gem.coop`.
 - kettle-jem-template-20260729-002 - VersionGem bootstrap now preserves
-  dedicated `version_gem.rb` entrypoint specs even when the gemspec dependency
-  is intentionally omitted, and generated anonymous-loader specs cover both
-  `version.rb` and `version_gem.rb`.
+  and templates dedicated `version_gem.rb` entrypoints even when the gemspec
+  dependency is intentionally omitted, and generated anonymous-loader specs
+  cover both `version.rb` and `version_gem.rb`.
 - `kettle-jem prepare` now skips release lockfile reset while local path
   development env is active, so self-templating unreleased template stacks does
   not fail release validation before templating can run.

@@ -200,6 +200,7 @@ module Kettle
     ].freeze
     VERSION_GEM_TEMPLATE_SOURCES = [
       "lib/gem/version.rb",
+      "lib/gem/version_gem.rb",
       "sig/gem.rbs"
     ].freeze
     KETTLE_CONFIG_ENV_SYNC_PATHS = Ractor.make_shareable({
@@ -209,6 +210,7 @@ module Kettle
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
       %w[rubygems min_ruby] => "KJ_MIN_RUBY",
+      %w[rubygems version_gem_entrypoint] => "KJ_VERSION_GEM_ENTRYPOINT",
       %w[templates profile] => "KETTLE_JEM_TEMPLATE_PROFILE",
       %w[shim replacement_gem] => "KETTLE_JEM_SHIMMED_GEM",
       %w[shim replacement_require] => "KETTLE_JEM_SHIMMED_REQUIRE",
@@ -3291,7 +3293,11 @@ module Kettle
           engines: ruby_engines_config(kettle_config)
         )
       }
-      version_gem_facts = version_gem_facts_for_project(project_root, entrypoint_require)
+      version_gem_facts = version_gem_facts_for_project(
+        project_root,
+        entrypoint_require,
+        mode: rubygems_version_gem_entrypoint_mode(rubygems_config)
+      )
       facts[:version_gem] = version_gem_facts unless version_gem_facts.empty?
       facts[:shim] = shim unless shim.empty?
       repository_topology = repository_topology_for(kettle_config, env, template_selection)
@@ -4949,7 +4955,7 @@ module Kettle
       facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
-      unless project_uses_version_gem?(project_root, entrypoint_require)
+      unless project_uses_version_gem?(project_root, entrypoint_require, facts)
         return [
           version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: false),
           legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
@@ -4996,6 +5002,7 @@ module Kettle
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      dedicated_entrypoint_path = File.join("lib", entrypoint_require, "version_gem.rb")
       version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
       changed_files = []
       current = read_project_file(project_root, entrypoint_path)
@@ -5003,6 +5010,7 @@ module Kettle
         cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
         changed_files << write_if_changed(project_root, entrypoint_path, cleaned)
       end
+      changed_files << cleanup_version_gem_entrypoint(project_root, dedicated_entrypoint_path)
       changed_files << cleanup_version_gem_version_spec(project_root, version_spec_path)
       changed_files.compact!
       {
@@ -5010,6 +5018,7 @@ module Kettle
         status: changed_files.empty? ? "already_current" : "applied",
         changed_files: changed_files,
         entrypoint_path: entrypoint_path,
+        dedicated_entrypoint_path: dedicated_entrypoint_path,
         version_spec_path: version_spec_path
       }
     end
@@ -5034,7 +5043,10 @@ module Kettle
       dependencies.any? { |dependency| dependency.name == "version_gem" }
     end
 
-    def project_uses_version_gem?(project_root, entrypoint_require)
+    def project_uses_version_gem?(project_root, entrypoint_require, facts = nil)
+      configured = facts.to_h.dig(:version_gem, :enabled)
+      return configured if configured == true || configured == false
+
       project_gemspec_declares_version_gem?(project_root) ||
         non_default_version_gem_entrypoint?(project_root, entrypoint_require)
     end
@@ -10897,6 +10909,8 @@ module Kettle
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
+      when "lib/gem/version_gem.rb"
+        File.join("lib", entrypoint_require, "version_gem.rb")
       when "sig/gem.rbs"
         File.join("sig", "#{entrypoint_require}.rbs")
       else
@@ -10912,6 +10926,8 @@ module Kettle
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
+      when "lib/gem/version_gem.rb"
+        File.join("lib", entrypoint_require, "version_gem.rb")
       when "sig/gem.rbs"
         File.join("sig", "#{entrypoint_require}.rbs")
       else
@@ -12278,6 +12294,11 @@ module Kettle
       {
         "KJ|GEM_VERSION" => version,
         "KJ|VERSION_GEM:VERSION_RB" => version_rb.chomp,
+        "KJ|VERSION_GEM:VERSION_GEM_RB" => version_gem_entrypoint_file_content(
+          namespace: namespace,
+          entrypoint_require: facts.dig(:rubygems, :entrypoint_require).to_s,
+          dedicated: true
+        ).chomp,
         "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(namespace: namespace).chomp
       }
     end
@@ -13093,7 +13114,8 @@ module Kettle
         )
       end
       current_entrypoint = read_project_file(project_root, entrypoint_path)
-      non_default_version_gem = non_default_version_gem_entrypoint?(project_root, entrypoint_require)
+      non_default_version_gem = facts.dig(:version_gem, :non_default_entrypoint) ||
+        non_default_version_gem_entrypoint?(project_root, entrypoint_require)
       entrypoint_content = if non_default_version_gem
         version_gem_free_entrypoint_content(current_entrypoint, entrypoint_require: entrypoint_require)
       elsif current_entrypoint.empty?
@@ -13102,6 +13124,13 @@ module Kettle
         version_gem_bootstrap_entrypoint_content(current_entrypoint, namespace: namespace, entrypoint_require: entrypoint_require)
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
+      if non_default_version_gem
+        changes << write_if_changed(
+          project_root,
+          File.join("lib", entrypoint_require, "version_gem.rb"),
+          version_gem_entrypoint_file_content(namespace: namespace, entrypoint_require: entrypoint_require, dedicated: true)
+        )
+      end
       changes << normalize_version_gem_version_spec(
         project_root,
         version_spec_path,
@@ -13136,11 +13165,33 @@ module Kettle
       File.file?(File.join(project_root, version_gem_path))
     end
 
-    def version_gem_facts_for_project(project_root, entrypoint_require)
+    def version_gem_facts_for_project(project_root, entrypoint_require, mode: "")
       version_gem_path = File.join("lib", entrypoint_require.to_s, "version_gem.rb")
-      return {} unless File.file?(File.join(project_root, version_gem_path))
+      normalized_mode = normalize_version_gem_entrypoint_mode(mode)
+      return {enabled: false, mode: "disabled"} if normalized_mode == "disabled"
 
-      {non_default_entrypoint: true, entrypoint_path: version_gem_path}
+      dedicated = normalized_mode == "dedicated" || File.file?(File.join(project_root, version_gem_path))
+      return {enabled: true, mode: "inline"} if normalized_mode == "inline"
+      return {} unless dedicated
+
+      {enabled: true, mode: "dedicated", non_default_entrypoint: true, entrypoint_path: version_gem_path}
+    end
+
+    def rubygems_version_gem_entrypoint_mode(rubygems_config)
+      raw = rubygems_config["version_gem_entrypoint"]
+      nested = rubygems_config["version_gem"]
+      raw = nested["entrypoint"] if raw.to_s.strip.empty? && nested.is_a?(Hash)
+      normalize_version_gem_entrypoint_mode(raw)
+    end
+
+    def normalize_version_gem_entrypoint_mode(value)
+      mode = value.to_s.strip.downcase.tr("_", "-")
+      return "" if mode.empty? || mode == "auto"
+      return "dedicated" if %w[dedicated non-default nondefault separate split].include?(mode)
+      return "inline" if %w[inline default].include?(mode)
+      return "disabled" if %w[disabled disable false off no none].include?(mode)
+
+      mode
     end
 
     def project_namespace(entrypoint_namespace:, version_namespace:, metadata_namespace:, default_namespace:)
@@ -13209,6 +13260,14 @@ module Kettle
       return if current.empty? || !managed_version_gem_version_spec?(current)
 
       delete_project_file(project_root, version_spec_path)
+    end
+
+    def cleanup_version_gem_entrypoint(project_root, entrypoint_path)
+      current = read_project_file(project_root, entrypoint_path)
+      return if current.empty?
+      return unless current.include?('require "version_gem"') && current.include?("VersionGem::Basic")
+
+      delete_project_file(project_root, entrypoint_path)
     end
 
     def managed_version_gem_version_spec?(content)
@@ -13361,13 +13420,14 @@ module Kettle
       RUBY
     end
 
-    def version_gem_entrypoint_file_content(namespace:, entrypoint_require:)
+    def version_gem_entrypoint_file_content(namespace:, entrypoint_require:, dedicated: false)
       sections = ["# frozen_string_literal: true"]
       requires = []
       requires << 'require "version_gem"' unless File.basename(entrypoint_require) == "version_gem"
-      requires << %(require_relative "#{File.join(File.basename(entrypoint_require), "version")}")
+      version_require = dedicated ? "version" : File.join(File.basename(entrypoint_require), "version")
+      requires << %(require_relative "#{version_require}")
       sections << requires.join("\n")
-      sections << wrap_ruby_namespace(namespace, []).join("\n")
+      sections << wrap_ruby_namespace(namespace, []).join("\n") unless dedicated
       sections << version_gem_class_eval_block(namespace).chomp
       "#{sections.reject(&:empty?).join("\n\n")}\n"
     end
@@ -13452,7 +13512,14 @@ module Kettle
       end
 
       first_owner = owners.first
-      first_owner ? first_owner.location.start_line - 1 : context.ast.comments.map { |comment| comment.location.end_line }.max.to_i
+      first_owner ? first_owner.location.start_line - 1 : ruby_parse_comments(context.ast).map { |comment| comment.location.end_line }.max.to_i
+    end
+
+    def ruby_parse_comments(analysis)
+      return analysis.comments if analysis.respond_to?(:comments)
+      return analysis.parse_result.comments if analysis.respond_to?(:parse_result) && analysis.parse_result.respond_to?(:comments)
+
+      []
     end
 
     def ruby_top_level_require?(content, method_name, argument)
@@ -15375,6 +15442,7 @@ module Kettle
       return if skip_disabled_integration_template?(target_path, config)
       return if skip_packaged_gemfile_template?(target_path, config)
       return if skip_packaged_license_template?(target_path, config)
+      return if skip_packaged_version_gem_entrypoint_template?(project_root, source_path, target_path, config)
       return if template_root.fetch(:kind) == "packaged" && opencollective_disabled && opencollective_disabled_file?(target_path)
 
       selected_source = preferred_template_source(template_root.fetch(:path), source_path, opencollective_disabled: opencollective_disabled)
@@ -15413,6 +15481,17 @@ module Kettle
         preference[:source_root_path] = template_root.fetch(:path)
       end
       preference
+    end
+
+    def skip_packaged_version_gem_entrypoint_template?(project_root, source_path, target_path, config)
+      return false unless source_path == "lib/gem/version_gem.rb"
+      return true unless version_gem_runtime_compatible?({rubygems: {min_ruby: config.dig("rubygems", "min_ruby")}})
+
+      mode = rubygems_version_gem_entrypoint_mode(config.fetch("rubygems", {}))
+      return true if mode == "disabled" || mode == "inline"
+      return false if mode == "dedicated"
+
+      !File.file?(File.join(project_root, target_path))
     end
 
     def template_legacy_destination_cleanups(project_root, preferences)
