@@ -281,12 +281,84 @@ RSpec.describe Kettle::Jem do
       )
       version_spec = File.read(File.join(root, "spec/kettle/family/version_spec.rb"))
       expect(version_spec).to include('require "anonymous_loader"')
-      expect(version_spec).to include('path = File.expand_path("../../../lib/kettle/family/version.rb", __dir__)')
-      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include('File.expand_path("../../../lib/kettle/family/version.rb", __dir__)')
+      expect(version_spec).to include('File.expand_path("../../../lib/kettle/family/version_gem.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: paths)")
       expect(version_spec).to include(
         "expect(anonymous_namespace::Kettle::Family::Version::VERSION).to eq(described_class::VERSION)"
       )
       expect(version_spec).not_to include("load path")
+    end
+  end
+
+  it "upgrades legacy anonymous-loader version specs to include version_gem entrypoints" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-version-spec-loader", tmp_root) do |root|
+      write_file(root, "stone_checksums.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "stone_checksums"
+          spec.version = "1.0.8"
+          spec.summary = "Stone checksums"
+          spec.required_ruby_version = ">= 3.1"
+        end
+      RUBY
+      write_file(root, "lib/stone_checksums.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "stone_checksums/version"
+      RUBY
+      write_file(root, "lib/stone_checksums/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module StoneChecksums
+          module Version
+            VERSION = "1.0.8"
+          end
+        end
+      RUBY
+      write_file(root, "lib/stone_checksums/version_gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "version"
+
+        StoneChecksums::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+      write_file(root, "spec/stone_checksums/version_spec.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "anonymous_loader"
+        require "stone_checksums/version_gem"
+
+        RSpec.describe StoneChecksums::Version do
+          it_behaves_like "a Version module", described_class
+
+          it "executes the version file for coverage without redefining constants" do
+            path = File.expand_path("../../lib/stone_checksums/version.rb", __dir__)
+            anonymous_namespace = AnonymousLoader.load(files: path)
+
+            expect(anonymous_namespace::StoneChecksums::Version::VERSION).to eq(described_class::VERSION)
+          end
+        end
+      RUBY
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_gem_bootstrap",
+          status: "applied",
+          changed_files: include("spec/stone_checksums/version_spec.rb")
+        )
+      )
+      version_spec = File.read(File.join(root, "spec/stone_checksums/version_spec.rb"))
+      expect(version_spec).to include('File.expand_path("../../lib/stone_checksums/version.rb", __dir__)')
+      expect(version_spec).to include('File.expand_path("../../lib/stone_checksums/version_gem.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: paths)")
+      expect(version_spec).not_to include("AnonymousLoader.load(files: path)")
     end
   end
 
@@ -300,7 +372,6 @@ RSpec.describe Kettle::Jem do
           spec.version = "1.0.8"
           spec.summary = "Stone checksums"
           spec.required_ruby_version = ">= 3.1"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
         end
       RUBY
       write_file(root, "lib/stone_checksums.rb", <<~RUBY)
@@ -348,8 +419,9 @@ RSpec.describe Kettle::Jem do
       expect(version_spec).to include('require "anonymous_loader"')
       expect(version_spec).to include('require "stone_checksums/version_gem"')
       expect(version_spec).to include("RSpec.describe StoneChecksums::Version do")
-      expect(version_spec).to include('path = File.expand_path("../../lib/stone_checksums/version.rb", __dir__)')
-      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include('File.expand_path("../../lib/stone_checksums/version.rb", __dir__)')
+      expect(version_spec).to include('File.expand_path("../../lib/stone_checksums/version_gem.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: paths)")
       expect(version_spec).to include(
         "expect(anonymous_namespace::StoneChecksums::Version::VERSION).to eq(described_class::VERSION)"
       )
@@ -493,8 +565,9 @@ RSpec.describe Kettle::Jem do
       expect(version_spec).to include('require "anonymous_loader"')
       expect(version_spec).to include('require "nomono/version_gem"')
       expect(version_spec).to include("RSpec.describe Nomono::Version do")
-      expect(version_spec).to include('path = File.expand_path("../../lib/nomono/version.rb", __dir__)')
-      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include('File.expand_path("../../lib/nomono/version.rb", __dir__)')
+      expect(version_spec).to include('File.expand_path("../../lib/nomono/version_gem.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: paths)")
       expect(version_spec).to include(
         "expect(anonymous_namespace::Nomono::Version::VERSION).to eq(described_class::VERSION)"
       )

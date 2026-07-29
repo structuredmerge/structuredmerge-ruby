@@ -4949,7 +4949,7 @@ module Kettle
       facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
-      unless project_gemspec_declares_version_gem?(project_root)
+      unless project_uses_version_gem?(project_root, entrypoint_require)
         return [
           version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: false),
           legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
@@ -5032,6 +5032,11 @@ module Kettle
         dependencies = Array(spec&.runtime_dependencies)
       end
       dependencies.any? { |dependency| dependency.name == "version_gem" }
+    end
+
+    def project_uses_version_gem?(project_root, entrypoint_require)
+      project_gemspec_declares_version_gem?(project_root) ||
+        non_default_version_gem_entrypoint?(project_root, entrypoint_require)
     end
 
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
@@ -13212,18 +13217,35 @@ module Kettle
     end
 
     def normalize_version_spec_anonymous_loader_example(content, version_spec_path:, entrypoint_require:, namespace:)
+      version_path = version_spec_relative_version_path(version_spec_path, entrypoint_require)
+      version_gem_path = version_spec_relative_version_gem_path(version_spec_path, entrypoint_require)
+      path_loader = <<~RUBY.chomp
+        paths = [
+          File.expand_path("#{version_path}", __dir__),
+          File.expand_path("#{version_gem_path}", __dir__)
+        ].select { |path| File.file?(path) }
+        anonymous_namespace = AnonymousLoader.load(files: paths)
+      RUBY
+      legacy_path_loader = <<~RUBY.chomp
+        path = File.expand_path("#{version_path}", __dir__)
+        anonymous_namespace = AnonymousLoader.load(files: path)
+      RUBY
+      indented_path_loader = path_loader.lines.map { |line| "    #{line}" }.join
+      indented_legacy_path_loader = legacy_path_loader.lines.map { |line| "    #{line}" }.join
+      return content.sub(indented_legacy_path_loader, indented_path_loader) if content.include?(indented_legacy_path_loader)
+
+      return content.sub(legacy_path_loader, path_loader) if content.include?(legacy_path_loader)
+
       return content if version_spec_anonymous_loader_call?(content)
 
       describe_call = version_spec_rspec_describe_call(content)
       return content unless describe_call&.block
 
-      version_path = version_spec_relative_version_path(version_spec_path, entrypoint_require)
       clean_namespace = namespace.to_s.start_with?("::") ? namespace.to_s[2..] : namespace.to_s
       example = <<~RUBY
 
         it "executes the version file for coverage without redefining constants" do
-          path = File.expand_path("#{version_path}", __dir__)
-          anonymous_namespace = AnonymousLoader.load(files: path)
+      #{indented_path_loader}
 
           expect(anonymous_namespace::#{clean_namespace}::Version::VERSION).to eq(described_class::VERSION)
         end
@@ -13245,6 +13267,11 @@ module Kettle
     def version_spec_relative_version_path(version_spec_path, entrypoint_require)
       spec_depth = File.dirname(version_spec_path.to_s).split(File::SEPARATOR).count { |part| !part.empty? }
       "#{"../" * spec_depth}lib/#{entrypoint_require}/version.rb"
+    end
+
+    def version_spec_relative_version_gem_path(version_spec_path, entrypoint_require)
+      spec_depth = File.dirname(version_spec_path.to_s).split(File::SEPARATOR).count { |part| !part.empty? }
+      "#{"../" * spec_depth}lib/#{entrypoint_require}/version_gem.rb"
     end
 
     def legacy_rbs_signature_paths(project_root, entrypoint_require)
