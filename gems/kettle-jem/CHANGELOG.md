@@ -49,14 +49,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated documentation tooling now includes `yard-lint` and a
   `.yard-lint.yml` config for kettle-dev's documentation lint task.
 - RubyForum tags are now configurable through family/project kettle-jem config
-  and ENV, generated gemspecs always set `mailing_list_uri`, and generated
-  support docs point to tagged RubyForum pages instead of GitHub Discussions.
+  and ENV, so templated gemspecs set `mailing_list_uri` and support docs point
+  to tagged RubyForum pages instead of GitHub Discussions.
 
 - kettle-jem-template-20260727-001 - Spec harness documentation now lists the
   RSpec helpers provided by `kettle-test`.
-- kettle-jem-template-20260729-005 - Generated gemspecs now publish the
-  configured RubyForum tag as `mailing_list_uri`, and generated support docs
-  link to the tagged RubyForum community alongside Discord.
 
 ### Changed
 

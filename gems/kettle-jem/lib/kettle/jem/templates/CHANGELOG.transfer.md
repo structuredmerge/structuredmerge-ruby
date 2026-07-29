@@ -11,9 +11,9 @@
   before generated docs are refreshed.
 - kettle-jem-template-20260727-001 - Spec harness documentation now lists the
   RSpec helpers provided by `kettle-test`.
-- kettle-jem-template-20260729-005 - Generated gemspecs now publish the
-  configured RubyForum tag as `mailing_list_uri`, and generated support docs
-  link to the tagged RubyForum community alongside Discord.
+- kettle-jem-template-20260729-005 - Gemspec metadata now publishes this
+  project's RubyForum tag as `mailing_list_uri`, and support docs link to the
+  tagged RubyForum community alongside Discord.
 
 ## Changed
 
