@@ -1080,6 +1080,14 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
+  it "keeps kettle-dev local overrides available for kettle-jem transitive runtime dependencies" do
+    template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
+
+    expect(template).to include(
+      "kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])"
+    )
+  end
+
   it "omits kettle-family from its own main Gemfile dependency token" do
     runtime = described_class.send(
       :project_runtime_facts,

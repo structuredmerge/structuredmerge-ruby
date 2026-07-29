@@ -67,6 +67,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated local templating gemfiles now activate the lockfile's `nomono`
+  version before requiring `nomono/bundler`, avoiding early activation conflicts
+  when a newer `nomono` is installed locally.
+- Generated local templating gemfiles now keep the `kettle-dev` local override
+  available even when it is already declared transitively by local `kettle-jem`.
 - Generated dep-heads workflows now run TruffleRuby jobs with current RubyGems
   and Bundler, avoiding setup failures before the test suite starts.
 - `kettle-jem-workflow-pins --write` now refreshes GitHub Actions release
