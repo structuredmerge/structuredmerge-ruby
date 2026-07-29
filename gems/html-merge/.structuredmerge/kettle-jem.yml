@@ -392,6 +392,8 @@ templates:
     - gemfiles/modular/x_std_libs/vHEAD.gemfile
     - source: lib/gem/version.rb
       target: lib/html/merge/version.rb
+    - source: lib/gem/version_gem.rb
+      target: lib/html/merge/version_gem.rb
     - source: sig/gem.rbs
       target: sig/html/merge.rbs
   # Template recipe profile.

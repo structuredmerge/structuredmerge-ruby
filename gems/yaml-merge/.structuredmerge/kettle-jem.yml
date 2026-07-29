@@ -301,6 +301,8 @@ templates:
     - gemfiles/modular/x_std_libs/vHEAD.gemfile
     - source: lib/gem/version.rb
       target: lib/yaml/merge/version.rb
+    - source: lib/gem/version_gem.rb
+      target: lib/yaml/merge/version_gem.rb
     - source: sig/gem.rbs
       target: sig/yaml/merge.rbs
 
