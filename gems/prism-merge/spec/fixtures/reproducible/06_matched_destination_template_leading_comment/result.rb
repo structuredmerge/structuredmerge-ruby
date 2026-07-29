@@ -7,34 +7,34 @@
 # NOTE: Gemfiles for non-coverage appraisals may not have kettle-soup-cover.
 #       The rescue LoadError handles that scenario.
 begin
-  require "kettle-soup-cover"
+  require 'kettle-soup-cover'
   if Kettle::Soup::Cover::DO_COV
     # Requiring simplecov loads the project-local `.simplecov`.
-    require "simplecov"
-    require "kettle/soup/cover/config"
+    require 'simplecov'
+    require 'kettle/soup/cover/config'
     SimpleCov.start
   end
-rescue LoadError => error
+rescue LoadError => e
   # check the error message and re-raise when unexpected
-  raise error unless error.message.include?("kettle")
+  raise e unless e.message.include?('kettle')
 end
 
 # External RSpec & related config
-require "kettle/test/rspec"
+require 'kettle/test/rspec'
 # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
 
 # This library
-require "kettle/family"
+require 'kettle/family'
 
 RSpec.configure do |config|
   config.before(:each, :prism) do
-    require "prism"
+    require 'prism'
   rescue LoadError
-    skip "Prism is unavailable on this Ruby engine"
+    skip 'Prism is unavailable on this Ruby engine'
   end
 
   # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = ".rspec_status"
+  config.example_status_persistence_file_path = '.rspec_status'
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
