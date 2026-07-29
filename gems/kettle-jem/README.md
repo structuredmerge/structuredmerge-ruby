@@ -104,7 +104,7 @@ Merge analysis must enter parsing through `tree_haver`. Parser-specific gems reg
  <summary>Find this repo on federated forges (Coming soon!)</summary>
 
 | Federated [DVCS][💎d-in-dvcs] Repository | Status | Issues | PRs | Wiki | CI |
-|-------------------------------------------------|-----------------------------------------------------------------------|---------------------------|--------------------------|---------------------------|--------------------------|
+|-------------------------------------------------|-------------------------------------------|-------------------|------------------|-----------------|----------------|
 | 🧪 [structuredmerge/structuredmerge-ruby on GitLab][📜src-gl] | The Truth | [💚][🤝gl-issues] | [💚][🤝gl-pulls] | [💚][📜gl-wiki] | 🐭 Tiny Matrix |
 | 🧊 [structuredmerge/structuredmerge-ruby on CodeBerg][📜src-cb] | An Ethical Mirror ([Donate][🤝cb-donate]) | [💚][🤝cb-issues] | [💚][🤝cb-pulls] | ➖ | ⭕️ No Matrix |
 | 🐙 [structuredmerge/structuredmerge-ruby on GitHub][📜src-gh] | Another Mirror | [💚][🤝gh-issues] | [💚][🤝gh-pulls] | [💚][📜gh-wiki] | 💯 Full Matrix |
@@ -128,6 +128,7 @@ The maintainers of this and thousands of other packages are working with Tidelif
 
 Alternatively:
 
+- [![Ruby Users Forum][✉️ruby-forum-img]][✉️ruby-forum]
 - [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite]
 - [![Get help from me on Upwork][👨🏼‍🏫expsup-upwork-img]][👨🏼‍🏫expsup-upwork]
 - [![Get help from me on Codementor][👨🏼‍🏫expsup-codementor-img]][👨🏼‍🏫expsup-codementor]
