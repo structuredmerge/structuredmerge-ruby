@@ -67,6 +67,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem prepare` now skips release lockfile reset while local path
+  development env is active, so self-templating unreleased template stacks does
+  not fail release validation before templating can run.
+- `kettle-jem prepare` now keeps templating enabled for bootstrap bundle
+  commands while local path development env is active.
+- `kettle-jem install` setup commands now also preserve templating when local
+  path development env is active.
+- `kettle-jem install` now skips release-style bundle lock normalization while
+  local path development env is active, so unreleased monorepo siblings are not
+  resolved as registry gems during self-templating.
 - Generated local templating gemfiles now activate the lockfile's `nomono`
   version before requiring `nomono/bundler`, avoiding early activation conflicts
   when a newer `nomono` is installed locally.

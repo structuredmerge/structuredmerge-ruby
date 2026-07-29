@@ -2104,7 +2104,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-  it "keeps direct sibling runtime dependencies available during lockfile normalization" do
+  it "skips lockfile normalization when direct sibling runtime dependencies use local path env" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-install-direct-sibling-lock-env", tmp_root) do |workspace|
@@ -2160,17 +2160,28 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
       end
 
-      Kettle::Jem::Tasks::InstallTask.run(
+      install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
-        env: {"K_JEM_TEMPLATING" => "true"},
+        env: {
+          "K_JEM_TEMPLATING" => "true",
+          "KETTLE_DEV_DEV" => "false",
+          "STRUCTUREDMERGE_DEV" => "false",
+          "RUBYTHEMS_DEV" => workspace
+        },
         run_options: {only: "bin/setup", skip_commit: true},
         command_runner: command_runner
       )
 
       lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
-      expect(lock_command).not_to be_nil
-      expect(lock_command.fetch(:env)).to include(
-        "K_JEM_TEMPLATING" => "false",
+      expect(lock_command).to be_nil
+      expect(install.fetch(:install_steps)).to include(hash_including(
+        name: "bundle_lock_normalization",
+        status: "skipped",
+        reason: "local_path_development_env"
+      ))
+      setup_command = commands.find { |entry| entry.fetch(:command) == ["bin/setup"] }
+      expect(setup_command.fetch(:env)).to include(
+        "K_JEM_TEMPLATING" => "true",
         "RUBYTHEMS_DEV" => workspace
       )
     end

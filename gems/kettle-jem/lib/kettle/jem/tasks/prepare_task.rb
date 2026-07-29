@@ -29,6 +29,7 @@ module Kettle
           )
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
+          setup_env["K_JEM_TEMPLATING"] = "true" if local_path_development_env?(env)
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
           reset_step = reset_release_lockfiles_step(
             project_root: project_root,
@@ -89,6 +90,15 @@ module Kettle
         end
 
         def reset_release_lockfiles_step(project_root:, setup_env:, quiet:, command_runner:, events:)
+          if local_path_development_env?(setup_env)
+            return {
+              name: "reset_release_lockfiles",
+              command: %w[kettle-reset release-lockfiles],
+              status: "skipped",
+              reason: "local_path_development_env"
+            }
+          end
+
           reset_command_runner = lambda do |command|
             command_runner.call(Shellwords.split(command), chdir: project_root, env: setup_env, quiet: quiet)
           end
@@ -122,6 +132,15 @@ module Kettle
             changed_files: changed_files,
             quiet: quiet
           }
+        end
+
+        def local_path_development_env?(env)
+          (env || {}).any? do |key, raw_value|
+            next false unless key.to_s.end_with?("_DEV")
+
+            value = raw_value.to_s.strip
+            !value.empty? && !Kettle::Jem::DecisionPolicy.falsey?(value)
+          end
         end
 
         def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)

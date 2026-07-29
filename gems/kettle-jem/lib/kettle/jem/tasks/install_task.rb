@@ -656,6 +656,14 @@ module Kettle
             }
           end
 
+          if local_path_development_env?(env)
+            return {
+              name: "bundle_lock_normalization",
+              status: "skipped",
+              reason: "local_path_development_env"
+            }
+          end
+
           unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
             return {
               name: "bundle_lock_normalization",
@@ -1078,14 +1086,20 @@ module Kettle
 
         def setup_command_env(project_root, env)
           command_env = (env || {}).to_h.dup
+          templating_requested = command_env.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
           requested_gemfile = command_env["BUNDLE_GEMFILE"].to_s
           strip_inherited_bundler_activation!(command_env)
           gemfile = File.join(project_root.to_s, "Gemfile")
           if File.file?(gemfile) || (!requested_gemfile.empty? && same_path?(requested_gemfile, gemfile))
             command_env["BUNDLE_GEMFILE"] = gemfile
           end
-          command_env["K_JEM_TEMPLATING"] = "false"
+          command_env["K_JEM_TEMPLATING"] = "true" if templating_requested
           apply_kettle_family_local_install_env!(command_env)
+          command_env["K_JEM_TEMPLATING"] = if templating_requested && local_path_development_env?(command_env)
+            "true"
+          else
+            "false"
+          end
           command_env
         end
 
@@ -1144,7 +1158,14 @@ module Kettle
         end
 
         def local_env_disabled?(value)
-          value.to_s.empty? || value.to_s.casecmp("false").zero?
+          raw_value = value.to_s.strip
+          raw_value.empty? || Kettle::Jem::DecisionPolicy.falsey?(raw_value)
+        end
+
+        def local_path_development_env?(env)
+          (env || {}).any? do |key, value|
+            key.to_s.end_with?("_DEV") && !local_env_disabled?(value)
+          end
         end
 
         def strip_inherited_bundler_activation!(command_env)

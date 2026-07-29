@@ -200,6 +200,68 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "skips release lockfile reset during local path template stack development" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), "GEM\n")
+      command_runner = ->(_command) { raise "unexpected command" }
+
+      step = described_class.reset_release_lockfiles_step(
+        project_root: root,
+        setup_env: {
+          "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+          "STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"
+        },
+        quiet: false,
+        command_runner: command_runner,
+        events: nil
+      )
+
+      expect(step).to include(
+        name: "reset_release_lockfiles",
+        status: "skipped",
+        reason: "local_path_development_env"
+      )
+    end
+  end
+
+  it "keeps templating enabled for bootstrap bundle commands during local path development" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
+      File.write(File.join(root, "Gemfile.lock"), "GEM\n")
+      command_runner = double("command_runner")
+      captured_env = nil
+
+      allow(Kettle::Jem).to receive(:apply_project).and_return(
+        mode: "apply",
+        changed_files: [],
+        diagnostics: []
+      )
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step) do |_name, _command, project_root:, env:, quiet:, command_runner:|
+        captured_env ||= env
+        {
+          name: "bundle_update_templating_bootstrap",
+          status: "succeeded",
+          changed_files: []
+        }
+      end
+
+      described_class.run(
+        project_root: root,
+        env: {
+          "K_JEM_TEMPLATING" => "true",
+          "STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"
+        },
+        run_options: {force: true},
+        command_runner: command_runner
+      )
+
+      expect(captured_env).to include(
+        "K_JEM_TEMPLATING" => "true",
+        "STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"
+      )
+    end
+  end
+
   it "updates lockfile-safe templating bootstrap gems before the full template run" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile.lock"), <<~LOCK)

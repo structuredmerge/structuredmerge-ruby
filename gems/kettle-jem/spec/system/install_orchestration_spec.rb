@@ -935,7 +935,9 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
-        "K_JEM_TEMPLATING" => "false"
+        "K_JEM_TEMPLATING" => "true",
+        "STRUCTUREDMERGE_DEV" => marker.fetch("members_root"),
+        "KETTLE_DEV_DEV" => File.join(root, "kettle-dev")
       )
 
       disabled_env = env.merge(
@@ -1072,7 +1074,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     )
   end
 
-  it "honors install ENV skip-commit and normalizes lockfiles without templating env overrides" do
+  it "honors install ENV skip-commit and skips lockfile normalization in local path development env" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-install-env-skip-lock", tmp_root) do |root|
@@ -1135,36 +1137,18 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_install_requested_env",
-        command: %w[bundle install],
-        status: "succeeded",
-        reason: "executed"
+        status: "skipped",
+        reason: "same_as_setup_bundle_env"
       ))
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
-        command: %w[bundle update],
-        status: "succeeded",
-        reason: "executed"
+        status: "skipped",
+        reason: "local_path_development_env"
       ))
-      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
-      expect(lock_command).not_to be_nil
       requested_bundle_install = commands.find { |entry| entry.fetch(:command) == %w[bundle install] }
-      expect(requested_bundle_install).not_to be_nil
+      expect(requested_bundle_install).to be_nil
       command_names = commands.map { |entry| entry.fetch(:command) }
-      expect(command_names.index(%w[bundle install])).to be < command_names.index(["bin/setup"])
-      expect(requested_bundle_install.fetch(:env)).to include(
-        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
-        "K_JEM_TEMPLATING" => "true",
-        "KETTLE_DEV_DEV" => "/workspace/my",
-        "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb"
-      )
-      expect(lock_command.fetch(:env)).to include(
-        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
-        "K_JEM_TEMPLATING" => "false",
-        "KETTLE_DEV_DEV" => "false",
-        "GALTZO_FLOSS_DEV" => "false",
-        "STRUCTUREDMERGE_DEV" => "false"
-      )
+      expect(command_names).not_to include(%w[bundle update])
       expect(command_names).not_to include(%w[git add -A])
     end
   end
@@ -1195,6 +1179,28 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         name: "bundle_lock_normalization",
         status: "skipped",
         reason: "skip_lock_normalization"
+      )
+    end
+  end
+
+  it "skips lockfile normalization while local path development env is active" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-local-lock-normalization", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), "GEM\n")
+
+      expect(
+        Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(
+          root,
+          env: {
+            "K_JEM_TEMPLATING" => "true",
+            "STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"
+          }
+        )
+      ).to include(
+        name: "bundle_lock_normalization",
+        status: "skipped",
+        reason: "local_path_development_env"
       )
     end
   end
@@ -1236,9 +1242,9 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       env = {
         "K_JEM_TEMPLATING" => "true",
-        "KETTLE_DEV_DEV" => "/workspace/my",
-        "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb",
+        "KETTLE_DEV_DEV" => "false",
+        "GALTZO_FLOSS_DEV" => "false",
+        "STRUCTUREDMERGE_DEV" => "false",
         "RUBYOPT" => "-rbundler/setup",
         "RUBYLIB" => "/workspace/kettle-jem/lib",
         "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
