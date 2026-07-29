@@ -45,6 +45,7 @@ Gem::Specification.new do |spec|
   spec.metadata['wiki_uri'] = "#{spec.homepage}/wiki"
   spec.metadata['news_uri'] = "https://www.railsbling.com/tags/#{spec.name}"
   spec.metadata['discord_uri'] = 'https://discord.gg/3qme4XHNKN'
+  spec.metadata['mailing_list_uri'] = 'https://www.rubyforum.org/tag/structuredmerge'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   enumerate_package_files = lambda do |root|
