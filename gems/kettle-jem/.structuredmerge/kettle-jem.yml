@@ -135,6 +135,16 @@ rubygems:
 # ENV override: KJ_REPOSITORY_TOPOLOGY
 repository:
   topology: "monorepo-subproject"
+# RubyForum community tag.
+# The project tag is used when present; otherwise the family tag is used.
+# kettle-family or family-level mise config can set the family tag during
+# templating so the value is written into each project config for standalone
+# checkouts.
+rubyforum:
+  # ENV override: KJ_RUBYFORUM_FAMILY_TAG
+  family_tag: "structuredmerge"
+  # ENV override: KJ_RUBYFORUM_PROJECT_TAG
+  project_tag: "{KJ|RUBYFORUM:PROJECT_TAG}"
 # Framework matrix workflows.
 # When your gem tests against multiple versions of a framework (Rails,
 # ActiveRecord, ActiveSupport, etc.), this section configures how
