@@ -13,35 +13,6 @@ PATH
       version_gem (~> 1.1, >= 1.1.9)
 
 PATH
-  remote: /home/pboling/src/my/kettle-dev/kettle-dev
-  specs:
-    kettle-dev (2.5.6)
-      emoji_regex (>= 15.0)
-      kettle-gha-pins (~> 0.3, >= 0.3.3)
-      kettle-ndjson (~> 0.1, >= 0.1.1)
-      kettle-rb (~> 0.1, >= 0.1.2)
-      kettle-test (~> 2.0, >= 2.0.12)
-      ruby-progressbar (~> 1.13)
-      tty-progressbar (~> 0.18)
-
-PATH
-  remote: /home/pboling/src/my/kettle-dev/kettle-drift
-  specs:
-    kettle-drift (1.0.8)
-      version_gem (~> 1.1, >= 1.1.14)
-
-PATH
-  remote: /home/pboling/src/my/kettle-dev/kettle-soup-cover
-  specs:
-    kettle-soup-cover (3.0.6)
-      kettle-wash (~> 0.1, >= 0.1.0)
-      simplecov (>= 1.0)
-      simplecov-cobertura (>= 4.0)
-      simplecov-console (~> 0.9, >= 0.9.5)
-      simplecov-rcov (~> 0.3, >= 0.3.7)
-      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
-
-PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.0)
@@ -300,6 +271,35 @@ PATH
       binary-merge (= 7.1.0)
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-dev
+  specs:
+    kettle-dev (2.5.6)
+      emoji_regex (>= 15.0)
+      kettle-gha-pins (~> 0.3, >= 0.3.3)
+      kettle-ndjson (~> 0.1, >= 0.1.1)
+      kettle-rb (~> 0.1, >= 0.1.2)
+      kettle-test (~> 2.0, >= 2.0.12)
+      ruby-progressbar (~> 1.13)
+      tty-progressbar (~> 0.18)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-drift
+  specs:
+    kettle-drift (1.0.8)
+      version_gem (~> 1.1, >= 1.1.14)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-soup-cover
+  specs:
+    kettle-soup-cover (3.0.6)
+      kettle-wash (~> 0.1, >= 0.1.0)
+      simplecov (>= 1.0)
+      simplecov-cobertura (>= 4.0)
+      simplecov-console (~> 0.9, >= 0.9.5)
+      simplecov-rcov (~> 0.3, >= 0.3.7)
+      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
 
 GEM
   remote: https://gem.coop/
@@ -726,7 +726,7 @@ DEPENDENCIES
   json-merge!
   kettle-dev (~> 2.0, >= 2.2.25, >= 0)!
   kettle-drift!
-  kettle-family (~> 1.2, >= 1.2.1)
+  kettle-family (~> 1.2, >= 1.2.2)
   kettle-jem!
   kettle-soup-cover!
   kettle-test (~> 2.0, >= 2.0.9)
