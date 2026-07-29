@@ -6,7 +6,7 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-source 'https://gem.coop'
+source "https://gem.coop"
 
 git_source(:codeberg) { |repo_name| "https://codeberg.org/#{repo_name}" }
 git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
@@ -18,42 +18,42 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from plain-merge.gemspec
 gemspec
 
-gem 'kettle-family', '~> 1.2', '>= 1.2.1'
+gem "kettle-family", "~> 1.2", ">= 1.2.2"
 
 # Local workspace dependency wiring for *_local.gemfile overrides
-gem 'nomono', '~> 1.1', '>= 1.1.1', require: false # ruby >= 3.2.0
+gem "nomono", "~> 1.1", ">= 1.1.1", require: false # ruby >= 3.2.0
 
 # Direct sibling dependencies (env-switched via STRUCTUREDMERGE_DEV)
 direct_sibling_gems = %w[
   ast-merge
   tree_haver
 ]
-direct_sibling_dev = ENV.fetch('STRUCTUREDMERGE_DEV', '')
+direct_sibling_dev = ENV.fetch("STRUCTUREDMERGE_DEV", "")
 direct_sibling_local =
   !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
-direct_sibling_templating = ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
 if direct_sibling_gems.any? &&
-   (direct_sibling_local ||
-     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
-  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
-  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
-  require 'nomono/bundler'
+    (direct_sibling_local ||
+      ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+  direct_sibling_dev_was_set = ENV.key?("STRUCTUREDMERGE_DEV")
+  direct_sibling_dev_original = ENV.fetch("STRUCTUREDMERGE_DEV", nil)
+  require "nomono/bundler"
   begin
-    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+    ENV["STRUCTUREDMERGE_DEV"] = File.expand_path("..", __dir__) if direct_sibling_templating && !direct_sibling_local
 
     eval_nomono_gems(
       gems: direct_sibling_gems,
-      prefix: 'STRUCTUREDMERGE',
-      path_env: 'STRUCTUREDMERGE_DEV',
-      root: %w[src my structuredmerge]
+      prefix: "STRUCTUREDMERGE",
+      path_env: "STRUCTUREDMERGE_DEV",
+      root: ["src", "my", "structuredmerge"]
     )
   ensure
     if direct_sibling_templating && !direct_sibling_local
       if direct_sibling_dev_was_set
-        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+        ENV["STRUCTUREDMERGE_DEV"] = direct_sibling_dev_original
       else
-        ENV.delete('STRUCTUREDMERGE_DEV')
+        ENV.delete("STRUCTUREDMERGE_DEV")
       end
     end
   end
@@ -63,25 +63,25 @@ end
 gem 'tree_sitter_language_pack', '~> 1.13', '>= 1.13.3'
 
 # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
 # Debugging
-eval_gemfile 'gemfiles/modular/debug.gemfile'
+eval_gemfile "gemfiles/modular/debug.gemfile"
 
 # Code Coverage (env-switched: KETTLE_DEV_DEV=true for local paths)
-eval_gemfile 'gemfiles/modular/coverage.gemfile'
+eval_gemfile "gemfiles/modular/coverage.gemfile"
 
 # Linting
-eval_gemfile 'gemfiles/modular/style.gemfile'
+eval_gemfile "gemfiles/modular/style.gemfile"
 
 # Documentation
-eval_gemfile 'gemfiles/modular/documentation.gemfile'
+eval_gemfile "gemfiles/modular/documentation.gemfile"
 
 # Optional
-eval_gemfile 'gemfiles/modular/optional.gemfile'
+eval_gemfile "gemfiles/modular/optional.gemfile"
 
 ### Std Lib Extracted Gems
-eval_gemfile 'gemfiles/modular/x_std_libs.gemfile'
+eval_gemfile "gemfiles/modular/x_std_libs.gemfile"
 
 # See unlocked_deps appraisal for more details on irb inclusion
-gem 'irb', '~> 1.17' # ruby >= 2.7
+gem "irb", "~> 1.17" # ruby >= 2.7
