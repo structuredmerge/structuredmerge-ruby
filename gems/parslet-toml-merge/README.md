@@ -2,9 +2,9 @@
 
 # ☯️ Parslet::Toml::Merge
 
-[![Version][👽versioni]][👽version] [![GitHub tag (latest SemVer)][⛳️tag-img]][⛳️tag] [![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0][📄license-img]][📄license] [![Downloads Rank][👽dl-ranki]][👽dl-rank] [![CI Current][🚎11-c-wfi]][🚎11-c-wf]
+[![Version][👽versioni]][👽version] [![Ruby Users Forum][✉️ruby-forum-top-img]][✉️ruby-forum] [![GitHub tag (latest SemVer)][⛳️tag-img]][⛳️tag] [![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0][📄license-img]][📄license] [![Downloads Rank][👽dl-ranki]][👽dl-rank] [![CI Current][🚎11-c-wfi]][🚎11-c-wf]
 
-`if ci_badges.map(&:color).detect { it != "green"}` ☝️ [let me know][✉️discord-invite], as I may have missed the [discord notification][✉️discord-invite].
+`if ci_badges.map(&:color).detect { it != "green"}` ☝️ [let me know on Discord][✉️discord-invite] or [RubyForum][✉️ruby-forum], as I may have missed the notification.
 
 ---
 
@@ -160,7 +160,6 @@ See [LICENSE.md][📄license] for details.
 
 If none of the available licenses suit your use case, please [contact us](mailto:floss@galtzo.com) to discuss a custom commercial license.
 
-[gh-discussions]: https://github.com/structuredmerge/structuredmerge-ruby/discussions
 [⛳liberapay-img]: https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&color=a51611&style=flat
 [⛳liberapay-bottom-img]: https://img.shields.io/liberapay/goal/pboling.svg?style=for-the-badge&logo=liberapay&color=a51611
 [⛳liberapay]: https://liberapay.com/pboling/donate
@@ -181,8 +180,9 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [✉️discord-invite-img-ftb]: https://img.shields.io/discord/1373797679469170758?style=for-the-badge&logo=discord
 [✉️ruby-friends-img]: https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&logo=dailydotdev&logoColor=white
 [✉️ruby-friends]: https://app.daily.dev/squads/rubyfriends
-[✉️ruby-forum-img]: https://img.shields.io/badge/RubyForum-Help-CC342D?style=for-the-badge&logo=ruby&logoColor=white
-[✉️ruby-forum]: https://www.rubyforum.org/c/help/8
+[✉️ruby-forum-top-img]: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=flat&logo=discourse&label=Ruby%20Users%20Forum
+[✉️ruby-forum-img]: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=for-the-badge&logo=discourse&label=Ruby%20Users%20Forum
+[✉️ruby-forum]: https://www.rubyforum.org/tag/structuredmerge
 [✇bundle-group-pattern]: https://gist.github.com/pboling/4564780
 [⛳️gem-namespace]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/parslet-toml-merge
 [⛳️namespace-img]: https://img.shields.io/badge/namespace-Parslet::Toml::Merge-3C2D2D.svg?style=square&logo=ruby&logoColor=white
