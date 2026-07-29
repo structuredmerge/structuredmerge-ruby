@@ -149,7 +149,7 @@ the [MIT](https://github.com/structuredmerge/structuredmerge-ruby/blob/main/MIT.
 [✉️ruby-friends]: https://app.daily.dev/squads/rubyfriends
 [✉️ruby-forum-top-img]: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=flat&logo=discourse&label=Ruby%20Users%20Forum
 [✉️ruby-forum-img]: https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=for-the-badge&logo=discourse&label=Ruby%20Users%20Forum
-[✉️ruby-forum]: https://www.rubyforum.org/tag/html-merge
+[✉️ruby-forum]: https://www.rubyforum.org/tag/structuredmerge
 [✇bundle-group-pattern]: https://gist.github.com/pboling/4564780
 [⛳️gem-namespace]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/html-merge
 [⛳️namespace-img]: https://img.shields.io/badge/namespace-Html::Merge-3C2D2D.svg?style=square&logo=ruby&logoColor=white
