@@ -85,7 +85,7 @@ template_state:
     Appraisals.example: 9cb1abcfb1a0bd6d859ca0705efb874dbe546754c8c71f9f95025ff6817f1471
     Big-Time-Public-License.md.example: b0c02a112c9eee0ed69f05fd8f22277a2f8bc62d447b6cb75d6df560e05bf431
     CHANGELOG.md.example: 73459e50dad34d84db88844c993d975097557bdf5229e101b0d1339de6f98ffc
-    CHANGELOG.transfer.md: 353b3348de181da539818f394b6f3717684b461ad7fa70ba862cca5bdedaea4f
+    CHANGELOG.transfer.md: 17b90a6161db282fd280d8f5cb8a949e7ab2b95fa6c6889a54ee403da96ea3de
     CITATION.cff.example: e404ea0a7919d78a83d53d80e211d17b9663576aa606583b709795dc023fd75c
     CODE_OF_CONDUCT.md.example: f1ad532f1860f73ef774c6b27a26d41f4bc1cb8813034f5957487766ebb0986b
     CONTRIBUTING.md.example: 5b03315b8ccb7ef3aee80e6feff683ce09fa23828dd1858dd99eb0cdca3a463f
@@ -188,7 +188,7 @@ files:
     recipe: template_source_application_Gemfile
     action: write
     dest_sha256: 00e9d94227c6aef292287e77b2c790b2c0c6ab1e6d3dbd269bf8a4a9a1bcbcc7
-    input_fingerprint: 2caba5b5de2ec6191b5414c4e1ecfb2df7f257f9b055dcdd723262c139111be8
+    input_fingerprint: 6ea8aca3800c2121356a489fd55bdf9ebb1c6f9c498fddbe9bd270e36c3469ca
     template_sources:
     - Gemfile.example
   LICENSE.md:
@@ -426,14 +426,14 @@ files:
     recipe: template_source_application_gemfiles_modular_templating_gemfile
     action: write
     dest_sha256: ced2cde37ea28f825af6f4bb87f9dac5778279ccb6ff2ddf0616659cd4dedee9
-    input_fingerprint: e89582947607a55f08416cff773a42ab9e77a95740677f52f200b7f7a016987d
+    input_fingerprint: 79723ca6233c4db4f3d9067cdbbff5618cfed8a9332ead854f19a89eec3933d7
     template_sources:
     - gemfiles/modular/templating.gemfile.example
   gemfiles/modular/templating_local.gemfile:
     recipe: template_source_application_gemfiles_modular_templating_local_gemfile
     action: write
     dest_sha256: 461b67f90170f1e19b3ccb0a1989af5c285ae2636a71af7bbbcb3c31fa165ee7
-    input_fingerprint: 114245d7375363544c64b7aee9aed687546fa9e0c5128c8141900da93a76eddf
+    input_fingerprint: 96ad2b8f913fb5237a447977f106815a4b48c639f9a4632c367dcf1969d1a770
     template_sources:
     - gemfiles/modular/templating_local.gemfile.example
   gemfiles/modular/webrick/r4/v1.9.gemfile:
