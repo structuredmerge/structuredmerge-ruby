@@ -13128,16 +13128,20 @@ module Kettle
 
     def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:)
       current = read_project_file(project_root, version_spec_path)
-      return if current.empty?
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
+      updated = if current.empty?
+        version_gem_version_spec_content(namespace: namespace)
+      else
+        current
+      end
+
       requirements = []
-      requirements << %(require "anonymous_loader"\n) unless ruby_top_level_require?(current, "require", "anonymous_loader")
-      if ensure_version_gem_require && !ruby_top_level_require?(current, "require", require_path)
+      requirements << %(require "anonymous_loader"\n) unless ruby_top_level_require?(updated, "require", "anonymous_loader")
+      if ensure_version_gem_require && !ruby_top_level_require?(updated, "require", require_path)
         requirements << %(require "#{require_path}"\n)
       end
 
-      updated = current
       if requirements.any?
         lines = updated.lines
         lines.insert(version_spec_require_insertion_index(updated), *requirements)
@@ -13150,6 +13154,17 @@ module Kettle
         namespace: namespace
       )
       write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(updated))
+    end
+
+    def version_gem_version_spec_content(namespace:)
+      clean_namespace = namespace.to_s.start_with?("::") ? namespace.to_s[2..] : namespace.to_s
+      <<~RUBY
+        # frozen_string_literal: true
+
+        RSpec.describe #{clean_namespace}::Version do
+          it_behaves_like "a Version module", described_class
+        end
+      RUBY
     end
 
     def cleanup_version_gem_version_spec(project_root, version_spec_path)
@@ -13196,7 +13211,7 @@ module Kettle
     end
 
     def version_spec_relative_version_path(version_spec_path, entrypoint_require)
-      spec_depth = File.dirname(version_spec_path.to_s).split(File::SEPARATOR).reject(&:empty?).length
+      spec_depth = File.dirname(version_spec_path.to_s).split(File::SEPARATOR).count { |part| !part.empty? }
       "#{"../" * spec_depth}lib/#{entrypoint_require}/version.rb"
     end
 

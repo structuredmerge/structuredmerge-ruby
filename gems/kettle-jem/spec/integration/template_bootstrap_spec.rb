@@ -555,7 +555,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(version_rbs).to include("VERSION: String")
       expect(version_rbs).not_to end_with("\n\n")
       post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "version_gem_bootstrap" }
-      expect(post_step.fetch(:changed_files)).to eq(["lib/example/gem.rb"])
+      expect(post_step.fetch(:changed_files)).to eq(["lib/example/gem.rb", "spec/example/gem/version_spec.rb"])
     end
   end
 

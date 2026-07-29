@@ -49,3 +49,6 @@
 - kettle-jem-template-20260728-004 - Generated dep-heads workflows now use the
   setup-ruby Bundler install path for direct appraisal Gemfiles, avoiding rv
   lockfile parser failures on Git and path dependencies.
+- kettle-jem-template-20260728-005 - VersionGem bootstrap now creates the
+  missing canonical version spec when a project only has shim namespace version
+  specs.

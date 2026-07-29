@@ -446,7 +446,12 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(install.fetch(:install_steps)).to include(
         name: "version_gem_bootstrap",
         status: "applied",
-        changed_files: ["lib/example/gem/version.rb", "lib/example/gem.rb", "sig/example/gem.rbs"],
+        changed_files: [
+          "lib/example/gem/version.rb",
+          "lib/example/gem.rb",
+          "spec/example/gem/version_spec.rb",
+          "sig/example/gem.rbs"
+        ],
         version_path: "lib/example/gem/version.rb",
         entrypoint_path: "lib/example/gem.rb",
         signature_path: "sig/example/gem.rbs"
