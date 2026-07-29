@@ -229,6 +229,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- kettle-jem-template-20260729-001 - Generated JRuby 9.4 workflows now use the
+  legacy manual bundle install path, avoiding setup-time Bundler full-index
+  failures against `gem.coop`.
 - `kettle-jem prepare` now skips release lockfile reset while local path
   development env is active, so self-templating unreleased template stacks does
   not fail release validation before templating can run.
