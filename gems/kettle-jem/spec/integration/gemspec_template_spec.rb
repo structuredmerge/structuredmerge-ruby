@@ -586,9 +586,9 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(gemspec_content).not_to include("version_gem")
       expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7" # rubocop:disable Gemspec/RequiredRubyVersion')
       expect(apply.fetch(:post_apply_steps)).to include(hash_including(
-        name: "version_gem_cleanup",
+        name: "version_bootstrap",
         status: "applied",
-        changed_files: contain_exactly("lib/legacy.rb", "spec/legacy/version_spec.rb")
+        changed_files: contain_exactly("lib/legacy.rb", "lib/legacy/version.rb", "spec/legacy/version_spec.rb")
       ))
       expect(entrypoint_content).not_to include("version_gem")
       expect(entrypoint_content).not_to include("VersionGem")
@@ -597,7 +597,15 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(version_content).to include("module Version")
       expect(version_content).to include('VERSION = "0.1.0"')
       expect(version_content).to include("VERSION = Version::VERSION # Traditional Constant Location")
-      expect(File).not_to exist(version_spec_path)
+      version_spec_content = File.read(version_spec_path)
+      expect(version_spec_content).to include('require "anonymous_loader"')
+      expect(version_spec_content).to include('path = File.expand_path("../../lib/legacy/version.rb", __dir__)')
+      expect(version_spec_content).not_to include("version_gem")
+      expect(version_spec_content).not_to include("VersionGem")
+      expect(version_spec_content).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec_content).to include(
+        "expect(anonymous_namespace::Legacy::Version::VERSION).to eq(described_class::VERSION)"
+      )
       expect(runtime_heads_content).not_to include("version_gem")
       expect(runtime_heads_content).to include('eval_gemfile("x_std_libs/vHEAD.gemfile")')
       expect(File.read(File.join(root, "legacy.gemspec"))).to eq(gemspec_content)

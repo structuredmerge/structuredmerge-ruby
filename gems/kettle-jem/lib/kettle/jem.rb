@@ -4955,14 +4955,19 @@ module Kettle
       facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
+      unless version_gem_runtime_compatible?(facts)
+        return [
+          old_ruby_version_bootstrap_step(project_root, report, entrypoint_require: entrypoint_require),
+          legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
+        ].compact
+      end
+
       unless project_uses_version_gem?(project_root, entrypoint_require, facts)
         return [
           version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: false),
           legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
         ].compact
       end
-
-      return version_gem_cleanup_step(project_root, facts) unless version_gem_runtime_compatible?(facts)
 
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       version_path = File.join("lib", entrypoint_require, "version.rb")
@@ -4973,6 +4978,52 @@ module Kettle
         manage_version_file: !templated_paths.include?(version_path),
         manage_signature_file: !templated_paths.include?(signature_path)
       )
+    end
+
+    def old_ruby_version_bootstrap_step(project_root, report, entrypoint_require:)
+      facts = report.fetch(:facts)
+      package_name = facts.dig(:package, :name).to_s
+      return {name: "version_bootstrap", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
+
+      entrypoint_require = package_name.tr("-", "/") if entrypoint_require.to_s.empty?
+      namespace = facts.dig(:rubygems, :namespace).to_s
+      version_path = File.join("lib", entrypoint_require, "version.rb")
+      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
+      namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
+      return {name: "version_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
+
+      templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
+      changes = []
+      cleanup = version_gem_cleanup_step(project_root, facts)
+      changes.concat(Array(cleanup[:changed_files]))
+      unless templated_paths.include?(version_path)
+        version = facts.dig(:project_runtime, :version).to_s
+        version = project_gemspec_version(project_root) if version.empty?
+        version = "0.0.1.pre" if version.empty?
+        changes << write_if_changed(
+          project_root,
+          version_path,
+          version_gem_version_file_content(existing_version: existing_version_file_value(project_root, version_path), namespace: namespace, version: version)
+        )
+      end
+      changes << normalize_version_gem_version_spec(
+        project_root,
+        File.join("spec", entrypoint_require, "version_spec.rb"),
+        entrypoint_require,
+        namespace,
+        ensure_version_gem_require: false,
+        include_version_gem_path: false
+      )
+      changes.compact!
+      changes.uniq!
+
+      {
+        name: "version_bootstrap",
+        status: changes.empty? ? "already_current" : "applied",
+        changed_files: changes,
+        cleanup_status: cleanup.fetch(:status)
+      }
     end
 
     def legacy_rbs_consolidation_step(project_root, facts, entrypoint_require:)
@@ -13214,7 +13265,7 @@ module Kettle
       namespace.start_with?("#{parent}::")
     end
 
-    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:)
+    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:, include_version_gem_path: true)
       current = read_project_file(project_root, version_spec_path)
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
@@ -13239,7 +13290,8 @@ module Kettle
         updated,
         version_spec_path: version_spec_path,
         entrypoint_require: entrypoint_require,
-        namespace: namespace
+        namespace: namespace,
+        include_version_gem_path: include_version_gem_path
       )
       write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(updated))
     end
@@ -13275,16 +13327,23 @@ module Kettle
         version_spec_anonymous_loader_call?(content)
     end
 
-    def normalize_version_spec_anonymous_loader_example(content, version_spec_path:, entrypoint_require:, namespace:)
+    def normalize_version_spec_anonymous_loader_example(content, version_spec_path:, entrypoint_require:, namespace:, include_version_gem_path: true)
       version_path = version_spec_relative_version_path(version_spec_path, entrypoint_require)
       version_gem_path = version_spec_relative_version_gem_path(version_spec_path, entrypoint_require)
-      path_loader = <<~RUBY.chomp
+      path_loader = if include_version_gem_path
+        <<~RUBY.chomp
         paths = [
           File.expand_path("#{version_path}", __dir__),
           File.expand_path("#{version_gem_path}", __dir__)
         ].select { |path| File.file?(path) }
         anonymous_namespace = AnonymousLoader.load(files: paths)
-      RUBY
+        RUBY
+      else
+        <<~RUBY.chomp
+        path = File.expand_path("#{version_path}", __dir__)
+        anonymous_namespace = AnonymousLoader.load(files: path)
+        RUBY
+      end
       legacy_path_loader = <<~RUBY.chomp
         path = File.expand_path("#{version_path}", __dir__)
         anonymous_namespace = AnonymousLoader.load(files: path)

@@ -485,6 +485,67 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "creates a managed plain version spec for old Ruby gems without version_gem" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-old-ruby-version-spec", tmp_root) do |root|
+      write_file(root, "legacy-gem.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "legacy-gem"
+          spec.version = "1.0.0"
+          spec.summary = "Legacy gem"
+          spec.required_ruby_version = ">= 1.8.7"
+        end
+      RUBY
+      write_file(root, "lib/legacy/gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "gem/version"
+
+        module Legacy
+          module Gem
+          end
+        end
+      RUBY
+      write_file(root, "lib/legacy/gem/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Legacy
+          module Gem
+            module Version
+              VERSION = "1.0.0"
+            end
+            VERSION = Version::VERSION # Traditional Constant Location
+          end
+        end
+      RUBY
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_bootstrap",
+          status: "applied",
+          changed_files: ["lib/legacy/gem/version.rb", "spec/legacy/gem/version_spec.rb"]
+        )
+      )
+      version_rb = File.read(File.join(root, "lib/legacy/gem/version.rb"))
+      expect(version_rb).to include("# Version namespace for this gem.")
+      expect(version_rb).to include("# Current gem version.")
+      expect(version_rb).to include("# Current gem version exposed at the traditional constant location.")
+      version_spec = File.read(File.join(root, "spec/legacy/gem/version_spec.rb"))
+      expect(version_spec).to include('require "anonymous_loader"')
+      expect(version_spec).to include('path = File.expand_path("../../../lib/legacy/gem/version.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include("RSpec.describe Legacy::Gem::Version do")
+      expect(version_spec).to include(
+        "expect(anonymous_namespace::Legacy::Gem::Version::VERSION).to eq(described_class::VERSION)"
+      )
+      expect(version_spec).not_to include("version_gem")
+      expect(version_spec).not_to include("VersionGem")
+    end
+  end
+
   it "preserves non-default version_gem loading when a dedicated version_gem entrypoint exists" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
