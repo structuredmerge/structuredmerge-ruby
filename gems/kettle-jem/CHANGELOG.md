@@ -49,6 +49,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated documentation tooling now includes `yard-lint` and a
   `.yard-lint.yml` config for kettle-dev's documentation lint task.
 
+- kettle-jem-template-20260727-001 - Spec harness documentation now lists the
+  RSpec helpers provided by `kettle-test`.
+
 ### Changed
 
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.3 or newer.
@@ -64,135 +67,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem-template-20260728-001 - Generated Ruby workflows now use clearer
   setup-ruby-flash planning and can prepare appraisal-only jobs without
   installing the main Gemfile bundle.
-
-### Fixed
-
-- `kettle-jem prepare` now skips release lockfile reset while local path
-  development env is active, so self-templating unreleased template stacks does
-  not fail release validation before templating can run.
-- `kettle-jem prepare` now keeps templating enabled for bootstrap bundle
-  commands while local path development env is active.
-- `kettle-jem install` setup commands now also preserve templating when local
-  path development env is active.
-- `kettle-jem install` now skips release-style bundle lock normalization while
-  local path development env is active, so unreleased monorepo siblings are not
-  resolved as registry gems during self-templating.
-- Generated local templating gemfiles now activate the lockfile's `nomono`
-  version before requiring `nomono/bundler`, avoiding early activation conflicts
-  when a newer `nomono` is installed locally.
-- Generated local templating gemfiles now keep the `kettle-dev` local override
-  available even when it is already declared transitively by local `kettle-jem`.
-- Generated dep-heads workflows now run TruffleRuby jobs with current RubyGems
-  and Bundler, avoiding setup failures before the test suite starts.
-- `kettle-jem-workflow-pins --write` now refreshes GitHub Actions release
-  metadata instead of trusting a fresh persistent cache entry, so newly
-  published action releases are detected immediately.
-- `kettle-jem-workflow-pins` no longer downgrades an existing version comment
-  such as `# v2.0` to an equivalent but less specific evergreen tag like
-  `# v2`.
-- kettle-jem-template-20260728-002 - Generated RuboCop configs now ignore the
-  same `gemfiles/vendor/bundle` tree as `.gitignore`, so vendored dependency
-  installs are not reported as project lint debt.
-- Existing generated `spec/spec_helper.rb` files now receive the
-  `kettle-test` helper documentation comment when structural merge preserves
-  their existing `require "kettle/test/rspec"` line.
-- Version spec normalization now removes managed version specs when
-  `version_gem` is disabled or incompatible with the project's runtime Ruby
-  floor.
-- Templating plan reports now include per-recipe duration metadata, template
-  planning deduplicates destination and template-source file reads, and runtime
-  loading is reduced to explicit main-Ractor extension points. A disabled
-  classified planning strategy now identifies worker-safe recipes, can opt into
-  experimental Ractor workers with `KETTLE_JEM_RACTOR_WORKERS`, records
-  execution counters, and preserves sequential report parity in preparation for
-  Ractor-based recipe planning.
-- Added a `benchmarks/` harness that templates a reset Bundler gem skeleton and
-  compares classified planning and phase-gated file work with and without
-  opt-in Ractor workers. The harness now defaults `KJ_MIN_RUBY` to `1.8.7` so
-  benchmark runs exercise legacy workflow and gemfile generation through the
-  supported one-shot `template --accept-config` flow, prints progress while
-  long benchmark matrices run, records planning and file-worker execution
-  counters for both Ractors and threads, and records the latest benchmark
-  outcome in a committed results README.
-- Apply now routes recipe report mutations through explicit write intents and
-  phase-gated per-file work units, preparing the file-processing path for
-  opt-in `KETTLE_JEM_RACTOR_FILE_WORKERS` execution without changing phase gates
-  or final filesystem outcomes.
-- The former monolithic thin-slice spec has been split into behavior-named
-  integration, system, and end-to-end specs so the project test harness can
-  parallelize templating coverage more effectively.
-- Generated README Support & Community rows now include a RubyForum help badge.
-- Generated READMEs can now render template-managed corporate sponsor logos
-  from `readme.corporate_sponsors` config or family-provided sponsorship data.
-- `kettle-jem` now supports `--events` for newline-delimited JSON progress
-  events, including named event type filters via comma-separated
-  `--events=TYPE,...` values, phase events, per-recipe template progress,
-  post-apply and command-step events, diagnostics, and summary events for family
-  orchestration consumers.
-- Generated CI workflow templates now cache `.rspec_status` with explicit
-  per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
-  across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
-  matrix runs.
-- Generated JRuby and TruffleRuby workflow templates now run when pull request
-  head branches start with `feature/release`, so `kettle-release` CI monitoring
-  does not treat intentionally skipped engine workflows as release failures.
-- Generated dep-heads workflows now document why every engine job runs directly
-  from `gemfiles/dep_heads.gemfile`, making that generated Appraisal file
-  required checked-in output for the workflow.
-- JRuby 9.2 workflow templates now use the legacy-engine bundle install path
-  instead of `ruby/setup-ruby` bundler caching so old Bundler does not fail
-  setup against gem servers without the full legacy index.
-- Gemspec templating now structurally merges destination `spec.files`
-  collection entries with template package entries so project-specific
-  packaged files are not lost when the template rewrites the generated gemspec
-  structure.
-- Main Gemfile templating now removes repeated direct sibling execution blocks
-  left behind by older `nomono` bootstrap output when applying the simplified
-  `require "nomono/bundler"` loader.
-- Gemspec templating now restores additional legacy Prism policy behavior for
-  destination-only metadata fields, Bundler `git ls-files` package declarations,
-  and empty development-dependency section cleanup after runtime dependency
-  promotion.
-- Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
-  update the GitHub Actions SHA pin index used by generated workflow templates
-  via `kettle-gha-sha-pins`.
-- Generated local Gemfile templates now use a simple `require "nomono/bundler"`
-  loader, with a provider-relative loader for `nomono` itself, instead of
-  emitting runtime lockfile parsing or explicit gem activation ceremony.
-- Generated root Gemfiles now declare `nomono` with a plain dependency line
-  requiring `nomono` 1.1.0 or newer, and retemplating removes the older
-  `nomono_requirements` helper block.
-- Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
-  dependency-bearing kettle-jem templates and update their dependency floors.
-- `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
-  `appraisal2` executable.
-- Added a default-off `readme.badges.fossa` template option for managed FOSSA
-  README badges.
-- Added explicit `ruby.test_minimum` template configuration, defaulting to
-  Ruby 2.4, for generated CI workflow and Appraisal floors.
-- Added top-level `integrations` configuration for disabling coverage
-  integrations (`codecov`, `coveralls`, `qlty`) and the SkyWalking Eyes license
-  check integration across README badges, upload/check workflow steps, packaged
-  config/workflow templates, and cleanup of existing config files or workflows.
-- kettle-jem's own `mise` environment now enables templating dependencies so
-  templating-only floors are validated in the normal gem bundle.
-- Restored `kettle-jem prepare` as a pre-flight dependency bootstrap mode for
-  applying the minimal templating Gemfile payload before full templating.
-- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.24.
-- Version-gem bootstrapping now removes stale top-level RBS `VERSION`
-  declarations and generated style workflows load the RBS environment so
-  duplicate declarations fail in CI.
-- Version-gem bootstrapping now removes literal `bundle gem` scaffold RBS
-  `VERSION` declarations before writing the managed `version.rbs` signature.
-- Added a destructive `shim` template profile for compatibility wrapper gems.
-  Shim templating accepts the replacement gem via `--shimmed-gem` or
-  `KETTLE_JEM_SHIMMED_GEM`, generates only the shim runtime/docs/specs/CI, and
-  deletes obsolete implementation code, behavior specs, workflows, and gemfiles.
-
-- kettle-jem-template-20260726-001 - Projects now include an optional
-  `yard:lint` task and YARD lint configuration for documentation quality checks.
-
-### Changed
 
 - The `kettle-jem` executable startup header is now shown only when
   `--verbose` is passed, while `version`, `-v`, and `--version` still print
@@ -354,6 +228,131 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Removed
 
 ### Fixed
+
+- `kettle-jem prepare` now skips release lockfile reset while local path
+  development env is active, so self-templating unreleased template stacks does
+  not fail release validation before templating can run.
+- `kettle-jem prepare` now keeps templating enabled for bootstrap bundle
+  commands while local path development env is active.
+- `kettle-jem install` setup commands now also preserve templating when local
+  path development env is active.
+- `kettle-jem install` now skips release-style bundle lock normalization while
+  local path development env is active, so unreleased monorepo siblings are not
+  resolved as registry gems during self-templating.
+- Generated local templating gemfiles now activate the lockfile's `nomono`
+  version before requiring `nomono/bundler`, avoiding early activation conflicts
+  when a newer `nomono` is installed locally.
+- Generated local templating gemfiles now keep the `kettle-dev` local override
+  available even when it is already declared transitively by local `kettle-jem`.
+- Generated dep-heads workflows now run TruffleRuby jobs with current RubyGems
+  and Bundler, avoiding setup failures before the test suite starts.
+- `kettle-jem-workflow-pins --write` now refreshes GitHub Actions release
+  metadata instead of trusting a fresh persistent cache entry, so newly
+  published action releases are detected immediately.
+- `kettle-jem-workflow-pins` no longer downgrades an existing version comment
+  such as `# v2.0` to an equivalent but less specific evergreen tag like
+  `# v2`.
+- kettle-jem-template-20260728-002 - Generated RuboCop configs now ignore the
+  same `gemfiles/vendor/bundle` tree as `.gitignore`, so vendored dependency
+  installs are not reported as project lint debt.
+- Existing generated `spec/spec_helper.rb` files now receive the
+  `kettle-test` helper documentation comment when structural merge preserves
+  their existing `require "kettle/test/rspec"` line.
+- Version spec normalization now removes managed version specs when
+  `version_gem` is disabled or incompatible with the project's runtime Ruby
+  floor.
+- Templating plan reports now include per-recipe duration metadata, template
+  planning deduplicates destination and template-source file reads, and runtime
+  loading is reduced to explicit main-Ractor extension points. A disabled
+  classified planning strategy now identifies worker-safe recipes, can opt into
+  experimental Ractor workers with `KETTLE_JEM_RACTOR_WORKERS`, records
+  execution counters, and preserves sequential report parity in preparation for
+  Ractor-based recipe planning.
+- Added a `benchmarks/` harness that templates a reset Bundler gem skeleton and
+  compares classified planning and phase-gated file work with and without
+  opt-in Ractor workers. The harness now defaults `KJ_MIN_RUBY` to `1.8.7` so
+  benchmark runs exercise legacy workflow and gemfile generation through the
+  supported one-shot `template --accept-config` flow, prints progress while
+  long benchmark matrices run, records planning and file-worker execution
+  counters for both Ractors and threads, and records the latest benchmark
+  outcome in a committed results README.
+- Apply now routes recipe report mutations through explicit write intents and
+  phase-gated per-file work units, preparing the file-processing path for
+  opt-in `KETTLE_JEM_RACTOR_FILE_WORKERS` execution without changing phase gates
+  or final filesystem outcomes.
+- The former monolithic thin-slice spec has been split into behavior-named
+  integration, system, and end-to-end specs so the project test harness can
+  parallelize templating coverage more effectively.
+- Generated README Support & Community rows now include a RubyForum help badge.
+- Generated READMEs can now render template-managed corporate sponsor logos
+  from `readme.corporate_sponsors` config or family-provided sponsorship data.
+- `kettle-jem` now supports `--events` for newline-delimited JSON progress
+  events, including named event type filters via comma-separated
+  `--events=TYPE,...` values, phase events, per-recipe template progress,
+  post-apply and command-step events, diagnostics, and summary events for family
+  orchestration consumers.
+- Generated CI workflow templates now cache `.rspec_status` with explicit
+  per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
+  across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
+  matrix runs.
+- Generated JRuby and TruffleRuby workflow templates now run when pull request
+  head branches start with `feature/release`, so `kettle-release` CI monitoring
+  does not treat intentionally skipped engine workflows as release failures.
+- Generated dep-heads workflows now document why every engine job runs directly
+  from `gemfiles/dep_heads.gemfile`, making that generated Appraisal file
+  required checked-in output for the workflow.
+- JRuby 9.2 workflow templates now use the legacy-engine bundle install path
+  instead of `ruby/setup-ruby` bundler caching so old Bundler does not fail
+  setup against gem servers without the full legacy index.
+- Gemspec templating now structurally merges destination `spec.files`
+  collection entries with template package entries so project-specific
+  packaged files are not lost when the template rewrites the generated gemspec
+  structure.
+- Main Gemfile templating now removes repeated direct sibling execution blocks
+  left behind by older `nomono` bootstrap output when applying the simplified
+  `require "nomono/bundler"` loader.
+- Gemspec templating now restores additional legacy Prism policy behavior for
+  destination-only metadata fields, Bundler `git ls-files` package declarations,
+  and empty development-dependency section cleanup after runtime dependency
+  promotion.
+- Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
+  update the GitHub Actions SHA pin index used by generated workflow templates
+  via `kettle-gha-sha-pins`.
+- Generated local Gemfile templates now use a simple `require "nomono/bundler"`
+  loader, with a provider-relative loader for `nomono` itself, instead of
+  emitting runtime lockfile parsing or explicit gem activation ceremony.
+- Generated root Gemfiles now declare `nomono` with a plain dependency line
+  requiring `nomono` 1.1.0 or newer, and retemplating removes the older
+  `nomono_requirements` helper block.
+- Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
+  dependency-bearing kettle-jem templates and update their dependency floors.
+- `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
+  `appraisal2` executable.
+- Added a default-off `readme.badges.fossa` template option for managed FOSSA
+  README badges.
+- Added explicit `ruby.test_minimum` template configuration, defaulting to
+  Ruby 2.4, for generated CI workflow and Appraisal floors.
+- Added top-level `integrations` configuration for disabling coverage
+  integrations (`codecov`, `coveralls`, `qlty`) and the SkyWalking Eyes license
+  check integration across README badges, upload/check workflow steps, packaged
+  config/workflow templates, and cleanup of existing config files or workflows.
+- kettle-jem's own `mise` environment now enables templating dependencies so
+  templating-only floors are validated in the normal gem bundle.
+- Restored `kettle-jem prepare` as a pre-flight dependency bootstrap mode for
+  applying the minimal templating Gemfile payload before full templating.
+- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.24.
+- Version-gem bootstrapping now removes stale top-level RBS `VERSION`
+  declarations and generated style workflows load the RBS environment so
+  duplicate declarations fail in CI.
+- Version-gem bootstrapping now removes literal `bundle gem` scaffold RBS
+  `VERSION` declarations before writing the managed `version.rbs` signature.
+- Added a destructive `shim` template profile for compatibility wrapper gems.
+  Shim templating accepts the replacement gem via `--shimmed-gem` or
+  `KETTLE_JEM_SHIMMED_GEM`, generates only the shim runtime/docs/specs/CI, and
+  deletes obsolete implementation code, behavior specs, workflows, and gemfiles.
+
+- kettle-jem-template-20260726-001 - Projects now include an optional
+  `yard:lint` task and YARD lint configuration for documentation quality checks.
 
 - Generated coverage workflows now treat Coveralls, QLTY, and Codecov uploads
   as optional so third-party coverage outages do not fail CI while the internal
@@ -1138,6 +1137,19 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem-template-20260726-002 - Generated version files now document their
   version namespace and constants, reducing warning-only YARD lint output.
+
+- kettle-jem-template-20260726-003 - Coverage upload steps now treat Coveralls,
+  QLTY, and Codecov as optional, so provider outages do not fail CI when local
+  coverage thresholds still pass.
+- kettle-jem-template-20260728-003 - Generated dep-heads workflows now run
+  TruffleRuby jobs with current RubyGems and Bundler, avoiding setup failures
+  before the test suite starts.
+- kettle-jem-template-20260728-004 - Generated dep-heads workflows now use the
+  setup-ruby Bundler install path for direct appraisal Gemfiles, avoiding rv
+  lockfile parser failures on Git and path dependencies.
+- kettle-jem-template-20260728-005 - VersionGem bootstrap now creates the
+  missing canonical version spec when a project only has shim namespace version
+  specs.
 
 ### Security
 

@@ -61,12 +61,15 @@ jobs:
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT }}
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        uses: appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # v2.0
         with:
           ruby-version: ${{ matrix.ruby }}
           rubygems: ${{ matrix.rubygems }}
           bundler: ${{ matrix.bundler }}
           bundler-cache: true
+          # Direct appraisal Gemfiles can contain Bundler GIT/PATH lockfile
+          # sections that rv clean-install does not currently parse.
+          use-setup-ruby: "3.2 3.3 3.4 4.0"
 
       - name: Restore RSpec status log
         if: "${{!env.ACT}}"
@@ -103,8 +106,8 @@ jobs:
             # for repositories using this generated workflow.
             bundle_gemfile: "gemfiles/dep_heads.gemfile"
             direct_bundle: true
-            rubygems: default
-            bundler: default
+            rubygems: latest
+            bundler: latest
 
     steps:
       - name: Checkout
@@ -115,12 +118,15 @@ jobs:
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT }}
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        uses: appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # v2.0
         with:
           ruby-version: ${{ matrix.ruby }}
           rubygems: ${{ matrix.rubygems }}
           bundler: ${{ matrix.bundler }}
           bundler-cache: true
+          # Direct appraisal Gemfiles can contain Bundler GIT/PATH lockfile
+          # sections that rv clean-install does not currently parse.
+          use-setup-ruby: "3.2 3.3 3.4 4.0"
 
       - name: Restore RSpec status log
         if: "${{!env.ACT}}"
@@ -170,12 +176,15 @@ jobs:
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT }}
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        uses: appraisal-rb/setup-ruby-flash@b22cb587431e9611d9e0a624a43872e2bbfbcd66 # v2.0
         with:
           ruby-version: ${{ matrix.ruby }}
           rubygems: ${{ matrix.rubygems }}
           bundler: ${{ matrix.bundler }}
           bundler-cache: true
+          # Direct appraisal Gemfiles can contain Bundler GIT/PATH lockfile
+          # sections that rv clean-install does not currently parse.
+          use-setup-ruby: "3.2 3.3 3.4 4.0"
 
       - name: Restore RSpec status log
         if: "${{!env.ACT}}"
