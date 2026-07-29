@@ -1332,15 +1332,15 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include("local_gems_to_eval = local_gems - %w[example] - declared_gems")
       expect(content).to include("gems: local_gems_to_eval")
       expect(content).to include('require "nomono/bundler"')
-      expect(content).not_to include("nomono_activation_requirements")
-      expect(content).not_to include("nomono_lockfile")
-      expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).to include("nomono_activation_requirements")
+      expect(content).to include("nomono_lockfile")
+      expect(content).to include("Bundler::LockfileParser")
       expect(content).not_to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
     end
   end
 
-  it "removes obsolete nomono activation ceremony from merged local Gemfiles" do
+  it "normalizes obsolete nomono activation ceremony in merged local Gemfiles" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-local-gemfile-nomono-loader-cleanup", tmp_root) do |root|
@@ -1398,11 +1398,11 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content.scan('require "nomono/bundler"').size).to eq(1)
-      expect(content).not_to include("nomono_activation_requirements")
-      expect(content).not_to include("nomono_lockfile")
-      expect(content).not_to include("Bundler::LockfileParser")
-      expect(content).not_to include('Kernel.send(:gem, "nomono"')
+      expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
+      expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.0"]')
+      expect(content).to include("nomono_lockfile")
+      expect(content).to include("Bundler::LockfileParser")
+      expect(content).to include('Kernel.send(:gem, "nomono"')
       expect(content).to include('root: ["src", "my", "kettle-dev"]')
     end
   end
@@ -1435,9 +1435,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
       expect(content).to include('require "nomono/bundler"')
       expect(content).not_to include("require_relative")
-      expect(content).not_to include("nomono_activation_requirements")
-      expect(content).not_to include("nomono_lockfile")
-      expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).to include("nomono_activation_requirements")
+      expect(content).to include("nomono_lockfile")
+      expect(content).to include("Bundler::LockfileParser")
       expect(content).to include('root: ["src", "my", "kettle-dev"]')
     end
   end

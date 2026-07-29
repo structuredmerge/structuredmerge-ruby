@@ -7639,13 +7639,27 @@ module Kettle
 
     def normalize_local_gemfile_nomono_bootstrap(content)
       output = remove_obsolete_local_gemfile_nomono_activation(content)
-      return output if ruby_call_records(output, :require).any? { |call| ruby_string_argument(call) == "nomono/bundler" }
+      bootstrap = "#{local_gemfile_nomono_bootstrap(nil)}\n\n"
+      require_records = ruby_call_records(output, :require).filter_map do |call|
+        next unless ruby_string_argument(call) == "nomono/bundler"
 
-      insertion = %(require "nomono/bundler"\n\n)
+        {
+          start_line: call.location.start_line,
+          end_line: ruby_node_source_end_line(call)
+        }
+      end
+      unless require_records.empty?
+        first = require_records.min_by { |record| record.fetch(:start_line) }
+        without_duplicates = require_records.reject { |record| record.equal?(first) }.sort_by { |record| -record.fetch(:start_line) }.reduce(output) do |memo, record|
+          replace_source_range_lines(memo, record.fetch(:start_line), expand_line_range_through_following_blanks(memo, record.fetch(:end_line)), "")
+        end
+        return replace_source_range_lines(without_duplicates, first.fetch(:start_line), first.fetch(:end_line), bootstrap)
+      end
+
       if (record = local_gems_assignment_record(output))
-        insert_lines_before(output, record.fetch(:start_line), insertion)
+        insert_lines_before(output, record.fetch(:start_line), bootstrap)
       else
-        ensure_trailing_newline([output.to_s.rstrip, insertion.rstrip].reject(&:empty?).join("\n\n"))
+        ensure_trailing_newline([output.to_s.rstrip, bootstrap.rstrip].reject(&:empty?).join("\n\n"))
       end
     end
 
@@ -13002,7 +13016,25 @@ module Kettle
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
-      %(require "nomono/bundler")
+      <<~RUBY.rstrip
+        # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
+        # Bundler records that dependency during Gemfile evaluation, but it does not
+        # activate that exact version before the immediate `require "nomono/bundler"`.
+        nomono_activation_requirements = ["~> 1.1", ">= 1.1.0"]
+        nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
+        if File.file?(nomono_lockfile)
+          require "bundler"
+          nomono_locked_spec = Bundler::LockfileParser
+            .new(Bundler.read_file(nomono_lockfile))
+            .specs
+            .find { |spec| spec.name == "nomono" }
+          nomono_locked = nomono_locked_spec &&
+            Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
+          nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"] if nomono_locked
+        end
+        Kernel.send(:gem, "nomono", *nomono_activation_requirements)
+        require "nomono/bundler"
+      RUBY
     end
 
     def project_homepage_uri(config, env, yard_host:, gemspec_homepage_uri: nil)
