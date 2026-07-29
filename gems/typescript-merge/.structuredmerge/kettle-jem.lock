@@ -200,8 +200,8 @@ files:
   Gemfile:
     recipe: template_source_application_Gemfile
     action: write
-    dest_sha256: 87d7ef74f341c32879f4a33cee576c95de956fb396872f98122885323ad7b557
-    input_fingerprint: 265360bf9d7afcb0fd67ca42df14f2268c63a3e7b94d28f0f0c3860af4f675e2
+    dest_sha256: 9321f694d175d67e2c88f0e345fea543503bbda64e4d2895891c637ff75b1496
+    input_fingerprint: 5e6e2e8b2da84634401895287c53cc17411f92f62cee4e588166f76a2eab3665
     template_sources:
     - Gemfile.example
   LICENSE.md:
@@ -439,14 +439,14 @@ files:
     recipe: template_source_application_gemfiles_modular_templating_gemfile
     action: write
     dest_sha256: ced2cde37ea28f825af6f4bb87f9dac5778279ccb6ff2ddf0616659cd4dedee9
-    input_fingerprint: 889123bd40fd3f5c138747128d76be3325cc229ad360390e6140b11e2d3c3b53
+    input_fingerprint: 570f13f95743988f643c967bf947d7ec128a3f90ef41c01021a51d6c189cfe5b
     template_sources:
     - gemfiles/modular/templating.gemfile.example
   gemfiles/modular/templating_local.gemfile:
     recipe: template_source_application_gemfiles_modular_templating_local_gemfile
     action: write
     dest_sha256: efad9f1d7465ed543d548c6847528213d563c518381d5f4e95850445f7d73f49
-    input_fingerprint: 2fc87dc321f092fa2c72d5bf7a4889421e1cf50e9355cc39a59174e14530fcfd
+    input_fingerprint: a1fbde2b75367b5af2f419a424ca52d007400288f37429d38b8eff63b2a49312
     template_sources:
     - gemfiles/modular/templating_local.gemfile.example
   gemfiles/modular/webrick/r4/v1.9.gemfile:
