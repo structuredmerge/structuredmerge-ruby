@@ -48,6 +48,15 @@
       ]
     }
   ],
+  "direct_bundle: true\nrubygems: default": [
+    {
+      "file": ".github/workflows/dep-heads.yml",
+      "lines": [
+        105,
+        159
+      ]
+    }
+  ],
   "exec_cmd: \"kettle-test\"\n# Run directly from the generated appraisal Gemfile so setup-ruby": [
     {
       "file": ".github/workflows/dep-heads.yml",
@@ -65,6 +74,24 @@
         44,
         105,
         163
+      ]
+    }
+  ],
+  "if: ${{ !env.ACT }}\nuses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0": [
+    {
+      "file": ".github/workflows/dep-heads.yml",
+      "lines": [
+        63,
+        117,
+        172
+      ]
+    },
+    {
+      "file": ".github/workflows/heads.yml",
+      "lines": [
+        56,
+        117,
+        175
       ]
     }
   ],
