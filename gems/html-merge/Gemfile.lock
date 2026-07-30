@@ -5,7 +5,7 @@ PATH
       ast-crispr (= 7.1.0)
       ast-merge (= 7.1.0)
       tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr-markdown-markly
@@ -14,7 +14,7 @@ PATH
       ast-crispr (= 7.1.0)
       markdown-merge (= 7.1.0)
       markly-merge (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr-ruby-prism
@@ -22,7 +22,7 @@ PATH
     ast-crispr-ruby-prism (7.1.0)
       ast-crispr (= 7.1.0)
       prism-merge (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr
@@ -30,7 +30,7 @@ PATH
     ast-crispr (7.1.0)
       ast-merge (= 7.1.0)
       service_actor (~> 3.9)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-merge-git
@@ -38,7 +38,7 @@ PATH
     ast-merge-git (7.1.0)
       ast-merge (= 7.1.0)
       json-merge (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-merge
@@ -47,7 +47,7 @@ PATH
       benchmark
       token-resolver (~> 2.0, >= 2.0.4)
       tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-template
@@ -110,7 +110,7 @@ PATH
     json-merge (7.1.0)
       ast-merge (= 7.1.0)
       tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
@@ -158,7 +158,7 @@ PATH
     markdown-merge (7.1.0)
       ast-merge (= 7.1.0)
       tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/markly-merge
@@ -166,7 +166,7 @@ PATH
     markly-merge (7.1.0)
       markdown-merge (= 7.1.0)
       markly (~> 0.9)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/parslet-toml-merge
@@ -182,7 +182,7 @@ PATH
     plain-merge (7.1.0)
       ast-merge (= 7.1.0)
       tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/prism-merge
@@ -190,7 +190,7 @@ PATH
     prism-merge (7.1.0)
       prism (~> 1.6)
       ruby-merge (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/psych-merge
@@ -216,7 +216,7 @@ PATH
     ruby-merge (7.1.0)
       ast-merge (= 7.1.0)
       tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/rust-merge
@@ -255,7 +255,7 @@ PATH
       citrus (~> 3.0)
       parslet (~> 2.0)
       tree_sitter_language_pack (>= 1.13.2, < 2.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.14)
 
 PATH
   remote: /home/pboling/src/my/structuredmerge/ruby/gems/typescript-merge
@@ -286,6 +286,8 @@ GEM
   specs:
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
+    anonymous_loader (0.1.3)
+      version_gem (~> 1.1, >= 1.1.14)
     ansi (1.6.0)
     appraisal2 (3.2.0)
       bundler (>= 1.17.3)
@@ -299,6 +301,9 @@ GEM
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
+    bundler-audit (0.9.3)
+      bundler (>= 1.2.0)
+      thor (~> 1.0)
     cgi (0.5.2)
     citrus (3.0.2)
     cmdparse (3.0.7)
@@ -361,6 +366,8 @@ GEM
       bundler (>= 1.14)
       version_gem (~> 1.1, >= 1.1.4)
     geom2d (0.4.1)
+    gitmoji-regex (2.0.10)
+      version_gem (~> 1.1, >= 1.1.14)
     hexapdf (1.9.1)
       cmdparse (~> 3.0, >= 3.0.3)
       geom2d (~> 0.4, >= 0.4.1)
@@ -480,6 +487,8 @@ GEM
     regexp_parser (2.12.0)
     reline (0.6.3)
       io-console (~> 0.5)
+    require_bench (1.0.4)
+      version_gem (>= 1.1.3, < 4)
     rexml (3.4.4)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
@@ -632,6 +641,7 @@ GEM
       standard-custom (~> 1.0, >= 1.0.2)
       standard-performance (~> 1.9, >= 1.9.0)
       version_gem (~> 1.1, >= 1.1.13)
+    stone_checksums (1.0.7)
     stringio (3.2.0)
     strings-ansi (0.2.0)
     strscan (3.1.8)
@@ -713,6 +723,8 @@ PLATFORMS
 
 DEPENDENCIES
   addressable (>= 2.8, < 3)
+  anonymous_loader (~> 0.1, >= 0.1.3)
+  appraisal2 (~> 3.2, >= 3.2.0)
   appraisal2-rubocop (~> 1.0, >= 1.0.0)
   ast-crispr!
   ast-crispr-markdown-markly!
@@ -723,6 +735,7 @@ DEPENDENCIES
   bash-merge!
   benchmark (~> 0.5, >= 0.5.0)
   binary-merge!
+  bundler-audit (~> 0.9.3)
   cgi (~> 0.5)
   citrus-toml-merge!
   commonmarker-merge!
@@ -730,14 +743,17 @@ DEPENDENCIES
   dotenv-merge!
   erb (~> 6.0, >= 6.0.6)
   gem_bench (~> 2.0, >= 2.0.5)
+  gitmoji-regex (~> 2.0, >= 2.0.10)
   go-merge!
   html-merge!
   irb (~> 1.17)
   json-merge!
+  kettle-dev (~> 2.3, >= 2.3.7)
   kettle-drift (~> 1.0, >= 1.0.8)
   kettle-family (~> 1.2, >= 1.2.5)
   kettle-jem!
   kettle-soup-cover (~> 3.0, >= 3.0.6)
+  kettle-test (~> 2.0, >= 2.0.16)
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-merge!
   kramdown-parser-gfm (~> 1.1)
@@ -749,10 +765,12 @@ DEPENDENCIES
   plain-merge!
   prism-merge!
   psych-merge!
+  rake (~> 13.0)
   rbs (>= 3.0)
   rbs-merge!
   rdoc (~> 6.11)
   reek (~> 6.5, >= 6.5.0)
+  require_bench (~> 1.0, >= 1.0.4)
   rubocop-gradual (~> 0.4, >= 0.4.0)
   rubocop-lts (~> 24.2, >= 24.2.1)
   rubocop-lts-rspec (~> 1.0, >= 1.0.5)
@@ -761,12 +779,15 @@ DEPENDENCIES
   rubocop-packaging (~> 0.6, >= 0.6.0)
   rubocop-ruby3_2 (~> 3.0, >= 3.0.6)
   ruby-merge!
+  ruby-progressbar (~> 1.13)
   rust-merge!
   smorg-rb!
   standard (~> 1.56, >= 1.56.0)
+  stone_checksums (~> 1.0, >= 1.0.7)
   stringio (>= 3.0)
   toml-merge!
   tree_haver!
+  turbo_tests2 (~> 3.2, >= 3.2.3)
   typescript-merge!
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.3)
@@ -782,6 +803,7 @@ DEPENDENCIES
 
 CHECKSUMS
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
+  anonymous_loader (0.1.3) sha256=084a18e2439144d955447dc11dfc982f41fcd1583ad32d4d55151325dc44cb55
   ansi (1.6.0) sha256=ac9ea0c0ea8d32fb4e271348e609963ac78882f34b73836c2a02b3622e666658
   appraisal2 (3.2.0) sha256=ccd0b767ac4060cd7af6d16747459b6990f49c39c7b4fb1f7d1146b1e97c492f
   appraisal2-rubocop (1.0.0) sha256=b71410fbb014befda5340605a605b7f6f3f012739baf0acc5b4351b592c3258d
@@ -798,6 +820,7 @@ CHECKSUMS
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
   binary-merge (7.1.0)
   bundler (4.0.17) sha256=214e21431b5665dd2f99df8a5511c6b151d7a72e8015c8b38f8b775b61cbb6c1
+  bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   cgi (0.5.2) sha256=61ca30298171190fd4fa0d8018e57ada456eae9b7a2b78526debf7f0a0e6f8bb
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (7.1.0)
@@ -832,6 +855,7 @@ CHECKSUMS
   erb (6.0.6) sha256=a9b24986700f5bf127c4f297c5403c3ca41b83b0a316c0cd09a096b56e644ae5
   gem_bench (2.0.5) sha256=0dc0fb44a5a5eb7b2f5c1c68a5b0164d72007132822c012bac3abe976b199ead
   geom2d (0.4.1) sha256=ea0998ea90c4f2752e24fe13d85a4f89bee689d151316140ebcc6369bf634ed9
+  gitmoji-regex (2.0.10) sha256=eb65faa16669ce072114deeef2b1a703f001d58685b6655410d7bf2ae9587d9b
   go-merge (7.1.0)
   hexapdf (1.9.1) sha256=2d1f6a3622e6bc2a70a707d4c3f3fa44f5552ecd9d899f6283abb07398a84884
   html-merge (7.1.0)
@@ -891,6 +915,7 @@ CHECKSUMS
   reek (6.5.0) sha256=d26d3a492773b2bbc228888067a21afe33ac07954a17dbd64cdeae42c4c69be1
   regexp_parser (2.12.0) sha256=35a916a1d63190ab5c9009457136ae5f3c0c7512d60291d0d1378ba18ce08ebb
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
+  require_bench (1.0.4) sha256=c8ef54aac5c01f80bb5f110f7c08d304417a6c7b34f3683e1923227b6e65d004
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
   rspec (3.13.2) sha256=206284a08ad798e61f86d7ca3e376718d52c0bc944626b2349266f239f820587
   rspec-block_is_expected (1.0.6) sha256=bbad3dc30eba93becf4dcb3fd1bff5f37f6e212ab5cbf6132c07edba6ff74282
@@ -939,6 +964,7 @@ CHECKSUMS
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
   standard-rspec (0.5.0) sha256=64d396524a65af47f5331b423d8cdd313e0267401647bb7892489ca89dad2973
   standard-rubocop-lts (2.0.10) sha256=89708a505b7d8b24d2ac399a7520fcb9e764abc2ecb4289b631b5fe0e3b76617
+  stone_checksums (1.0.7) sha256=faf7a175da7c4f32777c5292a0128b06eec183b3cc3a0b382529b21800300626
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   strings-ansi (0.2.0) sha256=90262d760ea4a94cc2ae8d58205277a343409c288cbe7c29416b1826bd511c88
   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
