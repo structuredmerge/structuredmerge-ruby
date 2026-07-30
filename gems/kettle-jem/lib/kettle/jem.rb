@@ -12299,7 +12299,7 @@ module Kettle
       ).merge(
         license_template_tokens(facts.fetch(:license, {}))
       ).merge(
-        gemspec_template_tokens(facts.fetch(:gemspec, {}))
+        gemspec_template_tokens(facts.fetch(:gemspec, {}), min_ruby: rubygems[:min_ruby])
       ).merge(
         project_runtime_template_tokens(facts.fetch(:project_runtime, {}))
       ).merge(
@@ -14581,10 +14581,54 @@ module Kettle
       includes.empty? ? {} : {package_file_includes: includes}
     end
 
-    def gemspec_template_tokens(gemspec)
+    def gemspec_template_tokens(gemspec, min_ruby: nil)
       {
-        "KJ|GEMSPEC:PACKAGE_FILE_INCLUDES" => gemspec_package_file_includes_token(gemspec)
+        "KJ|GEMSPEC:ENUMERATE_PACKAGE_GLOB_BODY" => gemspec_enumerate_package_glob_body(min_ruby),
+        "KJ|GEMSPEC:PACKAGE_FILE_INCLUDES" => gemspec_package_file_includes_token(gemspec),
+        "KJ|GEMSPEC:RELATIVE_PACKAGE_PATH_BODY" => gemspec_relative_package_path_body(min_ruby)
       }
+    end
+
+    def gemspec_relative_package_path_body(min_ruby)
+      if gemspec_modern_package_helper?(min_ruby)
+        %(    path.delete_prefix("\#{gemspec_root}/"))
+      else
+        [
+          %(    prefix = "\#{gemspec_root}/"),
+          "    path[0, prefix.length] == prefix ? path[prefix.length..-1] : path"
+        ].join("\n")
+      end
+    end
+
+    def gemspec_enumerate_package_glob_body(min_ruby)
+      if gemspec_modern_package_helper?(min_ruby)
+        [
+          "    Dir.glob(glob, File::FNM_DOTMATCH).filter_map do |path|",
+          %(      next unless File.file?(path) && ![".", ".."].include?(File.basename(path))),
+          "",
+          "      relative_package_path.call(path)",
+          "    end"
+        ].join("\n")
+      else
+        [
+          "    files = []",
+          "    Dir.glob(glob, File::FNM_DOTMATCH).each do |path|",
+          %(      next unless File.file?(path) && ![".", ".."].include?(File.basename(path))),
+          "",
+          "      files << relative_package_path.call(path)",
+          "    end",
+          "    files"
+        ].join("\n")
+      end
+    end
+
+    def gemspec_modern_package_helper?(min_ruby)
+      token = minimum_ruby_token(min_ruby)
+      return false if token.to_s.empty? || token == "0"
+
+      Gem::Version.new(token) >= Gem::Version.new("2.7")
+    rescue ArgumentError
+      false
     end
 
     def gemspec_package_file_includes_token(gemspec)
@@ -14601,11 +14645,7 @@ module Kettle
       includes.each_with_index do |pattern, index|
         comma = (index < includes.length - 1) ? "," : ""
         glob = %(File.join(gemspec_root, #{pattern.dump}))
-        lines << [
-          %(    *Dir.glob(#{glob}, File::FNM_DOTMATCH).filter_map { |path|),
-          "      File.file?(path) ? relative_package_path.call(path) : nil",
-          "    }#{comma}"
-        ].join("\n")
+        lines << %(    *enumerate_package_glob.call(#{glob})#{comma})
       end
       ",#{lines.join("\n")}"
     end

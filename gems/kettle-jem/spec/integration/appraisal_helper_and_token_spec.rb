@@ -1479,8 +1479,10 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
 
       expect(apply.dig(:facts, :gemspec, :package_file_includes)).to eq(["data/**/*.json", "config/runtime.yml"])
       expect(gemspec).to include("# Extra package files configured by .structuredmerge/kettle-jem.yml")
-      expect(gemspec).to include('*Dir.glob(File.join(gemspec_root, "data/**/*.json"), File::FNM_DOTMATCH)')
-      expect(gemspec).to include('*Dir.glob(File.join(gemspec_root, "config/runtime.yml"), File::FNM_DOTMATCH)')
+      expect(gemspec).to include('*enumerate_package_glob.call(File.join(gemspec_root, "data/**/*.json"))')
+      expect(gemspec).to include('*enumerate_package_glob.call(File.join(gemspec_root, "config/runtime.yml"))')
+      expect(gemspec).to include("files = []")
+      expect(gemspec).not_to include("filter_map")
       expect(gemspec).to include("relative_package_path.call(path)")
       expect { RubyVM::InstructionSequence.compile(gemspec) }.not_to raise_error
     end

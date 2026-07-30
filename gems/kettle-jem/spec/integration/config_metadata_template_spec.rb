@@ -622,6 +622,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(gemspec).to include("LICENSE.md")
       expect(gemspec).to include("README.md")
       expect(gemspec).to include("sig/example.rbs")
+      expect(gemspec).to include("files = []")
+      expect(gemspec).not_to include("filter_map")
       expect(files_assignment).to include("*package_metadata_files")
       expect(files_assignment).to include('"config/runtime.yml"')
       expect(files_assignment).to include('*enumerate_package_files.call("lib")')
@@ -638,6 +640,40 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(files_assignment).not_to include('*enumerate_package_files.call("certs")')
       expect(files_assignment).not_to include('*enumerate_package_files.call("sig")')
       expect(gemspec).not_to include("spec.extra_rdoc_files")
+    end
+  end
+
+  it "emits modern generated gemspec package helpers for modern Ruby floors" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-files-modern-ruby", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gem.gemspec.example"))
+      })
+
+      described_class.apply_project(root, env: {})
+      gemspec = File.read(File.join(root, "example.gemspec"))
+
+      expect(gemspec).to include('path.delete_prefix("#{gemspec_root}/")')
+      expect(gemspec).to include("filter_map")
+      expect(gemspec).not_to include("files = []")
+      expect { RubyVM::InstructionSequence.compile(gemspec) }.not_to raise_error
     end
   end
 

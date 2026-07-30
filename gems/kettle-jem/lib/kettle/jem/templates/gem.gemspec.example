@@ -61,14 +61,13 @@ Gem::Specification.new do |spec|
 
   gemspec_root = __dir__
   relative_package_path = lambda do |path|
-    path.delete_prefix("#{gemspec_root}/")
+{KJ|GEMSPEC:RELATIVE_PACKAGE_PATH_BODY}
+  end
+  enumerate_package_glob = lambda do |glob|
+{KJ|GEMSPEC:ENUMERATE_PACKAGE_GLOB_BODY}
   end
   enumerate_package_files = lambda do |root|
-    Dir.glob(File.join(gemspec_root, root, "**", "*"), File::FNM_DOTMATCH).filter_map do |path|
-      next unless File.file?(path) && ![".", ".."].include?(File.basename(path))
-
-      relative_package_path.call(path)
-    end
+    enumerate_package_glob.call(File.join(gemspec_root, root, "**", "*"))
   end
   package_metadata_files = %w[
     CHANGELOG.md
