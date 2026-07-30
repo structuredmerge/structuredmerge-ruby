@@ -3254,6 +3254,13 @@ module Kettle
       gemspec_license_spdx = gemspec_licenses
         .map { |license_id| license_id.to_s.strip }
         .reject(&:empty?)
+      repository_topology = repository_topology_for(kettle_config, env, template_selection)
+      repository = repository_facts(
+        project_root,
+        source_url,
+        package_name: name,
+        repository_topology: repository_topology
+      )
       project_runtime = project_runtime_facts(
         kettle_config,
         env,
@@ -3264,7 +3271,8 @@ module Kettle
         test_min_ruby: config_test_min_ruby(kettle_config, min_ruby),
         version: project_version,
         project_root: project_root,
-        gemspec_metadata: gemspec_metadata
+        gemspec_metadata: gemspec_metadata,
+        repository: repository
       )
       rubyforum = rubyforum_facts(kettle_config, env, package_name: name)
       shim = shim_facts(
@@ -3304,13 +3312,6 @@ module Kettle
       )
       facts[:version_gem] = version_gem_facts unless version_gem_facts.empty?
       facts[:shim] = shim unless shim.empty?
-      repository_topology = repository_topology_for(kettle_config, env, template_selection)
-      repository = repository_facts(
-        project_root,
-        source_url,
-        package_name: name,
-        repository_topology: repository_topology
-      )
       facts[:repository] = repository unless repository.empty?
       generated_blocks = generated_blocks_facts(gemspec_metadata, facts.merge(project_root: File.expand_path(project_root)), run_options)
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
@@ -12883,7 +12884,8 @@ module Kettle
       test_min_ruby:,
       version:,
       project_root: nil,
-      gemspec_metadata: {}
+      gemspec_metadata: {},
+      repository: {}
     )
       run_timestamp = Time.now
       configured_project_emoji = preferred_template_token_value(nil, config["project_emoji"], env, "KJ_PROJECT_EMOJI")
@@ -12920,6 +12922,7 @@ module Kettle
           package_name: package_name,
           source_url: source_url,
           project_root: project_root,
+          repository: repository,
           local_modular_eval_paths: local_modular_eval_paths.values.flatten
         )
       )
@@ -13009,7 +13012,7 @@ module Kettle
       end
     end
 
-    def main_gemfile_direct_sibling_block(gems, package_name:, source_url:, project_root:, local_modular_eval_paths: [])
+    def main_gemfile_direct_sibling_block(gems, package_name:, source_url:, project_root:, repository: {}, local_modular_eval_paths: [])
       names = Array(gems).map(&:to_s).reject(&:empty?).uniq
       eval_paths = Array(local_modular_eval_paths).map(&:to_s).reject(&:empty?).uniq.sort
       return "" if names.empty? && eval_paths.empty?
@@ -13027,7 +13030,7 @@ module Kettle
       prefix = workspace_slug.to_s.upcase.tr("-", "_")
       prefix = "LOCAL" if prefix.empty?
       dev_env = "#{prefix}_DEV"
-      root_literal = ruby_array_literal(["src", "my", workspace_slug].reject(&:empty?))
+      root_literal = ruby_array_literal(direct_sibling_nomono_root_parts(workspace_slug, repository))
       word_array = names.map { |name| "  #{name}" }.join("\n")
       nomono_loader = %(require "nomono/bundler")
 
@@ -13076,6 +13079,20 @@ module Kettle
       return "" unless project_root
 
       File.basename(File.expand_path("..", project_root.to_s)).to_s
+    end
+
+    def direct_sibling_nomono_root_parts(workspace_slug, repository)
+      parts = ["src", "my", workspace_slug].reject(&:empty?)
+      return parts unless repository_monorepo_subproject?(repository)
+
+      repo_name = repository.is_a?(Hash) ? repository[:name].to_s : ""
+      if !repo_name.empty? && repo_name != workspace_slug.to_s
+        suffix = repo_name.delete_prefix("#{workspace_slug}-")
+        parts.concat(suffix.split("-").reject(&:empty?)) unless suffix.empty? || suffix == repo_name
+      end
+      package_parent = File.dirname((repository[:package_path] if repository.is_a?(Hash)).to_s)
+      parts.concat(package_parent.split("/").reject { |segment| segment.empty? || segment == "." })
+      parts
     end
 
     def project_gemspec_metadata(project_root, gemspec_path, spec: nil)

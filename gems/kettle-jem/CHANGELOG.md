@@ -24,6 +24,9 @@ Please file a bug if you notice a violation of semantic versioning.
   `kettle-test`.
 - Generated main Gemfiles now include `kettle-family`, except when templating
   the `kettle-family` gem itself.
+- Monorepo subproject Gemfiles now use the repository package path when
+  generating direct sibling local-path wiring, so truthy family workspace envs
+  resolve siblings from the member root instead of the repository root.
 - Added `.structuredmerge/kettle-jem.lock` for template application state and
   checksum-based template skipping, with `--checksums` modes and
   `--ignore-checksums` as an alias for `--checksums=off`.

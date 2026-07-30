@@ -2336,6 +2336,62 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "uses the monorepo member root for direct sibling runtime dependency wiring" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-direct-sibling-monorepo-root", tmp_root) do |workspace|
+      repo_root = File.join(workspace, "structuredmerge", "ruby")
+      root = File.join(repo_root, "gems", "ast-merge")
+      sibling = File.join(repo_root, "gems", "tree_haver")
+      FileUtils.mkdir_p([root, sibling])
+      write_tree(sibling, {
+        "tree_haver.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "tree_haver"
+            spec.version = "7.1.0"
+            spec.summary = "Tree tools"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "ast-merge.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "ast-merge"
+            spec.version = "7.1.0"
+            spec.summary = "AST merge"
+            spec.metadata["source_code_uri"] = "https://github.com/structuredmerge/ast-merge"
+            spec.add_dependency "tree_haver", "= 7.1.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          repository:
+            topology: monorepo-subproject
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+      expect(system("git", "-C", repo_root, "init", "-q")).to be(true)
+      expect(system("git", "-C", repo_root, "remote", "add", "origin", "git@github.com:structuredmerge/structuredmerge-ruby.git")).to be(true)
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+      direct_block = gemfile
+        .split("# Direct sibling dependencies", 2).last.to_s
+        .split("# Templating", 2).first.to_s
+
+      expect(direct_block).to include("tree_haver")
+      expect(direct_block).to include('path_env: "STRUCTUREDMERGE_DEV"')
+      expect(direct_block).to include('root: ["src", "my", "structuredmerge", "ruby", "gems"]')
+    end
+  end
+
   it "collapses repeated direct sibling runtime dependency wiring in the main Gemfile" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
