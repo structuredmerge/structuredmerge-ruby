@@ -2,9 +2,11 @@
 # frozen_string_literal: true
 
 require "json"
+require "fileutils"
 require "open3"
 require "optparse"
 require "pathname"
+require "time"
 
 require_relative "../lib/kettle/jem"
 
@@ -14,6 +16,11 @@ class KettleJemDepsFloor
   VALID_UPGRADE_LEVELS = %w[major minor patch].freeze
   DEFAULT_UPGRADE_LEVEL = "major"
   DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
+  CACHE_TTL_SECONDS = 30 * 24 * 60 * 60
+  CACHE_ENV_KEY = "KETTLE_JEM_DEPS_FLOOR_CACHE"
+  CACHE_REFRESH_ENV_KEY = "KETTLE_JEM_DEPS_FLOOR_CACHE_REFRESH"
+  RUBYGEMS_REFRESH_ENV_KEY = "KETTLE_RUBYGEMS_REFRESH"
+  RELEASE_MARKER_ENV_KEY = "KETTLE_RUBYGEMS_CACHE_BUST_PATH"
 
   SOURCE_GLOBS = [
     "lib/kettle/jem/templates/Appraisal.root.gemfile.example",
@@ -28,7 +35,114 @@ class KettleJemDepsFloor
     "lib/kettle/jem.rb"
   ].freeze
 
-  def initialize(project_root:, resolver: Kettle::Jem::RubyGemsResolver.new, options: {})
+  class PersistentRubyGemsResolver
+    def initialize(delegate: Kettle::Jem::RubyGemsResolver.new, cache_path: KettleJemDepsFloor.default_cache_path, marker_path: KettleJemDepsFloor.default_release_marker_path, clock: -> { Time.now.utc })
+      @delegate = delegate
+      @cache_path = cache_path.to_s
+      @marker_path = marker_path.to_s
+      @clock = clock
+    end
+
+    def versions(gem_name, include_prerelease: false, requirements: nil)
+      requirement = Gem::Requirement.new(requirements || [">= 0"])
+      all_versions(gem_name).filter_map do |entry|
+        number = (entry[:number] || entry["number"]).to_s
+        next if number.empty?
+        next if !include_prerelease && truthy_entry_value?(entry[:prerelease] || entry["prerelease"])
+        next unless requirement.satisfied_by?(Gem::Version.new(number))
+
+        entry.transform_keys(&:to_sym).merge(number: number)
+      end.sort_by { |entry| Gem::Version.new(entry.fetch(:number)) }
+    end
+
+    private
+
+    attr_reader :delegate, :cache_path, :marker_path, :clock
+
+    def all_versions(gem_name)
+      name = gem_name.to_s
+      cached = cached_versions(name)
+      return cached if cached && !refresh_requested? && !fresh_release_marker?(name)
+
+      live = delegate.versions(name, include_prerelease: true, requirements: nil)
+      write_versions(name, live)
+      live
+    rescue => error
+      return cached if cached
+
+      raise error
+    end
+
+    def cached_versions(gem_name)
+      entry = read_cache.fetch("versions", {})[gem_name]
+      return unless entry.is_a?(Hash)
+      return unless fresh_cache_entry?(entry)
+
+      Array(entry["entries"])
+    end
+
+    def write_versions(gem_name, entries)
+      return if cache_path.empty?
+
+      data = read_cache
+      data["versions"] ||= {}
+      data["versions"][gem_name] = {
+        "cached_at" => clock.call.utc.iso8601,
+        "entries" => entries
+      }
+      FileUtils.mkdir_p(File.dirname(cache_path))
+      File.write(cache_path, JSON.pretty_generate(data) << "\n")
+    end
+
+    def read_cache
+      return {} if cache_path.empty? || !File.file?(cache_path)
+
+      parsed = JSON.parse(File.read(cache_path))
+      parsed.is_a?(Hash) ? parsed : {}
+    rescue JSON::ParserError
+      {}
+    end
+
+    def fresh_cache_entry?(entry)
+      cached_at = Time.iso8601(entry["cached_at"].to_s)
+      cached_at >= clock.call.utc - CACHE_TTL_SECONDS
+    rescue ArgumentError
+      false
+    end
+
+    def fresh_release_marker?(gem_name)
+      entry = read_release_marker.fetch("releases", {})[gem_name]
+      return false unless entry
+
+      released_at = Time.iso8601(entry["released_at"].to_s)
+      released_at >= clock.call.utc - CACHE_TTL_SECONDS
+    rescue ArgumentError
+      false
+    end
+
+    def read_release_marker
+      return {} if marker_path.empty? || !File.file?(marker_path)
+
+      parsed = JSON.parse(File.read(marker_path))
+      parsed.is_a?(Hash) ? parsed : {}
+    rescue JSON::ParserError
+      {}
+    end
+
+    def refresh_requested?
+      truthy_env?(CACHE_REFRESH_ENV_KEY) || truthy_env?(RUBYGEMS_REFRESH_ENV_KEY)
+    end
+
+    def truthy_env?(key)
+      ENV.fetch(key, "").match?(/\A(?:1|true|yes|on|enabled)\z/i)
+    end
+
+    def truthy_entry_value?(value)
+      value == true || value.to_s.match?(/\A(?:1|true|yes|on)\z/i)
+    end
+  end
+
+  def initialize(project_root:, resolver: self.class.default_resolver, options: {})
     @project_root = File.expand_path(project_root)
     @resolver = resolver
     @options = {
@@ -96,6 +210,29 @@ class KettleJemDepsFloor
       opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
       opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
     end
+  end
+
+  def self.default_resolver
+    PersistentRubyGemsResolver.new
+  end
+
+  def self.default_cache_path
+    configured = ENV.fetch(CACHE_ENV_KEY, "").to_s
+    return "" if configured.match?(/\A(?:false|0|no|off|disabled)\z/i)
+    return configured unless configured.empty?
+
+    cache_home = ENV["XDG_CACHE_HOME"]
+    cache_home = File.join(Dir.home, ".cache") if cache_home.to_s.empty?
+    File.join(cache_home, "kettle-jem", "deps-floor-rubygems-versions.json")
+  end
+
+  def self.default_release_marker_path
+    configured = ENV.fetch(RELEASE_MARKER_ENV_KEY, "").to_s
+    return configured unless configured.empty?
+
+    state_home = ENV["XDG_STATE_HOME"]
+    state_home = File.join(Dir.home, ".local", "state") if state_home.to_s.empty?
+    File.join(state_home, "kettle-dev", "rubygems-cache-bust.json")
   end
 
   def run

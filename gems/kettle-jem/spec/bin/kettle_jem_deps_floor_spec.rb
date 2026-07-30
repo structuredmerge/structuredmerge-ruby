@@ -30,7 +30,7 @@ RSpec.describe KettleJemDepsFloor do
 
         attr_reader :requests
 
-        def versions(gem_name, requirements: nil)
+        def versions(gem_name, include_prerelease: false, requirements: nil)
           @requests << [gem_name, requirements]
           requirement = Gem::Requirement.new(requirements || [">= 0"])
           Array(@versions.fetch(gem_name)).select do |version|
@@ -138,6 +138,71 @@ RSpec.describe KettleJemDepsFloor do
     options = described_class.parse_options(%w[--write --no-commit])
 
     expect(options).to include(write: true, commit: false)
+  end
+
+  it "uses a thirty-day persistent RubyGems version cache when live lookups fail", freeze: Time.utc(2026, 7, 30, 12, 0, 0) do
+    cache_path = File.join(project_root, "deps-floor-cache.json")
+    File.write(
+      cache_path,
+      JSON.generate(
+        "versions" => {
+          "version_gem" => {
+            "cached_at" => "2026-07-01T12:00:00Z",
+            "entries" => [{"number" => "1.1.14"}]
+          }
+        }
+      )
+    )
+    delegate = instance_double(Kettle::Jem::RubyGemsResolver)
+    allow(delegate).to receive(:versions).and_raise(Kettle::Jem::Error, "RubyGems API error for version_gem: 500")
+    resolver = described_class::PersistentRubyGemsResolver.new(
+      delegate: delegate,
+      cache_path: cache_path,
+      marker_path: File.join(project_root, "missing-marker.json")
+    )
+
+    versions = resolver.versions("version_gem", requirements: [">= 1.0"])
+
+    expect(versions).to eq([{number: "1.1.14"}])
+    expect(delegate).not_to have_received(:versions)
+  end
+
+  it "refreshes only gems with fresh kettle-release markers while keeping untouched gems cached", freeze: Time.utc(2026, 7, 30, 12, 0, 0) do
+    cache_path = File.join(project_root, "deps-floor-cache.json")
+    marker_path = File.join(project_root, "rubygems-cache-bust.json")
+    File.write(
+      cache_path,
+      JSON.generate(
+        "versions" => {
+          "released-gem" => {
+            "cached_at" => "2026-07-01T12:00:00Z",
+            "entries" => [{"number" => "1.0.0"}]
+          },
+          "untouched-gem" => {
+            "cached_at" => "2026-07-01T12:00:00Z",
+            "entries" => [{"number" => "2.0.0"}]
+          }
+        }
+      )
+    )
+    File.write(
+      marker_path,
+      JSON.generate(
+        "releases" => {
+          "released-gem" => {"version" => "1.1.0", "released_at" => "2026-07-30T11:59:00Z"}
+        }
+      )
+    )
+    delegate = FakeDepsFloorResolver.new("released-gem" => %w[1.0.0 1.1.0])
+    resolver = described_class::PersistentRubyGemsResolver.new(
+      delegate: delegate,
+      cache_path: cache_path,
+      marker_path: marker_path
+    )
+
+    expect(resolver.versions("released-gem", requirements: [">= 1.0"])).to eq([{number: "1.0.0"}, {number: "1.1.0"}])
+    expect(resolver.versions("untouched-gem", requirements: [">= 1.0"])).to eq([{number: "2.0.0"}])
+    expect(delegate.requests).to eq([["released-gem", nil]])
   end
 
   it "reports patch updates without writing files" do
