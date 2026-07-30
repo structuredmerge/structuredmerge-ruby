@@ -159,3 +159,7 @@ release:
   family_changelog:
     enabled: true
     command: bundle exec kettle-changelog
+
+pre_release:
+  image_url_skip_patterns:
+    - https://img.shields.io/*
