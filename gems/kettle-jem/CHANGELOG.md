@@ -64,6 +64,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Runtime dependency metadata now requires `kettle-ndjson` 0.1.3 or newer and
+  `kettle-rb` 0.1.7 or newer.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.3 or newer.
 - Generated main Gemfiles now require `kettle-family` 1.2.1 or newer, so
   gem-root family commands use the reset helper that runs outside broken
