@@ -265,7 +265,7 @@ RSpec.describe Toml::Merge do
     expect(result.fetch(:output)).to include('diff = "smorg-rb"')
     expect(result.fetch(:output)).to include('description = "Destination driver"')
     expect(result.fetch(:output)).to include('[[profiles.textconv-normalized.attributes]]')
-    expect(result.fetch(:output)).not_to include('smorg-rb')
+    expect(result.fetch(:output)).not_to include('description = "Template driver"')
   end
 
   it 'exposes non-overlapping effective table ranges and source fragments through the TOML substrate' do

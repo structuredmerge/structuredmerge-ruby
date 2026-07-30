@@ -150,7 +150,7 @@ RSpec.describe Parslet::Toml::Merge do
     expect(result.fetch(:output)).to include('diff = "smorg-rb"')
     expect(result.fetch(:output)).to include('description = "Destination driver"')
     expect(result.fetch(:output)).to include('[[profiles.textconv-normalized.attributes]]')
-    expect(result.fetch(:output)).not_to include('smorg-rb')
+    expect(result.fetch(:output)).not_to include('description = "Template driver"')
   end
 
   it 'conforms to the provider named-suite plan and manifest-report fixtures' do

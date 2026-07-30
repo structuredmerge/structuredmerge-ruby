@@ -124,6 +124,15 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- StructuredMerge Ruby's aggregate release test bundle now includes
+  `html-merge`, preventing root release checks from failing to load HTML merge
+  specs.
+- `kettle-jem` gemspec packaging now enumerates package files relative to the
+  gemspec directory, so release packaging specs see shipped template assets even
+  when the gemspec is loaded from the monorepo root.
+- TOML array-of-table fixture specs now assert that the losing template driver
+  description is absent instead of rejecting the retained destination driver
+  name they also require.
 - `prism-merge` now preserves template-owned trailing comment lines attached to
   matched Ruby statements, including comments adjacent to generated `require`
   calls during template merges.

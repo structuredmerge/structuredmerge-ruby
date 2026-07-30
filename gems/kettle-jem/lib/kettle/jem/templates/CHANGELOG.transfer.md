@@ -65,3 +65,6 @@
 - kettle-jem-template-20260729-003 - Old-Ruby gems below the VersionGem runtime
   floor now get managed minimal `version.rb` files and anonymous-loader version
   specs without adding `version_gem`.
+- kettle-jem-template-20260730-001 - Gemspec package file enumeration now runs
+  relative to the gemspec directory, so packaged template assets are included
+  even when the gemspec is loaded from another working directory.
