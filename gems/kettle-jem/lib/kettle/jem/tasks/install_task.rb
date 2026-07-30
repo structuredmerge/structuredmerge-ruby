@@ -1626,7 +1626,7 @@ module Kettle
           end
 
           commands = []
-          commands << %w[git add -A]
+          commands << %w[git add -A -- .]
           commands << ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
           {
             name: "bootstrap_commit",

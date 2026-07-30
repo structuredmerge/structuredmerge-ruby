@@ -124,6 +124,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem` bootstrap commits now stage with `git add -A -- .` from the
+  project root instead of repository-global `git add -A`, preventing monorepo
+  member bootstrap commits from sweeping unrelated sibling changes.
 - StructuredMerge Ruby's aggregate release test bundle now includes
   `html-merge`, preventing root release checks from failing to load HTML merge
   specs.

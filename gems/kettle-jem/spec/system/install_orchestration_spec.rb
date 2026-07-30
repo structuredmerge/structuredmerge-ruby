@@ -464,14 +464,14 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(bootstrap_step).to include(
         status: "succeeded",
         commands: [
-          %w[git add -A],
+          %w[git add -A -- .],
           ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
         ],
         reason: "executed",
         duration_ms: be >= 0
       )
       expect(bootstrap_step.fetch(:command_results)).to contain_exactly(
-        hash_including(command: %w[git add -A], exitstatus: 0, duration_ms: be >= 0),
+        hash_including(command: %w[git add -A -- .], exitstatus: 0, duration_ms: be >= 0),
         hash_including(command: ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0, duration_ms: be >= 0)
       )
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
@@ -496,7 +496,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
             name: "bootstrap_commit",
             status: "ready",
             dirty_entries: ["?? tracked.txt"],
-            commands: [%w[git add -A], ["git", "commit", "-m", "locked"]]
+            commands: [%w[git add -A -- .], ["git", "commit", "-m", "locked"]]
           },
           project_root: locked_root,
           env: {"KETTLE_JEM_GIT_COMMIT_LOCK" => lock_path},
@@ -518,7 +518,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
             name: "bootstrap_commit",
             status: "ready",
             dirty_entries: [" M bin/setup"],
-            commands: [%w[git add -A], ["git", "commit", "-m", "stale"]]
+            commands: [%w[git add -A -- .], ["git", "commit", "-m", "stale"]]
           },
           project_root: clean_root,
           env: {},
@@ -1149,7 +1149,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(requested_bundle_install).to be_nil
       command_names = commands.map { |entry| entry.fetch(:command) }
       expect(command_names).not_to include(%w[bundle update])
-      expect(command_names).not_to include(%w[git add -A])
+      expect(command_names).not_to include(%w[git add -A -- .])
     end
   end
 
