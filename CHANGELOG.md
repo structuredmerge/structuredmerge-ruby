@@ -69,6 +69,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - The monorepo root Gemfile now includes the same development tooling stack used
   by templated gem Gemfiles, so aggregate release coverage runs can load and
   collate SimpleCov output.
+- The monorepo root spec configuration now excludes member `spec/tmp` fixture
+  trees, preventing generated destination project specs from being loaded during
+  aggregate release coverage runs.
 - `kettle-jem` templating now defaults no-option runs to classified thread
   planning and file work with half of the available CPU cores.
 - `kettle-jem` Ractor-backed file work now batches file units by worker count
