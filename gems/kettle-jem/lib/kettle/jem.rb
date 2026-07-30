@@ -11649,7 +11649,7 @@ module Kettle
       paths.each { |path| preflight_ruby_syntax!(project_root, path) }
     end
 
-    def git_preflight_report(project_root, env: ENV, template_selection:)
+    def git_preflight_report(project_root, template_selection:, env: ENV)
       with_git_operation_lock(env) do
         inside = git_success?(project_root, "rev-parse", "--is-inside-work-tree")
         status = inside ? git_output(project_root, "status", "--porcelain") : nil
