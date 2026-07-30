@@ -4838,26 +4838,69 @@ module Kettle
       else
         updated.insert(profile_index + 1, *entries_lines)
       end
-      sync_kettle_config_gemspec_strategy_lines!(updated, gemspec_path, normalized_profile)
+      sync_kettle_config_gemspec_strategy_lines!(updated, gemspec_path)
       ensure_trailing_newline(updated.join("\n"))
     end
 
-    def sync_kettle_config_gemspec_strategy_lines!(lines, gemspec_path, profile)
+    def sync_kettle_config_gemspec_strategy_lines!(lines, gemspec_path)
       gemspec = gemspec_path.to_s
       return if gemspec.empty?
 
+      files_index = lines.index("files:")
+      return unless files_index
+
+      remove_stale_gemspec_file_override_blocks!(lines, files_index, gemspec)
       gemspec_index = lines.index("  #{gemspec}:")
-      return unless gemspec_index
+      unless gemspec_index
+        insertion_index = kettle_config_gemspec_override_insertion_index(lines, files_index)
+        lines.insert(insertion_index, "  #{gemspec}:", "    strategy: merge")
+        return
+      end
 
-      strategy_index = ((gemspec_index + 1)...lines.length).find do |index|
+      block_end = kettle_config_file_override_block_end(lines, gemspec_index)
+      strategy_index = ((gemspec_index + 1)...block_end).find do |index|
         line = lines.fetch(index)
-        break nil unless line.start_with?("    ")
-
         line.start_with?("    strategy:")
       end
-      return unless strategy_index
+      if strategy_index
+        lines[strategy_index] = "    strategy: merge"
+      else
+        lines.insert(gemspec_index + 1, "    strategy: merge")
+      end
+    end
 
-      lines[strategy_index] = "    strategy: merge"
+    def remove_stale_gemspec_file_override_blocks!(lines, files_index, gemspec)
+      index = files_index + 1
+      while index < lines.length
+        line = lines.fetch(index)
+        break if top_level_yaml_key_line?(line)
+
+        # Keep this as a bounded line match instead of dumping YAML so the
+        # generated field-guide comments and ordering survive profile sync.
+        match = line.match(/\A  ([^ ].*\.gemspec):\z/)
+        if match && match[1] != gemspec
+          block_end = kettle_config_file_override_block_end(lines, index)
+          lines.slice!(index...block_end)
+          next
+        end
+
+        index += 1
+      end
+    end
+
+    def kettle_config_gemspec_override_insertion_index(lines, files_index)
+      readme_index = lines.index("  README.md:")
+      if readme_index && readme_index > files_index
+        return kettle_config_file_override_block_end(lines, readme_index)
+      end
+
+      files_index + 1
+    end
+
+    def kettle_config_file_override_block_end(lines, start_index)
+      index = start_index + 1
+      index += 1 while index < lines.length && lines.fetch(index).start_with?("    ")
+      index
     end
 
     def top_level_yaml_key_line?(line)
@@ -4912,7 +4955,7 @@ module Kettle
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.5", ">= 2.5.6"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.8"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.5"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.6"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.16"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
@@ -13183,7 +13226,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.5"\n)
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.6"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)

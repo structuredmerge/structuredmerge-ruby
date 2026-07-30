@@ -43,6 +43,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- StructuredMerge Ruby gemspec manifests now exclude repository-only files from
+  release packages, including local signing certificates, governance documents,
+  recursive signatures, and `extra_rdoc_files`.
+- `kettle-jem` monorepo subgem package profiles now merge gemspec template
+  updates instead of preserving stale generated package manifests.
 - Documented the StructuredMerge Ruby merge-gem family model, including
   substrate/provider behavior sharing and the requirement that partial document
   insertion, replacement, and removal flow through `ast-crispr` instead of

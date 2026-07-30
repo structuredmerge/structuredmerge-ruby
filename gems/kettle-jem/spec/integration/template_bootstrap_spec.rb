@@ -964,6 +964,37 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "removes stale monorepo subgem gemspec overrides when syncing template profiles" do
+    content = <<~YAML
+      project_emoji: "💎"
+      templates:
+        root: packaged
+        apply: true
+        profile: monorepo-subgem-package
+        entries:
+          - README.md
+      files:
+        README.md:
+          strategy: merge
+        plain-merge.gemspec:
+          strategy: keep_destination
+        gemfiles:
+          strategy: keep_destination
+    YAML
+
+    updated = described_class.send(
+      :sync_kettle_config_monorepo_subgem_profile,
+      content,
+      "bash-merge.gemspec",
+      "monorepo-subgem-package"
+    )
+    config_yaml = YAML.safe_load(updated)
+
+    expect(config_yaml.dig("files", "bash-merge.gemspec", "strategy")).to eq("merge")
+    expect(config_yaml.fetch("files")).not_to have_key("plain-merge.gemspec")
+    expect(config_yaml.dig("files", "gemfiles", "strategy")).to eq("keep_destination")
+  end
+
   it "templates a monorepo root without a gemspec and syncs root Gemfile tooling dependencies" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

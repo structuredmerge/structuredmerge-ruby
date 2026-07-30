@@ -392,8 +392,8 @@ patterns:
 files:
   README.md:
     strategy: merge
-  plain-merge.gemspec:
-    strategy: keep_destination
+  rbs-merge.gemspec:
+    strategy: merge
   AGENTS.md:
     strategy: accept_template
   .github:
