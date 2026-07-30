@@ -4,6 +4,8 @@ require "pathname"
 require "rbs"
 
 RSpec.describe Kettle::Jem do
+  include_context "with isolated kettle-jem environment"
+
   def write_file(root, relative_path, content)
     path = File.join(root, relative_path)
     FileUtils.mkdir_p(File.dirname(path))
