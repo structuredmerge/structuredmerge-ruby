@@ -45,7 +45,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           Version: {KJ|KETTLE_JEM_VERSION}
           Date: {KJ|TEMPLATE_RUN_DATE}
           Year: {KJ|TEMPLATE_RUN_YEAR}
-          Dev gem: {KJ|KETTLE_DEV_GEM}
           YARD: {KJ|YARD_HOST}
           Homepage URI: {KJ|HOMEPAGE_URI}
           Emoji: {KJ|PROJECT_EMOJI}
@@ -79,7 +78,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content).to include("Version: #{Kettle::Jem::VERSION}")
       expect(final_content).to include("Date: #{Time.now.strftime("%Y-%m-%d")}")
       expect(final_content).to include("Year: #{Time.now.year}")
-      expect(final_content).to include("Dev gem: kettle-dev")
       expect(final_content).to include("YARD: docs.example.test")
       expect(final_content).to include("Homepage URI: https://homepage.example.test")
       expect(final_content).to include("Emoji: 🫖")

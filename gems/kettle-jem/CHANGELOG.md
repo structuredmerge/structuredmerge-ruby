@@ -135,7 +135,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - README recipe reports now include sub-step timing metadata, and benchmark
   results summarize the baseline README timing breakdown.
 
-- Generated gemspec templates now require `kettle-dev` >= 2.3.7.
+- Generated gemspec templates now require `kettle-dev` >= 2.5.10 and declare
+  `kettle-dev` literally so dependency floor automation can keep it current.
+- Generated `.rspec` files now exclude `spec/tmp/**/*_spec.rb` so temporary
+  fixture projects do not get discovered during member-level spec runs.
 - kettle-jem now requires `kettle-rb` >= 0.1.4.
 - Refreshed generated GitHub Actions workflow pins for `ruby/setup-ruby` and
   CodeQL actions.

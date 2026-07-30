@@ -743,7 +743,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
 
-            spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.7")
+            spec.add_development_dependency("kettle-dev", "~> 2.5", ">= 2.5.10")
             spec.add_development_dependency("rake", "~> 13.0")
           end
         RUBY
@@ -826,7 +826,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
         #       visibility and discoverability.
 
         # Dev, Test, & Release Tasks
-        spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.7")      # ruby >= 2.4.0
+        spec.add_development_dependency("kettle-dev", "~> 2.5", ">= 2.5.10")     # ruby >= 2.4.0
 
         # Security
         spec.add_development_dependency("bundler-audit", "~> 0.9.3")             # ruby >= 2.0.0
@@ -885,7 +885,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
         #       visibility and discoverability.
 
         # Dev, Test, & Release Tasks
-        spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.7")
+        spec.add_development_dependency("kettle-dev", "~> 2.5", ">= 2.5.10")
 
         # Security
         spec.add_development_dependency("bundler-audit", "~> 0.9.3")

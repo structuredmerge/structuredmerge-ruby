@@ -498,6 +498,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup", "spec/README.md")
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
+      expect(File.read(File.join(root, ".rspec"))).to include("--exclude-pattern spec/tmp/**/*_spec.rb")
       expect(File.read(File.join(root, "spec", "README.md"))).to include("stub_env")
       expect(File.read(File.join(root, "spec", "README.md"))).to include("include_context \"with rake\"")
       expect(File).to exist(File.join(root, ".yard-lint.yml"))

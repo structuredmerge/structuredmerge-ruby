@@ -84,6 +84,7 @@ RSpec.describe Kettle::Jem, "shim profile templating" do
           "spec/shim_spec.rb",
           "README.md",
           "Gemfile",
+          ".rspec",
           "gemfiles/modular/templating.gemfile",
           "gemfiles/modular/templating_local.gemfile",
           "gemfiles/legacy.gemfile",
@@ -101,6 +102,7 @@ RSpec.describe Kettle::Jem, "shim profile templating" do
       expect_gemspec_dependency_declared(generated[:"legacy-shim.gemspec"], "stone_checksums", kind: :add_development_dependency)
       expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
       expect_gem_dependency_declared(generated[:Gemfile], "nomono")
+      expect(generated[:".rspec"]).to include("--exclude-pattern spec/tmp/**/*_spec.rb")
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
       expect_gem_dependency_declared(generated[:"gemfiles/modular/templating.gemfile"], "kettle-jem")
