@@ -1168,6 +1168,10 @@ Please file a bug if you notice a violation of semantic versioning.
   missing canonical version spec when a project only has shim namespace version
   specs.
 
+- kettle-jem-template-20260730-001 - Gemspec package file enumeration now runs
+  relative to the gemspec directory, so packaged template assets are included
+  even when the gemspec is loaded from another working directory.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

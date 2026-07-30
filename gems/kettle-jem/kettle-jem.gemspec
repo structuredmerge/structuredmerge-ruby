@@ -74,7 +74,7 @@ Gem::Specification.new do |spec|
     # Executables and executable support scripts
     *enumerate_package_files.call("exe"),
     # Extra package files configured by .structuredmerge/kettle-jem.yml
-    *enumerate_package_files.call("certs")
+    *Dir.glob("certs/**", File::FNM_DOTMATCH).select { |path| File.file?(path) }
   ]
   spec.rdoc_options += [
     "--title",
