@@ -4958,7 +4958,7 @@ module Kettle
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.8"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.8"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
-        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.16"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.17"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.7"\n)},
