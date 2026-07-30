@@ -66,6 +66,9 @@ Please file a bug if you notice a violation of semantic versioning.
   exceptions for intentional style deviations.
 - Current CI now detects changed monorepo gems and runs each changed gem's own
   `kettle-test` suite instead of installing the root aggregate bundle.
+- The monorepo root Gemfile now includes the same development tooling stack used
+  by templated gem Gemfiles, so aggregate release coverage runs can load and
+  collate SimpleCov output.
 - `kettle-jem` templating now defaults no-option runs to classified thread
   planning and file work with half of the available CPU cores.
 - `kettle-jem` Ractor-backed file work now batches file units by worker count
