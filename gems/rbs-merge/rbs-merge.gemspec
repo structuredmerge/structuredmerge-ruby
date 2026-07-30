@@ -52,12 +52,15 @@ Gem::Specification.new do |spec|
   relative_package_path = lambda do |path|
     path.delete_prefix("#{gemspec_root}/")
   end
-  enumerate_package_files = lambda do |root|
-    Dir.glob(File.join(gemspec_root, root, '**', '*'), File::FNM_DOTMATCH).filter_map do |path|
+  enumerate_package_glob = lambda do |glob|
+    Dir.glob(glob, File::FNM_DOTMATCH).filter_map do |path|
       next unless File.file?(path) && !['.', '..'].include?(File.basename(path))
 
       relative_package_path.call(path)
     end
+  end
+  enumerate_package_files = lambda do |root|
+    enumerate_package_glob.call(File.join(gemspec_root, root, '**', '*'))
   end
   package_metadata_files = %w[
     CHANGELOG.md
@@ -133,7 +136,7 @@ Gem::Specification.new do |spec|
   # Loads version files in anonymous namespaces for coverage without constant redefinition warnings.
   spec.add_development_dependency('anonymous_loader', '~> 0.1', '>= 0.1.3')         # ruby >= 2.2.0
   spec.add_development_dependency('appraisal2', '~> 3.2', '>= 3.2.0')               # ruby >= 1.8.7, for testing against multiple versions of dependencies
-  spec.add_development_dependency('kettle-test', '~> 2.0', '>= 2.0.16') # ruby >= 4.0.0
+  spec.add_development_dependency('kettle-test', '~> 2.0', '>= 2.0.17') # ruby >= 4.0.0
   spec.add_development_dependency('turbo_tests2', '~> 3.2', '>= 3.2.3') # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing
