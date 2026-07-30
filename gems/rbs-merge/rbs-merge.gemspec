@@ -48,9 +48,15 @@ Gem::Specification.new do |spec|
   spec.metadata['mailing_list_uri'] = 'https://www.rubyforum.org/tag/structuredmerge'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
+  gemspec_root = __dir__
+  relative_package_path = lambda do |path|
+    path.delete_prefix("#{gemspec_root}/")
+  end
   enumerate_package_files = lambda do |root|
-    Dir.glob(File.join(root, '**', '*'), File::FNM_DOTMATCH).select do |path|
-      File.file?(path) && !['.', '..'].include?(File.basename(path))
+    Dir.glob(File.join(gemspec_root, root, '**', '*'), File::FNM_DOTMATCH).filter_map do |path|
+      next unless File.file?(path) && !['.', '..'].include?(File.basename(path))
+
+      relative_package_path.call(path)
     end
   end
   package_metadata_files = %w[
@@ -58,7 +64,7 @@ Gem::Specification.new do |spec|
     LICENSE.md
     README.md
     sig/rbs/merge.rbs
-  ].select { |path| File.exist?(path) }
+  ].select { |path| File.exist?(File.join(gemspec_root, path)) }
 
   # Specify which files are part of the released package.
   spec.files = [
