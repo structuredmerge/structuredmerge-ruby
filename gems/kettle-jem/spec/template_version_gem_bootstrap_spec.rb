@@ -541,8 +541,70 @@ RSpec.describe Kettle::Jem do
       expect(version_spec).to include(
         "expect(anonymous_namespace::Legacy::Gem::Version::VERSION).to eq(described_class::VERSION)"
       )
+      expect(version_spec).not_to include('it_behaves_like "a Version module"')
       expect(version_spec).not_to include("version_gem")
       expect(version_spec).not_to include("VersionGem")
+    end
+  end
+
+  it "removes stale managed VersionGem shared examples from old Ruby version specs" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-old-ruby-version-spec-stale-shared", tmp_root) do |root|
+      write_file(root, "legacy-gem.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "legacy-gem"
+          spec.version = "1.0.0"
+          spec.summary = "Legacy gem"
+          spec.required_ruby_version = ">= 1.8.7"
+        end
+      RUBY
+      write_file(root, "lib/legacy/gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "gem/version"
+
+        module Legacy
+          module Gem
+          end
+        end
+      RUBY
+      write_file(root, "lib/legacy/gem/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Legacy
+          module Gem
+            module Version
+              VERSION = "1.0.0"
+            end
+            VERSION = Version::VERSION # Traditional Constant Location
+          end
+        end
+      RUBY
+      write_file(root, "spec/legacy/gem/version_spec.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        RSpec.describe Legacy::Gem::Version do
+          it_behaves_like "a Version module", described_class
+        end
+      RUBY
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_bootstrap",
+          status: "applied",
+          changed_files: include("spec/legacy/gem/version_spec.rb")
+        )
+      )
+      version_spec = File.read(File.join(root, "spec/legacy/gem/version_spec.rb"))
+      expect(version_spec).not_to include('it_behaves_like "a Version module"')
+      expect(version_spec).not_to include("VersionGem")
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include(
+        "expect(anonymous_namespace::Legacy::Gem::Version::VERSION).to eq(described_class::VERSION)"
+      )
     end
   end
 

@@ -13476,6 +13476,7 @@ module Kettle
         lines.insert(version_spec_require_insertion_index(updated), *requirements)
         updated = lines.join
       end
+      updated = remove_version_gem_shared_example(updated) unless include_version_gem_path
       updated = normalize_version_spec_anonymous_loader_example(
         updated,
         version_spec_path: version_spec_path,
@@ -13484,6 +13485,12 @@ module Kettle
         include_version_gem_path: include_version_gem_path
       )
       write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(updated))
+    end
+
+    def remove_version_gem_shared_example(content)
+      content.to_s.lines.reject do |line|
+        line.include?('it_behaves_like "a Version module"')
+      end.join
     end
 
     def version_gem_version_spec_content(namespace:)

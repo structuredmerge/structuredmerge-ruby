@@ -242,6 +242,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Git preflight now honors `KETTLE_JEM_GIT_LOCK` /
   `KETTLE_JEM_GIT_COMMIT_LOCK`, preventing `.git/index.lock` races when
   family-level monorepo templating runs many members concurrently.
+- Old-Ruby version spec normalization now removes the managed VersionGem shared
+  example when the destination cannot depend on VersionGem.
 - Generated gemspec package file enumeration now honors the destination Ruby
   floor, so old-Ruby and JRuby workflows can parse gemspecs during Bundler
   install while modern gems keep modern helper code.

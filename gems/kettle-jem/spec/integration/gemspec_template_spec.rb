@@ -602,6 +602,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(version_spec_content).to include('path = File.expand_path("../../lib/legacy/version.rb", __dir__)')
       expect(version_spec_content).not_to include("version_gem")
       expect(version_spec_content).not_to include("VersionGem")
+      expect(version_spec_content).not_to include('it_behaves_like "a Version module"')
       expect(version_spec_content).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
       expect(version_spec_content).to include(
         "expect(anonymous_namespace::Legacy::Version::VERSION).to eq(described_class::VERSION)"
