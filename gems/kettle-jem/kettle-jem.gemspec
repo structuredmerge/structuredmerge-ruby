@@ -72,9 +72,7 @@ Gem::Specification.new do |spec|
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
     # Executables and executable support scripts
-    *enumerate_package_files.call("exe"),
-    # Extra package files configured by .structuredmerge/kettle-jem.yml
-    *Dir.glob("certs/**", File::FNM_DOTMATCH).select { |path| File.file?(path) }
+    *enumerate_package_files.call("exe")
   ]
   spec.rdoc_options += [
     "--title",

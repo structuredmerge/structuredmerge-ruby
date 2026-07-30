@@ -51,7 +51,7 @@ RSpec.describe Kettle::Jem do
       "lib/kettle/jem/rakelib/install.rake",
       "lib/kettle/jem/rakelib/selftest.rake"
     )
-    expect(files).to include("certs/pboling.pem")
+    expect(files).not_to include("certs/pboling.pem")
     expect(spec.extra_rdoc_files).to be_empty
   end
 

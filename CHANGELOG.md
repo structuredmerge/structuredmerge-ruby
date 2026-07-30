@@ -133,6 +133,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem` gemspec packaging now enumerates package files relative to the
   gemspec directory, so release packaging specs see shipped template assets even
   when the gemspec is loaded from the monorepo root.
+- `kettle-jem` no longer packages local gem signing certificates, while
+  configured extra package-file globs remain relative to the gemspec directory.
 - TOML array-of-table fixture specs now assert that the losing template driver
   description is absent instead of rejecting the retained destination driver
   name they also require.

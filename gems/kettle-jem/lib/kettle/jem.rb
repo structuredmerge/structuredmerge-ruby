@@ -14519,7 +14519,12 @@ module Kettle
       ]
       includes.each_with_index do |pattern, index|
         comma = (index < includes.length - 1) ? "," : ""
-        lines << %(    *Dir.glob(#{pattern.dump}, File::FNM_DOTMATCH).select { |path| File.file?(path) }#{comma})
+        glob = %(File.join(gemspec_root, #{pattern.dump}))
+        lines << [
+          %(    *Dir.glob(#{glob}, File::FNM_DOTMATCH).filter_map { |path|),
+          "      File.file?(path) ? relative_package_path.call(path) : nil",
+          "    }#{comma}"
+        ].join("\n")
       end
       ",#{lines.join("\n")}"
     end
