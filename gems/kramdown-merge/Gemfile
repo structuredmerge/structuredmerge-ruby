@@ -18,7 +18,7 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from kramdown-merge.gemspec
 gemspec
 
-gem 'kettle-family', '~> 1.2', '>= 1.2.8'
+gem 'kettle-family', '~> 1.2', '>= 1.2.9'
 
 # Local workspace dependency wiring for *_local.gemfile overrides
 gem 'nomono', '~> 1.1', '>= 1.1.1', require: false # ruby >= 3.2.0
@@ -45,7 +45,7 @@ if direct_sibling_gems.any? &&
       gems: direct_sibling_gems,
       prefix: 'STRUCTUREDMERGE',
       path_env: 'STRUCTUREDMERGE_DEV',
-      root: %w[src my structuredmerge]
+      root: %w[src my structuredmerge ruby gems]
     )
   ensure
     if direct_sibling_templating && !direct_sibling_local
