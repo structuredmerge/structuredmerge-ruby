@@ -3769,7 +3769,7 @@ module Kettle
       checksum_mode = with_event_phase(events, "checksum_mode") { checksum_mode_for(env, run_options) }
       decision_policy = with_event_phase(events, "decision_policy") { decision_policy_for(env, run_options) }
       git_preflight = with_event_phase(events, "git_preflight") do
-        git_preflight_report(project_root, template_selection: template_selection)
+        git_preflight_report(project_root, env: env, template_selection: template_selection)
       end
       with_event_phase(events, "git_preflight_enforcement") do
         enforce_git_preflight!(git_preflight, decision_policy: decision_policy, template_selection: template_selection)
@@ -11649,16 +11649,18 @@ module Kettle
       paths.each { |path| preflight_ruby_syntax!(project_root, path) }
     end
 
-    def git_preflight_report(project_root, template_selection:)
-      inside = git_success?(project_root, "rev-parse", "--is-inside-work-tree")
-      status = inside ? git_output(project_root, "status", "--porcelain") : nil
-      dirty_entries = status.to_s.lines.map(&:chomp).reject(&:empty?)
-      {
-        git_repository: inside,
-        clean_worktree: inside && dirty_entries.empty?,
-        dirty_entries: dirty_entries,
-        skip_commit: template_selection.fetch(:skip_commit, false)
-      }
+    def git_preflight_report(project_root, env: ENV, template_selection:)
+      with_git_operation_lock(env) do
+        inside = git_success?(project_root, "rev-parse", "--is-inside-work-tree")
+        status = inside ? git_output(project_root, "status", "--porcelain") : nil
+        dirty_entries = status.to_s.lines.map(&:chomp).reject(&:empty?)
+        {
+          git_repository: inside,
+          clean_worktree: inside && dirty_entries.empty?,
+          dirty_entries: dirty_entries,
+          skip_commit: template_selection.fetch(:skip_commit, false)
+        }
+      end
     end
 
     def enforce_git_preflight!(git_preflight, decision_policy:, template_selection:)
@@ -11676,6 +11678,27 @@ module Kettle
     def git_output(project_root, *args)
       stdout, _stderr, status = Open3.capture3("git", "-C", project_root.to_s, *args)
       status.success? ? stdout : ""
+    end
+
+    def with_git_operation_lock(env)
+      lock_path = git_operation_lock_path(env || {})
+      return yield if lock_path.to_s.empty?
+
+      FileUtils.mkdir_p(File.dirname(lock_path))
+      File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
+        lock.flock(File::LOCK_EX)
+        yield
+      ensure
+        lock&.flock(File::LOCK_UN)
+      end
+    end
+
+    def git_operation_lock_path(env)
+      %w[KETTLE_JEM_GIT_LOCK KETTLE_JEM_GIT_COMMIT_LOCK].each do |key|
+        value = env.to_h[key].to_s.strip
+        return value unless value.empty?
+      end
+      ""
     end
 
     def preflight_ruby_syntax!(project_root, path)

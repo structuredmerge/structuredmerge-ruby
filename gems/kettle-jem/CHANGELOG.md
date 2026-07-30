@@ -239,6 +239,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Git preflight now honors `KETTLE_JEM_GIT_LOCK` /
+  `KETTLE_JEM_GIT_COMMIT_LOCK`, preventing `.git/index.lock` races when
+  family-level monorepo templating runs many members concurrently.
 - kettle-jem-template-20260729-001 - Generated JRuby 9.4 workflows now use the
   legacy manual bundle install path, avoiding setup-time Bundler full-index
   failures against `gem.coop`.

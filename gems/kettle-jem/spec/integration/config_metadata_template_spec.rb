@@ -2064,6 +2064,32 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "holds the shared git operation lock during git preflight" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-preflight-lock", tmp_root) do |root|
+      lock_path = File.join(root, ".git", "kettle-family-template-commit.lock")
+      FileUtils.mkdir_p(File.dirname(lock_path))
+      lock_was_held = false
+      allow(described_class).to receive(:git_success?) do
+        File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
+          lock_was_held = !lock.flock(File::LOCK_EX | File::LOCK_NB)
+        end
+        true
+      end
+      allow(described_class).to receive(:git_output).and_return("")
+
+      report = described_class.git_preflight_report(
+        root,
+        env: {"KETTLE_JEM_GIT_LOCK" => lock_path},
+        template_selection: {skip_commit: true}
+      )
+
+      expect(report).to include(git_repository: true, clean_worktree: true)
+      expect(lock_was_held).to be(true)
+    end
+  end
+
   it "loads configured plugins and runs apply-time phase hooks" do
     plugin_module = Module.new do
       class << self
