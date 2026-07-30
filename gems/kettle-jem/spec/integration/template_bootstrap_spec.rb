@@ -439,14 +439,14 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
           README.md:
             strategy: merge
           tree_haver.gemspec:
-            strategy: keep_destination
+            strategy: merge
       YAML
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
       expect(apply.fetch(:changed_files)).to include("LICENSE.md")
       expect(apply.fetch(:changed_files)).to include("README.md")
       expect(apply.fetch(:changed_files)).to include("Gemfile")
-      expect(apply.fetch(:changed_files)).not_to include("tree_haver.gemspec")
+      expect(apply.fetch(:changed_files)).to include("tree_haver.gemspec")
       expect(File).not_to exist(File.join(root, ".github"))
       expect(File.read(File.join(root, "Gemfile"))).to include('gem "nomono"')
       expect(File.read(File.join(root, "Gemfile"))).to include('gem "kettle-family"')

@@ -4857,8 +4857,7 @@ module Kettle
       end
       return unless strategy_index
 
-      strategy = (normalize_template_profile(profile) == MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE) ? "merge" : "keep_destination"
-      lines[strategy_index] = "    strategy: #{strategy}"
+      lines[strategy_index] = "    strategy: merge"
     end
 
     def top_level_yaml_key_line?(line)
@@ -11054,10 +11053,9 @@ module Kettle
       ]
       gemspec = gemspec_path.to_s.strip
       unless gemspec.empty?
-        gemspec_strategy = (normalize_template_profile(profile) == MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE) ? "merge" : "keep_destination"
         override_lines.concat([
           "  #{gemspec}:",
-          "    strategy: #{gemspec_strategy}"
+          "    strategy: merge"
         ])
       end
       insert_after_line_sequence(
