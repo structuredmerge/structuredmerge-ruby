@@ -70,6 +70,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Runtime dependency metadata now requires `kettle-ndjson` 0.1.3 or newer and
   `kettle-rb` 0.1.7 or newer.
+- Gemspec package manifest merging now normalizes legacy destination `Dir[...]`
+  globs into the generated package-helper shape, preventing duplicated
+  `spec.files` assignments after templating.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.3 or newer.
 - Generated main Gemfiles now require `kettle-family` 1.2.1 or newer, so
   gem-root family commands use the reset helper that runs outside broken

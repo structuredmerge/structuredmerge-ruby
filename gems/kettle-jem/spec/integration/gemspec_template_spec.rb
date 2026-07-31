@@ -983,6 +983,99 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL)")
   end
 
+  it "repairs the rspec-pending_for generated package manifest merge shape" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "rspec-pending_for"
+        spec.version = "1.0.0"
+
+        gemspec_root = __dir__
+        relative_package_path = lambda do |path|
+          prefix = "\#{gemspec_root}/"
+          path[0, prefix.length] == prefix ? path[prefix.length..-1] : path
+        end
+        enumerate_package_glob = lambda do |glob|
+          files = []
+          Dir.glob(glob, File::FNM_DOTMATCH).each do |path|
+            next unless File.file?(path) && ![".", ".."].include?(File.basename(path))
+
+            files << relative_package_path.call(path)
+          end
+          files
+        end
+        enumerate_package_files = lambda do |root|
+          enumerate_package_glob.call(File.join(gemspec_root, root, "**", "*"))
+        end
+        package_metadata_files = %w[
+          CHANGELOG.md
+          LICENSE.md
+          README.md
+          sig/rspec/pending_for.rbs
+        ].select { |path| File.exist?(File.join(gemspec_root, path)) }
+
+        # Specify which files are part of the released package.
+        spec.files = [
+          # Root package metadata
+          *package_metadata_files,
+          # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
+          *enumerate_package_files.call("lib"),
+          # Executables and executable support scripts
+          *enumerate_package_files.call("exe")
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "rspec-pending_for"
+        spec.version = "1.0.0"
+
+        gemspec_root = __dir__
+        relative_package_path = lambda do |path|
+          prefix = "\#{gemspec_root}/"
+          (path[0, prefix.length] == prefix) ? path[prefix.length..-1] : path
+        end
+        enumerate_package_glob = lambda do |glob|
+          enumerate_package_glob.call(File.join(gemspec_root, root, "**", "*"))
+        end
+        package_metadata_files = [
+          "CHANGELOG.md",
+          "LICENSE.md",
+          "README.md",
+          "sig/rspec/pending_for.rbs"
+        ].select { |path| File.exist?(File.join(gemspec_root, path)) }
+
+        # Specify which files are part of the released package.
+        spec.files = Dir[
+          # Executables and tasks
+          "exe/*",
+          "lib/**/*.rb",
+          "lib/**/*.rake",
+          # Signatures
+          "sig/**/*.rbs"
+      ] + [
+        # Root package metadata
+        *package_metadata_files,
+
+        # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
+        *enumerate_package_files.call("lib"),
+        # Executables and executable support scripts
+        *enumerate_package_files.call("exe")
+      ]
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "rspec-pending_for"}})
+
+    expect { RubyVM::InstructionSequence.compile(merged) }.not_to raise_error
+    expect(merged).to include("spec.files = [")
+    expect(merged).not_to include("spec.files = Dir[")
+    expect(merged).not_to include("] + [")
+    expect(merged).not_to include("enumerate_package_glob = lambda do |glob|\n    enumerate_package_glob.call")
+    expect(merged.scan("spec.files =").size).to eq(1)
+    expect(merged.scan('*enumerate_package_files.call("lib")').size).to eq(1)
+    expect(merged.scan('*enumerate_package_files.call("exe")').size).to eq(1)
+  end
+
   it "normalizes destination gemspec receiver names while preserving destination-only fields" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

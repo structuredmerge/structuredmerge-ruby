@@ -6385,7 +6385,7 @@ module Kettle
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts, env: env)
         merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root) if template_file_type(recipe) == :toml
-        return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
+        return finalize_template_source_content(recipe, sync_kettle_config_env_overrides(merged, env)) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
         if github_workflow_template_recipe?(recipe)
           merged = preserve_github_workflow_project_settings(recipe, merged, original, project_root: project_root)
@@ -6416,6 +6416,7 @@ module Kettle
 
     def finalize_template_source_content(recipe, content)
       return finalize_rubocop_config(content) if recipe.fetch(:target_path).to_s == ".rubocop.yml"
+      return assert_no_unresolved_template_tokens_in_yaml_values(content, KETTLE_CONFIG_PATH) if recipe.fetch(:target_path).to_s == KETTLE_CONFIG_PATH
       return normalize_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == ".simplecov"
       return normalize_spec_helper_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
 
@@ -9044,6 +9045,7 @@ module Kettle
       end
       merged = replace_gemspec_assignment_sources(template_content, normalized_replacements, receiver: template_receiver)
       merged = insert_missing_gemspec_assignment_sources(merged, normalized_replacements, receiver: template_receiver)
+      merged = normalize_gemspec_package_helper_assignments(merged, template_content)
       merged = merge_gemspec_files_assignment(
         merged,
         template_content: template_content,
@@ -9076,6 +9078,48 @@ module Kettle
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
+    end
+
+    def normalize_gemspec_package_helper_assignments(content, template_content)
+      template_records = gemspec_package_helper_assignment_records(template_content).to_h do |record|
+        [record.fetch(:name), record.fetch(:source)]
+      end
+      return content if template_records.empty?
+
+      replacements = gemspec_package_helper_assignment_records(content).filter_map do |record|
+        source = template_records[record.fetch(:name)]
+        next unless source
+
+        [record.fetch(:start_line), record.merge(replacement: source)]
+      end.to_h
+      return content if replacements.empty?
+
+      replace_record_ranges(content, replacements)
+    end
+
+    def gemspec_package_helper_assignment_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      lines = content.to_s.lines
+      helper_names = %w[
+        gemspec_root
+        relative_package_path
+        enumerate_package_glob
+        enumerate_package_files
+        package_metadata_files
+      ].to_set
+      result.value.breadth_first_search_all do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && helper_names.include?(node.name.to_s)
+      end.map do |node|
+        end_line = ruby_node_source_end_line(node)
+        {
+          name: node.name.to_s,
+          start_line: node.location.start_line,
+          end_line: end_line,
+          source: lines[(node.location.start_line - 1)..(end_line - 1)].join
+        }
+      end
     end
 
     def remove_stale_generated_gemspec_homepage_replacement(replacements, destination_content, facts, receiver:)
@@ -9533,6 +9577,7 @@ module Kettle
           seen[group.fetch(:key)] = true
         end
       end
+      combined_groups = gemspec_files_normalize_dir_globs_for_array(combined_groups, merged_parts)
       if gemspec_files_collection_needs_concat?(merged_parts, combined_groups)
         return gemspec_files_concat_collection_source(merged_parts, combined_groups)
       end
@@ -9644,12 +9689,35 @@ module Kettle
 
         groups << group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, destination_parts))
       end
+      groups = gemspec_files_normalize_dir_globs_for_array(groups, merged_parts)
 
       if gemspec_files_collection_needs_concat?(merged_parts, groups)
         return gemspec_files_concat_collection_source(merged_parts, groups)
       end
 
       gemspec_files_array_collection_source(merged_parts, groups)
+    end
+
+    def gemspec_files_normalize_dir_globs_for_array(groups, target_parts)
+      return groups unless target_parts.fetch(:collection_kind) == :array
+
+      groups.map do |group|
+        next group unless group.fetch(:source_collection_kind, nil) == :dir
+
+        node = group.fetch(:node)
+        next group unless node.is_a?(::Prism::StringNode)
+
+        pattern = node.unescaped.to_s
+        lines = group.fetch(:lines)
+        entry_line = lines.reverse.find { |line| !line.strip.empty? && !line.lstrip.start_with?("#") }.to_s
+        indent = entry_line[/\A\s*/].to_s
+        comments = lines.take_while { |line| line.strip.empty? || line.lstrip.start_with?("#") }
+        group.merge(
+          key: [:package_glob, pattern],
+          source_collection_kind: :array,
+          lines: comments + [%(#{indent}*enumerate_package_glob.call(File.join(gemspec_root, #{pattern.dump}))\n)]
+        )
+      end
     end
 
     def gemspec_files_collection_parts(record)
@@ -9839,6 +9907,7 @@ module Kettle
           RUBOCOP.md
           SECURITY.md
         ].include?(path)
+        return true if stale_generated_gemspec_package_glob?(path)
         return true if path.end_with?(".md") && basename != "LICENSE" && known_license_template_basenames.include?(basename)
 
         return false
@@ -9858,6 +9927,17 @@ module Kettle
       return true if receiver == "Dir" && method_name == :[] && arguments.first.to_s == "sig/**/*.rbs"
 
       false
+    end
+
+    def stale_generated_gemspec_package_glob?(path)
+      %w[
+        certs/**/*
+        exe/*
+        exe/**/*
+        lib/**/*.rake
+        lib/**/*.rb
+        sig/**/*.rbs
+      ].include?(path.to_s)
     end
 
     def generated_gemspec_metadata_file_group?(group, target_parts)
@@ -10528,7 +10608,7 @@ module Kettle
       content = replace_kettle_config_bootstrap_rubyforum(content, recipe[:bootstrap_rubyforum]) if recipe[:bootstrap_rubyforum].is_a?(Hash)
       content = apply_kettle_config_bootstrap_profile(content, recipe[:bootstrap_template_profile], recipe[:bootstrap_gemspec_path])
       content = add_shim_bootstrap_config(content, recipe[:bootstrap_shim]) if recipe[:bootstrap_shim].is_a?(Hash)
-      sync_kettle_config_env_overrides(content, env)
+      assert_no_unresolved_template_tokens_in_yaml_values(sync_kettle_config_env_overrides(content, env), KETTLE_CONFIG_PATH)
     end
 
     def replace_kettle_config_bootstrap_project_emoji(content, emoji)
@@ -10550,6 +10630,8 @@ module Kettle
       updated = content
       family_tag = rubyforum[:family_tag].to_s
       project_tag = rubyforum[:project_tag].to_s
+      family_tag = "" if token_placeholder?(family_tag)
+      project_tag = "" if token_placeholder?(project_tag)
       updated = replace_yaml_scalar_path(updated, %w[rubyforum family_tag], yaml_config_scalar_literal(family_tag, path: %w[rubyforum family_tag])) unless family_tag.empty?
       updated = replace_yaml_scalar_path(updated, %w[rubyforum project_tag], yaml_config_scalar_literal(project_tag, path: %w[rubyforum project_tag])) unless project_tag.empty?
       updated
@@ -15005,6 +15087,20 @@ module Kettle
       return resolved if unresolved.empty?
 
       raise ArgumentError, "unresolved kettle-jem template tokens: #{unresolved.map { |token| "{#{token}}" }.join(", ")}"
+    end
+
+    def assert_no_unresolved_template_tokens_in_yaml_values(content, label)
+      unresolved = yaml_scalar_value_template_tokens(content)
+      return content if unresolved.empty?
+
+      tokens = unresolved.map { |token| "{#{token}}" }.sort.join(", ")
+      raise ArgumentError, "#{label}: unresolved kettle-jem template tokens: #{tokens}"
+    end
+
+    def yaml_scalar_value_template_tokens(content)
+      yaml_scalar_pairs(content).flat_map do |_key_node, value_node|
+        Token::Resolver::Document.new(value_node.value.to_s, config: TEMPLATE_TOKEN_CONFIG).token_keys.grep(/\AKJ\|/)
+      end.uniq
     end
 
     def readme_style_facts(project_root, config, license, template_profile: nil, repository: nil)

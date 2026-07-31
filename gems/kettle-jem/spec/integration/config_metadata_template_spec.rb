@@ -488,7 +488,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-  it "merges destination gemspec files entries into the template files assignment" do
+  it "normalizes destination gemspec Dir globs into the template files assignment" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-gemspec-files-preserve", tmp_root) do |root|
@@ -538,13 +538,13 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       final_content = template_report.fetch(:final_content)
 
       expect(Prism.parse(final_content)).to be_success
-      expect(final_content).to include("spec.files = Dir[")
-      expect(final_content).to include("] + [")
-      expect(final_content).to include('"rubocop-lts/**/*.yml"')
+      expect(final_content).to include("spec.files = [")
+      expect(final_content).not_to include("spec.files = Dir[")
+      expect(final_content).not_to include("] + [")
+      expect(final_content).to include('*enumerate_package_glob.call(File.join(gemspec_root, "rubocop-lts/**/*.yml"))')
       expect(final_content).to include('*enumerate_package_files.call("exe")')
-      expect(final_content.index('"rubocop-lts/**/*.yml"')).to be < final_content.index("] + [")
-      expect(final_content.index("] + [")).to be < final_content.index('*enumerate_package_files.call("lib")')
-      expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/).size).to eq(1)
+      expect(final_content.index('*enumerate_package_glob.call(File.join(gemspec_root, "rubocop-lts/**/*.yml"))')).to be < final_content.index('*enumerate_package_files.call("lib")')
+      expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/).size).to eq(0)
     end
   end
 
@@ -886,7 +886,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(merged.scan(/\*enumerate_package_files\.call\(["']lib["']\)/).size).to eq(1)
   end
 
-  it "supports the generated Dir plus Array gemspec files assignment shape" do
+  it "normalizes the generated Dir plus Array gemspec files assignment shape" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
         spec.name = "example"
@@ -935,12 +935,11 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "example"}})
 
     expect(Prism.parse(merged)).to be_success
-    expect(merged).to include("spec.files = Dir[")
-    expect(merged).to include("] + [")
-    expect(merged).to include('"lib/**/*.rb"')
+    expect(merged).to include("spec.files = [")
+    expect(merged).not_to include("spec.files = Dir[")
+    expect(merged).not_to include("] + [")
+    expect(merged).not_to include('"lib/**/*.rb"')
     expect(merged).to include('"MIT.md"')
-    expect(merged.index('"lib/**/*.rb"')).to be < merged.index("] + [")
-    expect(merged.index('"MIT.md"')).to be > merged.index("] + [")
     expect(merged.scan('*enumerate_package_files.call("lib")').size).to eq(1)
     expect(merged.scan("spec.files =").size).to eq(1)
   end
@@ -1497,6 +1496,37 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect do
         described_class.plan_project(root, env: {})
       end.to raise_error(ArgumentError, /unresolved kettle-jem template tokens: \{KJ\|UNKNOWN\}/)
+    end
+  end
+
+  it "fails fast when resolved kettle config YAML values retain template tokens" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-token-leak-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .structuredmerge/kettle-jem.yml
+        YAML
+        "template/.structuredmerge/kettle-jem.yml.example" => <<~YAML
+          project_emoji: "🧪"
+          rubyforum:
+            family_tag: "{KJ|UNKNOWN}"
+        YAML
+      })
+
+      expect do
+        described_class.plan_project(root, env: {})
+      end.to raise_error(ArgumentError, /\.structuredmerge\/kettle-jem\.yml: unresolved kettle-jem template tokens: \{KJ\|UNKNOWN\}/)
     end
   end
 

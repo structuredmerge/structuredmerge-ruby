@@ -66,5 +66,5 @@
   floor now get managed minimal `version.rb` files and anonymous-loader version
   specs without adding `version_gem`.
 - kettle-jem-template-20260730-001 - Gemspec package file enumeration now runs
-  relative to the gemspec directory, so packaged template assets are included
+  relative to the gemspec directory, so release package contents stay correct
   even when the gemspec is loaded from another working directory.
