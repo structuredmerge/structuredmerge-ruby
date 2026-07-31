@@ -586,7 +586,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content).to include('*enumerate_package_glob.call(File.join(gemspec_root, "rubocop-lts/**/*.yml"))')
       expect(final_content).to include('*enumerate_package_files.call("exe")')
       expect(final_content.index('*enumerate_package_glob.call(File.join(gemspec_root, "rubocop-lts/**/*.yml"))')).to be < final_content.index('*enumerate_package_files.call("lib")')
-      expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/).size).to eq(0)
+      expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/)).to be_empty
     end
   end
 
