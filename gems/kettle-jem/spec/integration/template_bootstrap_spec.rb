@@ -73,6 +73,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(bootstrap_report.fetch(:final_content)).to include("# kettle-jem configuration file")
       expect(bootstrap_report.fetch(:final_content)).to include("min_divergence_threshold: 7")
       expect(bootstrap_report.fetch(:final_content)).to include("#   tokens    - values for {KJ|...} placeholders used across template files")
+      expect(YAML.safe_load(bootstrap_report.fetch(:final_content)).dig("rubyforum", "family_tag")).to eq("")
+      expect(YAML.safe_load(bootstrap_report.fetch(:final_content)).dig("rubyforum", "project_tag")).to eq("")
 
       described_class.apply_project(root, env: {"KJ_MIN_DIVERGENCE_THRESHOLD" => "7"})
       applied_config = File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))
