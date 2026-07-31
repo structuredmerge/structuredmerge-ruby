@@ -334,6 +334,9 @@ specs are not managed for the project.</li>
 declarations when the current templates own that dependency through the<br>
 modular templating Gemfile, preventing duplicate Bundler requirements during<br>
 re-templating.</li>
+  <li>Kettle config templating now resolves known template tokens retained in<br>
+destination YAML values before the unresolved-token guard runs, while still<br>
+failing unknown token leaks.</li>
   <li>Git preflight now honors <code>KETTLE_JEM_GIT_LOCK</code> /<br>
 <code>KETTLE_JEM_GIT_COMMIT_LOCK</code>, preventing <code>.git/index.lock</code> races when<br>
 family-level monorepo templating runs many members concurrently.</li>
@@ -1334,7 +1337,7 @@ even when the gemspec is loaded from another working directory.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Fri Jul 31 06:31:29 2026 by
+  Generated on Fri Jul 31 07:18:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
