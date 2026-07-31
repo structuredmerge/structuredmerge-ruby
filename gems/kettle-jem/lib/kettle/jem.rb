@@ -4956,15 +4956,15 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.0"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.5", ">= 2.5.13"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.5", ">= 2.5.14"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.9"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.14"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.17"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.17"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
-        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.7"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.3"\n)}
+        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.8"\n)},
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.4"\n)}
       ].freeze
     end
 
@@ -13408,7 +13408,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.14"\n)
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.17"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)

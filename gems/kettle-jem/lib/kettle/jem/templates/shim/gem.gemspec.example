@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "{KJ|SHIMMED_GEM_NAME}"
 
   # Dev, Test, & Release Tasks
-  spec.add_development_dependency("kettle-dev", "~> 2.5", ">= 2.5.13")             # ruby >= {KJ|MIN_TEST_RUBY}
+  spec.add_development_dependency("kettle-dev", "~> 2.5", ">= 2.5.14")             # ruby >= {KJ|MIN_TEST_RUBY}
 
   # Tasks
   spec.add_development_dependency "rake", "~> 13.0"
@@ -41,5 +41,5 @@ Gem::Specification.new do |spec|
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0
-  spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.7")          # ruby >= 2.2.0
+  spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.8")          # ruby >= 2.2.0
 end
