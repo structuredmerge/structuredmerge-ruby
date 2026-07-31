@@ -103,6 +103,48 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "resolves known optional RubyForum tag tokens when unset" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rubyforum-empty-token-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🫖"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN
+          Family tag: {KJ|RUBYFORUM:FAMILY_TAG}
+          Project tag: {KJ|RUBYFORUM:PROJECT_TAG}
+          Effective URL: {KJ|RUBYFORUM:URL}
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+
+      expect(template_report.fetch(:final_content)).to include("Family tag:\n")
+      expect(template_report.fetch(:final_content)).to include("Project tag:\n")
+      expect(template_report.fetch(:final_content)).not_to include("{KJ|RUBYFORUM:")
+      expect(template_report.fetch(:final_content)).to include("Effective URL: https://www.rubyforum.org/tag/example-gem\n")
+      expect(template_report.dig(:metadata, :template_tokens)).to include(
+        "KJ|RUBYFORUM:FAMILY_TAG" => "",
+        "KJ|RUBYFORUM:PROJECT_TAG" => ""
+      )
+    end
+  end
+
   it "honors configured project runtime URI tokens when ENV is absent" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

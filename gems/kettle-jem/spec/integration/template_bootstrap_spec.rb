@@ -49,6 +49,10 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-slice", tmp_root) do |root|
+      packaged_config_template = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".structuredmerge/kettle-jem.yml.example"))
+      expect(packaged_config_template).to include('family_tag: "{KJ|RUBYFORUM:FAMILY_TAG}"')
+      expect(packaged_config_template).to include('project_tag: "{KJ|RUBYFORUM:PROJECT_TAG}"')
+
       write_tree(root, {
         "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
