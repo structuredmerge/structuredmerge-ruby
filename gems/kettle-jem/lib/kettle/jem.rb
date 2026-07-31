@@ -6418,11 +6418,17 @@ module Kettle
 
     def finalize_template_source_content(recipe, content)
       return finalize_rubocop_config(content) if recipe.fetch(:target_path).to_s == ".rubocop.yml"
-      return assert_no_unresolved_template_tokens_in_yaml_values(content, KETTLE_CONFIG_PATH) if recipe.fetch(:target_path).to_s == KETTLE_CONFIG_PATH
+      return finalize_kettle_config_template_source(recipe, content) if recipe.fetch(:target_path).to_s == KETTLE_CONFIG_PATH
       return normalize_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == ".simplecov"
       return normalize_spec_helper_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
 
       content
+    end
+
+    def finalize_kettle_config_template_source(recipe, content)
+      tokens = stringify_template_tokens(recipe.fetch(:template_tokens, {}))
+      resolved = resolve_template_tokens(content, tokens, scan_unresolved: false)
+      assert_no_unresolved_template_tokens_in_yaml_values(resolved, KETTLE_CONFIG_PATH)
     end
 
     def finalize_rubocop_config(content)

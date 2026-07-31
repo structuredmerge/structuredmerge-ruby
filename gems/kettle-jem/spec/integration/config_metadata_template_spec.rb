@@ -214,11 +214,11 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           tokens:
             forge:
               gh_user: config-user # GitHub username only. ENV: KJ_GH_USER
+            author:
+              orcid: "0000-0000-0000-0000"
           templates:
             root: packaged
             apply: true
-            entries:
-              - .structuredmerge/kettle-jem.yml
         YAML
       })
 
@@ -330,8 +330,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           templates:
             root: packaged
             apply: true
-            entries:
-              - .structuredmerge/kettle-jem.yml
         YAML
       })
 
@@ -1569,6 +1567,41 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect do
         described_class.plan_project(root, env: {})
       end.to raise_error(ArgumentError, /\.structuredmerge\/kettle-jem\.yml: unresolved kettle-jem template tokens: \{KJ\|UNKNOWN\}/)
+    end
+  end
+
+  it "resolves known template tokens retained in destination kettle config YAML values" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-known-token-migration-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
+          project_emoji: "🧪"
+          yard_host: "{KJ|YARD_HOST}"
+          homepage_uri: "{KJ|HOMEPAGE_URI}"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .structuredmerge/kettle-jem.yml
+        YAML
+      })
+
+      report = described_class.plan_project(root, env: {}).fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('yard_host: "example.example.com"')
+      expect(content).to include('homepage_uri: "https://example.example.com"')
+      expect(content).not_to include("{KJ|YARD_HOST}")
+      expect(content).not_to include("{KJ|HOMEPAGE_URI}")
     end
   end
 

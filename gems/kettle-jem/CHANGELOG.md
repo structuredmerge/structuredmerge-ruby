@@ -255,6 +255,9 @@ Please file a bug if you notice a violation of semantic versioning.
   declarations when the current templates own that dependency through the
   modular templating Gemfile, preventing duplicate Bundler requirements during
   re-templating.
+- Kettle config templating now resolves known template tokens retained in
+  destination YAML values before the unresolved-token guard runs, while still
+  failing unknown token leaks.
 - Git preflight now honors `KETTLE_JEM_GIT_LOCK` /
   `KETTLE_JEM_GIT_COMMIT_LOCK`, preventing `.git/index.lock` races when
   family-level monorepo templating runs many members concurrently.
