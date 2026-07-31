@@ -371,7 +371,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.21.1)
-    kettle-dev (2.5.7)
+    kettle-dev (2.5.11)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.3)
       kettle-ndjson (~> 0.1, >= 0.1.3)
@@ -381,10 +381,10 @@ GEM
       tty-progressbar (~> 0.18)
     kettle-drift (1.0.8)
       version_gem (~> 1.1, >= 1.1.14)
-    kettle-family (1.2.9)
+    kettle-family (1.2.12)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
-      kettle-dev (~> 2.3, >= 2.5.7)
+      kettle-dev (~> 2.3, >= 2.5.11)
       kettle-test (~> 2.0, >= 2.0.14)
       tsort (~> 0.2)
       tty-progressbar (~> 0.18)
@@ -608,7 +608,7 @@ GEM
       simplecov (>= 0.4.1)
     simplecov_lcov_formatter (0.9.0)
       simplecov (>= 0.18)
-    sorbet-runtime (0.6.13373)
+    sorbet-runtime (0.6.13385)
     standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -738,9 +738,9 @@ DEPENDENCIES
   go-merge!
   irb (~> 1.17)
   json-merge!
-  kettle-dev (~> 2.3, >= 2.3.7)
+  kettle-dev (~> 2.5, >= 2.5.11)
   kettle-drift (~> 1.0, >= 1.0.8)
-  kettle-family (~> 1.2, >= 1.2.9)
+  kettle-family (~> 1.2, >= 1.2.12)
   kettle-jem!
   kettle-soup-cover (~> 3.0, >= 3.0.6)
   kettle-test (~> 2.0, >= 2.0.17)
@@ -852,9 +852,9 @@ CHECKSUMS
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.21.1) sha256=13a43df75d95641443f5702dff350f237164a9d811ff0f2c2800d4d980220583
   json-merge (7.1.0)
-  kettle-dev (2.5.7) sha256=061b9d22d1a037e9299819a1b09294d3237b24f45a5aca5d032ff2e64d8495f6
+  kettle-dev (2.5.11) sha256=212a19605853358afb373dd9953f4382601600bdae6c9c3cacecc36807b41666
   kettle-drift (1.0.8) sha256=5c51e39bfbc4afd06ff2fca7d0d39d0e6405dce54315b5fcf9af2faa263dbf7a
-  kettle-family (1.2.9) sha256=cf70122e7601c9e38f41ac9ad4d135c14b6e5fed4270ffb4ce9173553664cab4
+  kettle-family (1.2.12) sha256=ea81adc2958f85cac25dbc356488d15b717dca98b2e151c53e24841c53fd4b7e
   kettle-gha-pins (0.3.3) sha256=da9337376dd957dca65164f669045a71252f0b5c0234aaa1cde384c5f5c8ad87
   kettle-jem (7.1.0)
   kettle-ndjson (0.1.3) sha256=da2716672e965210531009a99d420ff79156c6c15cc9956bcf5418978d572ca8
@@ -947,7 +947,7 @@ CHECKSUMS
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_lcov_formatter (0.9.0) sha256=4c1839bb31dcf7a8f7a6474c94ed228aa03b994e9dd5e1965e58b4121b049bed
   smorg-rb (7.1.0)
-  sorbet-runtime (0.6.13373) sha256=994ef7161d0f6001db4716c3ff0db8aa9ef3b80ed2b5201dbd1bc72af74fa022
+  sorbet-runtime (0.6.13385) sha256=79d7adeec8e452d3be363620363dd22f17a0a351a47048d4734fe0eb72d613d1
   standard (1.56.0) sha256=ae2af4d9669589162ac69ed5ef59dcf9f346d4afc81f7e62b84339310dfcb787
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
