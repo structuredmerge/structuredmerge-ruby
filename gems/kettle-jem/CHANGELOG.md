@@ -251,6 +251,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Main Gemfile templating now removes stale direct `tree_sitter_language_pack`
+  declarations when the current templates own that dependency through the
+  modular templating Gemfile, preventing duplicate Bundler requirements during
+  re-templating.
 - Git preflight now honors `KETTLE_JEM_GIT_LOCK` /
   `KETTLE_JEM_GIT_COMMIT_LOCK`, preventing `.git/index.lock` races when
   family-level monorepo templating runs many members concurrently.

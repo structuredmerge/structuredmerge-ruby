@@ -2468,6 +2468,69 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "removes stale main Gemfile tree-sitter language pack declarations owned by templating Gemfiles" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-stale-tslp", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          gemspec
+
+          # Use released TSLP with the Ruby ABI platform-gem fix.
+          gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.3"
+
+          # Templating
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+              - gemfiles/modular/templating.gemfile
+        YAML
+        "template/Gemfile.example" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          gemspec
+
+          # Templating
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
+        "template/gemfiles/modular/templating.gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          if ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false").zero?
+            gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7"
+          end
+        RUBY
+      })
+
+      report = described_class.apply_project(root, env: {})
+      gemfile = report.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }.fetch(:final_content)
+
+      expect(gemfile).not_to include("Use released TSLP with the Ruby ABI platform-gem fix")
+      expect(gemfile).not_to include("tree_sitter_language_pack")
+      expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
+      expect(File.read(File.join(root, "gemfiles/modular/templating.gemfile"))).to include(
+        'gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7"'
+      )
+    end
+  end
+
   it "uses the monorepo member root for direct sibling runtime dependency wiring" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

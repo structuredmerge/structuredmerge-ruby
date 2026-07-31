@@ -7078,6 +7078,7 @@ module Kettle
       )
       if recipe.fetch(:target_path).to_s == "Gemfile"
         output = inject_main_gemfile_recording_eval(output, facts)
+        output = remove_stale_main_gemfile_tree_sitter_language_pack(output, template_content)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
         output = deduplicate_main_gemfile_direct_sibling_blocks(output)
         output = ensure_main_gemfile_nomono_bootstrap(output, template_content)
@@ -7090,6 +7091,22 @@ module Kettle
       return output unless local_gemfile_template_recipe?(recipe)
 
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)
+    end
+
+    def remove_stale_main_gemfile_tree_sitter_language_pack(content, template_content)
+      return content if gemfile_declares_direct_gem?(template_content, "tree_sitter_language_pack")
+
+      records = main_gemfile_direct_gem_records(content, "tree_sitter_language_pack")
+      return content if records.empty?
+
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
     end
 
     def remove_stale_main_gemfile_direct_sibling_block(content, template_content)
@@ -7106,6 +7123,43 @@ module Kettle
           ""
         )
       end
+    end
+
+    def gemfile_declares_direct_gem?(content, gem_name)
+      ruby_call_records(content, :gem).any? do |call|
+        call.receiver.nil? && ruby_string_argument(call) == gem_name.to_s
+      end
+    end
+
+    def main_gemfile_direct_gem_records(content, gem_name)
+      lines = content.to_s.lines
+      ruby_call_records(content, :gem).filter_map do |call|
+        next unless call.receiver.nil? && ruby_string_argument(call) == gem_name.to_s
+
+        start_line = stale_main_gemfile_gem_comment_start_line(lines, call.location.start_line, gem_name)
+        {
+          start_line: start_line,
+          end_line: ruby_node_source_end_line(call)
+        }
+      end
+    end
+
+    def stale_main_gemfile_gem_comment_start_line(lines, start_line, gem_name)
+      index = start_line.to_i - 2
+      return start_line if index.negative?
+
+      previous = lines.fetch(index).to_s
+      return index + 1 if stale_main_gemfile_gem_comment?(previous, gem_name)
+
+      start_line
+    end
+
+    def stale_main_gemfile_gem_comment?(line, gem_name)
+      stripped = line.to_s.strip
+      return false unless stripped.start_with?("#")
+      return stripped.include?("TSLP") if gem_name.to_s == "tree_sitter_language_pack"
+
+      false
     end
 
     def deduplicate_main_gemfile_direct_sibling_blocks(content)
