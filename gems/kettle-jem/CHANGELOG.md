@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Unset optional author ORCIDs now resolve to an empty citation value rather
+  than leaking their template token and aborting templating.
 - Gemspec package manifest merging now recognizes the historical generated
   `Dir[...] + [...]` shape structurally, retains legitimate destination globs,
   and removes only obsolete generated `certs` and `sig` package helpers.

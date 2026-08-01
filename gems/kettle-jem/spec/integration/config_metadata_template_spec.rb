@@ -344,6 +344,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(report.fetch(:final_content)).to include("# README top logos.")
       expect(report.fetch(:final_content)).to include("# top_logos render above the title; h2_synopsis_logos render inline with the Synopsis H2.")
       expect(report.fetch(:final_content)).to include("# Supported values: related-org, ruby, org, project")
+      citation_report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "CITATION.cff" }
+      expect(citation_report.fetch(:final_content)).to include("orcid: 'https://orcid.org/'")
+      expect(citation_report.fetch(:final_content)).not_to include("{KJ|AUTHOR:ORCID}")
       expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(report.fetch(:final_content))
     end
   end
