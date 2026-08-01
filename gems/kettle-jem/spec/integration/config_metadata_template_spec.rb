@@ -185,6 +185,41 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "normalizes invalid underscores in configured project hostnames" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-project-runtime-hostname-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          yard_host: example_gem.example.test
+          homepage_uri: https://example_gem.example.test/docs
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => "YARD: {KJ|YARD_HOST}\nHomepage URI: {KJ|HOMEPAGE_URI}\n"
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+
+      expect(report.fetch(:final_content)).to eq("YARD: example-gem.example.test\nHomepage URI: https://example-gem.example.test/docs\n")
+      normalized_config = described_class.send(:sync_kettle_config_env_overrides, File.read(File.join(root, ".kettle-jem.yml")), {})
+      expect(normalized_config).to include('yard_host: "example-gem.example.test"')
+      expect(normalized_config).to include('homepage_uri: "https://example-gem.example.test/docs"')
+    end
+  end
+
   it "syncs ENV-backed values back into kettle config during templating" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

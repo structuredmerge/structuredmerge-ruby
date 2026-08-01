@@ -43,6 +43,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Template merges now normalize managed RSpec block bindings structurally, preventing invalid mixed parameter names.
 
+- Template runtime and config synchronization now normalize invalid underscore hostnames in generated documentation and gemspec metadata.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

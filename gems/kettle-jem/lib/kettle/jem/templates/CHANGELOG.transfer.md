@@ -32,6 +32,9 @@
 
 ## Fixed
 
+- kettle-jem-template-20260801-003 - Generated project metadata and
+  documentation now normalize configured underscore hostnames to valid
+  hyphenated hostnames.
 - kettle-jem-template-20260801-002 - Generated RSpec helpers now normalize
   managed configuration block bindings structurally, preventing mixed block
   parameter names from producing invalid configuration after a merge.

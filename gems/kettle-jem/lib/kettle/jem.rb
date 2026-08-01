@@ -10972,10 +10972,27 @@ module Kettle
 
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
       end
+      synced = sync_kettle_config_project_hostnames(synced)
       synced = sync_kettle_config_internal_values(synced)
       synced = migrate_readme_logo_config(synced)
       synced = prune_legacy_kettle_config_keys(synced)
       sync_kettle_config_documentation_comments(synced)
+    end
+
+    def sync_kettle_config_project_hostnames(content)
+      config = YAML.safe_load(content.to_s, permitted_classes: [], aliases: true) || {}
+      yard_host = config["yard_host"].to_s
+      homepage_uri = config["homepage_uri"].to_s
+      normalized_yard_host = normalize_project_hostname(yard_host)
+      normalized_homepage_uri = normalize_project_homepage_uri(homepage_uri)
+      synced = content.to_s
+      if !yard_host.empty? && normalized_yard_host != yard_host
+        synced = replace_yaml_scalar_path(synced, %w[yard_host], yaml_config_scalar_literal(normalized_yard_host, path: %w[yard_host]))
+      end
+      if !homepage_uri.empty? && normalized_homepage_uri != homepage_uri
+        synced = replace_yaml_scalar_path(synced, %w[homepage_uri], yaml_config_scalar_literal(normalized_homepage_uri, path: %w[homepage_uri]))
+      end
+      synced
     end
 
     def env_sync_value(env, env_key)
@@ -13633,7 +13650,9 @@ module Kettle
 
     def project_yard_host(config, env, package_name:, author_domain:)
       derived = "#{package_name.to_s.tr("_", "-")}.#{author_domain.to_s.empty? ? "example.com" : author_domain}"
-      preferred_template_token_value(derived, project_runtime_config_value(config, "yard_host"), env, "KJ_YARD_HOST").to_s
+      normalize_project_hostname(
+        preferred_template_token_value(derived, project_runtime_config_value(config, "yard_host"), env, "KJ_YARD_HOST")
+      )
     end
 
     def kettle_dev_local_gems(config)
@@ -13690,7 +13709,23 @@ module Kettle
       elsif present_template_token_value?(yard_host)
         "https://#{yard_host}"
       end
-      preferred_template_token_value(derived, project_runtime_config_value(config, "homepage_uri"), env, "KJ_HOMEPAGE_URI").to_s
+      normalize_project_homepage_uri(
+        preferred_template_token_value(derived, project_runtime_config_value(config, "homepage_uri"), env, "KJ_HOMEPAGE_URI")
+      )
+    end
+
+    def normalize_project_hostname(value)
+      value.to_s.tr("_", "-")
+    end
+
+    def normalize_project_homepage_uri(value)
+      uri = URI.parse(value.to_s)
+      return value.to_s unless uri.host
+
+      uri.host = normalize_project_hostname(uri.host)
+      uri.to_s
+    rescue URI::InvalidURIError
+      value.to_s
     end
 
     def project_runtime_config_value(config, key)
