@@ -158,7 +158,11 @@ RSpec.describe Kettle::Jem::CLI do
       expect(events).to include(include("type" => "phase_start", "phase" => "recipes"))
       expect(events).to include(include("type" => "phase_finish", "phase" => "recipes", "status" => "ok"))
       expect(events).to include(include("type" => "recipe", "path" => Kettle::Jem::KETTLE_CONFIG_PATH))
-      expect(events.last).to include("type" => "summary", "mode" => "plan")
+      summary = events.last
+      expect(summary).to include("type" => "summary", "mode" => "plan")
+      expect(summary.fetch("planned_count")).to eq(
+        summary.fetch("checksum_hit_count") + summary.fetch("unchanged_count") + summary.fetch("changed_count")
+      )
     end
   end
 

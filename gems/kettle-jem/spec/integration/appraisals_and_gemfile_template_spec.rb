@@ -1781,7 +1781,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
 
     expect(content).to include('gem "yard-lint", "~> 1.10", ">= 1.10.2", require: false # Ruby >= 3.3')
-    expect(content).not_to include('Gem::Version.new(RUBY_VERSION)')
+    expect(content).not_to include("Gem::Version.new(RUBY_VERSION)")
   end
 
   it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do

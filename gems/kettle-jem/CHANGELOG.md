@@ -28,6 +28,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Template NDJSON summaries now distinguish checksum write bypasses, planned
+  files left unchanged after rendering, and changed destination files.
+
 - `kettle-jem-deps-floor` now keeps a 30-day persistent per-gem RubyGems
   version cache and honors `kettle-release` cache-bust markers, so recently
   released gems refresh while untouched dependency checks can survive transient

@@ -3809,6 +3809,7 @@ module Kettle
       end
       plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
       changed_files = changed_files_from_recipe_reports(recipe_reports)
+      file_outcomes = template_file_outcomes(recipe_reports)
       diagnostics = recipe_reports.flat_map { |report| report[:diagnostics] }
       phase_reports = phase_reports_for(recipe_reports)
       decision_evaluations = recipe_reports.map { |report| report.fetch(:decision_evaluation) }
@@ -3845,6 +3846,7 @@ module Kettle
           decision_evaluations: decision_evaluations,
           prompt_requests: prompt_requests,
           changed_files: changed_files,
+          file_outcomes: file_outcomes,
           phase_timings: events.respond_to?(:phase_timings) ? events.phase_timings : [],
           warnings: warnings.uniq,
           diagnostics: diagnostics,
@@ -3862,6 +3864,41 @@ module Kettle
         latest_by_path[path] = report if path
       end
       latest_by_path.values.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
+    end
+
+    # A checksum hit still plans the recipe, but avoids writing after the lock
+    # proves the generated content is unchanged. Reduce overlays by path so the
+    # outcome counts describe destination files, not individual recipes.
+    def template_file_outcomes(recipe_reports)
+      latest_by_path = {}
+      unscoped_recipes = 0
+
+      recipe_reports.each do |report|
+        path = report[:relative_path].to_s
+        if path.empty?
+          unscoped_recipes += 1
+        else
+          latest_by_path[path] = report
+        end
+      end
+
+      outcomes = {
+        planned: latest_by_path.length,
+        checksum_hits: 0,
+        unchanged: 0,
+        changed: 0,
+        unscoped_recipes: unscoped_recipes
+      }
+      latest_by_path.each_value do |report|
+        if report[:checksum_skipped]
+          outcomes[:checksum_hits] += 1
+        elsif report[:changed]
+          outcomes[:changed] += 1
+        else
+          outcomes[:unchanged] += 1
+        end
+      end
+      outcomes
     end
 
     def checksum_mode_for(env, run_options)
@@ -4612,12 +4649,17 @@ module Kettle
     end
 
     def emit_summary_event(events, report)
+      file_outcomes = report.fetch(:file_outcomes, {})
       emit_event(
         events,
         "summary",
         mode: report.fetch(:mode, nil),
         changed_files: Array(report.fetch(:changed_files, [])),
         changed_count: Array(report.fetch(:changed_files, [])).length,
+        planned_count: file_outcomes.fetch(:planned, 0),
+        checksum_hit_count: file_outcomes.fetch(:checksum_hits, 0),
+        unchanged_count: file_outcomes.fetch(:unchanged, 0),
+        unscoped_recipe_count: file_outcomes.fetch(:unscoped_recipes, 0),
         diagnostics_count: Array(report.fetch(:diagnostics, [])).length,
         status: "ok",
         mark: "."

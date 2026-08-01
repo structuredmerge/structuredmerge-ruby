@@ -1805,6 +1805,11 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       default_report = default_apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "config.yml" }
 
       expect(default_report.fetch(:checksum_skipped)).to be(true)
+      outcomes = default_apply.fetch(:file_outcomes)
+      expect(outcomes.fetch(:checksum_hits)).to eq(1)
+      expect(outcomes.fetch(:planned)).to eq(
+        outcomes.fetch(:checksum_hits) + outcomes.fetch(:unchanged) + outcomes.fetch(:changed)
+      )
       expect(File.read(File.join(root, "config.yml"))).to eq("name: local\n")
 
       dest_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true, checksums: "dest,template"})
@@ -1813,6 +1818,24 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(dest_report).not_to include(:checksum_skipped)
       expect(File.read(File.join(root, "config.yml"))).to eq("name: template\n")
     end
+  end
+
+  it "accounts for final destination outcomes after recipe overlays" do
+    outcomes = described_class.template_file_outcomes([
+      {relative_path: "Gemfile", changed: true},
+      {relative_path: "Gemfile", changed: false, checksum_skipped: true},
+      {relative_path: "README.md", changed: false},
+      {relative_path: "Rakefile", changed: true},
+      {changed: true}
+    ])
+
+    expect(outcomes).to eq(
+      planned: 3,
+      checksum_hits: 1,
+      unchanged: 1,
+      changed: 1,
+      unscoped_recipes: 1
+    )
   end
 
   it "does not write template token values to the checksum lockfile" do
