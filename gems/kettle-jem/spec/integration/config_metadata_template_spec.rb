@@ -1799,6 +1799,14 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       })
 
       described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      matching_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      matching_outcomes = matching_apply.fetch(:file_outcomes)
+      expect(matching_outcomes).to include(checksum_hits: 1, checksum_protected: 0)
+      matching_report = matching_apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "config.yml" }
+      fingerprint_payload = described_class.template_input_fingerprint_payload(root, matching_report)
+      expect(fingerprint_payload).to include(template_source_application_fingerprint_version: 1)
+      expect(fingerprint_payload).not_to include(:kettle_jem_version, :kettle_jem_implementation_sha256)
+
       File.write(File.join(root, "config.yml"), "name: local\n")
 
       default_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
@@ -1806,9 +1814,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
       expect(default_report.fetch(:checksum_skipped)).to be(true)
       outcomes = default_apply.fetch(:file_outcomes)
-      expect(outcomes.fetch(:checksum_hits)).to eq(1)
+      expect(outcomes).to include(checksum_hits: 0, checksum_protected: 1, changed: 0)
       expect(outcomes.fetch(:planned)).to eq(
-        outcomes.fetch(:checksum_hits) + outcomes.fetch(:unchanged) + outcomes.fetch(:changed)
+        outcomes.fetch(:checksum_hits) + outcomes.fetch(:checksum_protected) + outcomes.fetch(:unchanged) + outcomes.fetch(:changed)
       )
       expect(File.read(File.join(root, "config.yml"))).to eq("name: local\n")
 
@@ -1823,17 +1831,18 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
   it "accounts for final destination outcomes after recipe overlays" do
     outcomes = described_class.template_file_outcomes([
       {relative_path: "Gemfile", changed: true},
-      {relative_path: "Gemfile", changed: false, checksum_skipped: true},
+      {relative_path: "Gemfile", changed: false, metadata: {checksum_match: {input_match: true, destination_match: true}}},
       {relative_path: "README.md", changed: false},
-      {relative_path: "Rakefile", changed: true},
+      {relative_path: "Rakefile", changed: false, checksum_skipped: true, metadata: {checksum_match: {input_match: true, destination_match: false}}},
       {changed: true}
     ])
 
     expect(outcomes).to eq(
       planned: 3,
       checksum_hits: 1,
+      checksum_protected: 1,
       unchanged: 1,
-      changed: 1,
+      changed: 0,
       unscoped_recipes: 1
     )
   end

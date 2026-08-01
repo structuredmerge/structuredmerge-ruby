@@ -161,7 +161,8 @@ RSpec.describe Kettle::Jem::CLI do
       summary = events.last
       expect(summary).to include("type" => "summary", "mode" => "plan")
       expect(summary.fetch("planned_count")).to eq(
-        summary.fetch("checksum_hit_count") + summary.fetch("unchanged_count") + summary.fetch("changed_count")
+        summary.fetch("checksum_hit_count") + summary.fetch("checksum_protected_count") +
+          summary.fetch("unchanged_count") + summary.fetch("changed_count")
       )
     end
   end

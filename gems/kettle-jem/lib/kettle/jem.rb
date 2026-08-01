@@ -34,6 +34,7 @@ module Kettle
 
     PACKAGE_NAME = "kettle-jem"
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
+    TEMPLATE_SOURCE_APPLICATION_FINGERPRINT_VERSION = 1
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
@@ -3866,9 +3867,8 @@ module Kettle
       latest_by_path.values.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
     end
 
-    # A checksum hit still plans the recipe, but avoids writing after the lock
-    # proves the generated content is unchanged. Reduce overlays by path so the
-    # outcome counts describe destination files, not individual recipes.
+    # Reduce overlays by path so post-planning outcome counts describe
+    # destination files, not individual recipes.
     def template_file_outcomes(recipe_reports)
       latest_by_path = {}
       unscoped_recipes = 0
@@ -3885,13 +3885,16 @@ module Kettle
       outcomes = {
         planned: latest_by_path.length,
         checksum_hits: 0,
+        checksum_protected: 0,
         unchanged: 0,
         changed: 0,
         unscoped_recipes: unscoped_recipes
       }
       latest_by_path.each_value do |report|
-        if report[:checksum_skipped]
+        if checksum_exact_match?(report)
           outcomes[:checksum_hits] += 1
+        elsif report[:checksum_skipped]
+          outcomes[:checksum_protected] += 1
         elsif report[:changed]
           outcomes[:changed] += 1
         else
@@ -3899,6 +3902,12 @@ module Kettle
         end
       end
       outcomes
+    end
+
+    def checksum_exact_match?(report)
+      checksum_match = report.dig(:metadata, :checksum_match) || report.dig(:metadata, "checksum_match") || {}
+      (checksum_match[:input_match] == true && checksum_match[:destination_match] == true) ||
+        (checksum_match["input_match"] == true && checksum_match["destination_match"] == true)
     end
 
     def checksum_mode_for(env, run_options)
@@ -3916,40 +3925,46 @@ module Kettle
       return recipe_reports if checksum_mode.off?
 
       recipe_reports.map do |report|
-        next report unless checksum_skip_report?(project_root, report, checksum_mode: checksum_mode, template_lock: template_lock)
+        checksum_match = checksum_match_details(project_root, report, checksum_mode: checksum_mode, template_lock: template_lock)
+        next report unless checksum_match
 
-        skipped = deep_dup(report)
-        skipped[:changed] = false
-        skipped[:checksum_skipped] = true
-        skipped[:metadata] = deep_dup(skipped.fetch(:metadata, {})).merge(
-          checksum_skip: {
-            mode: checksum_mode.to_s,
-            reason: "lock_match"
-          }
-        )
-        skipped
+        matched = deep_dup(report)
+        matched[:metadata] = deep_dup(matched.fetch(:metadata, {})).merge(checksum_match: checksum_match)
+        next matched unless report[:changed]
+
+        matched[:changed] = false
+        matched[:checksum_skipped] = true
+        matched[:metadata][:checksum_skip] = {
+          mode: checksum_mode.to_s,
+          reason: "lock_match"
+        }
+        matched
       end
     end
 
     def checksum_skip_report?(project_root, report, checksum_mode:, template_lock:)
       return false unless report[:changed]
-      return false unless checksum_cache_safe_report?(report)
+
+      !checksum_match_details(project_root, report, checksum_mode: checksum_mode, template_lock: template_lock).nil?
+    end
+
+    def checksum_match_details(project_root, report, checksum_mode:, template_lock:)
+      return unless checksum_cache_safe_report?(report)
 
       relative_path = report.fetch(:relative_path).to_s
       record = TemplateLock.file_record(template_lock, relative_path)
-      return false if record.empty?
+      return if record.empty?
+
+      input_match = record["input_fingerprint"].to_s == template_input_fingerprint(project_root, report)
+      destination_match = record["dest_sha256"].to_s == destination_file_sha256(project_root, relative_path).to_s
 
       if checksum_mode.check_template?
-        expected = record["input_fingerprint"].to_s
-        return false if expected.empty?
-        return false unless expected == template_input_fingerprint(project_root, report)
+        return if record["input_fingerprint"].to_s.empty? || !input_match
       end
       if checksum_mode.check_destination?
-        expected = record["dest_sha256"].to_s
-        return false if expected.empty?
-        return false unless expected == destination_file_sha256(project_root, relative_path).to_s
+        return if record["dest_sha256"].to_s.empty? || !destination_match
       end
-      true
+      {input_match: input_match, destination_match: destination_match}
     end
 
     def checksum_cache_safe_report?(report)
@@ -3972,15 +3987,11 @@ module Kettle
       tokens = stringify_keys_for_json(metadata[:template_tokens] || metadata["template_tokens"] || {})
       source_path = template_source_absolute_path(project_root, preference)
       # This payload is the per-destination "template checksum" used by
-      # --checksums=template. It intentionally includes the selected template
-      # source SHA, recipe identity/version, resolved token digest, and
-      # kettle-jem implementation SHA. The coarse template_state.checksums
-      # inventory records whole-template-tree drift, but it is not consulted
-      # for skip decisions because unrelated template files should not force a
-      # destination file to retemplate.
+      # --checksums=template. Bump the explicit renderer version only when
+      # source-template application semantics change; unrelated Kettle-Jem
+      # code changes must not invalidate every destination record.
       {
-        kettle_jem_version: VERSION,
-        kettle_jem_implementation_sha256: Digest::SHA256.file(__FILE__).hexdigest,
+        template_source_application_fingerprint_version: TEMPLATE_SOURCE_APPLICATION_FINGERPRINT_VERSION,
         recipe_name: report[:recipe_name].to_s,
         request_recipe_name: report.dig(:request_envelope, :request, :recipe_name).to_s,
         recipe_version: report.dig(:request_envelope, :request, :recipe_version).to_s,
@@ -4658,6 +4669,7 @@ module Kettle
         changed_count: Array(report.fetch(:changed_files, [])).length,
         planned_count: file_outcomes.fetch(:planned, 0),
         checksum_hit_count: file_outcomes.fetch(:checksum_hits, 0),
+        checksum_protected_count: file_outcomes.fetch(:checksum_protected, 0),
         unchanged_count: file_outcomes.fetch(:unchanged, 0),
         unscoped_recipe_count: file_outcomes.fetch(:unscoped_recipes, 0),
         diagnostics_count: Array(report.fetch(:diagnostics, [])).length,

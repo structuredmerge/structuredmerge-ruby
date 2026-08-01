@@ -30,6 +30,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
   files left unchanged after rendering, and changed destination files.
+- Source-template fingerprinting now uses an explicit renderer-semantics
+  version, so unrelated Kettle-Jem code changes do not invalidate every
+  destination checksum record.
 
 - `kettle-jem-deps-floor` now keeps a 30-day persistent per-gem RubyGems
   version cache and honors `kettle-release` cache-bust markers, so recently
