@@ -303,6 +303,19 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "uses bundle install until a legacy lockfile contains nomono" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            rake (13.2.1)
+      LOCK
+
+      expect(described_class.templating_bootstrap_command(root)).to eq(%w[bundle install])
+      expect(described_class.templating_bootstrap_step_name(root)).to eq("bundle_install_templating_bootstrap")
+    end
+  end
+
   it "lists parser gems that need lock-aware update handling" do
     expect(described_class::LOCKED_TEMPLATING_GEMS).to eq(
       %w[tree_sitter_language_pack]

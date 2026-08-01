@@ -150,15 +150,26 @@ module Kettle
         end
 
         def templating_bootstrap_command(project_root = Dir.pwd)
-          return %w[bundle install] unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
+          return %w[bundle install] unless templating_bootstrap_lockfile_ready?(project_root)
 
           bundle_update_templating_bootstrap_command(project_root)
         end
 
         def templating_bootstrap_step_name(project_root = Dir.pwd)
-          return "bundle_install_templating_bootstrap" unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
+          return "bundle_install_templating_bootstrap" unless templating_bootstrap_lockfile_ready?(project_root)
 
           "bundle_update_templating_bootstrap"
+        end
+
+        def templating_bootstrap_lockfile_ready?(project_root)
+          lock_path = File.join(project_root.to_s, "Gemfile.lock")
+          return false unless File.file?(lock_path)
+
+          locked_gem_names(project_root).then do |names|
+            CRITICAL_TEMPLATING_GEMS.all? { |gem_name| names.include?(gem_name) }
+          end
+        rescue Bundler::LockfileError
+          false
         end
 
         def bundle_install_after_bootstrap_step(project_root:, setup_env:, quiet:, command_runner:, events:, bootstrap_command:)
@@ -188,11 +199,14 @@ module Kettle
         end
 
         def locked_templating_gems(project_root)
+          LOCKED_TEMPLATING_GEMS & locked_gem_names(project_root)
+        end
+
+        def locked_gem_names(project_root)
           lock_path = File.join(project_root.to_s, "Gemfile.lock")
           return [] unless File.file?(lock_path)
 
-          locked_names = Bundler::LockfileParser.new(Bundler.read_file(lock_path)).specs.map(&:name)
-          LOCKED_TEMPLATING_GEMS & locked_names
+          Bundler::LockfileParser.new(Bundler.read_file(lock_path)).specs.map(&:name)
         end
 
         def snapshot_files(paths)

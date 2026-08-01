@@ -33,6 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve an existing main Gemfile source while applying templates.
 
+- Use bundle install when a legacy lockfile lacks the required templating bootstrap gems.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
