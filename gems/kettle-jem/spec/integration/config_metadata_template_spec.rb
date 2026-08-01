@@ -1073,7 +1073,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       final_content = template_report.fetch(:final_content)
       expect(final_content).to include("Galtzo FLOSS Logo")
       expect(final_content).to include("ruby-lang Logo")
-      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" width="12%" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by GitHub" src="https://github.com/acme.png?size=192" width="12%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="example-gem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg" width="12%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>))
@@ -1122,7 +1122,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       end
       final_content = template_report.fetch(:final_content)
 
-      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" width="96px" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by GitHub" src="https://github.com/acme.png?size=192" width="96px" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="12%" align="right"/></a>))
     end
   end

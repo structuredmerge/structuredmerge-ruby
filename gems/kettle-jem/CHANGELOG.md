@@ -45,6 +45,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Template runtime and config synchronization now normalize invalid underscore hostnames in generated documentation and gemspec metadata.
 
+- Generated organization README logos now use GitHub's stable avatar endpoint when no Galtzo-hosted asset is guaranteed.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

@@ -14817,9 +14817,15 @@ module Kettle
         credit_separator: readme_top_logo_credit_separator(type),
         image_ref: "#{ref_slug}-i",
         link_ref: ref_slug,
-        image_url: "#{LOGOS_GALTZO_BASE_URL}/#{slug}/avatar-192px.svg",
+        image_url: readme_top_logo_image_url(type, slug),
         href: href
       }
+    end
+
+    def readme_top_logo_image_url(type, slug)
+      return "https://github.com/#{slug}.png?size=192" if type == "org"
+
+      "#{LOGOS_GALTZO_BASE_URL}/#{slug}/avatar-192px.svg"
     end
 
     def default_readme_top_logo_slug(type, org:, gem_name:, repository: {})
@@ -14872,6 +14878,8 @@ module Kettle
       case type
       when "ruby"
         "Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"
+      when "org"
+        "GitHub"
       else
         "Aboling0, CC BY-SA 4.0"
       end

@@ -32,6 +32,9 @@
 
 ## Fixed
 
+- kettle-jem-template-20260801-004 - Generated organization README logos now
+  use GitHub's stable organization avatar endpoint instead of assuming a
+  matching Galtzo-hosted asset exists.
 - kettle-jem-template-20260801-003 - Generated project metadata and
   documentation now normalize configured underscore hostnames to valid
   hyphenated hostnames.
