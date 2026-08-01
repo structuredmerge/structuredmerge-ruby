@@ -1025,6 +1025,20 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("git ls-files")
   end
 
+  it "replaces every byebug-named Gemfile dependency with debug" do
+    source = <<~RUBY
+      group :test do
+        gem "byebug", require: false
+        gem "pry-byebug", require: false
+      end
+    RUBY
+
+    migrated = described_class.send(:migrate_legacy_byebug_pair, source)
+
+    expect(migrated).to include('gem "debug", require: false')
+    expect(migrated).not_to include("byebug")
+  end
+
   it "repairs the rspec-pending_for generated package manifest merge shape" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

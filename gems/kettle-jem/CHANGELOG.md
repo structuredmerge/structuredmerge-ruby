@@ -264,6 +264,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Recognize legacy git ls-files spec.files pipelines when merging gemspec templates.
 
+- Replace legacy byebug-named Gemfile dependencies with debug during templating.
+
 ### Deprecated
 
 ### Removed

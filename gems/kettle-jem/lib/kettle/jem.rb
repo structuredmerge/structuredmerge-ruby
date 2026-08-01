@@ -7146,13 +7146,29 @@ module Kettle
         output = normalize_main_gemfile_nomono_declaration(output)
         output = deduplicate_main_gemfile_eval_gemfiles(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
+        output = migrate_legacy_byebug_pair(output)
       end
+
       output = normalize_local_gemfile_nomono_bootstrap(output) if local_gemfile_template_recipe?(recipe)
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
       output = normalize_structuredmerge_local_gems(output, template_content)
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)
+    end
+
+    def migrate_legacy_byebug_pair(content)
+      records = gemfile_gem_call_records(content)
+      obsolete = records.select { |record| record.fetch(:name).include?("byebug") }
+      return content if obsolete.empty?
+
+      first = obsolete.min_by { |record| record.fetch(:start_line) }
+      replacement = "#{content.to_s.lines.fetch(first.fetch(:start_line) - 1)[/\A\s*/]}gem \"debug\", require: false\n"
+      replacements = obsolete.to_h do |record|
+        source = record == first ? replacement : ""
+        [record.fetch(:start_line), record.merge(replacement: source)]
+      end
+      replace_record_ranges(content, replacements)
     end
 
     def remove_stale_main_gemfile_tree_sitter_language_pack(content, template_content)
