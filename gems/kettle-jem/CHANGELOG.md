@@ -29,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `Dir[...] + [...]` shape structurally, retains legitimate destination globs,
   and removes only obsolete generated `certs` and `sig` package helpers.
 
+- Prepare every modular Gemfile referenced by the generated Gemfile before Bundler bootstraps templating dependencies.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

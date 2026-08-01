@@ -12,8 +12,10 @@ module Kettle
         PREPARE_ONLY_PATHS = [
           Kettle::Jem::KETTLE_CONFIG_PATH,
           "Gemfile",
-          "gemfiles/modular/templating.gemfile",
-          "gemfiles/modular/templating_local.gemfile",
+          # Gemfile evaluates these fragments immediately.  Preparing only the
+          # templating pair leaves a newly migrated project with references to
+          # files that do not exist yet, so Bundler cannot perform the bootstrap.
+          "gemfiles/modular/**",
           "mise.toml"
         ].freeze
         CRITICAL_TEMPLATING_GEMS = %w[nomono].freeze

@@ -5,6 +5,11 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     File.expand_path("../../../../tmp", __dir__).tap { |path| FileUtils.mkdir_p(path) }
   end
 
+  it "prepares every modular Gemfile needed by the generated main Gemfile before Bundler runs" do
+    expect(described_class::PREPARE_ONLY_PATHS).to include("Gemfile", "gemfiles/modular/**")
+    expect(described_class::PREPARE_ONLY_PATHS).not_to include("gemfiles/modular/templating.gemfile")
+  end
+
   it "updates critical templating gems after applying the dependency bootstrap payload" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
