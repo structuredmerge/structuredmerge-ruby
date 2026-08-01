@@ -8271,12 +8271,20 @@ module Kettle
     def merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: nil)
       return merge_prism_gemfile_template_source(template_content, destination_content) if file_type == :gemfile
 
+      template_preference = recipe.fetch(:template_preference, {})
+      preference = (template_preference[:preference] || "destination").to_sym
+      add_template_only_nodes = true
+      unless template_preference[:add_template_only_nodes].nil?
+        configured = DecisionPolicy.value_to_boolean(template_preference[:add_template_only_nodes])
+        add_template_only_nodes = configured unless configured.nil?
+      end
+
       Prism::Merge.merge_ruby(
         template_content,
         destination_content,
         "ruby",
-        preference: :destination,
-        add_template_only_nodes: true,
+        preference: preference,
+        add_template_only_nodes: add_template_only_nodes,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator(require_aliases: ruby_require_aliases(recipe, facts)),
         **prism_ruby_merge_options(recipe)
       )

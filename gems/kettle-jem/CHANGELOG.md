@@ -35,6 +35,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Use bundle install when a legacy lockfile lacks the required templating bootstrap gems.
 
+- Respect per-file Ruby merge settings when applying templates.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

@@ -1296,6 +1296,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
             apply: true
             entries:
               - spec/spec_helper.rb
+          files:
+            spec:
+              spec_helper.rb:
+                strategy: merge
+                preference: destination
+                add_template_only_nodes: false
         YAML
         "spec/spec_helper.rb" => <<~RUBY
           # frozen_string_literal: true
@@ -1365,6 +1371,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
             apply: true
             entries:
               - spec/spec_helper.rb
+          files:
+            spec:
+              spec_helper.rb:
+                strategy: merge
+                preference: destination
+                add_template_only_nodes: false
         YAML
         "spec/spec_helper.rb" => <<~RUBY
           # frozen_string_literal: true
@@ -1375,7 +1387,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
           require "example"
 
           RSpec.configure do |config|
-            config.disable_monkey_patching!
+            config.example_status_persistence_file_path = ".rspec_status"
           end
         RUBY
       })
@@ -1391,6 +1403,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         require "kettle/test/rspec"
         # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
       RUBY
+      expect(content).not_to include("config.disable_monkey_patching!")
       expect(File.read(File.join(root, "spec", "spec_helper.rb"))).to eq(content)
     end
   end
