@@ -47,6 +47,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated organization README logos now use GitHub's stable avatar endpoint when no Galtzo-hosted asset is guaranteed.
 
+- Preserve flat Ruby entrypoints and avoid duplicating equivalent version requires during template bootstrap.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

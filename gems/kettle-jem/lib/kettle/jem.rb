@@ -11459,7 +11459,8 @@ module Kettle
 
     def version_gem_template_target_path(gemspec_path, source)
       package_name = File.basename(gemspec_path.to_s, ".gemspec")
-      entrypoint_require = package_name.tr("-", "/")
+      project_root = File.dirname(File.expand_path(gemspec_path.to_s))
+      entrypoint_require = project_entrypoint_require(project_root, package_name)
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
@@ -11475,8 +11476,7 @@ module Kettle
     def version_gem_template_target_path_for_project(project_root, gemspec_path, source)
       config = kettle_jem_config(project_root)
       package_name = File.basename(gemspec_path.to_s, ".gemspec")
-      entrypoint_require = config.dig("rubygems", "entrypoint_require").to_s.strip
-      entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
+      entrypoint_require = project_entrypoint_require(project_root, package_name, config: config)
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
@@ -11487,6 +11487,16 @@ module Kettle
       else
         source
       end
+    end
+
+    def project_entrypoint_require(project_root, package_name, config: nil)
+      configured = (config || kettle_jem_config(project_root)).dig("rubygems", "entrypoint_require").to_s.strip
+      return configured unless configured.empty?
+
+      discovered = GemSpecReader.load(project_root).fetch(:entrypoint_require, "").to_s.strip
+      return discovered unless discovered.empty?
+
+      package_name.to_s.tr("-", "/")
     end
 
     def add_monorepo_subgem_file_overrides(content, gemspec_path, profile = MONOREPO_SUBGEM_TEMPLATE_PROFILE)
@@ -14122,7 +14132,10 @@ module Kettle
         insert_lines << "require \"version_gem\"\n"
       end
       relative_path = File.join(File.basename(entrypoint_require), "version")
-      insert_lines << %(require_relative "#{relative_path}"\n) unless ruby_top_level_require?(current, "require_relative", relative_path)
+      absolute_path = File.join(entrypoint_require, "version")
+      version_already_required = ruby_top_level_require?(current, "require_relative", relative_path) ||
+        ruby_top_level_require?(current, "require", absolute_path)
+      insert_lines << %(require_relative "#{relative_path}"\n) unless version_already_required
       if insert_lines.any?
         after_version_gem = insert_lines.none? { |line| line.include?('"version_gem"') }
         lines.insert(version_gem_require_insertion_index(current, after_version_gem: after_version_gem), *insert_lines, "\n")

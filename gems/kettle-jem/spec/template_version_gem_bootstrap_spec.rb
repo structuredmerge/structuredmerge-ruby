@@ -105,6 +105,71 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves a legacy flat entrypoint instead of synthesizing a slash-delimited path" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-flat-entrypoint", tmp_root) do |root|
+      write_file(root, "resque-lonely_job.gemspec", <<~RUBY)
+        gem_version =
+          if Gem.ruby_version >= Gem::Version.new("3.1")
+            Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/resque-lonely_job/version.rb", mod) }::Resque::Plugins::LonelyJob::VERSION
+          else
+            require_relative "lib/resque-lonely_job/version"
+            Resque::Plugins::LonelyJob::VERSION
+          end
+
+        Gem::Specification.new do |spec|
+          spec.name = "resque-lonely_job"
+          spec.version = gem_version
+          spec.summary = "Resque worker serialization"
+          spec.required_ruby_version = ">= 2.4"
+          spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+        end
+      RUBY
+      write_file(root, "lib/resque-lonely_job.rb", <<~RUBY)
+        require "resque-lonely_job/version"
+
+        module Resque
+          module Plugins
+            module LonelyJob
+            end
+          end
+        end
+      RUBY
+      write_file(root, "lib/resque-lonely_job/version.rb", <<~RUBY)
+        module Resque
+          module Plugins
+            module LonelyJob
+              VERSION = "1.1.4"
+            end
+          end
+        end
+      RUBY
+      write_file(root, ".kettle-jem.yml", <<~YAML)
+        project_emoji: "💎"
+        templates:
+          root: packaged
+          apply: true
+          entries:
+            - source: lib/gem/version.rb
+            - source: sig/gem.rbs
+      YAML
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(apply.fetch(:changed_files)).to include("lib/resque-lonely_job/version.rb", "sig/resque-lonely_job.rbs")
+      expect(File).to exist(File.join(root, "lib/resque-lonely_job.rb"))
+      expect(File).not_to exist(File.join(root, "lib/resque/lonely_job.rb"))
+      expect(File).not_to exist(File.join(root, "lib/resque/lonely_job/version.rb"))
+      expect(File).not_to exist(File.join(root, "sig/resque/lonely_job.rbs"))
+
+      entrypoint = File.read(File.join(root, "lib/resque-lonely_job.rb"))
+      expect(entrypoint).to include('require "resque-lonely_job/version"')
+      expect(entrypoint).not_to include('require_relative "resque-lonely_job/version"')
+      expect(entrypoint).to include('require "version_gem"')
+    end
+  end
+
   it "removes bundle gem scaffold literal VERSION declarations from the root signature" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
