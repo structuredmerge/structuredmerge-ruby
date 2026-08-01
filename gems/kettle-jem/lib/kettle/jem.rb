@@ -12691,13 +12691,13 @@ module Kettle
     def readme_dev_test_stack_table(package_name)
       rows = README_DEV_TEST_STACK_GEMS.reject { |gem| gem.fetch(:name) == package_name.to_s }.map do |gem|
         name = gem.fetch(:name)
-        bestgems_url = "https://bestgems.org/gems/#{name}"
+        clickgems_url = "https://clickgems.clickhouse.com/dashboard/#{name}"
         badge_url = "https://img.shields.io/gem/rd/#{name}.svg?style=flat-square"
         [
-          "| [#{name}](#{bestgems_url})",
+          "| [#{name}](#{clickgems_url})",
           "[GitHub](#{gem.fetch(:repo)})",
           gem.fetch(:role),
-          "[![Daily download rank for #{name}](#{badge_url})](#{bestgems_url}) |"
+          "[![Daily download rank for #{name}](#{badge_url})](#{clickgems_url}) |"
         ].join(" | ")
       end
 

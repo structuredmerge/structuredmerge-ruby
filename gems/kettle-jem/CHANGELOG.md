@@ -278,6 +278,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Replace legacy byebug-named Gemfile dependencies with debug during templating.
 
+- Generated README gem dashboard links now use ClickGems instead of BestGems.
+
 ### Deprecated
 
 ### Removed

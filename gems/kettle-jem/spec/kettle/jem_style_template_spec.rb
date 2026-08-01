@@ -19,6 +19,16 @@ RSpec.describe Kettle::Jem do
     expect(readme_template).to include("[✉️ruby-forum-img]: {KJ|RUBYFORUM:BADGE_IMG_FTB}")
   end
 
+  it "uses ClickGems dashboard links in the packaged README" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    readme_template = File.read(File.join(template_root, "README.md.example"))
+
+    expect(readme_template).to include("[⛳️gem-name]: https://clickgems.clickhouse.com/dashboard/{KJ|GEM_NAME}")
+    expect(readme_template).to include("[👽dl-rank]: https://clickgems.clickhouse.com/dashboard/{KJ|GEM_NAME}")
+    expect(readme_template).to include("[👽version]: https://clickgems.clickhouse.com/dashboard/{KJ|GEM_NAME}")
+    expect(readme_template).not_to include("bestgems.org")
+  end
+
   it "projects RuboCop LTS template tokens from minimum Ruby" do
     tmp_root = File.join(__dir__, "../tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -83,20 +93,20 @@ RSpec.describe Kettle::Jem do
 
     expect(example_table).to start_with("<details markdown=\"1\">\n<summary>How kettle-dev manages complexity in tests</summary>\n\n")
     expect(example_table).to end_with("\n</details>")
-    expect(example_table).to include("[appraisal2](https://bestgems.org/gems/appraisal2)")
+    expect(example_table).to include("[appraisal2](https://clickgems.clickhouse.com/dashboard/appraisal2)")
     expect(example_table).to include("[GitHub](https://github.com/appraisal-rb/appraisal2)")
     expect(example_table).to include("https://img.shields.io/gem/rd/appraisal2.svg?style=flat-square")
-    expect(example_table).to include("[kettle-dev](https://bestgems.org/gems/kettle-dev)")
+    expect(example_table).to include("[kettle-dev](https://clickgems.clickhouse.com/dashboard/kettle-dev)")
     expect(example_table).to include("[GitHub](https://github.com/kettle-dev/kettle-dev)")
-    expect(example_table).to include("[kettle-jem](https://bestgems.org/gems/kettle-jem)")
+    expect(example_table).to include("[kettle-jem](https://clickgems.clickhouse.com/dashboard/kettle-jem)")
     expect(example_table).to include("[GitHub](https://github.com/kettle-dev/kettle-jem)")
     expect(example_table).to include("Appraisals & CI workflow templates")
-    expect(example_table).to include("[kettle-soup-cover](https://bestgems.org/gems/kettle-soup-cover)")
+    expect(example_table).to include("[kettle-soup-cover](https://clickgems.clickhouse.com/dashboard/kettle-soup-cover)")
     expect(example_table).to include("[GitHub](https://github.com/kettle-dev/kettle-soup-cover)")
-    expect(example_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
+    expect(example_table).to include("[kettle-test](https://clickgems.clickhouse.com/dashboard/kettle-test)")
     expect(example_table).to include("[GitHub](https://github.com/kettle-dev/kettle-test)")
-    expect(example_table).to include("[rubocop-lts](https://bestgems.org/gems/rubocop-lts)")
-    expect(example_table).to include("[turbo_tests2](https://bestgems.org/gems/turbo_tests2)")
+    expect(example_table).to include("[rubocop-lts](https://clickgems.clickhouse.com/dashboard/rubocop-lts)")
+    expect(example_table).to include("[turbo_tests2](https://clickgems.clickhouse.com/dashboard/turbo_tests2)")
     expect(example_table.index("[appraisal2]")).to be < example_table.index("[appraisal2-rubocop]")
     expect(example_table.index("[appraisal2-rubocop]")).to be < example_table.index("[kettle-dev]")
     expect(example_table.index("[kettle-dev]")).to be < example_table.index("[kettle-jem]")
@@ -104,17 +114,17 @@ RSpec.describe Kettle::Jem do
     expect(example_table.index("[kettle-soup-cover]")).to be < example_table.index("[kettle-test]")
     expect(example_table.index("[kettle-test]")).to be < example_table.index("[rubocop-lts]")
     expect(example_table.index("[rubocop-lts]")).to be < example_table.index("[turbo_tests2]")
-    expect(turbo_table).not_to include("[turbo_tests2](https://bestgems.org/gems/turbo_tests2)")
-    expect(turbo_table).to include("[appraisal2](https://bestgems.org/gems/appraisal2)")
-    expect(turbo_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
-    expect(coverage_table).not_to include("[kettle-soup-cover](https://bestgems.org/gems/kettle-soup-cover)")
-    expect(coverage_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
+    expect(turbo_table).not_to include("[turbo_tests2](https://clickgems.clickhouse.com/dashboard/turbo_tests2)")
+    expect(turbo_table).to include("[appraisal2](https://clickgems.clickhouse.com/dashboard/appraisal2)")
+    expect(turbo_table).to include("[kettle-test](https://clickgems.clickhouse.com/dashboard/kettle-test)")
+    expect(coverage_table).not_to include("[kettle-soup-cover](https://clickgems.clickhouse.com/dashboard/kettle-soup-cover)")
+    expect(coverage_table).to include("[kettle-test](https://clickgems.clickhouse.com/dashboard/kettle-test)")
     kettle_dev_table = described_class.send(:readme_dev_test_stack_table, "kettle-dev")
-    expect(kettle_dev_table).not_to include("[kettle-dev](https://bestgems.org/gems/kettle-dev)")
-    expect(kettle_dev_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
+    expect(kettle_dev_table).not_to include("[kettle-dev](https://clickgems.clickhouse.com/dashboard/kettle-dev)")
+    expect(kettle_dev_table).to include("[kettle-test](https://clickgems.clickhouse.com/dashboard/kettle-test)")
     kettle_jem_table = described_class.send(:readme_dev_test_stack_table, "kettle-jem")
-    expect(kettle_jem_table).not_to include("[kettle-jem](https://bestgems.org/gems/kettle-jem)")
-    expect(kettle_jem_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
+    expect(kettle_jem_table).not_to include("[kettle-jem](https://clickgems.clickhouse.com/dashboard/kettle-jem)")
+    expect(kettle_jem_table).to include("[kettle-test](https://clickgems.clickhouse.com/dashboard/kettle-test)")
   end
 
   it "keeps packaged Ruby templates aligned with generated RuboCop Gradual baselines" do
