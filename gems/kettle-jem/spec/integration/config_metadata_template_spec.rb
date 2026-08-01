@@ -930,19 +930,19 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
         spec.name = "example"
+        package_metadata_files = %w[
+          CHANGELOG.md
+          LICENSE.md
+          README.md
+        ]
         # Specify which files are part of the released package.
         spec.files = [
-          # Root license files
-          "LICENSE.md",
-          "MIT.md",
+          # Root package metadata
+          *package_metadata_files,
           # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
           *enumerate_package_files.call("lib"),
           # Executables and executable support scripts
-          *enumerate_package_files.call("exe"),
-          # Public certs for gem signing
-          *enumerate_package_files.call("certs"),
-          # Signatures
-          *enumerate_package_files.call("sig")
+          *enumerate_package_files.call("exe")
         ]
       end
     RUBY
@@ -958,30 +958,45 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         # Specify which files are part of the released package.
         spec.files = Dir[
           # Splats (alphabetical)
+          "config/*.yml",
           "lib/**/*.rb"
-      ] + [
-        # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
-        *enumerate_package_files.call("lib"),
-        # Executables and executable support scripts
-        *enumerate_package_files.call("exe"),
-        # Public certs for gem signing
-        *enumerate_package_files.call("certs"),
-        # Signatures
-        *enumerate_package_files.call("sig")
-      ]
+        ] + [
+          "LICENSE.md",
+          "MIT.md",
+          # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
+          *enumerate_package_files.call("lib"),
+          # Executables and executable support scripts
+          *enumerate_package_files.call("exe"),
+          # Public certs for gem signing
+          *enumerate_package_files.call("certs"),
+          # Signatures
+          *enumerate_package_files.call("sig"),
+          "CHANGELOG.md",
+          "CODE_OF_CONDUCT.md",
+          "CONTRIBUTING.md",
+          "README.md",
+          "rubocop-lts.yml",
+          "SECURITY.md"
+        ]
       end
     RUBY
 
     merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "example"}})
+    remerged = described_class.merge_gemspec_template_source(template, merged, facts: {package: {name: "example"}})
 
     expect(Prism.parse(merged)).to be_success
     expect(merged).to include("spec.files = [")
     expect(merged).not_to include("spec.files = Dir[")
     expect(merged).not_to include("] + [")
     expect(merged).not_to include('"lib/**/*.rb"')
-    expect(merged).to include('"MIT.md"')
+    expect(merged).to include('*enumerate_package_glob.call(File.join(gemspec_root, "config/*.yml"))')
+    expect(merged).to include('"rubocop-lts.yml"')
+    expect(merged).not_to include('*enumerate_package_files.call("certs")')
+    expect(merged).not_to include('*enumerate_package_files.call("sig")')
     expect(merged.scan('*enumerate_package_files.call("lib")').size).to eq(1)
+    expect(merged.scan('*enumerate_package_glob.call(File.join(gemspec_root, "config/*.yml"))').size).to eq(1)
     expect(merged.scan("spec.files =").size).to eq(1)
+    expect(remerged).to eq(merged)
   end
 
   it "projects README top logo template tokens" do

@@ -18,6 +18,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ## [Unreleased]
 
+### Fixed
+
+- Gemspec package manifest merging now recognizes the historical generated
+  `Dir[...] + [...]` shape structurally, retains legitimate destination globs,
+  and removes only obsolete generated `certs` and `sig` package helpers.
+
 ### Added
 
 - `kettle-jem-deps-floor` now keeps a 30-day persistent per-gem RubyGems

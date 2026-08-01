@@ -9737,7 +9737,9 @@ module Kettle
           generated_gemspec_metadata_file_group?(group, merged_parts)
       end
       destination_only_nonliteral = destination_groups.any? do |group|
-        !group.fetch(:node).is_a?(::Prism::StringNode) && !merged_keys.include?(group.fetch(:key))
+        !group.fetch(:node).is_a?(::Prism::StringNode) &&
+          !merged_keys.include?(group.fetch(:key)) &&
+          !supported_gemspec_files_nonliteral_group?(group)
       end
       return if destination_only_nonliteral
 
@@ -9960,6 +9962,52 @@ module Kettle
       end
 
       node&.slice
+    end
+
+    # Accept only the generated package helpers that can safely survive a
+    # template revision. Other destination splats remain unsupported rather
+    # than being silently treated as template-owned package content.
+    def supported_gemspec_files_nonliteral_group?(group)
+      node = group.fetch(:node)
+      return false unless node.is_a?(::Prism::SplatNode)
+
+      expression = node.expression
+      return true if expression.is_a?(::Prism::LocalVariableReadNode) && expression.name == :package_metadata_files
+      return false unless expression.is_a?(::Prism::CallNode) && expression.name == :call
+
+      case expression.receiver&.slice
+      when "enumerate_package_files"
+        argument = Array(expression.arguments&.arguments).first
+        %w[lib exe certs sig].include?(ruby_static_string_value(argument))
+      when "enumerate_package_glob"
+        generated_gemspec_package_glob_call?(expression)
+      else
+        false
+      end
+    end
+
+    def generated_gemspec_package_glob_call?(node)
+      arguments = Array(node.arguments&.arguments)
+      return false unless arguments.length == 1
+
+      join = arguments.first
+      return false unless join.is_a?(::Prism::CallNode) && join.receiver&.slice == "File" && join.name == :join
+
+      join_arguments = Array(join.arguments&.arguments)
+      root = join_arguments.shift
+      gemspec_root_reference_node?(root) &&
+        join_arguments.any? &&
+        join_arguments.all? { |argument| argument.is_a?(::Prism::StringNode) }
+    end
+
+    def gemspec_root_reference_node?(node)
+      return node.name == :gemspec_root if node.is_a?(::Prism::LocalVariableReadNode)
+
+      node.is_a?(::Prism::CallNode) &&
+        node.receiver.nil? &&
+        node.name == :gemspec_root &&
+        Array(node.arguments&.arguments).empty? &&
+        node.block.nil?
     end
 
     def stale_generated_gemspec_files_group?(group)
