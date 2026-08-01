@@ -983,6 +983,48 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL)")
   end
 
+  it "replaces legacy backtick git-ls-files pipelines with the canonical package manifest" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = Dir["lib/**/*.rb"]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = `git ls-files -z`.split("\\x0").reject do |file|
+          file.match?(%r{^(test|spec|features)/})
+        end
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect(merged).to include('spec.files = Dir["lib/**/*.rb"]')
+    expect(merged).not_to include("git ls-files")
+  end
+
+  it "replaces legacy newline-split git-ls-files assignments with the canonical package manifest" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = Dir["lib/**/*.rb"]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = `git ls-files`.split($\\)
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect(merged).to include('spec.files = Dir["lib/**/*.rb"]')
+    expect(merged).not_to include("git ls-files")
+  end
+
   it "repairs the rspec-pending_for generated package manifest merge shape" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

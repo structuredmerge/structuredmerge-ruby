@@ -10163,10 +10163,25 @@ module Kettle
 
     def generic_bundler_gemspec_files_assignment?(record)
       node = record.fetch(:value_node)
+      io_popen_gemspec_files_assignment?(node) || legacy_git_ls_files_assignment?(node)
+    end
+
+    def io_popen_gemspec_files_assignment?(node)
       node.is_a?(::Prism::CallNode) &&
         node.name == :popen &&
         node.receiver&.slice == "IO" &&
         generic_bundler_gemspec_files_command?(node.arguments&.arguments&.first)
+    end
+
+    # Legacy gemspecs commonly shell out with backticks, then apply split and
+    # optional filtering calls. Prism lets us recognize that bounded pipeline
+    # without interpreting arbitrary Ruby.
+    def legacy_git_ls_files_assignment?(node)
+      current = node
+      while current.is_a?(::Prism::CallNode) && %i[split reject select grep map].include?(current.name)
+        current = current.receiver
+      end
+      current.is_a?(::Prism::XStringNode) && %w[git\ ls-files git\ ls-files\ -z].include?(current.unescaped.to_s)
     end
 
     def generic_bundler_gemspec_files_command?(node)

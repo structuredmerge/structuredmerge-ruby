@@ -262,6 +262,8 @@ Please file a bug if you notice a violation of semantic versioning.
   cover `version.rb` without redefining constants, or are removed when version
   specs are not managed for the project.
 
+- Recognize legacy git ls-files spec.files pipelines when merging gemspec templates.
+
 ### Deprecated
 
 ### Removed
