@@ -1,5 +1,16 @@
 # kettle-jem Transferable Changelog
 
+This file contains **destination release notes**, not a record of every template
+implementation change. Add an entry only when applying the template change
+changes behavior, configuration, compatibility, packaging, documentation, or
+developer workflow for a destination gem. A replayed entry is intentionally
+inserted into that gem's `Unreleased` section and must make it pending for
+release. Do not add entries for internal template refactors, merge mechanics,
+or other changes with no destination user or developer impact.
+
+`kettle-jem-template-YYYYMMDD-NNN` is a stable replay identifier, not metadata
+that exempts the entry from the destination changelog or release state.
+
 ## Added
 
 - kettle-jem-template-20260720-001 - READMEs can now display configured

@@ -286,6 +286,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated README gem dashboard links now use ClickGems instead of BestGems.
 
+- Clarify that transferable changelog entries are destination release notes, not internal template metadata.
+
 ### Deprecated
 
 ### Removed
