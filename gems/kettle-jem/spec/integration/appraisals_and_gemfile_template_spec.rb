@@ -768,6 +768,35 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
   end
 
+  it "configures retrying compatibility installs for every cached setup-ruby-flash template step" do
+    workflow_paths = Dir[project_root.join("lib/kettle/jem/templates/.github/workflows/*.yml.example")]
+    setup_steps = workflow_paths.flat_map do |path|
+      lines = File.readlines(path, chomp: true)
+      lines.each_index.filter_map do |index|
+        next unless lines[index].include?("uses: appraisal-rb/setup-ruby-flash@")
+
+        following_steps = lines[(index + 1)..]
+        next_step_offset = following_steps.find_index { |line| line.start_with?("      - ") }
+        step_lines = lines[index, next_step_offset ? next_step_offset + 1 : lines.length]
+        [path, step_lines.join("\n")]
+      end
+    end
+
+    expect(setup_steps).not_to be_empty
+    setup_steps.each do |_path, step|
+      expect(step).to include(
+        "uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5"
+      )
+    end
+
+    cached_setup_steps = setup_steps.select { |_path, step| step.include?("bundler-cache: true") }
+    expect(cached_setup_steps).not_to be_empty
+    cached_setup_steps.each do |_path, step|
+      expect(step).to include("manual-compatibility-bundle: true")
+      expect(step).to include("gem-install-retries: 7")
+    end
+  end
+
   it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

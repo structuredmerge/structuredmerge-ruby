@@ -39,6 +39,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Canonicalize legacy release headings before replaying transfer changelog entries.
 
+- Generated CI workflows now retry compatibility dependency installation while newly published runtime floors propagate through gem sources.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
