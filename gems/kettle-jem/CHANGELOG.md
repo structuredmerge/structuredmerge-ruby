@@ -251,8 +251,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Generated documentation Gemfiles now select `yard-lint` 1.8 on Ruby 3.2 and
-  1.10 on Ruby 3.3+, restoring the Ruby 3.2 framework CI appraisal.
+- Generated documentation Gemfiles now correctly document that `yard-lint`
+  1.10 requires Ruby 3.3 or newer; projects testing older Rubies must keep
+  documentation tooling out of those targeted appraisals.
 
 - Main Gemfile templating now removes stale direct `tree_sitter_language_pack`
   declarations when the current templates own that dependency through the

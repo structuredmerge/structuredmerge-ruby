@@ -333,6 +333,38 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "replaces framework appraisal blocks when configured support gemfiles are removed" do
+    content = <<~RUBY
+      appraise "rdoc-6-11" do
+        eval_gemfile "modular/rdoc/v6_11.gemfile"
+        eval_gemfile "modular/documentation.gemfile"
+        eval_gemfile "modular/x_std_libs.gemfile"
+      end
+
+      appraise "current" do
+        eval_gemfile "modular/x_std_libs.gemfile"
+      end
+    RUBY
+    facts = {
+      ci: {
+        framework_matrix: {
+          appraisals: [{
+            name: "rdoc-6-11",
+            eval_gemfiles: ["modular/rdoc/v6_11.gemfile", "modular/x_std_libs.gemfile"]
+          }]
+        }
+      }
+    }
+
+    output = described_class.send(:merge_framework_matrix_appraisals, content, facts)
+
+    expect(appraisals_eval_gemfile_paths(output, "rdoc-6-11")).to contain_exactly(
+      "modular/rdoc/v6_11.gemfile",
+      "modular/x_std_libs.gemfile"
+    )
+    expect(appraisals_eval_gemfile_paths(output, "current")).to contain_exactly("modular/x_std_libs.gemfile")
+  end
+
   it "adds configured support gemfiles to standard test Appraisal blocks" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1748,9 +1780,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   it "keeps YARD linting in the documentation modular Gemfile" do
     content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
 
-    expect(content).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")')
     expect(content).to include('gem "yard-lint", "~> 1.10", ">= 1.10.2", require: false # Ruby >= 3.3')
-    expect(content).to include('gem "yard-lint", "~> 1.8", ">= 1.8.0", require: false # Ruby >= 3.2')
+    expect(content).not_to include('Gem::Version.new(RUBY_VERSION)')
   end
 
   it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do

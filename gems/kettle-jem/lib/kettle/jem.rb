@@ -8856,6 +8856,7 @@ module Kettle
       generated = entries.to_h do |entry|
         [entry.fetch(:name).to_s, framework_matrix_appraisal_block(entry)]
       end
+      entries_by_name = entries.to_h { |entry| [entry.fetch(:name).to_s, entry] }
       replaced = entries.flat_map { |entry| entry.fetch(:replaces, []) }.map(&:to_s).to_set
       parsed = appraisal_blocks(content)
       emitted = Set.new
@@ -8865,7 +8866,13 @@ module Kettle
         emitted << name
         parsed_block = parsed.fetch(:blocks).fetch(name).rstrip
         generated_block = generated[name]
-        generated_block ? merge_appraisal_blocks_with_prism(generated_block, parsed_block) : parsed_block
+        if generated_block && !entries_by_name.fetch(name).fetch(:standard_appraisal, false)
+          generated_block
+        elsif generated_block
+          merge_appraisal_blocks_with_prism(generated_block, parsed_block)
+        else
+          parsed_block
+        end
       end.compact
       entries.each do |entry|
         name = entry.fetch(:name).to_s
@@ -16299,6 +16306,7 @@ module Kettle
             framework_version: entry.fetch(:label),
             gem: framework_gem,
             env: entry.fetch(:env, {}),
+            standard_appraisal: entry.fetch(:standard_appraisal, false),
             eval_gemfiles: [framework_matrix_appraisal_gemfile_path(gemfile), *appraisal_gemfiles].uniq,
             replaces: framework_matrix_replaced_appraisal_names(dimension, entry, name)
           }
@@ -16359,6 +16367,7 @@ module Kettle
         requirement: requirement
       }
       entry[:appraisal_name] = appraisal_name unless appraisal_name.empty?
+      entry[:standard_appraisal] = true if raw.is_a?(Hash) && raw["standard_appraisal"]
       entry[:env] = env unless env.empty?
       entry
     end
