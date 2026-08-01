@@ -7138,6 +7138,7 @@ module Kettle
         preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
       )
       if recipe.fetch(:target_path).to_s == "Gemfile"
+        output = preserve_destination_gemfile_source(output, destination_content)
         output = inject_main_gemfile_recording_eval(output, facts)
         output = remove_stale_main_gemfile_tree_sitter_language_pack(output, template_content)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
@@ -7155,6 +7156,27 @@ module Kettle
 
       output = normalize_structuredmerge_local_gems(output, template_content)
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)
+    end
+
+    def preserve_destination_gemfile_source(content, destination_content)
+      destination_source = ruby_call_records(destination_content, :source).find do |call|
+        call.receiver.nil? && ruby_string_argument(call)
+      end
+      template_source = ruby_call_records(content, :source).find do |call|
+        call.receiver.nil? && ruby_string_argument(call)
+      end
+      return content unless destination_source && template_source
+
+      destination_text = destination_source.location.slice
+      return content if destination_text == template_source.location.slice
+
+      replace_record_ranges(content, {
+        template_source.location.start_line => {
+          start_line: template_source.location.start_line,
+          end_line: ruby_node_source_end_line(template_source),
+          replacement: "#{destination_text}\n"
+        }
+      })
     end
 
     def migrate_legacy_byebug_pair(content)

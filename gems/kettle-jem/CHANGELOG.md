@@ -31,6 +31,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prepare every modular Gemfile referenced by the generated Gemfile before Bundler bootstraps templating dependencies.
 
+- Preserve an existing main Gemfile source while applying templates.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
