@@ -27,6 +27,8 @@
 - kettle-jem-template-20260728-001 - Generated Ruby workflows now use clearer
   setup-ruby-flash planning and can prepare appraisal-only jobs without
   installing the main Gemfile bundle.
+- kettle-jem-template-20260801-001 - Generated README gem dashboard links now
+  use ClickGems instead of BestGems.
 
 ## Fixed
 
