@@ -496,7 +496,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "removes managed version specs when version_gem is not declared" do
+  it "defaults an unconfigured supported-Ruby gem to the VersionGem bootstrap" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-version-gem-spec-disabled", tmp_root) do |root|
@@ -539,16 +539,17 @@ RSpec.describe Kettle::Jem do
 
       expect(result.fetch(:post_apply_steps)).to include(
         include(
-          name: "version_gem_cleanup",
+          name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: ["spec/plain/gem/version_spec.rb"]
+          changed_files: include("lib/plain/gem.rb", "lib/plain/gem/version.rb", "spec/plain/gem/version_spec.rb")
         )
       )
-      expect(File).not_to exist(File.join(root, "spec/plain/gem/version_spec.rb"))
+      expect(File).to exist(File.join(root, "spec/plain/gem/version_spec.rb"))
       expect(File).to exist(File.join(root, "spec/plain/gem/custom_version_spec.rb"))
       entrypoint = File.read(File.join(root, "lib/plain/gem.rb"))
       expect(entrypoint).to include('require_relative "gem/version"')
-      expect(entrypoint).not_to include("VersionGem")
+      expect(entrypoint).to include('require "version_gem"')
+      expect(entrypoint).to include("VersionGem::Basic")
     end
   end
 

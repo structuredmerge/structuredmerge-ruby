@@ -49,6 +49,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve flat Ruby entrypoints and avoid duplicating equivalent version requires during template bootstrap.
 
+- Honor explicit VersionGem disablement and default supported Ruby gems to VersionGem during templating.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

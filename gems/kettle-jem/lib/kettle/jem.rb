@@ -3305,6 +3305,7 @@ module Kettle
           entrypoint_require: entrypoint_require,
           namespace: namespace,
           min_ruby: min_ruby,
+          version_gem_default_enabled: version_gem_default_enabled_for_project?(rubygems_config, gemspec_metadata),
           engines: ruby_engines_config(kettle_config)
         )
       }
@@ -5060,6 +5061,8 @@ module Kettle
       facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
+      return [] unless version_gem_post_apply_selected?(report, entrypoint_require)
+
       unless version_gem_runtime_compatible?(facts)
         return [
           old_ruby_version_bootstrap_step(project_root, report, entrypoint_require: entrypoint_require),
@@ -5069,7 +5072,7 @@ module Kettle
 
       unless project_uses_version_gem?(project_root, entrypoint_require, facts)
         return [
-          version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: false),
+          version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: !version_gem_enabled?(facts)),
           legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
         ].compact
       end
@@ -5083,6 +5086,25 @@ module Kettle
         manage_version_file: !templated_paths.include?(version_path),
         manage_signature_file: !templated_paths.include?(signature_path)
       )
+    end
+
+    def version_gem_post_apply_selected?(report, entrypoint_require)
+      selected = Array(report.dig(:template_selection, :only)).map(&:to_s)
+      return true if selected.empty?
+
+      package_name = report.dig(:facts, :package, :name).to_s
+      managed_paths = [
+        "#{package_name}.gemspec",
+        File.join("lib", "#{entrypoint_require}.rb"),
+        File.join("lib", entrypoint_require, "version.rb"),
+        File.join("lib", entrypoint_require, "version_gem.rb"),
+        File.join("sig", "#{entrypoint_require}.rbs"),
+        File.join("spec", entrypoint_require, "version_spec.rb")
+      ]
+      report.fetch(:recipe_reports, []).any? do |recipe_report|
+        path = recipe_report.fetch(:relative_path, "").to_s
+        managed_paths.include?(path)
+      end
     end
 
     def old_ruby_version_bootstrap_step(project_root, report, entrypoint_require:)
@@ -5199,12 +5221,10 @@ module Kettle
       dependencies.any? { |dependency| dependency.name == "version_gem" }
     end
 
-    def project_uses_version_gem?(project_root, entrypoint_require, facts = nil)
-      configured = facts.to_h.dig(:version_gem, :enabled)
-      return configured if configured == true || configured == false
+    def project_uses_version_gem?(_project_root, _entrypoint_require, facts = nil)
+      return false unless version_gem_enabled?(facts)
 
-      project_gemspec_declares_version_gem?(project_root) ||
-        non_default_version_gem_entrypoint?(project_root, entrypoint_require)
+      true
     end
 
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
@@ -8374,7 +8394,7 @@ module Kettle
       removable_gems = ["appraisal"]
       removable_gems << package_name unless package_name.to_s.empty?
       removable_gems.concat(package_runtime_dependency_names(facts))
-      removable_gems << "version_gem" unless version_gem_runtime_compatible?(facts)
+      removable_gems << "version_gem" unless version_gem_enabled?(facts)
       pruned = remove_gemfile_dependency_blocks(content, removable_gems)
       pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
       pruned = merge_template_gemfile_dependency_blocks(
@@ -9313,7 +9333,7 @@ module Kettle
       merged = apply_configured_gemspec_metadata(merged, facts, receiver: template_receiver)
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
-      merged = remove_gemspec_version_gem_dependency_when_runtime_incompatible(merged, facts, receiver: template_receiver)
+      merged = remove_gemspec_version_gem_dependency_when_disabled(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
@@ -9591,8 +9611,8 @@ module Kettle
       []
     end
 
-    def remove_gemspec_version_gem_dependency_when_runtime_incompatible(content, facts, receiver:)
-      return content if version_gem_runtime_compatible?(facts)
+    def remove_gemspec_version_gem_dependency_when_disabled(content, facts, receiver:)
+      return content if version_gem_enabled?(facts)
 
       cleaned = remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
       remove_ruby_comment_lines_containing(cleaned, "version_gem")
@@ -9646,6 +9666,15 @@ module Kettle
       Gem::Version.new(min_ruby) >= Gem::Version.new("2.2")
     rescue ArgumentError
       true
+    end
+
+    def version_gem_enabled?(facts)
+      configured = facts.to_h.dig(:version_gem, :enabled)
+      return configured if configured == true || configured == false
+
+      return true if package_runtime_dependency_names(facts).include?("version_gem")
+
+      facts.to_h.dig(:rubygems, :version_gem_default_enabled) == true
     end
 
     def gemspec_runtime_floor_token(facts)
@@ -11458,9 +11487,14 @@ module Kettle
     end
 
     def version_gem_template_target_path(gemspec_path, source)
-      package_name = File.basename(gemspec_path.to_s, ".gemspec")
-      project_root = File.dirname(File.expand_path(gemspec_path.to_s))
-      entrypoint_require = project_entrypoint_require(project_root, package_name)
+      gemspec_reference = gemspec_path.to_s
+      package_name = File.basename(gemspec_reference, ".gemspec")
+      entrypoint_require = if File.dirname(gemspec_reference) == "."
+        package_name.tr("-", "/")
+      else
+        project_root = File.dirname(File.expand_path(gemspec_reference))
+        project_entrypoint_require(project_root, package_name)
+      end
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
@@ -13841,6 +13875,17 @@ module Kettle
       return {} unless dedicated
 
       {enabled: true, mode: "dedicated", non_default_entrypoint: true, entrypoint_path: version_gem_path}
+    end
+
+    def version_gem_default_enabled_for_project?(rubygems_config, gemspec_metadata)
+      configured_floor = rubygems_config.fetch("min_ruby", "").to_s.strip
+      gemspec_floor = metadata_value(gemspec_metadata, :required_ruby_version).to_s.strip
+      floor = minimum_ruby_token(configured_floor.empty? ? gemspec_floor : configured_floor)
+      return false if floor.empty?
+
+      Gem::Version.new(floor) >= Gem::Version.new("2.2")
+    rescue ArgumentError
+      false
     end
 
     def rubygems_version_gem_entrypoint_mode(rubygems_config)

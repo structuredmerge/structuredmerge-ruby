@@ -486,7 +486,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-  it "removes version_gem dependency and entrypoint references under an old Ruby floor" do
+  it "removes version_gem dependency and entrypoint references when explicitly disabled" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-remove-version-gem-runtime", tmp_root) do |root|
@@ -497,7 +497,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
             gem.version = "0.1.0"
             gem.summary = "Legacy gem"
             gem.homepage = "https://github.com/acme/legacy"
-            gem.required_ruby_version = ">= 1.8.7"
+            gem.required_ruby_version = ">= 3.2"
             gem.add_dependency("version_gem", "~> 1.1", ">= 1.1.10")
           end
         RUBY
@@ -543,7 +543,8 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           rubygems:
-            min_ruby: "1.8.7"
+            min_ruby: "3.2"
+            version_gem_entrypoint: disabled
             entrypoint_require: "legacy"
             namespace: "Legacy"
           templates:
@@ -558,7 +559,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
             spec.name = "{KJ|GEM_NAME}"
             spec.version = "0.0.0"
             spec.summary = "Template summary"
-            spec.required_ruby_version = ">= 2.3.0"
+            spec.required_ruby_version = ">= 3.2"
             # Ref: https://gitlab.com/ruby-oauth/version_gem/-/issues/3
             spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
           end
@@ -584,11 +585,11 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       version_spec_path = File.join(root, "spec", "legacy", "version_spec.rb")
 
       expect(gemspec_content).not_to include("version_gem")
-      expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7" # rubocop:disable Gemspec/RequiredRubyVersion')
+      expect(gemspec_content).to include('spec.required_ruby_version = ">= 3.2"')
       expect(apply.fetch(:post_apply_steps)).to include(hash_including(
-        name: "version_bootstrap",
+        name: "version_gem_cleanup",
         status: "applied",
-        changed_files: contain_exactly("lib/legacy.rb", "lib/legacy/version.rb", "spec/legacy/version_spec.rb")
+        changed_files: contain_exactly("lib/legacy.rb", "spec/legacy/version_spec.rb")
       ))
       expect(entrypoint_content).not_to include("version_gem")
       expect(entrypoint_content).not_to include("VersionGem")
@@ -597,19 +598,70 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(version_content).to include("module Version")
       expect(version_content).to include('VERSION = "0.1.0"')
       expect(version_content).to include("VERSION = Version::VERSION # Traditional Constant Location")
-      version_spec_content = File.read(version_spec_path)
-      expect(version_spec_content).to include('require "anonymous_loader"')
-      expect(version_spec_content).to include('path = File.expand_path("../../lib/legacy/version.rb", __dir__)')
-      expect(version_spec_content).not_to include("version_gem")
-      expect(version_spec_content).not_to include("VersionGem")
-      expect(version_spec_content).not_to include('it_behaves_like "a Version module"')
-      expect(version_spec_content).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
-      expect(version_spec_content).to include(
-        "expect(anonymous_namespace::Legacy::Version::VERSION).to eq(described_class::VERSION)"
-      )
+      expect(File).not_to exist(version_spec_path)
       expect(runtime_heads_content).not_to include("version_gem")
       expect(runtime_heads_content).to include('eval_gemfile("x_std_libs/vHEAD.gemfile")')
       expect(File.read(File.join(root, "legacy.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "defaults supported Ruby projects to the packaged version_gem dependency" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-default-version-gem", tmp_root) do |root|
+      write_tree(root, {
+        "modern.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "modern"
+            spec.version = "0.1.0"
+            spec.summary = "Modern gem"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        "lib/modern.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require_relative "modern/version"
+
+          module Modern
+          end
+        RUBY
+        "lib/modern/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module Modern
+            module Version
+              VERSION = "0.1.0"
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "2.3"
+            entrypoint_require: "modern"
+            namespace: "Modern"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - modern.gemspec
+        YAML
+        "template/modern.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3"
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+
+      expect(File.read(File.join(root, "modern.gemspec"))).to include('spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")')
+      expect(File.read(File.join(root, "lib", "modern.rb"))).to include('require "version_gem"', "VersionGem::Basic")
+      expect(apply.fetch(:post_apply_steps)).to include(hash_including(name: "version_gem_bootstrap", status: "applied"))
     end
   end
 

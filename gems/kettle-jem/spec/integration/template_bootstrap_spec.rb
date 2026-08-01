@@ -254,6 +254,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
           # ENV override: KJ_MIN_RUBY
           min_ruby: "3.2.0"
       YAML
+      expect(content).to include("version_gem_entrypoint: auto")
       expect(content).not_to include('min_ruby: "2.4"')
     end
   end
