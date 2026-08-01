@@ -1099,6 +1099,62 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "removes obsolete TSLP local wiring from StructuredMerge local gem lists" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-stale-tslp-local-wiring", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/templating_local.gemfile
+        YAML
+        "gemfiles/modular/templating_local.gemfile" => <<~RUBY,
+          structuredmerge_local_gems = %w[
+            tree_sitter_language_pack
+            tree_haver
+            kettle-jem
+          ]
+
+          eval_nomono_gems(
+            gems: structuredmerge_local_gems,
+            path_env: "STRUCTUREDMERGE_DEV"
+          )
+        RUBY
+        "template/gemfiles/modular/templating_local.gemfile.example" => <<~RUBY
+          structuredmerge_local_gems = %w[
+            tree_haver
+            kettle-jem
+          ]
+
+          eval_nomono_gems(
+            gems: structuredmerge_local_gems,
+            path_env: "STRUCTUREDMERGE_DEV"
+          )
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/templating_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).not_to include("tree_sitter_language_pack")
+      expect(content).to include("tree_haver")
+      expect(content).to include("kettle-jem")
+      expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
+    end
+  end
+
   it "adds configured kettle plugins to the kettle-rb local Gemfile overrides" do
     runtime = described_class.send(
       :project_runtime_facts,

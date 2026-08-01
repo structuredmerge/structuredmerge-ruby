@@ -20,6 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Templating now removes the obsolete `tree_sitter_language_pack` entry from
+  managed StructuredMerge local-gem lists, keeping `STRUCTUREDMERGE_DEV` from
+  resolving it under the sibling gems directory.
 - Unset optional author ORCIDs now resolve to an empty citation value rather
   than leaking their template token and aborting templating.
 - Gemspec package manifest merging now recognizes the historical generated

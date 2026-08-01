@@ -7151,6 +7151,7 @@ module Kettle
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
+      output = normalize_structuredmerge_local_gems(output, template_content)
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)
     end
 
@@ -7961,6 +7962,17 @@ module Kettle
       replace_local_gems_assignment(content, gems)
     end
 
+    # This list is resolved exclusively through STRUCTUREDMERGE_DEV. Preserve no
+    # destination entries here: an obsolete entry can point Bundler at a sibling
+    # path that does not exist in the StructuredMerge gems directory.
+    def normalize_structuredmerge_local_gems(content, template_content)
+      template_gems = word_array_assignment(template_content, :structuredmerge_local_gems)
+      return content if template_gems.empty?
+      return content unless word_array_assignment_record(content, :structuredmerge_local_gems)
+
+      replace_word_array_assignment(content, :structuredmerge_local_gems, template_gems)
+    end
+
     def versioned_gem_name_update_candidate?(destination_name, template_name)
       destination = versioned_gem_name_parts(destination_name)
       template = versioned_gem_name_parts(template_name)
@@ -7982,27 +7994,39 @@ module Kettle
     end
 
     def local_gems_assignment(content)
-      local_gems_assignment_record(content)&.fetch(:names) || []
+      word_array_assignment(content, :local_gems)
     end
 
     def replace_local_gems_assignment(content, gems)
-      replacement = ["local_gems = %w["]
+      replace_word_array_assignment(content, :local_gems, gems)
+    end
+
+    def local_gems_assignment_record(content)
+      word_array_assignment_record(content, :local_gems)
+    end
+
+    def word_array_assignment(content, name)
+      word_array_assignment_record(content, name)&.fetch(:names) || []
+    end
+
+    def replace_word_array_assignment(content, name, gems)
+      replacement = ["#{name} = %w["]
       gems.each { |gem_name| replacement << "  #{gem_name}" }
       replacement << "]"
-      if (record = local_gems_assignment_record(content))
+      if (record = word_array_assignment_record(content, name))
         replace_source_range_lines(content, record.fetch(:start_line), record.fetch(:end_line), ensure_trailing_newline(replacement.join("\n")))
       else
         ensure_trailing_newline([content.to_s.rstrip, replacement.join("\n")].reject(&:empty?).join("\n\n"))
       end
     end
 
-    def local_gems_assignment_record(content)
+    def word_array_assignment_record(content, name)
       result = prism_parse_success(content)
       return unless result
 
       result.value.breadth_first_search_all do |node|
         node.is_a?(::Prism::LocalVariableWriteNode) &&
-          node.name == :local_gems &&
+          node.name == name &&
           ruby_word_array_node?(node.value)
       end.first&.then do |node|
         {
