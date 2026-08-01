@@ -203,6 +203,59 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
+  it "canonicalizes legacy release headings before replaying transfer entries" do
+    template = <<~MARKDOWN
+      # Changelog
+
+      ## [Unreleased]
+
+      ### Added
+
+      ### Changed
+
+      ### Deprecated
+
+      ### Removed
+
+      ### Fixed
+
+      ### Security
+    MARKDOWN
+    destination = <<~MARKDOWN
+      # Changelog
+
+      ## [Unreleased]
+
+      ### Fixed
+
+      - Pending project fix.
+
+      ## 3.1.0 - 2024-09-24
+
+      - Historical release entry.
+    MARKDOWN
+
+    transfer_entries = [
+      {
+        key: "kettle-jem-template-20260801-001",
+        section: "### Changed",
+        lines: ["- kettle-jem-template-20260801-001 - Template change."]
+      }
+    ]
+    result = described_class.send(
+      :merge_changelog_template_source,
+      template,
+      destination,
+      facts: {changelog: {transfer_entries: transfer_entries}}
+    )
+
+    expect(result).to include("## [3.1.0] - 2024-09-24")
+    expect(result).to include("- Historical release entry.")
+    expect(result).to include("- Pending project fix.")
+    expect(result).to include("- kettle-jem-template-20260801-001 - Template change.")
+    expect(result).not_to include("## 3.1.0 - 2024-09-24")
+  end
+
   it "applies transferable changelog entries once while preserving project entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

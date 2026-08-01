@@ -5468,7 +5468,7 @@ module Kettle
     end
 
     def normalize_changelog(content, facts)
-      text = content.to_s
+      text = normalize_legacy_changelog_release_headings(content.to_s)
       title = "# Changelog"
       headings = markdown_heading_owners(text, source_label: "CHANGELOG.md")
       unless headings.any? { |heading| heading.level == 1 }
@@ -5499,6 +5499,33 @@ module Kettle
       ensure_trailing_newline(lines.join("\n").gsub(/\n{3,}/, "\n\n"))
     end
 
+    def normalize_legacy_changelog_release_headings(content)
+      lines = markdown_source_lines(content)
+      markdown_heading_owners(content, source_label: "CHANGELOG.md").each do |heading|
+        next unless heading.level == 2
+
+        canonical = canonical_changelog_release_heading(heading.heading_text)
+        next unless canonical
+
+        lines[heading.location.start_line - 1] = canonical
+      end
+      lines.join("\n")
+    end
+
+    def canonical_changelog_release_heading(heading_text)
+      text = heading_text.to_s.strip
+      return if changelog_unreleased_heading?(text) || text.start_with?("[")
+
+      version, date = text.split(" - ", 2)
+      version = version.to_s.delete_prefix("v")
+      # Markly owns heading discovery; Gem::Version is the bounded semantic
+      # version parser because Markdown has no release-version node type.
+      return unless Gem::Version.correct?(version)
+
+      suffix = date ? " - #{date}" : ""
+      "## [#{version}]#{suffix}"
+    end
+
     CHANGELOG_STANDARD_HEADINGS = [
       "### Added",
       "### Changed",
@@ -5509,7 +5536,7 @@ module Kettle
     ].freeze
 
     def merge_changelog_template_source(template_content, destination_content, facts: nil)
-      destination = destination_content.to_s
+      destination = normalize_legacy_changelog_release_headings(destination_content.to_s)
       if destination.strip.empty?
         return apply_changelog_transfer_entries(
           ensure_trailing_newline(template_content.to_s),

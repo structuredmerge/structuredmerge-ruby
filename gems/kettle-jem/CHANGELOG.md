@@ -37,6 +37,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Respect per-file Ruby merge settings when applying templates.
 
+- Canonicalize legacy release headings before replaying transfer changelog entries.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
