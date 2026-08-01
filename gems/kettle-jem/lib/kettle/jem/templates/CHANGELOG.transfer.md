@@ -32,6 +32,9 @@
 
 ## Fixed
 
+- kettle-jem-template-20260801-002 - Generated RSpec helpers now normalize
+  managed configuration block bindings structurally, preventing mixed block
+  parameter names from producing invalid configuration after a merge.
 - kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
   of a missing `LICENSE.txt` file.
 - kettle-jem-template-20260720-003 - StructuredMerge Git diff driver config now

@@ -24,3 +24,11 @@ RSpec.describe Ruby::Merge::GemspecSupport do
     ).to eq('Gem::Specification.new do |spec|')
   end
 end
+
+RSpec.describe Ruby::Merge::BlockBindingSupport do
+  it 'provides the same receiver and naming policy outside a gemspec context' do
+    expect(described_class.effective_receiver('config', 'config')).to eq(:__block_binding__)
+    expect(described_class.preferred_block_var('config', 'cfg')).to eq('config')
+    expect(described_class.merged_block_var('cfg', 'config')).to eq('config')
+  end
+end

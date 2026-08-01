@@ -41,6 +41,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated CI workflows now retry compatibility dependency installation while newly published runtime floors propagate through gem sources.
 
+- Template merges now normalize managed RSpec block bindings structurally, preventing invalid mixed parameter names.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

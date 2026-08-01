@@ -44,6 +44,8 @@ module Prism
     autoload :BeginNodeRescueSemantics, 'prism/merge/begin_node_rescue_semantics'
     autoload :BeginNodeStructure, 'prism/merge/begin_node_structure'
     autoload :BlockDirectiveDetector, 'prism/merge/block_directive_detector'
+    autoload :BlockBinding, 'prism/merge/block_binding'
+    autoload :BlockVarRenamer, 'prism/merge/block_var_renamer'
     autoload :Comment, 'prism/merge/comment'
     autoload :CommentOnlyFileMerger, 'prism/merge/comment_only_file_merger'
     autoload :DebugLogger, 'prism/merge/debug_logger'

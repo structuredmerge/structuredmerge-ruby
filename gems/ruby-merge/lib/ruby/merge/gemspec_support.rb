@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "block_binding_support"
+
 module Ruby
   module Merge
     module GemspecSupport
@@ -8,19 +10,15 @@ module Ruby
       module_function
 
       def effective_receiver(receiver, gemspec_block_var)
-        if gemspec_block_var && receiver == gemspec_block_var
-          GEMSPEC_VAR_PLACEHOLDER
-        else
-          receiver
-        end
+        BlockBindingSupport.effective_receiver(receiver, gemspec_block_var, placeholder: GEMSPEC_VAR_PLACEHOLDER)
       end
 
       def preferred_block_var(template_var, dest_var)
-        template_var if template_var && dest_var && template_var != dest_var
+        BlockBindingSupport.preferred_block_var(template_var, dest_var)
       end
 
       def merged_block_var(var, preferred_var)
-        preferred_var || var
+        BlockBindingSupport.merged_block_var(var, preferred_var)
       end
 
       def opening_line_with_preferred_block_var(opening_line, dest_var:, preferred_var:, node_preference:)

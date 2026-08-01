@@ -7146,6 +7146,7 @@ module Kettle
         output = finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(output, facts), facts) if github_workflow_template_recipe?(recipe)
         output = normalize_simplecov_template_source(output) if recipe.fetch(:target_path).to_s == ".simplecov"
         output = normalize_spec_helper_simplecov_template_source(output) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
+        output = normalize_spec_helper_block_bindings(output, template_content) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
         return output
       end
 
@@ -7595,6 +7596,25 @@ module Kettle
       output = remove_duplicate_simplecov_requires(output)
       output = ensure_spec_helper_simplecov_config_require(output)
       ensure_spec_helper_simplecov_start(output)
+    end
+
+    def normalize_spec_helper_block_bindings(content, template_content)
+      output = content
+      [
+        lambda { |call| call.receiver&.slice == "RSpec" && call.name == :configure },
+        lambda { |call| call.name == :expect_with && call.receiver }
+      ].each do |matcher|
+        template_binding = Prism::Merge::BlockBinding.find(template_content, &matcher)
+        destination_binding = Prism::Merge::BlockBinding.find(output, &matcher)
+        next unless template_binding && destination_binding
+
+        output = Prism::Merge::BlockVarRenamer.normalize(
+          output,
+          binding: destination_binding,
+          canonical_name: template_binding.name
+        )
+      end
+      output
     end
 
     def remove_obsolete_simplecov_rescue_bootstrap_blocks(content)
@@ -9673,11 +9693,7 @@ module Kettle
     def normalize_gemspec_receiver(line, from:, to:)
       return line if from.to_s.empty? || to.to_s.empty? || from == to
 
-      leading = line.to_s.length - line.to_s.lstrip.length
-      stripped = line.to_s[leading..].to_s
-      return line unless stripped.start_with?("#{from}.")
-
-      "#{line.to_s[0...leading]}#{to}#{stripped[from.to_s.length..]}"
+      Prism::Merge::BlockVarRenamer.rename(line.to_s, old_var: from.to_s, new_var: to.to_s)
     end
 
     def normalize_gemspec_project_emoji(line, facts, field:)

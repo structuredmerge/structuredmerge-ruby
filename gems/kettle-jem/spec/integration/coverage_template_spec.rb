@@ -88,6 +88,32 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).not_to include("`.simplecov` is run here")
   end
 
+  it "repairs divergent RSpec block bindings without rewriting nested bindings" do
+    template = <<~RUBY
+      RSpec.configure do |config|
+        config.expect_with :rspec do |c|
+          c.syntax = :expect
+        end
+      end
+    RUBY
+    destination = <<~RUBY
+      RSpec.configure do |cfg|
+        cfg.expect_with :rspec do |expectations|
+          c.syntax = :expect
+        end
+      end
+    RUBY
+
+    output = described_class.send(:normalize_spec_helper_block_bindings, destination, template)
+
+    expect(output).to include("RSpec.configure do |config|")
+    expect(output).to include("config.expect_with :rspec do |c|")
+    expect(output).to include("c.syntax = :expect")
+    expect(output).not_to include("|cfg|")
+    expect(output).not_to include("|expectations|")
+    expect(Prism.parse(output).errors).to be_empty
+  end
+
   it "upgrades modifier-form spec helper SimpleCov bootstrap to the kettle-soup-cover startup block" do
     content = <<~RUBY
       # frozen_string_literal: true
