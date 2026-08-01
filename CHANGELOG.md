@@ -126,6 +126,8 @@ Please file a bug if you notice a violation of semantic versioning.
   owners and ast-merge result mechanics instead of canonicalizing merged YAML
   through Ruby object rendering.
 
+- Replace legacy byebug-named Gemfile dependencies with debug during templating.
+
 ### Deprecated
 
 ### Removed
