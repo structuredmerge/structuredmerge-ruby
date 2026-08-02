@@ -1278,6 +1278,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated README titles now lead with the package name when a gem retains a different legacy namespace.
 
+- Generated gitignore files now ignore nested modular Gemfile lockfiles.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -694,6 +694,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(packaged_rubocop).to include('    - "**/vendor/**/*"')
     packaged_gitignore = File.read(project_root.join("lib/kettle/jem/templates/.gitignore.example"))
     expect(packaged_gitignore).to include("/gemfiles/vendor/")
+    expect(packaged_gitignore).to include("/gemfiles/**/*.gemfile.lock")
 
     packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"))
     expect(packaged_workflow).to include("bundler-cache: false")
