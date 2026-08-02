@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'toml-merge'
 require 'toml'
+require_relative 'merge/version'
 
 module Parslet
   module Toml
