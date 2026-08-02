@@ -93,7 +93,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
 
       expect(report.fetch(:final_content)).to include('"name": "destination"')
       expect(report.fetch(:final_content)).to include('"ghcr.io/devcontainers/features/git:1": {}')
-      expect(report.fetch(:final_content)).to include('// Local devcontainer settings')
+      expect(report.fetch(:final_content)).to include("// Local devcontainer settings")
     end
   end
 

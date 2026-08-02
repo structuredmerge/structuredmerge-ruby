@@ -4251,7 +4251,7 @@ module Kettle
         thread_worker_count: thread_worker_count,
         thread_spawns: thread_worker_count,
         thread_recipes: use_threads ? worker_safe.length : 0,
-        main_recipes: main_only.length + (use_threads || use_ractors ? 0 : worker_safe.length)
+        main_recipes: main_only.length + ((use_threads || use_ractors) ? 0 : worker_safe.length)
       )
       if use_threads
         reports_by_index.merge!(
@@ -4853,7 +4853,7 @@ module Kettle
         }
       ]
       version_constants.each do |node|
-        suffix = ruby_constant_path_segments(node).last(2) == ["Version", "VERSION"] ? ["Version", "VERSION"] : ["VERSION"]
+        suffix = (ruby_constant_path_segments(node).last(2) == ["Version", "VERSION"]) ? ["Version", "VERSION"] : ["VERSION"]
         replacements << {
           start_offset: node.location.start_offset,
           end_offset: node.location.end_offset,
@@ -6106,7 +6106,7 @@ module Kettle
         raise Error, "Invalid boolean transfer changelog filter value #{expected.inspect}" unless %w[true false].include?(expected)
         raise Error, "Invalid boolean transfer changelog filter operator #{operator.inspect}" unless %w[= !=].include?(operator)
 
-        operator == "=" ? actual == (expected == "true") : actual != (expected == "true")
+        (operator == "=") ? actual == (expected == "true") : actual != (expected == "true")
       when :version
         actual_version = Gem::Version.new(actual.to_s)
         expected_version = Gem::Version.new(expected.to_s)
@@ -6116,7 +6116,7 @@ module Kettle
       when :enum
         raise Error, "Invalid enum transfer changelog filter operator #{operator.inspect}" unless %w[= !=].include?(operator)
 
-        operator == "=" ? actual.to_s == expected : actual.to_s != expected
+        (operator == "=") ? actual.to_s == expected : actual.to_s != expected
       else
         raise Error, "Unknown transfer changelog filter type #{type.inspect}"
       end
@@ -6918,23 +6918,27 @@ module Kettle
           accepted = finalize_github_workflow_template(accepted, facts)
           accepted = preserve_newer_github_workflow_action_pins(accepted, original)
         end
-        return postprocess_readme_content(
-          accepted,
-          facts,
-          project_root: project_root,
-          destination_content: original
-        ) if recipe.fetch(:target_path) == "README.md"
+        if recipe.fetch(:target_path) == "README.md"
+          return postprocess_readme_content(
+            accepted,
+            facts,
+            project_root: project_root,
+            destination_content: original
+          )
+        end
 
         return finalize_template_source_content(recipe, accepted)
       end
 
       resolved = finalize_github_workflow_template(resolved, facts) if github_workflow_template_recipe?(recipe)
-      return postprocess_readme_content(
-        resolved,
-        facts,
-        project_root: project_root,
-        destination_content: original
-      ) if recipe.fetch(:target_path) == "README.md"
+      if recipe.fetch(:target_path) == "README.md"
+        return postprocess_readme_content(
+          resolved,
+          facts,
+          project_root: project_root,
+          destination_content: original
+        )
+      end
 
       finalize_template_source_content(recipe, resolved)
     end
@@ -7702,7 +7706,7 @@ module Kettle
       first = obsolete.min_by { |record| record.fetch(:start_line) }
       replacement = "#{content.to_s.lines.fetch(first.fetch(:start_line) - 1)[/\A\s*/]}gem \"debug\", require: false\n"
       replacements = obsolete.to_h do |record|
-        source = record == first ? replacement : ""
+        source = (record == first) ? replacement : ""
         [record.fetch(:start_line), record.merge(replacement: source)]
       end
       replace_record_ranges(content, replacements)
@@ -15045,7 +15049,7 @@ module Kettle
       lines = []
       segments.each_with_index do |segment, index|
         kind = namespace_kinds.fetch(index, index.zero? ? outer_namespace_kind : :module)
-        keyword = kind == :class ? "class" : "module"
+        keyword = (kind == :class) ? "class" : "module"
         lines << ("  " * index) + "#{keyword} #{segment}"
       end
       body_lines.each { |line| lines << ("  " * segments.length) + line unless line.empty? }
@@ -15111,7 +15115,7 @@ module Kettle
       return unless node.is_a?(::Prism::ModuleNode) || node.is_a?(::Prism::ClassNode)
 
       current = namespace + ruby_constant_path_segments(node.constant_path)
-      return(node.is_a?(::Prism::ClassNode) ? :class : :module) if current == target
+      return (node.is_a?(::Prism::ClassNode) ? :class : :module) if current == target
 
       node.body&.body&.each do |child|
         kind = ruby_namespace_declaration_kind_for(child, current, target)

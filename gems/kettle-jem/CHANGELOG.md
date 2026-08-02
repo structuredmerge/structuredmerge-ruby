@@ -68,10 +68,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem-template-20260727-001 - Spec harness documentation now lists the
   RSpec helpers provided by `kettle-test`.
 
-- kettle-jem-template-20260729-005 - Gemspec metadata now publishes this
-  project's RubyForum tag as `mailing_list_uri`, and support docs link to the
-  tagged RubyForum community alongside Discord.
-
 - Transfer changelog replay now supports destination applicability filters and filter-aware status reporting.
 
 ### Changed
@@ -231,19 +227,13 @@ Please file a bug if you notice a violation of semantic versioning.
   `yard-timekeeper` >= 0.2.3, and `yard-yaml` >= 0.2.3.
 - kettle-jem now requires `kettle-rb` >= 0.1.2.
 
-- kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
-  of a missing `LICENSE.txt` file.
 - kettle-jem-template-20260716-002 - Gemspecs now ship fewer repository-only
   files, reducing package noise for downstream packagers.
 
-- kettle-jem-template-20260720-001 - READMEs can now display configured
-  corporate sponsor logos.
 - kettle-jem-template-20260720-002 - Development Gemfiles now use the released
   `tree_sitter_language_pack` gem 1.13.3 or newer by default.
 - kettle-jem-template-20260720-003 - StructuredMerge Git diff driver config now
   uses the installed `smorg-rb` driver command.
-- kettle-jem-template-20260720-004 - MRI-only projects now omit JRuby and
-  TruffleRuby workflow jobs.
 - kettle-jem-template-20260720-005 - README Support & Community links now
   include RubyForum.
 
@@ -328,16 +318,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated gemspec package file enumeration now honors the destination Ruby
   floor, so old-Ruby and JRuby workflows can parse gemspecs during Bundler
   install while modern gems keep modern helper code.
-- kettle-jem-template-20260729-001 - Generated JRuby 9.4 workflows now use the
-  legacy manual bundle install path, avoiding setup-time Bundler full-index
-  failures against `gem.coop`.
 - kettle-jem-template-20260729-002 - VersionGem bootstrap now preserves
   and templates dedicated `version_gem.rb` entrypoints even when the gemspec
   dependency is intentionally omitted, and generated anonymous-loader specs
   cover both `version.rb` and `version_gem.rb`.
-- kettle-jem-template-20260729-003 - Old-Ruby gems below the VersionGem runtime
-  floor now get managed minimal `version.rb` files and anonymous-loader version
-  specs without adding `version_gem`.
 - `kettle-jem prepare` now skips release lockfile reset while local path
   development env is active, so self-templating unreleased template stacks does
   not fail release validation before templating can run.
@@ -1317,6 +1301,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Template policy fingerprints now invalidate cached Appraisal, gemspec, and spec helper transforms when their merge behavior changes.
 
 - Modular Gemfile fragments now retain their named runtime dependency when materializing missing files.
+
+- kettle-jem-template-20260802-001 - Devcontainer JSON files now merge as JSONC,
+  preserving comments and trailing commas during template updates.
 
 ### Security
 
