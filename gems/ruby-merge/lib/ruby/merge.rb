@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'digest'
 require 'tree_haver'
@@ -17,6 +16,7 @@ require_relative 'merge/nocov_wrapper_base'
 require_relative 'merge/rescue_semantics'
 require_relative 'merge/scaffold_chunk_support'
 require_relative 'merge/signature_support'
+require_relative 'merge/version'
 
 module Ruby
   module Merge
