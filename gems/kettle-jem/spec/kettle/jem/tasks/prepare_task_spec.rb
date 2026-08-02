@@ -296,6 +296,65 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "repairs an obsolete locked platform only after it blocks the templating parser install" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            nomono (1.0.8)
+
+        PLATFORMS
+          arm64-darwin-23
+          ruby
+      LOCK
+      command_runner = double("command_runner")
+      failure = Kettle::Jem::Error.new(
+        "bundle_install_templating_bootstrap failed: bundle install\n" \
+        "Could not find gem 'tree_sitter_language_pack' with platform 'arm64-darwin-23'"
+      )
+      recovery_step = {
+        name: "bundle_lock_remove_unsupported_platform",
+        command: %w[bundle lock --remove-platform=arm64-darwin-23],
+        status: "succeeded",
+        changed_files: ["Gemfile.lock"]
+      }
+      retried_step = {name: "bundle_install_templating_bootstrap", status: "succeeded"}
+
+      bootstrap_attempts = 0
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step) do |name, command, **options|
+        expect(options).to include(project_root: root, env: {}, quiet: false, command_runner: command_runner)
+        case [name, command]
+        when ["bundle_install_templating_bootstrap", %w[bundle install]]
+          bootstrap_attempts += 1
+          raise failure if bootstrap_attempts == 1
+
+          retried_step
+        when ["bundle_lock_remove_unsupported_platform", %w[bundle lock --remove-platform=arm64-darwin-23]]
+          recovery_step
+        else
+          raise "unexpected command: #{name} #{command.inspect}"
+        end
+      end
+
+      result = described_class.templating_bootstrap_step(
+        bootstrap_name: "bundle_install_templating_bootstrap",
+        bootstrap_command: %w[bundle install],
+        project_root: root,
+        setup_env: {},
+        quiet: false,
+        command_runner: command_runner,
+        events: nil
+      )
+
+      expect(result).to include(
+        status: "succeeded",
+        recovered: true,
+        changed_files: ["Gemfile.lock"],
+        recovery: recovery_step
+      )
+    end
+  end
+
   it "uses bundle install as the cold-start bootstrap command when no lockfile exists" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       expect(described_class.templating_bootstrap_command(root)).to eq(%w[bundle install])

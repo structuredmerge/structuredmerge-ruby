@@ -1286,6 +1286,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove legacy rubocop-rspec development dependencies that conflict with generated rubocop-lts-rspec tooling.
 
+- Recover legacy lockfiles with unsupported tree_sitter_language_pack platforms during templating bootstrap.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
