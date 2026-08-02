@@ -31,6 +31,13 @@ RSpec.describe Kettle::Jem do
     expect(readme_template).not_to include("bestgems.org")
   end
 
+  it "excludes the generated README from RuboCop source parsing" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    rubocop_template = File.read(File.join(template_root, ".rubocop.yml.example"))
+
+    expect(rubocop_template).to include("    - README.md")
+  end
+
   it "upgrades legacy RubyGems download-rank badge URLs" do
     content = "[downloads](https://img.shields.io/gem/rd/example.svg)\n"
 
