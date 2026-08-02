@@ -1282,6 +1282,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination README KLOC badges when current changelog coverage metadata is unavailable.
 
+- Allow local Gemfile bootstraps to reuse an already activated compatible nomono version instead of pinning an older lockfile version.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
