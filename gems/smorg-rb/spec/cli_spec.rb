@@ -96,7 +96,7 @@ RSpec.describe Smorg::RB do
     stderr = StringIO.new
 
     exit_code = described_class.run(['merge-driver', ancestor, current, other, 'package.json5'], stdout: stdout,
-                                                                                               stderr: stderr)
+                                                                                                 stderr: stderr)
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     expect(File.read(current)).to include('current: true', 'other: true')

@@ -13,7 +13,6 @@ require 'kettle/jem'
 require 'kettle/jem/tasks/install_task'
 require 'markly/merge'
 require 'plain-merge'
-
 require_relative 'rb/version'
 
 module Smorg
