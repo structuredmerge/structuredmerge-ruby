@@ -63,7 +63,7 @@ module Kettle
     ].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
     DEFAULT_OPENCOLLECTIVE_ORG = "galtzo-floss"
-    RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover].freeze
+    RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover rubocop-rspec].freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion

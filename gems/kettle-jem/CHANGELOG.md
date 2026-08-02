@@ -1284,6 +1284,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Allow local Gemfile bootstraps to reuse an already activated compatible nomono version instead of pinning an older lockfile version.
 
+- Remove legacy rubocop-rspec development dependencies that conflict with generated rubocop-lts-rspec tooling.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

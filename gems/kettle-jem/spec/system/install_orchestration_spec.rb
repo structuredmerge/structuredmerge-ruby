@@ -2101,7 +2101,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-  it "drops retired kettle-drift gemspec development dependencies during gemspec sync" do
+  it "drops retired gemspec development dependencies during gemspec sync" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-retired-gemspec-dev-dependency", tmp_root) do |root|
@@ -2111,6 +2111,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
             spec.name = "example"
             spec.summary = "Example gem"
             spec.add_development_dependency "kettle-drift"
+            spec.add_development_dependency "rubocop-rspec", "~> 2.10"
             spec.add_development_dependency "rake", "~> 13.0"
           end
         RUBY
@@ -2137,6 +2138,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       content = report.fetch(:final_content)
 
       expect(content).not_to include("kettle-drift")
+      expect(content).not_to include("rubocop-rspec")
       expect(content).to include('spec.add_development_dependency "rake", "~> 13.0"')
     end
   end
