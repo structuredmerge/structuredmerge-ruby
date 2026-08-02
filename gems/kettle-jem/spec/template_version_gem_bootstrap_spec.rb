@@ -6,6 +6,40 @@ require "rbs"
 RSpec.describe Kettle::Jem do
   include_context "with isolated kettle-jem environment"
 
+  it "preserves class-shaped nested version namespaces" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-namespace-kind", tmp_root) do |root|
+      write_file(root, "lib/simple_column/scopes/version.rb", <<~RUBY)
+        module SimpleColumn
+          class Scopes < Module
+            module Version
+              VERSION = "0.1.1"
+            end
+          end
+        end
+      RUBY
+
+      kinds = described_class.send(
+        :existing_version_namespace_kinds,
+        root,
+        "lib/simple_column/scopes/version.rb",
+        "SimpleColumn::Scopes"
+      )
+
+      expect(kinds).to eq(1 => :class)
+      rendered = described_class.send(
+        :version_gem_version_file_content,
+        existing_version: "0.1.1",
+        namespace: "SimpleColumn::Scopes",
+        version: "0.1.1",
+        namespace_kinds: kinds
+      )
+      expect(rendered).to include("class Scopes")
+      expect(rendered).not_to include("module Scopes")
+    end
+  end
+
   def write_file(root, relative_path, content)
     path = File.join(root, relative_path)
     FileUtils.mkdir_p(File.dirname(path))
