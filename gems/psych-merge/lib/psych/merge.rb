@@ -8,9 +8,9 @@ require 'yaml/merge'
 
 # Shared merge infrastructure
 require 'ast/merge'
+require_relative 'merge/version'
 
 # This gem
-require_relative 'merge/version'
 
 # Psych::Merge provides a generic YAML file smart merge system using Psych AST analysis.
 # It intelligently merges template and destination YAML files by identifying matching
