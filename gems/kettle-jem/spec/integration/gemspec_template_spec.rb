@@ -1129,6 +1129,25 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(migrated.scan('require "debug"').length).to eq(1)
   end
 
+  it "replaces byebug-family dependencies in each appraisal independently" do
+    source = <<~RUBY
+      appraise "ruby_2_4" do
+        gem "byebug", "9.0.6"
+        gem "pry-byebug", "3.4.3"
+      end
+
+      appraise "ruby_3_2" do
+        gem "byebug"
+        gem "pry-byebug"
+      end
+    RUBY
+
+    migrated = described_class.send(:migrate_legacy_byebug_appraisal_dependencies, source)
+
+    expect(migrated).not_to include("byebug")
+    expect(migrated.scan('gem "debug", require: false').length).to eq(2)
+  end
+
   it "preserves an existing main Gemfile source while applying the template" do
     recipe = {target_path: "Gemfile", template_preference: {strategy: "merge"}}
     template = "source \"https://gem.coop\"\ngemspec\n"

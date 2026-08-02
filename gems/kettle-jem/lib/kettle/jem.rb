@@ -9450,8 +9450,20 @@ module Kettle
       pruned = prune_appraisals_recording_entries(with_standard_appraisal_gemfiles, facts)
       pruned = prune_appraisals_below_min_ruby(pruned, min_ruby)
       pruned = remove_managed_stdlib_appraisal_gems(pruned)
+      pruned = migrate_legacy_byebug_appraisal_dependencies(pruned)
       pruned = remove_gemfile_dependency_lines(pruned, [package_name])
       remove_gemfile_percent_w_entries(pruned, [package_name])
+    end
+
+    # Each appraisal has an independent dependency set. Reuse the AST-based
+    # Gemfile migration per block so every legacy byebug/pry-byebug pair is
+    # replaced by one debug declaration in that same appraisal.
+    def migrate_legacy_byebug_appraisal_dependencies(content)
+      parsed = appraisal_blocks(content)
+      blocks = parsed.fetch(:order).map do |name|
+        migrate_legacy_byebug_pair(parsed.fetch(:blocks).fetch(name))
+      end
+      ensure_trailing_newline(([parsed.fetch(:prelude).to_s.rstrip] + blocks.map(&:rstrip)).reject(&:empty?).join("\n\n"))
     end
 
     # The x_std_libs aggregate owns these extracted standard libraries. Keeping

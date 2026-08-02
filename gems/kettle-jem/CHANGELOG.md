@@ -1310,6 +1310,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Replace stale byebug-family spec helper requires with debug during templating.
 
+- Migrate byebug-family dependencies to debug independently within each appraisal.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
