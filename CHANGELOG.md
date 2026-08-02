@@ -43,6 +43,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - json-merge now supports JSON5 parsing and structural merging.
 
+- JSON5 files and fenced code blocks are routed through json-merge.
+
 ### Changed
 
 - StructuredMerge Ruby gemspec manifests now exclude repository-only files from

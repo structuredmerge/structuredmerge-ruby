@@ -87,6 +87,21 @@ RSpec.describe Smorg::RB do
     expect(JSON.parse(merged)).to include('current' => true, 'other' => true)
   end
 
+  it 'merges JSON5 paths advertised by gitattributes' do
+    File.write('.gitattributes', "*.json5 smorg.language=json5\n")
+    ancestor = write_file(@dir, 'ancestor.tmp', "{ name: 'structuredmerge', }")
+    current = write_file(@dir, 'current.tmp', "{ name: 'structuredmerge', current: true, }")
+    other = write_file(@dir, 'other.tmp', "{ name: 'structuredmerge', other: true, }")
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(['merge-driver', ancestor, current, other, 'package.json5'], stdout: stdout,
+                                                                                               stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to include('current: true', 'other: true')
+  end
+
   it 'installs local Git diff driver attributes' do
     fixture = git_install_report_fixture
     stdout = StringIO.new
@@ -192,6 +207,7 @@ RSpec.describe Smorg::RB do
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     expect(stdout.string).to include('*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
+    expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
   end
 
   it 'falls back from unsupported structured file types instead of failing closed' do

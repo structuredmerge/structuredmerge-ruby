@@ -2431,6 +2431,7 @@ module Ast
                                               'dotenv')
       end
       return template_target_classification(path, 'json', 'json', 'jsonc') if lower_path.end_with?('.jsonc')
+      return template_target_classification(path, 'json', 'json', 'json5') if lower_path.end_with?('.json5')
       return template_target_classification(path, 'json', 'json', 'json') if lower_path.end_with?('.json')
       return template_target_classification(path, 'toml', 'toml', 'toml') if lower_path.end_with?('.toml')
       return template_target_classification(path, 'rbs', 'rbs', 'rbs') if lower_path.end_with?('.rbs')

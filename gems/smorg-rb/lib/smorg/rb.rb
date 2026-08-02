@@ -637,6 +637,7 @@ module Smorg
         '*.go merge=smorg-rb diff=smorg-rb smorg.language=go',
         '*.json merge=smorg-rb diff=smorg-rb smorg.language=json',
         '*.jsonc merge=smorg-rb diff=smorg-rb smorg.language=jsonc',
+        '*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5',
         '*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown',
         '*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown'
       ].each { |line| stdout.puts(line) }
@@ -665,6 +666,8 @@ module Smorg
         )
       when 'jsonc'
         Json::Merge.merge_json(other_source, current_source, 'jsonc')
+      when 'json5'
+        Json::Merge.merge_json(other_source, current_source, 'json5')
       when 'markdown'
         merge_markdown(ancestor_source, current_source, other_source)
       when 'text'
@@ -854,6 +857,8 @@ module Smorg
         'json'
       when 'jsonc', 'json with comments'
         'jsonc'
+      when 'json5'
+        'json5'
       when 'markdown', 'md', 'gfm', 'text/markdown'
         'markdown'
       when 'plain', 'text', 'plaintext', 'text/plain'

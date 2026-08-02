@@ -575,7 +575,7 @@ module Markdown
         'rust'
       when 'go'
         'go'
-      when 'json', 'jsonc'
+      when 'json', 'jsonc', 'json5'
         'json'
       when 'yaml', 'yml'
         'yaml'
@@ -589,7 +589,7 @@ module Markdown
       when 'typescript', 'rust', 'go', 'yaml', 'toml'
         family
       when 'json'
-        info_string.to_s.downcase == 'jsonc' ? 'jsonc' : 'json'
+        %w[json jsonc json5].include?(info_string.to_s.downcase) ? info_string.to_s.downcase : 'json'
       end
     end
 
