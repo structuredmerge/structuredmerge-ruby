@@ -13153,6 +13153,7 @@ module Kettle
         "KJ|GH_ORG" => github_org,
         "KJ|NAMESPACE" => rubygems.fetch(:namespace, package.fetch(:name).to_s).to_s,
         "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace, package.fetch(:name).to_s).to_s),
+        "KJ|README:TITLE" => readme_title_token(package, rubygems),
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
         "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
@@ -13192,6 +13193,16 @@ module Kettle
       tokens.merge!(shim_template_tokens(facts.fetch(:shim, {})))
 
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
+    end
+
+    def readme_title_token(package, rubygems)
+      package_name = package.fetch(:name).to_s.strip
+      default_entrypoint = package_name.tr("-", "/")
+      entrypoint = rubygems.fetch(:entrypoint_require, default_entrypoint).to_s.strip
+      namespace = rubygems.fetch(:namespace, package_name).to_s.strip
+      return namespace if entrypoint.empty? || entrypoint == default_entrypoint || namespace.empty?
+
+      "#{package_name} / #{namespace}"
     end
 
     def readme_dev_test_stack_table(package_name)

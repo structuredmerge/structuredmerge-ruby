@@ -1276,6 +1276,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Repair stale executable version headers when a configured entrypoint differs from the package name.
 
+- Generated README titles now lead with the package name when a gem retains a different legacy namespace.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

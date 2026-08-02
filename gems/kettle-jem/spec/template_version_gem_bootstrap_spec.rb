@@ -229,6 +229,10 @@ RSpec.describe Kettle::Jem do
       expect(executable).not_to include("require_relative")
       expect(executable).not_to include("appraisal2/version")
       expect(executable).not_to include("Appraisal2::Version")
+
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+      tokens = described_class.send(:template_tokens, facts, {})
+      expect(tokens.fetch("KJ|README:TITLE")).to eq("appraisal2 / Appraisal")
     end
   end
 
