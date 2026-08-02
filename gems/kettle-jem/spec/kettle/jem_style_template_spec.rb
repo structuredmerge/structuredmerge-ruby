@@ -25,8 +25,18 @@ RSpec.describe Kettle::Jem do
 
     expect(readme_template).to include("[⛳️gem-name]: https://clickgems.clickhouse.com/dashboard/{KJ|GEM_NAME}")
     expect(readme_template).to include("[👽dl-rank]: https://clickgems.clickhouse.com/dashboard/{KJ|GEM_NAME}")
+    expect(readme_template).to include("[👽dl-ranki]: https://img.shields.io/gem/dt/{KJ|GEM_NAME}.svg")
+    expect(readme_template).not_to include("https://img.shields.io/gem/rd/")
     expect(readme_template).to include("[👽version]: https://clickgems.clickhouse.com/dashboard/{KJ|GEM_NAME}")
     expect(readme_template).not_to include("bestgems.org")
+  end
+
+  it "upgrades legacy RubyGems download-rank badge URLs" do
+    content = "[downloads](https://img.shields.io/gem/rd/example.svg)\n"
+
+    expect(described_class.send(:normalize_readme_rubygems_download_badges, content)).to eq(
+      "[downloads](https://img.shields.io/gem/dt/example.svg)\n"
+    )
   end
 
   it "projects RuboCop LTS template tokens from minimum Ruby" do
@@ -95,7 +105,8 @@ RSpec.describe Kettle::Jem do
     expect(example_table).to end_with("\n</details>")
     expect(example_table).to include("[appraisal2](https://clickgems.clickhouse.com/dashboard/appraisal2)")
     expect(example_table).to include("[GitHub](https://github.com/appraisal-rb/appraisal2)")
-    expect(example_table).to include("https://img.shields.io/gem/rd/appraisal2.svg?style=flat-square")
+    expect(example_table).to include("https://img.shields.io/gem/dt/appraisal2.svg?style=flat-square")
+    expect(example_table).to include("Total downloads")
     expect(example_table).to include("[kettle-dev](https://clickgems.clickhouse.com/dashboard/kettle-dev)")
     expect(example_table).to include("[GitHub](https://github.com/kettle-dev/kettle-dev)")
     expect(example_table).to include("[kettle-jem](https://clickgems.clickhouse.com/dashboard/kettle-jem)")

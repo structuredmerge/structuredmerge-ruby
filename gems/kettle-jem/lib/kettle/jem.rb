@@ -6922,6 +6922,9 @@ module Kettle
       processed = with_readme_timing("postprocess.synopsis_heading") { normalize_readme_synopsis_heading(processed, facts) }
       processed = with_readme_timing("postprocess.conditional_blocks") { apply_readme_conditional_blocks(processed, facts) }
       processed = with_readme_timing("postprocess.badge_policy") { apply_readme_badge_policy(processed, facts) }
+      processed = with_readme_timing("postprocess.rubygems_download_badges") do
+        normalize_readme_rubygems_download_badges(processed)
+      end
       processed = with_readme_timing("postprocess.logo_link_prune") { prune_unused_readme_logo_link_definitions(processed) }
       processed = with_readme_timing("postprocess.kloc_badge") { apply_readme_kloc_badge(processed, facts, project_root) }
       processed = with_readme_timing("postprocess.monorepo_thin_projection") { apply_monorepo_subgem_thin_readme_projection(processed, facts) }
@@ -6930,6 +6933,10 @@ module Kettle
         replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
       end
       with_readme_timing("postprocess.blank_lines") { normalize_readme_blank_line_runs(processed) }
+    end
+
+    def normalize_readme_rubygems_download_badges(content)
+      content.gsub("https://img.shields.io/gem/rd/", "https://img.shields.io/gem/dt/")
     end
 
     def normalize_readme_blank_line_runs(content)
@@ -13045,12 +13052,12 @@ module Kettle
       rows = README_DEV_TEST_STACK_GEMS.reject { |gem| gem.fetch(:name) == package_name.to_s }.map do |gem|
         name = gem.fetch(:name)
         clickgems_url = "https://clickgems.clickhouse.com/dashboard/#{name}"
-        badge_url = "https://img.shields.io/gem/rd/#{name}.svg?style=flat-square"
+        badge_url = "https://img.shields.io/gem/dt/#{name}.svg?style=flat-square"
         [
           "| [#{name}](#{clickgems_url})",
           "[GitHub](#{gem.fetch(:repo)})",
           gem.fetch(:role),
-          "[![Daily download rank for #{name}](#{badge_url})](#{clickgems_url}) |"
+          "[![Total downloads for #{name}](#{badge_url})](#{clickgems_url}) |"
         ].join(" | ")
       end
 
@@ -13058,7 +13065,7 @@ module Kettle
         '<details markdown="1">',
         "<summary>How kettle-dev manages complexity in tests</summary>",
         "",
-        "| Gem | Source | Role | Daily download rank |",
+        "| Gem | Source | Role | Total downloads |",
         "|-----|--------|------|---------------------|",
         *rows,
         "",

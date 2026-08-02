@@ -57,6 +57,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Templating now removes duplicated legacy configuration comments and repeated generated SimpleCov usage guidance from destinations.
 
+- Generated RubyGems download badges now use Shields.io total downloads instead of the discontinued download-rank endpoint.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
