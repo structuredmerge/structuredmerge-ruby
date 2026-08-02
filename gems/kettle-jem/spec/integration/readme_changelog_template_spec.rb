@@ -680,6 +680,30 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     }.to raise_error(Kettle::Jem::Error, /Unknown transfer changelog filter field/)
   end
 
+  it "builds transfer context without recursively rediscovering project facts" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-transfer-context", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          engines:
+            - ruby
+        YAML
+      })
+      expect(described_class).not_to receive(:discover_facts)
+
+      context = described_class.send(:transfer_changelog_context, root, env: {})
+
+      expect(context).to include("ruby.min" => "3.2", "engine.alternates" => false)
+    end
+  end
+
   it "removes retroactively excluded transfer entries only from Unreleased" do
     changelog = <<~MARKDOWN
       # Changelog

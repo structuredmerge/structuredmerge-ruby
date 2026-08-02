@@ -53,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prune stale template lock records after managed files are removed.
 
+- Avoid recursive project fact discovery while evaluating transfer changelog filters during templating.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

@@ -5794,42 +5794,68 @@ module Kettle
         .to_set
     end
 
-    def transfer_changelog_context(project_root, env: ENV, facts: nil)
-      facts ||= discover_facts(project_root, env: env)
+    def transfer_changelog_context(project_root, env: ENV)
       config = kettle_jem_config(project_root)
-      engines = Array(facts.dig(:rubygems, :engines))
-      engines = DEFAULT_ENGINES if engines.empty?
-      profile = if facts[:shim]
-        SHIM_TEMPLATE_PROFILE
-      elsif monorepo_template_profile?(facts)
-        MONOREPO_ROOT_TEMPLATE_PROFILE
-      else
-        FULL_TEMPLATE_PROFILE
-      end
-      min_ruby = minimum_ruby_token(facts.dig(:rubygems, :min_ruby)).to_s
-      version_gem = facts[:version_gem].is_a?(Hash) ? facts[:version_gem] : {}
-      readme_sponsors = facts[:readme_sponsors].is_a?(Hash) ? facts[:readme_sponsors] : {}
-      readme_logo = facts[:readme_logo].is_a?(Hash) ? facts[:readme_logo] : {}
       rubygems = config["rubygems"].is_a?(Hash) ? config["rubygems"] : {}
-      rubyforum = facts[:rubyforum].is_a?(Hash) ? facts[:rubyforum] : {}
+      engines = Array(ruby_engines_config(config))
+      engines = DEFAULT_ENGINES if engines.empty?
+      profile = normalize_template_profile(config.dig("templates", "profile"))
+      profile = FULL_TEMPLATE_PROFILE if profile.empty?
+      min_ruby = transfer_changelog_min_ruby(project_root, rubygems)
+      entrypoint = transfer_changelog_entrypoint_require(project_root, rubygems)
+      version_gem_mode = rubygems_version_gem_entrypoint_mode(rubygems)
+      rubyforum_config = config["rubyforum"].is_a?(Hash) ? config["rubyforum"] : {}
+      project_tag = preferred_template_token_value(nil, rubyforum_config["project_tag"], env, "KJ_RUBYFORUM_PROJECT_TAG").to_s
+      sponsors = readme_corporate_sponsors(config, env)
       {
         "profile" => profile,
-        "topology" => facts.dig(:repository, :topology).to_s.empty? ? REPOSITORY_TOPOLOGY_STANDALONE : facts.dig(:repository, :topology).to_s,
+        "topology" => config.dig("repository", "topology").to_s.empty? ? REPOSITORY_TOPOLOGY_STANDALONE : config.dig("repository", "topology").to_s,
         "ruby.min" => min_ruby.empty? ? "0" : min_ruby,
         "engine.jruby" => engines.include?("jruby"),
         "engine.truffleruby" => engines.include?("truffleruby") || engines.include?("truby"),
         "engine.alternates" => engines.any? { |engine| %w[jruby truffleruby truby].include?(engine) },
         "feature.appraisals" => File.file?(File.join(project_root, "Appraisals")),
-        "feature.rubyforum" => rubyforum.any?,
-        "feature.rubyforum_project_tag" => !rubyforum[:project_tag].to_s.empty?,
-        "feature.corporate_sponsors" => readme_sponsors.any?,
-        "feature.organization_logo" => readme_logo.any?,
-        "feature.structuredmerge_driver" => config["git_drivers"].to_s == "semantic-diff",
-        "feature.dedicated_version_gem" => version_gem[:mode].to_s == "dedicated",
+        "feature.rubyforum" => !rubyforum_facts(config, env, package_name: transfer_changelog_package_name(project_root)).empty?,
+        "feature.rubyforum_project_tag" => !normalize_rubyforum_tag(project_tag).empty?,
+        "feature.corporate_sponsors" => sponsors.any?,
+        "feature.organization_logo" => readme_top_logo_options(config).any? || readme_h2_synopsis_logo_options(config).any?,
+        "feature.structuredmerge_driver" => config.fetch("git_drivers", "semantic-diff").to_s == "semantic-diff",
+        "feature.dedicated_version_gem" => version_gem_mode == "dedicated" || File.file?(File.join(project_root, "lib", entrypoint, "version_gem.rb")),
         "workflow.dep_heads" => File.file?(File.join(project_root, ".github", "workflows", "dep-heads.yml")),
         "workflow.jruby_94" => File.file?(File.join(project_root, ".github", "workflows", "jruby-9.4.yml")),
-        "version_gem.mode" => version_gem[:mode].to_s.empty? ? rubygems_version_gem_entrypoint_mode(rubygems) : version_gem[:mode].to_s
+        "version_gem.mode" => version_gem_mode
       }
+    end
+
+    # Do not call discover_facts here. discover_facts itself computes changelog
+    # facts, so doing so would recurse during every prepare/template operation.
+    def transfer_changelog_min_ruby(project_root, rubygems)
+      configured = minimum_ruby_token(rubygems["min_ruby"])
+      return configured unless configured.empty?
+
+      minimum_ruby_token(transfer_changelog_gemspec_assignment(project_root, "required_ruby_version"))
+    end
+
+    def transfer_changelog_entrypoint_require(project_root, rubygems)
+      configured = rubygems["entrypoint_require"].to_s.strip
+      return configured unless configured.empty?
+
+      transfer_changelog_package_name(project_root).tr("-", "/")
+    end
+
+    def transfer_changelog_package_name(project_root)
+      transfer_changelog_gemspec_assignment(project_root, "name").to_s.strip.then do |name|
+        name.empty? ? File.basename(project_root.to_s) : name
+      end
+    end
+
+    def transfer_changelog_gemspec_assignment(project_root, field)
+      path = Dir.glob(File.join(project_root, "*.gemspec")).min
+      return nil unless path
+
+      gemspec_assignment_records(File.read(path)).find { |record| record.fetch(:field) == field }&.fetch(:value)
+    rescue SystemCallError, Error
+      nil
     end
 
     def transfer_changelog_entry_applies?(entry, context)
