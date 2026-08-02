@@ -264,6 +264,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem preserves explicit version_gem template dependencies and avoids introducing missing version requires.
 
+- kettle-jem emits valid whitespace-free empty values for optional configuration tokens.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

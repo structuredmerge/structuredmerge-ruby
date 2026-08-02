@@ -91,6 +91,31 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "renders an unset divergence threshold without trailing whitespace" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-empty-divergence-threshold", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      content = bootstrap_report.fetch(:final_content)
+
+      expect(content).to include('min_divergence_threshold: ""')
+      expect(content).not_to match(/[ \t]+\n/)
+      expect(YAML.safe_load(content).fetch("min_divergence_threshold")).to eq("")
+    end
+  end
+
   it "removes explicit RuboCop TargetRubyVersion when templating rubocop-lts config" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
