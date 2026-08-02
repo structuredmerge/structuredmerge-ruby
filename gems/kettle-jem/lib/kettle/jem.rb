@@ -11355,6 +11355,7 @@ module Kettle
         RUBY_TEMPLATE_EXTENSIONS.include?(extension)
       return :yaml if extension.match?(/\A\.ya?ml\z/) || File.basename(relative_path).casecmp("citation.cff").zero?
       return :toml if extension == ".toml"
+      return :jsonc if relative_path == ".devcontainer/devcontainer.json"
       return :jsonc if extension == ".jsonc"
       return :json5 if extension == ".json5"
       return :json if extension == ".json"

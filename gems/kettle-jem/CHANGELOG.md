@@ -1296,6 +1296,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve generated version requires before executable entrypoint code when later requires exist.
 
+- Merge devcontainer JSON files as JSONC so comments and trailing commas are supported.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

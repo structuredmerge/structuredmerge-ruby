@@ -58,6 +58,8 @@ the other fields accept `=` or `!=`.
 
 ## Fixed
 
+- kettle-jem-template-20260802-001 - Devcontainer JSON files now merge as JSONC,
+  preserving comments and trailing commas during template updates.
 - kettle-jem-template-20260801-004 - Generated organization README logos now
   use GitHub's stable organization avatar endpoint instead of assuming a
   matching Galtzo-hosted asset exists.

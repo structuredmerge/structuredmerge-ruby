@@ -45,7 +45,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-  it "uses JSON structural merge for JSON template files" do
+  it "uses JSONC structural merge for devcontainer JSON files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-json-template-merge", tmp_root) do |root|
@@ -65,6 +65,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
                 target: .devcontainer/devcontainer.json
         YAML
         "template/devcontainer.json.example" => <<~JSON,
+          // Shared devcontainer defaults
           {
             "name": "template",
             "features": {
@@ -73,8 +74,16 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
           }
         JSON
         ".devcontainer/devcontainer.json" => <<~JSON
+          // Local devcontainer settings
           {
-            "name": "destination"
+            "name": "destination",
+            "customizations": {
+              "jetbrains": {
+                "backend": "RubyMine"
+              }
+            },
+            // Keep this comment after the trailing comma.
+            "remoteUser": "vscode"
           }
         JSON
       })
@@ -84,6 +93,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
 
       expect(report.fetch(:final_content)).to include('"name": "destination"')
       expect(report.fetch(:final_content)).to include('"ghcr.io/devcontainers/features/git:1": {}')
+      expect(report.fetch(:final_content)).to include('// Local devcontainer settings')
     end
   end
 
