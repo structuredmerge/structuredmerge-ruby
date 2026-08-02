@@ -124,7 +124,10 @@ module Json
         return @root_object = nil unless root
 
         root.each do |child|
-          return @root_object = NodeWrapper.new(child, lines: @lines, source: @source, dialect: @dialect) if child.type.to_s == 'object'
+          if child.type.to_s == 'object'
+            return @root_object = NodeWrapper.new(child, lines: @lines, source: @source,
+                                                         dialect: @dialect)
+          end
         end
 
         @root_object = nil
@@ -189,7 +192,8 @@ module Json
         return unless root
 
         root_type = root.type.to_s
-        return NodeWrapper.new(root, lines: @lines, source: @source, dialect: @dialect) if %w[object array].include?(root_type)
+        return NodeWrapper.new(root, lines: @lines, source: @source, dialect: @dialect) if %w[object
+                                                                                              array].include?(root_type)
 
         root.each do |child|
           child_type = child.type.to_s

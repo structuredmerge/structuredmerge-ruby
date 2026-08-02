@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'json'
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/version'
 
 module Json
   module Merge
@@ -106,7 +106,9 @@ module Json
         return unsupported_feature_result("Unsupported JSON backend #{requested}.")
       end
 
-      return parse_failure("Trailing commas are not supported for #{dialect}.") if dialect == :json && detect_trailing_comma(source)
+      if dialect == :json && detect_trailing_comma(source)
+        return parse_failure("Trailing commas are not supported for #{dialect}.")
+      end
       if dialect == :json && detect_json_comments(source)
         return parse_failure("Comments are not supported for #{dialect}.")
       end
@@ -153,7 +155,9 @@ module Json
         return {
           ok: true,
           diagnostics: [],
-          output: TreeHaver.with_backend(requested) { merge_json_sources(template_source, destination_source, dialect: dialect) },
+          output: TreeHaver.with_backend(requested) do
+            merge_json_sources(template_source, destination_source, dialect: dialect)
+          end,
           policies: [DESTINATION_WINS_ARRAY_POLICY]
         }
       end
@@ -185,10 +189,11 @@ module Json
         raise ParseError, "Unsupported JSON backend #{requested}."
       end
 
-      raise ParseError, "Trailing commas are not supported for #{dialect}." if dialect == :json && detect_trailing_comma(source)
-      if dialect == :json && detect_json_comments(source)
-        raise ParseError, "Comments are not supported for #{dialect}."
+      if dialect == :json && detect_trailing_comma(source)
+        raise ParseError,
+              "Trailing commas are not supported for #{dialect}."
       end
+      raise ParseError, "Comments are not supported for #{dialect}." if dialect == :json && detect_json_comments(source)
 
       register_backend!
       analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source, dialect: dialect) }
@@ -204,7 +209,10 @@ module Json
       case node.type.to_s
       when 'document'
         child = node.semantic_children.first
-        child ? json_value_for_node(NodeWrapper.new(child, lines: node.lines, source: node.source, dialect: dialect), dialect: dialect) : nil
+        if child
+          json_value_for_node(NodeWrapper.new(child, lines: node.lines, source: node.source, dialect: dialect),
+                              dialect: dialect)
+        end
       when 'object'
         node.pairs.each_with_object({}) do |pair, object|
           key = pair.key_name
@@ -312,7 +320,7 @@ module Json
       return parse_json_number(text) unless dialect == :json5
 
       literal = text.to_s.delete('_')
-      return Float::INFINITY if literal == 'Infinity' || literal == '+Infinity'
+      return Float::INFINITY if ['Infinity', '+Infinity'].include?(literal)
       return -Float::INFINITY if literal == '-Infinity'
       return Float::NAN if %w[NaN +NaN -NaN].include?(literal)
 
