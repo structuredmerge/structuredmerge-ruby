@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/version'
 
 module Go
   module Merge
