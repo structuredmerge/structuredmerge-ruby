@@ -3993,6 +3993,9 @@ module Kettle
       preference = metadata[:template_source_preference] || metadata["template_source_preference"]
       return false unless preference.is_a?(Hash)
       return false if report.dig(:metadata, :delete_file) || report.dig(:metadata, "delete_file")
+      # Config migrations are implemented during template application. They must
+      # run even when the template source and destination checksums still match.
+      return false if report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH
 
       primitive = report.dig(:request_envelope, :request, :recipe_name).to_s
       primitive == "supplied_template_source_application"

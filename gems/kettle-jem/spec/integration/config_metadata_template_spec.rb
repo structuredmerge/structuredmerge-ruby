@@ -1968,6 +1968,16 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     )
   end
 
+  it "always evaluates the managed kettle config despite a checksum match" do
+    report = {
+      relative_path: described_class::KETTLE_CONFIG_PATH,
+      metadata: {template_source_preference: {selected_source: ".structuredmerge/kettle-jem.yml.example"}},
+      request_envelope: {request: {recipe_name: "supplied_template_source_application"}}
+    }
+
+    expect(described_class.send(:checksum_cache_safe_report?, report)).to be(false)
+  end
+
   it "does not write template token values to the checksum lockfile" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
