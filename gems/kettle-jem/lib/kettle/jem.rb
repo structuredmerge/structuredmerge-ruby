@@ -7354,16 +7354,18 @@ module Kettle
     end
 
     def normalize_readme_project_heading(content, facts)
-      namespace = facts.dig(:rubygems, :namespace).to_s
+      package = facts.fetch(:package, {})
+      rubygems = facts.fetch(:rubygems, {})
+      title = readme_title_token(package, rubygems)
       emoji = facts.dig(:project_runtime, :project_emoji).to_s
-      return content if namespace.empty? || emoji.empty?
+      return content if title.empty? || emoji.empty?
 
       lines = content.to_s.split("\n", -1)
       h1 = markdown_heading_owners(content, source_label: "README.md").find { |owner| owner.level == 1 }
       return content unless h1
 
       index = h1.location.start_line - 1
-      lines[index] = "# #{emoji} #{namespace}"
+      lines[index] = "# #{emoji} #{title}"
       lines.join("\n")
     end
 

@@ -214,6 +214,14 @@ RSpec.describe Kettle::Jem do
           min_ruby: "1.8.7"
       YAML
 
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+      tokens = described_class.send(:template_tokens, facts, {})
+      expect(tokens.fetch("KJ|README:TITLE")).to eq("appraisal2 / Appraisal")
+      heading_facts = facts.merge(project_runtime: facts.fetch(:project_runtime, {}).merge(project_emoji: "🔍"))
+      expect(described_class.send(:normalize_readme_project_heading, "# 🔍 Appraisal\n", heading_facts)).to eq(
+        "# 🔍 appraisal2 / Appraisal\n"
+      )
+
       result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
 
       expect(result.fetch(:post_apply_steps)).to include(
@@ -229,10 +237,6 @@ RSpec.describe Kettle::Jem do
       expect(executable).not_to include("require_relative")
       expect(executable).not_to include("appraisal2/version")
       expect(executable).not_to include("Appraisal2::Version")
-
-      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
-      tokens = described_class.send(:template_tokens, facts, {})
-      expect(tokens.fetch("KJ|README:TITLE")).to eq("appraisal2 / Appraisal")
     end
   end
 
