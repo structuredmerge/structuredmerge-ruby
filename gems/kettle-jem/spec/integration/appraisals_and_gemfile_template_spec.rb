@@ -1925,6 +1925,48 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "keeps a named modular dependency when materializing a missing Gemfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-modular-gemfile-materialization", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example Gem"
+            spec.add_dependency("mutex_m", "~> 0.2")
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/mutex_m/r4/v0.3.gemfile
+          files:
+            gemfiles:
+              modular:
+                mutex_m/r4/v0.3.gemfile:
+                  strategy: accept_template
+        YAML
+        "template/gemfiles/modular/mutex_m/r4/v0.3.gemfile.example" => <<~RUBY
+          # Ruby >= 2.5
+          gem "mutex_m", "~> 0.2"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/mutex_m/r4/v0.3.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.fetch(:changed)).to be(true)
+      expect(content).to include('gem "mutex_m", "~> 0.2"')
+      expect(File.read(File.join(root, "gemfiles/modular/mutex_m/r4/v0.3.gemfile"))).to eq(content)
+    end
+  end
+
   it "keeps YARD linting in the documentation modular Gemfile" do
     content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
 

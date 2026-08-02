@@ -1316,6 +1316,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Template policy fingerprints now invalidate cached Appraisal, gemspec, and spec helper transforms when their merge behavior changes.
 
+- Modular Gemfile fragments now retain their named runtime dependency when materializing missing files.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

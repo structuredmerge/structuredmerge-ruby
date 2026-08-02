@@ -7622,9 +7622,24 @@ module Kettle
     def finalize_gemfile_template_source(recipe, content, destination_content, facts:, template_content:)
       modular_gemfile = modular_gemfile_template_recipe?(recipe)
       output = if modular_gemfile
-        removable = [facts.to_h.dig(:package, :name), *package_runtime_dependency_names(facts)]
-        output = remove_gemfile_dependency_blocks(content, removable)
-        remove_gemfile_percent_w_entries(output, removable)
+        # Modular Gemfiles are dependency fragments, not aggregate project
+        # Gemfiles. Preserve a dependency when a released fragment is
+        # specifically named for that dependency (for example
+        # mutex_m/r4/v0.3.gemfile). Local override fragments intentionally
+        # retain their existing dependency-pruning behavior.
+        target = recipe.fetch(:target_path).to_s
+        package_name = facts.to_h.dig(:package, :name).to_s
+        runtime_dependencies = package_runtime_dependency_names(facts)
+        if local_gemfile_template_recipe?(recipe)
+          content
+        else
+          named_fragment_dependencies = runtime_dependencies.select do |dependency|
+            target.include?(dependency.tr("-", "_"))
+          end
+          removable = [package_name, *(runtime_dependencies - named_fragment_dependencies)]
+          output = remove_gemfile_dependency_blocks(content, removable)
+          remove_gemfile_percent_w_entries(output, removable)
+        end
       else
         merge_gemfile_template_policy(
           content,
