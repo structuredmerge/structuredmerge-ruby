@@ -49,14 +49,13 @@ module Kettle
             {name: bootstrap_name, status: "started", command: bootstrap_command},
             phase: "prepare"
           )
-          bootstrap_step = templating_bootstrap_step(
-            bootstrap_name: bootstrap_name,
-            bootstrap_command: bootstrap_command,
+          bootstrap_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
+            bootstrap_name,
+            bootstrap_command,
             project_root: project_root,
-            setup_env: setup_env,
+            env: setup_env,
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
-            command_runner: command_runner,
-            events: events
+            command_runner: command_runner
           )
           Kettle::Jem.emit_step_event(events, "command_step", bootstrap_step, phase: "prepare")
           bundle_step = bundle_install_after_bootstrap_step(
@@ -199,76 +198,6 @@ module Kettle
           )
         end
 
-        def templating_bootstrap_step(bootstrap_name:, bootstrap_command:, project_root:, setup_env:, quiet:, command_runner:, events:)
-          Kettle::Jem::Tasks::InstallTask.run_command_step(
-            bootstrap_name,
-            bootstrap_command,
-            project_root: project_root,
-            env: setup_env,
-            quiet: quiet,
-            command_runner: command_runner
-          )
-        rescue Kettle::Jem::Error => error
-          recovery_step = repair_unsupported_templating_platform_step(
-            error: error,
-            project_root: project_root,
-            setup_env: setup_env,
-            quiet: quiet,
-            command_runner: command_runner,
-            events: events
-          )
-          raise unless recovery_step
-
-          Kettle::Jem::Tasks::InstallTask.run_command_step(
-            bootstrap_name,
-            bootstrap_command,
-            project_root: project_root,
-            env: setup_env,
-            quiet: quiet,
-            command_runner: command_runner
-          ).merge(
-            recovered: true,
-            recovery: recovery_step,
-            changed_files: recovery_step.fetch(:changed_files, [])
-          )
-        end
-
-        def repair_unsupported_templating_platform_step(error:, project_root:, setup_env:, quiet:, command_runner:, events:)
-          gem_name, platform = unsupported_templating_platform(error.message)
-          return nil unless gem_name && locked_platforms(project_root).include?(platform)
-
-          command = ["bundle", "lock", "--remove-platform=#{platform}"]
-          name = "bundle_lock_remove_unsupported_platform"
-          Kettle::Jem.emit_step_event(
-            events,
-            "command_step",
-            {name: name, status: "started", command: command, gem: gem_name, platform: platform},
-            phase: "prepare"
-          )
-          step = Kettle::Jem::Tasks::InstallTask.run_command_step(
-            name,
-            command,
-            project_root: project_root,
-            env: setup_env,
-            quiet: quiet,
-            command_runner: command_runner
-          ).merge(changed_files: ["Gemfile.lock"])
-          Kettle::Jem.emit_step_event(events, "command_step", step, phase: "prepare")
-          step
-        end
-
-        def unsupported_templating_platform(message)
-          # Bundler exposes this compatibility failure only as stderr text; match
-          # its exact quoted diagnostic rather than guessing from lockfile content.
-          match = /Could not find gem '([^']+)' with platform '([^']+)'/.match(message.to_s)
-          return [nil, nil] unless match
-
-          gem_name = match[1]
-          return [nil, nil] unless LOCKED_TEMPLATING_GEMS.include?(gem_name)
-
-          [gem_name, match[2]]
-        end
-
         def locked_templating_gems(project_root)
           LOCKED_TEMPLATING_GEMS & locked_gem_names(project_root)
         end
@@ -278,13 +207,6 @@ module Kettle
           return [] unless File.file?(lock_path)
 
           Bundler::LockfileParser.new(Bundler.read_file(lock_path)).specs.map(&:name)
-        end
-
-        def locked_platforms(project_root)
-          lock_path = File.join(project_root.to_s, "Gemfile.lock")
-          return [] unless File.file?(lock_path)
-
-          Bundler::LockfileParser.new(Bundler.read_file(lock_path)).platforms.map(&:to_s)
         end
 
         def snapshot_files(paths)

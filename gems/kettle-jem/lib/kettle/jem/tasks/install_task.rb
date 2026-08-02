@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "fileutils"
+require "bundler"
 require "json"
 require "open3"
 require "toml-rb"
@@ -1721,7 +1722,62 @@ module Kettle
             }
           end
 
+          recovered = retry_after_unsupported_templating_platform(
+            name: name,
+            command: command,
+            project_root: project_root,
+            env: env,
+            quiet: quiet,
+            command_runner: command_runner,
+            failure: result
+          )
+          return recovered if recovered
+
           raise Kettle::Jem::Error, "#{name} failed: #{command.join(" ")}\n#{result[:stderr]}"
+        end
+
+        def retry_after_unsupported_templating_platform(name:, command:, project_root:, env:, quiet:, command_runner:, failure:)
+          platform = unsupported_templating_platform(failure[:stderr], project_root)
+          return unless platform
+
+          recovery_command = ["bundle", "lock", "--remove-platform=#{platform}"]
+          recovery = command_runner.call(recovery_command, chdir: project_root, env: env, quiet: quiet)
+          return unless recovery.fetch(:success)
+
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          retried = command_runner.call(command, chdir: project_root, env: env, quiet: quiet)
+          return unless retried.fetch(:success)
+
+          {
+            name: name,
+            command: command,
+            status: "succeeded",
+            exitstatus: retried[:exitstatus],
+            duration_ms: ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3),
+            recovered: true,
+            recovery: {
+              command: recovery_command,
+              platform: platform,
+              status: "succeeded",
+              changed_files: ["Gemfile.lock"]
+            }
+          }
+        end
+
+        def unsupported_templating_platform(stderr, project_root)
+          # Bundler exposes this compatibility failure only as stderr text; match
+          # its exact quoted diagnostic rather than guessing from lockfile content.
+          match = /Could not find gem 'tree_sitter_language_pack' with platform '([^']+)'/.match(stderr.to_s)
+          return unless match
+
+          lock_path = File.join(project_root.to_s, "Gemfile.lock")
+          return unless File.file?(lock_path)
+
+          platforms = Bundler::LockfileParser.new(Bundler.read_file(lock_path)).platforms.map(&:to_s)
+          platform = match[1]
+          platforms.include?(platform) ? platform : nil
+        rescue Bundler::LockfileError
+          nil
         end
 
         def execute_ready_command_step(step, project_root:, env:, quiet:, command_runner:)

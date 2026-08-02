@@ -1074,6 +1074,65 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     )
   end
 
+  it "repairs an obsolete parser platform after Bundler rejects it, then retries setup" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-unsupported-platform", tmp_root) do |root|
+      write_tree(root, {"bin/setup" => "#!/usr/bin/env sh\n"})
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+
+        PLATFORMS
+          arm64-darwin-23
+          ruby
+      LOCK
+      commands = []
+      setup_attempts = 0
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        if command == ["bin/setup"]
+          setup_attempts += 1
+          next {success: true, exitstatus: 0, stdout: "", stderr: ""} if setup_attempts == 2
+
+          {
+            success: false,
+            exitstatus: 7,
+            stdout: "",
+            stderr: "Could not find gem 'tree_sitter_language_pack' with platform 'arm64-darwin-23'"
+          }
+        else
+          {success: true, exitstatus: 0, stdout: "", stderr: ""}
+        end
+      end
+
+      step = Kettle::Jem::Tasks::InstallTask.run_command_step(
+        "bin_setup",
+        ["bin/setup"],
+        project_root: root,
+        env: {},
+        quiet: false,
+        command_runner: command_runner
+      )
+
+      expect(step).to include(
+        name: "bin_setup",
+        status: "succeeded",
+        recovered: true,
+        recovery: include(
+          command: %w[bundle lock --remove-platform=arm64-darwin-23],
+          platform: "arm64-darwin-23",
+          status: "succeeded"
+        )
+      )
+      expect(commands.map { |entry| entry.fetch(:command) }).to eq([
+        ["bin/setup"],
+        %w[bundle lock --remove-platform=arm64-darwin-23],
+        ["bin/setup"]
+      ])
+    end
+  end
+
   it "honors install ENV skip-commit and skips lockfile normalization in local path development env" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
