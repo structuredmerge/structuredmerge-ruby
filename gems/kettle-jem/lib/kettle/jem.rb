@@ -11421,11 +11421,25 @@ module Kettle
 
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
       end
+      synced = normalize_kettle_config_optional_scalars(synced)
       synced = sync_kettle_config_project_hostnames(synced)
       synced = sync_kettle_config_internal_values(synced)
       synced = migrate_readme_logo_config(synced)
       synced = prune_legacy_kettle_config_keys(synced)
       sync_kettle_config_documentation_comments(synced)
+    end
+
+    def normalize_kettle_config_optional_scalars(content)
+      config = YAML.safe_load(content.to_s, permitted_classes: [], aliases: true) || {}
+      return content unless config.key?("min_divergence_threshold")
+
+      replace_yaml_scalar_path(
+        content,
+        %w[min_divergence_threshold],
+        yaml_config_scalar_literal(config["min_divergence_threshold"], path: %w[min_divergence_threshold])
+      )
+    rescue Psych::Exception
+      content
     end
 
     def sync_kettle_config_project_hostnames(content)

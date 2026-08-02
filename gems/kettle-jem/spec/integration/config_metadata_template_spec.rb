@@ -295,6 +295,16 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "canonicalizes an unset divergence threshold without trailing whitespace" do
+    content = "project_emoji: \"🫖\"\nmin_divergence_threshold: \n"
+
+    synced = described_class.send(:sync_kettle_config_env_overrides, content, {})
+
+    expect(synced).to include('min_divergence_threshold: ""')
+    expect(synced).not_to match(/[ \t]+\n/)
+    expect(YAML.safe_load(synced).fetch("min_divergence_threshold")).to eq("")
+  end
+
   it "sets gemspec mailing_list_uri from the effective RubyForum tag" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
