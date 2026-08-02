@@ -35,7 +35,9 @@ module Kettle
     PACKAGE_NAME = "kettle-jem"
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     TEMPLATE_SOURCE_APPLICATION_FINGERPRINT_VERSION = 1
-    APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
+    APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
+    GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
+    SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
@@ -4036,6 +4038,12 @@ module Kettle
       if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :appraisals
         payload[:appraisals_template_policy_fingerprint_version] = APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
+      if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :gemspec
+        payload[:gemspec_template_policy_fingerprint_version] = GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION
+      end
+      if report.fetch(:relative_path).to_s == "spec/spec_helper.rb"
+        payload[:spec_helper_template_policy_fingerprint_version] = SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION
+      end
       payload
     end
 
@@ -7612,7 +7620,9 @@ module Kettle
     def finalize_gemfile_template_source(recipe, content, destination_content, facts:, template_content:)
       modular_gemfile = modular_gemfile_template_recipe?(recipe)
       output = if modular_gemfile
-        content
+        removable = [facts.to_h.dig(:package, :name), *package_runtime_dependency_names(facts)]
+        output = remove_gemfile_dependency_blocks(content, removable)
+        remove_gemfile_percent_w_entries(output, removable)
       else
         merge_gemfile_template_policy(
           content,

@@ -85,7 +85,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(appraisals_content).to include("support-gem")
       expect(appraisals_content).not_to match(/^\s+example$/)
       expect(appraisals_content).to include('appraise "style"')
-      expect(fingerprint_payload).to include(appraisals_template_policy_fingerprint_version: 1)
+      expect(fingerprint_payload).to include(appraisals_template_policy_fingerprint_version: 2)
       expect(appraisals_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy)).to include(
         file_type: "appraisals",
         operations: include(

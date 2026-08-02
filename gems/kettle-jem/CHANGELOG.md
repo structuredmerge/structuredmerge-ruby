@@ -1314,6 +1314,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove preserved duplicate gemspec dependency declarations after template merge.
 
+- Template policy fingerprints now invalidate cached Appraisal, gemspec, and spec helper transforms when their merge behavior changes.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
