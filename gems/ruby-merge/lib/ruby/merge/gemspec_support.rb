@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "block_binding_support"
+require_relative 'block_binding_support'
 
 module Ruby
   module Merge
