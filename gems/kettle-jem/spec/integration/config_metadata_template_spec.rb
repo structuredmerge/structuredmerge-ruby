@@ -1950,6 +1950,51 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "recreates a missing managed file even when default checksum mode ignores destination changes" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-missing-destination", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.add_dependency "mutex_m", "~> 0.2"
+          end
+        RUBY
+        "template/gemfiles/modular/mutex_m/r4/v0.3.gemfile.example" => "gem \"mutex_m\", \"~> 0.2\"\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: gemfiles/modular/mutex_m/r4/v0.3.gemfile
+                target: gemfiles/modular/mutex_m/r4/v0.3.gemfile
+          files:
+            gemfiles:
+              modular:
+                mutex_m:
+                  r4:
+                    v0.3.gemfile:
+                      strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      path = File.join(root, "gemfiles/modular/mutex_m/r4/v0.3.gemfile")
+      File.delete(path)
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      report = apply.fetch(:recipe_reports).find do |entry|
+        entry.fetch(:relative_path) == "gemfiles/modular/mutex_m/r4/v0.3.gemfile"
+      end
+
+      expect(report).not_to include(:checksum_skipped)
+      expect(apply.fetch(:changed_files)).to include("gemfiles/modular/mutex_m/r4/v0.3.gemfile")
+      expect(File.read(path)).to eq("gem \"mutex_m\", \"~> 0.2\"\n")
+    end
+  end
+
   it "accounts for final destination outcomes after recipe overlays" do
     outcomes = described_class.template_file_outcomes([
       {relative_path: "Gemfile", changed: true},

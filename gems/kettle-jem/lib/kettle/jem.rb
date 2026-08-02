@@ -3974,6 +3974,12 @@ module Kettle
       return unless checksum_cache_safe_report?(report)
 
       relative_path = report.fetch(:relative_path).to_s
+      # `template,ignore-dest` preserves a user edit to an existing managed
+      # file, but it must never turn a missing managed file into a cache hit.
+      # Otherwise a prior partial template run can retain an empty SHA record
+      # and leave an aggregate Gemfile referring to a leaf it never creates.
+      return unless File.file?(File.join(project_root.to_s, relative_path))
+
       record = TemplateLock.file_record(template_lock, relative_path)
       return if record.empty?
 
@@ -7604,12 +7610,17 @@ module Kettle
     end
 
     def finalize_gemfile_template_source(recipe, content, destination_content, facts:, template_content:)
-      output = merge_gemfile_template_policy(
-        content,
-        facts: facts,
-        template_content: template_content,
-        preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
-      )
+      modular_gemfile = modular_gemfile_template_recipe?(recipe)
+      output = if modular_gemfile
+        content
+      else
+        merge_gemfile_template_policy(
+          content,
+          facts: facts,
+          template_content: template_content,
+          preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
+        )
+      end
       if recipe.fetch(:target_path).to_s == "Gemfile"
         # A merged Gemfile retains its project-specific source; an accepted
         # template owns the complete source declaration.
@@ -8441,6 +8452,10 @@ module Kettle
 
     def local_gemfile_template_recipe?(recipe)
       recipe.fetch(:target_path).to_s.end_with?("_local.gemfile")
+    end
+
+    def modular_gemfile_template_recipe?(recipe)
+      recipe.fetch(:target_path).to_s.start_with?("gemfiles/modular/")
     end
 
     def normalize_local_gemfile_nomono_bootstrap(content)

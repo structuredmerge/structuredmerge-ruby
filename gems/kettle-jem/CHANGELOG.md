@@ -1304,6 +1304,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove legacy standard-library declarations from Appraisals blocks managed by modular x_std_libs gemfiles.
 
+- Recreate missing managed modular Gemfiles instead of treating empty checksum records as cache hits.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
