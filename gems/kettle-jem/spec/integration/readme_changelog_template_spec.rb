@@ -1075,6 +1075,71 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
+  it "preserves the destination README KLOC badge when current changelog coverage is unavailable" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-kloc-fallback-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          gem_version = Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/example/version.rb", mod) }::Example::Version::VERSION
+
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.version = gem_version
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        "lib/example/version.rb" => <<~RUBY,
+          module Example
+            module Version
+              VERSION = "1.2.3"
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            profile: full
+            apply: true
+            entries:
+              - README.md
+          files:
+            README.md:
+              strategy: accept_template
+        YAML
+        "CHANGELOG.md" => <<~MARKDOWN,
+          # Changelog
+
+          ## [Unreleased]
+
+          ### Fixed
+
+          - Example change.
+        MARKDOWN
+        "README.md" => <<~MARKDOWN,
+          # Example
+
+          [🧮kloc-img]: https://img.shields.io/badge/KLOC-0.063-FFDD67.svg?style=for-the-badge&logo=YouTube&logoColor=blue
+        MARKDOWN
+        "template/README.md.example" => <<~MARKDOWN
+          # {KJ|GEM_NAME}
+
+          [🧮kloc-img]: https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&logo=YouTube&logoColor=blue
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      readme = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end.fetch(:final_content)
+
+      expect(readme).to include("KLOC-0.063-FFDD67.svg")
+      expect(readme).not_to include("KLOC-5.053-FFDD67.svg")
+      expect(File.read(File.join(root, "README.md"))).to eq(readme)
+    end
+  end
+
   it "keeps shim-only template files out of full profile inventory" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

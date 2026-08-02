@@ -6836,7 +6836,8 @@ module Kettle
         processed = postprocess_readme_content(
           merged_readme,
           facts,
-          project_root: project_root
+          project_root: project_root,
+          destination_content: original
         )
         return with_readme_timing("readme.append_used_link_definitions") do
           append_used_markdown_link_definitions(processed, resolved)
@@ -6863,13 +6864,23 @@ module Kettle
           accepted = finalize_github_workflow_template(accepted, facts)
           accepted = preserve_newer_github_workflow_action_pins(accepted, original)
         end
-        return postprocess_readme_content(accepted, facts, project_root: project_root) if recipe.fetch(:target_path) == "README.md"
+        return postprocess_readme_content(
+          accepted,
+          facts,
+          project_root: project_root,
+          destination_content: original
+        ) if recipe.fetch(:target_path) == "README.md"
 
         return finalize_template_source_content(recipe, accepted)
       end
 
       resolved = finalize_github_workflow_template(resolved, facts) if github_workflow_template_recipe?(recipe)
-      return postprocess_readme_content(resolved, facts, project_root: project_root) if recipe.fetch(:target_path) == "README.md"
+      return postprocess_readme_content(
+        resolved,
+        facts,
+        project_root: project_root,
+        destination_content: original
+      ) if recipe.fetch(:target_path) == "README.md"
 
       finalize_template_source_content(recipe, resolved)
     end
@@ -7054,7 +7065,7 @@ module Kettle
       end
     end
 
-    def postprocess_readme_content(content, facts, project_root: nil)
+    def postprocess_readme_content(content, facts, project_root: nil, destination_content: nil)
       return content unless facts
 
       processed = with_readme_timing("postprocess.readme_post_processor") do
@@ -7072,7 +7083,9 @@ module Kettle
         normalize_readme_rubygems_download_badges(processed)
       end
       processed = with_readme_timing("postprocess.logo_link_prune") { prune_unused_readme_logo_link_definitions(processed) }
-      processed = with_readme_timing("postprocess.kloc_badge") { apply_readme_kloc_badge(processed, facts, project_root) }
+      processed = with_readme_timing("postprocess.kloc_badge") do
+        apply_readme_kloc_badge(processed, facts, project_root, destination_content: destination_content)
+      end
       processed = with_readme_timing("postprocess.monorepo_thin_projection") { apply_monorepo_subgem_thin_readme_projection(processed, facts) }
       processed = with_readme_timing("postprocess.monorepo_subgem_recipe") { apply_monorepo_subgem_readme_recipe(processed, facts) }
       processed = with_readme_timing("postprocess.metadata_block") do
@@ -7103,14 +7116,23 @@ module Kettle
       ReadmePostProcessor.delete_markdown_link_definitions(content, labels)
     end
 
-    def apply_readme_kloc_badge(content, facts, project_root)
+    def apply_readme_kloc_badge(content, facts, project_root, destination_content: nil)
       kloc = readme_kloc_from_changelog(project_root, facts.dig(:project_runtime, :version))
-      return content if kloc.to_s.empty?
+      return preserve_destination_readme_kloc_badge(content, destination_content) if kloc.to_s.empty?
 
       content.to_s.gsub(
         README_KLOC_BADGE_PATTERN,
         "\\1#{kloc}\\3"
       )
+    end
+
+    def preserve_destination_readme_kloc_badge(content, destination_content)
+      destination_match = destination_content.to_s.match(README_KLOC_BADGE_PATTERN)
+      return content unless destination_match
+
+      content.to_s.gsub(README_KLOC_BADGE_PATTERN) do
+        "#{Regexp.last_match(1)}#{destination_match[2]}#{Regexp.last_match(3)}"
+      end
     end
 
     def readme_kloc_from_changelog(project_root, version)

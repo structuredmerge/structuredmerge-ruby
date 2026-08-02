@@ -1280,6 +1280,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated gitignore files now ignore nested modular Gemfile lockfiles.
 
+- Preserve destination README KLOC badges when current changelog coverage metadata is unavailable.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
