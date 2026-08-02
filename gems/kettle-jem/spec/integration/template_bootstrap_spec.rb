@@ -4,6 +4,100 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
   include_context "with isolated kettle-jem environment"
   include_context "with kettle-jem fixture contracts"
 
+  it "fails on a direct dependency also declared by a modular Gemfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-direct-modular-dependency-conflict", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+          dependency_conflicts:
+            resolve: []
+        YAML
+      })
+
+      reports = [
+        {
+          relative_path: "shields-badge.gemspec",
+          final_content: <<~RUBY
+            Gem::Specification.new do |spec|
+              spec.add_development_dependency("yard-relative_markdown_links", "~> 0.5.0")
+            end
+          RUBY
+        },
+        {
+          relative_path: "gemfiles/modular/documentation.gemfile",
+          final_content: %(gem "yard-relative_markdown_links", "~> 0.6", require: false\n)
+        }
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.to raise_error(
+        Kettle::Jem::Error,
+        include("yard-relative_markdown_links", "shields-badge.gemspec", "gemfiles/modular/documentation.gemfile", "dependency_conflicts.resolve")
+      )
+    end
+  end
+
+  it "keeps an explicit direct-versus-modular dependency decision stable across runs" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-direct-modular-dependency-decision", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
+          dependency_conflicts:
+            resolve:
+              - gem: yard-relative_markdown_links
+                direct: shields-badge.gemspec
+                modular: gemfiles/modular/documentation.gemfile
+                action: remove_modular_gem
+                reason: "The gemspec intentionally owns this dependency."
+        YAML
+      })
+      reports = [
+        {relative_path: "shields-badge.gemspec", final_content: %(spec.add_development_dependency("yard-relative_markdown_links", "~> 0.5.0")\n)},
+        {relative_path: "gemfiles/modular/documentation.gemfile", final_content: %(gem "yard-relative_markdown_links", "~> 0.6"\n)}
+      ]
+
+      2.times do
+        expect {
+          described_class.validate_modular_dependency_conflicts!(root, reports)
+        }.not_to raise_error
+      end
+    end
+  end
+
+  it "allows a broad direct requirement to coexist with a compatible modular narrowing" do
+    expect(described_class.compatible_dependency_requirements?([">= 1.0"], ["~> 2.0"])).to be(true)
+    expect(described_class.compatible_dependency_requirements?(["~> 0.5.0"], ["~> 0.6.0"])).to be(false)
+  end
+
+  it "writes discovered conflicts into a first-run config for review" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-direct-modular-dependency-bootstrap", tmp_root) do |root|
+      reports = [
+        {
+          relative_path: ".structuredmerge/kettle-jem.yml",
+          final_content: "dependency_conflicts:\n  resolve: []\n"
+        },
+        {
+          relative_path: "example.gemspec",
+          final_content: %(spec.add_development_dependency("yard-relative_markdown_links", "~> 0.5.0")\n)
+        },
+        {
+          relative_path: "gemfiles/modular/documentation.gemfile",
+          final_content: %(gem "yard-relative_markdown_links", "~> 0.6", require: false\n)
+        }
+      ]
+
+      described_class.validate_modular_dependency_conflicts!(root, reports)
+      config = reports.first.fetch(:final_content)
+      expect(config).to include("action: review")
+      expect(config).to include("yard-relative_markdown_links")
+    end
+  end
+
   it "filters template recipes with old only/include semantics" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

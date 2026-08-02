@@ -7,6 +7,7 @@ require "digest"
 require "json"
 require "net/http"
 require "open3"
+require "pathname"
 require "parslet"
 require "rbconfig"
 require "time"
@@ -3832,6 +3833,9 @@ module Kettle
       recipe_reports = with_event_phase(events, "checksum_skip") do
         apply_checksum_skips(project_root, recipe_reports, checksum_mode: checksum_mode, template_lock: template_lock)
       end
+      with_event_phase(events, "dependency_conflicts") do
+        validate_modular_dependency_conflicts!(project_root, recipe_reports)
+      end
       plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
       changed_files = changed_files_from_recipe_reports(recipe_reports)
       file_outcomes = template_file_outcomes(recipe_reports)
@@ -4763,11 +4767,25 @@ module Kettle
         *[template_version_gem_bootstrap_step(project_root, report)].flatten,
         executable_version_entrypoint_sync_step(project_root, report),
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
+        modular_dependency_conflict_resolution_step(project_root),
         git_hooks_executable_step(project_root),
         github_actions_pin_sync_step(project_root),
         monorepo_subgem_kettle_config_profile_sync_step(project_root, report),
         kettle_jem_state_sync_step(project_root, report)
       ].compact
+    end
+
+    def modular_dependency_conflict_resolution_step(project_root)
+      decisions = modular_dependency_conflict_decisions(kettle_jem_config(project_root))
+      return nil if decisions.empty?
+
+      changed_files = apply_modular_dependency_conflict_resolutions(project_root, decisions)
+      {
+        name: "modular_dependency_conflict_resolution",
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files,
+        decisions: decisions.map { |decision| %w[gem modular action].to_h { |key| [key, decision.fetch(key)] } }
+      }
     end
 
     # Older generated executable headers used the package name for both the
@@ -5219,11 +5237,11 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.0"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.5", ">= 2.5.16"\n)},
-        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.10"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.22"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.5", ">= 2.5.17"\n)},
+        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.11"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.23"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
-        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.18"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.19"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.8"\n)},
@@ -9147,10 +9165,201 @@ module Kettle
 
         {
           name: name,
+          requirements: ruby_string_arguments(call).drop(1),
           start_line: call.location.start_line,
           end_line: ruby_node_source_end_line(call)
         }
       end
+    end
+
+    # A dependency owned directly by the project must not also be introduced by
+    # a generated modular Gemfile. On first bootstrap, write a reviewable
+    # resolution list; later runs require an explicit removal operation.
+    def validate_modular_dependency_conflicts!(project_root, recipe_reports)
+      conflicts = modular_dependency_conflicts(project_root, recipe_reports)
+      return if conflicts.empty?
+
+      config = kettle_jem_config(project_root)
+      decisions = modular_dependency_conflict_decisions(config)
+      unresolved = conflicts.reject { |conflict| modular_dependency_conflict_decided?(decisions, conflict) }
+      if unresolved.empty?
+        return
+      end
+
+      bootstrap_report = recipe_reports.find { |report| report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH }
+      if !config.key?("dependency_conflicts") && bootstrap_report
+        bootstrap_report[:final_content] = add_dependency_conflict_review_list(bootstrap_report.fetch(:final_content, ""), conflicts)
+        return
+      end
+
+      details = unresolved.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.map do |conflict|
+        "#{conflict.fetch(:name)} (#{conflict.fetch(:direct)} vs #{conflict.fetch(:modular)})"
+      end.join(", ")
+      raise Error,
+        "direct dependencies also declared by templated modular Gemfiles: #{details}. " \
+          "Review dependency_conflicts.resolve in #{KETTLE_CONFIG_PATH}; each entry needs gem, direct, modular, action, and reason. " \
+          "Supported actions: remove_modular_gem, remove_x_std_lib_eval."
+    end
+
+    def modular_dependency_conflicts(project_root, recipe_reports)
+      report_paths = recipe_reports.map { |report| report.fetch(:relative_path, "").to_s }
+      paths = ["Gemfile", *Dir.glob(File.join(project_root.to_s, "*.gemspec")).map { |path| File.basename(path) }, *report_paths.select { |path| path.end_with?(".gemspec") }]
+      direct = dependency_file_contents(project_root, recipe_reports, paths)
+      modular_paths = [
+        *Dir.glob(File.join(project_root.to_s, "gemfiles/modular/**/*.gemfile")).map do |path|
+          Pathname(path).relative_path_from(Pathname(project_root.to_s)).to_s
+        end,
+        *report_paths.select { |path| path.start_with?("gemfiles/modular/") && path.end_with?(".gemfile") }
+      ].uniq
+      modular_paths = modular_paths.map do |path|
+        if path.start_with?("/")
+          Pathname(path).relative_path_from(Pathname(project_root.to_s)).to_s
+        else
+          path
+        end
+      end.select do |path|
+        relative = path.delete_prefix("gemfiles/modular/")
+        !relative.include?("/") || relative.start_with?("x_std_libs/")
+      end
+      modular = dependency_file_contents(project_root, recipe_reports, modular_paths)
+      direct.flat_map do |direct_path, content|
+        direct_records = dependency_records_for(direct_path, content)
+        modular.flat_map do |modular_path, modular_content|
+          modular_records = dependency_records_for(modular_path, modular_content)
+          direct_records.flat_map do |direct_record|
+            modular_records.select { |record| record.fetch(:name) == direct_record.fetch(:name) }.map do |modular_record|
+              {
+                name: direct_record.fetch(:name),
+                direct: direct_path,
+                modular: modular_path,
+                direct_requirements: direct_record.fetch(:requirements, []),
+                modular_requirements: modular_record.fetch(:requirements, [])
+              }
+            end
+          end
+        end
+      end
+    end
+
+    def dependency_records_for(path, content)
+      if path == "Gemfile" || path.end_with?(".gemfile")
+        gemfile_gem_call_records(content)
+      else
+        gemspec_dependency_records(content)
+      end
+    end
+
+    def dependency_file_contents(project_root, recipe_reports, paths)
+      reports = recipe_reports.to_h { |report| [report.fetch(:relative_path, "").to_s, report] }
+      paths.uniq.filter_map do |path|
+        file_path = File.join(project_root.to_s, path)
+        next unless reports.key?(path) || File.file?(file_path)
+
+        content = reports.key?(path) ? reports.fetch(path).fetch(:final_content, "") : File.read(file_path)
+        [path, content]
+      end.to_h
+    end
+
+    def modular_dependency_conflict_decisions(config)
+      Array(config.dig("dependency_conflicts", "resolve")).filter_map do |entry|
+        case entry
+        when Hash
+          normalized = entry.each_with_object({}) { |(key, value), result| result[key.to_s] = value }
+          next if %w[gem direct modular action reason].any? { |key| normalized.fetch(key, "").to_s.strip.empty? }
+
+          %w[gem direct modular action reason].to_h { |key| [key, normalized.fetch(key).to_s] }
+        end
+      end
+    end
+
+    def modular_dependency_conflict_decided?(decisions, conflict)
+      decisions.any? do |decision|
+          decision.fetch("gem") == conflict.fetch(:name) &&
+          decision.fetch("direct") == conflict.fetch(:direct) &&
+          decision.fetch("modular") == conflict.fetch(:modular) &&
+          case decision.fetch("action")
+          when "remove_modular_gem", "remove_x_std_lib_eval"
+            true
+          when "keep_both"
+            compatible_dependency_requirements?(conflict.fetch(:direct_requirements), conflict.fetch(:modular_requirements))
+          else
+            false
+          end
+      end
+    end
+
+    def compatible_dependency_requirements?(direct_requirements, modular_requirements)
+      direct = Gem::Requirement.new(*Array(direct_requirements).map(&:to_s))
+      modular = Gem::Requirement.new(*Array(modular_requirements).map(&:to_s))
+      candidates = ["0.0.0", "1.0.0", "2.0.0", "3.0.0", "4.0.0", "5.0.0", "6.0.0", "10.0.0"]
+      [direct, modular].each do |requirement|
+        requirement.requirements.each do |operator, version|
+          base = version.to_s.split(".").map(&:to_i)
+          base << 0 while base.length < 3
+          candidates << base.join(".")
+          candidates << [base[0], base[1] + 1, 0].join(".") if operator == "~>"
+        end
+      end
+      candidates.uniq.any? do |version|
+        version = Gem::Version.new(version)
+        direct.satisfied_by?(version) && modular.satisfied_by?(version)
+      end
+    rescue ArgumentError
+      false
+    end
+
+    def add_dependency_conflict_review_list(content, conflicts)
+      lines = content.to_s.lines
+      index = lines.index { |line| line.match?(/\Adependency_conflicts:\s*\z/) }
+      unless index
+        lines << "\n" unless lines.empty? || lines.last.strip.empty?
+        lines.concat(["dependency_conflicts:\n", "  # Review each entry and choose a supported action.\n", "  resolve:\n"])
+        index = lines.length - 3
+      end
+
+      block_end = (index + 1...lines.length).find { |line_index| lines[line_index].match?(/\A\S/) } || lines.length
+      replacement = ["dependency_conflicts:\n", "  # Review each entry and choose a supported action.\n", "  resolve:\n"]
+      conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.each do |conflict|
+        replacement.concat([
+          "    - gem: #{conflict.fetch(:name)}\n",
+          "      direct: #{conflict.fetch(:direct)}\n",
+          "      modular: #{conflict.fetch(:modular)}\n",
+          "      action: review\n",
+          "      reason: \"\"\n"
+        ])
+      end
+      ensure_trailing_newline([*lines[0...index], *replacement, *lines[block_end..].to_a].join)
+    end
+
+    def apply_modular_dependency_conflict_resolutions(project_root, decisions)
+      decisions.each_with_object([]) do |decision, changed_files|
+        path = File.join(project_root.to_s, decision.fetch("modular"))
+        next unless File.file?(path)
+
+        before = File.read(path)
+        after = case decision.fetch("action")
+        when "remove_modular_gem"
+          remove_gemfile_dependency_blocks(before, [decision.fetch("gem")])
+        when "remove_x_std_lib_eval"
+          remove_x_std_lib_eval_for_gem(before, decision.fetch("gem"))
+        when "keep_both"
+          before
+        end
+        next if after == before
+
+        File.write(path, after)
+        changed_files << decision.fetch("modular")
+      end
+    end
+
+    def remove_x_std_lib_eval_for_gem(content, gem_name)
+      records = ruby_call_records(content, :eval_gemfile).filter_map do |call|
+        path = ruby_string_argument(call).to_s
+        next unless path.split("/").any? { |part| part == gem_name || part.tr("-", "_") == gem_name.tr("-", "_") }
+
+        {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
+      end
+      replace_record_ranges(content, records.to_h { |record| [record.fetch(:start_line), record.merge(replacement: "")] })
     end
 
     def ruby_top_level_require_records(content)
@@ -14419,7 +14628,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.22"\n)
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.23"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -14432,7 +14641,7 @@ module Kettle
     end
 
     def nomono_gemfile_declaration
-      %(gem "nomono", "~> 1.1", ">= 1.1.3", require: false # ruby >= 3.2.0)
+      %(gem "nomono", "~> 1.1", ">= 1.1.4", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
@@ -14440,7 +14649,7 @@ module Kettle
         # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
         # Bundler records that dependency during Gemfile evaluation, but it does not
         # activate that exact version before the immediate `require "nomono/bundler"`.
-        nomono_activation_requirements = ["~> 1.1", ">= 1.1.3"]
+        nomono_activation_requirements = ["~> 1.1", ">= 1.1.4"]
         nomono_requirement = Gem::Requirement.new(nomono_activation_requirements)
         nomono_already_activated = Gem.loaded_specs["nomono"]
         nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)

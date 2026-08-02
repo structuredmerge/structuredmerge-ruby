@@ -254,6 +254,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem-template-20260801-001 - Generated README gem dashboard links now
   use ClickGems instead of BestGems.
 
+- Bootstrap direct-versus-modular dependency conflicts into a reviewable dependency_conflicts.resolve list, including keep_both for compatible overlapping ranges.
+
+- Scope direct-versus-modular conflict discovery to active top-level fragments and x_std_libs; framework appraisal matrix files remain under appraisal resolution.
+
+- Record explicit modular dependency removals and compatible keep_both decisions so repeated templating remains deterministic.
+
 ### Deprecated
 
 ### Removed
@@ -1304,6 +1310,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem-template-20260802-001 - Devcontainer JSON files now merge as JSONC,
   preserving comments and trailing commas during template updates.
+
+- Fail templating when direct project dependencies collide with templated modular Gemfiles unless an exact decision is recorded in kettle-jem configuration.
 
 ### Security
 

@@ -31,6 +31,7 @@ module Kettle
           )
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
+          setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
           setup_env["K_JEM_TEMPLATING"] = "true" if local_path_development_env?(env)
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
           reset_step = reset_release_lockfiles_step(
