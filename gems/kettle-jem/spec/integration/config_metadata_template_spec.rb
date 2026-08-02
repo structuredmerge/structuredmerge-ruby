@@ -1808,6 +1808,47 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "prunes stale write records when a template-owned destination was removed" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-stale-lock-record", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock_path = File.join(root, Kettle::Jem::KETTLE_LOCK_PATH)
+      lock = YAML.safe_load_file(lock_path)
+      lock.fetch("files")["obsolete.yml"] = {
+        "action" => "write",
+        "dest_sha256" => "stale",
+        "input_fingerprint" => "stale"
+      }
+      File.write(lock_path, YAML.dump(lock))
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+
+      expect(YAML.safe_load_file(lock_path).fetch("files")).not_to have_key("obsolete.yml")
+    end
+  end
+
   it "skips unchanged template inputs by default but honors destination checksum mode" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

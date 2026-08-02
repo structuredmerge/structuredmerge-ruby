@@ -51,6 +51,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Honor explicit VersionGem disablement and default supported Ruby gems to VersionGem during templating.
 
+- Prune stale template lock records after managed files are removed.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

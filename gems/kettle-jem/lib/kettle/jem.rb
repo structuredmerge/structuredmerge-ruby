@@ -4833,7 +4833,12 @@ module Kettle
     end
 
     def checksum_file_records(project_root, report, existing_state)
-      existing_records = TemplateLock.files(existing_state)
+      existing_records = TemplateLock.files(existing_state).each_with_object({}) do |(relative_path, record), retained|
+        action = record.is_a?(Hash) ? record["action"].to_s : ""
+        next if action != "delete" && !File.exist?(File.join(project_root, relative_path.to_s))
+
+        retained[relative_path] = record
+      end
       report.fetch(:recipe_reports, []).each_with_object(existing_records.dup) do |recipe_report, records|
         next unless checksum_cache_safe_report?(recipe_report)
 
