@@ -1298,6 +1298,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Merge devcontainer JSON files as JSONC so comments and trailing commas are supported.
 
+- Keep parser-backed and stateful template recipes out of parallel planning workers.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

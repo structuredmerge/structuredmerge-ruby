@@ -413,13 +413,13 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       expect(normalize.call(workers)).to eq(normalize.call(main_thread))
       expect(stats).to include(
         worker_safe_recipes: 1,
-        main_only_recipes: 0,
-        thread_worker_count: 2,
-        thread_spawn_count: 2,
-        thread_recipe_count: 2,
-        main_recipe_count: 0
+        main_only_recipes: 1,
+        thread_worker_count: 1,
+        thread_spawn_count: 1,
+        thread_recipe_count: 1,
+        main_recipe_count: 1
       )
-      expect(workers.map { |report| report.dig(:metadata, :executor) }).to eq(%w[thread thread])
+      expect(workers.map { |report| report.dig(:metadata, :executor) }).to eq(["thread", nil])
       expect(workers.map { |report| report.dig(:metadata, :duration_ms) }).to all(be >= 0)
       expect(workers.map { |report| report.dig(:report_envelope, :report, :metadata, :duration_ms) }).to eq(
         workers.map { |report| report.dig(:metadata, :duration_ms) }

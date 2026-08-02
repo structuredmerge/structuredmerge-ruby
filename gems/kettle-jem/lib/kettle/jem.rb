@@ -4214,34 +4214,41 @@ module Kettle
       raise ArgumentError, "Use either KETTLE_JEM_RACTOR_WORKERS or KETTLE_JEM_THREAD_WORKERS, not both" if use_threads && workers.to_i.positive?
 
       worker_count = use_ractors ? [workers.to_i, worker_safe.length].min : 0
-      thread_worker_count = use_threads ? [thread_workers.to_i, indexed_recipes.length].min : 0
+      thread_worker_count = use_threads ? [thread_workers.to_i, worker_safe.length].min : 0
       record_recipe_planning_execution_stats(
         stats,
         worker_safe: worker_safe.length,
-        main_only: use_threads ? 0 : main_only.length,
+        main_only: main_only.length,
         worker_count: worker_count,
         spawned: worker_count,
         ractor_recipes: use_ractors ? worker_safe.length : 0,
         thread_worker_count: thread_worker_count,
         thread_spawns: thread_worker_count,
-        thread_recipes: use_threads ? indexed_recipes.length : 0,
-        main_recipes: if use_threads
-                        0
-                      else
-                        main_only.length + (use_ractors ? 0 : worker_safe.length)
-                      end
+        thread_recipes: use_threads ? worker_safe.length : 0,
+        main_recipes: main_only.length + (use_threads || use_ractors ? 0 : worker_safe.length)
       )
       if use_threads
         reports_by_index.merge!(
           execute_indexed_recipe_reports_thread(
             project_root: project_root,
-            indexed_recipes: indexed_recipes,
+            indexed_recipes: worker_safe,
             facts: facts,
             files: files,
             template_contents: template_contents,
             decision_policy: decision_policy,
             env: env,
             workers: thread_worker_count
+          )
+        )
+        reports_by_index.merge!(
+          execute_indexed_recipe_reports(
+            project_root: project_root,
+            indexed_recipes: main_only,
+            facts: facts,
+            files: files,
+            template_contents: template_contents,
+            decision_policy: decision_policy,
+            env: env
           )
         )
       else
