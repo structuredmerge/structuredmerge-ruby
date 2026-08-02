@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'markdown-merge'
 require 'kramdown'
+require_relative 'merge/version'
 
 module Kramdown
   module Merge
