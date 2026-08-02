@@ -5356,7 +5356,12 @@ module Kettle
       changed_files = []
       current = read_project_file(project_root, entrypoint_path)
       if cleanup_entrypoint && !current.empty?
-        cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
+        version_path = File.join(project_root, "lib", entrypoint_require, "version.rb")
+        cleaned = version_gem_free_entrypoint_content(
+          current,
+          entrypoint_require: entrypoint_require,
+          ensure_version_require: File.file?(version_path)
+        )
         changed_files << write_if_changed(project_root, entrypoint_path, cleaned)
       end
       changed_files << cleanup_version_gem_entrypoint(project_root, dedicated_entrypoint_path)
@@ -5392,10 +5397,10 @@ module Kettle
       dependencies.any? { |dependency| dependency.name == "version_gem" }
     end
 
-    def project_uses_version_gem?(_project_root, _entrypoint_require, facts = nil)
-      return false unless version_gem_enabled?(facts)
+    def project_uses_version_gem?(project_root, _entrypoint_require, facts = nil)
+      return false if version_gem_explicitly_disabled?(facts)
 
-      true
+      version_gem_enabled?(facts) || project_gemspec_declares_version_gem?(project_root)
     end
 
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
@@ -9737,7 +9742,12 @@ module Kettle
       merged = apply_configured_gemspec_metadata(merged, facts, receiver: template_receiver)
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
-      merged = remove_gemspec_version_gem_dependency_when_disabled(merged, facts, receiver: template_receiver)
+      merged = remove_gemspec_version_gem_dependency_when_disabled(
+        merged,
+        facts,
+        receiver: template_receiver,
+        template_declares_version_gem: gemspec_dependency_names(template_content).include?("version_gem")
+      )
       merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
@@ -10015,11 +10025,16 @@ module Kettle
       []
     end
 
-    def remove_gemspec_version_gem_dependency_when_disabled(content, facts, receiver:)
+    def remove_gemspec_version_gem_dependency_when_disabled(content, facts, receiver:, template_declares_version_gem: false)
       return content if version_gem_enabled?(facts)
+      return content if template_declares_version_gem && !version_gem_explicitly_disabled?(facts) && version_gem_runtime_compatible?(facts)
 
       cleaned = remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
       remove_ruby_comment_lines_containing(cleaned, "version_gem")
+    end
+
+    def version_gem_explicitly_disabled?(facts)
+      facts.to_h.dig(:version_gem, :enabled) == false
     end
 
     def remove_gemspec_version_gem_dependency_when_non_default_entrypoint(content, facts, receiver:)
@@ -14664,8 +14679,10 @@ module Kettle
       collapse_excess_blank_lines(updated)
     end
 
-    def version_gem_free_entrypoint_content(content, entrypoint_require:)
+    def version_gem_free_entrypoint_content(content, entrypoint_require:, ensure_version_require: true)
       current = remove_version_gem_entrypoint_references(content)
+      return trim_trailing_blank_lines(collapse_excess_blank_lines(current)) unless ensure_version_require
+
       relative_path = File.join(File.basename(entrypoint_require), "version")
       return trim_trailing_blank_lines(collapse_excess_blank_lines(current)) if ruby_top_level_require?(current, "require_relative", relative_path)
 

@@ -1509,6 +1509,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
 
       expect(final_content).to include('require "set"')
       expect(final_content).to include('require "json"')
+      expect(final_content).not_to include('require_relative "example/version"')
       expect(final_content).to include("def keep\n    :destination\n  end")
       expect(final_content).to include("class Added")
       expect(final_content).to include(":template_only")

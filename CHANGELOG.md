@@ -262,6 +262,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - json-merge supports JSONC comments and trailing commas while rejecting JSON5-only syntax.
 
+- kettle-jem preserves explicit version_gem template dependencies and avoids introducing missing version requires.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
