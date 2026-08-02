@@ -5254,10 +5254,16 @@ module Kettle
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       version_path = File.join("lib", entrypoint_require, "version.rb")
       signature_path = File.join("sig", "#{entrypoint_require}.rbs")
+      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      namespace = facts.dig(:rubygems, :namespace).to_s
       version_gem_bootstrap_step_for_paths(
         project_root,
         facts,
-        manage_version_file: !templated_paths.include?(version_path),
+        # The generic recipe renders module namespaces.  A destination entrypoint
+        # can establish its outer namespace as a class (for example Month), which
+        # the generated version file must reopen as that same class.
+        manage_version_file: !templated_paths.include?(version_path) ||
+          version_namespace_outer_kind(project_root, entrypoint_path, namespace) == :class,
         manage_signature_file: !templated_paths.include?(signature_path)
       )
     end

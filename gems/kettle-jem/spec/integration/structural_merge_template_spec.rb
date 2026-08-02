@@ -838,10 +838,52 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       facts = {
         package: {name: "month-serializer"},
         rubygems: {entrypoint_require: "month/serializer", namespace: "Month::Serializer"},
-        project_runtime: {version: "1.0.0"}
+        project_runtime: {version: "1.0.0"},
+        version_gem: {enabled: true}
       }
 
       result = described_class.send(:version_gem_bootstrap_step_for_paths, root, facts)
+      version_file = File.read(File.join(root, "lib/month/serializer/version.rb"))
+
+      expect(result[:status]).to eq("applied")
+      expect(version_file).to include("class Month\n  module Serializer")
+      expect(version_file).not_to include("module Month\n")
+    end
+  end
+
+  it "repairs a recipe-generated module wrapper when the entrypoint outer namespace is a class" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-class-version-repair", tmp_root) do |root|
+      write_tree(root, {
+        "lib/month/serializer.rb" => <<~RUBY,
+          require "month"
+
+          class Month
+            module Serializer
+            end
+          end
+        RUBY
+        "lib/month/serializer/version.rb" => <<~RUBY
+          module Month
+            module Serializer
+            end
+          end
+        RUBY
+      })
+      facts = {
+        package: {name: "month-serializer"},
+        rubygems: {entrypoint_require: "month/serializer", namespace: "Month::Serializer"},
+        project_runtime: {version: "1.0.0"},
+        version_gem: {enabled: true}
+      }
+      report = {
+        facts: facts,
+        recipe_reports: [{relative_path: "lib/month/serializer/version.rb"}],
+        template_selection: {only: []}
+      }
+
+      result = described_class.send(:template_version_gem_bootstrap_step, root, report)
       version_file = File.read(File.join(root, "lib/month/serializer/version.rb"))
 
       expect(result[:status]).to eq("applied")
