@@ -7758,7 +7758,23 @@ module Kettle
       output = nodes.sort_by { |node| -node.location.start_line }.reduce(content.to_s) do |output, node|
         replace_source_range_lines(output, node.location.start_line, expand_line_range_through_following_blanks(output, node.location.end_line), "")
       end
-      normalize_simplecov_track_files_calls(output)
+      normalize_simplecov_usage_guidance(normalize_simplecov_track_files_calls(output))
+    end
+
+    # Older template merges appended a second generated usage-comment block.
+    # Keep the first block and remove only later comment-only blocks with the
+    # same generated heading, leaving any coverage code or local notes intact.
+    def normalize_simplecov_usage_guidance(content)
+      lines = content.to_s.lines
+      starts = lines.each_index.select { |index| lines[index].strip == "# To get coverage" }
+      return content if starts.length < 2
+
+      starts.drop(1).reverse_each do |start_index|
+        end_index = start_index
+        end_index += 1 while end_index < lines.length && comment_or_blank_line?(lines[end_index])
+        lines.slice!(start_index...end_index) if comment_only_lines?(lines[start_index...end_index])
+      end
+      lines.join
     end
 
     def simplecov_obsolete_call_nodes(content)
@@ -11329,7 +11345,57 @@ module Kettle
     end
 
     def sync_kettle_config_documentation_comments(content)
-      sync_readme_top_logos_documentation_comment(content)
+      synced = sync_readme_top_logos_documentation_comment(content)
+      synced = remove_duplicate_framework_matrix_documentation(synced)
+      remove_duplicate_readme_preservation_documentation(synced)
+    end
+
+    # YAML parsers do not retain comments. These migrations therefore operate
+    # on bounded comment-only spans left by older template versions; they never
+    # remove a span containing a YAML key or value.
+    def remove_duplicate_framework_matrix_documentation(content)
+      remove_duplicate_comment_span_before_marker(
+        content,
+        start_marker: "# Framework matrix workflows.",
+        end_marker: "# README top logos."
+      )
+    end
+
+    def remove_duplicate_readme_preservation_documentation(content)
+      lines = content.to_s.lines
+      marker = "# Sections to preserve from the destination README during template merging."
+      starts = lines.each_index.select { |index| lines[index].strip == marker }
+      return content if starts.length < 2
+
+      starts.drop(1).reverse_each do |start_index|
+        end_index = start_index
+        end_index += 1 while end_index < lines.length && comment_or_blank_line?(lines[end_index])
+        lines.slice!(start_index...end_index) if comment_only_lines?(lines[start_index...end_index])
+      end
+      lines.join
+    end
+
+    def remove_duplicate_comment_span_before_marker(content, start_marker:, end_marker:)
+      lines = content.to_s.lines
+      starts = lines.each_index.select { |index| lines[index].chomp == start_marker }
+      return content if starts.length < 2
+
+      starts.drop(1).reverse_each do |start_index|
+        end_index = ((start_index + 1)...lines.length).find { |index| lines[index].chomp == end_marker }
+        next unless end_index && comment_only_lines?(lines[start_index...end_index])
+
+        lines.slice!(start_index...end_index)
+      end
+      lines.join
+    end
+
+    def comment_or_blank_line?(line)
+      stripped = line.to_s.strip
+      stripped.empty? || stripped.start_with?("#")
+    end
+
+    def comment_only_lines?(lines)
+      Array(lines).all? { |line| comment_or_blank_line?(line) }
     end
 
     def sync_readme_top_logos_documentation_comment(content)

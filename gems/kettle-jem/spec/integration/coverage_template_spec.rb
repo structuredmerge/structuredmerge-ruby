@@ -38,6 +38,29 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).not_to include("track_files")
   end
 
+  it "removes repeated generated SimpleCov usage guidance" do
+    guidance = <<~RUBY
+      # To get coverage
+      # On Local, default (HTML) output coverage is turned on with Ruby 2.7+:
+      #   bundle exec rspec spec
+    RUBY
+    content = <<~RUBY
+      # local coverage note
+
+      #{guidance}
+      #{guidance}
+      SimpleCov.configure do
+        cover "lib/**/*.rb"
+      end
+    RUBY
+
+    output = described_class.send(:normalize_simplecov_template_source, content)
+
+    expect(output.scan("# To get coverage").size).to eq(1)
+    expect(output).to include("# local coverage note")
+    expect(output).to include('cover "lib/**/*.rb"')
+  end
+
   it "removes obsolete .simplecov keep_destination config during config sync" do
     content = <<~YAML
       defaults:

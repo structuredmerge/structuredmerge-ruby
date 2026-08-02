@@ -55,6 +55,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Avoid recursive project fact discovery while evaluating transfer changelog filters during templating.
 
+- Templating now removes duplicated legacy configuration comments and repeated generated SimpleCov usage guidance from destinations.
+
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned

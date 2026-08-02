@@ -414,6 +414,41 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(config.fetch("readme")).not_to have_key("top_logo_mode")
   end
 
+  it "removes duplicated legacy config documentation without removing YAML settings" do
+    content = <<~YAML
+      # Framework matrix workflows.
+      # Generated matrix documentation.
+
+      workflows:
+        exec_cmd: kettle-test
+
+      # Framework matrix workflows.
+      # Generated matrix documentation.
+
+      # README top logos.
+      readme:
+        top_logos: org
+        # Sections to preserve from the destination README during template merging.
+        # Generated README preservation documentation.
+
+        badges:
+          fossa: false
+        # Sections to preserve from the destination README during template merging.
+        # Generated README preservation documentation.
+
+      # SPDX license identifiers for this project.
+      licenses:
+        - MIT
+    YAML
+
+    output = described_class.send(:sync_kettle_config_env_overrides, content, {})
+
+    expect(output.scan("# Framework matrix workflows.").size).to eq(1)
+    expect(output.scan("# Sections to preserve from the destination README during template merging.").size).to eq(1)
+    expect(YAML.safe_load(output).dig("workflows", "exec_cmd")).to eq("kettle-test")
+    expect(YAML.safe_load(output).dig("readme", "badges", "fossa")).to eq(false)
+  end
+
   it "preserves explicit kettle config values while refreshing the config template" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
