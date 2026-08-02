@@ -1546,6 +1546,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
       expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
       expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.2"]')
+      expect(content).to include('nomono_already_activated = Gem.loaded_specs["nomono"]')
+      expect(content).to include("!nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)")
       expect(content).to include("nomono_lockfile")
       expect(content).to include("Bundler::LockfileParser")
       expect(content).to include('Kernel.send(:gem, "nomono"')
