@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'prism'
 require 'ruby-merge'
 require 'ast/merge'
 require 'tree_haver'
+require_relative 'merge/version'
 
 module Prism
   module Merge
