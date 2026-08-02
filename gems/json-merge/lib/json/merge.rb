@@ -64,7 +64,7 @@ module Json
     def json_feature_profile
       {
         family: 'json',
-        supported_dialects: %w[json jsonc],
+        supported_dialects: %w[json jsonc json5],
         supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     end
@@ -124,7 +124,7 @@ module Json
         diagnostics: [],
         analysis: {
           dialect: dialect.to_s,
-          allows_comments: dialect == :jsonc,
+          allows_comments: %i[jsonc json5].include?(dialect),
           root_kind: json_analysis_root_kind(analysis),
           owners: collect_file_analysis_owners(analysis)
         },
@@ -197,27 +197,27 @@ module Json
         raise ParseError, message
       end
 
-      json_value_for_node(analysis.root_node)
+      json_value_for_node(analysis.root_node, dialect: dialect)
     end
 
-    def json_value_for_node(node)
+    def json_value_for_node(node, dialect: :json)
       case node.type.to_s
       when 'document'
         child = node.semantic_children.first
-        child ? json_value_for_node(NodeWrapper.new(child, lines: node.lines, source: node.source)) : nil
+        child ? json_value_for_node(NodeWrapper.new(child, lines: node.lines, source: node.source, dialect: dialect), dialect: dialect) : nil
       when 'object'
         node.pairs.each_with_object({}) do |pair, object|
           key = pair.key_name
           next unless key
 
-          object[key] = json_value_for_node(pair.value_node)
+          object[key] = json_value_for_node(pair.value_node, dialect: dialect)
         end
       when 'array'
-        node.elements.map { |element| json_value_for_node(element) }
+        node.elements.map { |element| json_value_for_node(element, dialect: dialect) }
       when 'string'
-        decode_json_string_literal(node.text)
+        decode_string_literal(node.text, dialect: dialect)
       when 'number'
-        parse_json_number(node.text)
+        parse_number_literal(node.text, dialect: dialect)
       when 'true'
         true
       when 'false'
@@ -225,6 +225,19 @@ module Json
       when 'null'
         nil
       end
+    end
+
+    def object_key_for_literal(text, dialect: :json)
+      literal = text.to_s
+      return literal if dialect == :json5 && !%w[' "].include?(literal[0])
+
+      decode_string_literal(literal, dialect: dialect)
+    end
+
+    def decode_string_literal(text, dialect: :json)
+      return decode_json_string_literal(text) unless dialect == :json5
+
+      decode_json5_string_literal(text)
     end
 
     def decode_json_string_literal(text)
@@ -246,6 +259,67 @@ module Json
       end
     end
     private_class_method :decode_json_string_literal
+
+    def decode_json5_string_literal(text)
+      literal = text.to_s
+      return literal unless literal.length >= 2 && %w[' "].include?(literal[0]) && literal[-1] == literal[0]
+
+      body = literal[1...-1]
+      result = +''
+      index = 0
+      while index < body.length
+        char = body[index]
+        unless char == '\\'
+          result << char
+          index += 1
+          next
+        end
+
+        index += 1
+        escape = body[index]
+        break unless escape
+
+        case escape
+        when "\n"
+          # JSON5 line continuations contribute no character.
+        when "\r"
+          index += 1 if body[index + 1] == "\n"
+        when 'b' then result << "\b"
+        when 'f' then result << "\f"
+        when 'n' then result << "\n"
+        when 'r' then result << "\r"
+        when 't' then result << "\t"
+        when 'v' then result << "\v"
+        when '0' then result << "\0"
+        when 'x'
+          hex = body[(index + 1), 2]
+          result << hex.to_i(16).chr(Encoding::UTF_8) if hex&.match?(/\A[0-9a-fA-F]{2}\z/)
+          index += 2
+        when 'u'
+          hex = body[(index + 1), 4]
+          result << [hex.to_i(16)].pack('U') if hex&.match?(/\A[0-9a-fA-F]{4}\z/)
+          index += 4
+        else
+          result << escape
+        end
+        index += 1
+      end
+      result
+    end
+    private_class_method :decode_json5_string_literal
+
+    def parse_number_literal(text, dialect: :json)
+      return parse_json_number(text) unless dialect == :json5
+
+      literal = text.to_s.delete('_')
+      return Float::INFINITY if literal == 'Infinity' || literal == '+Infinity'
+      return -Float::INFINITY if literal == '-Infinity'
+      return Float::NAN if %w[NaN +NaN -NaN].include?(literal)
+
+      Integer(literal, 0)
+    rescue ArgumentError
+      Float(literal)
+    end
 
     def parse_json_number(text)
       number = text.to_s
@@ -277,7 +351,7 @@ module Json
 
     def json_backend_available_for_analysis?(backend_id, dialect: :json)
       register_backend!
-      languages = dialect == :jsonc ? %i[json json5] : [:json]
+      languages = %i[jsonc json5].include?(dialect) ? [:json5] : [:json]
       case backend_id.to_s
       when TREE_SITTER_BACKEND.id
         languages.all? do |language|
@@ -292,9 +366,9 @@ module Json
 
     def normalize_json_dialect(dialect)
       normalized = dialect.to_s.downcase
-      return normalized.to_sym if %w[json jsonc].include?(normalized)
+      return normalized.to_sym if %w[json jsonc json5].include?(normalized)
 
-      raise ArgumentError, "Unsupported JSON dialect #{dialect.inspect}. Expected json or jsonc."
+      raise ArgumentError, "Unsupported JSON dialect #{dialect.inspect}. Expected json, jsonc, or json5."
     end
     private_class_method :normalize_json_dialect
 

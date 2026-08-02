@@ -21,13 +21,13 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
-Json::Merge intelligently merges two versions of a JSON or JSONC file using the StructuredMerge Ruby stack. It is built on [ast-merge][ast-merge] and [tree_haver][tree_haver], with parser capability reported through the shared backend registry.
+Json::Merge intelligently merges two versions of a JSON, JSONC, or JSON5 file using the StructuredMerge Ruby stack. It is built on [ast-merge][ast-merge] and [tree_haver][tree_haver], with parser capability reported through the shared backend registry.
 
-JSONC support uses the same `Json::Merge` API as JSON; use `require "json/merge"` for both dialects.
+JSONC and JSON5 use the same `Json::Merge` API as JSON; use `require "json/merge"` for all three dialects.
 
 ### JSONC Support
 
-The JSON merge provider supports both JSON and JSONC dialects through `Json::Merge`. Pass JSONC content to the same merger API used for JSON.
+The JSON merge provider supports JSON, JSONC, and JSON5 dialects through `Json::Merge`. Pass JSONC content to the same merger API used for JSON.
 
 JSONC-specific behavior:
 
@@ -38,10 +38,18 @@ JSONC-specific behavior:
     single-quoted strings, and JSON5 numeric literals
   - **Freeze Blocks**: Uses the `json-merge` freeze token by default, with a custom token available when needed
 
+### JSON5 Support
+
+JSON5 uses the same structural merge engine with `dialect: :json5`. It accepts
+JSON5 syntax, including comments, trailing commas, unquoted object keys,
+single-quoted strings, hexadecimal and signed numeric literals, `Infinity`, and
+`NaN`. JSONC remains intentionally narrower: it accepts comments and trailing
+commas, but rejects the JSON5-only forms.
+
 ### Key Features
 
   - **Tree-Sitter Powered**: Uses tree-sitter-json for strict JSON and the
-    normalized JSON5 tree for JSONC syntax
+    normalized JSON5 tree for JSONC and JSON5 syntax
   - **JSONC-Aware**: Preserves `//` and `/* */` comments when the parser exposes them
   - **Intelligent**: Matches objects and arrays by structural signatures
   - **Fuzzy Property Matching**: `ObjectMatchRefiner` matches similar property names
@@ -221,9 +229,10 @@ Enable debug logging to see merge decisions:
 export JSON_MERGE_DEBUG=1
 ```
 
-### JSONC Options
+### JSONC and JSON5 Options
 
-JSONC files use the same options as JSON files:
+JSONC and JSON5 files use the same options as JSON files. Set `dialect` when
+constructing a direct merger:
 
 ```ruby
 merger = Json::Merge::SmartMerger.new(
@@ -238,6 +247,9 @@ merger = Json::Merge::SmartMerger.new(
   # false (default) - only include properties that exist in destination
   # true - include all template properties
   add_template_only_nodes: false,
+
+  # :json (strict), :jsonc (comments and trailing commas), or :json5
+  dialect: :jsonc,
 
   # Token for freeze block markers
   # Default: "json-merge"
@@ -367,6 +379,20 @@ merger = Json::Merge::SmartMerger.new(template, destination)
 result = merger.merge
 
 File.write("merged.jsonc", result)
+```
+
+### Merging JSON5 Files
+
+```ruby
+require "json/merge"
+
+template = File.read("template.json5")
+destination = File.read("destination.json5")
+
+merger = Json::Merge::SmartMerger.new(template, destination, dialect: :json5)
+result = merger.merge
+
+File.write("merged.json5", result)
 ```
 
 ### JSONC Freeze Blocks

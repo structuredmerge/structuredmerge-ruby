@@ -41,6 +41,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem` benchmark results now include README timing breakdowns for both
   the baseline and fastest non-baseline variant.
 
+- json-merge now supports JSON5 parsing and structural merging.
+
 ### Changed
 
 - StructuredMerge Ruby gemspec manifests now exclude repository-only files from

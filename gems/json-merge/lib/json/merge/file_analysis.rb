@@ -113,7 +113,7 @@ module Json
         return @root_node if defined?(@root_node)
         return @root_node = nil unless valid?
 
-        @root_node = NodeWrapper.new(@ast.root_node, lines: @lines, source: @source)
+        @root_node = NodeWrapper.new(@ast.root_node, lines: @lines, source: @source, dialect: @dialect)
       end
 
       def root_object
@@ -124,7 +124,7 @@ module Json
         return @root_object = nil unless root
 
         root.each do |child|
-          return @root_object = NodeWrapper.new(child, lines: @lines, source: @source) if child.type.to_s == 'object'
+          return @root_object = NodeWrapper.new(child, lines: @lines, source: @source, dialect: @dialect) if child.type.to_s == 'object'
         end
 
         @root_object = nil
@@ -189,14 +189,14 @@ module Json
         return unless root
 
         root_type = root.type.to_s
-        return NodeWrapper.new(root, lines: @lines, source: @source) if %w[object array].include?(root_type)
+        return NodeWrapper.new(root, lines: @lines, source: @source, dialect: @dialect) if %w[object array].include?(root_type)
 
         root.each do |child|
           child_type = child.type.to_s
           next if child_type == 'comment'
           next unless %w[object array].include?(child_type)
 
-          return NodeWrapper.new(child, lines: @lines, source: @source)
+          return NodeWrapper.new(child, lines: @lines, source: @source, dialect: @dialect)
         end
 
         nil
@@ -218,7 +218,7 @@ module Json
       end
 
       def parser_language
-        @dialect == :jsonc ? :json5 : :json
+        %i[jsonc json5].include?(@dialect) ? :json5 : :json
       end
 
       def validate_jsonc_dialect!

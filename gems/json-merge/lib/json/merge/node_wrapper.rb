@@ -5,6 +5,13 @@ module Json
     # Wraps TreeHaver nodes with line information and signatures for JSON /
     # JSONC merging.
     class NodeWrapper < Ast::Merge::NodeWrapperBase
+      attr_reader :dialect
+
+      def initialize(node, lines:, source: nil, dialect: :jsonc, **options)
+        @dialect = dialect.to_sym
+        super(node, lines: lines, source: source, **options)
+      end
+
       def object?
         @node.type.to_s == 'object'
       end
@@ -43,7 +50,7 @@ module Json
         key_node = find_child_by_field('key') || semantic_children.first
         return unless key_node
 
-        node_text(key_node)&.gsub(/\A"|"\z/, '')
+        Json::Merge.object_key_for_literal(node_text(key_node), dialect: dialect)
       end
 
       def value_node
@@ -52,7 +59,7 @@ module Json
         value = find_child_by_field('value') || semantic_children[1]
         return unless value
 
-        NodeWrapper.new(value, lines: @lines, source: @source)
+        NodeWrapper.new(value, lines: @lines, source: @source, dialect: dialect)
       end
 
       def pairs
@@ -63,7 +70,7 @@ module Json
           next if child.type.to_s == 'comment'
           next unless child.type.to_s == 'pair'
 
-          result << NodeWrapper.new(child, lines: @lines, source: @source)
+          result << NodeWrapper.new(child, lines: @lines, source: @source, dialect: dialect)
         end
         result
       end
@@ -79,7 +86,7 @@ module Json
           next if child_type == '['
           next if child_type == ']'
 
-          result << NodeWrapper.new(child, lines: @lines, source: @source)
+          result << NodeWrapper.new(child, lines: @lines, source: @source, dialect: dialect)
         end
         result
       end
@@ -167,7 +174,7 @@ module Json
       protected
 
       def wrap_child(child)
-        NodeWrapper.new(child, lines: @lines, source: @source)
+        NodeWrapper.new(child, lines: @lines, source: @source, dialect: dialect)
       end
 
       def compute_signature(node)
@@ -241,7 +248,7 @@ module Json
 
           next unless key_node
 
-          key_text = node_text(key_node)&.gsub(/\A"|"\z/, '')
+          key_text = Json::Merge.object_key_for_literal(node_text(key_node), dialect: dialect)
           keys << key_text if key_text
         end
         keys

@@ -28,6 +28,7 @@ RSpec.describe Json::Merge do
   def jsonc_fixture(role)
     direct_paths = {
       'parse_comments' => %w[jsonc slice-04-parse comments-accepted.json],
+      'parse_trailing_comma' => %w[jsonc slice-04-parse trailing-comma-accepted.json],
       'structure_jsonc' => %w[jsonc slice-07-structure commented-object.json]
     }
     path = direct_paths[role]
@@ -44,6 +45,14 @@ RSpec.describe Json::Merge do
 
     expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(result.dig(:analysis, :allows_comments)).to eq(fixture.dig(:expected, :allows_comments))
+    expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
+  end
+
+  it 'conforms to the jsonc trailing-comma fixture' do
+    fixture = jsonc_fixture('parse_trailing_comma')
+    result = described_class.parse_json(fixture[:source], fixture[:dialect])
+
+    expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
@@ -81,6 +90,31 @@ RSpec.describe Json::Merge do
       expect(result[:ok]).to be(false), description
       expect(result.dig(:diagnostics, 0, :message)).to include('JSONC rejects'), description
     end
+  end
+
+  it 'parses JSON5 syntax and exposes its semantic values' do
+    source = <<~JSON5
+      // JSON5 permits comments and trailing commas
+      {
+        unquoted: 'value',
+        hex: 0x2A,
+        signed: +1,
+        decimal: .5,
+        trailing: 1.,
+      }
+    JSON5
+
+    result = described_class.parse_json(source, 'json5')
+
+    expect(result[:ok]).to be(true)
+    expect(result.dig(:analysis, :dialect)).to eq('json5')
+    expect(described_class.json_value_for_source(source, dialect: 'json5')).to eq(
+      'unquoted' => 'value',
+      'hex' => 42,
+      'signed' => 1,
+      'decimal' => 0.5,
+      'trailing' => 1.0
+    )
   end
 
   it 'exposes JSON TreeHaver backend availability and plan context' do
@@ -272,10 +306,22 @@ RSpec.describe Json::Merge do
     expect(result[:output]).to include('"template": true')
   end
 
+  it 'merges JSON5 documents with equivalent quoted and unquoted keys' do
+    template = "{ feature: 'template', templateOnly: true, }"
+    destination = '{ "feature": \'destination\', destinationOnly: true, }'
+
+    result = described_class.merge_json(template, destination, 'json5')
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include('"feature": \'destination\'')
+    expect(result[:output]).to include('templateOnly: true')
+    expect(result[:output].scan(/["']?feature["']?\s*:/).length).to eq(1)
+  end
+
   it 'rejects unsupported direct merger dialects' do
     expect do
-      described_class::SmartMerger.new('{"value": true}', '{"value": true}', dialect: :json5)
-    end.to raise_error(ArgumentError, /Expected json or jsonc/)
+      described_class::SmartMerger.new('{"value": true}', '{"value": true}', dialect: :toml)
+    end.to raise_error(ArgumentError, /Expected json, jsonc, or json5/)
   end
 
   it 'conforms to the shared family feature profile fixture' do

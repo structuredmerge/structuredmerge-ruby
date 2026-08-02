@@ -64,8 +64,8 @@ module Json
         @merge_arrays = merge_arrays
         @preserve_atomic_formatting = preserve_atomic_formatting
         @dialect = dialect.to_sym
-        unless %i[json jsonc].include?(@dialect)
-          raise ArgumentError, "Unsupported JSON dialect #{dialect.inspect}. Expected json or jsonc."
+        unless %i[json jsonc json5].include?(@dialect)
+          raise ArgumentError, "Unsupported JSON dialect #{dialect.inspect}. Expected json, jsonc, or json5."
         end
 
         super(
