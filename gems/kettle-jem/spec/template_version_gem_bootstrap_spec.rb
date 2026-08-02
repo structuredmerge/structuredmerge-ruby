@@ -197,8 +197,15 @@ RSpec.describe Kettle::Jem do
       write_file(root, "exe/appraisal", <<~RUBY)
         #!/usr/bin/env ruby
 
+        script_basename = File.basename(__FILE__)
         require_relative "../lib/appraisal2/version"
-        puts Appraisal2::Version::VERSION if ARGV.include?("--version")
+        if ARGV.any? { |arg| arg == "-v" || arg == "--version" }
+          puts Appraisal2::Version::VERSION
+          exit(0)
+        end
+
+        require "appraisal2"
+        puts "== \#{script_basename} v\#{Appraisal2::Version::VERSION} =="
       RUBY
       write_file(root, ".kettle-jem.yml", <<~YAML)
         project_emoji: "🔍"
@@ -217,8 +224,9 @@ RSpec.describe Kettle::Jem do
         )
       )
       executable = File.read(File.join(root, "exe/appraisal"))
-      expect(executable).to include('require_relative "../lib/appraisal/version"')
-      expect(executable).to include("Appraisal::Version::VERSION")
+      expect(executable).to include('require "appraisal2"')
+      expect(executable).not_to include("script_basename")
+      expect(executable).not_to include("require_relative")
       expect(executable).not_to include("appraisal2/version")
       expect(executable).not_to include("Appraisal2::Version")
     end

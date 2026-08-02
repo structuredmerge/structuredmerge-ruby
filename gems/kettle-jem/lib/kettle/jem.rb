@@ -4782,11 +4782,21 @@ module Kettle
       parsed = prism_parse_success(content)
       return content unless parsed
 
-      require_argument = ruby_call_records(content, :require_relative).filter_map do |call|
+      require_call = ruby_call_records(content, :require_relative).find do |call|
         argument = call.arguments&.arguments&.first
-        argument if ruby_static_string_value(argument) == legacy_version_path
-      end.first
-      return content unless require_argument
+        [legacy_version_path, canonical_version_path].include?(ruby_static_string_value(argument))
+      end
+      return content unless require_call
+
+      stale_header = stale_executable_startup_header(
+        parsed.value,
+        require_call: require_call,
+        namespaces: [legacy_namespace, namespace]
+      )
+      return remove_stale_executable_startup_header(content, stale_header) if stale_header
+
+      require_argument = require_call.arguments&.arguments&.first
+      return content unless ruby_static_string_value(require_argument) == legacy_version_path
 
       legacy_segments = legacy_namespace.to_s.split("::")
       namespace_segments = namespace.to_s.split("::")
@@ -4815,6 +4825,58 @@ module Kettle
         }
       end
       replace_source_offsets(content, replacements)
+    end
+
+    def stale_executable_startup_header(ast, require_call:, namespaces:)
+      owners = ast.statements&.body.to_a
+      require_index = owners.index do |owner|
+        owner.location.start_offset == require_call.location.start_offset &&
+          owner.location.end_offset == require_call.location.end_offset
+      end
+      return unless require_index && require_index >= 1
+
+      assignment = owners.fetch(require_index - 1)
+      conditional = owners.fetch(require_index + 1, nil)
+      header = owners.drop(require_index + 2).find do |owner|
+        owner.is_a?(::Prism::CallNode) && owner.name == :puts && owner.slice.to_s.include?("script_basename")
+      end
+      return unless assignment.is_a?(::Prism::LocalVariableWriteNode) && assignment.name == :script_basename
+      return unless conditional.is_a?(::Prism::IfNode) && header
+
+      namespace_segments = namespaces.filter_map do |value|
+        segments = value.to_s.split("::").reject(&:empty?)
+        segments unless segments.empty?
+      end
+      return if namespace_segments.empty?
+      return unless executable_version_constant_nodes(conditional, namespace_segments).any?
+      return unless executable_version_constant_nodes(header, namespace_segments).any?
+      return unless header.slice.to_s.include?("script_basename")
+
+      {assignment: assignment, require_call: require_call, conditional: conditional, header: header}
+    end
+
+    def executable_version_constant_nodes(node, namespaces)
+      constants = []
+      node.breadth_first_search_all do |candidate|
+        next unless candidate.is_a?(::Prism::ConstantPathNode)
+
+        segments = ruby_constant_path_segments(candidate)
+        constants << candidate if namespaces.any? do |namespace|
+          segments == namespace + ["Version", "VERSION"] || segments == namespace + ["VERSION"]
+        end
+      end
+      constants
+    end
+
+    def remove_stale_executable_startup_header(content, header)
+      replacements = header.values.map do |node|
+        {
+          start_offset: node.location.start_offset,
+          end_offset: node.location.end_offset,
+          replacement: ""
+        }
+      end
+      ensure_trailing_newline(collapse_excess_blank_lines(replace_source_offsets(content, replacements)))
     end
 
     def git_hooks_executable_step(project_root)
