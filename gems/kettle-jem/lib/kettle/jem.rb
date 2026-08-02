@@ -4725,12 +4725,96 @@ module Kettle
     def post_apply_steps(project_root, report)
       [
         *[template_version_gem_bootstrap_step(project_root, report)].flatten,
+        executable_version_entrypoint_sync_step(project_root, report),
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
         git_hooks_executable_step(project_root),
         github_actions_pin_sync_step(project_root),
         monorepo_subgem_kettle_config_profile_sync_step(project_root, report),
         kettle_jem_state_sync_step(project_root, report)
       ].compact
+    end
+
+    # Older generated executable headers used the package name for both the
+    # version file and namespace.  Projects such as appraisal2 intentionally
+    # expose a different historical entrypoint, so repair that exact stale
+    # header shape from the configured entrypoint facts.
+    def executable_version_entrypoint_sync_step(project_root, report)
+      facts = report.fetch(:facts)
+      package_name = facts.dig(:package, :name).to_s
+      entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
+      return if package_name.empty? || entrypoint_require.empty?
+
+      package_entrypoint = package_name.tr("-", "/")
+      return if package_entrypoint == entrypoint_require
+
+      namespace = facts.dig(:rubygems, :namespace).to_s
+      version_path = File.join("lib", entrypoint_require, "version.rb")
+      namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
+      return if namespace.empty?
+
+      legacy_namespace = package_name.split(/[-_]/).map { |part| part[0].to_s.upcase + part[1..].to_s }.join("::")
+      legacy_version_path = "../lib/#{package_entrypoint}/version"
+      canonical_version_path = "../lib/#{entrypoint_require}/version"
+      changed_files = Dir.glob(File.join(project_root, "exe", "*")).sort.filter_map do |path|
+        next unless File.file?(path)
+
+        before = File.read(path)
+        after = normalize_executable_version_entrypoint(
+          before,
+          legacy_version_path: legacy_version_path,
+          canonical_version_path: canonical_version_path,
+          legacy_namespace: legacy_namespace,
+          namespace: namespace
+        )
+        next if after == before
+
+        File.write(path, after)
+        path.delete_prefix("#{project_root}/")
+      end
+      {
+        name: "executable_version_entrypoint_sync",
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files
+      }
+    end
+
+    def normalize_executable_version_entrypoint(content, legacy_version_path:, canonical_version_path:, legacy_namespace:, namespace:)
+      parsed = prism_parse_success(content)
+      return content unless parsed
+
+      require_argument = ruby_call_records(content, :require_relative).filter_map do |call|
+        argument = call.arguments&.arguments&.first
+        argument if ruby_static_string_value(argument) == legacy_version_path
+      end.first
+      return content unless require_argument
+
+      legacy_segments = legacy_namespace.to_s.split("::")
+      namespace_segments = namespace.to_s.split("::")
+      version_constants = []
+      parsed.value.breadth_first_search_all do |node|
+        next unless node.is_a?(::Prism::ConstantPathNode)
+
+        segments = ruby_constant_path_segments(node)
+        version_constants << node if segments == legacy_segments + ["Version", "VERSION"] || segments == legacy_segments + ["VERSION"]
+      end
+      return content if version_constants.empty?
+
+      replacements = [
+        {
+          start_offset: require_argument.location.start_offset,
+          end_offset: require_argument.location.end_offset,
+          replacement: JSON.generate(canonical_version_path)
+        }
+      ]
+      version_constants.each do |node|
+        suffix = ruby_constant_path_segments(node).last(2) == ["Version", "VERSION"] ? ["Version", "VERSION"] : ["VERSION"]
+        replacements << {
+          start_offset: node.location.start_offset,
+          end_offset: node.location.end_offset,
+          replacement: (namespace_segments + suffix).join("::")
+        }
+      end
+      replace_source_offsets(content, replacements)
     end
 
     def git_hooks_executable_step(project_root)

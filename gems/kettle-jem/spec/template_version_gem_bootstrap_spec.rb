@@ -170,6 +170,60 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "repairs a package-derived executable version header for a configured legacy entrypoint" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-executable-entrypoint", tmp_root) do |root|
+      write_file(root, "appraisal2.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "appraisal2"
+          spec.version = "3.2.1"
+          spec.summary = "Appraisal compatibility matrix"
+          spec.required_ruby_version = ">= 1.8.7"
+          spec.executables = ["appraisal"]
+        end
+      RUBY
+      write_file(root, "lib/appraisal.rb", <<~RUBY)
+        module Appraisal
+        end
+      RUBY
+      write_file(root, "lib/appraisal/version.rb", <<~RUBY)
+        module Appraisal
+          module Version
+            VERSION = "3.2.1"
+          end
+        end
+      RUBY
+      write_file(root, "exe/appraisal", <<~RUBY)
+        #!/usr/bin/env ruby
+
+        require_relative "../lib/appraisal2/version"
+        puts Appraisal2::Version::VERSION if ARGV.include?("--version")
+      RUBY
+      write_file(root, ".kettle-jem.yml", <<~YAML)
+        project_emoji: "🔍"
+        rubygems:
+          entrypoint_require: appraisal
+          min_ruby: "1.8.7"
+      YAML
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "executable_version_entrypoint_sync",
+          status: "applied",
+          changed_files: ["exe/appraisal"]
+        )
+      )
+      executable = File.read(File.join(root, "exe/appraisal"))
+      expect(executable).to include('require_relative "../lib/appraisal/version"')
+      expect(executable).to include("Appraisal::Version::VERSION")
+      expect(executable).not_to include("appraisal2/version")
+      expect(executable).not_to include("Appraisal2::Version")
+    end
+  end
+
   it "removes bundle gem scaffold literal VERSION declarations from the root signature" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -1274,6 +1274,8 @@ Please file a bug if you notice a violation of semantic versioning.
   use GitHub's stable organization avatar endpoint instead of assuming a
   matching Galtzo-hosted asset exists.
 
+- Repair stale executable version headers when a configured entrypoint differs from the package name.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
