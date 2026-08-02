@@ -11461,8 +11461,8 @@ module Kettle
       config = YAML.safe_load(content.to_s, permitted_classes: [], aliases: true) || {}
       yard_host = config["yard_host"].to_s
       homepage_uri = config["homepage_uri"].to_s
-      normalized_yard_host = normalize_project_hostname(yard_host)
-      normalized_homepage_uri = normalize_project_homepage_uri(homepage_uri)
+      normalized_yard_host = token_placeholder?(yard_host) ? yard_host : normalize_project_hostname(yard_host)
+      normalized_homepage_uri = token_placeholder?(homepage_uri) ? homepage_uri : normalize_project_homepage_uri(homepage_uri)
       synced = content.to_s
       if !yard_host.empty? && normalized_yard_host != yard_host
         synced = replace_yaml_scalar_path(synced, %w[yard_host], yaml_config_scalar_literal(normalized_yard_host, path: %w[yard_host]))

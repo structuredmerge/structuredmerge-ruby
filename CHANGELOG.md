@@ -270,6 +270,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem preserves class-based outer namespaces in generated version files.
 
+- kettle-jem preserves host token placeholders during configuration normalization.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

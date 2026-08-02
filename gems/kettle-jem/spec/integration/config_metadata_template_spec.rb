@@ -1461,7 +1461,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       final_content = template_report.fetch(:final_content)
       expect(final_content).to include(%(<a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>))
-      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" width="12%" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by GitHub" src="https://github.com/acme.png?size=192" width="12%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="example-gem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg" width="12%" align="right"/></a>))
       expect(final_content).not_to include("[🖼️galtzo-floss]:")
       expect(final_content).not_to include("[🖼️acme-example-gem]:")
@@ -1507,7 +1507,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       final_content = template_report.fetch(:final_content)
       expect(final_content).not_to include("[🖼️galtzo-floss]:")
       expect(final_content).not_to include("[🖼️galtzo-floss]: https://github.com/galtzo-floss")
-      expect(final_content.scan("galtzo-floss/avatar-128px.svg").length).to eq(2)
+      expect(final_content.scan("galtzo-floss/avatar-128px.svg").length).to eq(1)
+      expect(final_content).to include(%(<a href="https://github.com/galtzo-floss"><img alt="galtzo-floss Logo by GitHub" src="https://github.com/galtzo-floss.png?size=192" width="12%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/galtzo-floss/turbo_tests2"><img alt="turbo_tests2 Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/turbo_tests2/avatar-128px.svg" width="12%" align="right"/></a>))
     end
   end
@@ -1602,7 +1603,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       end
       final_content = template_report.fetch(:final_content)
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="Ruby language Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" align="right"/></a>))
-      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="Acme org Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="Acme org Logo by GitHub" src="https://github.com/acme.png?size=192" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/"><img alt="Tree-sitter project Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="Ignored fourth Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/ignored/avatar-128px.svg" align="right"/></a>))
     end
@@ -1935,7 +1936,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
       expect(default_report.fetch(:checksum_skipped)).to be(true)
       outcomes = default_apply.fetch(:file_outcomes)
-      expect(outcomes).to include(checksum_hits: 0, checksum_protected: 1, changed: 0)
+      expect(outcomes).to include(checksum_hits: 0, checksum_protected: 1, changed: 1)
       expect(outcomes.fetch(:planned)).to eq(
         outcomes.fetch(:checksum_hits) + outcomes.fetch(:checksum_protected) + outcomes.fetch(:unchanged) + outcomes.fetch(:changed)
       )
