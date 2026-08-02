@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-require_relative 'merge/version'
 
 require 'toml-rb'
 require 'toml-merge'
+require_relative 'merge/version'
 
 module Citrus
   module Toml
