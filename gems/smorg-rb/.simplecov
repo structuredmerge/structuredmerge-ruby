@@ -10,5 +10,5 @@
 # If the values for minimum coverage need to change, they should be changed both there,
 #   and in 2 places in .github/workflows/coverage.yml.
 SimpleCov.configure do
-  cover 'lib/**/*.rb', 'lib/**/*.rake', 'exe/*.rb'
+  cover "lib/**/*.rb", "lib/**/*.rake", "exe/*.rb"
 end
