@@ -1300,6 +1300,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep parser-backed and stateful template recipes out of parallel planning workers.
 
+- Preserve destination-specific SimpleCov filters and formatters when migrating legacy SimpleCov.start configuration blocks.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

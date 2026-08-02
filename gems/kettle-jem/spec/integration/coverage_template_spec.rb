@@ -18,6 +18,8 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
       end
 
       SimpleCov.start do
+        # GemMine is test infrastructure, not library code.
+        add_filter "gem_mine"
         track_files "lib/**/*.rb"
         track_files "exe/*.rb"
       end
@@ -31,6 +33,8 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).to include("SimpleCov.configure do")
     expect(output).to include('cover "lib/**/*.rb"')
     expect(output).to include('custom_setting "kept"')
+    expect(output).to include('add_filter "gem_mine"')
+    expect(output).to include("# GemMine is test infrastructure, not library code.")
     expect(output).to include("custom_after_config")
     expect(output).not_to include('require "kettle-soup-cover"')
     expect(output).not_to include('require "kettle/soup/cover/config"')

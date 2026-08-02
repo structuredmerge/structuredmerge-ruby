@@ -7961,11 +7961,32 @@ module Kettle
     end
 
     def normalize_simplecov_template_source(content)
-      nodes = simplecov_obsolete_call_nodes(content)
-      output = nodes.sort_by { |node| -node.location.start_line }.reduce(content.to_s) do |output, node|
-        replace_source_range_lines(output, node.location.start_line, expand_line_range_through_following_blanks(output, node.location.end_line), "")
+      output = migrate_simplecov_start_configuration(content)
+      nodes = simplecov_obsolete_call_nodes(output)
+      output = nodes.sort_by { |node| -node.location.start_line }.reduce(output) do |memo, node|
+        replace_source_range_lines(memo, node.location.start_line, expand_line_range_through_following_blanks(memo, node.location.end_line), "")
       end
       normalize_simplecov_usage_guidance(normalize_simplecov_track_files_calls(output))
+    end
+
+    # SimpleCov.start was historically used as both configuration and startup.
+    # The generated spec helper now owns startup, but a destination's block can
+    # contain project-specific filters and formatters that must survive.
+    def migrate_simplecov_start_configuration(content)
+      result = prism_parse_success(content)
+      return content unless result
+
+      replacements = []
+      result.value.breadth_first_search_all do |node|
+        next unless simplecov_start_call_node?(node) && node.block
+
+        replacements << {
+          start_offset: node.message_loc.start_offset,
+          end_offset: node.message_loc.end_offset,
+          replacement: "configure"
+        }
+      end
+      replace_source_offsets(content, replacements)
     end
 
     # Older template merges appended a second generated usage-comment block.
