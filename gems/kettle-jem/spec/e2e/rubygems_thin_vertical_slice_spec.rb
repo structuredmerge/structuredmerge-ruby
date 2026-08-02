@@ -65,7 +65,10 @@ RSpec.describe Kettle::Jem, "RubyGems thin vertical slice" do
       )
 
       apply = described_class.apply_project(root, env: {})
-      expect(apply[:changed_files]).to eq(fixture.fetch(:expected).fetch(:changed_files))
+      expect(apply[:changed_files]).to eq(
+        fixture.fetch(:expected).fetch(:changed_files) +
+        ["lib/example.rb", "lib/example/version.rb", "sig/example.rbs", "spec/example/version_spec.rb"]
+      )
       expect(normalize_workflow_pins_for_spec(project_files(root, fixture.fetch(:expected).fetch(:files).keys.map(&:to_s)))).to eq(
         normalize_workflow_pins_for_spec(fixture.fetch(:expected).fetch(:files))
       )

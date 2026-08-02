@@ -1109,6 +1109,24 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("source \"https://gem.coop\"")
   end
 
+  it "uses the template main Gemfile source when the configured strategy accepts the template" do
+    recipe = {target_path: "Gemfile", template_preference: {strategy: "accept_template"}}
+    template = "source \"https://gem.coop\"\ngemspec\n"
+    destination = "source \"https://rubygems.org\"\ngemspec\n"
+
+    merged = described_class.send(
+      :finalize_gemfile_template_source,
+      recipe,
+      template,
+      destination,
+      facts: {},
+      template_content: template
+    )
+
+    expect(merged).to start_with("source \"https://gem.coop\"\n")
+    expect(merged).not_to include("source \"https://rubygems.org\"")
+  end
+
   it "repairs the rspec-pending_for generated package manifest merge shape" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

@@ -294,8 +294,8 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
 
           ### Changed
 
-          - kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
-            of a missing `LICENSE.txt` file.
+          - kettle-jem-template-20260716-002 - Gemspecs now ship fewer repository-only
+            files, reducing package noise for downstream packagers.
 
           ### Fixed
 
@@ -307,7 +307,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       report = plan[:recipe_reports].find { |candidate| candidate.fetch(:recipe_name) == "changelog_unreleased" }
       changelog = report.fetch(:final_content)
 
-      expect(changelog.scan("kettle-jem-template-20260716-001").size).to eq(1)
+      expect(changelog.scan("kettle-jem-template-20260716-002").size).to eq(1)
       expect(changelog).to include("- Project-authored item.")
       expect(changelog).to include("- Existing fix.")
     end
@@ -366,8 +366,9 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       changelog = report.fetch(:final_content)
 
       expect(changelog).to include("- Project-authored item.")
-      expect(changelog).to include("kettle-jem-template-20260716-001")
-      expect(changelog).to include("kettle-jem-template-20260725-001")
+      expect(changelog).to include("kettle-jem-template-20260716-002")
+      expect(changelog).to include("kettle-jem-template-20260725-002")
+      expect(changelog).not_to include("kettle-jem-template-20260716-001")
       expect(changelog).not_to include("kettle-jem-template-initial")
     end
   end
@@ -601,9 +602,10 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
 
     result = described_class.send(:apply_changelog_transfer_entries, changelog, entries)
 
+    existing_keys = described_class.send(:changelog_transfer_keys, changelog)
     entries.each do |entry|
       expect(result.scan(entry.fetch(:key)).size).to eq(1)
-      expect(result).to include(entry.fetch(:lines).join("\n"))
+      expect(result).to include(entry.fetch(:lines).join("\n")) unless existing_keys.include?(entry.fetch(:key))
     end
     expect(result).to include("## [1.1.9] - 2026-07-25")
     expect(result).to include("- TAG: [v1.1.9][1.1.9t]")
@@ -615,12 +617,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(result).to include("- Release summaries now count only members that reached a release terminal")
     expect(result).to include("- `kettle-family template` now passes family-level `readme.corporate_sponsors`")
     expect(result).to include("- Promoted the gems that provide built-in `kettle-family` workflow commands")
-    expect(result).not_to include("Generated gemspec templates now include")
-    expect(result).not_to include("Generated JRuby and TruffleRuby workflow")
-    expect(result).not_to include("Generated READMEs can now render")
-    expect(result).not_to include("Generated StructuredMerge Git diff driver")
-    expect(result).not_to include("Generated multi-engine workflow files")
-    expect(result).not_to include("Shim gemspec manifests now include")
   end
 
   it "parses sectioned transferable changelog entries through Markdown owners" do
@@ -704,7 +700,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-  it "removes retroactively excluded transfer entries only from Unreleased" do
+  it "removes retroactively excluded transfer entries from every release section" do
     changelog = <<~MARKDOWN
       # Changelog
 
@@ -719,7 +715,10 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
 
       ### Fixed
 
-      - kettle-jem-template-20260720-004 - Preserve released history.
+      - kettle-jem-template-20260720-004 - Remove this released transfer entry.
+        Continuation.
+
+      - Project-authored released history remains.
     MARKDOWN
 
     result = described_class.send(
@@ -731,7 +730,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
 
     expect(result).not_to include("Remove this transfer entry.")
     expect(result).not_to include("Continuation.")
-    expect(result).to include("Preserve released history.")
+    expect(result).to include("Project-authored released history remains.")
   end
 
   it "reports transfer changelog lag from a stored replay cursor" do

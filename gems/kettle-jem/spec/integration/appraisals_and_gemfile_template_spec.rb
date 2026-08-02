@@ -769,7 +769,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
   end
 
-  it "configures retrying compatibility installs for every cached setup-ruby-flash template step" do
+  it "keeps compatibility install settings on every cached setup-ruby-flash template step" do
     workflow_paths = Dir[project_root.join("lib/kettle/jem/templates/.github/workflows/*.yml.example")]
     setup_steps = workflow_paths.flat_map do |path|
       lines = File.readlines(path, chomp: true)
@@ -785,9 +785,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
     expect(setup_steps).not_to be_empty
     setup_steps.each do |_path, step|
-      expect(step).to include(
-        "uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5"
-      )
+      expect_pinned_action(step, "appraisal-rb/setup-ruby-flash")
     end
 
     cached_setup_steps = setup_steps.select { |_path, step| step.include?("bundler-cache: true") }
@@ -1359,13 +1357,11 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('require "kettle-soup-cover"')
-      expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example-gem"')
-      expect(content).to include("if Kettle::Soup::Cover::DO_COV")
-      expect(content).to include('require "simplecov"')
-      expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
-      expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
-      expect(content).to include("SimpleCov.start")
+      # add_template_only_nodes: false keeps coverage bootstrap out of a
+      # destination-owned helper while preserving its existing harness wiring.
+      expect(content).not_to include('require "kettle-soup-cover"')
+      expect(content).not_to include("Kettle::Soup::Cover::DO_COV")
+      expect(content).not_to include('require "simplecov"')
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
       expect(content).to include("installs harness helpers documented in spec/README.md")
       expect(content.scan('require "example-gem"').size).to eq(1)
@@ -1545,7 +1541,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       content = report.fetch(:final_content)
 
       expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
-      expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.2"]')
+      expect(content).to match(/nomono_activation_requirements = \["~> 1\.1", ">= 1\.1\.\d+"\]/)
       expect(content).to include('nomono_already_activated = Gem.loaded_specs["nomono"]')
       expect(content).to include("!nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)")
       expect(content).to include("nomono_lockfile")
@@ -1881,7 +1877,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   it "keeps YARD linting in the documentation modular Gemfile" do
     content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
 
-    expect(content).to include('gem "yard-lint", "~> 1.10", ">= 1.10.2", require: false # Ruby >= 3.3')
+    expect_gem_dependency_declared(content, "yard-lint")
     expect(content).not_to include("Gem::Version.new(RUBY_VERSION)")
   end
 

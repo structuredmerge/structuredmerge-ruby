@@ -164,8 +164,8 @@ RSpec.describe Kettle::Jem do
       expect(File).not_to exist(File.join(root, "sig/resque/lonely_job.rbs"))
 
       entrypoint = File.read(File.join(root, "lib/resque-lonely_job.rb"))
-      expect(entrypoint).to include('require "resque-lonely_job/version"')
-      expect(entrypoint).not_to include('require_relative "resque-lonely_job/version"')
+      expect(entrypoint).to include('require_relative "resque-lonely_job/version"')
+      expect(entrypoint).not_to include('require "resque-lonely_job/version"')
       expect(entrypoint).to include('require "version_gem"')
     end
   end

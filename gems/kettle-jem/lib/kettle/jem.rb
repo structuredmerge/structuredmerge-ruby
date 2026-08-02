@@ -5903,7 +5903,7 @@ module Kettle
       applicable_keys = applicable.map { |entry| entry.fetch(:key).to_s }.to_set
       applied_keys = changelog_transfer_applied_keys(project_root)
       missing = applicable.reject { |entry| applied_keys.include?(entry.fetch(:key).to_s) }
-      excluded_present = changelog_unreleased_transfer_keys(project_root).reject { |key| applicable_keys.include?(key) }
+      excluded_present = changelog_transfer_applied_keys(project_root).reject { |key| applicable_keys.include?(key) }
       result = {
         total_count: all_entries.size,
         applicable_count: applicable.size,
@@ -6262,7 +6262,6 @@ module Kettle
       removals = changelog_existing_transfer_occurrences(content).filter_map do |occurrence|
         key = occurrence.fetch(:key).to_s
         next unless excluded.include?(key)
-        next unless occurrence.fetch(:release_heading) == "## [Unreleased]"
 
         (occurrence.fetch(:start_line)..occurrence.fetch(:end_line))
       end
@@ -7593,7 +7592,11 @@ module Kettle
         preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
       )
       if recipe.fetch(:target_path).to_s == "Gemfile"
-        output = preserve_destination_gemfile_source(output, destination_content)
+        # A merged Gemfile retains its project-specific source; an accepted
+        # template owns the complete source declaration.
+        unless recipe.dig(:template_preference, :strategy).to_s == "accept_template"
+          output = preserve_destination_gemfile_source(output, destination_content)
+        end
         output = inject_main_gemfile_recording_eval(output, facts)
         output = remove_stale_main_gemfile_tree_sitter_language_pack(output, template_content)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)

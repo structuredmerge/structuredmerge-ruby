@@ -1290,6 +1290,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove legacy yard-junk development dependencies that conflict with generated documentation tooling.
 
+- Gemfile accept-template strategy now replaces an existing dependency source instead of retaining it.
+
+- Transfer changelog filters now remove inapplicable template-owned entries from released and Unreleased sections.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
