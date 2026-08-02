@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 module Prism
   module Merge
     # AST-directed renaming of a block parameter and its receiver references.
