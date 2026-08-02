@@ -9,9 +9,9 @@ require 'version_gem'
 
 # Shared merge infrastructure
 require 'ast/merge'
+require_relative 'merge/version'
 
 # This gem
-require_relative 'merge/version'
 
 # Toml::Merge provides a TOML file smart merge system using tree-sitter AST analysis.
 # It intelligently merges template and destination TOML files by identifying matching
