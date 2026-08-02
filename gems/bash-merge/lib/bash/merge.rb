@@ -21,9 +21,9 @@ require 'version_gem'
 
 # Shared merge infrastructure
 require 'ast/merge'
+require_relative 'merge/version'
 
 # This gem
-require_relative 'merge/version'
 
 # Bash::Merge provides a generic Bash script smart merge system using tree-sitter AST analysis.
 # It intelligently merges template and destination Bash scripts by identifying matching
