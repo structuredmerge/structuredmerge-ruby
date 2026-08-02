@@ -5302,10 +5302,16 @@ module Kettle
         version = facts.dig(:project_runtime, :version).to_s
         version = project_gemspec_version(project_root) if version.empty?
         version = "0.0.1.pre" if version.empty?
+        outer_namespace_kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
         changes << write_if_changed(
           project_root,
           version_path,
-          version_gem_version_file_content(existing_version: existing_version_file_value(project_root, version_path), namespace: namespace, version: version)
+          version_gem_version_file_content(
+            existing_version: existing_version_file_value(project_root, version_path),
+            namespace: namespace,
+            version: version,
+            outer_namespace_kind: outer_namespace_kind
+          )
         )
       end
       changes << normalize_version_gem_version_spec(
@@ -14307,15 +14313,21 @@ module Kettle
       version = project_gemspec_version(project_root) if version.empty?
       version = "0.0.1.pre" if version.empty?
       changes = []
+      current_entrypoint = read_project_file(project_root, entrypoint_path)
+      outer_namespace_kind = ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
 
       if manage_version_file
         changes << write_if_changed(
           project_root,
           version_path,
-          version_gem_version_file_content(existing_version: existing_version_file_value(project_root, version_path), namespace: namespace, version: version)
+          version_gem_version_file_content(
+            existing_version: existing_version_file_value(project_root, version_path),
+            namespace: namespace,
+            version: version,
+            outer_namespace_kind: outer_namespace_kind
+          )
         )
       end
-      current_entrypoint = read_project_file(project_root, entrypoint_path)
       non_default_version_gem = facts.dig(:version_gem, :non_default_entrypoint) ||
         non_default_version_gem_entrypoint?(project_root, entrypoint_require)
       entrypoint_content = if non_default_version_gem
@@ -14629,7 +14641,7 @@ module Kettle
       version_gem_require_insertion_index(content)
     end
 
-    def version_gem_version_file_content(existing_version:, namespace:, version:)
+    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module)
       resolved_version = existing_version.to_s.empty? ? version.to_s : existing_version.to_s
       body = [
         "# Version namespace for this gem.",
@@ -14644,7 +14656,7 @@ module Kettle
       <<~RUBY
         # frozen_string_literal: true
 
-        #{wrap_ruby_namespace(namespace, body).join("\n")}
+        #{wrap_ruby_namespace(namespace, body, outer_namespace_kind: outer_namespace_kind).join("\n")}
       RUBY
     end
 
@@ -14820,15 +14832,34 @@ module Kettle
       RUBY
     end
 
-    def wrap_ruby_namespace(namespace, body_lines)
+    def wrap_ruby_namespace(namespace, body_lines, outer_namespace_kind: :module)
       segments = namespace.to_s.split("::").reject(&:empty?)
       return body_lines if segments.empty?
 
       lines = []
-      segments.each_with_index { |segment, index| lines << ("  " * index) + "module #{segment}" }
+      segments.each_with_index do |segment, index|
+        keyword = index.zero? && outer_namespace_kind == :class ? "class" : "module"
+        lines << ("  " * index) + "#{keyword} #{segment}"
+      end
       body_lines.each { |line| lines << ("  " * segments.length) + line unless line.empty? }
       (segments.length - 1).downto(0) { |index| lines << ("  " * index) + "end" }
       lines
+    end
+
+    def version_namespace_outer_kind(project_root, entrypoint_path, namespace)
+      ruby_entrypoint_outer_namespace_kind(read_project_file(project_root, entrypoint_path), namespace)
+    end
+
+    def ruby_entrypoint_outer_namespace_kind(content, namespace)
+      first_segment = namespace.to_s.split("::").reject(&:empty?).first
+      return :module if first_segment.to_s.empty?
+
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      declaration = body.find do |node|
+        (node.is_a?(::Prism::ClassNode) || node.is_a?(::Prism::ModuleNode)) &&
+          ruby_constant_path_segments(node.constant_path).first == first_segment
+      end
+      declaration.is_a?(::Prism::ClassNode) ? :class : :module
     end
 
     def existing_version_file_value(project_root, relative_path)

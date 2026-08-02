@@ -268,6 +268,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem loads runtime dependencies before generated version namespaces.
 
+- kettle-jem preserves class-based outer namespaces in generated version files.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

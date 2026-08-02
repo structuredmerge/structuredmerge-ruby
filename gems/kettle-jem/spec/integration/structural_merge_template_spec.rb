@@ -819,6 +819,37 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     expect(updated).not_to include('require "month/serializer/version"')
   end
 
+  it "preserves a class outer namespace when generating a nested version file" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-class-version-namespace", tmp_root) do |root|
+      write_tree(root, {
+        "lib/month/serializer.rb" => <<~RUBY
+          # frozen_string_literal: true
+
+          require "month"
+
+          class Month
+            module Serializer
+            end
+          end
+        RUBY
+      })
+      facts = {
+        package: {name: "month-serializer"},
+        rubygems: {entrypoint_require: "month/serializer", namespace: "Month::Serializer"},
+        project_runtime: {version: "1.0.0"}
+      }
+
+      result = described_class.send(:version_gem_bootstrap_step_for_paths, root, facts)
+      version_file = File.read(File.join(root, "lib/month/serializer/version.rb"))
+
+      expect(result[:status]).to eq("applied")
+      expect(version_file).to include("class Month\n  module Serializer")
+      expect(version_file).not_to include("module Month\n")
+    end
+  end
+
   it "reports setup execution context without load-path inspection" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
