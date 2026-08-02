@@ -9,9 +9,9 @@ require 'tree_haver'
 
 # Shared merge infrastructure
 require 'ast/merge'
+require_relative 'merge/version'
 
 # This gem
-require_relative 'merge/version'
 
 module Rbs
   module Merge
