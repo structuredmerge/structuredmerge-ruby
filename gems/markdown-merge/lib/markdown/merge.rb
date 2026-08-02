@@ -4,7 +4,6 @@ require 'version_gem'
 
 require 'ast/merge'
 require 'tree_haver'
-
 require_relative 'merge/version'
 
 module Markdown
