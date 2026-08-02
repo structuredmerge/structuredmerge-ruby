@@ -14781,8 +14781,10 @@ module Kettle
         return owner.location.start_line - 1 if owner
       end
 
-      requires = owners.select { |candidate| candidate.is_a?(::Prism::CallNode) && %i[require require_relative].include?(candidate.name) }
-      return requires.last.location.end_line if requires.any?
+      initial_requires = owners.take_while do |candidate|
+        candidate.is_a?(::Prism::CallNode) && %i[require require_relative].include?(candidate.name)
+      end
+      return initial_requires.last.location.end_line if initial_requires.any?
 
       first_owner = owners.first
       first_owner ? first_owner.location.start_line - 1 : ruby_parse_comments(context.ast).map { |comment| comment.location.end_line }.max.to_i

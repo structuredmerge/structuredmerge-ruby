@@ -1294,6 +1294,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Transfer changelog filters now remove inapplicable template-owned entries from released and Unreleased sections.
 
+- Preserve generated version requires before executable entrypoint code when later requires exist.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

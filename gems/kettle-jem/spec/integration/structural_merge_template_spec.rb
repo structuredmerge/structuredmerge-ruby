@@ -788,6 +788,34 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     RUBY
   end
 
+  it "keeps the version require before executable code that precedes later requires" do
+    content = <<~RUBY
+      require "version_gem"
+      require_relative "turbo_tests/version"
+
+      TurboTests::Version.class_eval do
+        extend VersionGem::Basic
+      end
+
+      require "securerandom"
+    RUBY
+
+    updated = described_class.send(
+      :version_gem_bootstrap_entrypoint_content,
+      content,
+      namespace: "TurboTests",
+      entrypoint_require: "turbo_tests"
+    )
+
+    expect(updated).to include(<<~RUBY)
+      require "version_gem"
+      require_relative "turbo_tests/version"
+
+      TurboTests::Version.class_eval do
+    RUBY
+    expect(updated.index('require_relative "turbo_tests/version"')).to be < updated.index("TurboTests::Version.class_eval do")
+  end
+
   it "loads runtime dependencies before a generated nested version namespace" do
     content = <<~RUBY
       require "month/serializer/version"
