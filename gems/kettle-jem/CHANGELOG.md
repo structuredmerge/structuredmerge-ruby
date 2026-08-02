@@ -1308,6 +1308,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Recognize legacy Dir.chdir-wrapped git ls-files gemspec package manifests during templating.
 
+- Replace stale byebug-family spec helper requires with debug during templating.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -8092,7 +8092,43 @@ module Kettle
       output = remove_obsolete_simplecov_rescue_bootstrap_blocks(output)
       output = remove_duplicate_simplecov_requires(output)
       output = ensure_spec_helper_simplecov_config_require(output)
-      ensure_spec_helper_simplecov_start(output)
+      output = ensure_spec_helper_simplecov_start(output)
+      migrate_legacy_byebug_requires(output)
+    end
+
+    # The Gemfile migration replaces every byebug-family dependency with
+    # debug. Keep the runnable spec helper consistent with that dependency
+    # graph: a stale require "byebug" otherwise makes a successfully
+    # templated project fail before its examples load.
+    def migrate_legacy_byebug_requires(content)
+      records = ruby_call_records(content, :require).filter_map do |call|
+        next unless call.receiver.nil?
+
+        name = ruby_string_argument(call).to_s
+        next unless name.include?("byebug")
+
+        {
+          start_line: call.location.start_line,
+          end_line: ruby_node_source_end_line(call),
+          source: call.location.slice
+        }
+      end.sort_by { |record| record.fetch(:start_line) }
+      return content if records.empty?
+
+      debug_already_required = ruby_call_records(content, :require).any? do |call|
+        call.receiver.nil? && ruby_string_argument(call) == "debug"
+      end
+      first = records.first
+      replacements = records.to_h do |record|
+        replacement = if record.equal?(first) && !debug_already_required
+          indent = content.to_s.lines.fetch(record.fetch(:start_line) - 1)[/\A\s*/]
+          %(#{indent}require "debug"\n)
+        else
+          ""
+        end
+        [record.fetch(:start_line), record.merge(replacement: replacement)]
+      end
+      replace_record_ranges(content, replacements)
     end
 
     def normalize_spec_helper_block_bindings(content, template_content)

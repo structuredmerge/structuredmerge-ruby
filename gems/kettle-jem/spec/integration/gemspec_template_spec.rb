@@ -1114,6 +1114,21 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(migrated).not_to include("byebug")
   end
 
+  it "replaces legacy byebug requires in spec helpers with debug" do
+    source = <<~RUBY
+      require "byebug"
+      require "pry-byebug"
+      require "rspec"
+    RUBY
+
+    migrated = described_class.send(:migrate_legacy_byebug_requires, source)
+
+    expect(migrated).to include('require "debug"')
+    expect(migrated).to include('require "rspec"')
+    expect(migrated).not_to include("byebug")
+    expect(migrated.scan('require "debug"').length).to eq(1)
+  end
+
   it "preserves an existing main Gemfile source while applying the template" do
     recipe = {target_path: "Gemfile", template_preference: {strategy: "merge"}}
     template = "source \"https://gem.coop\"\ngemspec\n"
