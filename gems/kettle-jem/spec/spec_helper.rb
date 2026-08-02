@@ -9,6 +9,7 @@
 begin
   require "kettle-soup-cover"
   if Kettle::Soup::Cover::DO_COV
+    # Requiring simplecov loads the project-local `.simplecov`.
     require "simplecov"
     require "kettle/soup/cover/config"
     SimpleCov.start
@@ -24,6 +25,7 @@ require "kettle/test/rspec"
 
 # This library
 require "kettle/jem"
+
 Kettle::Jem.ensure_runtime_dependencies!
 require_relative "support/kettle_jem_spec_helpers"
 

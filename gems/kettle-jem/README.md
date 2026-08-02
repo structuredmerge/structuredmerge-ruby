@@ -1,4 +1,4 @@
-<a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" width="12%" align="right"/></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img alt="kettle-jem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg" width="12%" align="right"/></a>
+<a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by GitHub" src="https://github.com/structuredmerge.png?size=192" width="12%" align="right"/></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img alt="kettle-jem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg" width="12%" align="right"/></a>
 
 # 🔮 Kettle::Jem
 
@@ -71,7 +71,7 @@ The _amazing_ test matrix is powered by the kettle-dev stack.
 <summary>How kettle-dev manages complexity in tests</summary>
 
 | Gem | Source | Role | Total downloads |
-|-----|--------|------|-----------------|
+|-----|--------|------|---------------------|
 | [appraisal2](https://clickgems.clickhouse.com/dashboard/appraisal2) | [GitHub](https://github.com/appraisal-rb/appraisal2) | multi-dependency Appraisal matrix generation | [![Total downloads for appraisal2](https://img.shields.io/gem/dt/appraisal2.svg?style=flat-square)](https://clickgems.clickhouse.com/dashboard/appraisal2) |
 | [appraisal2-rubocop](https://clickgems.clickhouse.com/dashboard/appraisal2-rubocop) | [GitHub](https://github.com/appraisal-rb/appraisal2-rubocop) | RuboCop Appraisal generator integration | [![Total downloads for appraisal2-rubocop](https://img.shields.io/gem/dt/appraisal2-rubocop.svg?style=flat-square)](https://clickgems.clickhouse.com/dashboard/appraisal2-rubocop) |
 | [kettle-dev](https://clickgems.clickhouse.com/dashboard/kettle-dev) | [GitHub](https://github.com/kettle-dev/kettle-dev) | development, release, and CI workflow tooling | [![Total downloads for kettle-dev](https://img.shields.io/gem/dt/kettle-dev.svg?style=flat-square)](https://clickgems.clickhouse.com/dashboard/kettle-dev) |
@@ -685,7 +685,7 @@ Thanks for RTFM. ☺️
 [✇bundle-group-pattern]: https://gist.github.com/pboling/4564780
 [⛳️gem-namespace]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem
 [⛳️namespace-img]: https://img.shields.io/badge/namespace-Kettle::Jem-3C2D2D.svg?style=square&logo=ruby&logoColor=white
-[⛳️gem-name]: https://bestgems.org/gems/kettle-jem
+[⛳️gem-name]: https://clickgems.clickhouse.com/dashboard/kettle-jem
 [⛳️name-img]: https://img.shields.io/badge/name-kettle--jem-3C2D2D.svg?style=square&logo=rubygems&logoColor=red
 [⛳️tag-img]: https://img.shields.io/github/tag/structuredmerge/structuredmerge-ruby.svg
 [⛳️tag]: https://github.com/structuredmerge/structuredmerge-ruby/releases

@@ -18,47 +18,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ## [Unreleased]
 
-### Fixed
-
-- Templating now removes the obsolete `tree_sitter_language_pack` entry from
-  managed StructuredMerge local-gem lists, keeping `STRUCTUREDMERGE_DEV` from
-  resolving it under the sibling gems directory.
-- Unset optional author ORCIDs now resolve to an empty citation value rather
-  than leaking their template token and aborting templating.
-- Gemspec package manifest merging now recognizes the historical generated
-  `Dir[...] + [...]` shape structurally, retains legitimate destination globs,
-  and removes only obsolete generated `certs` and `sig` package helpers.
-
-- Prepare every modular Gemfile referenced by the generated Gemfile before Bundler bootstraps templating dependencies.
-
-- Preserve an existing main Gemfile source while applying templates.
-
-- Use bundle install when a legacy lockfile lacks the required templating bootstrap gems.
-
-- Respect per-file Ruby merge settings when applying templates.
-
-- Canonicalize legacy release headings before replaying transfer changelog entries.
-
-- Generated CI workflows now retry compatibility dependency installation while newly published runtime floors propagate through gem sources.
-
-- Template merges now normalize managed RSpec block bindings structurally, preventing invalid mixed parameter names.
-
-- Template runtime and config synchronization now normalize invalid underscore hostnames in generated documentation and gemspec metadata.
-
-- Generated organization README logos now use GitHub's stable avatar endpoint when no Galtzo-hosted asset is guaranteed.
-
-- Preserve flat Ruby entrypoints and avoid duplicating equivalent version requires during template bootstrap.
-
-- Honor explicit VersionGem disablement and default supported Ruby gems to VersionGem during templating.
-
-- Prune stale template lock records after managed files are removed.
-
-- Avoid recursive project fact discovery while evaluating transfer changelog filters during templating.
-
-- Templating now removes duplicated legacy configuration comments and repeated generated SimpleCov usage guidance from destinations.
-
-- Generated RubyGems download badges now use Shields.io total downloads instead of the discontinued download-rank endpoint.
-
 ### Added
 
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
@@ -302,11 +261,53 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Clarify that transferable changelog entries are destination release notes, not internal template metadata.
 
+- kettle-jem-template-20260801-001 - Generated README gem dashboard links now
+  use ClickGems instead of BestGems.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Templating now removes the obsolete `tree_sitter_language_pack` entry from
+  managed StructuredMerge local-gem lists, keeping `STRUCTUREDMERGE_DEV` from
+  resolving it under the sibling gems directory.
+- Unset optional author ORCIDs now resolve to an empty citation value rather
+  than leaking their template token and aborting templating.
+- Gemspec package manifest merging now recognizes the historical generated
+  `Dir[...] + [...]` shape structurally, retains legitimate destination globs,
+  and removes only obsolete generated `certs` and `sig` package helpers.
+
+- Prepare every modular Gemfile referenced by the generated Gemfile before Bundler bootstraps templating dependencies.
+
+- Preserve an existing main Gemfile source while applying templates.
+
+- Use bundle install when a legacy lockfile lacks the required templating bootstrap gems.
+
+- Respect per-file Ruby merge settings when applying templates.
+
+- Canonicalize legacy release headings before replaying transfer changelog entries.
+
+- Generated CI workflows now retry compatibility dependency installation while newly published runtime floors propagate through gem sources.
+
+- Template merges now normalize managed RSpec block bindings structurally, preventing invalid mixed parameter names.
+
+- Template runtime and config synchronization now normalize invalid underscore hostnames in generated documentation and gemspec metadata.
+
+- Generated organization README logos now use GitHub's stable avatar endpoint when no Galtzo-hosted asset is guaranteed.
+
+- Preserve flat Ruby entrypoints and avoid duplicating equivalent version requires during template bootstrap.
+
+- Honor explicit VersionGem disablement and default supported Ruby gems to VersionGem during templating.
+
+- Prune stale template lock records after managed files are removed.
+
+- Avoid recursive project fact discovery while evaluating transfer changelog filters during templating.
+
+- Templating now removes duplicated legacy configuration comments and repeated generated SimpleCov usage guidance from destinations.
+
+- Generated RubyGems download badges now use Shields.io total downloads instead of the discontinued download-rank endpoint.
 
 - Generated documentation Gemfiles now correctly document that `yard-lint`
   1.10 requires Ruby 3.3 or newer; projects testing older Rubies must keep
@@ -1262,6 +1263,16 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem-template-20260730-001 - Gemspec package file enumeration now runs
   relative to the gemspec directory, so packaged template assets are included
   even when the gemspec is loaded from another working directory.
+
+- kettle-jem-template-20260801-002 - Generated RSpec helpers now normalize
+  managed configuration block bindings structurally, preventing mixed block
+  parameter names from producing invalid configuration after a merge.
+- kettle-jem-template-20260801-003 - Generated project metadata and
+  documentation now normalize configured underscore hostnames to valid
+  hyphenated hostnames.
+- kettle-jem-template-20260801-004 - Generated organization README logos now
+  use GitHub's stable organization avatar endpoint instead of assuming a
+  matching Galtzo-hosted asset exists.
 
 ### Security
 
