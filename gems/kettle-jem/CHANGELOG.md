@@ -1312,6 +1312,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate byebug-family dependencies to debug independently within each appraisal.
 
+- Remove preserved duplicate gemspec dependency declarations after template merge.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

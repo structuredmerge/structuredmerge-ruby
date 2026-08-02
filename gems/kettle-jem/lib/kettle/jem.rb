@@ -9902,6 +9902,7 @@ module Kettle
       )
       merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
+      merged = remove_duplicate_gemspec_dependency_lines(merged, receiver: template_receiver)
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
@@ -11149,6 +11150,22 @@ module Kettle
         [record.fetch(:start_line), record.merge(replacement: "")]
       end
       replace_record_ranges(content, records_by_line)
+    end
+
+    # Template dependencies precede preserved destination dependencies. Keep
+    # the first declaration for each dependency kind/name pair so an old,
+    # weaker destination declaration cannot survive beside its managed one.
+    def remove_duplicate_gemspec_dependency_lines(content, receiver:)
+      seen = Set.new
+      duplicates = gemspec_dependency_records(content, receiver: receiver).select do |record|
+        key = gemspec_dependency_record_key(record)
+        already_seen = seen.include?(key)
+        seen << key
+        already_seen
+      end
+      return content if duplicates.empty?
+
+      replace_record_ranges(content, duplicates.to_h { |record| [record.fetch(:start_line), record.merge(replacement: "")] })
     end
 
     def remove_empty_gemspec_development_dependency_section_headings(content, receiver:)

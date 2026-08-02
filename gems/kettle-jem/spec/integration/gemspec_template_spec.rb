@@ -1148,6 +1148,20 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(migrated.scan('gem "debug", require: false').length).to eq(2)
   end
 
+  it "removes preserved duplicate gemspec dependency declarations" do
+    source = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.add_development_dependency "kettle-test", "~> 2.0", ">= 2.0.18"
+        spec.add_development_dependency "kettle-test"
+      end
+    RUBY
+
+    migrated = described_class.send(:remove_duplicate_gemspec_dependency_lines, source, receiver: "spec")
+
+    expect(migrated.scan("kettle-test").length).to eq(1)
+    expect(migrated).to include('">= 2.0.18"')
+  end
+
   it "preserves an existing main Gemfile source while applying the template" do
     recipe = {target_path: "Gemfile", template_preference: {strategy: "merge"}}
     template = "source \"https://gem.coop\"\ngemspec\n"
