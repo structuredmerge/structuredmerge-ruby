@@ -9,7 +9,7 @@ module Json
 
       DEFAULT_FREEZE_TOKEN = 'json-merge'
 
-      attr_reader :comment_tracker, :ast, :errors
+      attr_reader :comment_tracker, :ast, :errors, :dialect
 
       class << self
         def find_parser_path
@@ -17,17 +17,20 @@ module Json
         end
       end
 
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **_options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, dialect: :jsonc,
+                     **_options)
         @source = source
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
         @signature_generator = signature_generator
         @parser_path = parser_path
+        @dialect = dialect.to_sym
         @errors = []
 
         @comment_tracker = CommentTracker.new(source)
 
         DebugLogger.time('FileAnalysis#parse_json') { parse_json }
+        validate_jsonc_dialect! if valid? && @dialect == :jsonc
 
         @freeze_blocks = extract_freeze_blocks
         @nodes = integrate_nodes_and_freeze_blocks
@@ -201,7 +204,7 @@ module Json
 
       def parse_json
         Json::Merge.register_backend!
-        parser = TreeHaver.parser_for(:json, backend_type: :tree_sitter)
+        parser = TreeHaver.parser_for(parser_language, backend_type: :tree_sitter)
 
         @ast = parser.parse(@source)
 
@@ -212,6 +215,46 @@ module Json
       rescue StandardError => e
         @errors << e
         @ast = nil
+      end
+
+      def parser_language
+        @dialect == :jsonc ? :json5 : :json
+      end
+
+      def validate_jsonc_dialect!
+        validate_jsonc_node!(@ast.root_node)
+      end
+
+      def validate_jsonc_node!(node)
+        native_type = node.respond_to?(:native_type) ? node.native_type.to_s : node.type.to_s
+        case native_type
+        when 'identifier'
+          add_jsonc_dialect_error(node, 'unquoted object keys are JSON5-only')
+        when 'string'
+          validate_json_literal!(node, String, 'single-quoted strings and JSON5 escapes are not supported')
+        when 'number'
+          validate_json_literal!(node, Numeric, 'JSON5 numeric literals are not supported')
+        end
+
+        node.each { |child| validate_jsonc_node!(child) } if node.respond_to?(:each)
+      end
+
+      # Tree-sitter identifies complete string and number tokens. Delegating those
+      # token semantics to Ruby's strict JSON parser avoids a second hand-written
+      # lexer while retaining AST-derived source locations.
+      def validate_json_literal!(node, expected_class, reason)
+        value = ::JSON.parse(node.text)
+        return if value.is_a?(expected_class)
+
+        add_jsonc_dialect_error(node, reason)
+      rescue ::JSON::ParserError
+        add_jsonc_dialect_error(node, reason)
+      end
+
+      def add_jsonc_dialect_error(node, reason)
+        @errors << Json::Merge::JsoncDialectError.new(
+          "JSONC rejects #{reason} at line #{node.start_line}, column #{node.start_point[:column] + 1}."
+        )
       end
 
       def collect_parse_errors(node, found_errors = [])

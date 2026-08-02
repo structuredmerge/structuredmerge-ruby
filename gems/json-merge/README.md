@@ -33,11 +33,15 @@ JSONC-specific behavior:
 
   - **Single API**: JSON and JSONC both use `Json::Merge`
   - **Comment-Aware**: Preserves `//` and `/* */` comments when the parser exposes them
+  - **Trailing Commas**: Accepts trailing commas in JSONC objects and arrays
+  - **JSONC Boundaries**: Rejects JSON5-only syntax such as unquoted keys,
+    single-quoted strings, and JSON5 numeric literals
   - **Freeze Blocks**: Uses the `json-merge` freeze token by default, with a custom token available when needed
 
 ### Key Features
 
-  - **Tree-Sitter Powered**: Uses tree-sitter-json for accurate AST parsing
+  - **Tree-Sitter Powered**: Uses tree-sitter-json for strict JSON and the
+    normalized JSON5 tree for JSONC syntax
   - **JSONC-Aware**: Preserves `//` and `/* */` comments when the parser exposes them
   - **Intelligent**: Matches objects and arrays by structural signatures
   - **Fuzzy Property Matching**: `ObjectMatchRefiner` matches similar property names

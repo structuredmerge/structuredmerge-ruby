@@ -68,6 +68,14 @@ module TreeHaver
         raise NotImplementedError, "#{self.class}#type must be implemented"
       end
 
+      # The parser's original node type before a backend applies any portable
+      # vocabulary aliases. Backends without aliases use their public type.
+      #
+      # @return [String]
+      def native_type
+        type
+      end
+
       # Get byte offset where the node starts
       # @return [Integer] Start byte offset
       def start_byte

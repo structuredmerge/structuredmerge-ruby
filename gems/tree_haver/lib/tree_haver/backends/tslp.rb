@@ -15,6 +15,7 @@ module TreeHaver
       @language_unavailable_reasons = {}
       PARSER_SMOKE_SOURCES = {
         'json' => '{}',
+        'json5' => '{}',
         'bash' => "echo tree_haver\n",
         'go' => "package main\nfunc main() {}\n",
         'html' => "<!doctype html>\n<title>TreeHaver</title>\n",
@@ -165,7 +166,7 @@ module TreeHaver
           raw_tree = parser.parse(source)
           raise TreeHaver::NotAvailable, "TSLP did not return a parse tree for #{language.name}" unless raw_tree
 
-          Tree.new(raw_tree, source: source)
+          Tree.new(raw_tree, source: source, language: language.name)
         end
 
         private
@@ -178,13 +179,38 @@ module TreeHaver
       end
 
       class Tree < TreeHaver::Base::Tree
+        attr_reader :language
+
+        def initialize(inner_tree = nil, source: nil, lines: nil, language: nil)
+          super(inner_tree, source: source, lines: lines)
+          @language = language.to_s
+        end
+
         def root_node
-          Node.new(inner_tree.root_node, source: source, lines: lines)
+          Node.new(inner_tree.root_node, source: source, lines: lines, language: language)
         end
       end
 
       class Node < TreeHaver::Base::Node
+        NODE_TYPE_ALIASES = {
+          'json5' => {
+            'file' => 'document',
+            'member' => 'pair'
+          }
+        }.freeze
+
+        attr_reader :language
+
+        def initialize(node, source: nil, lines: nil, language: nil)
+          super(node, source: source, lines: lines)
+          @language = language.to_s
+        end
+
         def type
+          NODE_TYPE_ALIASES.fetch(language, {}).fetch(native_type, native_type)
+        end
+
+        def native_type
           inner_node.kind
         end
 
@@ -209,8 +235,18 @@ module TreeHaver
         def children
           Array.new(inner_node.child_count) do |index|
             child = inner_node.child(index)
-            child && self.class.new(child, source: source, lines: lines)
+            child && self.class.new(child, source: source, lines: lines, language: language)
           end.compact
+        end
+
+        def child_by_field_name(name)
+          child = inner_node.child_by_field_name(name.to_s) if inner_node.respond_to?(:child_by_field_name)
+          child && self.class.new(child, source: source, lines: lines, language: language)
+        end
+
+        def parent
+          parent = inner_node.parent if inner_node.respond_to?(:parent)
+          parent && self.class.new(parent, source: source, lines: lines, language: language)
         end
 
         def named?

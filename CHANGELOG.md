@@ -252,6 +252,10 @@ Please file a bug if you notice a violation of semantic versioning.
   running setup, and skips RuboCop Gradual autocorrect when the destination does
   not define that task.
 
+- TreeHaver normalizes JSON5 parser node names for portable JSON dialect consumers.
+
+- json-merge supports JSONC comments and trailing commas while rejecting JSON5-only syntax.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

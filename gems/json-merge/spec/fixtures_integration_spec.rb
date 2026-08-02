@@ -47,6 +47,42 @@ RSpec.describe Json::Merge do
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
+  it 'parses JSONC comments and trailing commas through the normalized JSON5 backend' do
+    source = <<~JSONC
+      // devcontainer configuration
+      {
+        "customizations": {
+          "jetbrains": { "backend": "RubyMine" },
+        },
+      }
+    JSONC
+
+    result = described_class.parse_json(source, 'jsonc')
+
+    expect(result[:ok]).to be(true)
+    expect(result.dig(:analysis, :root_kind)).to eq('object')
+    expect(described_class.json_value_for_source(source, dialect: 'jsonc')).to eq(
+      'customizations' => { 'jetbrains' => { 'backend' => 'RubyMine' } }
+    )
+  end
+
+  it 'rejects JSON5-only syntax while accepting the JSONC subset' do
+    invalid_sources = {
+      'unquoted object key' => '{name: "value"}',
+      'single-quoted string' => "{'name': 'value'}",
+      'hexadecimal number' => '{"value": 0x2A}',
+      'non-finite number' => '{"value": Infinity}',
+      'leading plus number' => '{"value": +1}'
+    }
+
+    invalid_sources.each do |description, source|
+      result = described_class.parse_json(source, 'jsonc')
+
+      expect(result[:ok]).to be(false), description
+      expect(result.dig(:diagnostics, 0, :message)).to include('JSONC rejects'), description
+    end
+  end
+
   it 'exposes JSON TreeHaver backend availability and plan context' do
     expect(json_ready(described_class.available_json_backends.map(&:to_h))).to eq(
       [{ 'id' => 'kreuzberg-language-pack', 'family' => 'tree-sitter' }]
@@ -214,6 +250,32 @@ RSpec.describe Json::Merge do
         "template_only": {"compact": true}
       }
     JSON
+  end
+
+  it 'merges JSONC documents with trailing commas through the JSON5-normalized path' do
+    template = <<~JSONC
+      {
+        "template": true,
+      }
+    JSONC
+    destination = <<~JSONC
+      // retained destination comment
+      {
+        "destination": true,
+      }
+    JSONC
+
+    result = described_class.merge_json(template, destination, 'jsonc')
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include('"destination": true')
+    expect(result[:output]).to include('"template": true')
+  end
+
+  it 'rejects unsupported direct merger dialects' do
+    expect do
+      described_class::SmartMerger.new('{"value": true}', '{"value": true}', dialect: :json5)
+    end.to raise_error(ArgumentError, /Expected json or jsonc/)
   end
 
   it 'conforms to the shared family feature profile fixture' do

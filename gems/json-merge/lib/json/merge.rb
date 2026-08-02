@@ -27,6 +27,7 @@ module Json
 
     class TemplateParseError < ParseError; end
     class DestinationParseError < ParseError; end
+    class JsoncDialectError < ParseError; end
     class CorruptionDetectedError < Error; end
 
     autoload :CommentTracker, 'json/merge/comment_tracker'
@@ -49,6 +50,9 @@ module Json
 
           grammar_finder = TreeHaver::GrammarFinder.new(:json)
           grammar_finder.register! if grammar_finder.available?
+
+          json5_grammar_finder = TreeHaver::GrammarFinder.new(:json5)
+          json5_grammar_finder.register! if json5_grammar_finder.available?
 
           BACKEND_REGISTRY.registered = true
         end
@@ -96,18 +100,19 @@ module Json
     end
 
     def parse_json(source, dialect, backend: nil)
+      dialect = normalize_json_dialect(dialect)
       requested = requested_json_backend_id(backend)
-      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+      unless json_backend_available_for_analysis?(requested, dialect: dialect)
         return unsupported_feature_result("Unsupported JSON backend #{requested}.")
       end
 
-      return parse_failure("Trailing commas are not supported for #{dialect}.") if detect_trailing_comma(source)
-      if dialect.to_s != 'jsonc' && detect_json_comments(source)
+      return parse_failure("Trailing commas are not supported for #{dialect}.") if dialect == :json && detect_trailing_comma(source)
+      if dialect == :json && detect_json_comments(source)
         return parse_failure("Comments are not supported for #{dialect}.")
       end
 
       register_backend!
-      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source) }
+      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source, dialect: dialect) }
       unless analysis.valid?
         return parse_failure(analysis.errors.map do |error|
           error.respond_to?(:message) ? error.message : error.inspect
@@ -118,8 +123,8 @@ module Json
         ok: true,
         diagnostics: [],
         analysis: {
-          dialect: dialect,
-          allows_comments: dialect == 'jsonc',
+          dialect: dialect.to_s,
+          allows_comments: dialect == :jsonc,
           root_kind: json_analysis_root_kind(analysis),
           owners: collect_file_analysis_owners(analysis)
         },
@@ -134,8 +139,9 @@ module Json
     end
 
     def merge_json(template_source, destination_source, dialect, backend: nil)
+      dialect = normalize_json_dialect(dialect)
       requested = requested_json_backend_id(backend)
-      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+      unless json_backend_available_for_analysis?(requested, dialect: dialect)
         return unsupported_feature_result("Unsupported JSON backend #{requested}.")
       end
 
@@ -147,7 +153,7 @@ module Json
         return {
           ok: true,
           diagnostics: [],
-          output: TreeHaver.with_backend(requested) { merge_json_sources(template_source, destination_source) },
+          output: TreeHaver.with_backend(requested) { merge_json_sources(template_source, destination_source, dialect: dialect) },
           policies: [DESTINATION_WINS_ARRAY_POLICY]
         }
       end
@@ -160,10 +166,11 @@ module Json
       }
     end
 
-    def merge_json_sources(template_source, destination_source)
+    def merge_json_sources(template_source, destination_source, dialect:)
       SmartMerger.new(
         template_source,
         destination_source,
+        dialect: dialect,
         add_template_only_nodes: true,
         merge_arrays: false,
         preserve_atomic_formatting: true
@@ -172,18 +179,19 @@ module Json
     private_class_method :merge_json_sources
 
     def json_value_for_source(source, dialect: 'json', backend: nil)
+      dialect = normalize_json_dialect(dialect)
       requested = requested_json_backend_id(backend)
-      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+      unless json_backend_available_for_analysis?(requested, dialect: dialect)
         raise ParseError, "Unsupported JSON backend #{requested}."
       end
 
-      raise ParseError, "Trailing commas are not supported for #{dialect}." if detect_trailing_comma(source)
-      if dialect.to_s != 'jsonc' && detect_json_comments(source)
+      raise ParseError, "Trailing commas are not supported for #{dialect}." if dialect == :json && detect_trailing_comma(source)
+      if dialect == :json && detect_json_comments(source)
         raise ParseError, "Comments are not supported for #{dialect}."
       end
 
       register_backend!
-      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source) }
+      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source, dialect: dialect) }
       unless analysis.valid?
         message = analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', ')
         raise ParseError, message
@@ -267,17 +275,28 @@ module Json
     end
     private_class_method :requested_json_backend_id
 
-    def json_backend_available_for_analysis?(backend_id)
+    def json_backend_available_for_analysis?(backend_id, dialect: :json)
       register_backend!
-      registrations = TreeHaver.registered_languages(:json)
+      languages = dialect == :jsonc ? %i[json json5] : [:json]
       case backend_id.to_s
       when TREE_SITTER_BACKEND.id
-        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+        languages.all? do |language|
+          registrations = TreeHaver.registered_languages(language)
+          registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+        end
       else
         false
       end
     end
     private_class_method :json_backend_available_for_analysis?
+
+    def normalize_json_dialect(dialect)
+      normalized = dialect.to_s.downcase
+      return normalized.to_sym if %w[json jsonc].include?(normalized)
+
+      raise ArgumentError, "Unsupported JSON dialect #{dialect.inspect}. Expected json or jsonc."
+    end
+    private_class_method :normalize_json_dialect
 
     def parse_error(message)
       { severity: 'error', category: 'parse_error', message: message }

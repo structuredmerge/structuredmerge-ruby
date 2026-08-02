@@ -143,6 +143,33 @@ RSpec.describe TreeHaver::Backends::Tslp do
     expect(tree.root_node.children.map(&:type)).to include('object')
   end
 
+  it 'normalizes JSON5 root and member names for portable JSON consumers' do
+    begin
+      require 'tree_sitter_language_pack'
+    rescue LoadError
+      skip 'tree_sitter_language_pack is not installed'
+    end
+
+    described_class.reset!
+    unless described_class.available?
+      skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable'
+    end
+    skip 'tree_sitter_language_pack does not publish json5' unless TreeSitterLanguagePack.has_language('json5')
+
+    TreeHaver::GrammarFinder.new(:json5).register!(raise_on_missing: true)
+    tree = TreeHaver.with_backend('tslp') do
+      TreeHaver.parser_for(:json5).parse("// comment\n{\n  \"name\": \"value\",\n}\n")
+    end
+
+    object = tree.root_node.children.find { |child| child.type == 'object' }
+    pair = object.children.find { |child| child.type == 'pair' }
+
+    expect(tree.root_node.type).to eq('document')
+    expect(tree.root_node.native_type).to eq('file')
+    expect(pair.native_type).to eq('member')
+    expect(pair.child_by_field_name('value').type).to eq('string')
+  end
+
   it 'exposes real TSLP point locations through TreeHaver nodes when available' do
     begin
       require 'tree_sitter_language_pack'

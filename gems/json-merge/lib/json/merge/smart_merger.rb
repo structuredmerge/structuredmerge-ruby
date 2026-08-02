@@ -24,7 +24,7 @@ module Json
     class SmartMerger < ::Ast::Merge::SmartMergerBase
       include ::Ast::Merge::Runtime::RootSessionSupport
 
-      attr_reader :runtime_session, :corruption_handling
+      attr_reader :runtime_session, :corruption_handling, :dialect
 
       # Creates a new SmartMerger
       #
@@ -56,12 +56,17 @@ module Json
         node_typing: nil,
         merge_arrays: true,
         preserve_atomic_formatting: false,
+        dialect: :jsonc,
         **options
       )
         @remove_template_missing_nodes = remove_template_missing_nodes
         @corruption_handling = ::Ast::Merge::Healer.normalize_mode(corruption_handling)
         @merge_arrays = merge_arrays
         @preserve_atomic_formatting = preserve_atomic_formatting
+        @dialect = dialect.to_sym
+        unless %i[json jsonc].include?(@dialect)
+          raise ArgumentError, "Unsupported JSON dialect #{dialect.inspect}. Expected json or jsonc."
+        end
 
         super(
           template_content,
@@ -77,6 +82,7 @@ module Json
           node_typing: node_typing,
           merge_arrays: merge_arrays,
           preserve_atomic_formatting: preserve_atomic_formatting,
+          dialect: @dialect,
           **options
         )
       end
@@ -92,7 +98,8 @@ module Json
           resolution_mode: @resolution_mode,
           unresolved_policy: @unresolved_policy.to_h,
           corruption_handling: @corruption_handling,
-          match_refiner: @match_refiner
+          match_refiner: @match_refiner,
+          dialect: @dialect
         }
       end
 
