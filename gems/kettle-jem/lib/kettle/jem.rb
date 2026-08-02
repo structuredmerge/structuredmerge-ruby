@@ -14672,20 +14672,15 @@ module Kettle
     end
 
     def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:)
-      current = content.to_s
+      current = normalize_entrypoint_version_require(content, entrypoint_require: entrypoint_require)
       lines = current.lines
       insert_lines = []
       if File.basename(entrypoint_require) != "version_gem" && !ruby_top_level_require?(current, "require", "version_gem")
         insert_lines << "require \"version_gem\"\n"
       end
-      relative_path = File.join(File.basename(entrypoint_require), "version")
-      absolute_path = File.join(entrypoint_require, "version")
-      version_already_required = ruby_top_level_require?(current, "require_relative", relative_path) ||
-        ruby_top_level_require?(current, "require", absolute_path)
-      insert_lines << %(require_relative "#{relative_path}"\n) unless version_already_required
       if insert_lines.any?
-        after_version_gem = insert_lines.none? { |line| line.include?('"version_gem"') }
-        lines.insert(version_gem_require_insertion_index(current, after_version_gem: after_version_gem), *insert_lines, "\n")
+        relative_path = File.join(File.basename(entrypoint_require), "version")
+        lines.insert(version_gem_require_insertion_index(current, before_relative_path: relative_path), *insert_lines)
       end
 
       updated = lines.join
@@ -14700,12 +14695,33 @@ module Kettle
       current = remove_version_gem_entrypoint_references(content)
       return trim_trailing_blank_lines(collapse_excess_blank_lines(current)) unless ensure_version_require
 
-      relative_path = File.join(File.basename(entrypoint_require), "version")
-      return trim_trailing_blank_lines(collapse_excess_blank_lines(current)) if ruby_top_level_require?(current, "require_relative", relative_path)
+      normalize_entrypoint_version_require(current, entrypoint_require: entrypoint_require)
+    end
 
+    def normalize_entrypoint_version_require(content, entrypoint_require:)
+      relative_path = File.join(File.basename(entrypoint_require), "version")
+      absolute_path = File.join(entrypoint_require, "version")
+      current = remove_entrypoint_version_requires(content, relative_path: relative_path, absolute_path: absolute_path)
       lines = current.lines
       lines.insert(version_gem_require_insertion_index(current), %(require_relative "#{relative_path}"\n), "\n")
       trim_trailing_blank_lines(collapse_excess_blank_lines(lines.join))
+    end
+
+    def remove_entrypoint_version_requires(content, relative_path:, absolute_path:)
+      selectors = [
+        *top_level_ruby_call_records(content, :require),
+        *top_level_ruby_call_records(content, :require_relative)
+      ].filter_map do |call|
+        argument = ruby_string_argument(call)
+        matches_relative = call.name == :require_relative && argument == relative_path
+        matches_absolute = call.name == :require && argument == absolute_path
+        next unless matches_relative || matches_absolute
+
+        {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
+      end
+      return content.to_s if selectors.empty?
+
+      collapse_excess_blank_lines(delete_line_ranges(content.to_s, selectors))
     end
 
     def remove_version_gem_entrypoint_references(content)
@@ -14735,14 +14751,17 @@ module Kettle
         end
     end
 
-    def version_gem_require_insertion_index(content, after_version_gem: false)
+    def version_gem_require_insertion_index(content, before_relative_path: nil)
       ensure_runtime_dependencies!
       context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "entrypoint.rb")
       owners = context.structural_owners(owner_scope: :top_level_statements)
-      if after_version_gem
-        owner = owners.find { |candidate| ruby_require_call?(candidate, "require", "version_gem") }
-        return owner.location.end_line if owner
+      if before_relative_path
+        owner = owners.find { |candidate| ruby_require_call?(candidate, "require_relative", before_relative_path) }
+        return owner.location.start_line - 1 if owner
       end
+
+      requires = owners.select { |candidate| candidate.is_a?(::Prism::CallNode) && %i[require require_relative].include?(candidate.name) }
+      return requires.last.location.end_line if requires.any?
 
       first_owner = owners.first
       first_owner ? first_owner.location.start_line - 1 : ruby_parse_comments(context.ast).map { |comment| comment.location.end_line }.max.to_i

@@ -266,6 +266,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem emits valid whitespace-free empty values for optional configuration tokens.
 
+- kettle-jem loads runtime dependencies before generated version namespaces.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

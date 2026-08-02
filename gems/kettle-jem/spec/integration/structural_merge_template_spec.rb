@@ -788,6 +788,37 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     RUBY
   end
 
+  it "loads runtime dependencies before a generated nested version namespace" do
+    content = <<~RUBY
+      require "month/serializer/version"
+
+      # Eternal Gems
+      require "month"
+
+      class Month
+        module Serializer
+        end
+      end
+    RUBY
+
+    updated = described_class.send(
+      :version_gem_bootstrap_entrypoint_content,
+      content,
+      namespace: "Month::Serializer",
+      entrypoint_require: "month/serializer"
+    )
+
+    expect(updated).to include(<<~RUBY)
+      # Eternal Gems
+      require "month"
+      require "version_gem"
+      require_relative "serializer/version"
+
+      class Month
+    RUBY
+    expect(updated).not_to include('require "month/serializer/version"')
+  end
+
   it "reports setup execution context without load-path inspection" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
