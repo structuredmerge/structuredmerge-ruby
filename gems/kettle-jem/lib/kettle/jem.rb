@@ -718,10 +718,30 @@ module Kettle
       rule(:date) { digit.repeat(8, 8).as(:date) }
       rule(:sequence) { digit.repeat(3, 3).as(:sequence) }
       rule(:key) { (str("kettle-jem-template-") >> date >> str("-") >> sequence).as(:key) }
+      rule(:filter_character) { str("]").absent? >> any }
+      rule(:filter) do
+        str("[") >> str("if") >> space.repeat(1) >> filter_character.repeat(1).as(:filter) >> str("]")
+      end
       rule(:separator) { space.repeat(1) >> str("-") >> space.repeat(1) }
       rule(:message) { any.repeat(1).as(:message) }
-      rule(:entry) { key >> separator >> message >> any.absent? }
+      rule(:entry) { key >> (space.repeat(1) >> filter).maybe >> separator >> message >> any.absent? }
       root(:entry)
+    end
+
+    # This deliberately accepts only conjunctions.  A transfer entry should be
+    # easy to audit, and derived boolean facts avoid a general-purpose query
+    # language for the few cases where an OR would otherwise be tempting.
+    class TransferChangelogFilterParser < Parslet::Parser
+      rule(:space) { match('\s') }
+      rule(:identifier_start) { match("[A-Za-z]") }
+      rule(:identifier_rest) { match("[A-Za-z0-9_.]") }
+      rule(:identifier) { (identifier_start >> identifier_rest.repeat).as(:field) }
+      rule(:operator) { (str(">=") | str("<=") | str("!=") | str("=") | str(">") | str("<")).as(:operator) }
+      rule(:literal) { match("[A-Za-z0-9_.-]").repeat(1).as(:value) }
+      rule(:predicate) { (identifier >> operator >> literal).as(:predicate) }
+      rule(:separator) { space.repeat >> str("&") >> space.repeat }
+      rule(:expression) { predicate.as(:predicate) >> (separator >> predicate.as(:predicate)).repeat }
+      root(:expression)
     end
 
     module ReadmePostProcessor
@@ -5565,7 +5585,8 @@ module Kettle
       if destination.strip.empty?
         return apply_changelog_transfer_entries(
           ensure_trailing_newline(template_content.to_s),
-          facts.to_h.dig(:changelog, :transfer_entries)
+          facts.to_h.dig(:changelog, :transfer_entries),
+          excluded_keys: facts.to_h.dig(:changelog, :excluded_transfer_keys)
         )
       end
 
@@ -5574,7 +5595,8 @@ module Kettle
       unless template_unreleased
         return apply_changelog_transfer_entries(
           ensure_trailing_newline(template_content.to_s),
-          facts.to_h.dig(:changelog, :transfer_entries)
+          facts.to_h.dig(:changelog, :transfer_entries),
+          excluded_keys: facts.to_h.dig(:changelog, :excluded_transfer_keys)
         )
       end
 
@@ -5584,7 +5606,8 @@ module Kettle
         header = changelog_template_header(template_lines, template_unreleased).join("\n")
         return apply_changelog_transfer_entries(
           ensure_trailing_newline("#{header}\n\n#{destination}"),
-          facts.to_h.dig(:changelog, :transfer_entries)
+          facts.to_h.dig(:changelog, :transfer_entries),
+          excluded_keys: facts.to_h.dig(:changelog, :excluded_transfer_keys)
         )
       end
 
@@ -5601,7 +5624,8 @@ module Kettle
         destination_lines[destination_end..].to_a
       apply_changelog_transfer_entries(
         ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n")),
-        facts.to_h.dig(:changelog, :transfer_entries)
+        facts.to_h.dig(:changelog, :transfer_entries),
+        excluded_keys: facts.to_h.dig(:changelog, :excluded_transfer_keys)
       )
     end
 
@@ -5688,28 +5712,46 @@ module Kettle
       lock = TemplateLock.load(project_root: project_root, config_path: kettle_jem_config_path(project_root))
       state = lock[TemplateLock::TEMPLATE_STATE_KEY]
       state = state.is_a?(Hash) ? state : {}
-      replay = state[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
-      replay = replay.is_a?(Hash) ? replay : {}
-      last_key = replay[TemplateChecksums::LAST_ENTRY_KEY_SUBKEY].to_s
+      context = transfer_changelog_context(project_root)
+      applicable_entries = all_entries.select { |entry| transfer_changelog_entry_applies?(entry, context) }
+      excluded_keys = all_entries.reject { |entry| transfer_changelog_entry_applies?(entry, context) }.map { |entry| entry.fetch(:key).to_s }
       applied_keys = changelog_transfer_applied_keys(project_root)
       selected_entries = if state.empty?
         [CHANGELOG_INITIAL_TEMPLATE_ENTRY]
-      elsif !last_key.empty?
-        all_entries.select do |entry|
-          key = entry.fetch(:key).to_s
-          key > last_key || !applied_keys.include?(key)
-        end
       else
-        all_entries
+        applicable_entries.reject { |entry| applied_keys.include?(entry.fetch(:key).to_s) }
       end
 
       {
         transfer_entries: selected_entries,
+        excluded_transfer_keys: excluded_keys,
         latest_transfer_entry: latest,
         first_template: state.empty?
       }.compact
     end
 
+    def transfer_changelog_status(project_root, env: ENV, verbose: false)
+      all_entries = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
+      context = transfer_changelog_context(project_root, env: env)
+      applicable = all_entries.select { |entry| transfer_changelog_entry_applies?(entry, context) }
+      applicable_keys = applicable.map { |entry| entry.fetch(:key).to_s }.to_set
+      applied_keys = changelog_transfer_applied_keys(project_root)
+      missing = applicable.reject { |entry| applied_keys.include?(entry.fetch(:key).to_s) }
+      excluded_present = changelog_unreleased_transfer_keys(project_root).reject { |key| applicable_keys.include?(key) }
+      result = {
+        total_count: all_entries.size,
+        applicable_count: applicable.size,
+        applied_count: applicable.size - missing.size,
+        missing_count: missing.size,
+        excluded_present_count: excluded_present.size
+      }.compact
+      result[:missing_entries] = missing if verbose
+      result[:excluded_present_keys] = excluded_present if verbose
+      result
+    end
+
+    # Compatibility API for callers released before filter-aware replay.  New
+    # callers must use transfer_changelog_status(project_root:).
     def transfer_changelog_lag(last_entry_key = nil, verbose: false)
       all_entries = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
       latest = latest_changelog_transfer_entry(all_entries)
@@ -5740,6 +5782,119 @@ module Kettle
       return Set.new unless File.file?(path)
 
       changelog_transfer_keys(File.read(path))
+    end
+
+    def changelog_unreleased_transfer_keys(project_root)
+      path = File.join(project_root.to_s, "CHANGELOG.md")
+      return Set.new unless File.file?(path)
+
+      changelog_existing_transfer_occurrences(File.read(path))
+        .select { |occurrence| occurrence.fetch(:release_heading) == "## [Unreleased]" }
+        .map { |occurrence| occurrence.fetch(:key).to_s }
+        .to_set
+    end
+
+    def transfer_changelog_context(project_root, env: ENV, facts: nil)
+      facts ||= discover_facts(project_root, env: env)
+      config = kettle_jem_config(project_root)
+      engines = Array(facts.dig(:rubygems, :engines))
+      engines = DEFAULT_ENGINES if engines.empty?
+      profile = if facts[:shim]
+        SHIM_TEMPLATE_PROFILE
+      elsif monorepo_template_profile?(facts)
+        MONOREPO_ROOT_TEMPLATE_PROFILE
+      else
+        FULL_TEMPLATE_PROFILE
+      end
+      min_ruby = minimum_ruby_token(facts.dig(:rubygems, :min_ruby)).to_s
+      version_gem = facts[:version_gem].is_a?(Hash) ? facts[:version_gem] : {}
+      readme_sponsors = facts[:readme_sponsors].is_a?(Hash) ? facts[:readme_sponsors] : {}
+      readme_logo = facts[:readme_logo].is_a?(Hash) ? facts[:readme_logo] : {}
+      rubygems = config["rubygems"].is_a?(Hash) ? config["rubygems"] : {}
+      rubyforum = facts[:rubyforum].is_a?(Hash) ? facts[:rubyforum] : {}
+      {
+        "profile" => profile,
+        "topology" => facts.dig(:repository, :topology).to_s.empty? ? REPOSITORY_TOPOLOGY_STANDALONE : facts.dig(:repository, :topology).to_s,
+        "ruby.min" => min_ruby.empty? ? "0" : min_ruby,
+        "engine.jruby" => engines.include?("jruby"),
+        "engine.truffleruby" => engines.include?("truffleruby") || engines.include?("truby"),
+        "engine.alternates" => engines.any? { |engine| %w[jruby truffleruby truby].include?(engine) },
+        "feature.appraisals" => File.file?(File.join(project_root, "Appraisals")),
+        "feature.rubyforum" => rubyforum.any?,
+        "feature.rubyforum_project_tag" => !rubyforum[:project_tag].to_s.empty?,
+        "feature.corporate_sponsors" => readme_sponsors.any?,
+        "feature.organization_logo" => readme_logo.any?,
+        "feature.structuredmerge_driver" => config["git_drivers"].to_s == "semantic-diff",
+        "feature.dedicated_version_gem" => version_gem[:mode].to_s == "dedicated",
+        "workflow.dep_heads" => File.file?(File.join(project_root, ".github", "workflows", "dep-heads.yml")),
+        "workflow.jruby_94" => File.file?(File.join(project_root, ".github", "workflows", "jruby-9.4.yml")),
+        "version_gem.mode" => version_gem[:mode].to_s.empty? ? rubygems_version_gem_entrypoint_mode(rubygems) : version_gem[:mode].to_s
+      }
+    end
+
+    def transfer_changelog_entry_applies?(entry, context)
+      filter = entry[:filter]
+      return true unless filter
+
+      transfer_changelog_filter_applies?(filter, context)
+    end
+
+    def transfer_changelog_filter_applies?(filter, context)
+      Array(filter.fetch(:predicates)).all? do |predicate|
+        field = predicate.fetch(:field)
+        type = transfer_changelog_filter_field_types.fetch(field) do
+          raise Error, "Unknown transfer changelog filter field #{field.inspect}"
+        end
+        actual = context.fetch(field) do
+          raise Error, "Transfer changelog context omitted #{field.inspect}"
+        end
+        transfer_changelog_filter_predicate_applies?(type, actual, predicate.fetch(:operator), predicate.fetch(:value))
+      end
+    end
+
+    def transfer_changelog_filter_field_types
+      @transfer_changelog_filter_field_types ||= {
+        "profile" => :enum,
+        "topology" => :enum,
+        "ruby.min" => :version,
+        "engine.jruby" => :boolean,
+        "engine.truffleruby" => :boolean,
+        "engine.alternates" => :boolean,
+        "feature.appraisals" => :boolean,
+        "feature.rubyforum" => :boolean,
+        "feature.rubyforum_project_tag" => :boolean,
+        "feature.corporate_sponsors" => :boolean,
+        "feature.organization_logo" => :boolean,
+        "feature.structuredmerge_driver" => :boolean,
+        "feature.dedicated_version_gem" => :boolean,
+        "workflow.dep_heads" => :boolean,
+        "workflow.jruby_94" => :boolean,
+        "version_gem.mode" => :enum
+      }.freeze
+    end
+
+    def transfer_changelog_filter_predicate_applies?(type, actual, operator, expected)
+      case type
+      when :boolean
+        raise Error, "Invalid boolean transfer changelog filter value #{expected.inspect}" unless %w[true false].include?(expected)
+        raise Error, "Invalid boolean transfer changelog filter operator #{operator.inspect}" unless %w[= !=].include?(operator)
+
+        operator == "=" ? actual == (expected == "true") : actual != (expected == "true")
+      when :version
+        actual_version = Gem::Version.new(actual.to_s)
+        expected_version = Gem::Version.new(expected.to_s)
+        {"=" => actual_version == expected_version, "!=" => actual_version != expected_version, ">" => actual_version > expected_version, ">=" => actual_version >= expected_version, "<" => actual_version < expected_version, "<=" => actual_version <= expected_version}.fetch(operator) do
+          raise Error, "Invalid version transfer changelog filter operator #{operator.inspect}"
+        end
+      when :enum
+        raise Error, "Invalid enum transfer changelog filter operator #{operator.inspect}" unless %w[= !=].include?(operator)
+
+        operator == "=" ? actual.to_s == expected : actual.to_s != expected
+      else
+        raise Error, "Unknown transfer changelog filter type #{type.inspect}"
+      end
+    rescue ArgumentError
+      raise Error, "Invalid version transfer changelog filter value #{expected.inspect}"
     end
 
     def changelog_transfer_entries_after(entries, key)
@@ -5780,10 +5935,13 @@ module Kettle
 
           payload = changelog_transfer_list_item_payload(item.source)
           parsed = parse_changelog_transfer_line(payload)
+          lines = item.source.lines.map { |line| line.chomp.rstrip }
+          lines[0] = changelog_transfer_list_item_line(item.source, parsed.fetch(:rendered_payload))
           {
             key: parsed.fetch(:key),
             section: heading,
-            lines: item.source.lines.map { |line| line.chomp.rstrip }
+            lines: lines,
+            filter: parsed[:filter]
           }
         end
       end
@@ -5801,6 +5959,10 @@ module Kettle
       @changelog_transfer_line_parser ||= TransferChangelogLineParser.new
     end
 
+    def changelog_transfer_filter_parser
+      @changelog_transfer_filter_parser ||= TransferChangelogFilterParser.new
+    end
+
     def changelog_transfer_list_item_payload(source)
       stripped = source.to_s.lines.first.to_s.lstrip.chomp
       %w[- *].each do |marker|
@@ -5816,12 +5978,35 @@ module Kettle
       key_data = parsed.fetch(:key)
       date = key_data.fetch(:date).to_s
       sequence = key_data.fetch(:sequence).to_s
+      key = "kettle-jem-template-#{date}-#{sequence}"
+      filter = parsed[:filter] ? parse_changelog_transfer_filter(parsed.fetch(:filter).to_s) : nil
       {
-        key: "kettle-jem-template-#{date}-#{sequence}",
+        key: key,
         date: date,
         sequence: sequence,
-        message: parsed.fetch(:message).to_s
-      }
+        message: parsed.fetch(:message).to_s,
+        rendered_payload: "#{key} - #{parsed.fetch(:message)}"
+      }.tap { |entry| entry[:filter] = filter if filter }
+    end
+
+    def parse_changelog_transfer_filter(payload)
+      parsed = changelog_transfer_filter_parser.parse(payload.to_s)
+      predicates = (parsed.is_a?(Array) ? parsed : [parsed]).map do |node|
+        predicate = node.fetch(:predicate).fetch(:predicate)
+        {
+          field: predicate.fetch(:field).to_s,
+          operator: predicate.fetch(:operator).to_s,
+          value: predicate.fetch(:value).to_s
+        }
+      end
+      {predicates: predicates}
+    end
+
+    def changelog_transfer_list_item_line(source, rendered_payload)
+      first_line = source.to_s.lines.first.to_s
+      indentation = first_line.each_char.take_while { |character| character.match?(" ") || character.match?("\t") }.join
+      marker = first_line.lstrip.start_with?("* ") ? "*" : "-"
+      "#{indentation}#{marker} #{rendered_payload}"
     end
 
     def parse_changelog_transfer_key(key)
@@ -5843,14 +6028,13 @@ module Kettle
       nil
     end
 
-    def apply_changelog_transfer_entries(content, entries)
+    def apply_changelog_transfer_entries(content, entries, excluded_keys: [])
       transfer_entries = Array(entries).select do |entry|
         entry.is_a?(Hash) && entry[:key].to_s != "" && Array(entry[:lines]).any?
       end
-      return ensure_trailing_newline(content) if transfer_entries.empty?
 
       normalized = normalize_changelog(content, {})
-      normalized = refresh_existing_changelog_transfer_entries(normalized, transfer_entries)
+      normalized = remove_excluded_changelog_transfer_entries(normalized, excluded_keys)
       existing_keys = changelog_transfer_keys(normalized)
       missing = transfer_entries.reject { |entry| existing_keys.include?(entry.fetch(:key)) }
       return ensure_trailing_newline(normalized) if missing.empty?
@@ -5878,30 +6062,24 @@ module Kettle
       ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
     end
 
-    def refresh_existing_changelog_transfer_entries(content, entries)
-      entry_by_key = entries.to_h { |entry| [entry.fetch(:key).to_s, entry] }
+    def remove_excluded_changelog_transfer_entries(content, excluded_keys)
+      excluded = Array(excluded_keys).map(&:to_s).reject(&:empty?).to_set
+      return content if excluded.empty?
+
       lines = markdown_source_lines(content)
-      found = {}
       removals = changelog_existing_transfer_occurrences(content).filter_map do |occurrence|
         key = occurrence.fetch(:key).to_s
-        next unless entry_by_key.key?(key)
+        next unless excluded.include?(key)
+        next unless occurrence.fetch(:release_heading) == "## [Unreleased]"
 
-        found[key] = occurrence.fetch(:release_heading)
         (occurrence.fetch(:start_line)..occurrence.fetch(:end_line))
       end
-      return content if found.empty?
+      return content if removals.empty?
 
-      cleaned = lines.each_with_index.reject do |_line, index|
+      lines.each_with_index.reject do |_line, index|
         line_number = index + 1
         removals.any? { |range| range.cover?(line_number) }
-      end.map(&:first)
-      grouped_entries = found.each_with_object({}) do |(key, heading), grouped|
-        grouped[heading] ||= []
-        grouped[heading] << entry_by_key.fetch(key)
-      end
-      grouped_entries.reduce(cleaned) do |current_lines, (heading, heading_entries)|
-        insert_changelog_transfer_entries_in_release(current_lines, heading, heading_entries)
-      end.join("\n").then { |text| ensure_trailing_newline(text.gsub(/\n{3,}/, "\n\n")) }
+      end.map(&:first).join("\n").then { |text| ensure_trailing_newline(text.gsub(/\n{3,}/, "\n\n")) }
     end
 
     def changelog_existing_transfer_occurrences(content)
@@ -6049,7 +6227,8 @@ module Kettle
         when "changelog_unreleased"
           apply_changelog_transfer_entries(
             normalize_changelog(original, facts),
-            facts.to_h.dig(:changelog, :transfer_entries)
+            facts.to_h.dig(:changelog, :transfer_entries),
+            excluded_keys: facts.to_h.dig(:changelog, :excluded_transfer_keys)
           )
         when "generated_block_sync"
           synchronize_managed_block(original, facts)

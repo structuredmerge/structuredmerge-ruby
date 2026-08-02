@@ -107,6 +107,8 @@ Please file a bug if you notice a violation of semantic versioning.
   project's RubyForum tag as `mailing_list_uri`, and support docs link to the
   tagged RubyForum community alongside Discord.
 
+- Transfer changelog replay now supports destination applicability filters and filter-aware status reporting.
+
 ### Changed
 
 - Runtime dependency metadata now requires `kettle-ndjson` 0.1.3 or newer and

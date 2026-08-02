@@ -500,7 +500,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(result).to include("- kettle-jem-template-20260716-003 - Second missed transfer.")
   end
 
-  it "corrects stale transfer changelog entries inside released sections by stable ID" do
+  it "preserves existing transfer changelog entries inside released sections by stable ID" do
     changelog = <<~MARKDOWN
       # Changelog
 
@@ -586,12 +586,11 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(result).to include("- TAG: [v1.0.7][1.0.7t]")
     expect(result).to include("- Project-authored changed entry.")
     expect(result).to include("- Project-authored fixed entry.")
-    expect(result).to include("### Added\n\n- kettle-jem-template-20260720-001 - READMEs can now display configured")
-    expect(result).to include("### Fixed\n\n- Project-authored fixed entry.\n\n- kettle-jem-template-20260716-001")
-    expect(result).to include("- kettle-jem-template-20260725-001 - Release pull request branches beginning")
-    expect(result).not_to include("Shim gemspec manifests now include")
-    expect(result).not_to include("Generated READMEs can now render")
-    expect(result).not_to include("so release CI monitoring does not report")
+    expect(result).to include("Shim gemspec manifests now include")
+    expect(result).to include("Generated READMEs can now render")
+    expect(result).to include("so release CI monitoring does not report")
+    expect(result).not_to include("READMEs can now display configured")
+    expect(result).not_to include("Shim gems now package `LICENSE.md`")
     expect(result).to include("## [1.0.6] - 2026-07-11")
     expect(result).to include("- Prior release entry.")
   end
@@ -642,6 +641,73 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(described_class::CHANGELOG_STANDARD_HEADINGS).to include(entry.fetch(:section))
       expect(entry.fetch(:lines).join("\n")).to include(entry.fetch(:key))
     end
+  end
+
+  it "parses transfer applicability filters without transferring their source notation" do
+    parsed = described_class.send(
+      :parse_changelog_transfer_line,
+      "kettle-jem-template-20260720-004 [if engine.alternates=false & ruby.min<2.2] - MRI-only fix."
+    )
+
+    expect(parsed.fetch(:filter)).to eq(
+      predicates: [
+        {field: "engine.alternates", operator: "=", value: "false"},
+        {field: "ruby.min", operator: "<", value: "2.2"}
+      ]
+    )
+    expect(parsed.fetch(:rendered_payload)).to eq("kettle-jem-template-20260720-004 - MRI-only fix.")
+  end
+
+  it "evaluates transfer filters against the fixed destination context schema" do
+    filter = described_class.send(:parse_changelog_transfer_filter, "engine.alternates=false & ruby.min<2.2")
+
+    expect(described_class.send(
+      :transfer_changelog_filter_applies?,
+      filter,
+      {"engine.alternates" => false, "ruby.min" => "2.1"}
+    )).to be(true)
+    expect(described_class.send(
+      :transfer_changelog_filter_applies?,
+      filter,
+      {"engine.alternates" => true, "ruby.min" => "2.1"}
+    )).to be(false)
+    expect {
+      described_class.send(
+        :transfer_changelog_filter_applies?,
+        {predicates: [{field: "unknown.field", operator: "=", value: "true"}]},
+        {}
+      )
+    }.to raise_error(Kettle::Jem::Error, /Unknown transfer changelog filter field/)
+  end
+
+  it "removes retroactively excluded transfer entries only from Unreleased" do
+    changelog = <<~MARKDOWN
+      # Changelog
+
+      ## [Unreleased]
+
+      ### Fixed
+
+      - kettle-jem-template-20260720-004 - Remove this transfer entry.
+        Continuation.
+
+      ## [1.0.0] - 2026-08-01
+
+      ### Fixed
+
+      - kettle-jem-template-20260720-004 - Preserve released history.
+    MARKDOWN
+
+    result = described_class.send(
+      :apply_changelog_transfer_entries,
+      changelog,
+      [],
+      excluded_keys: ["kettle-jem-template-20260720-004"]
+    )
+
+    expect(result).not_to include("Remove this transfer entry.")
+    expect(result).not_to include("Continuation.")
+    expect(result).to include("Preserve released history.")
   end
 
   it "reports transfer changelog lag from a stored replay cursor" do
