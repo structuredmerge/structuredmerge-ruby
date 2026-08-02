@@ -1306,6 +1306,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Recreate missing managed modular Gemfiles instead of treating empty checksum records as cache hits.
 
+- Recognize legacy Dir.chdir-wrapped git ls-files gemspec package manifests during templating.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -10818,11 +10818,25 @@ module Kettle
     # optional filtering calls. Prism lets us recognize that bounded pipeline
     # without interpreting arbitrary Ruby.
     def legacy_git_ls_files_assignment?(node)
+      return legacy_git_ls_files_chdir_assignment?(node) if node.is_a?(::Prism::CallNode) && node.name == :chdir
+
       current = node
       while current.is_a?(::Prism::CallNode) && %i[split reject select grep map].include?(current.name)
         current = current.receiver
       end
       current.is_a?(::Prism::XStringNode) && %w[git\ ls-files git\ ls-files\ -z].include?(current.unescaped.to_s)
+    end
+
+    # Older Bundler gemspecs commonly scope a git-ls-files pipeline with
+    # Dir.chdir(File.expand_path(__dir__)). This wrapper does not change the
+    # package-file semantics, so recognize it without evaluating arbitrary
+    # destination Ruby. The block must contain exactly one known pipeline.
+    def legacy_git_ls_files_chdir_assignment?(node)
+      return false unless node.receiver&.slice == "Dir"
+      return false unless Array(node.arguments&.arguments).length == 1
+
+      body = Array(node.block&.body&.body)
+      body.length == 1 && legacy_git_ls_files_assignment?(body.first)
     end
 
     def generic_bundler_gemspec_files_command?(node)

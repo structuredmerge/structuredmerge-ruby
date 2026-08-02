@@ -1057,6 +1057,29 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("git ls-files")
   end
 
+  it "replaces a legacy git-ls-files pipeline scoped by Dir.chdir" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = Dir["lib/**/*.rb"]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = Dir.chdir(File.expand_path(__dir__)) do
+          `git ls-files -z`.split("\\x0").reject { |file| file.match?(%r{^(test|spec|features)/}) }
+        end
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect(merged).to include('spec.files = Dir["lib/**/*.rb"]')
+    expect(merged).not_to include("Dir.chdir")
+    expect(merged).not_to include("git ls-files")
+  end
+
   it "replaces legacy newline-split git-ls-files assignments with the canonical package manifest" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
