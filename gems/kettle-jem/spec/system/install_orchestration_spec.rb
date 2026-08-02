@@ -2171,6 +2171,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
             spec.summary = "Example gem"
             spec.add_development_dependency "kettle-drift"
             spec.add_development_dependency "rubocop-rspec", "~> 2.10"
+            spec.add_development_dependency "yard-junk", "~> 0.0.10"
             spec.add_development_dependency "rake", "~> 13.0"
           end
         RUBY
@@ -2198,6 +2199,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       expect(content).not_to include("kettle-drift")
       expect(content).not_to include("rubocop-rspec")
+      expect(content).not_to include("yard-junk")
       expect(content).to include('spec.add_development_dependency "rake", "~> 13.0"')
     end
   end

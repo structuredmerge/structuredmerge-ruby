@@ -1288,6 +1288,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Recover legacy lockfiles with unsupported tree_sitter_language_pack platforms during templating bootstrap.
 
+- Remove legacy yard-junk development dependencies that conflict with generated documentation tooling.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
