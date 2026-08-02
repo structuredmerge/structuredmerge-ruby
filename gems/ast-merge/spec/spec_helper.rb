@@ -25,6 +25,7 @@ require 'kettle/test/rspec'
 
 # This library
 require 'ast/merge'
+
 require_relative 'support/testable_node'
 
 # Load registry/helper support before RSpec dependency filters are configured.
