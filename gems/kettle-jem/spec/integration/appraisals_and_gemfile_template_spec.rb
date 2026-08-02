@@ -70,6 +70,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         report.fetch(:recipe_name) == "template_source_application_Appraisals"
       end
       appraisals_content = appraisals_report.fetch(:final_content)
+      fingerprint_payload = described_class.template_input_fingerprint_payload(root, appraisals_report)
 
       expect(appraisals_content).not_to include('appraise "ruby-2-7"')
       expect(appraisals_content).not_to include('gem "example"')
@@ -84,6 +85,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(appraisals_content).to include("support-gem")
       expect(appraisals_content).not_to match(/^\s+example$/)
       expect(appraisals_content).to include('appraise "style"')
+      expect(fingerprint_payload).to include(appraisals_template_policy_fingerprint_version: 1)
       expect(appraisals_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy)).to include(
         file_type: "appraisals",
         operations: include(
@@ -231,6 +233,55 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         "modular/activerecord/r3/v8.0.gemfile",
         "modular/x_std_libs/r3/libs.gemfile"
       )
+    end
+  end
+
+  it "removes legacy standard library gem declarations when an appraisal uses the managed aggregate" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisals-managed-stdlibs", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 4.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "coverage" do
+            # Legacy declarations conflict with modular/x_std_libs on Ruby 4.
+            gem "mutex_m", "~> 0.2"
+            gem "stringio", "~> 3.0"
+            gem "benchmark", "~> 0.4", ">= 0.4.1"
+            gem "simplecov"
+          end
+        RUBY
+        "template/Appraisals.example" => <<~RUBY
+          appraise "coverage" do
+            eval_gemfile "modular/coverage.gemfile"
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_content).to include('eval_gemfile "modular/x_std_libs.gemfile"')
+      expect(appraisals_content).to include('gem "simplecov"')
+      expect(appraisals_content).not_to include('gem "mutex_m"')
+      expect(appraisals_content).not_to include('gem "stringio"')
+      expect(appraisals_content).not_to include('gem "benchmark"')
     end
   end
 

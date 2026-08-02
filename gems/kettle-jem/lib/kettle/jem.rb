@@ -35,6 +35,7 @@ module Kettle
     PACKAGE_NAME = "kettle-jem"
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     TEMPLATE_SOURCE_APPLICATION_FINGERPRINT_VERSION = 1
+    APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
@@ -4014,7 +4015,7 @@ module Kettle
       # --checksums=template. Bump the explicit renderer version only when
       # source-template application semantics change; unrelated Kettle-Jem
       # code changes must not invalidate every destination record.
-      {
+      payload = {
         template_source_application_fingerprint_version: TEMPLATE_SOURCE_APPLICATION_FINGERPRINT_VERSION,
         recipe_name: report[:recipe_name].to_s,
         request_recipe_name: report.dig(:request_envelope, :request, :recipe_name).to_s,
@@ -4026,6 +4027,17 @@ module Kettle
         template_token_keys: tokens.keys.sort,
         template_tokens_sha256: Digest::SHA256.hexdigest(JSON.generate(tokens))
       }
+      if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :appraisals
+        payload[:appraisals_template_policy_fingerprint_version] = APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION
+      end
+      payload
+    end
+
+    def template_file_type_for_relative_path(relative_path)
+      basename = File.basename(relative_path.to_s)
+      return :appraisals if basename.start_with?("Appraisals") || basename == "Appraisal.root.gemfile"
+
+      nil
     end
 
     def template_source_absolute_path(project_root, preference)
@@ -9386,8 +9398,39 @@ module Kettle
       with_standard_appraisal_gemfiles = inject_standard_appraisal_gemfiles(with_framework_appraisals, facts)
       pruned = prune_appraisals_recording_entries(with_standard_appraisal_gemfiles, facts)
       pruned = prune_appraisals_below_min_ruby(pruned, min_ruby)
+      pruned = remove_managed_stdlib_appraisal_gems(pruned)
       pruned = remove_gemfile_dependency_lines(pruned, [package_name])
       remove_gemfile_percent_w_entries(pruned, [package_name])
+    end
+
+    # The x_std_libs aggregate owns these extracted standard libraries. Keeping
+    # legacy gem declarations in an appraisal block that evaluates the aggregate
+    # makes Bundler reject the same gem with two requirement declarations.
+    MANAGED_APPRAISAL_STDLIB_GEMS = %w[benchmark cgi erb mutex_m stringio webrick].freeze
+
+    def remove_managed_stdlib_appraisal_gems(content)
+      parsed = appraisal_blocks(content)
+      blocks = parsed.fetch(:order).map do |name|
+        remove_managed_stdlib_gems_from_appraisal_block(parsed.fetch(:blocks).fetch(name))
+      end
+      ensure_trailing_newline(([parsed.fetch(:prelude).to_s.rstrip] + blocks.map(&:rstrip)).reject(&:empty?).join("\n\n"))
+    end
+
+    def remove_managed_stdlib_gems_from_appraisal_block(block)
+      return block unless appraisal_x_stdlib_eval_gemfile_call(block)
+
+      lines = block.to_s.lines
+      remove_indexes = Set.new
+      gemfile_gem_call_records(block).each do |record|
+        next unless MANAGED_APPRAISAL_STDLIB_GEMS.include?(record.fetch(:name))
+
+        start_index = record.fetch(:start_line) - 1
+        start_index -= 1 while start_index.positive? && gemfile_comment_line?(lines[start_index - 1])
+        (start_index..(record.fetch(:end_line) - 1)).each { |index| remove_indexes << index }
+      end
+      return block if remove_indexes.empty?
+
+      ensure_trailing_newline(lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"))
     end
 
     def inject_standard_appraisal_gemfiles(content, facts)

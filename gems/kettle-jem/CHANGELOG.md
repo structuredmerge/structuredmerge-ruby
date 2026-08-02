@@ -1302,6 +1302,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination-specific SimpleCov filters and formatters when migrating legacy SimpleCov.start configuration blocks.
 
+- Remove legacy standard-library declarations from Appraisals blocks managed by modular x_std_libs gemfiles.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
