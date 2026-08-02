@@ -5304,11 +5304,11 @@ module Kettle
       changes = []
       cleanup = version_gem_cleanup_step(project_root, facts)
       changes.concat(Array(cleanup[:changed_files]))
-      unless templated_paths.include?(version_path)
+      outer_namespace_kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
+      unless templated_paths.include?(version_path) && outer_namespace_kind != :class
         version = facts.dig(:project_runtime, :version).to_s
         version = project_gemspec_version(project_root) if version.empty?
         version = "0.0.1.pre" if version.empty?
-        outer_namespace_kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
         changes << write_if_changed(
           project_root,
           version_path,

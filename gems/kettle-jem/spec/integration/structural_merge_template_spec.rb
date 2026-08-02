@@ -837,9 +837,12 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       })
       facts = {
         package: {name: "month-serializer"},
-        rubygems: {entrypoint_require: "month/serializer", namespace: "Month::Serializer"},
-        project_runtime: {version: "1.0.0"},
-        version_gem: {enabled: true}
+        rubygems: {
+          entrypoint_require: "month/serializer",
+          namespace: "Month::Serializer",
+          min_ruby: "1.9.3"
+        },
+        project_runtime: {version: "1.0.0"}
       }
 
       result = described_class.send(:version_gem_bootstrap_step_for_paths, root, facts)
@@ -873,9 +876,12 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       })
       facts = {
         package: {name: "month-serializer"},
-        rubygems: {entrypoint_require: "month/serializer", namespace: "Month::Serializer"},
-        project_runtime: {version: "1.0.0"},
-        version_gem: {enabled: true}
+        rubygems: {
+          entrypoint_require: "month/serializer",
+          namespace: "Month::Serializer",
+          min_ruby: "1.9.3"
+        },
+        project_runtime: {version: "1.0.0"}
       }
       report = {
         facts: facts,
@@ -883,7 +889,9 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
         template_selection: {only: []}
       }
 
-      result = described_class.send(:template_version_gem_bootstrap_step, root, report)
+      result = Array(described_class.send(:template_version_gem_bootstrap_step, root, report)).find do |step|
+        step[:name] == "version_bootstrap"
+      end
       version_file = File.read(File.join(root, "lib/month/serializer/version.rb"))
 
       expect(result[:status]).to eq("applied")
