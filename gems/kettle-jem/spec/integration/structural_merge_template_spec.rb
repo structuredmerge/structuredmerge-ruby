@@ -134,6 +134,46 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "uses JSON5 structural merge for JSON5 template files" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-json5-template-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: settings.json5
+                target: config/settings.json5
+        YAML
+        "template/settings.json5.example" => <<~JSON5,
+          {
+            shared: true,
+            'template-only': 'added',
+          }
+        JSON5
+        "config/settings.json5" => <<~JSON5
+          {
+            // Local configuration must survive
+            shared: false,
+          }
+        JSON5
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find { |entry| entry.fetch(:relative_path) == "config/settings.json5" }
+
+      expect(report.fetch(:final_content)).to include('"shared": false', '"template-only": \'added\'')
+    end
+  end
+
   it "uses RBS structural merge for RBS template files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

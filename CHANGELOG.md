@@ -45,6 +45,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - JSON5 files and fenced code blocks are routed through json-merge.
 
+- kettle-jem recognizes and structurally merges JSON5 template files.
+
 ### Changed
 
 - StructuredMerge Ruby gemspec manifests now exclude repository-only files from

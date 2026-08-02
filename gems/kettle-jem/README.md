@@ -33,7 +33,7 @@ to build `kettle-jem` extension gems against the supported plugin seam.
 
 ### Key Features
 
-- **AST-aware merging** — 10 format-specific merge engines (prism, psych, markly, toml, json, jsonc, bash, dotenv, rbs, text)
+- **AST-aware merging** — 10 format-specific merge engines (prism, psych, markly, toml, json, jsonc, json5, bash, dotenv, rbs, text)
 - **Token substitution** — `{KJ|TOKEN}` patterns resolved from config, ENV, or auto-derived from gemspec
 - **Freeze blocks** — protect any section from template overwrites with `# kettle-jem:freeze` / `# kettle-jem:unfreeze`
 - **Per-file strategies** — `merge`, `accept_template`, `keep_destination`, or `raw_copy`
@@ -314,6 +314,7 @@ Kettle::Jem selects the merge engine by file type:
 | `*.toml`                                                 | Toml::Merge   | Sort keys, table matching                  |
 | `*.json`                                                 | Json::Merge   | Key-based matching                         |
 | `*.jsonc`                                                | Json::Merge   | With comment preservation                  |
+| `*.json5`                                                | Json::Merge   | JSON5 keys, strings, comments, and trailing commas |
 | `*.sh`, `*.bash`, `.envrc`                               | Bash::Merge   | Block matching                             |
 | `.env*`                                                  | Dotenv::Merge | KEY=value matching                         |
 | `*.rbs`                                                  | RBS::Merge    | Type signature matching                    |

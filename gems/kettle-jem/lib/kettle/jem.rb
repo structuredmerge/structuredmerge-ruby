@@ -324,7 +324,7 @@ module Kettle
       ".github/copilot_instructions.md" => ".github/COPILOT_INSTRUCTIONS.md"
     }.freeze
     SUPPORTED_TEMPLATE_STRATEGIES = %i[merge accept_template keep_destination raw_copy].freeze
-    SUPPORTED_TEMPLATE_FILE_TYPES = %i[ruby gemfile appraisals gemspec rakefile yaml toml markdown json jsonc dotenv rbs bash text].freeze
+    SUPPORTED_TEMPLATE_FILE_TYPES = %i[ruby gemfile appraisals gemspec rakefile yaml toml markdown json jsonc json5 dotenv rbs bash text].freeze
     SUPPORTED_RUBY_METHOD_MOVE_POLICIES = %w[destination_order].freeze
     DEFAULT_RUBY_METHOD_MOVE_POLICY = "destination_order"
     SUPPORTED_YAML_COMMENT_MERGE_POLICIES = %w[preserve_destination template_fallback_when_missing template_documentation].freeze
@@ -7527,7 +7527,7 @@ module Kettle
         )
       when :toml
         merge_result = Citrus::Toml::Merge.merge_toml(template_content, destination_content, "toml")
-      when :json, :jsonc
+      when :json, :jsonc, :json5
         merge_result = merge_json_template_source(template_content, destination_content, recipe, file_type)
       when :markdown
         return merge_changelog_template_source(template_content, destination_content, facts: facts) if recipe.fetch(:target_path) == "CHANGELOG.md"
@@ -9524,6 +9524,7 @@ module Kettle
       output = Json::Merge::SmartMerger.new(
         template_content,
         destination_content,
+        dialect: file_type,
         **json_merge_options(recipe)
       ).merge
       {ok: true, output: output, diagnostics: []}
@@ -11322,6 +11323,7 @@ module Kettle
       return :yaml if extension.match?(/\A\.ya?ml\z/) || File.basename(relative_path).casecmp("citation.cff").zero?
       return :toml if extension == ".toml"
       return :jsonc if extension == ".jsonc"
+      return :json5 if extension == ".json5"
       return :json if extension == ".json"
       return :markdown if extension.match?(/\A\.md(?:own)?\z/)
       return :dotenv if basename.start_with?(".env") || basename.end_with?(".env") || extension == ".env"
