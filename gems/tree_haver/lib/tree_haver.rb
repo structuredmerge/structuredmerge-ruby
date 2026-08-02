@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'version_gem'
-
 require_relative 'tree_haver/version'
 
 module TreeHaver
