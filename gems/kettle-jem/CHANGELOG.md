@@ -1339,6 +1339,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Bootstrap VersionGem wiring in existing package-level shims instead of nested implementation files.
 
+- Infer direct VERSION namespaces and remove stale VersionGem wiring from former nested implementation entrypoints.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

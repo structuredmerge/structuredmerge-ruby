@@ -14771,6 +14771,18 @@ module Kettle
         )
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
+      default_entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      if entrypoint_path != default_entrypoint_path
+        default_entrypoint = read_project_file(project_root, default_entrypoint_path)
+        unless default_entrypoint.empty?
+          cleaned_default_entrypoint = remove_entrypoint_version_requires(
+            remove_version_gem_entrypoint_references(default_entrypoint),
+            relative_path: File.join(File.basename(entrypoint_require), "version"),
+            absolute_path: File.join(entrypoint_require, "version")
+          )
+          changes << write_if_changed(project_root, default_entrypoint_path, cleaned_default_entrypoint)
+        end
+      end
       if non_default_version_gem
         changes << write_if_changed(
           project_root,
@@ -15392,6 +15404,10 @@ module Kettle
       current = namespace + ruby_constant_path_segments(node.constant_path)
       if current.last == "Version" && current.length > 1
         return current[0...-1].join("::")
+      end
+
+      if node.body&.body&.any? { |child| child.is_a?(::Prism::ConstantWriteNode) && child.name == :VERSION }
+        return current.join("::")
       end
 
       node.body&.body&.each do |child|
