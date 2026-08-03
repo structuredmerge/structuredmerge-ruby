@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'tree_haver'
 require 'ast/merge'
-require_relative 'merge/version'
 
 module Go
   module Merge
@@ -239,7 +236,3 @@ module Go
 end
 
 Go::Merge.register_backend!
-
-Go::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
