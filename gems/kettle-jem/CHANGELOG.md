@@ -1321,6 +1321,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Clarify modular dependency conflict decisions and reject incompatible keep_both requirements.
 
+- Repair legacy local Gemfile nomono bootstraps before the templating dependency bundle starts.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

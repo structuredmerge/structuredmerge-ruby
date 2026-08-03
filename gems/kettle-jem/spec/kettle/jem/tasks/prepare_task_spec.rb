@@ -10,6 +10,37 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     expect(described_class::PREPARE_ONLY_PATHS).not_to include("gemfiles/modular/templating.gemfile")
   end
 
+  it "repairs legacy local Gemfile nomono bootstraps before Bundler starts" do
+    Dir.mktmpdir("kettle-jem-prepare-nomono-repair", tmp_root) do |root|
+      path = File.join(root, "gemfiles/modular/coverage_local.gemfile")
+      FileUtils.mkdir_p(File.dirname(path))
+      File.write(path, <<~RUBY)
+        nomono_activation_requirements = ["~> 1.1", ">= 1.1.3"]
+        nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
+        if File.file?(nomono_lockfile)
+          nomono_locked_spec = Bundler::LockfileParser.new(Bundler.read_file(nomono_lockfile)).specs.find { |spec| spec.name == "nomono" }
+          nomono_locked = nomono_locked_spec && Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
+        nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"] if nomono_locked
+        end
+        Kernel.send(:gem, "nomono", *nomono_activation_requirements)
+        require "nomono/bundler"
+
+        local_gems = %w[example]
+      RUBY
+
+      step = described_class.normalize_existing_local_gemfile_bootstraps_step(
+        root,
+        events: Kettle::Jem.event_stream_from_options({})
+      )
+      expect(step.fetch(:status)).to eq("applied")
+      expect(step.fetch(:changed_files)).to eq(["gemfiles/modular/coverage_local.gemfile"])
+      content = File.read(path)
+      expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.4"]')
+      expect(content).to include('Gem::Specification.find_all_by_name("nomono")')
+      expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
+    end
+  end
+
   it "updates critical templating gems after applying the dependency bootstrap payload" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
@@ -86,7 +117,16 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         prepared: true,
         prepare_only: described_class::PREPARE_ONLY_PATHS
       )
-      expect(result.fetch(:prepare_steps)).to eq([reset_step, update_step, bundle_step])
+      expect(result.fetch(:prepare_steps)).to eq([
+        {
+          name: "normalize_local_gemfile_bootstraps",
+          status: "already_current",
+          changed_files: []
+        },
+        reset_step,
+        update_step,
+        bundle_step
+      ])
       expect(result.fetch(:changed_files)).to eq(["Gemfile", "Gemfile.lock"])
       expect(Kettle::Jem).to have_received(:apply_project).with(
         root,
@@ -158,6 +198,11 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         prepare_only: described_class::PREPARE_ONLY_PATHS
       )
       expect(result.fetch(:prepare_steps)).to eq([
+        {
+          name: "normalize_local_gemfile_bootstraps",
+          status: "already_current",
+          changed_files: []
+        },
         reset_step,
         bootstrap_step,
         {

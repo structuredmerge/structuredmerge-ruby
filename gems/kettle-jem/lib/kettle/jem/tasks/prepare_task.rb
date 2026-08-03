@@ -29,11 +29,12 @@ module Kettle
             only: PREPARE_ONLY_PATHS,
             skip_lock_normalization: true
           )
+          events = Kettle::Jem.event_stream_from_options(effective_run_options)
+          nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
           setup_env["K_JEM_TEMPLATING"] = "true" if local_path_development_env?(env)
-          events = Kettle::Jem.event_stream_from_options(effective_run_options)
           reset_step = reset_release_lockfiles_step(
             project_root: project_root,
             setup_env: setup_env,
@@ -75,9 +76,10 @@ module Kettle
               %w[skipped succeeded].include?(reset_step.fetch(:status)) &&
               %w[skipped succeeded].include?(bundle_step.fetch(:status)),
             prepare_only: PREPARE_ONLY_PATHS,
-            prepare_steps: [reset_step, bootstrap_step, bundle_step],
+            prepare_steps: [nomono_bootstrap_step, reset_step, bootstrap_step, bundle_step],
             changed_files: (
               report.fetch(:changed_files, []) +
+                nomono_bootstrap_step.fetch(:changed_files, []) +
                 reset_step.fetch(:changed_files, []) +
                 bootstrap_step.fetch(:changed_files, []) +
                 bundle_step.fetch(:changed_files, [])
@@ -90,6 +92,25 @@ module Kettle
           )
           Kettle::Jem.emit_summary_event(events, final_report)
           final_report
+        end
+
+        def normalize_existing_local_gemfile_bootstraps_step(project_root, events:)
+          paths = Dir.glob(File.join(project_root.to_s, "gemfiles/modular/**/*_local.gemfile")).sort
+          changed_files = paths.filter_map do |path|
+            before = File.read(path)
+            after = Kettle::Jem.normalize_local_gemfile_nomono_bootstrap(before)
+            next if after == before
+
+            File.write(path, after)
+            Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
+          end
+          step = {
+            name: "normalize_local_gemfile_bootstraps",
+            status: changed_files.empty? ? "already_current" : "applied",
+            changed_files: changed_files
+          }
+          Kettle::Jem.emit_step_event(events, "command_step", step, phase: "prepare")
+          step
         end
 
         def reset_release_lockfiles_step(project_root:, setup_env:, quiet:, command_runner:, events:)
