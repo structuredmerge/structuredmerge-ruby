@@ -31,7 +31,7 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
 
     expect(output).to include("# local coverage note")
     expect(output).to include("SimpleCov.configure do")
-    expect(output).to include('cover "lib/**/*.rb"')
+    expect(output).to include('track_files "lib/**/*.rb"')
     expect(output).to include('custom_setting "kept"')
     expect(output).to include('add_filter "gem_mine"')
     expect(output).to include("# GemMine is test infrastructure, not library code.")
@@ -39,7 +39,7 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).not_to include('require "kettle-soup-cover"')
     expect(output).not_to include('require "kettle/soup/cover/config"')
     expect(output).not_to include("SimpleCov.start")
-    expect(output).not_to include("track_files")
+    expect(output).to include("track_files")
   end
 
   it "removes repeated generated SimpleCov usage guidance" do
@@ -228,7 +228,7 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
       spec_helper = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "spec/spec_helper.rb" }
       kettle_config = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml" }
 
-      expect(simplecov.fetch(:final_content)).to include('cover "lib/**/*.rb"')
+      expect(simplecov.fetch(:final_content)).to include('track_files "lib/**/*.rb"')
       expect(simplecov.fetch(:final_content)).not_to include("SimpleCov.start")
       expect(simplecov.fetch(:final_content)).not_to include('require "kettle-soup-cover"')
       expect(simplecov.fetch(:final_content)).not_to include('require "kettle/soup/cover/config"')
@@ -305,8 +305,9 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
       expect(simplecov).not_to be_nil
       expect(spec_helper).not_to be_nil
       expect(simplecov.fetch(:final_content)).to include('cover "lib/**/*.rb", "lib/**/*.rake", "exe/*.rb"')
+      expect(simplecov.fetch(:final_content)).to include('track_files "{lib/**/*.rb,lib/**/*.rake,exe/*.rb}"')
       expect(simplecov.fetch(:final_content)).not_to include("SimpleCov.start")
-      expect(simplecov.fetch(:final_content)).not_to include("track_files")
+      expect(simplecov.fetch(:final_content)).to include("track_files")
       expect(spec_helper.fetch(:final_content)).to include('require "simplecov"')
       expect(spec_helper.fetch(:final_content)).to include('require "kettle/soup/cover/config"')
       expect(spec_helper.fetch(:final_content)).to include("SimpleCov.start")

@@ -8040,7 +8040,7 @@ module Kettle
       output = nodes.sort_by { |node| -node.location.start_line }.reduce(output) do |memo, node|
         replace_source_range_lines(memo, node.location.start_line, expand_line_range_through_following_blanks(memo, node.location.end_line), "")
       end
-      normalize_simplecov_usage_guidance(normalize_simplecov_track_files_calls(output))
+      normalize_simplecov_usage_guidance(output)
     end
 
     # SimpleCov.start was historically used as both configuration and startup.
@@ -8108,35 +8108,6 @@ module Kettle
         ruby_string_argument(node) == "kettle-soup-cover"
     end
 
-    def normalize_simplecov_track_files_calls(content)
-      records = simplecov_track_files_call_records(content)
-      return content if records.empty?
-
-      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
-        indent = leading_whitespace(record.fetch(:source))
-        replacement = "#{indent}cover #{record.fetch(:arguments_source)}\n"
-        replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), replacement)
-      end
-    end
-
-    def simplecov_track_files_call_records(content)
-      lines = content.to_s.lines
-      ruby_call_records(content, :track_files).filter_map do |call|
-        next unless call.receiver.nil?
-
-        arguments = call.arguments&.location&.slice.to_s
-        next if arguments.empty?
-
-        end_line = ruby_node_source_end_line(call)
-        {
-          start_line: call.location.start_line,
-          end_line: end_line,
-          source: (lines[(call.location.start_line - 1)..(end_line - 1)] || []).join,
-          arguments_source: arguments
-        }
-      end
-    end
-
     def normalize_spec_helper_simplecov_template_source(content)
       output = remove_duplicate_simplecov_do_cov_bootstrap_blocks(content)
       output = ensure_spec_helper_simplecov_do_cov_bootstrap(output)
@@ -8152,6 +8123,18 @@ module Kettle
     # graph: a stale require "byebug" otherwise makes a successfully
     # templated project fail before its examples load.
     def migrate_legacy_byebug_requires(content)
+      debug_records = ruby_call_records(content, :require).filter_map do |call|
+        next unless call.receiver.nil? && ruby_string_argument(call) == "debug"
+
+        line = content.to_s.lines.fetch(call.location.start_line - 1, "")
+        next unless line.strip == call.location.slice.strip
+
+        {
+          start_line: call.location.start_line,
+          end_line: ruby_node_source_end_line(call),
+          source: call.location.slice
+        }
+      end
       records = ruby_call_records(content, :require).filter_map do |call|
         next unless call.receiver.nil?
 
@@ -8164,22 +8147,34 @@ module Kettle
           source: call.location.slice
         }
       end.sort_by { |record| record.fetch(:start_line) }
-      return content if records.empty?
+      return normalize_debug_require_records(content, debug_records) if records.empty?
 
-      debug_already_required = ruby_call_records(content, :require).any? do |call|
-        call.receiver.nil? && ruby_string_argument(call) == "debug"
-      end
+      debug_already_required = !debug_records.empty?
       first = records.first
       replacements = records.to_h do |record|
         replacement = if record.equal?(first) && !debug_already_required
           indent = content.to_s.lines.fetch(record.fetch(:start_line) - 1)[/\A\s*/]
-          %(#{indent}require "debug"\n)
+          %(#{indent}#{guarded_debug_require}\n)
         else
           ""
         end
         [record.fetch(:start_line), record.merge(replacement: replacement)]
       end
+      normalize_debug_require_records(replace_record_ranges(content, replacements), debug_records)
+    end
+
+    def normalize_debug_require_records(content, records)
+      return content if records.empty?
+
+      replacements = records.to_h do |record|
+        indent = content.to_s.lines.fetch(record.fetch(:start_line) - 1)[/\A\s*/]
+        [record.fetch(:start_line), record.merge(replacement: %(#{indent}#{guarded_debug_require}\n))]
+      end
       replace_record_ranges(content, replacements)
+    end
+
+    def guarded_debug_require
+      'require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7")'
     end
 
     def normalize_spec_helper_block_bindings(content, template_content)

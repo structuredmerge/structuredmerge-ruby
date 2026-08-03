@@ -1144,10 +1144,22 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
 
     migrated = described_class.send(:migrate_legacy_byebug_requires, source)
 
-    expect(migrated).to include('require "debug"')
+    expect(migrated).to include('require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7")')
     expect(migrated).to include('require "rspec"')
     expect(migrated).not_to include("byebug")
     expect(migrated.scan('require "debug"').length).to eq(1)
+  end
+
+  it "guards existing direct debug requires for legacy Ruby appraisals" do
+    source = <<~RUBY
+      require "debug"
+      require "debug" if load_debugger
+    RUBY
+
+    migrated = described_class.send(:migrate_legacy_byebug_requires, source)
+
+    expect(migrated).to include('require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7")')
+    expect(migrated).to include('require "debug" if load_debugger')
   end
 
   it "replaces byebug-family dependencies in each appraisal independently" do

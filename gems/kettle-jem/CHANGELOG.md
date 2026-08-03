@@ -1335,6 +1335,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Refresh kettle-family with nomono in the templating workflow.
 
+- Guard generated debug requires for Ruby versions below the debug gem support floor.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
