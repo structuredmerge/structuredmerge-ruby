@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'ast/merge'
 require 'json'
 require 'json/merge'
-require_relative 'git/version'
 
 module Ast
   module Merge
@@ -412,8 +409,4 @@ module Ast
       end
     end
   end
-end
-
-Ast::Merge::Git::Version.class_eval do
-  extend VersionGem::Basic
 end
