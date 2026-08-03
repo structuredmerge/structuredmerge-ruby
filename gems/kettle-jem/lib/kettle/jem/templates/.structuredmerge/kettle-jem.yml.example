@@ -110,6 +110,10 @@ project_emoji: ""
 #
 # Supported values: ruby, jruby, truffleruby
 # Default (when key is absent): all three engines.
+# The generated direct dependency-heads workflow derives its Bundler lockfile
+# platform from this list. MRI and TruffleRuby use the checked-in Ruby/Linux
+# lock context; JRuby receives an isolated lock with universal-java after the
+# JRuby runtime is installed. Do not hand-edit a shared lockfile for JRuby.
 engines:
   - ruby
   - jruby

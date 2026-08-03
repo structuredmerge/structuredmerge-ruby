@@ -182,6 +182,12 @@ engines:
   - jruby
   - truffleruby
 
+# The generated direct dependency-heads workflow derives its Bundler lockfile
+# platform from `engines`. JRuby gets an isolated temporary lockfile with the
+# `universal-java` platform; MRI and TruffleRuby use the checked-in lock
+# context. This avoids making one shared lockfile satisfy incompatible engine
+# platforms.
+
 # SPDX license identifiers
 licenses:
   - MIT

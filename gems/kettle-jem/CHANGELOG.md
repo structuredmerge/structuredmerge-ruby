@@ -1329,6 +1329,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove explicit rdoc development dependency declarations from documentation modular Gemfiles.
 
+- Generate engine-specific dependency lockfiles for JRuby CI workflows
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

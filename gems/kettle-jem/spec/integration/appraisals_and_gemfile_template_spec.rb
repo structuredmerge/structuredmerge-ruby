@@ -664,9 +664,13 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     jobs = workflow.fetch("jobs")
 
     expect(template).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.bundle_gemfile || 'Appraisal.root.gemfile' }}")
+    expect(template).to include('BUNDLE_LOCKFILE="${RUNNER_TEMP}/kettle-jem-lockfiles/${{ matrix.appraisal }}-${{ matrix.ruby }}.lock"')
     expect(template).not_to include("bundle exec appraisal ${{ matrix.appraisal }}")
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
     expect(template).to include('use-setup-ruby: "3.2 3.3 3.4 4.0"')
+    expect(template).to include("bundler-cache: ${{ matrix.ruby != 'jruby' }}")
+    expect(template).to include("bundle lock --remove-platform=x86_64-linux --remove-platform=x86_64-linux-gnu --remove-platform=x86_64-linux-musl --add-platform=universal-java --update")
+    expect(template).to include("run: bundle install --jobs 4")
 
     expect(jobs.keys).to include("ruby", "truffleruby", "jruby")
     jobs.each_value do |job|
