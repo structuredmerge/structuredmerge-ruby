@@ -2,14 +2,12 @@
 
 # External gems
 # NOTE: rbs gem is loaded by the RBS backend when needed.
-require 'version_gem'
 
 # tree_haver provides unified parsing via multiple backends
 require 'tree_haver'
 
 # Shared merge infrastructure
 require 'ast/merge'
-require_relative 'merge/version'
 
 # This gem
 
@@ -155,8 +153,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: "class Foo\nend",
     category: :code
   )
-end
-
-Rbs::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
