@@ -651,9 +651,10 @@ RSpec.describe Kettle::Jem do
         end
       end
     RUBY
-    write_file(root, "spec/gitmoji/regex/version_spec.rb", <<~RUBY)
-      require "anonymous_loader"
-      RSpec.describe Gitmoji::Regex::Version do
+      write_file(root, "spec/gitmoji/regex/version_spec.rb", <<~RUBY)
+        require "anonymous_loader"
+        require "gitmoji-regex"
+        RSpec.describe Gitmoji::Regex::Version do
         it_behaves_like "a Version module", described_class
       end
     RUBY

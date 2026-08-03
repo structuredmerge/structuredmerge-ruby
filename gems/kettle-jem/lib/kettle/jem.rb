@@ -14962,6 +14962,10 @@ module Kettle
         requirements << %(require "#{require_path}"\n)
       end
       if ensure_package_entrypoint_require && !entrypoint_require.to_s.empty? &&
+        !package_name.to_s.empty? && package_name.to_s != entrypoint_require.to_s
+        updated = remove_top_level_ruby_require(updated, package_name.to_s)
+      end
+      if ensure_package_entrypoint_require && !entrypoint_require.to_s.empty? &&
         !ruby_top_level_require?(updated, "require", entrypoint_require.to_s)
         requirements << %(require "#{entrypoint_require}"\n)
       end
@@ -15258,6 +15262,17 @@ module Kettle
         matches_relative = call.name == :require_relative && argument == relative_path
         matches_absolute = call.name == :require && argument == absolute_path
         next unless matches_relative || matches_absolute
+
+        {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
+      end
+      return content.to_s if selectors.empty?
+
+      collapse_excess_blank_lines(delete_line_ranges(content.to_s, selectors))
+    end
+
+    def remove_top_level_ruby_require(content, argument)
+      selectors = top_level_ruby_call_records(content, :require).filter_map do |call|
+        next unless ruby_string_argument(call) == argument.to_s
 
         {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
       end
