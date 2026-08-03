@@ -9276,7 +9276,7 @@ module Kettle
 
     def modular_dependency_conflict_decided?(decisions, conflict)
       decisions.any? do |decision|
-          decision.fetch("gem") == conflict.fetch(:name) &&
+        decision.fetch("gem") == conflict.fetch(:name) &&
           decision.fetch("direct") == conflict.fetch(:direct) &&
           decision.fetch("modular") == conflict.fetch(:modular) &&
           case decision.fetch("action")
@@ -10148,6 +10148,10 @@ module Kettle
         template_declares_version_gem: gemspec_dependency_names(template_content).include?("version_gem")
       )
       merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
+      # Yard owns the documentation dependency graph. A direct gemspec rdoc
+      # development dependency creates an unnecessary second owner and can
+      # conflict with the documentation modular Gemfile.
+      merged = remove_gemspec_dependency_lines(merged, receiver: template_receiver, names: ["rdoc"], development_only: true)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = remove_duplicate_gemspec_dependency_lines(merged, receiver: template_receiver)
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
@@ -10453,11 +10457,12 @@ module Kettle
       ensure_trailing_newline(replace_record_ranges(content, records_by_line).gsub(/\n{3,}/, "\n\n"))
     end
 
-    def remove_gemspec_dependency_lines(content, receiver:, names:, runtime_only: false)
+    def remove_gemspec_dependency_lines(content, receiver:, names:, runtime_only: false, development_only: false)
       wanted = names.map(&:to_s).to_set
       records_by_line = gemspec_dependency_records(content, receiver: receiver)
         .select { |record| wanted.include?(record.fetch(:name)) }
         .select { |record| !runtime_only || record.fetch(:kind) != "add_development_dependency" }
+        .select { |record| !development_only || record.fetch(:kind) == "add_development_dependency" }
         .to_h { |record| [record.fetch(:start_line), record.merge(replacement: "")] }
       return content if records_by_line.empty?
 

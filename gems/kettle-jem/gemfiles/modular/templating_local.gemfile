@@ -18,7 +18,10 @@ if !nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already
       .new(Bundler.read_file(nomono_lockfile))
       .specs
       .find { |spec| spec.name == "nomono" }
+    nomono_locked_installed = nomono_locked_spec &&
+      Gem::Specification.find_all_by_name("nomono").any? { |spec| spec.version == nomono_locked_spec.version }
     nomono_locked = nomono_locked_spec &&
+      nomono_locked_installed &&
       nomono_requirement.satisfied_by?(nomono_locked_spec.version)
     nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
   end
@@ -38,7 +41,6 @@ structuredmerge_local_gems = %w[
   dotenv-merge
   go-merge
   json-merge
-  kettle-jem
   kramdown-merge
   markdown-merge
   markly-merge
@@ -63,8 +65,8 @@ kettle_dev_local_gems = %w[
   kettle-dev kettle-family kettle-test kettle-soup-cover kettle-drift
 ]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
-structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[kettle-jem] - declared_gems
-kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[kettle-jem] - (declared_gems - %w[kettle-dev])
+structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[] - declared_gems
+kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[] - (declared_gems - %w[kettle-dev])
 
 platform :mri do
   if ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0

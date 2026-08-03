@@ -1325,6 +1325,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Run legacy local Gemfile bootstrap repair after managed template application so stale nomono pins cannot reach Bundler.
 
+- Remove direct rdoc development dependencies from templated gemspecs; Yard owns documentation dependencies.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

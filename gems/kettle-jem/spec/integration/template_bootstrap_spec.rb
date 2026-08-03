@@ -9,7 +9,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-direct-modular-dependency-conflict", tmp_root) do |root|
       write_tree(root, {
-        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
           dependency_conflicts:
             resolve: []
         YAML

@@ -916,6 +916,27 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(note_index).to be < bundler_audit_index
   end
 
+  it "removes direct rdoc development dependencies because Yard owns documentation dependencies" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.add_development_dependency("yard", "~> 0.9")
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |gem|
+        gem.name = "demo"
+        gem.add_development_dependency("yard", "~> 0.9")
+        gem.add_development_dependency("rdoc", ">= 3")
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect(merged).to include('spec.add_development_dependency("yard", "~> 0.9")')
+    expect(merged).not_to include('add_development_dependency("rdoc"')
+  end
+
   it "does not accumulate duplicate blank section separators across repeated gemspec merges" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
