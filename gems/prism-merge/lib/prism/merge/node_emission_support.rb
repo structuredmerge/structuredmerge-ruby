@@ -924,7 +924,7 @@ module Prism
           prefix: '[prism-merge]',
           error_class: Prism::Merge::CorruptionDetectedError,
           kind: :comment_ownership_overlap,
-          message: 'template-leading comment block overlaps previously emitted destination leading comment ownership',
+          message: 'template-leading comment block overlaps previously emitted leading comment ownership',
           on_filter: ->(comment) { last_filtered_line = comment.location.start_line }
         ) { |comment| emitted_texts.include?(comment.slice.strip) }
         [filtered, last_filtered_line]
