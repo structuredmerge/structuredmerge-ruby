@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'json'
 require 'tree_haver'
 require 'ast/merge'
-require_relative 'merge/version'
 
 module Json
   module Merge
@@ -521,8 +518,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: '{"key": "value"}',
     category: :data
   )
-end
-
-Json::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
