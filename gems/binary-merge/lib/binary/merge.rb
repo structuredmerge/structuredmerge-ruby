@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'tree_haver'
-require_relative 'merge/version'
 
 module Binary
   module Merge
@@ -52,8 +49,4 @@ module Binary
       )
     end
   end
-end
-
-Binary::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
