@@ -17,11 +17,8 @@
 # MRI statically links tree-sitter, FFI dynamically links libtree-sitter.so.
 require 'tree_haver'
 
-require 'version_gem'
-
 # Shared merge infrastructure
 require 'ast/merge'
-require_relative 'merge/version'
 
 # This gem
 
@@ -214,8 +211,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: "#!/bin/bash\necho hello",
     category: :code
   )
-end
-
-Bash::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
