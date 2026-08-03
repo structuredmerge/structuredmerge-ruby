@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'prism'
 require 'ruby-merge'
 require 'ast/merge'
 require 'tree_haver'
-require_relative 'merge/version'
 
 module Prism
   module Merge
@@ -1347,8 +1344,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: 'def foo; end',
     category: :code
   )
-end
-
-Prism::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
