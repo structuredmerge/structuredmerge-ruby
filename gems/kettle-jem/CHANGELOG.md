@@ -1317,6 +1317,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prevent local modular Gemfiles from evaluating the destination gem as a sibling path dependency.
 
+- Avoid pinning local nomono bootstraps to unavailable versions from stale lockfiles.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -1597,6 +1597,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include("!nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)")
       expect(content).to include("nomono_lockfile")
       expect(content).to include("Bundler::LockfileParser")
+      expect(content).to include('Gem::Specification.find_all_by_name("nomono")')
       expect(content).to include('Kernel.send(:gem, "nomono"')
       expect(content).to include('root: ["src", "my", "kettle-dev"]')
     end
