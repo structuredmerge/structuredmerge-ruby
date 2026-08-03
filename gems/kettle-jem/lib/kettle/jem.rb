@@ -14961,9 +14961,9 @@ module Kettle
       if ensure_version_gem_require && !ruby_top_level_require?(updated, "require", require_path)
         requirements << %(require "#{require_path}"\n)
       end
-      if ensure_package_entrypoint_require && !package_name.to_s.empty? &&
-        !ruby_top_level_require?(updated, "require", package_name.to_s)
-        requirements << %(require "#{package_name}"\n)
+      if ensure_package_entrypoint_require && !entrypoint_require.to_s.empty? &&
+        !ruby_top_level_require?(updated, "require", entrypoint_require.to_s)
+        requirements << %(require "#{entrypoint_require}"\n)
       end
 
       if requirements.any?

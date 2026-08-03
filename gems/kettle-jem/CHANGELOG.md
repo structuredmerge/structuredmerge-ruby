@@ -1353,6 +1353,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Version specs now load inline version-gem package entrypoints before exercising the VersionGem API.
 
+- Version specs now require the discovered Ruby entrypoint for hyphenated package names.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
