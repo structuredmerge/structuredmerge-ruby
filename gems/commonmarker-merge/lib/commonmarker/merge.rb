@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'markdown-merge'
 require 'commonmarker'
-require_relative 'merge/version'
 
 module Commonmarker
   module Merge
@@ -227,7 +224,3 @@ module Commonmarker
 end
 
 Commonmarker::Merge.ensure_backend_loaded!
-
-Commonmarker::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
