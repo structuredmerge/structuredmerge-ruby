@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 # External gems
-require 'version_gem'
 
 # Shared merge infrastructure
 require 'ast/merge'
 require 'plain/merge'
 require 'tree_haver'
-require_relative 'merge/version'
 
 # This gem
 
@@ -87,8 +85,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: 'KEY=value',
     category: :config
   )
-end
-
-Dotenv::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
