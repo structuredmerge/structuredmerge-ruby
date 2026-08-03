@@ -4,3 +4,9 @@
 #   See: https://github.com/fxn/zeitwerk#for_gem_extension
 # Hook for other libraries to load this library (e.g. via bundler)
 require 'psych/merge'
+require 'version_gem'
+require_relative 'psych/merge/version'
+
+Psych::Merge::Version.class_eval do
+  extend VersionGem::Basic
+end

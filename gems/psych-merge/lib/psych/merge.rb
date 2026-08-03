@@ -3,12 +3,10 @@
 # External gems
 require 'psych'
 require 'tree_haver'
-require 'version_gem'
 require 'yaml/merge'
 
 # Shared merge infrastructure
 require 'ast/merge'
-require_relative 'merge/version'
 
 # This gem
 
@@ -319,8 +317,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: 'key: value',
     category: :config
   )
-end
-
-Psych::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
