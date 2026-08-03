@@ -272,6 +272,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem preserves host token placeholders during configuration normalization.
 
+- Prevent Ruby merges from duplicating identical leading comments when template and destination already contain the same comment.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

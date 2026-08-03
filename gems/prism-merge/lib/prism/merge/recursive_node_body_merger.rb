@@ -105,7 +105,43 @@ module Prism
         merged_body_metadata = body_result&.line_metadata&.dup || []
         remapped_result_lines = {}
 
-        prev_comment_line = comment_source == :template ? last_skipped_template_line : nil
+        # Recursive body merges emit comments through SmartMerger directly, so
+        # apply the same ownership filters used by NodeEmissionSupport. Without
+        # this, a floating comment can be emitted once as a matched node's
+        # external template trailing comment and again as a nested leading
+        # comment when both inputs already contain it.
+        emission_support = merger.send(:node_emission_support)
+        last_filtered_comment_line = nil
+        if comment_source == :template
+          leading_comments, trailing_filtered_line = emission_support.send(
+            :filter_emitted_template_trailing_comments,
+            leading_comments
+          )
+          leading_comments, leading_filtered_line = emission_support.send(
+            :filter_already_emitted_leading_comments,
+            leading_comments
+          )
+          last_filtered_comment_line = leading_filtered_line || trailing_filtered_line
+          emission_support.send(:track_emitted_template_leading_comments, leading_comments)
+        else
+          leading_comments, trailing_filtered_line = emission_support.send(
+            :filter_emitted_template_trailing_comments,
+            leading_comments
+          )
+          leading_comments, template_leading_filtered_line = emission_support.send(
+            :filter_emitted_template_leading_comments,
+            leading_comments,
+            last_filtered_line: trailing_filtered_line
+          )
+          last_filtered_comment_line = template_leading_filtered_line || trailing_filtered_line
+          emission_support.send(:track_emitted_dest_leading_comments, leading_comments)
+        end
+
+        prev_comment_line = if comment_source == :template
+                              [last_skipped_template_line, last_filtered_comment_line].compact.max
+                            else
+                              last_filtered_comment_line
+                            end
         merger.send(
           :emit_leading_comments,
           merger.result,

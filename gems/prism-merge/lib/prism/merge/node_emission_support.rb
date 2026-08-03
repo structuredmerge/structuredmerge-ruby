@@ -907,13 +907,15 @@ module Prism
         merger.instance_variable_set(:@emitted_dest_leading_texts, set)
       end
 
-      # Remove template leading comments whose text was already emitted as
-      # leading comments of a preceding destination node.  This prevents
-      # duplication when Prism attaches the same gap-separated (floating)
-      # comment block to different nodes in template vs destination.
+      # Remove leading comments whose text was already emitted by an earlier
+      # node from either source. Prism can attach the same gap-separated
+      # (floating) comment block to different nodes in template and
+      # destination, including when both sides already contain the comment.
       def filter_already_emitted_leading_comments(comments)
-        dest_leading_texts = merger.instance_variable_get(:@emitted_dest_leading_texts)
-        return [comments, nil] unless dest_leading_texts&.any?
+        emitted_texts = Set.new
+        emitted_texts.merge(merger.instance_variable_get(:@emitted_dest_leading_texts).to_a)
+        emitted_texts.merge(merger.instance_variable_get(:@emitted_template_leading_texts).to_a)
+        return [comments, nil] if emitted_texts.empty?
 
         last_filtered_line = nil
         filtered = Ast::Merge::Healer.filter_items(
@@ -924,7 +926,7 @@ module Prism
           kind: :comment_ownership_overlap,
           message: 'template-leading comment block overlaps previously emitted destination leading comment ownership',
           on_filter: ->(comment) { last_filtered_line = comment.location.start_line }
-        ) { |comment| dest_leading_texts.include?(comment.slice.strip) }
+        ) { |comment| emitted_texts.include?(comment.slice.strip) }
         [filtered, last_filtered_line]
       end
 

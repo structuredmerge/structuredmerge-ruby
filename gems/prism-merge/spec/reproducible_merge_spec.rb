@@ -72,5 +72,37 @@ RSpec.describe 'Prism reproducible merge' do
         add_template_only_nodes: true
       }
     end
+
+    it 'does not duplicate an identical leading comment already present on both sides' do
+      source = <<~RUBY
+        require 'kettle/test/rspec'
+        # helper comment
+
+        RSpec.configure do |config|
+          config.expect_with :rspec do |c|
+            c.syntax = :expect
+          end
+        end
+      RUBY
+
+      merged = Prism::Merge.merge_ruby(
+        source,
+        source,
+        'ruby',
+        preference: :template,
+        add_template_only_nodes: true
+      )[:output]
+
+      expect(merged.scan('# helper comment').size).to eq(1)
+      expect(
+        Prism::Merge.merge_ruby(
+          source,
+          merged,
+          'ruby',
+          preference: :template,
+          add_template_only_nodes: true
+        )[:output]
+      ).to eq(merged)
+    end
   end
 end
