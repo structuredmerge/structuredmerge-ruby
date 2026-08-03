@@ -894,6 +894,63 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "preserves a legacy nested version namespace when bootstrapping version_gem" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-legacy-version-namespace", tmp_root) do |root|
+      write_tree(root, {
+        "activesupport-broadcast_logger.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "activesupport-broadcast_logger"
+            spec.version = "2.0.4"
+            spec.summary = "Broadcast logger"
+            spec.required_ruby_version = ">= 2.7.0"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+          end
+        RUBY
+        "lib/activesupport-broadcast_logger.rb" => <<~RUBY,
+          require_relative "activesupport/broadcast_logger/version"
+
+          module Activesupport
+          end
+
+          Activesupport::BroadcastLogger::Version.class_eval do
+            extend VersionGem::Basic
+          end
+        RUBY
+        "lib/activesupport/broadcast_logger/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module Activesupport
+            module BroadcastLogger
+              module Version
+                VERSION = "2.0.4"
+              end
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          rubygems:
+            version_gem_entrypoint: auto
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - source: lib/gem/version.rb
+                target: lib/activesupport/broadcast_logger/version.rb
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+
+      version_rb = File.read(File.join(root, "lib", "activesupport", "broadcast_logger", "version.rb"))
+      expect(version_rb).to include("module Activesupport")
+      expect(version_rb).to include("module BroadcastLogger")
+      expect(version_rb).not_to include("module ActiveSupport")
+      expect(version_rb).to include('VERSION = "2.0.4"')
+    end
+  end
+
   it "migrates all legacy nested RBS files into the package-level signature" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
