@@ -1313,6 +1313,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Fail templating when direct project dependencies collide with templated modular Gemfiles unless an exact decision is recorded in kettle-jem configuration.
 
+- Preserve explicit Bundler checksum validation settings during template setup.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

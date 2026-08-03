@@ -953,6 +953,26 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "preserves explicit checksum validation settings for setup commands" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-checksum-env", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
+
+      env = {
+        "BUNDLE_DISABLE_CHECKSUM_VALIDATION" => "true",
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "BUNDLE_BIN_PATH" => "/inherited/bundler"
+      }
+
+      expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, env)).to include(
+        "BUNDLE_DISABLE_CHECKSUM_VALIDATION" => "true",
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "BUNDLE_BIN_PATH" => nil
+      )
+    end
+  end
+
   it "detects rake tasks using the same bundle environment as command execution" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
