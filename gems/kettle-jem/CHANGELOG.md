@@ -1351,6 +1351,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Avoid duplicate version requires when a package shim delegates version loading to its implementation.
 
+- Version specs now load inline version-gem package entrypoints before exercising the VersionGem API.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

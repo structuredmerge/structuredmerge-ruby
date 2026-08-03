@@ -14821,7 +14821,9 @@ module Kettle
         version_spec_path,
         entrypoint_require,
         namespace,
-        ensure_version_gem_require: non_default_version_gem
+        package_name: package_name,
+        ensure_version_gem_require: non_default_version_gem,
+        ensure_package_entrypoint_require: !non_default_version_gem
       )
       if manage_signature_file || !legacy_signature_paths.empty?
         changes.concat(
@@ -14943,7 +14945,8 @@ module Kettle
       namespace.start_with?("#{parent}::")
     end
 
-    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:, include_version_gem_path: true)
+    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, package_name: nil,
+      ensure_version_gem_require:, include_version_gem_path: true, ensure_package_entrypoint_require: false)
       current = read_project_file(project_root, version_spec_path)
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
@@ -14957,6 +14960,10 @@ module Kettle
       requirements << %(require "anonymous_loader"\n) unless ruby_top_level_require?(updated, "require", "anonymous_loader")
       if ensure_version_gem_require && !ruby_top_level_require?(updated, "require", require_path)
         requirements << %(require "#{require_path}"\n)
+      end
+      if ensure_package_entrypoint_require && !package_name.to_s.empty? &&
+        !ruby_top_level_require?(updated, "require", package_name.to_s)
+        requirements << %(require "#{package_name}"\n)
       end
 
       if requirements.any?
