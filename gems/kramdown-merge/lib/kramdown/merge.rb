@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'markdown-merge'
 require 'kramdown'
-require_relative 'merge/version'
 
 module Kramdown
   module Merge
@@ -201,7 +198,3 @@ module Kramdown
 end
 
 require_relative 'merge/backend'
-
-Kramdown::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
