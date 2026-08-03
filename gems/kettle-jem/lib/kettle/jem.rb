@@ -14726,13 +14726,13 @@ module Kettle
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
-      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      entrypoint_path = version_gem_bootstrap_entrypoint_path(project_root, package_name, entrypoint_require)
       version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
       signature_path = File.join("sig", "#{entrypoint_require}.rbs")
       legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
-      namespace = facts.dig(:rubygems, :namespace).to_s
+      namespace = existing_version_namespace(project_root, version_path).to_s
+      namespace = facts.dig(:rubygems, :namespace).to_s if namespace.empty?
       namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
-      namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
       return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
 
       version = facts.dig(:project_runtime, :version).to_s
@@ -14763,7 +14763,12 @@ module Kettle
       elsif current_entrypoint.empty?
         version_gem_entrypoint_file_content(namespace: namespace, entrypoint_require: entrypoint_require)
       else
-        version_gem_bootstrap_entrypoint_content(current_entrypoint, namespace: namespace, entrypoint_require: entrypoint_require)
+        version_gem_bootstrap_entrypoint_content(
+          current_entrypoint,
+          namespace: namespace,
+          entrypoint_require: entrypoint_require,
+          version_require_path: version_require_path_for_entrypoint(entrypoint_path, version_path)
+        )
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
       if non_default_version_gem
@@ -14800,6 +14805,18 @@ module Kettle
         entrypoint_path: entrypoint_path,
         signature_path: signature_path
       }
+    end
+
+    def version_gem_bootstrap_entrypoint_path(project_root, package_name, entrypoint_require)
+      default_path = File.join("lib", "#{entrypoint_require}.rb")
+      package_path = File.join("lib", "#{package_name}.rb")
+      return package_path if package_path != default_path && File.file?(File.join(project_root, package_path))
+
+      default_path
+    end
+
+    def version_require_path_for_entrypoint(entrypoint_path, version_path)
+      Pathname(version_path).relative_path_from(Pathname(File.dirname(entrypoint_path))).to_s.delete_suffix(".rb")
     end
 
     def non_default_version_gem_entrypoint?(project_root, entrypoint_require)
@@ -15111,15 +15128,19 @@ module Kettle
       "#{wrap_ruby_namespace(namespace, body).join("\n")}\n"
     end
 
-    def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:)
-      current = normalize_entrypoint_version_require(content, entrypoint_require: entrypoint_require)
+    def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, version_require_path: nil)
+      current = normalize_entrypoint_version_require(
+        content,
+        entrypoint_require: entrypoint_require,
+        version_require_path: version_require_path
+      )
       lines = current.lines
       insert_lines = []
       if File.basename(entrypoint_require) != "version_gem" && !ruby_top_level_require?(current, "require", "version_gem")
         insert_lines << "require \"version_gem\"\n"
       end
       if insert_lines.any?
-        relative_path = File.join(File.basename(entrypoint_require), "version")
+        relative_path = version_require_path.to_s.empty? ? File.join(File.basename(entrypoint_require), "version") : version_require_path.to_s
         lines.insert(version_gem_require_insertion_index(current, before_relative_path: relative_path), *insert_lines)
       end
 
@@ -15138,8 +15159,8 @@ module Kettle
       normalize_entrypoint_version_require(current, entrypoint_require: entrypoint_require)
     end
 
-    def normalize_entrypoint_version_require(content, entrypoint_require:)
-      relative_path = File.join(File.basename(entrypoint_require), "version")
+    def normalize_entrypoint_version_require(content, entrypoint_require:, version_require_path: nil)
+      relative_path = version_require_path.to_s.empty? ? File.join(File.basename(entrypoint_require), "version") : version_require_path.to_s
       absolute_path = File.join(entrypoint_require, "version")
       current = remove_entrypoint_version_requires(content, relative_path: relative_path, absolute_path: absolute_path)
       lines = current.lines

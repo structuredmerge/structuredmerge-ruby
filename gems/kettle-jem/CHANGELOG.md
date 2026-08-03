@@ -1337,6 +1337,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Guard generated debug requires for Ruby versions below the debug gem support floor.
 
+- Bootstrap VersionGem wiring in existing package-level shims instead of nested implementation files.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

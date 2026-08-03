@@ -204,6 +204,63 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "bootstraps an existing package shim without modifying its nested implementation" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-package-shim-entrypoint", tmp_root) do |root|
+      write_file(root, "demo-widget.gemspec", <<~RUBY)
+        gem_version =
+          Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/demo/widget/version.rb", mod) }::Demo::Widget::VERSION
+
+        Gem::Specification.new do |spec|
+          spec.name = "demo-widget"
+          spec.version = gem_version
+          spec.summary = "Demo widget"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+        end
+      RUBY
+      write_file(root, "lib/demo-widget.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "demo/widget/version"
+        require_relative "demo/widget"
+      RUBY
+      write_file(root, "lib/demo/widget.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Demo
+          module Widget
+          end
+        end
+      RUBY
+      write_file(root, "lib/demo/widget/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Demo
+          module Widget
+            VERSION = "1.0.0"
+          end
+        end
+      RUBY
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(name: "version_gem_bootstrap", status: "applied")
+      )
+      package_entrypoint = File.read(File.join(root, "lib/demo-widget.rb"))
+      expect(package_entrypoint).to include('require "version_gem"')
+      expect(package_entrypoint).to include('require_relative "demo/widget/version"')
+      expect(package_entrypoint).to include("Demo::Widget::Version.class_eval")
+
+      implementation = File.read(File.join(root, "lib/demo/widget.rb"))
+      expect(implementation).not_to include("version_gem", "Version.class_eval")
+      expect(File).to exist(File.join(root, "lib/demo/widget/version.rb"))
+      expect(File).not_to exist(File.join(root, "lib/demo-widget/version.rb"))
+    end
+  end
+
   it "repairs a package-derived executable version header for a configured legacy entrypoint" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
