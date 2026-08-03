@@ -1327,6 +1327,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove direct rdoc development dependencies from templated gemspecs; Yard owns documentation dependencies.
 
+- Remove explicit rdoc development dependency declarations from documentation modular Gemfiles.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

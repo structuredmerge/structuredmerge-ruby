@@ -2003,6 +2003,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
 
     expect_gem_dependency_declared(content, "yard-lint")
+    expect(content).not_to include('gem "rdoc"')
     expect(content).not_to include("Gem::Version.new(RUBY_VERSION)")
   end
 

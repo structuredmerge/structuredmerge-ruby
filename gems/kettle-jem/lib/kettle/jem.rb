@@ -7662,6 +7662,7 @@ module Kettle
           output = remove_gemfile_dependency_blocks(content, removable)
           remove_gemfile_percent_w_entries(output, removable)
         end
+        output = remove_gemfile_dependency_blocks(output, ["rdoc"])
       else
         merge_gemfile_template_policy(
           content,
