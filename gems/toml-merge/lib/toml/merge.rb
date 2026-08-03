@@ -5,11 +5,9 @@
 # Toml::Merge registers TOML-specific backends with TreeHaver when loaded so
 # parser_for(:toml) can resolve registered grammars and backends consistently.
 require 'tree_haver'
-require 'version_gem'
 
 # Shared merge infrastructure
 require 'ast/merge'
-require_relative 'merge/version'
 
 # This gem
 
@@ -377,8 +375,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     test_source: "[section]\nkey = \"value\"",
     category: :config
   )
-end
-
-Toml::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
