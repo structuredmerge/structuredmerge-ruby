@@ -1140,7 +1140,8 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
 
     expect(workflow).to include("- name: Update templating bootstrap dependencies")
     expect(workflow).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile")
-    expect(workflow).to include("run: bundle update nomono")
+    expect(workflow).to include("run: bundle update nomono kettle-family")
+    expect(workflow).to include("experimental: false")
     expect(workflow.index("Update templating bootstrap dependencies")).to be < workflow.index("[Attempt 1] Appraisal")
 
     bootstrap_step = workflow[/      - name: Update templating bootstrap dependencies.*?(?=^      - name:)/m]
