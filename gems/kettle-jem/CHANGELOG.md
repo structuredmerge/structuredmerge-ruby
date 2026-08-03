@@ -1323,6 +1323,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Repair legacy local Gemfile nomono bootstraps before the templating dependency bundle starts.
 
+- Run legacy local Gemfile bootstrap repair after managed template application so stale nomono pins cannot reach Bundler.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

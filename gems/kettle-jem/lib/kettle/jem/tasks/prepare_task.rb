@@ -30,8 +30,8 @@ module Kettle
             skip_lock_normalization: true
           )
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
-          nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
+          nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
           setup_env["K_JEM_TEMPLATING"] = "true" if local_path_development_env?(env)
