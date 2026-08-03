@@ -15142,7 +15142,7 @@ module Kettle
 
     def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, version_require_path: nil)
       current = normalize_entrypoint_version_require(
-        content,
+        remove_version_gem_class_eval_references(content),
         entrypoint_require: entrypoint_require,
         version_require_path: version_require_path
       )
@@ -15204,14 +15204,25 @@ module Kettle
 
         selectors << {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
       end
-      top_level_ruby_call_records(content, :class_eval).each do |call|
-        next unless version_gem_class_eval_call?(call)
-
-        selectors << {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
-      end
+      selectors.concat(version_gem_class_eval_selectors(content))
       return content.to_s if selectors.empty?
 
       collapse_excess_blank_lines(delete_line_ranges(content.to_s, selectors))
+    end
+
+    def remove_version_gem_class_eval_references(content)
+      selectors = version_gem_class_eval_selectors(content)
+      return content.to_s if selectors.empty?
+
+      collapse_excess_blank_lines(delete_line_ranges(content.to_s, selectors))
+    end
+
+    def version_gem_class_eval_selectors(content)
+      top_level_ruby_call_records(content, :class_eval).filter_map do |call|
+        next unless version_gem_class_eval_call?(call)
+
+        {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
+      end
     end
 
     def version_gem_class_eval_call?(call)

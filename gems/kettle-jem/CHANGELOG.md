@@ -1343,6 +1343,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Allow legacy appraisal projects to opt into a compatible Bundler via KJ_BUNDLER_VERSION.
 
+- Normalize stale VersionGem class extensions when repairing an existing package shim.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
