@@ -2,8 +2,6 @@
 
 require 'ast/crispr'
 require 'markly/merge'
-require 'version_gem'
-require_relative 'markly/version'
 
 module Ast
   module Crispr
@@ -356,8 +354,4 @@ module Ast
       end
     end
   end
-end
-
-Ast::Crispr::Markdown::Markly::Version.class_eval do
-  extend VersionGem::Basic
 end
