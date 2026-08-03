@@ -15226,13 +15226,12 @@ module Kettle
     end
 
     def version_gem_class_eval_call?(call)
-      call.receiver&.slice.to_s.end_with?("::Version") &&
-        call.block&.body&.body.to_a.any? do |child|
-          child.is_a?(::Prism::CallNode) &&
-            child.receiver.nil? &&
-            child.name == :extend &&
-            child.arguments&.arguments&.first&.slice == "VersionGem::Basic"
-        end
+      call.receiver && call.block&.body&.body.to_a.any? do |child|
+        child.is_a?(::Prism::CallNode) &&
+          child.receiver.nil? &&
+          child.name == :extend &&
+          child.arguments&.arguments&.first&.slice == "VersionGem::Basic"
+      end
     end
 
     def version_gem_require_insertion_index(content, before_relative_path: nil)

@@ -1345,6 +1345,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Normalize stale VersionGem class extensions when repairing an existing package shim.
 
+- Remove legacy VersionGem extensions from nested implementation files during package-shim repair.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
