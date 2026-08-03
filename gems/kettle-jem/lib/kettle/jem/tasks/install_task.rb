@@ -1088,9 +1088,11 @@ module Kettle
         def setup_command_env(project_root, env)
           command_env = (env || {}).to_h.dup
           templating_requested = command_env.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          requested_bundler_version = command_env["KJ_BUNDLER_VERSION"].to_s.strip
           requested_gemfile = command_env["BUNDLE_GEMFILE"].to_s
           disable_checksum_validation = command_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"]
           strip_inherited_bundler_activation!(command_env)
+          command_env["BUNDLER_VERSION"] = requested_bundler_version unless requested_bundler_version.empty?
           gemfile = File.join(project_root.to_s, "Gemfile")
           if File.file?(gemfile) || (!requested_gemfile.empty? && same_path?(requested_gemfile, gemfile))
             command_env["BUNDLE_GEMFILE"] = gemfile
@@ -1108,8 +1110,10 @@ module Kettle
 
         def bundler_command_env(project_root, env)
           command_env = (env || {}).to_h.dup
+          requested_bundler_version = command_env["KJ_BUNDLER_VERSION"].to_s.strip
           disable_checksum_validation = command_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"]
           strip_inherited_bundler_activation!(command_env)
+          command_env["BUNDLER_VERSION"] = requested_bundler_version unless requested_bundler_version.empty?
           gemfile = File.join(project_root.to_s, "Gemfile")
           command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
           command_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = disable_checksum_validation unless disable_checksum_validation.nil?

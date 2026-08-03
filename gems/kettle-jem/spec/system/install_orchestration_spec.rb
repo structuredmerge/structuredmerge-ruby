@@ -911,6 +911,39 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "preserves an explicit KJ Bundler version through setup environment sanitization" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-env-bundler-override", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+      command_envs = []
+      command_runner = lambda do |_command, chdir:, env:, quiet:|
+        expect(chdir).to eq(root)
+        expect(quiet).to be(true)
+        command_envs << env
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {"BUNDLER_VERSION" => "4.0.12", "KJ_BUNDLER_VERSION" => "2.7.2"},
+        run_options: {only: "bin/setup", quiet: true, skip_commit: true},
+        command_runner: command_runner
+      )
+
+      expect(command_envs).not_to be_empty
+      expect(command_envs).to all(include("BUNDLER_VERSION" => "2.7.2"))
+    end
+  end
+
   it "uses kettle-family local install roots for templating setup" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

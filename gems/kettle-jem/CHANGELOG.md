@@ -1341,6 +1341,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Infer direct VERSION namespaces and remove stale VersionGem wiring from former nested implementation entrypoints.
 
+- Allow legacy appraisal projects to opt into a compatible Bundler via KJ_BUNDLER_VERSION.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
