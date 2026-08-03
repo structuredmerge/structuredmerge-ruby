@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'tree_haver'
 require 'ast/merge'
-require_relative 'merge/version'
 
 module Rust
   module Merge
@@ -240,7 +237,3 @@ module Rust
 end
 
 Rust::Merge.register_backend!
-
-Rust::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
