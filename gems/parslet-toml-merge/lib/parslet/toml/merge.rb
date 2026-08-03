@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'toml-merge'
 require 'toml'
-require_relative 'merge/version'
 
 module Parslet
   module Toml
@@ -150,7 +147,3 @@ module Parslet
 end
 
 Parslet::Toml::Merge.register_backend!
-
-Parslet::Toml::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
