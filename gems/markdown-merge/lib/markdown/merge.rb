@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'ast/merge'
 require 'tree_haver'
-require_relative 'merge/version'
 
 module Markdown
   module Merge
@@ -695,8 +692,4 @@ if defined?(Ast::Merge::RSpec::MergeGemRegistry)
     category: :markdown,
     skip_instantiation: true
   )
-end
-
-Markdown::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
