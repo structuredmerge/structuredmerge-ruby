@@ -1347,6 +1347,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove legacy VersionGem extensions from nested implementation files during package-shim repair.
 
+- Preserve local modular Gemfile bodies during template finalization.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

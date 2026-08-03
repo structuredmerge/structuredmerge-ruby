@@ -7653,7 +7653,7 @@ module Kettle
         package_name = facts.to_h.dig(:package, :name).to_s
         runtime_dependencies = package_runtime_dependency_names(facts)
         if local_gemfile_template_recipe?(recipe)
-          content
+          remove_gemfile_dependency_blocks(content, ["rdoc"])
         else
           named_fragment_dependencies = runtime_dependencies.select do |dependency|
             target.include?(dependency.tr("-", "_"))
@@ -7662,7 +7662,6 @@ module Kettle
           output = remove_gemfile_dependency_blocks(content, removable)
           remove_gemfile_percent_w_entries(output, removable)
         end
-        output = remove_gemfile_dependency_blocks(output, ["rdoc"])
       else
         merge_gemfile_template_policy(
           content,

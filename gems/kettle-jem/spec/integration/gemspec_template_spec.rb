@@ -1231,6 +1231,35 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("source \"https://rubygems.org\"")
   end
 
+  it "preserves the body of an accepted local modular Gemfile while removing rdoc" do
+    recipe = {
+      target_path: "gemfiles/modular/style_local.gemfile",
+      template_preference: {strategy: "accept_template"}
+    }
+    template = <<~RUBY
+      require "nomono/bundler"
+
+      gem "rdoc"
+      local_gems = %w[example]
+      platform :mri do
+        eval_nomono_gems(gems: local_gems)
+      end
+    RUBY
+
+    finalized = described_class.send(
+      :finalize_gemfile_template_source,
+      recipe,
+      template,
+      "",
+      facts: {package: {name: "other"}},
+      template_content: template
+    )
+
+    expect(finalized).to include("local_gems = %w[example]")
+    expect(finalized).to include("eval_nomono_gems(gems: local_gems)")
+    expect(finalized).not_to include('gem "rdoc"')
+  end
+
   it "repairs the rspec-pending_for generated package manifest merge shape" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
