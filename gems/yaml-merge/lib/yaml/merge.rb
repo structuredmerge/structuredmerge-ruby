@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'json'
 require 'tree_haver'
 require 'ast/merge'
-require_relative 'merge/version'
 
 module Yaml
   module Merge
@@ -484,7 +481,3 @@ module Yaml
 end
 
 Yaml::Merge.register_backend!
-
-Yaml::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
