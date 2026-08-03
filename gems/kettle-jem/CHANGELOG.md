@@ -1355,6 +1355,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Version specs now require the discovered Ruby entrypoint for hyphenated package names.
 
+- Version bootstrap repairs remove stale package-name requires when the discovered Ruby entrypoint uses a different require path.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
