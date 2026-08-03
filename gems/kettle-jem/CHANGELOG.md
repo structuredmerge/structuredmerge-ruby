@@ -1331,6 +1331,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generate engine-specific dependency lockfiles for JRuby CI workflows
 
+- Generate JRuby dependency lockfiles directly instead of requiring ignored appraisal lockfiles
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
