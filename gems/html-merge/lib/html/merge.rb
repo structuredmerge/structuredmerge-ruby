@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
 require "version_gem"
-require_relative "merge/version"
-
-Html::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
 
 require "tree_haver"
 require "ast/merge"
+require_relative "merge/version"
 
 module Html
   module Merge
@@ -256,4 +252,8 @@ module Html
       actor.updated_content
     end
   end
+end
+
+Html::Merge::Version.class_eval do
+  extend VersionGem::Basic
 end
