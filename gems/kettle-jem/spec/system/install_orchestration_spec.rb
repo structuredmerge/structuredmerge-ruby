@@ -917,7 +917,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     Dir.mktmpdir("kettle-jem-install-env-bundler-override", tmp_root) do |root|
       write_tree(root, {
         "Gemfile" => "source \"https://gem.coop\"\n",
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
