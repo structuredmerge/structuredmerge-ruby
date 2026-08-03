@@ -1108,9 +1108,11 @@ module Kettle
 
         def bundler_command_env(project_root, env)
           command_env = (env || {}).to_h.dup
+          disable_checksum_validation = command_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"]
           strip_inherited_bundler_activation!(command_env)
           gemfile = File.join(project_root.to_s, "Gemfile")
           command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
+          command_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = disable_checksum_validation unless disable_checksum_validation.nil?
           command_env["K_JEM_TEMPLATING"] = "false" unless command_env.key?("K_JEM_TEMPLATING")
           apply_kettle_family_local_install_env!(command_env)
           command_env

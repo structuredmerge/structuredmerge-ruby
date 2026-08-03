@@ -970,6 +970,11 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "BUNDLE_BIN_PATH" => nil
       )
+      expect(Kettle::Jem::Tasks::InstallTask.bundler_command_env(root, env)).to include(
+        "BUNDLE_DISABLE_CHECKSUM_VALIDATION" => "true",
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "BUNDLE_BIN_PATH" => nil
+      )
     end
   end
 
