@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'tree_haver'
 require 'ast/merge'
-require_relative 'merge/version'
 
 module TypeScript
   module Merge
@@ -253,7 +250,3 @@ module TypeScript
 end
 
 TypeScript::Merge.register_backend!
-
-TypeScript::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
