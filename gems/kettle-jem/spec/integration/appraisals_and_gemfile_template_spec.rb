@@ -1670,6 +1670,37 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "excludes the current gem from every local path override word array" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-local-gemfile-galtzo-self-exclusion", tmp_root) do |root|
+      write_tree(root, {
+        "turbo_tests2.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "turbo_tests2"
+            spec.summary = "Turbo Tests"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/coverage_local.gemfile
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/coverage_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).not_to include("gems: %w[turbo_tests2]")
+      expect(content).not_to include("- turbo_tests2")
+    end
+  end
+
   it "generates nomono in the main Gemfile before local workspace overrides need it" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

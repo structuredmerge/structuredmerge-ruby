@@ -7688,6 +7688,7 @@ module Kettle
       end
 
       output = normalize_local_gemfile_nomono_bootstrap(output) if local_gemfile_template_recipe?(recipe)
+      output = remove_gemfile_percent_w_entries(output, [facts.to_h.dig(:package, :name)]) if local_gemfile_template_recipe?(recipe)
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 

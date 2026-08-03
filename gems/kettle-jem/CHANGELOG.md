@@ -1315,6 +1315,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve explicit Bundler checksum validation settings during template setup.
 
+- Prevent local modular Gemfiles from evaluating the destination gem as a sibling path dependency.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
