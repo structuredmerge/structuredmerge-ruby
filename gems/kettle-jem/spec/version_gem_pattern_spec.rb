@@ -21,21 +21,32 @@ RSpec.describe Kettle::Jem do
         expect(namespace).not_to be_empty
 
         version_dir = File.dirname(version_path)
-        entrypoint_path = File.join(File.dirname(version_dir), "#{File.basename(version_dir)}.rb")
+        package_entrypoint_path = File.join(gem_root, "lib", "#{gem_name}.rb")
+        entrypoint_path = if File.exist?(package_entrypoint_path)
+          package_entrypoint_path
+        else
+          File.join(File.dirname(version_dir), "#{File.basename(version_dir)}.rb")
+        end
         expect(File).to exist(entrypoint_path)
 
-        entrypoint_content = File.read(entrypoint_path)
+        entrypoint_paths = [entrypoint_path]
+        default_entrypoint_path = File.join(File.dirname(version_dir), "#{File.basename(version_dir)}.rb")
+        entrypoint_paths << default_entrypoint_path if File.exist?(default_entrypoint_path) && default_entrypoint_path != entrypoint_path
+        entrypoint_content = entrypoint_paths.map { |path| File.read(path) }.join("\n")
         non_default_version_gem_path = File.join(version_dir, "version_gem.rb")
-        version_require_pattern = /^\s*require_relative\s+["']#{Regexp.escape(File.basename(version_dir))}\/version["']/
+        version_require_paths = entrypoint_paths.map do |path|
+          Pathname(version_path).relative_path_from(Pathname(File.dirname(path))).to_s.delete_suffix(".rb")
+        end
+        version_require_pattern = /^[ \t]*require_relative\s+["'](?:#{version_require_paths.map { |path| Regexp.escape(path) }.join("|")})["']/
         class_eval = "#{namespace}::Version.class_eval do"
         if File.exist?(non_default_version_gem_path)
-          expect(entrypoint_content).not_to match(/^\s*require\s+["']version_gem["']/)
+          expect(entrypoint_content).not_to match(/^[ \t]*require\s+["']version_gem["']/)
           expect(entrypoint_content).to match(version_require_pattern)
           expect(entrypoint_content).not_to include(class_eval)
           next
         end
 
-        expect(entrypoint_content).to match(/^\s*require\s+["']version_gem["']/)
+        expect(entrypoint_content).to match(/^[ \t]*require\s+["']version_gem["']/)
         version_require_index = entrypoint_content =~ version_require_pattern
         expect(version_require_index).not_to be_nil
         expect(version_require_index).to be < entrypoint_content.index(class_eval)

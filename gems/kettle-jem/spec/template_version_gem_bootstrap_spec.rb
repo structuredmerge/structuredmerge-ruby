@@ -261,6 +261,116 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves the full version path for a dedicated package-shim entrypoint" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-dedicated-package-shim-entrypoint", tmp_root) do |root|
+      write_file(root, "demo-widget.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "demo-widget"
+          spec.version = "1.0.0"
+          spec.summary = "Demo widget"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+        end
+      RUBY
+      write_file(root, "lib/demo-widget.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "demo/widget"
+      RUBY
+      write_file(root, "lib/demo/widget.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Demo
+          module Widget
+          end
+        end
+      RUBY
+      write_file(root, "lib/demo/widget/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Demo
+          module Widget
+            VERSION = "1.0.0"
+          end
+        end
+      RUBY
+      write_file(root, "lib/demo/widget/version_gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "version"
+
+        Demo::Widget::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      package_entrypoint = File.read(File.join(root, "lib/demo-widget.rb"))
+      expect(package_entrypoint).to include('require_relative "demo/widget/version"')
+      expect(package_entrypoint).not_to include('require_relative "widget/version"')
+    end
+  end
+
+  it "does not duplicate a version require owned by a package shim implementation" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-package-shim-owned-version", tmp_root) do |root|
+      write_file(root, "demo-widget.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "demo-widget"
+          spec.version = "1.0.0"
+          spec.summary = "Demo widget"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+        end
+      RUBY
+      write_file(root, "lib/demo-widget.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "demo/widget"
+      RUBY
+      write_file(root, "lib/demo/widget.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "widget/version"
+
+        module Demo
+          module Widget
+          end
+        end
+      RUBY
+      write_file(root, "lib/demo/widget/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Demo
+          module Widget
+            VERSION = "1.0.0"
+          end
+        end
+      RUBY
+      write_file(root, "lib/demo/widget/version_gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "version"
+
+        Demo::Widget::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      package_entrypoint = File.read(File.join(root, "lib/demo-widget.rb"))
+      expect(package_entrypoint).not_to include("version")
+      expect(File.read(File.join(root, "lib/demo/widget.rb"))).to include('require_relative "widget/version"')
+    end
+  end
+
   it "repairs a package-derived executable version header for a configured legacy entrypoint" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

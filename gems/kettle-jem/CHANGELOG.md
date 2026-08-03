@@ -1349,6 +1349,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve local modular Gemfile bodies during template finalization.
 
+- Avoid duplicate version requires when a package shim delegates version loading to its implementation.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
