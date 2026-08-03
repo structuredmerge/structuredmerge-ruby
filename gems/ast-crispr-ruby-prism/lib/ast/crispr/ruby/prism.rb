@@ -2,8 +2,6 @@
 
 require 'ast/crispr'
 require 'prism/merge'
-require 'version_gem'
-require_relative 'prism/version'
 
 module Ast
   module Crispr
@@ -204,8 +202,4 @@ module Ast
       end
     end
   end
-end
-
-Ast::Crispr::Ruby::Prism::Version.class_eval do
-  extend VersionGem::Basic
 end
