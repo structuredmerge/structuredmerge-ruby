@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'digest'
 require 'tree_haver'
 require 'ast/merge'
@@ -16,7 +14,6 @@ require_relative 'merge/nocov_wrapper_base'
 require_relative 'merge/rescue_semantics'
 require_relative 'merge/scaffold_chunk_support'
 require_relative 'merge/signature_support'
-require_relative 'merge/version'
 
 module Ruby
   module Merge
@@ -3172,8 +3169,4 @@ TreeHaver::BackendRegistry.register_tag(
     Ruby::Merge.send(:ruby_tslp_merge_context, template.fetch(:analysis), role: 'template').fetch(:declarations),
     Ruby::Merge.send(:ruby_tslp_merge_context, destination.fetch(:analysis), role: 'destination').fetch(:declarations)
   ).empty?
-end
-
-Ruby::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
