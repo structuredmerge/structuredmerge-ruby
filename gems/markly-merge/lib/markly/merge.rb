@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'markdown-merge'
 require 'markly'
-require_relative 'merge/version'
 
 module Markly
   module Merge
@@ -528,7 +525,3 @@ module Markly
 end
 
 Markly::Merge.ensure_backend_loaded!
-
-Markly::Merge::Version.class_eval do
-  extend VersionGem::Basic
-end
