@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require 'version_gem'
-
 require 'find'
 require 'json'
 require 'token/resolver'
-require_relative 'merge/version'
 
 module Ast
   module Merge
@@ -6375,8 +6372,4 @@ module Ast
     end
     private_class_method :conformance_suite_selectors_equal?
   end
-end
-
-Ast::Merge::Version.class_eval do
-  extend VersionGem::Basic
 end
