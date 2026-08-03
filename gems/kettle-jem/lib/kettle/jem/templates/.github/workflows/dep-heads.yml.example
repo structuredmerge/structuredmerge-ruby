@@ -80,7 +80,7 @@ jobs:
           echo "BUNDLE_LOCKFILE=${BUNDLE_LOCKFILE}" >> "$GITHUB_ENV"
           mkdir -p "$(dirname "$BUNDLE_LOCKFILE")"
           if [ "${{ matrix.ruby }}" = "jruby" ]; then
-            bundle lock --lockfile="$BUNDLE_LOCKFILE" --remove-platform=x86_64-linux --remove-platform=x86_64-linux-gnu --remove-platform=x86_64-linux-musl --add-platform=universal-java --update
+            bundle lock --lockfile="$BUNDLE_LOCKFILE" --add-platform=universal-java --update
           fi
 
       - name: Bundle install
@@ -153,7 +153,7 @@ jobs:
           echo "BUNDLE_LOCKFILE=${BUNDLE_LOCKFILE}" >> "$GITHUB_ENV"
           mkdir -p "$(dirname "$BUNDLE_LOCKFILE")"
           if [ "${{ matrix.ruby }}" = "jruby" ]; then
-            bundle lock --lockfile="$BUNDLE_LOCKFILE" --remove-platform=x86_64-linux --remove-platform=x86_64-linux-gnu --remove-platform=x86_64-linux-musl --add-platform=universal-java --update
+            bundle lock --lockfile="$BUNDLE_LOCKFILE" --add-platform=universal-java --update
           fi
 
       - name: Bundle install
@@ -227,7 +227,7 @@ jobs:
           echo "BUNDLE_LOCKFILE=${BUNDLE_LOCKFILE}" >> "$GITHUB_ENV"
           mkdir -p "$(dirname "$BUNDLE_LOCKFILE")"
           if [ "${{ matrix.ruby }}" = "jruby" ]; then
-            bundle lock --lockfile="$BUNDLE_LOCKFILE" --remove-platform=x86_64-linux --remove-platform=x86_64-linux-gnu --remove-platform=x86_64-linux-musl --add-platform=universal-java --update
+            bundle lock --lockfile="$BUNDLE_LOCKFILE" --add-platform=universal-java --update
           fi
 
       - name: Bundle install

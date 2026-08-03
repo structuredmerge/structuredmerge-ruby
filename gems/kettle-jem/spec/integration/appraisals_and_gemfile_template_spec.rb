@@ -671,7 +671,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
     expect(template).to include('use-setup-ruby: "3.2 3.3 3.4 4.0"')
     expect(template).to include("bundler-cache: ${{ matrix.ruby != 'jruby' }}")
-    expect(template).to include("bundle lock --lockfile=\"$BUNDLE_LOCKFILE\" --remove-platform=x86_64-linux --remove-platform=x86_64-linux-gnu --remove-platform=x86_64-linux-musl --add-platform=universal-java --update")
+    expect(template).to include("bundle lock --lockfile=\"$BUNDLE_LOCKFILE\" --add-platform=universal-java --update")
     expect(template).to include("run: bundle install --jobs 4")
 
     expect(jobs.keys).to include("ruby", "truffleruby", "jruby")
