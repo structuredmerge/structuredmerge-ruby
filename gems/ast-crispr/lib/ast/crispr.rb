@@ -2,8 +2,6 @@
 
 require 'ast/merge'
 require 'service_actor'
-require 'version_gem'
-require_relative 'crispr/version'
 
 module Ast
   module Crispr
@@ -1869,8 +1867,4 @@ module Ast
       end
     end
   end
-end
-
-Ast::Crispr::Version.class_eval do
-  extend VersionGem::Basic
 end
