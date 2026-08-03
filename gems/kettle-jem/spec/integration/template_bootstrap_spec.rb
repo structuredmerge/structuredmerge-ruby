@@ -72,6 +72,38 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     expect(described_class.compatible_dependency_requirements?(["~> 0.5.0"], ["~> 0.6.0"])).to be(false)
   end
 
+  it "does not accept keep_both for incompatible direct and modular requirements" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-incompatible-keep-both", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
+          dependency_conflicts:
+            resolve:
+              - gem: yard-relative_markdown_links
+                direct: example.gemspec
+                modular: gemfiles/modular/documentation.gemfile
+                action: keep_both
+                reason: "The modular declaration was intended to narrow the direct range."
+        YAML
+      })
+      reports = [
+        {
+          relative_path: "example.gemspec",
+          final_content: %(spec.add_development_dependency("yard-relative_markdown_links", "~> 0.5.0")\n)
+        },
+        {
+          relative_path: "gemfiles/modular/documentation.gemfile",
+          final_content: %(gem "yard-relative_markdown_links", "~> 0.6"\n)
+        }
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.to raise_error(Kettle::Jem::Error, include("keep_both", "requirements overlap"))
+    end
+  end
+
   it "writes discovered conflicts into a first-run config for review" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

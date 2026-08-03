@@ -9199,7 +9199,8 @@ module Kettle
       raise Error,
         "direct dependencies also declared by templated modular Gemfiles: #{details}. " \
           "Review dependency_conflicts.resolve in #{KETTLE_CONFIG_PATH}; each entry needs gem, direct, modular, action, and reason. " \
-          "Supported actions: remove_modular_gem, remove_x_std_lib_eval."
+        "Supported actions: remove_modular_gem, remove_x_std_lib_eval, keep_both. " \
+        "keep_both is valid only when the direct and modular requirements overlap."
     end
 
     def modular_dependency_conflicts(project_root, recipe_reports)
@@ -9319,7 +9320,12 @@ module Kettle
       end
 
       block_end = (index + 1...lines.length).find { |line_index| lines[line_index].match?(/\A\S/) } || lines.length
-      replacement = ["dependency_conflicts:\n", "  # Review each entry and choose a supported action.\n", "  resolve:\n"]
+      replacement = [
+        "dependency_conflicts:\n",
+        "  # Review each entry and choose a supported action.\n",
+        "  # keep_both is for a broad direct requirement plus a compatible modular narrowing.\n",
+        "  resolve:\n"
+      ]
       conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.each do |conflict|
         replacement.concat([
           "    - gem: #{conflict.fetch(:name)}\n",

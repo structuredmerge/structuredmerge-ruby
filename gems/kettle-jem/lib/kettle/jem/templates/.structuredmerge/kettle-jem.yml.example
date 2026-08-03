@@ -84,10 +84,13 @@
 #       modular: gemfiles/modular/documentation.gemfile
 #       action: remove_modular_gem
 #       reason: "The gemspec owns the project's documentation integration."
-# Supported actions:
+# Supported actions (the destination project must explicitly choose one):
 #   remove_modular_gem       - remove the modular Gemfile's direct gem call.
 #   remove_x_std_lib_eval    - remove x_std_libs eval references for the gem.
-#   keep_both                - retain both declarations when ranges overlap.
+#   keep_both                - retain both declarations when their requirements
+#                              overlap. This is intended for a broad direct
+#                              requirement narrowed by framework/engine Gemfiles;
+#                              incompatible ranges remain an error.
 dependency_conflicts:
   resolve: []
 

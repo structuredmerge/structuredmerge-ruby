@@ -1319,6 +1319,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Avoid pinning local nomono bootstraps to unavailable versions from stale lockfiles.
 
+- Clarify modular dependency conflict decisions and reject incompatible keep_both requirements.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
