@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'parslet/toml/merge'
+require 'parslet-toml-merge'
 RSpec.describe Parslet::Toml::Merge::Version do
   it_behaves_like 'a Version module', described_class
 
