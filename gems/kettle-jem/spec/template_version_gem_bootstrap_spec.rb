@@ -639,44 +639,44 @@ RSpec.describe Kettle::Jem do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-hyphenated-version-spec", tmp_root) do |root|
-    write_file(root, "lib/gitmoji/regex.rb", <<~RUBY)
-      require_relative "regex/version"
-    RUBY
-    write_file(root, "lib/gitmoji/regex/version.rb", <<~RUBY)
-      module Gitmoji
-        module Regex
-          module Version
-            VERSION = "1.0.0"
+      write_file(root, "lib/gitmoji/regex.rb", <<~RUBY)
+        require_relative "regex/version"
+      RUBY
+      write_file(root, "lib/gitmoji/regex/version.rb", <<~RUBY)
+        module Gitmoji
+          module Regex
+            module Version
+              VERSION = "1.0.0"
+            end
           end
         end
-      end
-    RUBY
+      RUBY
       write_file(root, "spec/gitmoji/regex/version_spec.rb", <<~RUBY)
-        require "anonymous_loader"
-        require "gitmoji-regex"
-        RSpec.describe Gitmoji::Regex::Version do
-        it_behaves_like "a Version module", described_class
-      end
-    RUBY
+          require "anonymous_loader"
+          require "gitmoji-regex"
+          RSpec.describe Gitmoji::Regex::Version do
+          it_behaves_like "a Version module", described_class
+        end
+      RUBY
 
-    report = {
-      facts: {
-        package: {name: "gitmoji-regex"},
-        rubygems: {entrypoint_require: "gitmoji/regex", namespace: "Gitmoji::Regex"},
-        project_runtime: {version: "1.0.0"},
-        version_gem: {non_default_entrypoint: false}
+      report = {
+        facts: {
+          package: {name: "gitmoji-regex"},
+          rubygems: {entrypoint_require: "gitmoji/regex", namespace: "Gitmoji::Regex"},
+          project_runtime: {version: "1.0.0"},
+          version_gem: {non_default_entrypoint: false}
+        }
       }
-    }
 
-    result = described_class.version_gem_bootstrap_step_for_paths(root, report.fetch(:facts))
+      result = described_class.version_gem_bootstrap_step_for_paths(root, report.fetch(:facts))
 
-    expect(result.fetch(:status)).to eq("applied")
-    expect(File.read(File.join(root, "spec/gitmoji/regex/version_spec.rb"))).to include(
-      'require "gitmoji/regex"'
-    )
-    expect(File.read(File.join(root, "spec/gitmoji/regex/version_spec.rb"))).not_to include(
-      'require "gitmoji-regex"'
-    )
+      expect(result.fetch(:status)).to eq("applied")
+      expect(File.read(File.join(root, "spec/gitmoji/regex/version_spec.rb"))).to include(
+        'require "gitmoji/regex"'
+      )
+      expect(File.read(File.join(root, "spec/gitmoji/regex/version_spec.rb"))).not_to include(
+        'require "gitmoji-regex"'
+      )
     end
   end
 

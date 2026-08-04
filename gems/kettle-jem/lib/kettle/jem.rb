@@ -14945,8 +14945,7 @@ module Kettle
       namespace.start_with?("#{parent}::")
     end
 
-    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, package_name: nil,
-      ensure_version_gem_require:, include_version_gem_path: true, ensure_package_entrypoint_require: false)
+    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:, package_name: nil, include_version_gem_path: true, ensure_package_entrypoint_require: false)
       current = read_project_file(project_root, version_spec_path)
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
@@ -14962,11 +14961,11 @@ module Kettle
         requirements << %(require "#{require_path}"\n)
       end
       if ensure_package_entrypoint_require && !entrypoint_require.to_s.empty? &&
-        !package_name.to_s.empty? && package_name.to_s != entrypoint_require.to_s
+          !package_name.to_s.empty? && package_name.to_s != entrypoint_require.to_s
         updated = remove_top_level_ruby_require(updated, package_name.to_s)
       end
       if ensure_package_entrypoint_require && !entrypoint_require.to_s.empty? &&
-        !ruby_top_level_require?(updated, "require", entrypoint_require.to_s)
+          !ruby_top_level_require?(updated, "require", entrypoint_require.to_s)
         requirements << %(require "#{entrypoint_require}"\n)
       end
 
