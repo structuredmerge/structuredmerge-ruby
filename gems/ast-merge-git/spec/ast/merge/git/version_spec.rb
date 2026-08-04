@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
+require 'ast/merge/git'
 RSpec.describe Ast::Merge::Git::Version do
   it_behaves_like 'a Version module', described_class
 
