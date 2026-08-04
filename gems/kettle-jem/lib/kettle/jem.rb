@@ -3246,7 +3246,7 @@ module Kettle
       entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
       entrypoint_require = metadata_value(gemspec_metadata, :entrypoint_require) if entrypoint_require.empty?
       entrypoint_require = name.tr("-", "/") if entrypoint_require.to_s.empty?
-      version_path = File.join("lib", "#{entrypoint_require}.rb")
+      version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       configured_namespace = rubygems_config["namespace"].to_s.strip
       entrypoint_namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path)

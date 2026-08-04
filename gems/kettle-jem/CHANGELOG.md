@@ -1359,6 +1359,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Version specs for packages with nested version entrypoints now load the package shim when it owns the version bootstrap.
 
+- Use the canonical version file when deriving a gem namespace during templating.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
