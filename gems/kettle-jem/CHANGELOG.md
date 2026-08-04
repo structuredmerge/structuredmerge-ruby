@@ -1365,6 +1365,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Reconcile malformed version namespaces against destination class declarations during templating.
 
+- Prevent Bundler from auto-loading Tree Sitter Language Pack before gems that define the Parser namespace.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
