@@ -5371,6 +5371,7 @@ module Kettle
       changes.concat(Array(cleanup[:changed_files]))
       outer_namespace_kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
       namespace_kinds = existing_version_namespace_kinds(project_root, version_path, namespace)
+      preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
       unless templated_paths.include?(version_path) && outer_namespace_kind != :class
         version = facts.dig(:project_runtime, :version).to_s
         version = project_gemspec_version(project_root) if version.empty?
@@ -5383,7 +5384,8 @@ module Kettle
             namespace: namespace,
             version: version,
             outer_namespace_kind: outer_namespace_kind,
-            namespace_kinds: namespace_kinds
+            namespace_kinds: namespace_kinds,
+            preserve_version_module_include: preserve_version_module_include
           )
         )
       end
@@ -14805,6 +14807,7 @@ module Kettle
       current_entrypoint = read_project_file(project_root, entrypoint_path)
       outer_namespace_kind = ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
       namespace_kinds = existing_version_namespace_kinds(project_root, version_path, namespace)
+      preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
 
       if manage_version_file
         changes << write_if_changed(
@@ -14815,7 +14818,8 @@ module Kettle
             namespace: namespace,
             version: version,
             outer_namespace_kind: outer_namespace_kind,
-            namespace_kinds: namespace_kinds
+            namespace_kinds: namespace_kinds,
+            preserve_version_module_include: preserve_version_module_include
           )
         )
       end
@@ -15191,7 +15195,7 @@ module Kettle
       version_gem_require_insertion_index(content)
     end
 
-    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module, namespace_kinds: {})
+    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module, namespace_kinds: {}, preserve_version_module_include: false)
       resolved_version = existing_version.to_s.empty? ? version.to_s : existing_version.to_s
       body = [
         "# Version namespace for this gem.",
@@ -15202,6 +15206,7 @@ module Kettle
         "# Current gem version exposed at the traditional constant location.",
         "VERSION = Version::VERSION # Traditional Constant Location"
       ]
+      body << "include Version" if preserve_version_module_include
 
       <<~RUBY
         # frozen_string_literal: true
@@ -15235,10 +15240,11 @@ module Kettle
 
     def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, version_require_path: nil)
       current = normalize_entrypoint_version_require(
-        remove_version_gem_class_eval_references(content),
+        content,
         entrypoint_require: entrypoint_require,
         version_require_path: version_require_path
       )
+      current = remove_version_gem_class_eval_references(current) unless ruby_version_class_eval_namespaces(current).include?(namespace.to_s)
       lines = current.lines
       insert_lines = []
       if File.basename(entrypoint_require) != "version_gem" && !ruby_top_level_require?(current, "require", "version_gem")
@@ -15473,6 +15479,15 @@ module Kettle
 
     def existing_version_namespace(project_root, relative_path)
       ruby_version_module_namespace(read_project_file(project_root, relative_path))
+    end
+
+    def existing_version_file_includes_version_module?(project_root, relative_path)
+      ruby_call_records(read_project_file(project_root, relative_path), :include).any? do |call|
+        next false unless call.receiver.nil?
+
+        arguments = call.arguments&.arguments || []
+        arguments.length == 1 && arguments.first.slice.to_s == "Version"
+      end
     end
 
     def existing_version_namespace_kinds(project_root, relative_path, namespace)

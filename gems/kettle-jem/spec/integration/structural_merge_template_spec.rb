@@ -892,6 +892,50 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "preserves an existing Version module include during version bootstrap" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-module-include", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.version = "1.0.0"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        "lib/example.rb" => <<~RUBY,
+          require_relative "example/version"
+
+          module Example
+          end
+        RUBY
+        "lib/example/version.rb" => <<~RUBY
+          module Example
+            module Version
+              VERSION = "1.0.0"
+            end
+
+            VERSION = Version::VERSION
+            include Version
+          end
+        RUBY
+      })
+      facts = {
+        package: {name: "example"},
+        rubygems: {entrypoint_require: "example", namespace: "Example"},
+        project_runtime: {version: "1.0.0"}
+      }
+
+      result = described_class.send(:version_gem_bootstrap_step_for_paths, root, facts)
+      version_file = File.read(File.join(root, "lib/example/version.rb"))
+
+      expect(result[:status]).to eq("applied")
+      expect(version_file).to include("include Version")
+    end
+  end
+
   it "repairs a recipe-generated module wrapper when the entrypoint outer namespace is a class" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
