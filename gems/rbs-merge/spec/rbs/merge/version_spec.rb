@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'anonymous_loader'
+require 'rbs/merge'
 
 RSpec.describe Rbs::Merge::Version do
   it_behaves_like 'a Version module', described_class
