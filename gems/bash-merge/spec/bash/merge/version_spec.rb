@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'anonymous_loader'
+require 'bash/merge'
 
 RSpec.describe Bash::Merge::Version do
   it_behaves_like 'a Version module', described_class
