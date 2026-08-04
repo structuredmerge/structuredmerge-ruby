@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'ast/crispr/ruby/prism'
+require 'ast-crispr-ruby-prism'
 RSpec.describe Ast::Crispr::Ruby::Prism::Version do
   it_behaves_like 'a Version module', described_class
 
