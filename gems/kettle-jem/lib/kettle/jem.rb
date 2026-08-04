@@ -39,6 +39,7 @@ module Kettle
     APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
     GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
     SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
+    VERSION_NAMESPACE_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
@@ -4045,10 +4046,18 @@ module Kettle
       if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :gemspec
         payload[:gemspec_template_policy_fingerprint_version] = GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
+      if version_namespace_template_file?(report.fetch(:relative_path).to_s)
+        payload[:version_namespace_template_policy_fingerprint_version] = VERSION_NAMESPACE_TEMPLATE_POLICY_FINGERPRINT_VERSION
+      end
       if report.fetch(:relative_path).to_s == "spec/spec_helper.rb"
         payload[:spec_helper_template_policy_fingerprint_version] = SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
       payload
+    end
+
+    def version_namespace_template_file?(relative_path)
+      basename = File.basename(relative_path.to_s)
+      basename == "version.rb" || basename == "version_gem.rb" || basename.end_with?(".gemspec")
     end
 
     def template_file_type_for_relative_path(relative_path)

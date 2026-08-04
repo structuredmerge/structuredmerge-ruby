@@ -1361,6 +1361,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Use the canonical version file when deriving a gem namespace during templating.
 
+- Invalidate version namespace template checksums after renderer policy changes so corrected bootstrap output can repair prior template damage.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

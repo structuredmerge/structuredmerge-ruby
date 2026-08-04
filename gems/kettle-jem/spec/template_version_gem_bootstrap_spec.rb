@@ -44,6 +44,31 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "includes the version namespace policy in managed version fingerprints" do
+    report = {
+      relative_path: "lib/demo/widget/version.rb",
+      recipe_name: "template_source_application_lib_demo_widget_version_rb",
+      request_envelope: {
+        request: {
+          recipe_name: "supplied_template_source_application",
+          recipe_version: "1"
+        }
+      },
+      metadata: {
+        template_source_preference: {
+          source_root_path: "/templates",
+          source_relative_path: "lib/gem/version.rb"
+        }
+      }
+    }
+
+    payload = described_class.template_input_fingerprint_payload(Dir.pwd, report)
+
+    expect(payload).to include(
+      version_namespace_template_policy_fingerprint_version: described_class::VERSION_NAMESPACE_TEMPLATE_POLICY_FINGERPRINT_VERSION
+    )
+  end
+
   def write_file(root, relative_path, content)
     path = File.join(root, relative_path)
     FileUtils.mkdir_p(File.dirname(path))
