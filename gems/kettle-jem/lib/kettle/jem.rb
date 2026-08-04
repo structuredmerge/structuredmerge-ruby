@@ -3252,6 +3252,12 @@ module Kettle
       configured_namespace = rubygems_config["namespace"].to_s.strip
       entrypoint_namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path)
       version_namespace = existing_version_namespace(project_root, version_path)
+      version_namespace = reconcile_existing_version_namespace(
+        project_root,
+        entrypoint_path,
+        version_path,
+        version_namespace
+      )
       metadata_namespace = metadata_value(gemspec_metadata, :namespace)
       default_namespace = classify_namespace(name)
       namespace = configured_namespace.empty? ? nil : configured_namespace
@@ -15512,6 +15518,30 @@ module Kettle
 
     def existing_version_namespace(project_root, relative_path)
       ruby_version_module_namespace(read_project_file(project_root, relative_path))
+    end
+
+    def reconcile_existing_version_namespace(project_root, entrypoint_path, version_path, namespace)
+      namespace = namespace.to_s
+      return namespace if namespace.empty?
+
+      entrypoint_kind = ruby_namespace_declaration_kind(
+        read_project_file(project_root, entrypoint_path),
+        namespace
+      )
+      version_kind = ruby_namespace_declaration_kind(
+        read_project_file(project_root, version_path),
+        namespace
+      )
+      return namespace unless entrypoint_kind && version_kind && entrypoint_kind != version_kind
+
+      parent = namespace.split("::")[0...-1].join("::")
+      return namespace if parent.empty?
+      return namespace unless ruby_namespace_declaration_kind(
+        read_project_file(project_root, entrypoint_path),
+        parent
+      )
+
+      parent
     end
 
     def existing_version_file_includes_version_module?(project_root, relative_path)

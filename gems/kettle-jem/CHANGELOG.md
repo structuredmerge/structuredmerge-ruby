@@ -1363,6 +1363,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Invalidate version namespace template checksums after renderer policy changes so corrected bootstrap output can repair prior template damage.
 
+- Reconcile malformed version namespaces against destination class declarations during templating.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

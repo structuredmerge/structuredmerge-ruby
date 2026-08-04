@@ -780,6 +780,51 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "repairs a version namespace that conflicts with an entrypoint class declaration" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-version-namespace-kind-conflict", tmp_root) do |root|
+      write_tree(root, {
+        "stone_checksums.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "stone_checksums"
+            spec.version = "1.0.8"
+            spec.summary = "Stone checksums"
+            spec.required_ruby_version = ">= 2.2.0"
+          end
+        RUBY
+        "lib/stone_checksums.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module StoneChecksums
+            class Error < StandardError; end
+          end
+        RUBY
+        "lib/stone_checksums/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module StoneChecksums
+            module Error
+              module Version
+                VERSION = "1.0.8"
+              end
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          rubygems:
+            min_ruby: "2.2.0"
+        YAML
+      })
+
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+
+      expect(facts.dig(:rubygems, :namespace)).to eq("StoneChecksums")
+    end
+  end
+
   it "normalizes generated README badge image URLs consistently with pre-release checks" do
     expect(described_class.send(:shield_token, "Example::Gem")).to eq("Example::Gem")
     expect(described_class.send(:license_compat_img, :a)).to include(
