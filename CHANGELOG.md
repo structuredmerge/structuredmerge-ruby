@@ -274,6 +274,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prevent Ruby merges from duplicating identical leading comments when template and destination already contain the same comment.
 
+- Version bootstrap repairs remove stale package-name requires when the discovered Ruby entrypoint uses a different require path.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
