@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'ast/crispr/markdown/markly'
+require 'ast-crispr-markdown-markly'
 RSpec.describe Ast::Crispr::Markdown::Markly::Version do
   it_behaves_like 'a Version module', described_class
 
