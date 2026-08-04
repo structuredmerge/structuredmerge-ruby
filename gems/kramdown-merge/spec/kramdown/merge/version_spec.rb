@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
+require 'kramdown/merge'
 RSpec.describe Kramdown::Merge::Version do
   it_behaves_like 'a Version module', described_class
 
