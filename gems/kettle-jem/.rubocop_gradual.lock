@@ -7,6 +7,9 @@
     [466, 8, 66, "Style/RedundantFormat: Use `\"step                                           duration    share count\"` directly instead of `format`.", 4013676740],
     [622, 6, 309, "Style/RedundantFormat: Use `\"variant                           +/-      min   median     mean      max  recipes     cmds   pr   pt   fr   ft safe f_units pr_job pt_job fr_job ft_job recipes changed\"` directly instead of `format`.", 3979716419]
   ],
+  "gemfiles/modular/templating.gemfile:650510879": [
+    [14, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 10 of the Gemfile.", 3843603197]
+  ],
   "kettle-jem.gemspec:22053188": [
     [19, 32, 10, "Gemspec/RequiredRubyVersion: `required_ruby_version` and `TargetRubyVersion` (3.2, which may be specified in .rubocop.yml) should be equal.", 3888670706],
     [98, 3, 70, "Gemspec/DependencyVersion: Dependency version specification is required.", 4023754366],
@@ -28,16 +31,16 @@
     [122, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
     [123, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
   ],
-  "lib/kettle/jem.rb:2149282280": [
-    [2025, 31, 20, "Style/RedundantInterpolation: Prefer `to_s` over string interpolation.", 2134022545],
-    [4273, 9, 337, "Style/IdenticalConditionalBranches: Move `reports_by_index.merge!(\n          execute_indexed_recipe_reports(\n            project_root: project_root,\n            indexed_recipes: main_only,\n            facts: facts,\n            files: files,\n            template_contents: template_contents,\n            decision_policy: decision_policy,\n            env: env\n          )\n        )` out of the conditional.", 1230895451],
-    [4309, 9, 337, "Style/IdenticalConditionalBranches: Move `reports_by_index.merge!(\n          execute_indexed_recipe_reports(\n            project_root: project_root,\n            indexed_recipes: main_only,\n            facts: facts,\n            files: files,\n            template_contents: template_contents,\n            decision_policy: decision_policy,\n            env: env\n          )\n        )` out of the conditional.", 1230895451],
-    [4365, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
-    [6117, 7, 38, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3536678117],
-    [6220, 7, 31, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3672762618],
-    [6224, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 163033044],
-    [13336, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
-    [15522, 35, 23, "Performance/Count: Use `count` instead of `reject...length`.", 4275829615]
+  "lib/kettle/jem.rb:2227346927": [
+    [2026, 31, 20, "Style/RedundantInterpolation: Prefer `to_s` over string interpolation.", 2134022545],
+    [4288, 9, 337, "Style/IdenticalConditionalBranches: Move `reports_by_index.merge!(\n          execute_indexed_recipe_reports(\n            project_root: project_root,\n            indexed_recipes: main_only,\n            facts: facts,\n            files: files,\n            template_contents: template_contents,\n            decision_policy: decision_policy,\n            env: env\n          )\n        )` out of the conditional.", 1230895451],
+    [4324, 9, 337, "Style/IdenticalConditionalBranches: Move `reports_by_index.merge!(\n          execute_indexed_recipe_reports(\n            project_root: project_root,\n            indexed_recipes: main_only,\n            facts: facts,\n            files: files,\n            template_contents: template_contents,\n            decision_policy: decision_policy,\n            env: env\n          )\n        )` out of the conditional.", 1230895451],
+    [4380, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
+    [6132, 7, 38, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3536678117],
+    [6235, 7, 31, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3672762618],
+    [6239, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 163033044],
+    [13351, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
+    [15561, 35, 23, "Performance/Count: Use `count` instead of `reject...length`.", 4275829615]
   ],
   "lib/kettle/jem/tasks/install_task.rb:1506294020": [
     [1130, 47, 29, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 964126728]
@@ -84,7 +87,7 @@
     [3, 1, 53, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*shim_profile_templating*_spec.rb`.", 837334745],
     [3, 29, 25, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 2022445956]
   ],
-  "spec/integration/structural_merge_template_spec.rb:2425400818": [
+  "spec/integration/structural_merge_template_spec.rb:2297057604": [
     [3, 1, 64, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*structural_merge_template_behavior*_spec.rb`.", 1693815617],
     [3, 29, 36, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 3903270460]
   ],
