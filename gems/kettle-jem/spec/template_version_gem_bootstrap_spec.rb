@@ -1086,4 +1086,50 @@ RSpec.describe Kettle::Jem do
       )
     end
   end
+
+  it "uses the public slash entrypoint for explicit inline version_gem mode despite a legacy package wrapper" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-inline-wrapper", tmp_root) do |root|
+      write_file(root, "yard-timekeeper.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "yard-timekeeper"
+          spec.version = "0.2.5"
+          spec.summary = "YARD timekeeper"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.15")
+        end
+      RUBY
+      write_file(root, "lib/yard-timekeeper.rb", <<~RUBY)
+        require_relative "yard/timekeeper"
+      RUBY
+      write_file(root, "lib/yard/timekeeper.rb", <<~RUBY)
+        require "open3"
+      RUBY
+
+      facts = {
+        package: {name: "yard-timekeeper"},
+        rubygems: {
+          entrypoint_require: "yard/timekeeper",
+          namespace: "Yard::Timekeeper",
+          min_ruby: "3.2"
+        },
+        project_runtime: {version: "0.2.5"},
+        version_gem: {enabled: true, mode: "inline"}
+      }
+
+      report = {
+        facts: facts,
+        recipe_reports: [],
+        template_selection: {only: []}
+      }
+      result = described_class.send(:template_version_gem_bootstrap_step, root, report)
+
+      expect(result[:entrypoint_path]).to eq("lib/yard/timekeeper.rb")
+      entrypoint = File.read(File.join(root, "lib/yard/timekeeper.rb"))
+      expect(entrypoint).to include('require "version_gem"')
+      expect(entrypoint).to include('require_relative "timekeeper/version"')
+      expect(File.read(File.join(root, "lib/yard-timekeeper.rb"))).to include('require_relative "yard/timekeeper"')
+    end
+  end
 end

@@ -5299,6 +5299,7 @@ module Kettle
       else
         File.file?(File.join(project_root, package_entrypoint_path))
       end
+      package_entrypoint_preexisting = false if facts.dig(:version_gem, :mode).to_s == "inline"
 
       unless version_gem_runtime_compatible?(facts)
         return [
@@ -7606,7 +7607,12 @@ module Kettle
       when :gemspec
         return merge_gemspec_template_source(template_content, destination_content, facts: facts, env: env)
       when :ruby, :gemfile, :rakefile, :appraisals
-        merge_result = merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: facts)
+        merge_destination = if recipe.fetch(:target_path).to_s == ".simplecov"
+          normalize_simplecov_template_source(destination_content)
+        else
+          destination_content
+        end
+        merge_result = merge_ruby_template_source(file_type, recipe, template_content, merge_destination, facts: facts)
       when :yaml
         merge_result = Psych::Merge.merge_yaml(
           template_content,
@@ -8047,12 +8053,42 @@ module Kettle
     end
 
     def normalize_simplecov_template_source(content)
-      output = migrate_simplecov_start_configuration(content)
+      output = normalize_simplecov_cover_predicates(content)
+      output = migrate_simplecov_start_configuration(output)
       nodes = simplecov_obsolete_call_nodes(output)
       output = nodes.sort_by { |node| -node.location.start_line }.reduce(output) do |memo, node|
         replace_source_range_lines(memo, node.location.start_line, expand_line_range_through_following_blanks(memo, node.location.end_line), "")
       end
       normalize_simplecov_usage_guidance(output)
+    end
+
+    # SimpleCov's compatibility probe changed spelling between template
+    # generations. Normalize the legacy AST shape before merging so the same
+    # generated branch is matched instead of appended a second time.
+    def normalize_simplecov_cover_predicates(content)
+      result = prism_parse_success(content)
+      return content unless result
+
+      nodes = []
+      result.value.breadth_first_search_all { |node| nodes << node }
+      replacements = nodes.filter_map do |node|
+        next unless node.is_a?(::Prism::IfNode)
+
+        predicate = node.predicate
+        next unless predicate.is_a?(::Prism::CallNode)
+        next unless predicate.name == :method_defined?
+        next unless predicate.receiver&.slice.to_s == "SimpleCov::Configuration"
+        next unless predicate.arguments&.arguments&.first&.slice.to_s == ":cover"
+
+        {
+          start_offset: predicate.location.start_offset,
+          end_offset: predicate.location.end_offset,
+          replacement: "SimpleCov::Configuration.instance_methods.include?(:cover)"
+        }
+      end
+      return content if replacements.empty?
+
+      replace_source_offsets(content, replacements)
     end
 
     # SimpleCov.start was historically used as both configuration and startup.

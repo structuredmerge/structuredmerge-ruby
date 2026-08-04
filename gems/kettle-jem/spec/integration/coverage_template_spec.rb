@@ -65,6 +65,23 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).to include('cover "lib/**/*.rb"')
   end
 
+  it "canonicalizes legacy SimpleCov coverage capability probes before merging" do
+    content = <<~RUBY
+      SimpleCov.configure do
+        if SimpleCov::Configuration.method_defined?(:cover)
+          cover "lib/**/*.rb"
+        else
+          track_files "lib/**/*.rb"
+        end
+      end
+    RUBY
+
+    output = described_class.send(:normalize_simplecov_template_source, content)
+
+    expect(output).to include("SimpleCov::Configuration.instance_methods.include?(:cover)")
+    expect(output).not_to include("SimpleCov::Configuration.method_defined?(:cover)")
+  end
+
   it "removes obsolete .simplecov keep_destination config during config sync" do
     content = <<~YAML
       defaults:
