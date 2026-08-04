@@ -3246,7 +3246,7 @@ module Kettle
       entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
       entrypoint_require = metadata_value(gemspec_metadata, :entrypoint_require) if entrypoint_require.empty?
       entrypoint_require = name.tr("-", "/") if entrypoint_require.to_s.empty?
-      version_path = File.join("lib", entrypoint_require, "version.rb")
+      version_path = File.join("lib", "#{entrypoint_require}.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       configured_namespace = rubygems_config["namespace"].to_s.strip
       entrypoint_namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path)
@@ -14987,6 +14987,9 @@ module Kettle
 
     def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:, package_name: nil, include_version_gem_path: true, ensure_package_entrypoint_require: false)
       current = read_project_file(project_root, version_spec_path)
+      package_entrypoint_require = if ensure_package_entrypoint_require
+        version_spec_package_entrypoint_require(project_root, package_name, entrypoint_require)
+      end
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
       updated = if current.empty?
@@ -15004,9 +15007,12 @@ module Kettle
           !package_name.to_s.empty? && package_name.to_s != entrypoint_require.to_s
         updated = remove_top_level_ruby_require(updated, package_name.to_s)
       end
+      if ensure_package_entrypoint_require && package_entrypoint_require.to_s != entrypoint_require.to_s
+        updated = remove_top_level_ruby_require(updated, entrypoint_require.to_s)
+      end
       if ensure_package_entrypoint_require && !entrypoint_require.to_s.empty? &&
-          !ruby_top_level_require?(updated, "require", entrypoint_require.to_s)
-        requirements << %(require "#{entrypoint_require}"\n)
+          !ruby_top_level_require?(updated, "require", package_entrypoint_require.to_s)
+        requirements << %(require "#{package_entrypoint_require}"\n)
       end
 
       if requirements.any?
@@ -15023,6 +15029,24 @@ module Kettle
         include_version_gem_path: include_version_gem_path
       )
       write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(updated))
+    end
+
+    def version_spec_package_entrypoint_require(project_root, package_name, entrypoint_require)
+      package_name = package_name.to_s.strip
+      entrypoint_require = entrypoint_require.to_s.strip
+      return entrypoint_require if package_name.empty? || package_name == entrypoint_require
+
+      package_path = File.join("lib", "#{package_name}.rb")
+      version_path = File.join("lib", "#{entrypoint_require}.rb")
+      return entrypoint_require unless File.file?(File.join(project_root, package_path))
+
+      package_content = read_project_file(project_root, package_path)
+      entrypoint_loads_version_file?(
+        package_content,
+        project_root: project_root,
+        entrypoint_path: package_path,
+        version_path: version_path
+      ) ? package_name : entrypoint_require
     end
 
     def remove_version_gem_shared_example(content)

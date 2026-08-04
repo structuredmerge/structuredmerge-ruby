@@ -1357,6 +1357,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Version bootstrap repairs remove stale package-name requires when the discovered Ruby entrypoint uses a different require path.
 
+- Version specs for packages with nested version entrypoints now load the package shim when it owns the version bootstrap.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

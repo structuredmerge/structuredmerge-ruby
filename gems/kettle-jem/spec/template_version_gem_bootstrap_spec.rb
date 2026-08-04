@@ -628,7 +628,7 @@ RSpec.describe Kettle::Jem do
       )
       version_spec = File.read(File.join(root, "spec/kettle/family/version_spec.rb"))
       expect(version_spec).to include('require "anonymous_loader"')
-      expect(version_spec).to include('require "kettle/family"')
+      expect(version_spec).to include('require "kettle-family"')
       expect(version_spec).to include('File.expand_path("../../../lib/kettle/family/version.rb", __dir__)')
       expect(version_spec).to include('File.expand_path("../../../lib/kettle/family/version_gem.rb", __dir__)')
       expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: paths)")

@@ -936,6 +936,46 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "requires a package entrypoint when it loads the nested version file" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-package-version-spec-entrypoint", tmp_root) do |root|
+      write_tree(root, {
+        "lib/example-gem.rb" => <<~RUBY,
+          require_relative "example/version"
+        RUBY
+        "lib/example/version.rb" => <<~RUBY,
+          module Example
+            module Version
+              VERSION = "1.0.0"
+            end
+          end
+        RUBY
+        "spec/example/version_spec.rb" => <<~RUBY
+          require "anonymous_loader"
+          require "example/version"
+          RSpec.describe Example::Version do
+          end
+        RUBY
+      })
+
+      described_class.send(
+        :normalize_version_gem_version_spec,
+        root,
+        "spec/example/version_spec.rb",
+        "example/version",
+        "Example",
+        ensure_version_gem_require: false,
+        package_name: "example-gem",
+        ensure_package_entrypoint_require: true
+      )
+
+      version_spec = File.read(File.join(root, "spec/example/version_spec.rb"))
+      expect(version_spec).to include('require "example-gem"')
+      expect(version_spec).not_to include('require "example/version"')
+    end
+  end
+
   it "repairs a recipe-generated module wrapper when the entrypoint outer namespace is a class" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
