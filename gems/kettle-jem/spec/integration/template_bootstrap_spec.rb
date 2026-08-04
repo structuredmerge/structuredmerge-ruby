@@ -1796,11 +1796,11 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     ]
     resolve.each do |entry|
       replacement.concat([
-        "    - gem: #{entry.fetch('gem')}\n",
-        "      direct: #{entry.fetch('direct')}\n",
-        "      modular: #{entry.fetch('modular')}\n",
-        "      action: #{entry.fetch('action')}\n",
-        "      reason: #{entry.fetch('reason').dump}\n"
+        "    - gem: #{entry.fetch("gem")}\n",
+        "      direct: #{entry.fetch("direct")}\n",
+        "      modular: #{entry.fetch("modular")}\n",
+        "      action: #{entry.fetch("action")}\n",
+        "      reason: #{entry.fetch("reason").dump}\n"
       ])
     end
     File.write(path, [*lines[0...start], *replacement, *lines[finish || lines.length..]].join)

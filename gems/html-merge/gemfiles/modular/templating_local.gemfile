@@ -15,21 +15,19 @@ if !nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already
   require "bundler"
   if File.file?(nomono_lockfile)
     nomono_locked_spec = Bundler::LockfileParser
-      .new(Bundler.read_file(nomono_lockfile))
-      .specs
-      .find { |spec| spec.name == "nomono" }
+                         .new(Bundler.read_file(nomono_lockfile))
+                         .specs
+                         .find { |spec| spec.name == "nomono" }
     nomono_locked_installed = nomono_locked_spec &&
-      Gem::Specification.find_all_by_name("nomono").any? { |spec| spec.version == nomono_locked_spec.version }
+                              Gem::Specification.find_all_by_name("nomono").any? { |spec| spec.version == nomono_locked_spec.version }
     nomono_locked = nomono_locked_spec &&
-      nomono_locked_installed &&
-      nomono_requirement.satisfied_by?(nomono_locked_spec.version)
+                    nomono_locked_installed &&
+                    nomono_requirement.satisfied_by?(nomono_locked_spec.version)
     nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
   end
 end
 Kernel.send(:gem, "nomono", *nomono_activation_requirements)
 require "nomono/bundler"
-
-
 
 structuredmerge_local_gems = %w[
   tree_haver
@@ -91,7 +89,7 @@ platform :mri do
       vendored_gems_env: "VENDORED_GEMS",
       vendor_gem_dir_env: "VENDOR_GEM_DIR",
       debug_env: "KETTLE_DEV_DEBUG",
-      root: ["src", "my", "kettle-dev"]
+      root: %w[src my kettle-dev]
     )
   end
 end

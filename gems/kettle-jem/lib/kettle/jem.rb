@@ -7711,7 +7711,10 @@ module Kettle
           output = remove_gemfile_dependency_blocks(content, removable)
           output = remove_gemfile_percent_w_entries(output, removable)
         end
+        # The returned content contains the policy-preserving rewrite.
+        # rubocop:disable Lint/UselessAssignment
         output = apply_commented_gem_dependency_policy(template_content, output)
+        # rubocop:enable Lint/UselessAssignment
       else
         merge_gemfile_template_policy(
           content,

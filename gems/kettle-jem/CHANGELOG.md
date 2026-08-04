@@ -1369,6 +1369,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve modular Gemfile content while filtering direct dependency conflicts.
 
+- Keep policy-preserving modular Gemfile rewrites during lint autocorrection.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
