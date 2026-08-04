@@ -31,7 +31,7 @@ RSpec.describe Kettle::Jem do
         described_class.send(:existing_version_namespace, root, "lib/simple_column/scopes/version.rb")
       ).to eq("SimpleColumn::Scopes")
 
-      expect(kinds).to eq(1 => :class)
+      expect(kinds).to eq(0 => :module, 1 => :class)
       rendered = described_class.send(
         :version_gem_version_file_content,
         existing_version: "0.1.1",

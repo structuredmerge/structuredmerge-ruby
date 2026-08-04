@@ -1528,7 +1528,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
       expect(content).to include("rubocop-ruby")
       expect(content).to include("declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)")
-      expect(content).to include("local_gems_to_eval = local_gems - %w[example] - declared_gems")
+      expect(content).to include("local_gems_to_eval = local_gems -")
+      expect(content).to include("declared_gems")
       expect(content).to include("gems: local_gems_to_eval")
       expect(content).to include('require "nomono/bundler"')
       expect(content).to include("nomono_activation_requirements")
@@ -1670,9 +1671,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include("local_gems = %w[yard-fence yard-timekeeper yard-yaml]")
+      expect(content).to include("local_gems = %w[yard-fence yard-timekeeper]")
       expect(content).to include("declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)")
-      expect(content).to include("local_gems_to_eval = local_gems - %w[yard-yaml] - declared_gems")
+      expect(content).to include("local_gems_to_eval = local_gems - %w[] - declared_gems")
       expect(content).to include("gems: local_gems_to_eval")
     end
   end

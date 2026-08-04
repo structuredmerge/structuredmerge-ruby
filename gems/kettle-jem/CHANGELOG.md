@@ -1367,6 +1367,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve class-based version namespaces during template bootstrap.
 
+- Preserve modular Gemfile content while filtering direct dependency conflicts.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

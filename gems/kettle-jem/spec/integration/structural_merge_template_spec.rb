@@ -982,6 +982,24 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "derives a version namespace from the package name when none is configured" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-missing-version-namespace", tmp_root) do |root|
+      write_tree(root, {"lib/example.rb" => "# No namespace here\n"})
+      facts = {
+        package: {name: "example"},
+        rubygems: {entrypoint_require: "example"},
+        project_runtime: {version: "1.0.0"}
+      }
+
+      result = described_class.send(:version_gem_bootstrap_step_for_paths, root, facts)
+
+      expect(result).to include(name: "version_gem_bootstrap", status: "applied")
+      expect(File.read(File.join(root, "lib/example/version.rb"))).to include("module Example")
+    end
+  end
+
   it "preserves an existing Version module include during version bootstrap" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

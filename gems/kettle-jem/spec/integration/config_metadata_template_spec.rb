@@ -3225,6 +3225,19 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
+          dependency_conflicts:
+            reviewed: true
+            resolve:
+              - gem: ur_brain-adapters-ruby
+                direct: ur_brain-claude-code.gemspec
+                modular: gemfiles/modular/ur_brain.gemfile
+                action: keep_both
+                reason: "The released modular dependency and gemspec range intentionally coexist."
+              - gem: ur_brain-adapters-ruby
+                direct: ur_brain-claude-code.gemspec
+                modular: gemfiles/modular/ur_brain_local.gemfile
+                action: keep_both
+                reason: "The local modular override intentionally shadows the released dependency."
           templates:
             root: packaged
             apply: true
@@ -3287,6 +3300,14 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
+          dependency_conflicts:
+            reviewed: true
+            resolve:
+              - gem: ur_brain
+                direct: ur_brain-mcp.gemspec
+                modular: gemfiles/modular/ur_brain.gemfile
+                action: keep_both
+                reason: "The modular local/released switch intentionally coexists with the gemspec range."
           templates:
             root: packaged
             apply: true

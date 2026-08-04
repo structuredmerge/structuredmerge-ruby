@@ -11,6 +11,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       write_tree(root, {
         ".structuredmerge/kettle-jem.yml" => <<~YAML
           dependency_conflicts:
+            reviewed: true
             resolve: []
         YAML
       })
@@ -600,6 +601,10 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
             strategy: merge
       YAML
 
+      configure_dependency_conflicts(root, [
+        {"gem" => "version_gem", "direct" => "tree_haver.gemspec", "modular" => "gemfiles/modular/runtime_heads.gemfile", "action" => "keep_both", "reason" => "The runtime gemspec and HEAD appraisal intentionally share this dependency."}
+      ])
+
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
       expect(apply.fetch(:changed_files)).to include("LICENSE.md")
       expect(apply.fetch(:changed_files)).to include("README.md")
@@ -651,6 +656,10 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         "gemfiles/modular/documentation.gemfile"
       )
       expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
+
+      configure_dependency_conflicts(root, [
+        {"gem" => "version_gem", "direct" => "tree_haver.gemspec", "modular" => "gemfiles/modular/runtime_heads.gemfile", "action" => "keep_both", "reason" => "The runtime gemspec and HEAD appraisal intentionally share this dependency."}
+      ])
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
       expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup", "spec/README.md")
@@ -1772,5 +1781,28 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
 
       expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to include("project_emoji: 🥨\n")
     end
+  end
+
+  def configure_dependency_conflicts(root, resolve)
+    path = File.join(root, ".structuredmerge", "kettle-jem.yml")
+    lines = File.read(path).lines
+    start = lines.index { |line| line.match?(/\Adependency_conflicts:\s*$/) }
+    finish = (start + 1...lines.length).find { |index| lines[index].match?(/\A\S/) }
+    replacement = [
+      "dependency_conflicts:\n",
+      "  # Test fixture declares its direct-versus-modular ownership decisions.\n",
+      "  reviewed: true\n",
+      "  resolve:\n"
+    ]
+    resolve.each do |entry|
+      replacement.concat([
+        "    - gem: #{entry.fetch('gem')}\n",
+        "      direct: #{entry.fetch('direct')}\n",
+        "      modular: #{entry.fetch('modular')}\n",
+        "      action: #{entry.fetch('action')}\n",
+        "      reason: #{entry.fetch('reason').dump}\n"
+      ])
+    end
+    File.write(path, [*lines[0...start], *replacement, *lines[finish || lines.length..]].join)
   end
 end

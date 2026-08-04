@@ -5381,10 +5381,11 @@ module Kettle
 
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.to_s.empty?
       namespace = facts.dig(:rubygems, :namespace).to_s
+      namespace = classify_namespace(package_name) if namespace.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
-      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
-      namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
+      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path).to_s if namespace.empty?
+      namespace = existing_version_namespace(project_root, version_path).to_s if namespace.empty?
       return {name: "version_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
 
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
@@ -7701,15 +7702,16 @@ module Kettle
         package_name = facts.to_h.dig(:package, :name).to_s
         runtime_dependencies = package_runtime_dependency_names(facts)
         if local_gemfile_template_recipe?(recipe)
-          remove_gemfile_dependency_blocks(content, ["rdoc"])
+          output = remove_gemfile_dependency_blocks(content, ["rdoc"])
         else
           named_fragment_dependencies = runtime_dependencies.select do |dependency|
             target.include?(dependency.tr("-", "_"))
           end
           removable = [package_name, *(runtime_dependencies - named_fragment_dependencies)]
           output = remove_gemfile_dependency_blocks(content, removable)
-          remove_gemfile_percent_w_entries(output, removable)
+          output = remove_gemfile_percent_w_entries(output, removable)
         end
+        output = apply_commented_gem_dependency_policy(template_content, output)
       else
         merge_gemfile_template_policy(
           content,
@@ -9261,7 +9263,7 @@ module Kettle
       end
 
       bootstrap_report = recipe_reports.find { |report| report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH }
-      if !config.key?("dependency_conflicts") && bootstrap_report
+      if bootstrap_report && !modular_dependency_conflicts_reviewed?(config)
         bootstrap_report[:final_content] = add_dependency_conflict_review_list(bootstrap_report.fetch(:final_content, ""), conflicts)
         return
       end
@@ -9347,6 +9349,10 @@ module Kettle
       end
     end
 
+    def modular_dependency_conflicts_reviewed?(config)
+      config.dig("dependency_conflicts", "reviewed") == true
+    end
+
     def modular_dependency_conflict_decided?(decisions, conflict)
       decisions.any? do |decision|
         decision.fetch("gem") == conflict.fetch(:name) &&
@@ -9397,6 +9403,7 @@ module Kettle
         "dependency_conflicts:\n",
         "  # Review each entry and choose a supported action.\n",
         "  # keep_both is for a broad direct requirement plus a compatible modular narrowing.\n",
+        "  reviewed: false\n",
         "  resolve:\n"
       ]
       conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.each do |conflict|
@@ -14824,7 +14831,8 @@ module Kettle
       legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
       namespace = existing_version_namespace(project_root, version_path).to_s
       namespace = facts.dig(:rubygems, :namespace).to_s if namespace.empty?
-      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
+      namespace = classify_namespace(package_name) if namespace.empty?
+      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path).to_s if namespace.empty?
       return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
 
       version = facts.dig(:project_runtime, :version).to_s
@@ -15002,7 +15010,9 @@ module Kettle
         return default_namespace
       end
 
-      entrypoint_namespace || version_namespace || metadata_namespace || default_namespace
+      [entrypoint_namespace, version_namespace, metadata_namespace, default_namespace].find do |candidate|
+        !candidate.to_s.empty?
+      end
     end
 
     def namespace_descendant?(namespace, parent)
