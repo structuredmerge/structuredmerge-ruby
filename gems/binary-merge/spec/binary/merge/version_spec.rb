@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'binary/merge'
+require 'binary-merge'
 RSpec.describe Binary::Merge::Version do
   it_behaves_like 'a Version module', described_class
 
