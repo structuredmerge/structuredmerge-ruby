@@ -27,6 +27,10 @@ RSpec.describe Kettle::Jem do
         "SimpleColumn::Scopes"
       )
 
+      expect(
+        described_class.send(:existing_version_namespace, root, "lib/simple_column/scopes/version.rb")
+      ).to eq("SimpleColumn::Scopes")
+
       expect(kinds).to eq(1 => :class)
       rendered = described_class.send(
         :version_gem_version_file_content,

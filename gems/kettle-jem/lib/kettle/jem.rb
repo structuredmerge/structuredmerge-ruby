@@ -15528,7 +15528,7 @@ module Kettle
     end
 
     def ruby_version_module_namespace_for(node, namespace)
-      return unless node.is_a?(::Prism::ModuleNode)
+      return unless node.is_a?(::Prism::ModuleNode) || node.is_a?(::Prism::ClassNode)
 
       current = namespace + ruby_constant_path_segments(node.constant_path)
       if current.last == "Version" && current.length > 1
@@ -15575,7 +15575,7 @@ module Kettle
     end
 
     def ruby_entrypoint_module_namespace_for(node, namespace)
-      return unless node.is_a?(::Prism::ModuleNode)
+      return unless node.is_a?(::Prism::ModuleNode) || node.is_a?(::Prism::ClassNode)
 
       current = namespace + ruby_constant_path_segments(node.constant_path)
       node.body&.body&.each do |child|
