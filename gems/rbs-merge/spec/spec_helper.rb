@@ -26,7 +26,7 @@ require 'kettle/test/rspec'
 # This library
 require 'ast/merge'
 require 'ast/merge/rspec'
-require 'rbs/merge'
+require 'rbs-merge'
 
 require 'tree_haver/rspec/dependency_tags'
 require_relative 'support/testable_node'
