@@ -1365,6 +1365,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Reconcile malformed version namespaces against destination class declarations during templating.
 
+- Preserve class-based version namespaces during template bootstrap.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

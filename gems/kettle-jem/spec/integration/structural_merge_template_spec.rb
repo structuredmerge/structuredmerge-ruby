@@ -1112,6 +1112,54 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "preserves a class namespace when the class is loaded by the entrypoint" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-loaded-class-version-repair", tmp_root) do |root|
+      write_tree(root, {
+        "activesupport-broadcast_logger.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "activesupport-broadcast_logger"
+            spec.version = "2.0.4"
+            spec.required_ruby_version = ">= 2.7.0"
+            spec.add_dependency "version_gem", "~> 1.1"
+          end
+        RUBY
+        "lib/activesupport/broadcast_logger.rb" => <<~RUBY,
+          module ActiveSupport
+            class BroadcastLogger
+            end
+          end
+
+          require_relative "broadcast_logger/version"
+        RUBY
+        "lib/activesupport/broadcast_logger/version.rb" => <<~RUBY
+          module ActiveSupport
+            module BroadcastLogger
+              module Version
+                VERSION = "2.0.4"
+              end
+            end
+          end
+        RUBY
+      })
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+      expect(facts.dig(:rubygems, :version_namespace_kinds)).to include(1 => :class)
+      report = {
+        facts: facts,
+        recipe_reports: [{relative_path: "lib/activesupport/broadcast_logger/version.rb"}],
+        template_selection: {only: []}
+      }
+
+      described_class.send(:template_version_gem_bootstrap_step, root, report)
+
+      version_file = File.read(File.join(root, "lib/activesupport/broadcast_logger/version.rb"))
+      expect(version_file).to include("class BroadcastLogger")
+      expect(version_file).to include("    module Version")
+      expect(version_file).not_to include("module ActiveSupport\n  module BroadcastLogger")
+    end
+  end
+
   it "reports setup execution context without load-path inspection" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

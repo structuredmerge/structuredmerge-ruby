@@ -3258,6 +3258,12 @@ module Kettle
         version_path,
         version_namespace
       )
+      version_namespace_kinds = existing_version_namespace_kinds(
+        project_root,
+        version_path,
+        version_namespace,
+        entrypoint_path: entrypoint_path
+      )
       metadata_namespace = metadata_value(gemspec_metadata, :namespace)
       default_namespace = classify_namespace(name)
       namespace = configured_namespace.empty? ? nil : configured_namespace
@@ -3336,6 +3342,7 @@ module Kettle
           entrypoint_require: entrypoint_require,
           namespace: namespace,
           min_ruby: min_ruby,
+          version_namespace_kinds: version_namespace_kinds,
           version_gem_default_enabled: version_gem_default_enabled_for_project?(rubygems_config, gemspec_metadata),
           engines: ruby_engines_config(kettle_config)
         )
@@ -5343,7 +5350,7 @@ module Kettle
         # can establish its outer namespace as a class (for example Month), which
         # the generated version file must reopen as that same class.
         manage_version_file: !templated_paths.include?(version_path) ||
-          version_namespace_outer_kind(project_root, entrypoint_path, namespace) == :class,
+          version_namespace_outer_kind_for_template(project_root, facts, entrypoint_path, version_path, namespace) == :class,
         manage_signature_file: !templated_paths.include?(signature_path)
       )
     end
@@ -5385,7 +5392,12 @@ module Kettle
       cleanup = version_gem_cleanup_step(project_root, facts)
       changes.concat(Array(cleanup[:changed_files]))
       outer_namespace_kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
-      namespace_kinds = existing_version_namespace_kinds(project_root, version_path, namespace)
+      namespace_kinds = existing_version_namespace_kinds(
+        project_root,
+        version_path,
+        namespace,
+        entrypoint_path: entrypoint_path
+      )
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
       unless templated_paths.include?(version_path) && outer_namespace_kind != :class
         version = facts.dig(:project_runtime, :version).to_s
@@ -14822,6 +14834,7 @@ module Kettle
       current_entrypoint = read_project_file(project_root, entrypoint_path)
       outer_namespace_kind = ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
       namespace_kinds = existing_version_namespace_kinds(project_root, version_path, namespace)
+      namespace_kinds = namespace_kinds.merge(version_namespace_kinds_from_facts(facts))
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
 
       if manage_version_file
@@ -15488,6 +15501,28 @@ module Kettle
       ruby_entrypoint_outer_namespace_kind(read_project_file(project_root, entrypoint_path), namespace)
     end
 
+    def version_namespace_outer_kind_for_template(project_root, facts, entrypoint_path, version_path, namespace)
+      kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
+      return kind if kind == :class
+
+      configured_kinds = version_namespace_kinds_from_facts(facts)
+      target_index = namespace.to_s.split("::").reject(&:empty?).length - 1
+      configured_kind = configured_kinds[target_index]
+      return configured_kind if configured_kind
+
+      ruby_namespace_declaration_kind(read_project_file(project_root, version_path), namespace) || kind
+    end
+
+    def version_namespace_kinds_from_facts(facts)
+      raw = facts.dig(:rubygems, :version_namespace_kinds)
+      return {} unless raw.is_a?(Hash)
+
+      raw.each_with_object({}) do |(index, kind), kinds|
+        normalized_kind = kind.to_s.to_sym
+        kinds[index.to_i] = normalized_kind if %i[class module].include?(normalized_kind)
+      end
+    end
+
     def ruby_entrypoint_outer_namespace_kind(content, namespace)
       first_segment = namespace.to_s.split("::").reject(&:empty?).first
       return :module if first_segment.to_s.empty?
@@ -15533,6 +15568,7 @@ module Kettle
         namespace
       )
       return namespace unless entrypoint_kind && version_kind && entrypoint_kind != version_kind
+      return namespace unless error_class_namespace?(read_project_file(project_root, entrypoint_path), namespace)
 
       parent = namespace.split("::")[0...-1].join("::")
       return namespace if parent.empty?
@@ -15544,6 +15580,16 @@ module Kettle
       parent
     end
 
+    def error_class_namespace?(content, namespace)
+      return false unless namespace.to_s.split("::").last == "Error"
+
+      node = ruby_namespace_declaration_node(content, namespace)
+      return false unless node.is_a?(::Prism::ClassNode)
+
+      superclass = node.superclass&.slice.to_s
+      %w[Exception StandardError].include?(superclass)
+    end
+
     def existing_version_file_includes_version_module?(project_root, relative_path)
       ruby_call_records(read_project_file(project_root, relative_path), :include).any? do |call|
         next false unless call.receiver.nil?
@@ -15553,12 +15599,19 @@ module Kettle
       end
     end
 
-    def existing_version_namespace_kinds(project_root, relative_path, namespace)
-      content = read_project_file(project_root, relative_path)
-      kind = ruby_namespace_declaration_kind(content, namespace)
-      return {} unless kind
+    def existing_version_namespace_kinds(project_root, relative_path, namespace, entrypoint_path: nil)
+      contents = [read_project_file(project_root, relative_path)]
+      contents << read_project_file(project_root, entrypoint_path) if entrypoint_path
+      segments = namespace.to_s.split("::").reject(&:empty?)
+      return {} if segments.empty?
 
-      {namespace.to_s.split("::").reject(&:empty?).length - 1 => kind}
+      contents.each_with_object({}) do |content, kinds|
+        segments.each_index do |index|
+          prefix = segments.first(index + 1).join("::")
+          kind = ruby_namespace_declaration_kind(content, prefix)
+          kinds[index] = kind if kind
+        end
+      end
     end
 
     def ruby_namespace_declaration_kind(content, namespace)
@@ -15580,6 +15633,29 @@ module Kettle
       node.body&.body&.each do |child|
         kind = ruby_namespace_declaration_kind_for(child, current, target)
         return kind if kind
+      end
+      nil
+    end
+
+    def ruby_namespace_declaration_node(content, namespace)
+      target = namespace.to_s.split("::").reject(&:empty?)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      body.each do |node|
+        found = ruby_namespace_declaration_node_for(node, [], target)
+        return found if found
+      end
+      nil
+    end
+
+    def ruby_namespace_declaration_node_for(node, namespace, target)
+      return unless node.is_a?(::Prism::ModuleNode) || node.is_a?(::Prism::ClassNode)
+
+      current = namespace + ruby_constant_path_segments(node.constant_path)
+      return node if current == target
+
+      node.body&.body&.each do |child|
+        found = ruby_namespace_declaration_node_for(child, current, target)
+        return found if found
       end
       nil
     end
