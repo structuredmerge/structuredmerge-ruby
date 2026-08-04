@@ -24,7 +24,7 @@ require 'kettle/test/rspec'
 # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
 
 # This library
-require 'ast/merge'
+require 'ast-merge'
 
 require_relative 'support/testable_node'
 
