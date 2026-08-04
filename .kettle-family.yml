@@ -76,7 +76,7 @@ members:
       - kettle-jem
 
 commands:
-  lint: bundle exec rake rubocop_gradual:autocorrect rubocop_gradual:force_update
+  lint: bundle exec rubocop-gradual --autocorrect --force-update
   docs: bin/rake yard
 
 check:

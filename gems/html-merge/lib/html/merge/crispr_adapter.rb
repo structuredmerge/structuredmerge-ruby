@@ -13,7 +13,7 @@ module Html
         unless result.fetch(:ok)
           raise Ast::Crispr::Error.new(
             "Unable to parse HTML for CRISPR",
-            details: {source_label: document.source_label, diagnostics: result.fetch(:diagnostics)}
+            details: { source_label: document.source_label, diagnostics: result.fetch(:diagnostics) }
           )
         end
 
@@ -21,7 +21,10 @@ module Html
       end
 
       def structural_owners(document, owner_scope: :html_element)
-        raise Ast::Crispr::Error.new("Unsupported HTML CRISPR owner scope", details: {owner_scope: owner_scope}) unless owner_scope.to_sym == :html_element
+        unless owner_scope.to_sym == :html_element
+          raise Ast::Crispr::Error.new("Unsupported HTML CRISPR owner scope",
+                                       details: { owner_scope: owner_scope })
+        end
 
         root = Html::Merge.html_root_node(document.content)
         owners = []
@@ -43,7 +46,7 @@ module Html
       def comment_regions_for(_document, _owner, region: :leading, owner_scope: :html_element)
         raise Ast::Crispr::Error.new(
           "HTML CRISPR comment regions are not implemented",
-          details: {region: region, owner_scope: owner_scope}
+          details: { region: region, owner_scope: owner_scope }
         )
       end
 
@@ -55,7 +58,7 @@ module Html
         Ast::Crispr::StructureProfile.new(
           owner_scope: owner_scope,
           owner_selector: :html_element,
-          metadata: {source: :html_merge}
+          metadata: { source: :html_merge }
         )
       end
     end

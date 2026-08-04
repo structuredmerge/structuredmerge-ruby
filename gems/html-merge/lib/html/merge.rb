@@ -89,7 +89,7 @@ module Html
           span: html_node_span(node)
         }
       end
-      return {ok: false, diagnostics: diagnostics, policies: []} unless diagnostics.empty?
+      return { ok: false, diagnostics: diagnostics, policies: [] } unless diagnostics.empty?
 
       {
         ok: true,
@@ -173,11 +173,9 @@ module Html
     end
 
     def html_point(point)
-      if point.respond_to?(:row) && point.respond_to?(:column)
-        return {row: point.row, column: point.column}
-      end
+      return { row: point.row, column: point.column } if point.respond_to?(:row) && point.respond_to?(:column)
 
-      return {row: point[:row], column: point[:column]} if point.respond_to?(:[])
+      return { row: point[:row], column: point[:column] } if point.respond_to?(:[])
 
       raise Error, "Unsupported TreeHaver point #{point.inspect}"
     end
