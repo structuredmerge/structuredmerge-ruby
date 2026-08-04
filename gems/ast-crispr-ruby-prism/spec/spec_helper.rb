@@ -24,8 +24,8 @@ require 'kettle/test/rspec'
 # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
 
 # This library
+require 'ast-crispr-ruby-prism'
 require 'ast/crispr/rspec'
-require 'ast/crispr/ruby/prism'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
