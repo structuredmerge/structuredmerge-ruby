@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'smorg/rb'
+require 'smorg-rb'
 RSpec.describe Smorg::RB::Version do
   it_behaves_like 'a Version module', described_class
 
