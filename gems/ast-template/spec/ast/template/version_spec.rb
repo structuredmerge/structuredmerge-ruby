@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'ast/template'
+require 'ast-template'
 RSpec.describe Ast::Template::Version do
   it_behaves_like 'a Version module', described_class
 
