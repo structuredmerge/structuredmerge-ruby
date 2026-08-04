@@ -168,11 +168,18 @@ module Prism
       end
 
       def normalize_exception_name(exception_name)
-        ruby_rescue_semantics.normalize_exception_name(exception_name)
+        return 'StandardError' if exception_name == :standard_error
+
+        name = exception_name.to_s.sub(/\A::/, '')
+        name.empty? ? nil : name
       end
 
       def qualify_source_constant_name(constant_name, namespace = nil)
-        ruby_rescue_semantics.qualify_source_constant_name(constant_name, namespace)
+        normalized_name = normalize_exception_name(constant_name)
+        return if normalized_name.nil?
+        return normalized_name if constant_name.to_s.start_with?('::') || namespace.nil? || namespace.empty?
+
+        "#{namespace}::#{normalized_name}"
       end
 
       def source_defined_exception_definitions

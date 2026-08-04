@@ -25,4 +25,24 @@ RSpec.describe Prism::Merge::BeginNodeRescueSemantics do
       end
     end
   end
+
+  describe '#source_defined_exception_definitions' do
+    it 'collects nested source exception definitions without recursive initialization' do
+      analysis = Struct.new(:parse_result).new(
+        Prism.parse(<<~RUBY)
+          module Example
+            class Error < StandardError
+            end
+          end
+        RUBY
+      )
+      semantics = described_class.new(template_analysis: analysis, dest_analysis: nil)
+
+      expect(semantics.send(:source_defined_exception_definitions)).to include(
+        name: 'Example::Error',
+        namespace: 'Example',
+        superclass: 'StandardError'
+      )
+    end
+  end
 end
