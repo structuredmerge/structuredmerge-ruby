@@ -90,7 +90,7 @@ platform :mri do
       vendored_gems_env: "VENDORED_GEMS",
       vendor_gem_dir_env: "VENDOR_GEM_DIR",
       debug_env: "KETTLE_DEV_DEBUG",
-      root: %w[src my kettle-dev]
+      root: ["src", "my", "kettle-dev"]
     )
   end
 end
