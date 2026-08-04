@@ -2773,11 +2773,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         "template/gemfiles/modular/templating.gemfile.example" => <<~RUBY
           # frozen_string_literal: true
 
-          tslp_dev = ENV.fetch("TSLP_DEV", nil)
-          if tslp_dev.to_s.empty?
-            gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7", require: false
-          else
-            gem "tree_sitter_language_pack", path: tslp_dev, require: false
+          if ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false").zero?
+            gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7"
           end
         RUBY
       })
@@ -2789,7 +2786,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(gemfile).not_to include("tree_sitter_language_pack")
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
       expect(File.read(File.join(root, "gemfiles/modular/templating.gemfile"))).to include(
-        'gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7", require: false'
+        'gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7"'
       )
     end
   end
