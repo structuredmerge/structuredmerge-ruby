@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'psych/merge'
+require 'psych-merge'
 RSpec.describe Psych::Merge::Version do
   it_behaves_like 'a Version module', described_class
 
