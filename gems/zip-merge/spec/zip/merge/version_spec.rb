@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'anonymous_loader'
-require 'zip/merge'
+require 'zip-merge'
 RSpec.describe Zip::Merge::Version do
   it_behaves_like 'a Version module', described_class
 
