@@ -26,7 +26,7 @@ require 'kettle/test/rspec'
 # This library
 require 'ast/merge'
 require 'ast/merge/rspec'
-require 'bash/merge'
+require 'bash-merge'
 
 require_relative 'support/shared_examples/file_analysis_examples'
 require_relative 'support/shared_examples/smart_merger_examples'
