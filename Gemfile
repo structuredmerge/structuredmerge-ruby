@@ -81,7 +81,9 @@ if kettle_dev_dev.casecmp("false").zero?
   gem "kettle-test", "~> 2.0", ">= 2.0.11"
 end
 
-gem "kettle-drift", "~> 1.0", ">= 1.0.8", require: false
+if kettle_dev_dev.casecmp("false").zero?
+  gem "kettle-drift", "~> 1.0", ">= 1.0.8", require: false
+end
 
 
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"
