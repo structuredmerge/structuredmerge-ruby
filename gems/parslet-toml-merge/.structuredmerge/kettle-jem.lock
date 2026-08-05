@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -503,14 +503,14 @@ files:
     recipe: template_source_application_lib_parslet_toml_merge_version_rb
     action: write
     dest_sha256: 41d30394b4502287b1fab3f27d92a149bc97906b224c1007afc550a4a5d31758
-    input_fingerprint: ce4b5a828db0a407517152c593ac4493e7380a2aaf991caab7f5200979186eb7
+    input_fingerprint: 54c2227e62b9ff97fd9ffba7d08e48b917c30bbeee97d7146daa5dcf3c440cb8
     template_sources:
     - lib/gem/version.rb.example
   parslet-toml-merge.gemspec:
     recipe: template_source_application_parslet_toml_merge_gemspec
     action: write
     dest_sha256: a8554e10072e92f374f5888def9f0cfa12783de006db3571291e139b88def777
-    input_fingerprint: d7b6f614161c094c12ea86088c96c0f534083bb035a0c5b2476378cabf783ae9
+    input_fingerprint: cd828732f0c2fbcd59e703bde8b304d6c5d94af274b80ec92f6e6388ddf0b837
     template_sources:
     - gem.gemspec.example
   sig/parslet/toml/merge.rbs:
