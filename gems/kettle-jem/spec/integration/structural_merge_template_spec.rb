@@ -982,6 +982,47 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "preserves a class namespace superclass when bootstrapping version_gem" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-namespace-superclass", tmp_root) do |root|
+      write_tree(root, {
+        "simple_column-scopes.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "simple_column-scopes"
+            spec.version = "0.1.1"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        "lib/simple_column/scopes.rb" => <<~RUBY,
+          module SimpleColumn
+          end
+        RUBY
+        "lib/simple_column/scopes/version.rb" => <<~RUBY
+          module SimpleColumn
+            class Scopes < Module
+              module Version
+                VERSION = "0.1.1"
+              end
+            end
+          end
+        RUBY
+      })
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+      expect(facts.dig(:rubygems, :version_namespace_superclasses)).to include(1 => "Module")
+      report = {
+        facts: facts,
+        recipe_reports: [{relative_path: "lib/simple_column/scopes/version.rb"}],
+        template_selection: {only: []}
+      }
+
+      described_class.send(:template_version_gem_bootstrap_step, root, report)
+
+      version_file = File.read(File.join(root, "lib/simple_column/scopes/version.rb"))
+      expect(version_file).to include("class Scopes < Module")
+    end
+  end
+
   it "derives a version namespace from the package name when none is configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

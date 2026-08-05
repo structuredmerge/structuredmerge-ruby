@@ -37,9 +37,10 @@ RSpec.describe Kettle::Jem do
         existing_version: "0.1.1",
         namespace: "SimpleColumn::Scopes",
         version: "0.1.1",
-        namespace_kinds: kinds
+        namespace_kinds: kinds,
+        namespace_superclasses: {1 => "Module"}
       )
-      expect(rendered).to include("class Scopes")
+      expect(rendered).to include("class Scopes < Module")
       expect(rendered).not_to include("module Scopes")
     end
   end

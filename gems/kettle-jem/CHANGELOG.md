@@ -1371,6 +1371,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep policy-preserving modular Gemfile rewrites during lint autocorrection.
 
+- Preserve explicit class namespace superclasses when generating VersionGem version files.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

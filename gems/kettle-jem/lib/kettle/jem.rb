@@ -39,7 +39,7 @@ module Kettle
     APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
     GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
     SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
-    VERSION_NAMESPACE_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
+    VERSION_NAMESPACE_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
@@ -3264,6 +3264,12 @@ module Kettle
         version_namespace,
         entrypoint_path: entrypoint_path
       )
+      version_namespace_superclasses = existing_version_namespace_superclasses(
+        project_root,
+        version_path,
+        version_namespace,
+        entrypoint_path: entrypoint_path
+      )
       metadata_namespace = metadata_value(gemspec_metadata, :namespace)
       default_namespace = classify_namespace(name)
       namespace = configured_namespace.empty? ? nil : configured_namespace
@@ -3343,6 +3349,7 @@ module Kettle
           namespace: namespace,
           min_ruby: min_ruby,
           version_namespace_kinds: version_namespace_kinds,
+          version_namespace_superclasses: version_namespace_superclasses,
           version_gem_default_enabled: version_gem_default_enabled_for_project?(rubygems_config, gemspec_metadata),
           engines: ruby_engines_config(kettle_config)
         )
@@ -5399,6 +5406,12 @@ module Kettle
         namespace,
         entrypoint_path: entrypoint_path
       )
+      namespace_superclasses = existing_version_namespace_superclasses(
+        project_root,
+        version_path,
+        namespace,
+        entrypoint_path: entrypoint_path
+      )
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
       unless templated_paths.include?(version_path) && outer_namespace_kind != :class
         version = facts.dig(:project_runtime, :version).to_s
@@ -5413,6 +5426,7 @@ module Kettle
             version: version,
             outer_namespace_kind: outer_namespace_kind,
             namespace_kinds: namespace_kinds,
+            namespace_superclasses: namespace_superclasses,
             preserve_version_module_include: preserve_version_module_include
           )
         )
@@ -14846,6 +14860,8 @@ module Kettle
       outer_namespace_kind = ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
       namespace_kinds = existing_version_namespace_kinds(project_root, version_path, namespace)
       namespace_kinds = namespace_kinds.merge(version_namespace_kinds_from_facts(facts))
+      namespace_superclasses = existing_version_namespace_superclasses(project_root, version_path, namespace)
+      namespace_superclasses = namespace_superclasses.merge(version_namespace_superclasses_from_facts(facts))
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
 
       if manage_version_file
@@ -14858,6 +14874,7 @@ module Kettle
             version: version,
             outer_namespace_kind: outer_namespace_kind,
             namespace_kinds: namespace_kinds,
+            namespace_superclasses: namespace_superclasses,
             preserve_version_module_include: preserve_version_module_include
           )
         )
@@ -15260,7 +15277,7 @@ module Kettle
       version_gem_require_insertion_index(content)
     end
 
-    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module, namespace_kinds: {}, preserve_version_module_include: false)
+    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module, namespace_kinds: {}, namespace_superclasses: {}, preserve_version_module_include: false)
       resolved_version = existing_version.to_s.empty? ? version.to_s : existing_version.to_s
       body = [
         "# Version namespace for this gem.",
@@ -15276,7 +15293,7 @@ module Kettle
       <<~RUBY
         # frozen_string_literal: true
 
-        #{wrap_ruby_namespace(namespace, body, outer_namespace_kind: outer_namespace_kind, namespace_kinds: namespace_kinds).join("\n")}
+        #{wrap_ruby_namespace(namespace, body, outer_namespace_kind: outer_namespace_kind, namespace_kinds: namespace_kinds, namespace_superclasses: namespace_superclasses).join("\n")}
       RUBY
     end
 
@@ -15495,7 +15512,7 @@ module Kettle
       RUBY
     end
 
-    def wrap_ruby_namespace(namespace, body_lines, outer_namespace_kind: :module, namespace_kinds: {})
+    def wrap_ruby_namespace(namespace, body_lines, outer_namespace_kind: :module, namespace_kinds: {}, namespace_superclasses: {})
       segments = namespace.to_s.split("::").reject(&:empty?)
       return body_lines if segments.empty?
 
@@ -15503,7 +15520,10 @@ module Kettle
       segments.each_with_index do |segment, index|
         kind = namespace_kinds.fetch(index, index.zero? ? outer_namespace_kind : :module)
         keyword = (kind == :class) ? "class" : "module"
-        lines << ("  " * index) + "#{keyword} #{segment}"
+        superclass = namespace_superclasses[index].to_s
+        declaration = "#{keyword} #{segment}"
+        declaration += " < #{superclass}" if keyword == "class" && !superclass.empty?
+        lines << ("  " * index) + declaration
       end
       body_lines.each { |line| lines << ("  " * segments.length) + line unless line.empty? }
       (segments.length - 1).downto(0) { |index| lines << ("  " * index) + "end" }
@@ -15533,6 +15553,16 @@ module Kettle
       raw.each_with_object({}) do |(index, kind), kinds|
         normalized_kind = kind.to_s.to_sym
         kinds[index.to_i] = normalized_kind if %i[class module].include?(normalized_kind)
+      end
+    end
+
+    def version_namespace_superclasses_from_facts(facts)
+      raw = facts.dig(:rubygems, :version_namespace_superclasses)
+      return {} unless raw.is_a?(Hash)
+
+      raw.each_with_object({}) do |(index, superclass), superclasses|
+        value = superclass.to_s.strip
+        superclasses[index.to_i] = value unless value.empty?
       end
     end
 
@@ -15623,6 +15653,24 @@ module Kettle
           prefix = segments.first(index + 1).join("::")
           kind = ruby_namespace_declaration_kind(content, prefix)
           kinds[index] = kind if kind
+        end
+      end
+    end
+
+    def existing_version_namespace_superclasses(project_root, relative_path, namespace, entrypoint_path: nil)
+      contents = [read_project_file(project_root, relative_path)]
+      contents << read_project_file(project_root, entrypoint_path) if entrypoint_path
+      segments = namespace.to_s.split("::").reject(&:empty?)
+      return {} if segments.empty?
+
+      contents.each_with_object({}) do |content, superclasses|
+        segments.each_index do |index|
+          prefix = segments.first(index + 1).join("::")
+          node = ruby_namespace_declaration_node(content, prefix)
+          next unless node.is_a?(::Prism::ClassNode)
+
+          superclass = node.superclass&.slice.to_s.strip
+          superclasses[index] = superclass unless superclass.empty?
         end
       end
     end
