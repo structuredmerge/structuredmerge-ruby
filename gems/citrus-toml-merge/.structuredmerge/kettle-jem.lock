@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -237,7 +237,7 @@ files:
     recipe: template_source_application_citrus_toml_merge_gemspec
     action: write
     dest_sha256: 8adb1dc5da380721b4285e8379e443e7ad6401a1379fcdb5511644bd6b077592
-    input_fingerprint: b70289293671673e07f5e564ff4035dac3b43f81764b44744a9bdfc1eaf769e7
+    input_fingerprint: 33eefc1201b5018b00ad435c0e5f19c44e7e2eb5b7329b6b5f781e7aaad23a5b
     template_sources:
     - gem.gemspec.example
   gemfiles/modular/benchmark/r4/v0.5.gemfile:
@@ -510,7 +510,7 @@ files:
     recipe: template_source_application_lib_citrus_toml_merge_version_rb
     action: write
     dest_sha256: db0a417b72f1be10de38c96f6b0bbf3b4f39a03c57300a3f438693306683a3eb
-    input_fingerprint: d7caed2b0c10202dfdfb0a814bec883c89385a95dc423b7caf143013cceff1b8
+    input_fingerprint: 60d5095fea38c865f9ab7001de7505861709d01b3440fee151f65feb8f7c12b4
     template_sources:
     - lib/gem/version.rb.example
   sig/citrus/toml/merge.rbs:
