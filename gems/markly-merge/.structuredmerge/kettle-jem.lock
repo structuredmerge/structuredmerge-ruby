@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -503,14 +503,14 @@ files:
     recipe: template_source_application_lib_markly_merge_version_rb
     action: write
     dest_sha256: '049ed2a90effd28598495d36766f308d600161118784208bc246a7e8fc08cea2'
-    input_fingerprint: 70f9147523b080f8a9a72538068988758d6f80ce310652fdcc73de6410b014a8
+    input_fingerprint: 11175aa626cf62b8637911e784f2e37efa677d5e82c8aa129aaf48ea8ef2fc55
     template_sources:
     - lib/gem/version.rb.example
   markly-merge.gemspec:
     recipe: template_source_application_markly_merge_gemspec
     action: write
     dest_sha256: 447ceedf035ea409dd0de021d96a309516b630df796d91c338ba769bcc7e8a2d
-    input_fingerprint: 816c25615743dd9237a244644e753775399f098d900b360d536ff71b9e1000fd
+    input_fingerprint: 328b28d11e21ad3e557c6d66e33c01272716fa99b6c8416335756009d49afb68
     template_sources:
     - gem.gemspec.example
   sig/markly/merge.rbs:
