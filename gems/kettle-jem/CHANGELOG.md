@@ -1375,6 +1375,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve tracked project-owned Bundler binstubs during template bootstrap.
 
+- Preserve existing Version module includes when templating version files.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -4524,6 +4524,7 @@ module Kettle
             report.fetch(:recipe_reports).filter_map { |entry| entry[:relative_path] }
           )
         end
+        report[:version_bootstrap_source] = version_bootstrap_source_state(report, before_apply_files)
         with_event_phase(events, "write_template_files") do
           run_apply_phases(
             project_root,
@@ -4802,6 +4803,20 @@ module Kettle
         monorepo_subgem_kettle_config_profile_sync_step(project_root, report),
         kettle_jem_state_sync_step(project_root, report)
       ].compact
+    end
+
+    def version_bootstrap_source_state(report, before_apply_files)
+      facts = report.fetch(:facts, {})
+      entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
+      return {} if entrypoint_require.empty?
+
+      version_path = File.join("lib", entrypoint_require, "version.rb")
+      content = before_apply_files.fetch(version_path, nil)
+      return {} unless content
+
+      {
+        preserve_version_module_include: version_file_includes_version_module?(content)
+      }
     end
 
     def modular_dependency_conflict_resolution_step(project_root)
@@ -5332,7 +5347,12 @@ module Kettle
 
       unless version_gem_runtime_compatible?(facts)
         return [
-          old_ruby_version_bootstrap_step(project_root, report, entrypoint_require: entrypoint_require),
+          old_ruby_version_bootstrap_step(
+            project_root,
+            report,
+            entrypoint_require: entrypoint_require,
+            preserve_version_module_include: report.dig(:version_bootstrap_source, :preserve_version_module_include)
+          ),
           legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
         ].compact
       end
@@ -5353,6 +5373,7 @@ module Kettle
         project_root,
         facts,
         package_entrypoint_preexisting: package_entrypoint_preexisting,
+        preserve_version_module_include: report.dig(:version_bootstrap_source, :preserve_version_module_include),
         # The generic recipe renders module namespaces.  A destination entrypoint
         # can establish its outer namespace as a class (for example Month), which
         # the generated version file must reopen as that same class.
@@ -5381,7 +5402,7 @@ module Kettle
       end
     end
 
-    def old_ruby_version_bootstrap_step(project_root, report, entrypoint_require:)
+    def old_ruby_version_bootstrap_step(project_root, report, entrypoint_require:, preserve_version_module_include: nil)
       facts = report.fetch(:facts)
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_bootstrap", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
@@ -5412,7 +5433,7 @@ module Kettle
         namespace,
         entrypoint_path: entrypoint_path
       )
-      preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
+      preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path) if preserve_version_module_include.nil?
       unless templated_paths.include?(version_path) && outer_namespace_kind != :class
         version = facts.dig(:project_runtime, :version).to_s
         version = project_gemspec_version(project_root) if version.empty?
@@ -14821,7 +14842,7 @@ module Kettle
     end
 
     def version_gem_bootstrap_step_for_paths(project_root, facts, manage_version_file: true, manage_signature_file: true,
-      package_entrypoint_preexisting: true)
+      package_entrypoint_preexisting: true, preserve_version_module_include: nil)
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
 
@@ -14862,7 +14883,7 @@ module Kettle
       namespace_kinds = namespace_kinds.merge(version_namespace_kinds_from_facts(facts))
       namespace_superclasses = existing_version_namespace_superclasses(project_root, version_path, namespace)
       namespace_superclasses = namespace_superclasses.merge(version_namespace_superclasses_from_facts(facts))
-      preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path)
+      preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path) if preserve_version_module_include.nil?
 
       if manage_version_file
         changes << write_if_changed(
@@ -15634,7 +15655,11 @@ module Kettle
     end
 
     def existing_version_file_includes_version_module?(project_root, relative_path)
-      ruby_call_records(read_project_file(project_root, relative_path), :include).any? do |call|
+      version_file_includes_version_module?(read_project_file(project_root, relative_path))
+    end
+
+    def version_file_includes_version_module?(content)
+      ruby_call_records(content.to_s, :include).any? do |call|
         next false unless call.receiver.nil?
 
         arguments = call.arguments&.arguments || []

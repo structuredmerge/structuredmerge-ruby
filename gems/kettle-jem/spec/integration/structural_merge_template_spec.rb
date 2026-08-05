@@ -1085,6 +1085,60 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "preserves a Version module include when the version recipe runs first" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-module-include-recipe", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.version = "1.0.0"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: lib/gem/version.rb
+                target: lib/example/version.rb
+        YAML
+        "lib/example.rb" => <<~RUBY,
+          require_relative "example/version"
+
+          module Example
+          end
+        RUBY
+        "lib/example/version.rb" => <<~RUBY,
+          module Example
+            module Version
+              VERSION = "1.0.0"
+            end
+
+            VERSION = Version::VERSION
+            include Version
+          end
+        RUBY
+        "template/lib/gem/version.rb.example" => <<~RUBY
+          module Example
+            module Version
+              VERSION = "1.0.0"
+            end
+
+            VERSION = Version::VERSION
+          end
+        RUBY
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(File.read(File.join(root, "lib/example/version.rb"))).to include("include Version")
+    end
+  end
+
   it "requires a package entrypoint when it loads the nested version file" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
