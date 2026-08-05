@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -503,14 +503,14 @@ files:
     recipe: template_source_application_lib_markdown_merge_version_rb
     action: write
     dest_sha256: 7bba553f1954c57c0228db7a0e9e831d0b68f926bb057d7c46ecbb17daf9f43a
-    input_fingerprint: 3772198b8e62221875159c2d763ff618ed51086cdddec8f033f0f13f2611d073
+    input_fingerprint: b0186d3406504f4a64154a7bfe017c3c723329bbfdce6bf85fe30b1e8a480e5c
     template_sources:
     - lib/gem/version.rb.example
   markdown-merge.gemspec:
     recipe: template_source_application_markdown_merge_gemspec
     action: write
     dest_sha256: 555ca14ffb71aff2c4e9df30001aebbde3cd77dcd822fe6abc4094d026fac3e8
-    input_fingerprint: 01f31e751eb9e40cbabba3950c0f8da1b49da41ca88d7860c1e84156617a7858
+    input_fingerprint: d9975bb79814ce195fc4a90c813918fa0dfe204ef95f04da827b8864f7370d98
     template_sources:
     - gem.gemspec.example
   sig/markdown/merge.rbs:
