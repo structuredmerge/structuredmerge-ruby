@@ -1144,7 +1144,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
 
     migrated = described_class.send(:migrate_legacy_byebug_requires, source)
 
-    expect(migrated).to include('require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7")')
+    expect(migrated).to include('require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7") && ENV["CI"].nil? && ENV.fetch("DEBUG", "false").casecmp("true").zero?')
     expect(migrated).to include('require "rspec"')
     expect(migrated).not_to include("byebug")
     expect(migrated.scan('require "debug"').length).to eq(1)
@@ -1158,7 +1158,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
 
     migrated = described_class.send(:migrate_legacy_byebug_requires, source)
 
-    expect(migrated).to include('require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7")')
+    expect(migrated).to include('require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7") && ENV["CI"].nil? && ENV.fetch("DEBUG", "false").casecmp("true").zero?')
     expect(migrated).to include('require "debug" if load_debugger')
   end
 

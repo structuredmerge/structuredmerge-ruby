@@ -8291,7 +8291,7 @@ module Kettle
     end
 
     def guarded_debug_require
-      'require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7")'
+      'require "debug" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.7") && ENV["CI"].nil? && ENV.fetch("DEBUG", "false").casecmp("true").zero?'
     end
 
     def normalize_spec_helper_block_bindings(content, template_content)
