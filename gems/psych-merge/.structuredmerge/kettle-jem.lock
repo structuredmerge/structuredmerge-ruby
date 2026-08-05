@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -503,14 +503,14 @@ files:
     recipe: template_source_application_lib_psych_merge_version_rb
     action: write
     dest_sha256: eaf7e3527ac13694ff6638bcef1b3c8e59a499c8cf3500d0dfb43c5715db0116
-    input_fingerprint: 1bc07b7d711acfb8a49f2e0f4b5a39e2710ae81bd0cd6ec95eec2a2cda627c69
+    input_fingerprint: 8cbfa7b907308dfc9045e12fe27d126a8d06b1bd47cf8578ca2eaa343d17ed5f
     template_sources:
     - lib/gem/version.rb.example
   psych-merge.gemspec:
     recipe: template_source_application_psych_merge_gemspec
     action: write
     dest_sha256: acedd2254ad1c4718047955a71a3753ad9e55ef3137746644cd12e3a310f1644
-    input_fingerprint: 613a6f3aba1be28fe7a7e9d4628bd883c3942a22e5f5e074bb51626a9166fcd2
+    input_fingerprint: 90f9d00d9ce6a128114df658d85245f539e04a5b71e058d174bf244d07bdd8af
     template_sources:
     - gem.gemspec.example
   sig/psych/merge.rbs:
