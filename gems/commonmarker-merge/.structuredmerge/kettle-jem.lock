@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -237,7 +237,7 @@ files:
     recipe: template_source_application_commonmarker_merge_gemspec
     action: write
     dest_sha256: 8121649251fd5eb4f5332a8c63fa28777935cf7cffe3ce50e4854cdfda218d93
-    input_fingerprint: 91fb20396217a5b7260c75d120a885ef838cfe45c1d5c2cb235d428b23f9d419
+    input_fingerprint: f36f9768fc399733f69224a7893d3e6b2e2f8d03705d6e6a38a326280587b47b
     template_sources:
     - gem.gemspec.example
   gemfiles/modular/benchmark/r4/v0.5.gemfile:
@@ -510,7 +510,7 @@ files:
     recipe: template_source_application_lib_commonmarker_merge_version_rb
     action: write
     dest_sha256: 900621e1d427ad3d71832a82ce63721d579cc74728b02d59282337cd4b0a05e7
-    input_fingerprint: cec74d953a02d08803e8433168e701ac49a734e45b8539dd8789131a672c744c
+    input_fingerprint: 7bafc3fdc63e3ba3259c765d9ae642a5fde5b3e89228c78a7cd8dba912ae22b7
     template_sources:
     - lib/gem/version.rb.example
   sig/commonmarker/merge.rbs:
