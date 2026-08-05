@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -503,14 +503,14 @@ files:
     recipe: template_source_application_lib_rust_merge_version_rb
     action: write
     dest_sha256: dfbc3c980752573090b5b389cc8b29bd4c377433846d178acef4a8264d5b0e8b
-    input_fingerprint: 7f694461b5078ba5c6bf545de9e276efce5f8c07c7cc29efc29bf7fadb963186
+    input_fingerprint: c903022b1f08bcfe1369cc5aa3aaff2269eff25e2ca4613eb60a77903ba0d5af
     template_sources:
     - lib/gem/version.rb.example
   rust-merge.gemspec:
     recipe: template_source_application_rust_merge_gemspec
     action: write
     dest_sha256: 9692ee27762be87c467a4f2be6cd340f3dd2a9dfef14abafa44248c577eb874b
-    input_fingerprint: 8af4f7d9cc237b1d597b66dc4bc646dc9858fe9892754f846cef052ea30d1a5a
+    input_fingerprint: 8f77966daa77afd174a7a4b4926648d06bc3de92f4836be26b83c9a0fa714909
     template_sources:
     - gem.gemspec.example
   sig/rust/merge.rbs:
