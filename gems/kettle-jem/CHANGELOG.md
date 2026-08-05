@@ -1377,6 +1377,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve existing Version module includes when templating version files.
 
+- Generated workflows now pin the setup-ruby-flash revision that supports compatibility-bundle retries.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
