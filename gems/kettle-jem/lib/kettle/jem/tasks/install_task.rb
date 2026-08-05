@@ -973,21 +973,45 @@ module Kettle
 
         def prune_unwanted_bundler_binstubs(project_root)
           bin_dir = File.join(project_root.to_s, "bin")
-          removed = binstub_files(bin_dir).filter_map do |path|
+          removed = []
+          preserved = []
+          binstub_files(bin_dir).each do |path|
             basename = File.basename(path)
             next if curated_binstub?(path)
             next unless bundler_generated_binstub?(path)
 
+            if tracked_binstub?(project_root, path)
+              preserved << basename
+              next
+            end
+
             FileUtils.rm_f(path)
-            basename
+            removed << basename
           end
 
           {
             name: "bundle_binstub_pruning",
             status: removed.empty? ? "already_current" : "pruned",
             reason: removed.empty? ? "no_unwanted_bundler_binstubs" : "removed_unwanted_bundler_binstubs",
-            removed_binstubs: removed.sort
+            removed_binstubs: removed.sort,
+            preserved_binstubs: preserved.sort
           }
+        end
+
+        def tracked_binstub?(project_root, path)
+          relative_path = path.to_s.delete_prefix("#{File.expand_path(project_root.to_s)}/")
+          _stdout, _stderr, status = Open3.capture3(
+            "git",
+            "-C",
+            project_root.to_s,
+            "ls-files",
+            "--error-unmatch",
+            "--",
+            relative_path
+          )
+          status.success?
+        rescue StandardError
+          false
         end
 
         def binstub_files(bin_dir)

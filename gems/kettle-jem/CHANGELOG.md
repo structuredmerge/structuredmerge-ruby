@@ -1373,6 +1373,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve explicit class namespace superclasses when generating VersionGem version files.
 
+- Preserve tracked project-owned Bundler binstubs during template bootstrap.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
