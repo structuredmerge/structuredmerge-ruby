@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.0
-  applied_at: '2026-08-04'
+  applied_at: '2026-08-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260802-001
     last_entry_date: '2026-08-02'
@@ -230,7 +230,7 @@ files:
     recipe: template_source_application_ast_crispr_gemspec
     action: write
     dest_sha256: 72979f43c783f14c8049932f09bf4f84d8d6383282aa78bf1d8d4ed9e094820c
-    input_fingerprint: 25b340451d8289d528a1d2be88755abd86b578437eb5d44d1cbea1d713df26df
+    input_fingerprint: 54489468ee25b12753e05df444625793ca6d623a789440011555e12266ac57a2
     template_sources:
     - gem.gemspec.example
   certs/pboling.pem:
@@ -510,7 +510,7 @@ files:
     recipe: template_source_application_lib_ast_crispr_version_rb
     action: write
     dest_sha256: 8a854a00c4bea4d1cd33bf2885709781ff211d50d6b8fae0e31a3c73744e1453
-    input_fingerprint: fe4f9a7938e09c0eadb8ced801d948071600905c77908111f404c8619f44e6de
+    input_fingerprint: 830a2c04f7acb56de1d0f17285260df348f5260c55b289dbc65ba64a3b8183fa
     template_sources:
     - lib/gem/version.rb.example
   sig/ast/crispr.rbs:
