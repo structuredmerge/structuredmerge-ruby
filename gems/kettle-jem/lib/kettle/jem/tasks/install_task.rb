@@ -1010,7 +1010,7 @@ module Kettle
             relative_path
           )
           status.success?
-        rescue StandardError
+        rescue
           false
         end
 
