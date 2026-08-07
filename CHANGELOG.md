@@ -276,6 +276,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Version bootstrap repairs remove stale package-name requires when the discovered Ruby entrypoint uses a different require path.
 
+- Restore VERSION loading through the public ast/merge entrypoint.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

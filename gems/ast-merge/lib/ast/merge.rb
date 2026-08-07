@@ -3,6 +3,7 @@
 require 'find'
 require 'json'
 require 'token/resolver'
+require_relative 'merge/version'
 
 module Ast
   module Merge
