@@ -1047,17 +1047,17 @@ RSpec.describe TreeHaver do
       end
     end
 
-    described_class.register_language(
+    described_class.with_language_registration(
+      :rbs,
       :rbs,
       backend_module: backend,
-      backend_type: :rbs,
       gem_name: 'rbs'
-    )
+    ) do
+      parser = described_class.parser_for(:rbs)
 
-    parser = described_class.parser_for(:rbs)
-
-    expect(parser).to be_a(backend::Parser)
-    expect(parser.language).to eq(:rbs_language)
+      expect(parser).to be_a(backend::Parser)
+      expect(parser.language).to eq(:rbs_language)
+    end
   end
 
   it 'auto-selects an available registered backend module without explicit backend selection' do
