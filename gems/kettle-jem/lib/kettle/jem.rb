@@ -16606,7 +16606,10 @@ module Kettle
       compat_category = license_compat_category(licenses)
       copyright_prefix = polyform_licenses?(licenses) ? "Required Notice: " : ""
       copyright_lines = Array(copyright[:lines])
-      copyright_lines = license_txt[:copyright_lines] + copyright_lines if license_txt[:mit]
+      # Git blame is authoritative for generated LICENSE.md notices. A legacy
+      # MIT LICENSE.txt notice is only a fallback for projects without blame
+      # data, such as an unpacked source tree being templated for the first time.
+      copyright_lines = license_txt[:copyright_lines] if copyright_lines.empty? && license_txt[:mit]
       license_source_url = license_source_blob_url(source_url)
       compact_hash(
         spdx: licenses,
@@ -18637,7 +18640,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # retry compatibility bundle installation
+          uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -18749,7 +18752,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # retry compatibility bundle installation",
+        "        uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -19189,7 +19192,7 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # retry compatibility bundle installation",
+        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1",
         "ruby/setup-ruby" => "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",

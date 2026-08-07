@@ -1387,6 +1387,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate MIT LICENSE.txt copyright notices safely and preserve custom license files with an unlabelled LICENSE.md link.
 
+- Keep git-blame copyright facts authoritative when migrating legacy MIT LICENSE.txt files.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
