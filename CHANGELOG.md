@@ -20,6 +20,27 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Ensure monorepo subgems receive JSON coverage formatter settings in mise.toml.
+
+### Security
+
+## [7.1.0] - 2026-08-07
+
+- TAG: [v7.1.0][7.1.0t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 73.97% documented
+
+### Added
+
 - `ast-crispr` now provides `Ast::Crispr::DeleteBatch` for deleting matches from
   multiple structural selectors through one parsed document context.
 - `zip-merge` now registers a Kaitai-backed `TreeHaver.parser_for(:zip)` path
@@ -133,8 +154,6 @@ Please file a bug if you notice a violation of semantic versioning.
   through Ruby object rendering.
 
 - Replace legacy byebug-named Gemfile dependencies with debug during templating.
-
-### Deprecated
 
 ### Removed
 
@@ -284,8 +303,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Make the TreeHaver documentation examples pass YARD lint.
 
-### Security
-
 ## [7.0.0] - 2026-05-05
 
 - TAG: [v7.0.0][7.0.0t]
@@ -295,6 +312,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.0...HEAD
+[7.1.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...v7.1.0
+[7.1.0t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.0
 [7.0.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/0aae485e7ca20583b73f8c146f467a64e526ca41...v7.0.0
 [7.0.0t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.0.0
