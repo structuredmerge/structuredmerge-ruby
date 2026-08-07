@@ -2,6 +2,7 @@
 
 require 'ast/crispr'
 require 'markly/merge'
+require_relative 'markly/version'
 
 module Ast
   module Crispr

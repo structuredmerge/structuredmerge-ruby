@@ -2,6 +2,7 @@
 
 require 'ast/crispr'
 require 'prism/merge'
+require_relative 'prism/version'
 
 module Ast
   module Crispr
