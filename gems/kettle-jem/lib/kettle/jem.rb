@@ -132,6 +132,7 @@ module Kettle
       "PolyForm-Noncommercial-1.0.0.md",
       "PolyForm-Small-Business-1.0.0.md",
       "Big-Time-Public-License.md",
+      "mise.toml",
       "Gemfile",
       "certs/pboling.pem",
       "tmp/.gitignore"

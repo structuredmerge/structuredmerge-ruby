@@ -642,6 +642,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         "README.md",
         {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
         "LICENSE.md",
+        "mise.toml",
         "Gemfile",
         "gemfiles/modular/coverage.gemfile",
         "gemfiles/modular/debug.gemfile",
