@@ -6,6 +6,14 @@ PATH
       toml-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.15)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/toml-merge
+  specs:
+    toml-merge (7.1.0)
+      ast-merge (= 7.1.0)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.15)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -368,10 +376,6 @@ GEM
       version_gem (~> 1.1, >= 1.1.15)
     toml (0.3.0)
       parslet (>= 1.8.0, < 3.0.0)
-    toml-merge (7.1.0)
-      ast-merge (= 7.1.0)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.15)
     tree_haver (7.1.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
@@ -462,6 +466,7 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8)
   stringio (>= 3.0)
+  toml-merge!
   turbo_tests2 (~> 3.2, >= 3.2.4)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.4)

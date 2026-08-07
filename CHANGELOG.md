@@ -28,15 +28,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Ensure monorepo subgems receive JSON coverage formatter settings in mise.toml.
-
 ### Security
 
 ## [7.1.0] - 2026-08-07
 
 - TAG: [v7.1.0][7.1.0t]
-- COVERAGE: 0.00% -- 0/0 lines in 0 files
-- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- COVERAGE: 47.23% -- 1579/3343 lines in 37 files
+- BRANCH COVERAGE: 13.61% -- 188/1381 branches in 37 files
 - 73.97% documented
 
 ### Added
@@ -302,6 +300,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Restore version loading for AST Crispr adapter entrypoints.
 
 - Make the TreeHaver documentation examples pass YARD lint.
+
+- Ensure monorepo subgems receive JSON coverage formatter settings in mise.toml.
 
 ## [7.0.0] - 2026-05-05
 
