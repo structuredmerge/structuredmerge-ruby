@@ -1391,6 +1391,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Monorepo subgem mise templates no longer enforce aggregate coverage thresholds during per-gem release checks.
 
+- Exclude the intentional vHEAD.gemfile appraisal filename from templated RuboCop filename checks.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
