@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Expose separate family-root test and lint tasks in mise configuration.
+
 ### Deprecated
 
 ### Removed
