@@ -117,7 +117,6 @@ jobs:
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
-          bundle config set path vendor/bundle
           bundle config set frozen false
           bundle install --jobs 4
       - name: Run checks
@@ -183,7 +182,6 @@ jobs:
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
-          bundle config set path vendor/bundle
           bundle config set frozen false
           bundle install --jobs 4
       - name: Run cold-cache TSLP checks

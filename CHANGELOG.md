@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Point setup-ruby-flash at each monorepo gem before installing pre-bundle templating gems.
 
+- Keep setup-ruby-flash preinstalled templating gems visible during monorepo Bundler evaluation.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
