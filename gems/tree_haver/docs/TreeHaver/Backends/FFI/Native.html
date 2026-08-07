@@ -6,7 +6,7 @@
 <title>
   Module: TreeHaver::Backends::FFI::Native
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -348,11 +348,11 @@ This prevents polluting the Ruby environment at require time.</p>
 </span>  <span class='comment'># Mirrors the C struct layout used by tree-sitter
 </span>  <span class='id identifier rubyid_ts_node_class'>ts_node_class</span> <span class='op'>=</span> <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Struct</span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_layout'>layout</span> <span class='symbol'>:context</span><span class='comma'>,</span>
-      <span class='lbracket'>[</span><span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='int'>4</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='symbol'>:id</span><span class='comma'>,</span>
-      <span class='symbol'>:pointer</span><span class='comma'>,</span>
-      <span class='symbol'>:tree</span><span class='comma'>,</span>
-      <span class='symbol'>:pointer</span>
+           <span class='lbracket'>[</span><span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='int'>4</span><span class='rbracket'>]</span><span class='comma'>,</span>
+           <span class='symbol'>:id</span><span class='comma'>,</span>
+           <span class='symbol'>:pointer</span><span class='comma'>,</span>
+           <span class='symbol'>:tree</span><span class='comma'>,</span>
+           <span class='symbol'>:pointer</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='symbol'>:TSNode</span><span class='comma'>,</span> <span class='id identifier rubyid_ts_node_class'>ts_node_class</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_typedef'>typedef</span><span class='lparen'>(</span><span class='id identifier rubyid_ts_node_class'>ts_node_class</span><span class='period'>.</span><span class='id identifier rubyid_by_value'>by_value</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
@@ -416,9 +416,9 @@ This prevents polluting the Ruby environment at require time.</p>
 </span>  <span class='comment'># Mirrors the C struct layout: struct { uint32_t row; uint32_t column; }
 </span>  <span class='id identifier rubyid_ts_point_class'>ts_point_class</span> <span class='op'>=</span> <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Struct</span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_layout'>layout</span> <span class='symbol'>:row</span><span class='comma'>,</span>
-      <span class='symbol'>:uint32</span><span class='comma'>,</span>
-      <span class='symbol'>:column</span><span class='comma'>,</span>
-      <span class='symbol'>:uint32</span>
+           <span class='symbol'>:uint32</span><span class='comma'>,</span>
+           <span class='symbol'>:column</span><span class='comma'>,</span>
+           <span class='symbol'>:uint32</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='symbol'>:TSPoint</span><span class='comma'>,</span> <span class='id identifier rubyid_ts_point_class'>ts_point_class</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_typedef'>typedef</span><span class='lparen'>(</span><span class='id identifier rubyid_ts_point_class'>ts_point_class</span><span class='period'>.</span><span class='id identifier rubyid_by_value'>by_value</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rparen'>)</span>
@@ -467,6 +467,19 @@ This prevents polluting the Ruby environment at require time.</p>
     </li>
   
 </ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">TreeHaver::NotAvailable</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -474,8 +487,6 @@ This prevents polluting the Ruby environment at require time.</p>
       <pre class="lines">
 
 
-150
-151
 152
 153
 154
@@ -489,14 +500,12 @@ This prevents polluting the Ruby environment at require time.</p>
 162</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 150</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_ffi_extended!'>ensure_ffi_extended!</span>
   <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='ivar'>@ffi_extended</span>
 
-  <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../FFI.html" title="TreeHaver::Backends::FFI (module)">FFI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ffi_gem_available?'><span class='object_link'><a href="../FFI.html#ffi_gem_available%3F-class_method" title="TreeHaver::Backends::FFI.ffi_gem_available? (method)">ffi_gem_available?</a></span></span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI gem is not available</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FFI gem is not available</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../FFI.html" title="TreeHaver::Backends::FFI (module)">FFI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ffi_gem_available?'><span class='object_link'><a href="../FFI.html#ffi_gem_available%3F-class_method" title="TreeHaver::Backends::FFI.ffi_gem_available? (method)">ffi_gem_available?</a></span></span>
 
   <span class='id identifier rubyid_extend'>extend</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Library</span><span class='rparen'>)</span>
 
@@ -581,12 +590,12 @@ If TREE_SITTER_RUNTIME_LIB is set, it is tried first.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lib_candidates'>lib_candidates</span>
   <span class='lbracket'>[</span>
-    <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.so.0</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.dylib</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.dll</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>libtree-sitter.so.0</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>libtree-sitter.dylib</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>libtree-sitter.dll</span><span class='tstring_end'>&#39;</span></span>
   <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -790,11 +799,11 @@ After loading, attaches FFI function definitions for the tree-sitter API.</p>
   <span class='id identifier rubyid_ensure_ffi_extended!'>ensure_ffi_extended!</span>
 
   <span class='comment'># Warn about potential conflicts with MRI backend
-</span>  <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='op'>::</span><span class='const'>Parser</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TreeHaver: FFI backend loading after ruby_tree_sitter (MRI backend). </span><span class='tstring_end'>&quot;</span></span> \
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This may cause symbol conflicts due to different libtree-sitter versions. </span><span class='tstring_end'>&quot;</span></span> \
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Consider using only one backend per process, or set TREE_SITTER_RUNTIME_LIB </span><span class='tstring_end'>&quot;</span></span> \
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>to match the version used by ruby_tree_sitter.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='gvar'>$VERBOSE</span>
+</span>  <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='op'>::</span><span class='const'>Parser</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='gvar'>$VERBOSE</span>
+    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TreeHaver: FFI backend loading after ruby_tree_sitter (MRI backend). </span><span class='tstring_end'>&#39;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This may cause symbol conflicts due to different libtree-sitter versions. </span><span class='tstring_end'>&#39;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Consider using only one backend per process, or set TREE_SITTER_RUNTIME_LIB </span><span class='tstring_end'>&#39;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>to match the version used by ruby_tree_sitter.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_last_error'>last_error</span> <span class='op'>=</span> <span class='kw'>nil</span>
@@ -805,21 +814,21 @@ After loading, attaches FFI function definitions for the tree-sitter API.</p>
     <span class='id identifier rubyid_lib_loaded'>lib_loaded</span> <span class='op'>=</span> <span class='kw'>true</span>
     <span class='kw'>break</span>
   <span class='kw'>rescue</span> <span class='const'>LoadError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-    <span class='comment'># Note: FFI::NotFoundError inherits from LoadError, so it&#39;s caught here too
+    <span class='comment'># NOTE: FFI::NotFoundError inherits from LoadError, so it&#39;s caught here too
 </span>    <span class='id identifier rubyid_last_error'>last_error</span> <span class='op'>=</span> <span class='id identifier rubyid_e'>e</span>
   <span class='kw'>end</span>
 
   <span class='kw'>unless</span> <span class='id identifier rubyid_lib_loaded'>lib_loaded</span>
-    <span class='comment'># :nocov:
-</span>    <span class='id identifier rubyid_tried'>tried</span> <span class='op'>=</span> <span class='id identifier rubyid_candidates'>candidates</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_env_hint'>env_hint</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> TREE_SITTER_RUNTIME_LIB=</span><span class='embexpr_beg'>#{</span><span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+    <span class='comment'># simplecov:disable
+</span>    <span class='id identifier rubyid_tried'>tried</span> <span class='op'>=</span> <span class='id identifier rubyid_candidates'>candidates</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>, </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_env_hint'>env_hint</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> TREE_SITTER_RUNTIME_LIB=</span><span class='embexpr_beg'>#{</span><span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
     <span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_last_error'>last_error</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load libtree-sitter (tried: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tried'>tried</span><span class='embexpr_end'>}</span><span class='tstring_content'>).</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_hint'>env_hint</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_error'>last_error</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_error'>last_error</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-    <span class='kw'>else</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load libtree-sitter (tried: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tried'>tried</span><span class='embexpr_end'>}</span><span class='tstring_content'>).</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_hint'>env_hint</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-    <span class='kw'>end</span>
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load libtree-sitter (tried: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tried'>tried</span><span class='embexpr_end'>}</span><span class='tstring_content'>).</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_hint'>env_hint</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_error'>last_error</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_error'>last_error</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='kw'>else</span>
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load libtree-sitter (tried: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tried'>tried</span><span class='embexpr_end'>}</span><span class='tstring_content'>).</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_hint'>env_hint</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='kw'>end</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span>
-    <span class='comment'># :nocov:
+    <span class='comment'># simplecov:enable
 </span>  <span class='kw'>end</span>
 
   <span class='comment'># Attach functions after lib is selected
@@ -827,16 +836,16 @@ After loading, attaches FFI function definitions for the tree-sitter API.</p>
 </span>  <span class='comment'># so these attach_function calls will fail on TruffleRuby.
 </span>  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_new</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_delete</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:void</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_set_language</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_parse_string</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='comma'>,</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_set_language</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>pointer</span><span class='words_sep'> </span><span class='tstring_content'>pointer</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_parse_string</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>pointer</span><span class='words_sep'> </span><span class='tstring_content'>pointer</span><span class='words_sep'> </span><span class='tstring_content'>string</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_tree_delete</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:void</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_tree_root_node</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:string</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child_count</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child_by_field_name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child_by_field_name</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>string</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_start_byte</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_end_byte</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_start_point</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rparen'>)</span>
@@ -852,14 +861,14 @@ After loading, attaches FFI function definitions for the tree-sitter API.</p>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_prev_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_next_named_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_prev_named_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_child</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_child</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_child_count</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
 
   <span class='comment'># Descendant lookup functions
-</span>  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_descendant_for_byte_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_descendant_for_point_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_descendant_for_byte_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_descendant_for_point_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_descendant_for_byte_range</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_descendant_for_point_range</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>ts_point</span><span class='words_sep'> </span><span class='tstring_content'>ts_point</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_descendant_for_byte_range</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='words_sep'> </span><span class='tstring_content'>uint32</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_descendant_for_point_range</span><span class='comma'>,</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>ts_node</span><span class='words_sep'> </span><span class='tstring_content'>ts_point</span><span class='words_sep'> </span><span class='tstring_content'>ts_point</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
 
   <span class='comment'># Only mark as fully loaded after all attach_function calls succeed
 </span>  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -937,9 +946,9 @@ After loading, attaches FFI function definitions for the tree-sitter API.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

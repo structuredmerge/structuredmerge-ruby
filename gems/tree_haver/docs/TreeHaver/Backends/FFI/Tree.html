@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Backends::FFI::Tree
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -273,13 +273,13 @@
       <pre class="lines">
 
 
-644
-645
 646
-647</pre>
+647
+648
+649</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 644</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 646</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_ptr'>ptr</span><span class='rparen'>)</span>
   <span class='ivar'>@ptr</span> <span class='op'>=</span> <span class='id identifier rubyid_ptr'>ptr</span>
@@ -343,8 +343,6 @@ creating a Tree object.</p>
       <pre class="lines">
 
 
-659
-660
 661
 662
 663
@@ -354,10 +352,12 @@ creating a Tree object.</p>
 667
 668
 669
-670</pre>
+670
+671
+672</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 659</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 661</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_finalizer'>finalizer</span><span class='lparen'>(</span><span class='id identifier rubyid_ptr'>ptr</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span>
@@ -424,13 +424,13 @@ creating a Tree object.</p>
       <pre class="lines">
 
 
-676
-677
 678
-679</pre>
+679
+680
+681</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 676</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 678</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_node'>root_node</span>
   <span class='id identifier rubyid_node_val'>node_val</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_tree_root_node'>ts_tree_root_node</span><span class='lparen'>(</span><span class='ivar'>@ptr</span><span class='rparen'>)</span>
@@ -446,9 +446,9 @@ creating a Tree object.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:40 2026 by
+  Generated on Thu Aug  6 23:38:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

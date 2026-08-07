@@ -6,7 +6,7 @@
 <title>
   Module: TreeHaver::LanguageRegistry
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -120,7 +120,25 @@ switching, benchmarking, and fallback scenarios.</p>
 <p>External gems can register their own backend types using the same API.</p>
 
 <p>Registration structure:</p>
-<pre class="code language-ruby"><code class="language-ruby">}
+<pre class="code language-ruby"><code class="language-ruby">registrations = {
+  toml: {
+    tree_sitter: { path: &quot;/path/to/lib.so&quot;, symbol: &quot;tree_sitter_toml&quot; },
+    citrus: { grammar_module: TomlRB::Document, gem_name: &quot;toml-rb&quot; }
+  },
+  ruby: {
+    prism: { backend_module: TreeHaver::Backends::Prism }
+  },
+  yaml: {
+    psych: { backend_module: TreeHaver::Backends::Psych }
+  },
+  markdown: {
+    commonmarker: { backend_module: TreeHaver::Backends::Commonmarker },
+    markly: { backend_module: TreeHaver::Backends::Markly }
+  },
+  rbs: {
+    rbs: { backend_module: Rbs::Merge::Backends::RbsBackend }  # External
+  }
+}
 </code></pre>
 
 <pre class="code language-ruby"><code class="language-ruby">  TreeHaver::LanguageRegistry.register(:toml, :tree_sitter,
@@ -295,6 +313,29 @@ switching, benchmarking, and fallback scenarios.</p>
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#with_registration-class_method" title="with_registration (class method)">.<strong>with_registration</strong>(name, backend_type, **config)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
     </ul>
     
   
@@ -345,16 +386,16 @@ Primarily used in tests to reset state between test cases.</p>
       <pre class="lines">
 
 
-182
-183
-184
-185
-186
-187
-188</pre>
+213
+214
+215
+216
+217
+218
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 182</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 213</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear'>clear</span>
   <span class='ivar'>@mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -408,13 +449,13 @@ will recompute the value. Does not clear registrations.</p>
       <pre class="lines">
 
 
-169
-170
-171
-172</pre>
+200
+201
+202
+203</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 169</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 200</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear_cache!'>clear_cache!</span>
   <span class='ivar'>@mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='lbrace'>{</span> <span class='ivar'>@cache</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span> <span class='rbrace'>}</span>
@@ -521,20 +562,22 @@ Otherwise, the block is called to compute the value, which is then cached.</p>
       <pre class="lines">
 
 
-153
-154
-155
-156
-157
-158
-159</pre>
+183
+184
+185
+186
+187
+188
+189
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 153</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 183</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='ivar'>@mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
     <span class='kw'>return</span> <span class='ivar'>@cache</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='ivar'>@cache</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+
     <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>yield</span>
     <span class='ivar'>@cache</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
   <span class='kw'>end</span>
@@ -859,21 +902,21 @@ can be registered for the same language without conflict.</p>
       <pre class="lines">
 
 
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138</pre>
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 157</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_registered'>registered</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_backend_type'>backend_type</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -892,14 +935,110 @@ can be registered for the same language without conflict.</p>
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="with_registration-class_method">
+  
+    .<strong>with_registration</strong>(name, backend_type, **config)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_registry.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_with_registration'>with_registration</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_backend_type'>backend_type</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='id identifier rubyid_backend_key'>backend_key</span> <span class='op'>=</span> <span class='id identifier rubyid_backend_type'>backend_type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='id identifier rubyid_original'>original</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_had_language'>had_language</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='id identifier rubyid_had_backend'>had_backend</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+  <span class='ivar'>@mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_had_language'>had_language</span> <span class='op'>=</span> <span class='ivar'>@registrations</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_had_backend'>had_backend</span> <span class='op'>=</span> <span class='ivar'>@registrations</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_key'>backend_key</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_original'>original</span> <span class='op'>=</span> <span class='ivar'>@registrations</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend_key'>backend_key</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dup'>dup</span>
+    <span class='ivar'>@registrations</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@registrations</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend_key'>backend_key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+    <span class='ivar'>@cache</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>yield</span>
+<span class='kw'>ensure</span>
+  <span class='ivar'>@mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_had_backend'>had_backend</span>
+      <span class='ivar'>@registrations</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend_key'>backend_key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_original'>original</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_had_language'>had_language</span>
+      <span class='ivar'>@registrations</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_key'>backend_key</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='ivar'>@registrations</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+    <span class='ivar'>@cache</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

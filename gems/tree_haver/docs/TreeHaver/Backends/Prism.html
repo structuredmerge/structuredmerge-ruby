@@ -6,7 +6,7 @@
 <title>
   Module: TreeHaver::Backends::Prism
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -289,26 +289,28 @@ and is the future of Ruby parsing (used by CRuby, JRuby, TruffleRuby).</p>
 50
 51
 52
-53</pre>
+53
+54</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/prism.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available?'>available?</span>
-  <span class='kw'>return</span> <span class='ivar'>@loaded</span> <span class='kw'>if</span> <span class='ivar'>@load_attempted</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>begin</span>
-    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism</span><span class='tstring_end'>&quot;</span></span>
-    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>rescue</span> <span class='const'>LoadError</span>
-    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>rescue</span> <span class='const'>StandardError</span>
-    <span class='comment'># :nocov: defensive code - StandardError during require is extremely rare
-</span>    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>    <span class='comment'># :nocov:
+  <span class='kw'>return</span> <span class='ivar'>@loaded</span> <span class='kw'>if</span> <span class='ivar'>@load_attempted</span>
+
+  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>begin</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>prism</span><span class='tstring_end'>&#39;</span></span>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>rescue</span> <span class='const'>LoadError</span>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='kw'>rescue</span> <span class='const'>StandardError</span>
+    <span class='comment'># simplecov:disable defensive code - StandardError during require is extremely rare
+</span>    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='comment'># simplecov:enable
 </span>  <span class='kw'>end</span>
-  <span class='ivar'>@loaded</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span><span class='kw'>end</span></pre>
+  <span class='ivar'>@loaded</span>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -365,7 +367,6 @@ and is the future of Ruby parsing (used by CRuby, JRuby, TruffleRuby).</p>
       <pre class="lines">
 
 
-70
 71
 72
 73
@@ -378,13 +379,16 @@ and is the future of Ruby parsing (used by CRuby, JRuby, TruffleRuby).</p>
 80
 81
 82
-83</pre>
+83
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/prism.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/prism.rb', line 71</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
+
   <span class='lbrace'>{</span>
     <span class='label'>backend:</span> <span class='symbol'>:prism</span><span class='comma'>,</span>
     <span class='label'>query:</span> <span class='kw'>false</span><span class='comma'>,</span>           <span class='comment'># Prism doesn&#39;t have tree-sitter-style queries (has pattern matching)
@@ -394,7 +398,7 @@ and is the future of Ruby parsing (used by CRuby, JRuby, TruffleRuby).</p>
 </span>    <span class='label'>ruby_only:</span> <span class='kw'>true</span><span class='comma'>,</span>        <span class='comment'># Prism only parses Ruby source code
 </span>    <span class='label'>error_tolerant:</span> <span class='kw'>true</span><span class='comma'>,</span>   <span class='comment'># Prism has excellent error recovery
 </span>    <span class='label'>comment_support:</span> <span class='symbol'>:partial</span><span class='comma'>,</span>
-    <span class='label'>comment_attachment_hints:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>comment_attachment_hints:</span> <span class='kw'>true</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -431,18 +435,18 @@ and is the future of Ruby parsing (used by CRuby, JRuby, TruffleRuby).</p>
       <pre class="lines">
 
 
-59
 60
 61
-62</pre>
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/prism.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/prism.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset!'>reset!</span>
-  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span><span class='kw'>end</span></pre>
+  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -453,9 +457,9 @@ and is the future of Ruby parsing (used by CRuby, JRuby, TruffleRuby).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -186,7 +186,14 @@ module TreeHaver
     # @return [Boolean] true if {#edit} can be called on this tree
     # @example
     #   if tree.supports_editing?
-    #     tree.edit(...)
+    #     tree.edit(
+    #       start_byte: 4,
+    #       old_end_byte: 5,
+    #       new_end_byte: 6,
+    #       start_point: {row: 0, column: 4},
+    #       old_end_point: {row: 0, column: 5},
+    #       new_end_point: {row: 0, column: 6}
+    #     )
     #     new_tree = parser.parse_string(tree, edited_source)
     #   else
     #     # Fall back to full re-parse

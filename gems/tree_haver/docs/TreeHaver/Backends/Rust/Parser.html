@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Backends::Rust::Parser
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -272,16 +272,18 @@
       <pre class="lines">
 
 
-189
-190
 191
-192</pre>
+192
+193
+194
+195</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 191</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree_stump not available</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Rust.html" title="TreeHaver::Backends::Rust (module)">Rust</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../Rust.html#available%3F-class_method" title="TreeHaver::Backends::Rust.available? (method)">available?</a></span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree_stump not available</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Rust.html" title="TreeHaver::Backends::Rust (module)">Rust</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../Rust.html#available%3F-class_method" title="TreeHaver::Backends::Rust.available? (method)">available?</a></span></span>
+
   <span class='ivar'>@parser</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>TreeStump</span><span class='op'>::</span><span class='const'>Parser</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -361,16 +363,16 @@ For backward compatibility and backend tests, also handles Language wrapper.</p>
       <pre class="lines">
 
 
-202
-203
-204
 205
 206
 207
-208</pre>
+208
+209
+210
+211</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 202</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 205</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_language='>language=</span><span class='lparen'>(</span><span class='id identifier rubyid_lang'>lang</span><span class='rparen'>)</span>
   <span class='comment'># Extract language name (handle both wrapper and raw string)
@@ -445,13 +447,13 @@ For backward compatibility and backend tests, also handles Language wrapper.</p>
       <pre class="lines">
 
 
-214
-215
-216
-217</pre>
+217
+218
+219
+220</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 214</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 217</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='comment'># Return raw tree_stump tree - TreeHaver::Parser will wrap it
@@ -541,14 +543,14 @@ The parse method always does a full parse, ignoring old_tree.</p>
       <pre class="lines">
 
 
-227
-228
-229
 230
-231</pre>
+231
+232
+233
+234</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 227</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 230</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_string'>parse_string</span><span class='lparen'>(</span><span class='id identifier rubyid_old_tree'>old_tree</span><span class='comma'>,</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span> <span class='comment'># rubocop:disable Lint/UnusedMethodArgument
 </span>  <span class='comment'># TreeStump&#39;s parse method only accepts source as a single argument
@@ -565,9 +567,9 @@ The parse method always does a full parse, ignoring old_tree.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:41 2026 by
+  Generated on Thu Aug  6 23:38:03 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

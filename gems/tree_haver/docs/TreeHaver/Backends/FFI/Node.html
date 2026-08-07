@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Backends::FFI::Node
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -806,13 +806,13 @@ tree-sitter C library. The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-718
-719
 720
-721</pre>
+721
+722
+723</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 718</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 720</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_ts_node_value'>ts_node_value</span><span class='rparen'>)</span>
   <span class='comment'># Store by-value struct (FFI will copy); methods pass it back by value
@@ -902,9 +902,6 @@ tree-sitter C library. The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-991
-992
-993
 994
 995
 996
@@ -912,10 +909,13 @@ tree-sitter C library. The wrapper adds Ruby-level conveniences.</p>
 998
 999
 1000
-1001</pre>
+1001
+1002
+1003
+1004</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 991</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 994</span>
 
 <span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="TreeHaver::Backends::FFI::Node (class)">Node</a></span></span><span class='rparen'>)</span>
@@ -998,17 +998,19 @@ tree-sitter C library. The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-741
-742
 743
 744
-745</pre>
+745
+746
+747
+748</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 741</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 743</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_child_count'>child_count</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+
   <span class='id identifier rubyid_child_node'>child_node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_child'>ts_node_child</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="" title="TreeHaver::Backends::FFI::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Backends::FFI::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1097,17 +1099,17 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-757
-758
-759
 760
 761
 762
 763
-764</pre>
+764
+765
+766
+767</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 757</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 760</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_by_field_name'>child_by_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='const'>String</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='rparen'>)</span>
@@ -1168,12 +1170,12 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-733
-734
-735</pre>
+735
+736
+737</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 733</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 735</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_count'>child_count</span>
   <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_child_count'>ts_node_child_count</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -1263,15 +1265,15 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-906
-907
-908
 909
 910
-911</pre>
+911
+912
+913
+914</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 906</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 909</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_descendant_for_byte_range'>descendant_for_byte_range</span><span class='lparen'>(</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='comma'>,</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_descendant_for_byte_range'>ts_node_descendant_for_byte_range</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='comma'>,</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='comma'>,</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='rparen'>)</span>
@@ -1364,9 +1366,6 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-930
-931
-932
 933
 934
 935
@@ -1377,10 +1376,13 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
 940
 941
 942
-943</pre>
+943
+944
+945
+946</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 930</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 933</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_descendant_for_point_range'>descendant_for_point_range</span><span class='lparen'>(</span><span class='id identifier rubyid_start_point'>start_point</span><span class='comma'>,</span> <span class='id identifier rubyid_end_point'>end_point</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_start_pt'>start_pt</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='op'>::</span><span class='const'>TSPoint</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -1466,9 +1468,6 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-969
-970
-971
 972
 973
 974
@@ -1477,10 +1476,13 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
 977
 978
 979
-980</pre>
+980
+981
+982
+983</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 969</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 972</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each'>each</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span><span class='lparen'>(</span><span class='symbol'>:each</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
@@ -1541,12 +1543,12 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-776
-777
-778</pre>
+779
+780
+781</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 776</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 779</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_byte'>end_byte</span>
   <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_end_byte'>ts_node_end_byte</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -1602,14 +1604,14 @@ For example, in JSON, a “pair” node has “key” and “value” fields.</p
       <pre class="lines">
 
 
-792
-793
-794
 795
-796</pre>
+796
+797
+798
+799</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 792</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 795</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_point'>end_point</span>
   <span class='id identifier rubyid_point'>point</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_end_point'>ts_node_end_point</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -1670,14 +1672,14 @@ This is the FFI equivalent of tree-sitter’s ts_node_has_error.</p>
       <pre class="lines">
 
 
-804
-805
-806
 807
-808</pre>
+808
+809
+810
+811</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 804</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 807</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_error?'>has_error?</span>
   <span class='comment'># Explicit boolean conversion ensures consistent behavior across Ruby versions
@@ -1739,12 +1741,12 @@ to allow parsing to continue despite syntax errors.</p>
       <pre class="lines">
 
 
-817
-818
-819</pre>
+820
+821
+822</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 817</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 820</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_missing?'>missing?</span>
   <span class='op'>!</span><span class='op'>!</span><span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_is_missing'>ts_node_is_missing</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -1803,12 +1805,12 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-827
-828
-829</pre>
+830
+831
+832</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 827</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 830</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named?'>named?</span>
   <span class='op'>!</span><span class='op'>!</span><span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_is_named'>ts_node_is_named</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -1883,17 +1885,17 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-885
-886
-887
 888
 889
 890
 891
-892</pre>
+892
+893
+894
+895</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 885</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 888</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_child'>named_child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&lt;</span> <span class='int'>0</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_named_child_count'>named_child_count</span>
@@ -1954,12 +1956,12 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-897
-898
-899</pre>
+900
+901
+902</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 897</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 900</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_child_count'>named_child_count</span>
   <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_named_child_count'>ts_node_named_child_count</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2049,15 +2051,15 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-918
-919
-920
 921
 922
-923</pre>
+923
+924
+925
+926</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 918</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 921</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_descendant_for_byte_range'>named_descendant_for_byte_range</span><span class='lparen'>(</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='comma'>,</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_named_descendant_for_byte_range'>ts_node_named_descendant_for_byte_range</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='comma'>,</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='comma'>,</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='rparen'>)</span>
@@ -2150,9 +2152,6 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-950
-951
-952
 953
 954
 955
@@ -2163,10 +2162,13 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
 960
 961
 962
-963</pre>
+963
+964
+965
+966</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 950</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 953</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_descendant_for_point_range'>named_descendant_for_point_range</span><span class='lparen'>(</span><span class='id identifier rubyid_start_point'>start_point</span><span class='comma'>,</span> <span class='id identifier rubyid_end_point'>end_point</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_start_pt'>start_pt</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='op'>::</span><span class='const'>TSPoint</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -2233,15 +2235,15 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-864
-865
-866
 867
 868
-869</pre>
+869
+870
+871
+872</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 864</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 867</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_named_sibling'>next_named_sibling</span>
   <span class='id identifier rubyid_sibling'>sibling</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_next_named_sibling'>ts_node_next_named_sibling</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2300,15 +2302,15 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-844
-845
-846
 847
 848
-849</pre>
+849
+850
+851
+852</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 844</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 847</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span>
   <span class='id identifier rubyid_sibling'>sibling</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_next_sibling'>ts_node_next_sibling</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2367,15 +2369,15 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-834
-835
-836
 837
 838
-839</pre>
+839
+840
+841
+842</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 834</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 837</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parent'>parent</span>
   <span class='id identifier rubyid_parent_node'>parent_node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_parent'>ts_node_parent</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2434,15 +2436,15 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-874
-875
-876
 877
 878
-879</pre>
+879
+880
+881
+882</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 874</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 877</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prev_named_sibling'>prev_named_sibling</span>
   <span class='id identifier rubyid_sibling'>sibling</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_prev_named_sibling'>ts_node_prev_named_sibling</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2501,15 +2503,15 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-854
-855
-856
 857
 858
-859</pre>
+859
+860
+861
+862</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 854</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 857</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prev_sibling'>prev_sibling</span>
   <span class='id identifier rubyid_sibling'>sibling</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_prev_sibling'>ts_node_prev_sibling</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2564,12 +2566,12 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-769
-770
-771</pre>
+772
+773
+774</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 769</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 772</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_byte'>start_byte</span>
   <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_start_byte'>ts_node_start_byte</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2625,14 +2627,14 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-783
-784
-785
 786
-787</pre>
+787
+788
+789
+790</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 783</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 786</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_point'>start_point</span>
   <span class='id identifier rubyid_point'>point</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_start_point'>ts_node_start_point</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2690,12 +2692,12 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="lines">
 
 
-726
-727
-728</pre>
+728
+729
+730</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 726</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 728</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
   <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_type'>ts_node_type</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='rparen'>)</span>
@@ -2710,9 +2712,9 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:41 2026 by
+  Generated on Thu Aug  6 23:38:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

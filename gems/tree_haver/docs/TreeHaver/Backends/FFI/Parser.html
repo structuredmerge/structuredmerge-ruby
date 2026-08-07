@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Backends::FFI::Parser
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -249,8 +249,6 @@
       <pre class="lines">
 
 
-525
-526
 527
 528
 529
@@ -265,19 +263,21 @@
 538
 539
 540
-541</pre>
+541
+542
+543</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 525</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 527</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI not available</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../../Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../FFI.html" title="TreeHaver::Backends::FFI (module)">FFI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../FFI.html#available%3F-class_method" title="TreeHaver::Backends::FFI.available? (method)">available?</a></span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FFI not available</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../../Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../FFI.html" title="TreeHaver::Backends::FFI (module)">FFI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../FFI.html#available%3F-class_method" title="TreeHaver::Backends::FFI.available? (method)">available?</a></span></span>
 
   <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_try_load!'><span class='object_link'><a href="Native.html#try_load!-class_method" title="TreeHaver::Backends::FFI::Native.try_load! (method)">try_load!</a></span></span>
   <span class='ivar'>@parser</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_parser_new'>ts_parser_new</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to create ts_parser</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='ivar'>@parser</span><span class='period'>.</span><span class='id identifier rubyid_null?'>null?</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Failed to create ts_parser</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='ivar'>@parser</span><span class='period'>.</span><span class='id identifier rubyid_null?'>null?</span>
 
-  <span class='comment'># Note: We intentionally do NOT register a finalizer here because:
+  <span class='comment'># NOTE: We intentionally do NOT register a finalizer here because:
 </span>  <span class='comment'># 1. ts_parser_delete can segfault if called during certain GC scenarios
 </span>  <span class='comment'># 2. The native library may be unloaded before finalizers run
 </span>  <span class='comment'># 3. Parser cleanup happens automatically on process exit
@@ -381,8 +381,6 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
       <pre class="lines">
 
 
-552
-553
 554
 555
 556
@@ -444,26 +442,28 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
 612
 613
 614
-615</pre>
+615
+616
+617</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 552</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 554</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_language='>language=</span><span class='lparen'>(</span><span class='id identifier rubyid_lang'>lang</span><span class='rparen'>)</span>
   <span class='comment'># Defensive check: ensure we received an FFI Language wrapper
 </span>  <span class='kw'>unless</span> <span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Language.html" title="TreeHaver::Backends::FFI::Language (class)">Language</a></span></span><span class='rparen'>)</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI backend expected FFI::Language wrapper, got </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This usually means TreeHaver::Parser#unwrap_language passed the wrong type. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Check that language caching respects backend boundaries.</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI backend expected FFI::Language wrapper, got </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This usually means TreeHaver::Parser#unwrap_language passed the wrong type. </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Check that language caching respects backend boundaries.</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 
   <span class='comment'># Additional check: verify the language is actually for FFI backend
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:backend</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_backend'>backend</span> <span class='op'>!=</span> <span class='symbol'>:ffi</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI backend received Language for wrong backend: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_backend'>backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Expected :ffi backend. Class: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI backend received Language for wrong backend: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_backend'>backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Expected :ffi backend. Class: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='comment'># Verify the DynamicLibrary is still valid (not GC&#39;d)
@@ -471,8 +471,8 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
 </span>  <span class='id identifier rubyid_lib'>lib</span> <span class='op'>=</span> <span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_instance_variable_get'>instance_variable_get</span><span class='lparen'>(</span><span class='symbol'>:@library</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_lib'>lib</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI Language has no library reference. The dynamic library may have been unloaded. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FFI Language has no library reference. The dynamic library may have been unloaded. </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='comment'># Verify the language has a valid pointer
@@ -481,9 +481,9 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
   <span class='comment'># Check ptr is actually an FFI::Pointer
 </span>  <span class='kw'>unless</span> <span class='id identifier rubyid_ptr'>ptr</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Pointer</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI Language#to_ptr returned </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ptr'>ptr</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>, expected FFI::Pointer. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Language class: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI Language#to_ptr returned </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ptr'>ptr</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>, expected FFI::Pointer. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Language class: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_ptr_address'>ptr_address</span> <span class='op'>=</span> <span class='id identifier rubyid_ptr'>ptr</span><span class='period'>.</span><span class='id identifier rubyid_address'>address</span>
@@ -491,25 +491,25 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
   <span class='comment'># Check for NULL (0x0)
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_ptr'>ptr</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_ptr_address'>ptr_address</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI Language has NULL pointer. Language may not have loaded correctly. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FFI Language has NULL pointer. Language may not have loaded correctly. </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='comment'># Check for small invalid addresses (&lt; 4KB are typically unmapped memory)
 </span>  <span class='comment'># Common invalid addresses like 0x40 (64) indicate corrupted or uninitialized pointers
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_ptr_address'>ptr_address</span> <span class='op'>&lt;</span> <span class='int'>4096</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI Language has invalid pointer (address 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ptr_address'>ptr_address</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>). </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This usually indicates the language library was unloaded or never loaded correctly. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI Language has invalid pointer (address 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ptr_address'>ptr_address</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>). </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This usually indicates the language library was unloaded or never loaded correctly. </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, Symbol: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang'>lang</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
-  <span class='comment'># Note: MRI backend conflict is now handled by TreeHaver::BackendConflict
+  <span class='comment'># NOTE: MRI backend conflict is now handled by TreeHaver::BackendConflict
 </span>  <span class='comment'># at a higher level (in TreeHaver.resolve_backend_module)
 </span>
   <span class='comment'># lang is a wrapped FFI::Language that has to_ptr method
 </span>  <span class='id identifier rubyid_ok'>ok</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_parser_set_language'>ts_parser_set_language</span><span class='lparen'>(</span><span class='ivar'>@parser</span><span class='comma'>,</span> <span class='id identifier rubyid_ptr'>ptr</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to set language on parser</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_ok'>ok</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Failed to set language on parser</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_ok'>ok</span>
 
   <span class='id identifier rubyid_lang'>lang</span> <span class='comment'># rubocop:disable Lint/Void (intentional return value)
 </span><span class='kw'>end</span></pre>
@@ -596,22 +596,22 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
       <pre class="lines">
 
 
-622
-623
 624
 625
 626
 627
 628
-629</pre>
+629
+630
+631</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 622</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 624</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_src'>src</span> <span class='op'>=</span> <span class='const'>String</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_tree_ptr'>tree_ptr</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_parser_parse_string'>ts_parser_parse_string</span><span class='lparen'>(</span><span class='ivar'>@parser</span><span class='comma'>,</span> <span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Pointer</span><span class='op'>::</span><span class='const'>NULL</span><span class='comma'>,</span> <span class='id identifier rubyid_src'>src</span><span class='comma'>,</span> <span class='id identifier rubyid_src'>src</span><span class='period'>.</span><span class='id identifier rubyid_bytesize'>bytesize</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Parse returned NULL</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_tree_ptr'>tree_ptr</span><span class='period'>.</span><span class='id identifier rubyid_null?'>null?</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Parse returned NULL</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_tree_ptr'>tree_ptr</span><span class='period'>.</span><span class='id identifier rubyid_null?'>null?</span>
 
   <span class='comment'># Return raw FFI::Tree - TreeHaver::Parser will wrap it
 </span>  <span class='const'><span class='object_link'><a href="Tree.html" title="TreeHaver::Backends::FFI::Tree (class)">Tree</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Tree.html#initialize-instance_method" title="TreeHaver::Backends::FFI::Tree#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_tree_ptr'>tree_ptr</span><span class='rparen'>)</span>
@@ -626,9 +626,9 @@ detects FFI Language wrappers (respond_to?(:to_ptr)) and passes them through.</p
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:40 2026 by
+  Generated on Thu Aug  6 23:38:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

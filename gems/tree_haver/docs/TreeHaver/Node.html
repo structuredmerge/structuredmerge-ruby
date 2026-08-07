@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Node
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1225,16 +1225,16 @@ underlying node implementation.</p>
       <pre class="lines">
 
 
-571
-572
-573
-574
-575
-576
-577</pre>
+580
+581
+582
+583
+584
+585
+586</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 571</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 580</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span>
@@ -1326,22 +1326,22 @@ The Comparable module provides &lt;, &lt;=, ==, &gt;=, &gt;, and between? based 
       <pre class="lines">
 
 
-486
-487
-488
-489
-490
-491
-492
-493
 494
 495
 496
 497
-498</pre>
+498
+499
+500
+501
+502
+503
+504
+505
+506</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 486</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 494</span>
 
 <span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='rparen'>)</span>
@@ -1435,16 +1435,18 @@ equality for testing and collection membership, not position-based equality.</p>
       <pre class="lines">
 
 
-513
-514
-515
-516</pre>
+521
+522
+523
+524
+525</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 513</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 521</span>
 
 <span class='kw'>def</span> <span class='op'>==</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='rparen'>)</span>
+
   <span class='ivar'>@inner_node</span> <span class='op'>==</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_inner_node'>inner_node</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1520,7 +1522,8 @@ equality for testing and collection membership, not position-based equality.</p>
 315
 316
 317
-318</pre>
+318
+319</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 311</span>
@@ -1528,6 +1531,7 @@ equality for testing and collection membership, not position-based equality.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_child_node'>child_node</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
   <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
 <span class='kw'>rescue</span> <span class='const'>IndexError</span>
   <span class='comment'># Some backends (e.g., MRI w/ ruby_tree_sitter) raise IndexError for out of bounds
@@ -1603,7 +1607,6 @@ equality for testing and collection membership, not position-based equality.</p>
       <pre class="lines">
 
 
-418
 419
 420
 421
@@ -1612,15 +1615,18 @@ equality for testing and collection membership, not position-based equality.</p>
 424
 425
 426
-427</pre>
+427
+428
+429</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 418</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 419</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_by_field_name'>child_by_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:child_by_field_name</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_child_node'>child_node</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_child_by_field_name'>child_by_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
     <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
   <span class='kw'>else</span>
     <span class='comment'># Not all backends support field names
@@ -1800,13 +1806,15 @@ equality for testing and collection membership, not position-based equality.</p>
 409
 410
 411
-412</pre>
+412
+413</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 409</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_to_enum'>to_enum</span><span class='lparen'>(</span><span class='id identifier rubyid___method__'>__method__</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+
   <span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2011,7 +2019,7 @@ equality for testing and collection membership, not position-based equality.</p>
       <span class='const'><span class='object_link'><a href="../TreeHaver.html#Point-constant" title="TreeHaver::Point (constant)">Point</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Backend node does not support end_point/end_position</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Backend node does not support end_point/end_position</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2176,12 +2184,12 @@ backend node have the same hash value.</p>
       <pre class="lines">
 
 
-527
-528
-529</pre>
+536
+537
+538</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 527</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 536</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hash'>hash</span>
   <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span>
@@ -2229,12 +2237,12 @@ backend node have the same hash value.</p>
       <pre class="lines">
 
 
-464
-465
-466</pre>
+472
+473
+474</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 464</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 472</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> type=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_content'> bytes=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -2486,7 +2494,6 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
       <pre class="lines">
 
 
-327
 328
 329
 330
@@ -2516,16 +2523,19 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
 354
 355
 356
-357</pre>
+357
+358
+359</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 327</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 328</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_child'>named_child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='comment'># Try native implementation first
 </span>  <span class='kw'>if</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:named_child</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_child_node'>child_node</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_named_child'>named_child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
     <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -2537,20 +2547,20 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
 
     <span class='comment'># Check if this child is named
 </span>    <span class='id identifier rubyid_is_named'>is_named</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:named?</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_named?'>named?</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:is_named?</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_is_named?'>is_named?</span>
-    <span class='kw'>else</span>
-      <span class='kw'>true</span>  <span class='comment'># Assume named if we can&#39;t determine
-</span>    <span class='kw'>end</span>
+                 <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_named?'>named?</span>
+               <span class='kw'>elsif</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:is_named?</span><span class='rparen'>)</span>
+                 <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_is_named?'>is_named?</span>
+               <span class='kw'>else</span>
+                 <span class='kw'>true</span> <span class='comment'># Assume named if we can&#39;t determine
+</span>               <span class='kw'>end</span>
 
-    <span class='kw'>if</span> <span class='id identifier rubyid_is_named'>is_named</span>
-      <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_named_count'>named_count</span> <span class='op'>==</span> <span class='id identifier rubyid_index'>index</span>
-      <span class='id identifier rubyid_named_count'>named_count</span> <span class='op'>+=</span> <span class='int'>1</span>
-    <span class='kw'>end</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_is_named'>is_named</span>
+    <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_named_count'>named_count</span> <span class='op'>==</span> <span class='id identifier rubyid_index'>index</span>
+
+    <span class='id identifier rubyid_named_count'>named_count</span> <span class='op'>+=</span> <span class='int'>1</span>
   <span class='kw'>end</span>
 
-  <span class='kw'>nil</span>  <span class='comment'># Index out of bounds
+  <span class='kw'>nil</span> <span class='comment'># Index out of bounds
 </span><span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2601,8 +2611,6 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
       <pre class="lines">
 
 
-364
-365
 366
 367
 368
@@ -2629,13 +2637,11 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
 389</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 364</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 366</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_child_count'>named_child_count</span>
   <span class='comment'># Try native implementation first
-</span>  <span class='kw'>if</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:named_child_count</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_named_child_count'>named_child_count</span>
-  <span class='kw'>end</span>
+</span>  <span class='kw'>return</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_named_child_count'>named_child_count</span> <span class='kw'>if</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:named_child_count</span><span class='rparen'>)</span>
 
   <span class='comment'># Fallback: count named children manually
 </span>  <span class='id identifier rubyid_count'>count</span> <span class='op'>=</span> <span class='int'>0</span>
@@ -2645,12 +2651,12 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
 
     <span class='comment'># Check if this child is named
 </span>    <span class='id identifier rubyid_is_named'>is_named</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:named?</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_named?'>named?</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:is_named?</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_is_named?'>is_named?</span>
-    <span class='kw'>else</span>
-      <span class='kw'>true</span>  <span class='comment'># Assume named if we can&#39;t determine
-</span>    <span class='kw'>end</span>
+                 <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_named?'>named?</span>
+               <span class='kw'>elsif</span> <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:is_named?</span><span class='rparen'>)</span>
+                 <span class='id identifier rubyid_child_node'>child_node</span><span class='period'>.</span><span class='id identifier rubyid_is_named?'>is_named?</span>
+               <span class='kw'>else</span>
+                 <span class='kw'>true</span> <span class='comment'># Assume named if we can&#39;t determine
+</span>               <span class='kw'>end</span>
 
     <span class='id identifier rubyid_count'>count</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='kw'>if</span> <span class='id identifier rubyid_is_named'>is_named</span>
   <span class='kw'>end</span>
@@ -2757,20 +2763,24 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
       <pre class="lines">
 
 
-445
-446
-447
-448
 449
-450</pre>
+450
+451
+452
+453
+454
+455
+456</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 445</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 449</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:next_sibling</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_sibling'>sibling</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_next_sibling'>next_sibling</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_sibling'>sibling</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
   <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_sibling'>sibling</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2820,20 +2830,24 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
       <pre class="lines">
 
 
-435
-436
 437
 438
 439
-440</pre>
+440
+441
+442
+443
+444</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 435</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 437</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parent'>parent</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:parent</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_parent_node'>parent_node</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_parent'>parent</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_parent_node'>parent_node</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
   <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_parent_node'>parent_node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2879,20 +2893,24 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
       <pre class="lines">
 
 
-455
-456
-457
-458
-459
-460</pre>
+461
+462
+463
+464
+465
+466
+467
+468</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 455</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 461</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prev_sibling'>prev_sibling</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:prev_sibling</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_sibling'>sibling</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_prev_sibling'>prev_sibling</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_sibling'>sibling</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
   <span class='const'><span class='object_link'><a href="" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_sibling'>sibling</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2974,12 +2992,12 @@ Uses backend’s native named_child if available, otherwise provides fallback.</
       <pre class="lines">
 
 
-536
-537
-538</pre>
+545
+546
+547</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 536</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 545</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -3060,7 +3078,7 @@ This format is compatible with *-merge gems’ FileAnalysisBase.</p>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
     <span class='label'>start_column:</span> <span class='id identifier rubyid_start_point'>start_point</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span><span class='comma'>,</span>
-    <span class='label'>end_column:</span> <span class='id identifier rubyid_end_point'>end_point</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span><span class='comma'>,</span>
+    <span class='label'>end_column:</span> <span class='id identifier rubyid_end_point'>end_point</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3243,7 +3261,7 @@ This is useful for error messages and matching with editor line numbers.</p>
       <span class='const'><span class='object_link'><a href="../TreeHaver.html#Point-constant" title="TreeHaver::Point (constant)">Point</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Backend node does not support start_point/start_position</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Backend node does not support start_point/start_position</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3399,7 +3417,7 @@ while anonymous nodes are syntax/punctuation (e.g., [, =, whitespace).</p>
     <span class='comment'># Some backends (like TreeStump) require source as argument
 </span>    <span class='comment'># Check arity to determine how to call
 </span>    <span class='id identifier rubyid_arity'>arity</span> <span class='op'>=</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_arity'>arity</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_arity'>arity</span> <span class='op'>==</span> <span class='int'>0</span> <span class='op'>||</span> <span class='id identifier rubyid_arity'>arity</span> <span class='op'>==</span> <span class='op'>-</span><span class='int'>1</span>
+    <span class='kw'>if</span> <span class='lbracket'>[</span><span class='int'>0</span><span class='comma'>,</span> <span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_arity'>arity</span><span class='rparen'>)</span>
       <span class='comment'># No required arguments, or optional arguments only
 </span>      <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span>
     <span class='kw'>elsif</span> <span class='id identifier rubyid_arity'>arity</span> <span class='op'>&gt;=</span> <span class='int'>1</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@source</span>
@@ -3407,15 +3425,15 @@ while anonymous nodes are syntax/punctuation (e.g., [, =, whitespace).</p>
 </span>      <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span><span class='lparen'>(</span><span class='ivar'>@source</span><span class='rparen'>)</span>
     <span class='kw'>elsif</span> <span class='ivar'>@source</span>
       <span class='comment'># Fallback to byte extraction
-</span>      <span class='ivar'>@source</span><span class='lbracket'>[</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+</span>      <span class='ivar'>@source</span><span class='lbracket'>[</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
     <span class='kw'>else</span>
-      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Cannot extract text: backend requires source but none provided</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Cannot extract text: backend requires source but none provided</span><span class='tstring_end'>&#39;</span></span>
     <span class='kw'>end</span>
   <span class='kw'>elsif</span> <span class='ivar'>@source</span>
     <span class='comment'># Fallback: extract from source using byte positions
-</span>    <span class='ivar'>@source</span><span class='lbracket'>[</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+</span>    <span class='ivar'>@source</span><span class='lbracket'>[</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Cannot extract text: node has no text method and no source provided</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Cannot extract text: node has no text method and no source provided</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3461,12 +3479,12 @@ while anonymous nodes are syntax/punctuation (e.g., [, =, whitespace).</p>
       <pre class="lines">
 
 
-470
-471
-472</pre>
+478
+479
+480</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 470</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/node.rb', line 478</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_text'>text</span>
@@ -3544,7 +3562,7 @@ while anonymous nodes are syntax/punctuation (e.g., [, =, whitespace).</p>
   <span class='kw'>elsif</span> <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:kind</span><span class='rparen'>)</span>
     <span class='ivar'>@inner_node</span><span class='period'>.</span><span class='id identifier rubyid_kind'>kind</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Backend node does not support type/kind</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Error.html" title="TreeHaver::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Backend node does not support type/kind</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3557,9 +3575,9 @@ while anonymous nodes are syntax/punctuation (e.g., [, =, whitespace).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

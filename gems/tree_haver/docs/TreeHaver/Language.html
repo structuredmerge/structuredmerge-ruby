@@ -6,7 +6,7 @@
 <title>
   Module: TreeHaver::Language
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -495,7 +495,8 @@ unless you’ve already validated the path).</p>
 125
 126
 127
-128</pre>
+128
+129</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/language.rb', line 89</span>
@@ -504,12 +505,12 @@ unless you’ve already validated the path).</p>
   <span class='kw'>if</span> <span class='id identifier rubyid_validate'>validate</span>
     <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="PathValidator.html" title="TreeHaver::PathValidator (module)">PathValidator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_safe_library_path?'><span class='object_link'><a href="PathValidator.html#safe_library_path%3F-class_method" title="TreeHaver::PathValidator.safe_library_path? (method)">safe_library_path?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
       <span class='id identifier rubyid_errors'>errors</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="PathValidator.html" title="TreeHaver::PathValidator (module)">PathValidator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_validation_errors'><span class='object_link'><a href="PathValidator.html#validation_errors-class_method" title="TreeHaver::PathValidator.validation_errors (method)">validation_errors</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsafe library path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>. Errors: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>; </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsafe library path: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>. Errors: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>; </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
     <span class='kw'>end</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_symbol'>symbol</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='const'><span class='object_link'><a href="PathValidator.html" title="TreeHaver::PathValidator (module)">PathValidator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_safe_symbol_name?'><span class='object_link'><a href="PathValidator.html#safe_symbol_name%3F-class_method" title="TreeHaver::PathValidator.safe_symbol_name? (method)">safe_symbol_name?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_symbol'>symbol</span><span class='rparen'>)</span>
       <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsafe symbol name: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Symbol names must be valid C identifiers.</span><span class='tstring_end'>&quot;</span></span>
+        <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Symbol names must be valid C identifiers.</span><span class='tstring_end'>&#39;</span></span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 
@@ -519,19 +520,20 @@ unless you’ve already validated the path).</p>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_mod'>mod</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_backend'>backend</span>
-      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Requested backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> is not available or does not support shared libraries</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Requested backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> is not available or does not support shared libraries</span><span class='tstring_end'>&quot;</span></span>
     <span class='kw'>else</span>
       <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No native tree-sitter backend is available for loading shared libraries. </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Available native backends (MRI, Rust, FFI, Java) require platform-specific setup. </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>For pure-Ruby parsing, use backend-specific Language classes directly (e.g., Prism, Psych, Citrus).</span><span class='tstring_end'>&quot;</span></span>
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>No native tree-sitter backend is available for loading shared libraries. </span><span class='tstring_end'>&#39;</span></span> \
+              <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Available native backends (MRI, Rust, FFI, Java) require platform-specific setup. </span><span class='tstring_end'>&#39;</span></span> \
+              <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>For pure-Ruby parsing, use backend-specific Language classes directly (e.g., Prism, Psych, Citrus).</span><span class='tstring_end'>&#39;</span></span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Backend must implement .from_library; fallback to .from_path for older impls
 </span>  <span class='comment'># Include effective backend AND ENV vars in cache key since they affect loading
 </span>  <span class='id identifier rubyid_effective_b'>effective_b</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resolve_effective_backend'><span class='object_link'><a href="../TreeHaver.html#resolve_effective_backend-class_method" title="TreeHaver.resolve_effective_backend (method)">resolve_effective_backend</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_effective_b'>effective_b</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_LANG_SYMBOL</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_effective_b'>effective_b</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_SITTER_LANG_SYMBOL</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rbracket'>]</span>
   <span class='const'><span class='object_link'><a href="LanguageRegistry.html" title="TreeHaver::LanguageRegistry (module)">LanguageRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fetch'><span class='object_link'><a href="LanguageRegistry.html#fetch-class_method" title="TreeHaver::LanguageRegistry.fetch (method)">fetch</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_mod'>mod</span><span class='op'>::</span><span class='const'>Language</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:from_library</span><span class='rparen'>)</span>
       <span class='id identifier rubyid_mod'>mod</span><span class='op'>::</span><span class='const'>Language</span><span class='period'>.</span><span class='id identifier rubyid_from_library'>from_library</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -828,7 +830,6 @@ used based on registration and current backend.</p>
       <pre class="lines">
 
 
-155
 156
 157
 158
@@ -919,13 +920,10 @@ used based on registration and current backend.</p>
 243
 244
 245
-246
-247
-248
-249</pre>
+246</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language.rb', line 155</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language.rb', line 156</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='comment'># Resolve only if the language name was registered
@@ -937,42 +935,38 @@ used based on registration and current backend.</p>
 
   <span class='comment'># Determine which backend type to use
 </span>  <span class='id identifier rubyid_backend_type'>backend_type</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_current_backend'>current_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Citrus.html" title="TreeHaver::Backends::Citrus (module)">Citrus</a></span></span>
-    <span class='symbol'>:citrus</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_current_backend'>current_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Parslet.html" title="TreeHaver::Backends::Parslet (module)">Parslet</a></span></span>
-    <span class='symbol'>:parslet</span>
-  <span class='kw'>else</span>
-    <span class='symbol'>:tree_sitter</span>  <span class='comment'># MRI, Rust, FFI, Java all use tree-sitter
-</span>  <span class='kw'>end</span>
+                   <span class='symbol'>:citrus</span>
+                 <span class='kw'>elsif</span> <span class='id identifier rubyid_current_backend'>current_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Parslet.html" title="TreeHaver::Backends::Parslet (module)">Parslet</a></span></span>
+                   <span class='symbol'>:parslet</span>
+                 <span class='kw'>else</span>
+                   <span class='symbol'>:tree_sitter</span> <span class='comment'># MRI, Rust, FFI, Java all use tree-sitter
+</span>                 <span class='kw'>end</span>
 
   <span class='comment'># Get backend-specific registration
 </span>  <span class='id identifier rubyid_reg'>reg</span> <span class='op'>=</span> <span class='id identifier rubyid_all_backends'>all_backends</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend_type'>backend_type</span><span class='rbracket'>]</span>
 
   <span class='comment'># If Citrus backend is active
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_backend_type'>backend_type</span> <span class='op'>==</span> <span class='symbol'>:citrus</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_reg'>reg</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_module</span><span class='rbracket'>]</span>
-      <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Citrus.html" title="TreeHaver::Backends::Citrus (module)">Citrus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Citrus/Language.html" title="TreeHaver::Backends::Citrus::Language (class)">Language</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Backends/Citrus/Language.html#initialize-instance_method" title="TreeHaver::Backends::Citrus::Language#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_module</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
+    <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Citrus.html" title="TreeHaver::Backends::Citrus (module)">Citrus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Citrus/Language.html" title="TreeHaver::Backends::Citrus::Language (class)">Language</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Backends/Citrus/Language.html#initialize-instance_method" title="TreeHaver::Backends::Citrus::Language#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_module</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_reg'>reg</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_module</span><span class='rbracket'>]</span>
 
     <span class='comment'># No Citrus grammar for this language — provide actionable error
 </span>    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No Citrus grammar registered for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This language may only be available via tree-sitter. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Check that the correct backend is selected (current: citrus). </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registered backends for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_all_backends'>all_backends</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No Citrus grammar registered for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This language may only be available via tree-sitter. </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Check that the correct backend is selected (current: citrus). </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registered backends for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_all_backends'>all_backends</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='comment'># If Parslet backend is active
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_backend_type'>backend_type</span> <span class='op'>==</span> <span class='symbol'>:parslet</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_reg'>reg</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_class</span><span class='rbracket'>]</span>
-      <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Parslet.html" title="TreeHaver::Backends::Parslet (module)">Parslet</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Parslet/Language.html" title="TreeHaver::Backends::Parslet::Language (class)">Language</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Backends/Parslet/Language.html#initialize-instance_method" title="TreeHaver::Backends::Parslet::Language#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_class</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
+    <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Parslet.html" title="TreeHaver::Backends::Parslet (module)">Parslet</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backends/Parslet/Language.html" title="TreeHaver::Backends::Parslet::Language (class)">Language</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Backends/Parslet/Language.html#initialize-instance_method" title="TreeHaver::Backends::Parslet::Language#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_class</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_reg'>reg</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:grammar_class</span><span class='rbracket'>]</span>
 
     <span class='comment'># No Parslet grammar for this language — provide actionable error
 </span>    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No Parslet grammar registered for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This language may only be available via tree-sitter. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Check that the correct backend is selected (current: parslet). </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registered backends for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_all_backends'>all_backends</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No Parslet grammar registered for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>This language may only be available via tree-sitter. </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Check that the correct backend is selected (current: parslet). </span><span class='tstring_end'>&#39;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registered backends for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_all_backends'>all_backends</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='comment'># For tree-sitter backends, try to load from path
@@ -981,16 +975,16 @@ used based on registration and current backend.</p>
     <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_kwargs'>kwargs</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span> <span class='op'>||</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span>
     <span class='comment'># Symbol priority: kwargs override &gt; registration &gt; derive from method_name
 </span>    <span class='id identifier rubyid_symbol'>symbol</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_kwargs'>kwargs</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:symbol</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_kwargs'>kwargs</span><span class='lbracket'>[</span><span class='symbol'>:symbol</span><span class='rbracket'>]</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:symbol</span><span class='rbracket'>]</span>
-      <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:symbol</span><span class='rbracket'>]</span>
-    <span class='kw'>else</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree_sitter_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-    <span class='kw'>end</span>
+               <span class='id identifier rubyid_kwargs'>kwargs</span><span class='lbracket'>[</span><span class='symbol'>:symbol</span><span class='rbracket'>]</span>
+             <span class='kw'>elsif</span> <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:symbol</span><span class='rbracket'>]</span>
+               <span class='id identifier rubyid_reg'>reg</span><span class='lbracket'>[</span><span class='symbol'>:symbol</span><span class='rbracket'>]</span>
+             <span class='kw'>else</span>
+               <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree_sitter_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+             <span class='kw'>end</span>
     <span class='comment'># Name priority: kwargs override &gt; derive from symbol (strip tree_sitter_ prefix)
 </span>    <span class='comment'># Using symbol-derived name ensures ruby_tree_sitter gets the correct language name
 </span>    <span class='comment'># e.g., &quot;toml&quot; not &quot;toml_both&quot; when symbol is &quot;tree_sitter_toml&quot;
-</span>    <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_kwargs'>kwargs</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='op'>&amp;.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\Atree_sitter_</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</span>    <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_kwargs'>kwargs</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='op'>&amp;.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\Atree_sitter_</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 
     <span class='kw'>begin</span>
       <span class='kw'>return</span> <span class='id identifier rubyid_from_library'>from_library</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -1019,8 +1013,8 @@ used based on registration and current backend.</p>
 
   <span class='comment'># No appropriate registration found
 </span>  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No grammar registered for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> compatible with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_backend_type'>backend_type</span><span class='embexpr_end'>}</span><span class='tstring_content'> backend. </span><span class='tstring_end'>&quot;</span></span> \
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registered backends: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_all_backends'>all_backends</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No grammar registered for :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> compatible with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_backend_type'>backend_type</span><span class='embexpr_end'>}</span><span class='tstring_content'> backend. </span><span class='tstring_end'>&quot;</span></span> \
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registered backends: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_all_backends'>all_backends</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1069,12 +1063,12 @@ used based on registration and current backend.</p>
       <pre class="lines">
 
 
-252
-253
-254</pre>
+249
+250
+251</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language.rb', line 249</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='op'>!</span><span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered_language'><span class='object_link'><a href="../TreeHaver.html#registered_language-class_method" title="TreeHaver.registered_language (method)">registered_language</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -1089,9 +1083,9 @@ used based on registration and current backend.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

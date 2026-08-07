@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Backends::Java::Node
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -632,12 +632,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-697
-698
-699</pre>
+706
+707
+708</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 697</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 706</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_impl'>impl</span><span class='rparen'>)</span>
   <span class='ivar'>@impl</span> <span class='op'>=</span> <span class='id identifier rubyid_impl'>impl</span>
@@ -683,12 +683,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-694
-695
-696</pre>
+703
+704
+705</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 694</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 703</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_impl'>impl</span>
   <span class='ivar'>@impl</span>
@@ -770,15 +770,6 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-719
-720
-721
-722
-723
-724
-725
-726
-727
 728
 729
 730
@@ -787,10 +778,20 @@ The wrapper adds Ruby-level conveniences.</p>
 733
 734
 735
-736</pre>
+736
+737
+738
+739
+740
+741
+742
+743
+744
+745
+746</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 719</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 728</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='comment'># jtreesitter 0.26.0: getChild returns Optional&lt;Node&gt; or throws IndexOutOfBoundsException
@@ -800,6 +801,7 @@ The wrapper adds Ruby-level conveniences.</p>
   <span class='comment'># Handle Java Optional
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:isPresent</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_isPresent'>isPresent</span>
+
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
   <span class='kw'>else</span>
     <span class='comment'># Direct Node return (some jtreesitter versions)
@@ -880,26 +882,27 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-742
-743
-744
-745
-746
-747
-748
-749
-750
-751
 752
 753
 754
 755
 756
 757
-758</pre>
+758
+759
+760
+761
+762
+763
+764
+765
+766
+767
+768
+769</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 742</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 752</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_by_field_name'>child_by_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='comment'># jtreesitter 0.26.0: getChildByFieldName returns Optional&lt;Node&gt;
@@ -910,6 +913,7 @@ The wrapper adds Ruby-level conveniences.</p>
   <span class='comment'># Handle Java Optional
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:isPresent</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_isPresent'>isPresent</span>
+
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
   <span class='kw'>else</span>
     <span class='comment'># Direct Node return (some jtreesitter versions)
@@ -969,12 +973,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-711
-712
-713</pre>
+720
+721
+722</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 711</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 720</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_count'>child_count</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_childCount'>childCount</span>
@@ -1030,18 +1034,20 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-764
-765
-766
-767
-768
-769</pre>
+775
+776
+777
+778
+779
+780
+781</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 764</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each'>each</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span><span class='lparen'>(</span><span class='symbol'>:each</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+
   <span class='id identifier rubyid_child_count'>child_count</span><span class='period'>.</span><span class='id identifier rubyid_times'>times</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
     <span class='kw'>yield</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
@@ -1097,12 +1103,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-781
-782
-783</pre>
+793
+794
+795</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 781</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 793</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_byte'>end_byte</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_endByte'>endByte</span>
@@ -1158,17 +1164,17 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-796
-797
-798
-799</pre>
+808
+809
+810
+811</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 796</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 808</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_point'>end_point</span>
   <span class='id identifier rubyid_pt'>pt</span> <span class='op'>=</span> <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_endPoint'>endPoint</span>
-  <span class='lbrace'>{</span><span class='label'>row:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span><span class='rbrace'>}</span>
+  <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1221,12 +1227,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-804
-805
-806</pre>
+816
+817
+818</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 804</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 816</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_error?'>has_error?</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_hasError'>hasError</span>
@@ -1282,12 +1288,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-811
-812
-813</pre>
+823
+824
+825</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 811</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 823</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_missing?'>missing?</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_isMissing'>isMissing</span>
@@ -1343,12 +1349,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-818
-819
-820</pre>
+830
+831
+832</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 818</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 830</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named?'>named?</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_isNamed'>isNamed</span>
@@ -1404,24 +1410,25 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-844
-845
-846
-847
-848
-849
-850
-851
-852
-853
-854
-855
-856
 857
-858</pre>
+858
+859
+860
+861
+862
+863
+864
+865
+866
+867
+868
+869
+870
+871
+872</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 844</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 857</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span>
   <span class='comment'># jtreesitter 0.26.0: getNextSibling returns Optional&lt;Node&gt;
@@ -1431,6 +1438,7 @@ The wrapper adds Ruby-level conveniences.</p>
   <span class='comment'># Handle Java Optional
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:isPresent</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_isPresent'>isPresent</span>
+
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span>
@@ -1489,24 +1497,25 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-825
-826
-827
-828
-829
-830
-831
-832
-833
-834
-835
-836
 837
 838
-839</pre>
+839
+840
+841
+842
+843
+844
+845
+846
+847
+848
+849
+850
+851
+852</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 825</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 837</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parent'>parent</span>
   <span class='comment'># jtreesitter 0.26.0: getParent returns Optional&lt;Node&gt;
@@ -1516,6 +1525,7 @@ The wrapper adds Ruby-level conveniences.</p>
   <span class='comment'># Handle Java Optional
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:isPresent</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_isPresent'>isPresent</span>
+
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span>
@@ -1574,24 +1584,25 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-863
-864
-865
-866
-867
-868
-869
-870
-871
-872
-873
-874
-875
-876
-877</pre>
+877
+878
+879
+880
+881
+882
+883
+884
+885
+886
+887
+888
+889
+890
+891
+892</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 863</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 877</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prev_sibling'>prev_sibling</span>
   <span class='comment'># jtreesitter 0.26.0: getPrevSibling returns Optional&lt;Node&gt;
@@ -1601,6 +1612,7 @@ The wrapper adds Ruby-level conveniences.</p>
   <span class='comment'># Handle Java Optional
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:isPresent</span><span class='rparen'>)</span>
     <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_isPresent'>isPresent</span>
+
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_java_node'>java_node</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span>
@@ -1659,12 +1671,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-774
-775
-776</pre>
+786
+787
+788</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 774</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 786</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_byte'>start_byte</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_startByte'>startByte</span>
@@ -1720,17 +1732,17 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-788
-789
-790
-791</pre>
+800
+801
+802
+803</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 788</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 800</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_point'>start_point</span>
   <span class='id identifier rubyid_pt'>pt</span> <span class='op'>=</span> <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_startPoint'>startPoint</span>
-  <span class='lbrace'>{</span><span class='label'>row:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span><span class='rbrace'>}</span>
+  <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='id identifier rubyid_pt'>pt</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1783,12 +1795,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-882
-883
-884</pre>
+897
+898
+899</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 882</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 897</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text'>text</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -1844,12 +1856,12 @@ The wrapper adds Ruby-level conveniences.</p>
       <pre class="lines">
 
 
-704
-705
-706</pre>
+713
+714
+715</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 704</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 713</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
   <span class='ivar'>@impl</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
@@ -1864,9 +1876,9 @@ The wrapper adds Ruby-level conveniences.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:41 2026 by
+  Generated on Thu Aug  6 23:38:03 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

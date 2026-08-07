@@ -232,7 +232,14 @@ module TreeHaver
     # @example First parse (no old tree)
     #   tree = parser.parse_string(nil, "x = 1")
     # @example Incremental parse
-    #   tree.edit(start_byte: 4, old_end_byte: 5, new_end_byte: 6, ...)
+    #   tree.edit(
+    #     start_byte: 4,
+    #     old_end_byte: 5,
+    #     new_end_byte: 6,
+    #     start_point: {row: 0, column: 4},
+    #     old_end_point: {row: 0, column: 5},
+    #     new_end_point: {row: 0, column: 6}
+    #   )
     #   new_tree = parser.parse_string(tree, "x = 42")
     def parse_string(old_tree, source)
       # Pass through to backend if it supports incremental parsing

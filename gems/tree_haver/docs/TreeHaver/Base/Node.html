@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Base::Node
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -163,7 +163,7 @@ They return raw <code>::TreeSitter::Node</code> objects which are wrapped by<br 
 
 </div><div id="subclasses">
   <h2>Direct Known Subclasses</h2>
-  <p class="children"><span class='object_link'><a href="../Backends/Citrus/Node.html" title="TreeHaver::Backends::Citrus::Node (class)">TreeHaver::Backends::Citrus::Node</a></span>, <span class='object_link'><a href="../Backends/Parslet/Node.html" title="TreeHaver::Backends::Parslet::Node (class)">TreeHaver::Backends::Parslet::Node</a></span>, <span class='object_link'><a href="../Backends/Prism/Node.html" title="TreeHaver::Backends::Prism::Node (class)">TreeHaver::Backends::Prism::Node</a></span>, <span class='object_link'><a href="../Backends/Psych/Node.html" title="TreeHaver::Backends::Psych::Node (class)">TreeHaver::Backends::Psych::Node</a></span></p>
+  <p class="children"><span class='object_link'><a href="../Backends/Citrus/Node.html" title="TreeHaver::Backends::Citrus::Node (class)">TreeHaver::Backends::Citrus::Node</a></span>, <span class='object_link'><a href="../Backends/Parslet/Node.html" title="TreeHaver::Backends::Parslet::Node (class)">TreeHaver::Backends::Parslet::Node</a></span>, <span class='object_link'><a href="../Backends/Prism/Node.html" title="TreeHaver::Backends::Prism::Node (class)">TreeHaver::Backends::Prism::Node</a></span>, <span class='object_link'><a href="../Backends/Psych/Node.html" title="TreeHaver::Backends::Psych::Node (class)">TreeHaver::Backends::Psych::Node</a></span>, <span class='object_link'><a href="../Backends/Tslp/Node.html" title="TreeHaver::Backends::Tslp::Node (class)">TreeHaver::Backends::Tslp::Node</a></span></p>
 </div>
 
 
@@ -659,6 +659,29 @@ They return raw <code>::TreeSitter::Node</code> objects which are wrapped by<br 
 
   
     <span class="summary_desc"><div class='inline'><p>Check if this node is named (structural).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#native_type-instance_method" title="#native_type (instance method)">#<strong>native_type</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The parser’s original node type before a backend applies any portable vocabulary aliases.</p>
 </div></span>
   
 </li>
@@ -1242,17 +1265,17 @@ They return raw <code>::TreeSitter::Node</code> objects which are wrapped by<br 
       <pre class="lines">
 
 
-204
-205
-206
-207
-208
-209
-210
-211</pre>
+212
+213
+214
+215
+216
+217
+218
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 204</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 212</span>
 
 <span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_byte</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:end_byte</span><span class='rparen'>)</span>
@@ -1320,14 +1343,14 @@ They return raw <code>::TreeSitter::Node</code> objects which are wrapped by<br 
       <pre class="lines">
 
 
-293
-294
-295
-296
-297</pre>
+301
+302
+303
+304
+305</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 293</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 301</span>
 
 <span class='kw'>def</span> <span class='op'>==</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_byte</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:end_byte</span><span class='rparen'>)</span>
@@ -1403,15 +1426,15 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-104
-105
-106
-107
-108
-109</pre>
+112
+113
+114
+115
+116
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_negative?'>negative?</span>
@@ -1485,12 +1508,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-183
-184
-185</pre>
+191
+192
+193</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 191</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_by_field_name'>child_by_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid__name'>_name</span><span class='rparen'>)</span>
   <span class='kw'>nil</span>
@@ -1542,12 +1565,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-93
-94
-95</pre>
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 93</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_count'>child_count</span>
   <span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
@@ -1608,12 +1631,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-85
-86
-87</pre>
+93
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 93</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_children'>children</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>#children must be implemented</span><span class='tstring_end'>&quot;</span></span>
@@ -1665,14 +1688,14 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-113
-114
-115
-116
-117</pre>
+121
+122
+123
+124
+125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 121</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_to_enum'>to_enum</span><span class='lparen'>(</span><span class='id identifier rubyid___method__'>__method__</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
@@ -1739,12 +1762,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-79
-80
-81</pre>
+87
+88
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_byte'>end_byte</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>#end_byte must be implemented</span><span class='tstring_end'>&quot;</span></span>
@@ -1792,26 +1815,26 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-227
-228
-229
-230
-231
-232
-233
-234
-235</pre>
+235
+236
+237
+238
+239
+240
+241
+242
+243</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 227</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 235</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
   <span class='id identifier rubyid_ep'>ep</span> <span class='op'>=</span> <span class='id identifier rubyid_end_point'>end_point</span>
   <span class='id identifier rubyid_row'>row</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_ep'>ep</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+          <span class='id identifier rubyid_ep'>ep</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
+        <span class='kw'>else</span>
+          <span class='lparen'>(</span><span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
   <span class='id identifier rubyid_row'>row</span> <span class='op'>+</span> <span class='int'>1</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1861,15 +1884,15 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-195
-196
-197</pre>
+203
+204
+205</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 195</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 203</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_point'>end_point</span>
-  <span class='lbrace'>{</span><span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>0</span><span class='rbrace'>}</span>
+  <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>0</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1914,12 +1937,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-121
-122
-123</pre>
+129
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_first_child'>first_child</span>
   <span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1971,12 +1994,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-162
-163
-164</pre>
+170
+171
+172</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 170</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_error?'>has_error?</span>
   <span class='kw'>false</span>
@@ -2024,25 +2047,25 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-274
-275
-276
-277
-278
-279
-280
-281
-282</pre>
+282
+283
+284
+285
+286
+287
+288
+289
+290</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 274</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 282</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='id identifier rubyid_class_name'>class_name</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_superclass'>superclass</span><span class='op'>&amp;.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>(anonymous)</span><span class='tstring_end'>&quot;</span></span>
   <span class='id identifier rubyid_node_type'>node_type</span> <span class='op'>=</span> <span class='kw'>begin</span>
     <span class='id identifier rubyid_type'>type</span>
   <span class='kw'>rescue</span> <span class='const'>NotImplementedError</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(not implemented)</span><span class='tstring_end'>&quot;</span></span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(not implemented)</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_class_name'>class_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> type=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node_type'>node_type</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
@@ -2089,12 +2112,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-127
-128
-129</pre>
+135
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 135</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_last_child'>last_child</span>
   <span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span>
@@ -2146,12 +2169,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-168
-169
-170</pre>
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 168</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_missing?'>missing?</span>
   <span class='kw'>false</span>
@@ -2207,15 +2230,69 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-153
-154
-155</pre>
+161
+162
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 153</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 161</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named?'>named?</span>
   <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="native_type-instance_method">
+  
+    #<strong>native_type</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The parser’s original node type before a backend applies any portable<br />
+vocabulary aliases. Backends without aliases use their public type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+75
+76
+77</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 75</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_native_type'>native_type</span>
+  <span class='id identifier rubyid_type'>type</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2264,12 +2341,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-141
-142
-143</pre>
+149
+150
+151</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 141</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 149</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span>
   <span class='kw'>nil</span>
@@ -2321,12 +2398,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-135
-136
-137</pre>
+143
+144
+145</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 143</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parent'>parent</span>
   <span class='kw'>nil</span>
@@ -2378,12 +2455,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-147
-148
-149</pre>
+155
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 147</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prev_sibling'>prev_sibling</span>
   <span class='kw'>nil</span>
@@ -2431,14 +2508,6 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-239
-240
-241
-242
-243
-244
-245
-246
 247
 248
 249
@@ -2462,41 +2531,49 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
 267
 268
 269
-270</pre>
+270
+271
+272
+273
+274
+275
+276
+277
+278</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 239</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 247</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source_position'>source_position</span>
   <span class='id identifier rubyid_sp'>sp</span> <span class='op'>=</span> <span class='id identifier rubyid_start_point'>start_point</span>
   <span class='id identifier rubyid_ep'>ep</span> <span class='op'>=</span> <span class='id identifier rubyid_end_point'>end_point</span>
 
   <span class='id identifier rubyid_sp_row'>sp_row</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_sp'>sp</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+             <span class='id identifier rubyid_sp'>sp</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
+           <span class='kw'>else</span>
+             <span class='lparen'>(</span><span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
+           <span class='kw'>end</span>
   <span class='id identifier rubyid_sp_col'>sp_col</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_sp'>sp</span><span class='lbracket'>[</span><span class='symbol'>:column</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:column</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+             <span class='id identifier rubyid_sp'>sp</span><span class='lbracket'>[</span><span class='symbol'>:column</span><span class='rbracket'>]</span>
+           <span class='kw'>else</span>
+             <span class='lparen'>(</span><span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:column</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
+           <span class='kw'>end</span>
   <span class='id identifier rubyid_ep_row'>ep_row</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_ep'>ep</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+             <span class='id identifier rubyid_ep'>ep</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
+           <span class='kw'>else</span>
+             <span class='lparen'>(</span><span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
+           <span class='kw'>end</span>
   <span class='id identifier rubyid_ep_col'>ep_col</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_ep'>ep</span><span class='lbracket'>[</span><span class='symbol'>:column</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:column</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+             <span class='id identifier rubyid_ep'>ep</span><span class='lbracket'>[</span><span class='symbol'>:column</span><span class='rbracket'>]</span>
+           <span class='kw'>else</span>
+             <span class='lparen'>(</span><span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:column</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_ep'>ep</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
+           <span class='kw'>end</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_sp_row'>sp_row</span> <span class='op'>+</span> <span class='int'>1</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='id identifier rubyid_ep_row'>ep_row</span> <span class='op'>+</span> <span class='int'>1</span><span class='comma'>,</span>
     <span class='label'>start_column:</span> <span class='id identifier rubyid_sp_col'>sp_col</span><span class='comma'>,</span>
-    <span class='label'>end_column:</span> <span class='id identifier rubyid_ep_col'>ep_col</span><span class='comma'>,</span>
+    <span class='label'>end_column:</span> <span class='id identifier rubyid_ep_col'>ep_col</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2559,12 +2636,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-73
-74
-75</pre>
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_byte'>start_byte</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>#start_byte must be implemented</span><span class='tstring_end'>&quot;</span></span>
@@ -2612,26 +2689,26 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-215
-216
-217
-218
-219
-220
-221
-222
-223</pre>
+223
+224
+225
+226
+227
+228
+229
+230
+231</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 215</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 223</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
   <span class='id identifier rubyid_sp'>sp</span> <span class='op'>=</span> <span class='id identifier rubyid_start_point'>start_point</span>
   <span class='id identifier rubyid_row'>row</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_sp'>sp</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+          <span class='id identifier rubyid_sp'>sp</span><span class='lbracket'>[</span><span class='symbol'>:row</span><span class='rbracket'>]</span>
+        <span class='kw'>else</span>
+          <span class='lparen'>(</span><span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_sp'>sp</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
   <span class='id identifier rubyid_row'>row</span> <span class='op'>+</span> <span class='int'>1</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2681,15 +2758,15 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-189
-190
-191</pre>
+197
+198
+199</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 197</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_point'>start_point</span>
-  <span class='lbrace'>{</span><span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>0</span><span class='rbrace'>}</span>
+  <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>0</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2738,19 +2815,19 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-174
-175
-176
-177
-178</pre>
+182
+183
+184
+185
+186</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 174</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 182</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text'>text</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_source'>source</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_source'>source</span>
 
-  <span class='id identifier rubyid_source'>source</span><span class='lbracket'>[</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_source'>source</span><span class='lbracket'>[</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2795,12 +2872,12 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
       <pre class="lines">
 
 
-286
-287
-288</pre>
+294
+295
+296</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 286</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/base/node.rb', line 294</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_text'>text</span>
@@ -2885,9 +2962,9 @@ This matches tree-sitter behavior where negative indices are invalid.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

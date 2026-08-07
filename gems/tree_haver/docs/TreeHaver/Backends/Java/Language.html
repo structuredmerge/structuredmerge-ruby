@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Backends::Java::Language
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -122,7 +122,7 @@ grammar (e.g., TOML, JSON, etc.).</p>
 <p>Unlike <code>TreeHaver::Language</code> (which is a module with factory methods), this<br />
 class holds the actual loaded language data from a grammar shared library.</p>
 
-<p>:nocov:<br />
+<p>simplecov:disable<br />
 All Java backend implementation classes require JRuby and cannot be tested on MRI/CRuby.<br />
 JRuby-specific CI jobs would test this code.</p>
 
@@ -439,15 +439,15 @@ JRuby-specific CI jobs would test this code.</p>
       <pre class="lines">
 
 
-275
-276
-277
 278
 279
-280</pre>
+280
+281
+282
+283</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 275</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 278</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_impl'>impl</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@impl</span> <span class='op'>=</span> <span class='id identifier rubyid_impl'>impl</span>
@@ -509,12 +509,12 @@ JRuby-specific CI jobs would test this code.</p>
       <pre class="lines">
 
 
-264
-265
-266</pre>
+267
+268
+269</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 264</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 267</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend'>backend</span>
   <span class='ivar'>@backend</span>
@@ -555,12 +555,12 @@ JRuby-specific CI jobs would test this code.</p>
       <pre class="lines">
 
 
-260
-261
-262</pre>
+263
+264
+265</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 260</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_impl'>impl</span>
   <span class='ivar'>@impl</span>
@@ -614,12 +614,12 @@ JRuby-specific CI jobs would test this code.</p>
       <pre class="lines">
 
 
-268
-269
-270</pre>
+271
+272
+273</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 268</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 271</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_path'>path</span>
   <span class='ivar'>@path</span>
@@ -673,12 +673,12 @@ JRuby-specific CI jobs would test this code.</p>
       <pre class="lines">
 
 
-272
-273
-274</pre>
+275
+276
+277</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 272</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 275</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_symbol'>symbol</span>
   <span class='ivar'>@symbol</span>
@@ -741,9 +741,6 @@ JRuby-specific CI jobs would test this code.</p>
       <pre class="lines">
 
 
-337
-338
-339
 340
 341
 342
@@ -811,13 +808,16 @@ JRuby-specific CI jobs would test this code.</p>
 404
 405
 406
-407</pre>
+407
+408
+409
+410</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 337</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 340</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_from_library'>from_library</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Java backend not available</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../Java.html#available%3F-class_method" title="TreeHaver::Backends::Java.available? (method)">available?</a></span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Java backend not available</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../Java.html#available%3F-class_method" title="TreeHaver::Backends::Java.available? (method)">available?</a></span></span>
 
   <span class='comment'># Use shared utility for consistent symbol derivation across backends
 </span>  <span class='comment'># If symbol not provided, derive from name or path
@@ -834,7 +834,7 @@ JRuby-specific CI jobs would test this code.</p>
 </span>    <span class='comment'># We cache this lookup at the module level
 </span>    <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span>
       <span class='comment'># Use libraryLookup(String, Arena) to search LD_LIBRARY_PATH
-</span>      <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_symbol_lookup_class'>symbol_lookup_class</span><span class='period'>.</span><span class='id identifier rubyid_libraryLookup'>libraryLookup</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_arena'>arena</span><span class='rparen'>)</span>
+</span>      <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_symbol_lookup_class'>symbol_lookup_class</span><span class='period'>.</span><span class='id identifier rubyid_libraryLookup'>libraryLookup</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_arena'>arena</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
 
     <span class='comment'># Now load the grammar library
@@ -861,30 +861,30 @@ JRuby-specific CI jobs would test this code.</p>
     <span class='id identifier rubyid_error_msg'>error_msg</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to load language &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_sym'>sym</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
     <span class='kw'>if</span> <span class='id identifier rubyid_root_cause'>root_cause</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>Java</span><span class='op'>::</span><span class='const'>JavaLang</span><span class='op'>::</span><span class='const'>UnsatisfiedLinkError</span><span class='rparen'>)</span>
       <span class='id identifier rubyid_unresolved'>unresolved</span> <span class='op'>=</span> <span class='id identifier rubyid_root_cause'>root_cause</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-      <span class='kw'>if</span> <span class='id identifier rubyid_unresolved'>unresolved</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ts_language_version</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_unresolved'>unresolved</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ts_language_version</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
         <span class='comment'># This specific symbol was renamed in tree-sitter 0.24
 </span>        <span class='id identifier rubyid_error_msg'>error_msg</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\nVersion mismatch detected: The grammar was built against </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree-sitter &lt; 0.24 (uses ts_language_version), but your runtime library </span><span class='tstring_end'>&quot;</span></span> \
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree-sitter &lt; 0.24 (uses ts_language_version), but your runtime library </span><span class='tstring_end'>&#39;</span></span> \
           <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>is tree-sitter &gt;= 0.24 (uses ts_language_abi_version).\n\n</span><span class='tstring_end'>&quot;</span></span> \
           <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Solutions:\n</span><span class='tstring_end'>&quot;</span></span> \
           <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1. Rebuild the grammar against your version of tree-sitter\n</span><span class='tstring_end'>&quot;</span></span> \
           <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2. Install a matching version of tree-sitter (&lt; 0.24)\n</span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>3. Find a pre-built grammar compatible with tree-sitter 0.24+</span><span class='tstring_end'>&quot;</span></span>
-      <span class='kw'>elsif</span> <span class='id identifier rubyid_unresolved'>unresolved</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ts_language</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_unresolved'>unresolved</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ts_parser</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3. Find a pre-built grammar compatible with tree-sitter 0.24+</span><span class='tstring_end'>&#39;</span></span>
+      <span class='kw'>elsif</span> <span class='id identifier rubyid_unresolved'>unresolved</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ts_language</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_unresolved'>unresolved</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ts_parser</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
         <span class='id identifier rubyid_error_msg'>error_msg</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\nThe grammar library has unresolved tree-sitter symbols. </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure libtree-sitter.so is in LD_LIBRARY_PATH and version-compatible </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>with the grammar.</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Ensure libtree-sitter.so is in LD_LIBRARY_PATH and version-compatible </span><span class='tstring_end'>&#39;</span></span> \
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>with the grammar.</span><span class='tstring_end'>&#39;</span></span>
       <span class='kw'>end</span>
     <span class='kw'>end</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_error_msg'>error_msg</span>
   <span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>Java</span><span class='op'>::</span><span class='const'>JavaLang</span><span class='op'>::</span><span class='const'>UnsatisfiedLinkError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Native library error loading </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure the library is in LD_LIBRARY_PATH.</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Native library error loading </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Ensure the library is in LD_LIBRARY_PATH.</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>Java</span><span class='op'>::</span><span class='const'>JavaLang</span><span class='op'>::</span><span class='const'>IllegalArgumentException</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not find library &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure it&#39;s in LD_LIBRARY_PATH or provide an absolute path.</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not find library &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure it&#39;s in LD_LIBRARY_PATH or provide an absolute path.</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -988,9 +988,6 @@ pre-built for Java’s Foreign Function API.</p>
       <pre class="lines">
 
 
-423
-424
-425
 426
 427
 428
@@ -1035,20 +1032,23 @@ pre-built for Java’s Foreign Function API.</p>
 467
 468
 469
-470</pre>
+470
+471
+472
+473</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 423</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 426</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load_by_name'>load_by_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Java backend not available</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../Java.html#available%3F-class_method" title="TreeHaver::Backends::Java.available? (method)">available?</a></span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Java backend not available</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="../Java.html#available%3F-class_method" title="TreeHaver::Backends::Java.available? (method)">available?</a></span></span>
 
   <span class='comment'># Try to find the grammar library in standard locations
 </span>  <span class='comment'># Look for library names like &quot;tree-sitter-toml&quot; or &quot;libtree-sitter-toml&quot;
 </span>  <span class='id identifier rubyid_lib_names'>lib_names</span> <span class='op'>=</span> <span class='lbracket'>[</span>
     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree-sitter-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree_sitter_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree_sitter_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbracket'>]</span>
 
   <span class='kw'>begin</span>
@@ -1057,7 +1057,7 @@ pre-built for Java’s Foreign Function API.</p>
 
     <span class='comment'># Ensure runtime lookup is available
 </span>    <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span>
-      <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_symbol_lookup_class'>symbol_lookup_class</span><span class='period'>.</span><span class='id identifier rubyid_libraryLookup'>libraryLookup</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_arena'>arena</span><span class='rparen'>)</span>
+      <span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_symbol_lookup_class'>symbol_lookup_class</span><span class='period'>.</span><span class='id identifier rubyid_libraryLookup'>libraryLookup</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_arena'>arena</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
 
     <span class='comment'># Try each library name
@@ -1072,9 +1072,9 @@ pre-built for Java’s Foreign Function API.</p>
 
     <span class='kw'>unless</span> <span class='id identifier rubyid_grammar_lookup'>grammar_lookup</span>
       <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to load language &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: Library not found. </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure the grammar library (e.g., libtree-sitter-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.so) </span><span class='tstring_end'>&quot;</span></span> \
-          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>is in LD_LIBRARY_PATH.</span><span class='tstring_end'>&quot;</span></span>
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to load language &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: Library not found. </span><span class='tstring_end'>&quot;</span></span> \
+              <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure the grammar library (e.g., libtree-sitter-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.so) </span><span class='tstring_end'>&quot;</span></span> \
+              <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>is in LD_LIBRARY_PATH.</span><span class='tstring_end'>&#39;</span></span>
     <span class='kw'>end</span>
 
     <span class='id identifier rubyid_combined_lookup'>combined_lookup</span> <span class='op'>=</span> <span class='id identifier rubyid_grammar_lookup'>grammar_lookup</span><span class='period'>.</span><span class='id identifier rubyid_or'>or</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_runtime_lookup'><span class='object_link'><a href="../Java.html#runtime_lookup-class_method" title="TreeHaver::Backends::Java.runtime_lookup (method)">runtime_lookup</a></span></span><span class='rparen'>)</span>
@@ -1083,9 +1083,9 @@ pre-built for Java’s Foreign Function API.</p>
     <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_java_lang'>java_lang</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='id identifier rubyid_sym'>sym</span><span class='rparen'>)</span>
   <span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>Java</span><span class='op'>::</span><span class='const'>JavaLang</span><span class='op'>::</span><span class='const'>RuntimeException</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to load language &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure the grammar library (e.g., libtree-sitter-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.so) </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>is in LD_LIBRARY_PATH.</span><span class='tstring_end'>&quot;</span></span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to load language &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_content'>. </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ensure the grammar library (e.g., libtree-sitter-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.so) </span><span class='tstring_end'>&quot;</span></span> \
+            <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>is in LD_LIBRARY_PATH.</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1167,29 +1167,29 @@ Path and symbol uniquely identify a loaded language.</p>
       <pre class="lines">
 
 
-289
-290
-291
 292
 293
 294
 295
 296
 297
-298</pre>
+298
+299
+300
+301</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 289</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 292</span>
 
 <span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="" title="TreeHaver::Backends::Java::Language (class)">Language</a></span></span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_backend'>backend</span> <span class='op'>==</span> <span class='ivar'>@backend</span>
 
   <span class='comment'># Compare by path first, then symbol
-</span>  <span class='id identifier rubyid_cmp'>cmp</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='ivar'>@path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&lt;=&gt;</span> <span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_cmp'>cmp</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='ivar'>@path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&lt;=&gt;</span> <span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_cmp'>cmp</span> <span class='kw'>if</span> <span class='id identifier rubyid_cmp'>cmp</span><span class='period'>.</span><span class='id identifier rubyid_nonzero?'>nonzero?</span>
 
-  <span class='lparen'>(</span><span class='ivar'>@symbol</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&lt;=&gt;</span> <span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='lparen'>(</span><span class='ivar'>@symbol</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&lt;=&gt;</span> <span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_symbol'>symbol</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1238,12 +1238,12 @@ Path and symbol uniquely identify a loaded language.</p>
       <pre class="lines">
 
 
-302
-303
-304</pre>
+305
+306
+307</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 302</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/java.rb', line 305</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hash'>hash</span>
   <span class='lbracket'>[</span><span class='ivar'>@backend</span><span class='comma'>,</span> <span class='ivar'>@path</span><span class='comma'>,</span> <span class='ivar'>@symbol</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span>
@@ -1258,9 +1258,9 @@ Path and symbol uniquely identify a loaded language.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:41 2026 by
+  Generated on Thu Aug  6 23:38:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

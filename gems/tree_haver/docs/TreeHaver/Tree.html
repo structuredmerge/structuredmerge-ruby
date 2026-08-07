@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::Tree
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -589,16 +589,16 @@ underlying tree implementation.</p>
       <pre class="lines">
 
 
-250
-251
-252
-253
-254
-255
-256</pre>
+259
+260
+261
+262
+263
+264
+265</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 250</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 259</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span>
@@ -794,7 +794,6 @@ to check before calling this method.</p>
       <pre class="lines">
 
 
-128
 129
 130
 131
@@ -825,10 +824,12 @@ to check before calling this method.</p>
 156
 157
 158
-159</pre>
+159
+160
+161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 128</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span><span class='label'>start_byte:</span><span class='comma'>,</span> <span class='label'>old_end_byte:</span><span class='comma'>,</span> <span class='label'>new_end_byte:</span><span class='comma'>,</span> <span class='label'>start_point:</span><span class='comma'>,</span> <span class='label'>old_end_point:</span><span class='comma'>,</span> <span class='label'>new_end_point:</span><span class='rparen'>)</span>
   <span class='comment'># MRI backend (ruby_tree_sitter) requires an InputEdit object
@@ -852,15 +853,16 @@ to check before calling this method.</p>
       <span class='label'>new_end_byte:</span> <span class='id identifier rubyid_new_end_byte'>new_end_byte</span><span class='comma'>,</span>
       <span class='label'>start_point:</span> <span class='id identifier rubyid_start_point'>start_point</span><span class='comma'>,</span>
       <span class='label'>old_end_point:</span> <span class='id identifier rubyid_old_end_point'>old_end_point</span><span class='comma'>,</span>
-      <span class='label'>new_end_point:</span> <span class='id identifier rubyid_new_end_point'>new_end_point</span><span class='comma'>,</span>
+      <span class='label'>new_end_point:</span> <span class='id identifier rubyid_new_end_point'>new_end_point</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>rescue</span> <span class='const'>NoMethodError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='comment'># Re-raise as NotAvailable if it&#39;s about the edit method
-</span>  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:edit</span> <span class='op'>||</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>edit</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:edit</span> <span class='op'>||</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>edit</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Incremental parsing not supported by current backend. </span><span class='tstring_end'>&quot;</span></span> \
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Use MRI (ruby_tree_sitter), Rust (tree_stump), or Java (java-tree-sitter / jtreesitter) backend.</span><span class='tstring_end'>&quot;</span></span>
+        <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Incremental parsing not supported by current backend. </span><span class='tstring_end'>&#39;</span></span> \
+          <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Use MRI (ruby_tree_sitter), Rust (tree_stump), or Java (java-tree-sitter / jtreesitter) backend.</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -905,17 +907,17 @@ to check before calling this method.</p>
       <pre class="lines">
 
 
-205
-206
-207
-208</pre>
+214
+215
+216
+217</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 214</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
-  <span class='id identifier rubyid_inner_class'>inner_class</span> <span class='op'>=</span> <span class='ivar'>@inner_tree</span> <span class='op'>?</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>nil</span><span class='tstring_end'>&quot;</span></span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> source_length=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@source</span><span class='op'>&amp;.</span><span class='id identifier rubyid_bytesize'>bytesize</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unknown</span><span class='tstring_end'>&quot;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'> inner_tree=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inner_class'>inner_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_inner_class'>inner_class</span> <span class='op'>=</span> <span class='ivar'>@inner_tree</span> <span class='op'>?</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>nil</span><span class='tstring_end'>&#39;</span></span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> source_length=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@source</span><span class='op'>&amp;.</span><span class='id identifier rubyid_bytesize'>bytesize</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unknown</span><span class='tstring_end'>&#39;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'> inner_tree=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inner_class'>inner_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -996,12 +998,12 @@ to check before calling this method.</p>
       <pre class="lines">
 
 
-215
-216
-217</pre>
+224
+225
+226</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 215</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 224</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -1057,7 +1059,8 @@ to check before calling this method.</p>
 88
 89
 90
-91</pre>
+91
+92</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 87</span>
@@ -1065,6 +1068,7 @@ to check before calling this method.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_root_node'>root_node</span>
   <span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span> <span class='op'>=</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
   <span class='const'><span class='object_link'><a href="Node.html" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Node.html#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1098,13 +1102,20 @@ with small edits.</p>
     <h4 class="tag_title">Examples:</h4>
     
       
-      <pre class="example code"><code>if tree.supports_editing?
-  tree.edit(...)
-  new_tree = parser.parse_string(tree, edited_source)
-else
-  # Fall back to full re-parse
-  new_tree = parser.parse(edited_source)
-end</code></pre>
+      <pre class="example code"><code><span class='kw'>if</span> <span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_supports_editing?'>supports_editing?</span>
+  <span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span>
+    <span class='label'>start_byte:</span> <span class='int'>4</span><span class='comma'>,</span>
+    <span class='label'>old_end_byte:</span> <span class='int'>5</span><span class='comma'>,</span>
+    <span class='label'>new_end_byte:</span> <span class='int'>6</span><span class='comma'>,</span>
+    <span class='label'>start_point:</span> <span class='lbrace'>{</span><span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>4</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>old_end_point:</span> <span class='lbrace'>{</span><span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>5</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>new_end_point:</span> <span class='lbrace'>{</span><span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>6</span><span class='rbrace'>}</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_new_tree'>new_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse_string'>parse_string</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='comma'>,</span> <span class='id identifier rubyid_edited_source'>edited_source</span><span class='rparen'>)</span>
+<span class='kw'>else</span>
+  <span class='comment'># Fall back to full re-parse
+</span>  <span class='id identifier rubyid_new_tree'>new_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_edited_source'>edited_source</span><span class='rparen'>)</span>
+<span class='kw'>end</span></code></pre>
     
   </div>
 
@@ -1132,18 +1143,18 @@ end</code></pre>
       <pre class="lines">
 
 
-193
-194
-195
-196
-197
-198
-199
-200
-201</pre>
+202
+203
+204
+205
+206
+207
+208
+209
+210</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 202</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_supports_editing?'>supports_editing?</span>
   <span class='comment'># Try to get the edit method to verify it exists
@@ -1164,9 +1175,9 @@ end</code></pre>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:39 2026 by
+  Generated on Thu Aug  6 23:38:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

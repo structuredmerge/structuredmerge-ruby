@@ -26,7 +26,7 @@ module TreeHaver
   #
   # Registration structure:
   # ```ruby
-  # @registrations = {
+  # registrations = {
   #   toml: {
   #     tree_sitter: { path: "/path/to/lib.so", symbol: "tree_sitter_toml" },
   #     citrus: { grammar_module: TomlRB::Document, gem_name: "toml-rb" }

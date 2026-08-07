@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::ParsletGrammarFinder
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -909,11 +909,7 @@ Result is cached after first call.</p>
 127
 128
 129
-130
-131
-132
-133
-134</pre>
+130</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 67</span>
@@ -922,7 +918,7 @@ Result is cached after first call.</p>
   <span class='kw'>return</span> <span class='ivar'>@available</span> <span class='kw'>if</span> <span class='ivar'>@load_attempted</span>
 
   <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>true</span>
-  <span class='id identifier rubyid_debug'>debug</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_HAVER_DEBUG</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_debug'>debug</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_HAVER_DEBUG</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
 
   <span class='comment'># Guard against nil require_path (can happen if gem_name was nil)
 </span>  <span class='kw'>if</span> <span class='ivar'>@require_path</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='ivar'>@require_path</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -950,38 +946,34 @@ Result is cached after first call.</p>
 
     <span class='ivar'>@available</span> <span class='op'>=</span> <span class='kw'>true</span>
   <span class='kw'>rescue</span> <span class='const'>LoadError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-    <span class='comment'># :nocov: defensive - requires gem to not be installed
+    <span class='comment'># simplecov:disable defensive - requires gem to not be installed
 </span>    <span class='kw'>if</span> <span class='id identifier rubyid_debug'>debug</span>
       <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: Failed to load &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@require_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
       <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: LoadError backtrace:\n  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
     <span class='kw'>end</span>
     <span class='ivar'>@available</span> <span class='op'>=</span> <span class='kw'>false</span>
-    <span class='comment'># :nocov:
+    <span class='comment'># simplecov:enable
 </span>  <span class='kw'>rescue</span> <span class='const'>NameError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-    <span class='comment'># :nocov: defensive - requires gem with missing constant
+    <span class='comment'># simplecov:disable defensive - requires gem with missing constant
 </span>    <span class='kw'>if</span> <span class='id identifier rubyid_debug'>debug</span>
       <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: Failed to resolve &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@grammar_const</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
       <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: NameError backtrace:\n  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
     <span class='kw'>end</span>
     <span class='ivar'>@available</span> <span class='op'>=</span> <span class='kw'>false</span>
-    <span class='comment'># :nocov:
+    <span class='comment'># simplecov:enable
 </span>  <span class='kw'>rescue</span> <span class='const'>TypeError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-    <span class='comment'># :nocov: defensive - TruffleRuby-specific edge case
+    <span class='comment'># simplecov:disable defensive - TruffleRuby-specific edge case
 </span>    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: TypeError during load of &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@require_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_debug'>debug</span>
-      <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: TypeError backtrace:\n  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
+    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ParsletGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: TypeError backtrace:\n  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_debug'>debug</span>
     <span class='ivar'>@available</span> <span class='op'>=</span> <span class='kw'>false</span>
-    <span class='comment'># :nocov:
-</span>  <span class='kw'>rescue</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-    <span class='comment'># :nocov: defensive - catch-all for unexpected errors
+    <span class='comment'># simplecov:enable
+</span>  <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+    <span class='comment'># simplecov:disable defensive - catch-all for unexpected errors
 </span>    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: Unexpected error: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_debug'>debug</span>
-      <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: backtrace:\n  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
+    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ParsletGrammarFinder: backtrace:\n  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_backtrace'>backtrace</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n  </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_debug'>debug</span>
     <span class='ivar'>@available</span> <span class='op'>=</span> <span class='kw'>false</span>
-    <span class='comment'># :nocov:
+    <span class='comment'># simplecov:enable
 </span>  <span class='kw'>end</span>
 
   <span class='ivar'>@available</span>
@@ -1033,13 +1025,13 @@ Result is cached after first call.</p>
       <pre class="lines">
 
 
-139
-140
-141
-142</pre>
+135
+136
+137
+138</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 135</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_grammar_class'>grammar_class</span>
   <span class='id identifier rubyid_available?'>available?</span> <span class='comment'># Ensure we&#39;ve tried to load
@@ -1092,13 +1084,13 @@ Result is cached after first call.</p>
       <pre class="lines">
 
 
-185
-186
-187
-188</pre>
+180
+181
+182
+183</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 185</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 180</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_not_found_message'>not_found_message</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Parslet grammar for </span><span class='embexpr_beg'>#{</span><span class='ivar'>@language_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> not found. </span><span class='tstring_end'>&quot;</span></span> \
@@ -1192,6 +1184,10 @@ Result is cached after first call.</p>
       <pre class="lines">
 
 
+148
+149
+150
+151
 152
 153
 154
@@ -1201,28 +1197,22 @@ Result is cached after first call.</p>
 158
 159
 160
-161
-162
-163
-164
-165
-166</pre>
+161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 152</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register!'>register!</span><span class='lparen'>(</span><span class='label'>raise_on_missing:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_raise_on_missing'>raise_on_missing</span>
-      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_not_found_message'>not_found_message</span>
-    <span class='kw'>end</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_not_found_message'>not_found_message</span> <span class='kw'>if</span> <span class='id identifier rubyid_raise_on_missing'>raise_on_missing</span>
+
     <span class='kw'>return</span> <span class='kw'>false</span>
   <span class='kw'>end</span>
 
   <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_register_language'><span class='object_link'><a href="../TreeHaver.html#register_language-class_method" title="TreeHaver.register_language (method)">register_language</a></span></span><span class='lparen'>(</span>
     <span class='ivar'>@language_name</span><span class='comma'>,</span>
     <span class='label'>grammar_class:</span> <span class='ivar'>@grammar_class</span><span class='comma'>,</span>
-    <span class='label'>gem_name:</span> <span class='ivar'>@gem_name</span><span class='comma'>,</span>
+    <span class='label'>gem_name:</span> <span class='ivar'>@gem_name</span>
   <span class='rparen'>)</span>
   <span class='kw'>true</span>
 <span class='kw'>end</span></pre>
@@ -1273,19 +1263,19 @@ Result is cached after first call.</p>
       <pre class="lines">
 
 
+166
+167
+168
+169
+170
 171
 172
 173
 174
-175
-176
-177
-178
-179
-180</pre>
+175</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 171</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/parslet_grammar_finder.rb', line 166</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_search_info'>search_info</span>
   <span class='lbrace'>{</span>
@@ -1294,7 +1284,7 @@ Result is cached after first call.</p>
     <span class='label'>grammar_const:</span> <span class='ivar'>@grammar_const</span><span class='comma'>,</span>
     <span class='label'>require_path:</span> <span class='ivar'>@require_path</span><span class='comma'>,</span>
     <span class='label'>available:</span> <span class='id identifier rubyid_available?'>available?</span><span class='comma'>,</span>
-    <span class='label'>grammar_class:</span> <span class='ivar'>@grammar_class</span><span class='op'>&amp;.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+    <span class='label'>grammar_class:</span> <span class='ivar'>@grammar_class</span><span class='op'>&amp;.</span><span class='id identifier rubyid_name'>name</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1307,9 +1297,9 @@ Result is cached after first call.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:41 2026 by
+  Generated on Thu Aug  6 23:38:03 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

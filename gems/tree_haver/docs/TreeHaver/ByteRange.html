@@ -6,7 +6,7 @@
 <title>
   Class: TreeHaver::ByteRange
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -367,12 +367,12 @@
       <pre class="lines">
 
 
-306
-307
-308</pre>
+286
+287
+288</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 306</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 286</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_byte'>end_byte</span>
   <span class='ivar'>@end_byte</span>
@@ -426,12 +426,12 @@
       <pre class="lines">
 
 
-306
-307
-308</pre>
+286
+287
+288</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 306</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 286</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_byte'>start_byte</span>
   <span class='ivar'>@start_byte</span>
@@ -486,12 +486,12 @@
       <pre class="lines">
 
 
-315
-316
-317</pre>
+295
+296
+297</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 315</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 295</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_contains_byte?'>contains_byte?</span><span class='lparen'>(</span><span class='id identifier rubyid_offset'>offset</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_offset'>offset</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_offset'>offset</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
@@ -539,12 +539,12 @@
       <pre class="lines">
 
 
-319
-320
-321</pre>
+299
+300
+301</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 319</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 299</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_contains_range?'>contains_range?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
@@ -569,12 +569,12 @@
       <pre class="lines">
 
 
-311
-312
-313</pre>
+291
+292
+293</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 311</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 291</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_length'>length</span>
   <span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>?</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>-</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>:</span> <span class='int'>0</span>
@@ -622,12 +622,12 @@
       <pre class="lines">
 
 
-323
-324
-325</pre>
+303
+304
+305</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 323</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 303</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_overlaps?'>overlaps?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
@@ -652,15 +652,15 @@
       <pre class="lines">
 
 
-327
-328
-329
-330
-331
-332</pre>
+307
+308
+309
+310
+311
+312</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 327</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 307</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
   <span class='lbrace'>{</span>
@@ -711,12 +711,12 @@
       <pre class="lines">
 
 
-307
-308
-309</pre>
+287
+288
+289</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 307</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/contracts.rb', line 287</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&gt;=</span> <span class='int'>0</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_byte'>end_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
@@ -731,9 +731,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:40 2026 by
+  Generated on Thu Aug  6 23:38:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
