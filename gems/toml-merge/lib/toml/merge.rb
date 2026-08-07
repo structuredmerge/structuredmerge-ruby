@@ -8,6 +8,7 @@ require 'tree_haver'
 
 # Shared merge infrastructure
 require 'ast/merge'
+require_relative 'merge/version'
 
 # This gem
 

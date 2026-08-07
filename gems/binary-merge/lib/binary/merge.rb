@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'tree_haver'
+require_relative 'merge/version'
 
 module Binary
   module Merge

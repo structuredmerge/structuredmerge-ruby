@@ -3,6 +3,7 @@
 require 'json'
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/version'
 
 module Yaml
   module Merge

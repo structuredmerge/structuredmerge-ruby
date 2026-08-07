@@ -3,6 +3,7 @@
 require 'digest'
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/version'
 require_relative 'merge/block_directive_detector'
 require_relative 'merge/block_binding_support'
 require_relative 'merge/doc_comment_support'

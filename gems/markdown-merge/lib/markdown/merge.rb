@@ -2,6 +2,7 @@
 
 require 'ast/merge'
 require 'tree_haver'
+require_relative 'merge/version'
 
 module Markdown
   module Merge

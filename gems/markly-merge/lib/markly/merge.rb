@@ -2,6 +2,7 @@
 
 require 'markdown-merge'
 require 'markly'
+require_relative 'merge/version'
 
 module Markly
   module Merge

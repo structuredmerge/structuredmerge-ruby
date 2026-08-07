@@ -3,6 +3,7 @@
 require 'stringio'
 require 'zlib'
 require 'tree_haver'
+require_relative 'merge/version'
 
 module Zip
   module Merge

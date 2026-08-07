@@ -278,6 +278,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Restore VERSION loading through the public ast/merge entrypoint.
 
+- Restore version constants through public namespace entrypoints across the merge gems.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

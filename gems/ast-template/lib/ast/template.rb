@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'ast/merge'
+require_relative 'template/version'
 
 module Ast
   module Template

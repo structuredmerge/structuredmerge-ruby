@@ -2,6 +2,7 @@
 
 require 'ast/merge'
 require 'service_actor'
+require_relative 'crispr/version'
 
 module Ast
   module Crispr

@@ -2,6 +2,7 @@
 
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/version'
 
 module Go
   module Merge

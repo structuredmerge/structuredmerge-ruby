@@ -10,6 +10,7 @@
 # BACKEND COMPATIBILITY for Bash:
 # - FFI: Most portable and reliable with bash grammar (recommended)
 # - MRI: Has ABI incompatibility with bash grammar
+require_relative 'merge/version'
 # - Rust: Has version mismatch with bash grammar
 #
 # Set TREE_HAVER_BACKEND=ffi (or mri/rust) to control backend selection.

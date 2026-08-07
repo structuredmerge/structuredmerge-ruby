@@ -2,6 +2,7 @@
 
 require 'markdown-merge'
 require 'commonmarker'
+require_relative 'merge/version'
 
 module Commonmarker
   module Merge

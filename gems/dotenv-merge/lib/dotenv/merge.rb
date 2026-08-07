@@ -6,6 +6,7 @@
 require 'ast/merge'
 require 'plain/merge'
 require 'tree_haver'
+require_relative 'merge/version'
 
 # This gem
 
