@@ -24,7 +24,8 @@ require 'kettle/test/rspec'
 # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
 
 # This library
-require 'ast-crispr-markdown-markly'
+require 'ast/crispr/markdown/markly'
+
 require 'ast/crispr/rspec'
 
 RSpec.configure do |config|
