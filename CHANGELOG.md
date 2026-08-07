@@ -28,17 +28,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Point setup-ruby-flash at each monorepo gem before installing pre-bundle templating gems.
-
-- Keep setup-ruby-flash preinstalled templating gems visible during monorepo Bundler evaluation.
-
 ### Security
 
 ## [7.1.0] - 2026-08-07
 
 - TAG: [v7.1.0][7.1.0t]
-- COVERAGE: 47.26% -- 1580/3343 lines in 37 files
-- BRANCH COVERAGE: 13.69% -- 189/1381 branches in 37 files
+- COVERAGE: 47.23% -- 1579/3343 lines in 37 files
+- BRANCH COVERAGE: 13.61% -- 188/1381 branches in 37 files
 - 73.97% documented
 
 ### Added
@@ -314,6 +310,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Installed the nomono templating bootstrap inside Bundler's isolated path so CI can load nomono/bundler.
 
 - Use setup-ruby-flash pre-bundle gem support for the monorepo nomono bootstrap instead of pinning a CI install path or version.
+
+- Point setup-ruby-flash at each monorepo gem before installing pre-bundle templating gems.
+
+- Keep setup-ruby-flash preinstalled templating gems visible during monorepo Bundler evaluation.
 
 ## [7.0.0] - 2026-05-05
 
