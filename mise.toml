@@ -7,6 +7,8 @@ FORGE_ORG = "structuredmerge"
 KJ_HOMEPAGE_URI = "https://structuredmerge.org"
 KJ_REPOSITORY_TOPOLOGY = "monorepo-subproject"
 KETTLE_JEM_TEMPLATE_PROFILE = "monorepo-subgem"
+# Releases run from member gem directories but update this shared changelog.
+K_CHANGELOG_PATH = "{{config_root}}/CHANGELOG.md"
 
 [tasks.test]
 description = "Run Ruby specs"

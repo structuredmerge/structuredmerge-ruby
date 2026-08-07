@@ -276,6 +276,13 @@ We [![Keep A Changelog][📗keep-changelog-img]][📗keep-changelog] so if you m
 
 See [CONTRIBUTING.md][🤝contributing] for more detailed instructions.
 
+### Code Coverage
+
+<details markdown="1">
+<summary>Coverage service badges</summary>
+
+</details>
+
 ## 📌 Versioning
 
 This library follows [![Semantic Versioning 2.0.0][📌semver-img]][📌semver] for its public API where practical.
