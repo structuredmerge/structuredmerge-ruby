@@ -250,6 +250,10 @@ module Ruby
           'records to tree-sitter-language-pack.'
         )
       end
+      if !namespace_conflicts.empty? && TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_namespace_form_equivalence)
+        template_declarations += qualified_nested_declaration_entries(template_declarations)
+        template_declarations_by_key = template_declarations.to_h { |entry| [entry[:merge_key], entry] }
+      end
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
       preamble = destination_context.fetch(:preamble)
@@ -272,7 +276,8 @@ module Ruby
       )
       sections.concat(
         template_declarations.reject do |entry|
-          destination_paths[entry[:merge_key]]
+          destination_paths[entry[:merge_key]] ||
+            namespace_wrapper_matched?(entry, template_declarations, destination_paths)
         end.map { |entry| { text: entry[:text] } }
       )
       destination_footer = destination_context.fetch(:footer)
@@ -2457,7 +2462,7 @@ module Ruby
           }
         elsif %w[string_node string].include?(key_node.type.to_s)
           {
-            key: node_source(key_node),
+            key: hash_key_value(key_node),
             key_source: node_source(key_node),
             delimiter: delimiter
           }

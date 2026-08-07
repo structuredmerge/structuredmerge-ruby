@@ -11,9 +11,9 @@ KETTLE_JEM_TEMPLATE_PROFILE = "monorepo-subgem"
 K_CHANGELOG_PATH = "{{config_root}}/CHANGELOG.md"
 
 [tasks.test]
-description = "Run Ruby specs"
-run = "bundle exec rspec"
+description = "Run each member gem suite with its own bundle"
+run = "bundle exec kettle-family test --execute"
 
 [tasks.check]
-description = "Run the local Ruby verification suite"
-run = "bundle exec rspec"
+description = "Run the family test orchestration"
+run = "bundle exec kettle-family test --execute"

@@ -38,6 +38,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Restore the full templated Rakefile scaffold for this monorepo subgem.
 
+- Run family-root test and check tasks through kettle-family so each member uses its own bundle and test environment.
+
+- Allow freeze-marker test registrations to use the intentionally mutable marker registry.
+
+- Correct Ruby hash-rocket string key projection and reconcile equivalent nested and qualified namespace declarations.
+
+- Repair JSON structural statement enumeration and Plain text exact/refined matching.
+
+- Implement Ruby namespace-form declaration matching for equivalent qualified and nested declarations.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

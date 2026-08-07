@@ -102,18 +102,17 @@ module Plain
         template_index = template[:blocks].find_index.with_index do |template_block, candidate_index|
           !matched_template[candidate_index] && template_block[:normalized] == destination_block[:normalized]
         end
-        next unless template_index
-
-        matched_template[template_index] = true
-        matched_destination[destination_index] = true
-        matched << {
-          template_index: template_index,
-          destination_index: destination_index,
-          phase: 'exact',
-          score: 1.0
-        }
-
-        next if matched_destination[destination_index]
+        if template_index
+          matched_template[template_index] = true
+          matched_destination[destination_index] = true
+          matched << {
+            template_index: template_index,
+            destination_index: destination_index,
+            phase: 'exact',
+            score: 1.0
+          }
+          next
+        end
 
         best_template_index = nil
         best_score = 0.0

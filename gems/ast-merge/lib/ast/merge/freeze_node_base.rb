@@ -122,7 +122,7 @@ module Ast
           start: %r{^\s*/\*\s*[\w-]+:freeze\b.*\*/}i,
           end: %r{^\s*/\*\s*[\w-]+:unfreeze\b.*\*/}i
         }
-      }.freeze
+      }
 
       # Default pattern when none specified
       # @return [Symbol]

@@ -3,7 +3,7 @@
 require 'ast/merge/rspec/shared_examples/removal_mode_compliance'
 
 class TestRemovalModeMerger
-  REGISTERED_CASES = {}.freeze
+  REGISTERED_CASES = {}
 
   class << self
     def registered_cases
