@@ -28,12 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Synchronize the RuboCop Gradual baseline with the parser implementation so releases pass lint validation.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
 
 - TAG: [v7.1.0][7.1.0t]
-- COVERAGE: 47.23% -- 1579/3343 lines in 37 files
+- COVERAGE: 47.26% -- 1580/3343 lines in 37 files
 - BRANCH COVERAGE: 13.61% -- 188/1381 branches in 37 files
 - 73.97% documented
 
