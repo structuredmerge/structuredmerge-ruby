@@ -7,15 +7,6 @@ PATH
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.15)
 
-PATH
-  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/tree_haver
-  specs:
-    tree_haver (7.1.0)
-      citrus (~> 3.0)
-      parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.13.2, < 2.0)
-      version_gem (~> 1.1, >= 1.1.15)
-
 GEM
   remote: https://gem.coop/
   specs:
@@ -109,7 +100,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.21.2)
-    kettle-dev (2.5.21)
+    kettle-dev (2.5.22)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.5)
       kettle-ndjson (~> 0.1, >= 0.1.10)
@@ -117,10 +108,10 @@ GEM
       kettle-test (~> 2.0, >= 2.0.18)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
-    kettle-family (1.2.36)
+    kettle-family (1.2.37)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
-      kettle-dev (~> 2.3, >= 2.5.21)
+      kettle-dev (~> 2.3, >= 2.5.22)
       kettle-test (~> 2.0, >= 2.0.18)
       tsort (~> 0.2)
       tty-screen (~> 0.8)
@@ -379,6 +370,11 @@ GEM
     token-resolver (2.0.9)
       parslet (~> 2.0)
       version_gem (~> 1.1, >= 1.1.15)
+    tree_haver (7.1.0)
+      citrus (~> 3.0)
+      parslet (~> 2.0)
+      tree_sitter_language_pack (>= 1.13.2, < 2.0)
+      version_gem (~> 1.1, >= 1.1.15)
     tree_sitter_language_pack (1.14.3-aarch64-linux)
       sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.14.3-arm64-darwin)
@@ -474,7 +470,6 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8)
   stringio (>= 3.0)
-  tree_haver!
   turbo_tests2 (~> 3.2, >= 3.2.4)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.4)
@@ -529,8 +524,8 @@ CHECKSUMS
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
-  kettle-dev (2.5.21) sha256=c7fbb3d4bb7f845d48a1944dec522550f034903e39ca009c07e506bd749c1667
-  kettle-family (1.2.36) sha256=ebb15fe3f54920e87405453ecab9b76e831b8ac079ba5aca6f91c74f1e6d90c3
+  kettle-dev (2.5.22) sha256=460901ef1a894a556e847b17d616f27926c395e7d5a5746f0615ce1ef9b4fbef
+  kettle-family (1.2.37) sha256=9d0e7db9080c2d5fc608a9c81063ae32750f473e12f44cc2d5ac501533a0865d
   kettle-gha-pins (0.3.9) sha256=fd664efadb77df53e4e83bcb5c8ef60cb2d850cd1915dd88f6db0b019cdb3104
   kettle-ndjson (0.1.11) sha256=f09d3d926b0734a1b257109247b919725489b04235a871372e223f46b826a1ca
   kettle-rb (0.1.9) sha256=6dc58a072d6389a1399288f791819ce8f9e9653cf16767a9edc3a5e8a5127936
