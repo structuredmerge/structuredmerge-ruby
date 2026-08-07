@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Ruleset::Parser
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -519,7 +519,6 @@
       <pre class="lines">
 
 
-30
 31
 32
 33
@@ -529,10 +528,11 @@
 37
 38
 39
-40</pre>
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/ruleset/parser.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/ruleset/parser.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -913,12 +913,12 @@
       <pre class="lines">
 
 
-25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/ruleset/parser.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/ruleset/parser.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span>
@@ -949,7 +949,6 @@
       <pre class="lines">
 
 
-42
 43
 44
 45
@@ -963,10 +962,11 @@
 53
 54
 55
-56</pre>
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/ruleset/parser.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/ruleset/parser.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse'>parse</span>
   <span class='id identifier rubyid_parse_source!'>parse_source!</span>
@@ -980,7 +980,7 @@
     <span class='label'>logical_owners:</span> <span class='id identifier rubyid_logical_owners'>logical_owners</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='comma'>,</span>
     <span class='label'>repair_policies:</span> <span class='id identifier rubyid_repair_policies'>repair_policies</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='comma'>,</span>
     <span class='label'>surfaces:</span> <span class='id identifier rubyid_surfaces'>surfaces</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:dup</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>delegation_policies:</span> <span class='id identifier rubyid_delegation_policies'>delegation_policies</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:dup</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>delegation_policies:</span> <span class='id identifier rubyid_delegation_policies'>delegation_policies</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:dup</span><span class='rparen'>)</span>
   <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='ivar'>@parsed_values</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -993,9 +993,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

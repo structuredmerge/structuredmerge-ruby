@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Text::Section
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -842,18 +842,18 @@ AST-level node classification (see SectionTyping for that).</p>
       <pre class="lines">
 
 
-67
-68
 69
 70
 71
-72</pre>
+72
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_full_text'>full_text</span>
-  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_header'>header</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_header'>header</span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_result'>result</span>
@@ -905,16 +905,18 @@ AST-level node classification (see SectionTyping for that).</p>
       <pre class="lines">
 
 
-59
 60
 61
-62</pre>
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_count'>line_count</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_line'>end_line</span>
+
   <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>-</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>+</span> <span class='int'>1</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -967,13 +969,15 @@ AST-level node classification (see SectionTyping for that).</p>
 51
 52
 53
-54</pre>
+54
+55</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_range'>line_range</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_line'>end_line</span>
+
   <span class='id identifier rubyid_start_line'>start_line</span><span class='op'>..</span><span class='id identifier rubyid_end_line'>end_line</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1024,19 +1028,21 @@ Strips whitespace, downcases, and normalizes spaces.</p>
       <pre class="lines">
 
 
-85
-86
 87
 88
-89</pre>
+89
+90
+91
+92</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalized_name'>normalized_name</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1085,12 +1091,12 @@ Strips whitespace, downcases, and normalizes spaces.</p>
       <pre class="lines">
 
 
-77
-78
-79</pre>
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_preamble?'>preamble?</span>
   <span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:preamble</span>
@@ -1105,9 +1111,9 @@ Strips whitespace, downcases, and normalizes spaces.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:49 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

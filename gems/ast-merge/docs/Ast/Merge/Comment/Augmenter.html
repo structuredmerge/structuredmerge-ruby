@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Comment::Augmenter
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -502,6 +502,8 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
+33
+34
 35
 36
 37
@@ -519,12 +521,10 @@ objects that format gems can adopt incrementally.</p>
 49
 50
 51
-52
-53
-54</pre>
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>lines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>comments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>owners:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>style:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>capability:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_lines'>normalize_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
@@ -536,7 +536,7 @@ objects that format gems can adopt incrementally.</p>
     <span class='label'>style:</span> <span class='id identifier rubyid_style_name'>style_name</span><span class='comma'>,</span>
     <span class='label'>owner_count:</span> <span class='ivar'>@owners</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
     <span class='label'>comment_count:</span> <span class='ivar'>@tracked_comments</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 
   <span class='ivar'>@attachments_by_owner</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -583,12 +583,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attachments_by_owner'>attachments_by_owner</span>
   <span class='ivar'>@attachments_by_owner</span>
@@ -625,12 +625,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_capability'>capability</span>
   <span class='ivar'>@capability</span>
@@ -667,12 +667,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lines'>lines</span>
   <span class='ivar'>@lines</span>
@@ -709,12 +709,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_orphan_regions'>orphan_regions</span>
   <span class='ivar'>@orphan_regions</span>
@@ -751,12 +751,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owners'>owners</span>
   <span class='ivar'>@owners</span>
@@ -793,12 +793,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_postlude_region'>postlude_region</span>
   <span class='ivar'>@postlude_region</span>
@@ -835,12 +835,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_preamble_region'>preamble_region</span>
   <span class='ivar'>@preamble_region</span>
@@ -877,12 +877,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_style'>style</span>
   <span class='ivar'>@style</span>
@@ -919,12 +919,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-15
-16
-17</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tracked_comments'>tracked_comments</span>
   <span class='ivar'>@tracked_comments</span>
@@ -998,12 +998,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-30
-31
-32</pre>
+28
+29
+30</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -1076,12 +1076,12 @@ objects that format gems can adopt incrementally.</p>
       <pre class="lines">
 
 
-60
-61
-62</pre>
+58
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/augmenter.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attachments_by_owner'>attachments_by_owner</span><span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span>
@@ -1096,9 +1096,9 @@ objects that format gems can adopt incrementally.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

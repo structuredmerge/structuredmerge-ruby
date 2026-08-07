@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Recipe::Runner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -379,7 +379,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(recipe, dry_run: false, base_dir: nil, parser: nil, verbose: false, target_files: nil, context: nil, **options)  &#x21d2; Runner </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(recipe, dry_run: false, base_dir: nil, parser: nil, verbose: false, target_files: nil, context: nil, **_options)  &#x21d2; Runner </a>
     
 
     
@@ -473,7 +473,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#run_content-instance_method" title="#run_content (instance method)">#<strong>run_content</strong>(template_content:, destination_content:, target_path: nil, relative_path: nil, context: nil, **options) {|@results.first| ... } &#x21d2; Result </a>
+      <a href="#run_content-instance_method" title="#run_content (instance method)">#<strong>run_content</strong>(template_content:, destination_content:, target_path: nil, relative_path: nil, context: nil, **_options) {|@results.first| ... } &#x21d2; Result </a>
     
 
     
@@ -549,7 +549,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(recipe, dry_run: false, base_dir: nil, parser: nil, verbose: false, target_files: nil, context: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::Recipe::Runner (class)">Runner</a></span></tt> 
+    #<strong>initialize</strong>(recipe, dry_run: false, base_dir: nil, parser: nil, verbose: false, target_files: nil, context: nil, **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::Recipe::Runner (class)">Runner</a></span></tt> 
   
 
   
@@ -692,7 +692,6 @@
       <pre class="lines">
 
 
-76
 77
 78
 79
@@ -701,12 +700,15 @@
 82
 83
 84
-85</pre>
+85
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 77</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_recipe'>recipe</span><span class='comma'>,</span> <span class='label'>dry_run:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>base_dir:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parser:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>verbose:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>target_files:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>context:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_recipe'>recipe</span><span class='comma'>,</span> <span class='label'>dry_run:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>base_dir:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parser:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>verbose:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>target_files:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+               <span class='label'>context:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='ivar'>@recipe</span> <span class='op'>=</span> <span class='id identifier rubyid_recipe'>recipe</span>
   <span class='ivar'>@dry_run</span> <span class='op'>=</span> <span class='id identifier rubyid_dry_run'>dry_run</span>
   <span class='ivar'>@base_dir</span> <span class='op'>=</span> <span class='id identifier rubyid_base_dir'>base_dir</span> <span class='op'>||</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span>
@@ -770,12 +772,12 @@
       <pre class="lines">
 
 
-53
 54
-55</pre>
+55
+56</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_base_dir'>base_dir</span>
   <span class='ivar'>@base_dir</span>
@@ -829,12 +831,12 @@
       <pre class="lines">
 
 
-65
 66
-67</pre>
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_context'>context</span>
   <span class='ivar'>@context</span>
@@ -888,12 +890,12 @@
       <pre class="lines">
 
 
-50
 51
-52</pre>
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_dry_run'>dry_run</span>
   <span class='ivar'>@dry_run</span>
@@ -947,12 +949,12 @@
       <pre class="lines">
 
 
-56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parser'>parser</span>
   <span class='ivar'>@parser</span>
@@ -1006,12 +1008,12 @@
       <pre class="lines">
 
 
-47
 48
-49</pre>
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_recipe'>recipe</span>
   <span class='ivar'>@recipe</span>
@@ -1065,12 +1067,12 @@
       <pre class="lines">
 
 
-62
 63
-64</pre>
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 63</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_results'>results</span>
   <span class='ivar'>@results</span>
@@ -1124,12 +1126,12 @@
       <pre class="lines">
 
 
-59
 60
-61</pre>
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_target_files'>target_files</span>
   <span class='ivar'>@target_files</span>
@@ -1184,12 +1186,12 @@
       <pre class="lines">
 
 
-142
-143
-144</pre>
+145
+146
+147</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 142</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 145</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_results_by_status'>results_by_status</span>
   <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_group_by'>group_by</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:status</span><span class='rparen'>)</span>
@@ -1237,27 +1239,27 @@
       <pre class="lines">
 
 
-164
-165
-166
 167
 168
 169
 170
 171
 172
-173</pre>
+173
+174
+175
+176</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 164</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_results_table'>results_table</span>
   <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_r'>r</span><span class='op'>|</span>
     <span class='lbrace'>{</span>
       <span class='label'>file:</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_relative_path'>relative_path</span><span class='comma'>,</span>
       <span class='label'>status:</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_status'>status</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
-      <span class='label'>changed:</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yes</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='label'>message:</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='comma'>,</span>
+      <span class='label'>changed:</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yes</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>message:</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -1308,8 +1310,6 @@
       <pre class="lines">
 
 
-90
-91
 92
 93
 94
@@ -1330,10 +1330,12 @@
 109
 110
 111
-112</pre>
+112
+113
+114</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 92</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
   <span class='ivar'>@results</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1343,12 +1345,12 @@
 
   <span class='comment'># Use command-line targets if provided, otherwise expand from recipe
 </span>  <span class='id identifier rubyid_files_to_process'>files_to_process</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ivar'>@target_files</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@target_files</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-    <span class='comment'># Expand paths relative to base_dir
-</span>    <span class='ivar'>@target_files</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='comma'>,</span> <span class='ivar'>@base_dir</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-  <span class='kw'>else</span>
-    <span class='comment'># Let the recipe expand targets from its own location
-</span>    <span class='id identifier rubyid_recipe'>recipe</span><span class='period'>.</span><span class='id identifier rubyid_expand_targets'>expand_targets</span>
-  <span class='kw'>end</span>
+                       <span class='comment'># Expand paths relative to base_dir
+</span>                       <span class='ivar'>@target_files</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='comma'>,</span> <span class='ivar'>@base_dir</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+                     <span class='kw'>else</span>
+                       <span class='comment'># Let the recipe expand targets from its own location
+</span>                       <span class='id identifier rubyid_recipe'>recipe</span><span class='period'>.</span><span class='id identifier rubyid_expand_targets'>expand_targets</span>
+                     <span class='kw'>end</span>
 
   <span class='id identifier rubyid_files_to_process'>files_to_process</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_target_path'>target_path</span><span class='op'>|</span>
     <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_process_file'>process_file</span><span class='lparen'>(</span><span class='id identifier rubyid_target_path'>target_path</span><span class='comma'>,</span> <span class='id identifier rubyid_template_content'>template_content</span><span class='rparen'>)</span>
@@ -1366,7 +1368,7 @@
       <div class="method_details ">
   <h3 class="signature " id="run_content-instance_method">
   
-    #<strong>run_content</strong>(template_content:, destination_content:, target_path: nil, relative_path: nil, context: nil, **options) {|@results.first| ... } &#x21d2; <tt><span class='object_link'><a href="Runner/Result.html" title="Ast::Merge::Recipe::Runner::Result (class)">Result</a></span></tt> 
+    #<strong>run_content</strong>(template_content:, destination_content:, target_path: nil, relative_path: nil, context: nil, **_options) {|@results.first| ... } &#x21d2; <tt><span class='object_link'><a href="Runner/Result.html" title="Ast::Merge::Recipe::Runner::Result (class)">Result</a></span></tt> 
   
 
   
@@ -1503,8 +1505,6 @@ template and destination strings directly.</p>
       <pre class="lines">
 
 
-126
-127
 128
 129
 130
@@ -1514,19 +1514,23 @@ template and destination strings directly.</p>
 134
 135
 136
-137</pre>
+137
+138
+139
+140</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 126</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 128</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_run_content'>run_content</span><span class='lparen'>(</span><span class='label'>template_content:</span><span class='comma'>,</span> <span class='label'>destination_content:</span><span class='comma'>,</span> <span class='label'>target_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>relative_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>context:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_run_content'>run_content</span><span class='lparen'>(</span><span class='label'>template_content:</span><span class='comma'>,</span> <span class='label'>destination_content:</span><span class='comma'>,</span> <span class='label'>target_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>relative_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>context:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='ivar'>@results</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_process_file_steps'>process_file_steps</span><span class='lparen'>(</span>
-    <span class='id identifier rubyid_target_path'>target_path</span> <span class='op'>||</span> <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(memory)</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='op'>||</span> <span class='id identifier rubyid_target_path'>target_path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(memory)</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='id identifier rubyid_target_path'>target_path</span> <span class='op'>||</span> <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(memory)</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='op'>||</span> <span class='id identifier rubyid_target_path'>target_path</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(memory)</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
     <span class='id identifier rubyid_destination_content'>destination_content</span><span class='comma'>,</span>
     <span class='label'>write_changes:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>context:</span> <span class='id identifier rubyid_runtime_context'>runtime_context</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>context:</span> <span class='id identifier rubyid_runtime_context'>runtime_context</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
   <span class='rparen'>)</span><span class='rbracket'>]</span>
   <span class='kw'>yield</span> <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
   <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1574,9 +1578,6 @@ template and destination strings directly.</p>
       <pre class="lines">
 
 
-149
-150
-151
 152
 153
 154
@@ -1584,10 +1585,13 @@ template and destination strings directly.</p>
 156
 157
 158
-159</pre>
+159
+160
+161
+162</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_summary'>summary</span>
   <span class='id identifier rubyid_by_status'>by_status</span> <span class='op'>=</span> <span class='id identifier rubyid_results_by_status'>results_by_status</span>
@@ -1597,7 +1601,7 @@ template and destination strings directly.</p>
     <span class='label'>would_update:</span> <span class='lparen'>(</span><span class='id identifier rubyid_by_status'>by_status</span><span class='lbracket'>[</span><span class='symbol'>:would_update</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
     <span class='label'>unchanged:</span> <span class='lparen'>(</span><span class='id identifier rubyid_by_status'>by_status</span><span class='lbracket'>[</span><span class='symbol'>:unchanged</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
     <span class='label'>skipped:</span> <span class='lparen'>(</span><span class='id identifier rubyid_by_status'>by_status</span><span class='lbracket'>[</span><span class='symbol'>:skipped</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>errors:</span> <span class='lparen'>(</span><span class='id identifier rubyid_by_status'>by_status</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>errors:</span> <span class='lparen'>(</span><span class='id identifier rubyid_by_status'>by_status</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1643,28 +1647,28 @@ template and destination strings directly.</p>
       <pre class="lines">
 
 
-178
-179
-180
 181
 182
 183
 184
 185
 186
-187</pre>
+187
+188
+189
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 178</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/runner.rb', line 181</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_summary_table'>summary_table</span>
   <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='id identifier rubyid_summary'>summary</span>
   <span class='lbracket'>[</span>
-    <span class='lbrace'>{</span><span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Total files</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:total</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Updated</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_dry_run'>dry_run</span> <span class='op'>?</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:would_update</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:updated</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unchanged</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:unchanged</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Skipped (no anchor)</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:skipped</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Errors</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:errors</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Total files</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:total</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Updated</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_dry_run'>dry_run</span> <span class='op'>?</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:would_update</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:updated</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unchanged</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:unchanged</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipped (no anchor)</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:skipped</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>metric:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Errors</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_s'>s</span><span class='lbracket'>[</span><span class='symbol'>:errors</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
   <span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1677,9 +1681,9 @@ template and destination strings directly.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

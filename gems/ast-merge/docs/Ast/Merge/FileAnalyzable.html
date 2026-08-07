@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Merge::FileAnalyzable
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1312,8 +1312,8 @@ returns an empty attachment so callers can migrate incrementally.</p>
     <span class='label'>leading_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
     <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
-      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1456,7 +1456,6 @@ shared augmenter interface while reporting the analysis capability.</p>
       <pre class="lines">
 
 
-460
 461
 462
 463
@@ -1464,10 +1463,11 @@ shared augmenter interface while reporting the analysis capability.</p>
 465
 466
 467
-468</pre>
+468
+469</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 460</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 461</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Augmenter.html" title="Ast::Merge::Comment::Augmenter (class)">Augmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Augmenter.html#initialize-instance_method" title="Ast::Merge::Comment::Augmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span>
@@ -1475,7 +1475,7 @@ shared augmenter interface while reporting the analysis capability.</p>
     <span class='label'>comments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span>
     <span class='label'>capability:</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1776,8 +1776,8 @@ region of the requested kind so callers can rely on the hook surface.</p>
     <span class='label'>nodes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
-      <span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1860,7 +1860,7 @@ intended read/write model independently from raw parser capability.</p>
   <span class='id identifier rubyid_capability'>capability</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
   <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
-    <span class='label'>capability:</span> <span class='id identifier rubyid_capability'>capability</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span>
+    <span class='label'>capability:</span> <span class='id identifier rubyid_capability'>capability</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span>
   <span class='rbrace'>}</span>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_capability'>capability</span><span class='period'>.</span><span class='id identifier rubyid_none?'>none?</span>
@@ -1870,14 +1870,14 @@ intended read/write model independently from raw parser capability.</p>
       <span class='label'>read:</span> <span class='symbol'>:source_augmented_portable_write</span><span class='comma'>,</span>
       <span class='label'>source:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>capability:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:capability</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>style:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>style:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span>
     <span class='rparen'>)</span>
   <span class='kw'>else</span>
     <span class='const'><span class='object_link'><a href="Ruleset.html" title="Ast::Merge::Ruleset (module)">Ruleset</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html" title="Ast::Merge::Ruleset::SupportStyleResolver (class)">SupportStyleResolver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html#call-class_method" title="Ast::Merge::Ruleset::SupportStyleResolver.call (method)">call</a></span></span><span class='lparen'>(</span>
       <span class='label'>read:</span> <span class='symbol'>:native_read_portable_write</span><span class='comma'>,</span>
       <span class='label'>source:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>capability:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:capability</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>style:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>style:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -1966,12 +1966,12 @@ This method must be implemented by including classes.</p>
       <pre class="lines">
 
 
-743
 744
-745</pre>
+745
+746</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 743</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 744</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> must implement #compute_node_signature</span><span class='tstring_end'>&quot;</span></span>
@@ -2055,16 +2055,16 @@ This includes:</p>
       <pre class="lines">
 
 
-729
 730
 731
 732
 733
 734
-735</pre>
+735
+736</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 729</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 730</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="AstNode.html" title="Ast::Merge::AstNode (class)">AstNode</a></span></span><span class='rparen'>)</span> <span class='op'>||</span>
@@ -2156,7 +2156,7 @@ surface more specific without replacing the whole profile object.</p>
     <span class='label'>repair_policies:</span> <span class='id identifier rubyid_ruleset_repair_policies'>ruleset_repair_policies</span><span class='comma'>,</span>
     <span class='label'>surfaces:</span> <span class='id identifier rubyid_ruleset_surfaces'>ruleset_surfaces</span><span class='comma'>,</span>
     <span class='label'>delegation_policies:</span> <span class='id identifier rubyid_ruleset_delegation_policies'>ruleset_delegation_policies</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span> <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2442,7 +2442,6 @@ ensuring only ONE version is output (the destination version, since it’s froze
       <pre class="lines">
 
 
-613
 614
 615
 616
@@ -2541,10 +2540,11 @@ ensuring only ONE version is output (the destination version, since it’s froze
 709
 710
 711
-712</pre>
+712
+713</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 613</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 614</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='comment'># ==========================================================================
@@ -2558,9 +2558,7 @@ ensuring only ONE version is output (the destination version, since it’s froze
 </span>  <span class='comment'># These are standalone structural elements (not attached to AST nodes).
 </span>  <span class='comment'># They use content-based signatures so identical freeze blocks match.
 </span>  <span class='comment'># This is different from FrozenWrapper which wraps AST nodes.
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_freeze_signature'>freeze_signature</span>
-  <span class='kw'>end</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_freeze_signature'>freeze_signature</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></span><span class='rparen'>)</span>
 
   <span class='comment'># ==========================================================================
 </span>  <span class='comment'># CASE 2: Unwrap FrozenWrapper (and other wrappers)
@@ -2581,68 +2579,70 @@ ensuring only ONE version is output (the destination version, since it’s froze
 </span>  <span class='id identifier rubyid_actual_node'>actual_node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span>
 
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
-    <span class='comment'># ==========================================================================
-</span>    <span class='comment'># CASE 3: Custom signature generator
-</span>    <span class='comment'># ==========================================================================
-</span>    <span class='comment'># Pass the UNWRAPPED node to the custom generator. This ensures:
-</span>    <span class='comment'># - Type checks work (e.g., `node.is_a?(Prism::CallNode)`)
-</span>    <span class='comment'># - The generator sees the real AST structure
-</span>    <span class='comment'># - Frozen nodes match by their underlying identity
-</span>    <span class='comment'>#
-</span>    <span class='comment'># NOTE: For TreeHaver-based backends, the node already has a unified API
-</span>    <span class='comment'># with #text, #type, #source_position methods. For other backends, they
-</span>    <span class='comment'># must conform to the same API (either via TreeHaver or equivalent adapter).
-</span>    <span class='id identifier rubyid_custom_result'>custom_result</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span>
-    <span class='kw'>case</span> <span class='id identifier rubyid_custom_result'>custom_result</span>
-    <span class='kw'>when</span> <span class='const'>Array</span><span class='comma'>,</span> <span class='kw'>nil</span>
-      <span class='comment'># Generator returned a final signature or nil - use as-is
-</span>      <span class='id identifier rubyid_custom_result'>custom_result</span>
-    <span class='kw'>else</span>
-      <span class='comment'># Generator returned a node (fallthrough) - compute default signature.
-</span>      <span class='comment'>#
-</span>      <span class='comment'># Two conditions indicate the generator is deferring to default handling:
-</span>      <span class='comment'># 1. Identity equality: the generator returned the exact same object it
-</span>      <span class='comment'>#    received (classic &quot;I don&#39;t handle this type&quot; passthrough pattern).
-</span>      <span class='comment'># 2. Known node type: the result is a recognised wrapper/node class.
-</span>      <span class='comment'>#
-</span>      <span class='comment'># If neither applies, treat the return value as a final custom signature
-</span>      <span class='comment'># (e.g. a String, Symbol, or other non-node key).
-</span>      <span class='kw'>if</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_custom_result'>custom_result</span><span class='rparen'>)</span>
-        <span class='comment'># Special case: if fallthrough result is Freezable, use freeze_signature
-</span>        <span class='comment'># This handles cases where the generator wraps a node in Freezable
-</span>        <span class='kw'>if</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></span><span class='rparen'>)</span>
-          <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_freeze_signature'>freeze_signature</span>
-        <span class='kw'>else</span>
-          <span class='comment'># Unwrap any wrapper and compute default signature
-</span>          <span class='id identifier rubyid_unwrapped'>unwrapped</span> <span class='op'>=</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_custom_result'>custom_result</span>
-          <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_unwrapped'>unwrapped</span><span class='rparen'>)</span>
-        <span class='kw'>end</span>
-      <span class='kw'>else</span>
-        <span class='comment'># Non-node return value - pass through (allows arbitrary signature types)
-</span>        <span class='id identifier rubyid_custom_result'>custom_result</span>
-      <span class='kw'>end</span>
-    <span class='kw'>end</span>
-  <span class='kw'>else</span>
-    <span class='comment'># ==========================================================================
-</span>    <span class='comment'># CASE 4: No custom generator - use default computation
-</span>    <span class='comment'># ==========================================================================
-</span>    <span class='comment'># Pass the UNWRAPPED node to compute_node_signature. This is critical
-</span>    <span class='comment'># because compute_node_signature uses type checking (e.g., case statements
-</span>    <span class='comment'># matching Prism::DefNode, Prism::CallNode, etc.). If we pass a
-</span>    <span class='comment'># FrozenWrapper, it won&#39;t match any of those types and will fall through
-</span>    <span class='comment'># to a generic handler, producing incorrect signatures.
-</span>    <span class='comment'>#
-</span>    <span class='comment'># For FrozenWrapper nodes, the underlying AST node determines the signature
-</span>    <span class='comment'># (e.g., method name for DefNode, gem name for CallNode). The wrapper only
-</span>    <span class='comment'># affects merge preference (destination wins), not matching.
-</span>    <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+             <span class='comment'># ==========================================================================
+</span>             <span class='comment'># CASE 3: Custom signature generator
+</span>             <span class='comment'># ==========================================================================
+</span>             <span class='comment'># Pass the UNWRAPPED node to the custom generator. This ensures:
+</span>             <span class='comment'># - Type checks work (e.g., `node.is_a?(Prism::CallNode)`)
+</span>             <span class='comment'># - The generator sees the real AST structure
+</span>             <span class='comment'># - Frozen nodes match by their underlying identity
+</span>             <span class='comment'>#
+</span>             <span class='comment'># NOTE: For TreeHaver-based backends, the node already has a unified API
+</span>             <span class='comment'># with #text, #type, #source_position methods. For other backends, they
+</span>             <span class='comment'># must conform to the same API (either via TreeHaver or equivalent adapter).
+</span>             <span class='id identifier rubyid_custom_result'>custom_result</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span>
+             <span class='kw'>case</span> <span class='id identifier rubyid_custom_result'>custom_result</span>
+             <span class='kw'>when</span> <span class='const'>Array</span><span class='comma'>,</span> <span class='kw'>nil</span>
+               <span class='comment'># Generator returned a final signature or nil - use as-is
+</span>               <span class='id identifier rubyid_custom_result'>custom_result</span>
+             <span class='kw'>else</span>
+               <span class='comment'># Generator returned a node (fallthrough) - compute default signature.
+</span>               <span class='comment'>#
+</span>               <span class='comment'># Two conditions indicate the generator is deferring to default handling:
+</span>               <span class='comment'># 1. Identity equality: the generator returned the exact same object it
+</span>               <span class='comment'>#    received (classic &quot;I don&#39;t handle this type&quot; passthrough pattern).
+</span>               <span class='comment'># 2. Known node type: the result is a recognised wrapper/node class.
+</span>               <span class='comment'>#
+</span>               <span class='comment'># If neither applies, treat the return value as a final custom signature
+</span>               <span class='comment'># (e.g. a String, Symbol, or other non-node key).
+</span>               <span class='kw'>if</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_custom_result'>custom_result</span><span class='rparen'>)</span>
+                 <span class='comment'># Special case: if fallthrough result is Freezable, use freeze_signature
+</span>                 <span class='comment'># This handles cases where the generator wraps a node in Freezable
+</span>                 <span class='kw'>if</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_freeze_signature'>freeze_signature</span>
+                 <span class='kw'>else</span>
+                   <span class='comment'># Unwrap any wrapper and compute default signature
+</span>                   <span class='id identifier rubyid_unwrapped'>unwrapped</span> <span class='op'>=</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_custom_result'>custom_result</span>
+                   <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_unwrapped'>unwrapped</span><span class='rparen'>)</span>
+                 <span class='kw'>end</span>
+               <span class='kw'>else</span>
+                 <span class='comment'># Non-node return value - pass through (allows arbitrary signature types)
+</span>                 <span class='id identifier rubyid_custom_result'>custom_result</span>
+               <span class='kw'>end</span>
+             <span class='kw'>end</span>
+           <span class='kw'>else</span>
+             <span class='comment'># ==========================================================================
+</span>             <span class='comment'># CASE 4: No custom generator - use default computation
+</span>             <span class='comment'># ==========================================================================
+</span>             <span class='comment'># Pass the UNWRAPPED node to compute_node_signature. This is critical
+</span>             <span class='comment'># because compute_node_signature uses type checking (e.g., case statements
+</span>             <span class='comment'># matching Prism::DefNode, Prism::CallNode, etc.). If we pass a
+</span>             <span class='comment'># FrozenWrapper, it won&#39;t match any of those types and will fall through
+</span>             <span class='comment'># to a generic handler, producing incorrect signatures.
+</span>             <span class='comment'>#
+</span>             <span class='comment'># For FrozenWrapper nodes, the underlying AST node determines the signature
+</span>             <span class='comment'># (e.g., method name for DefNode, gem name for CallNode). The wrapper only
+</span>             <span class='comment'># affects merge preference (destination wins), not matching.
+</span>             <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span>
+           <span class='kw'>end</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Ast::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'><span class='object_link'><a href="DebugLogger.html#debug-instance_method" title="Ast::Merge::DebugLogger#debug (method)">debug</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Generated signature</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-    <span class='label'>node_type:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>::</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='comma'>,</span>
-    <span class='label'>signature:</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span>
-    <span class='label'>generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span>
+    <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Ast::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'><span class='object_link'><a href="DebugLogger.html#debug-instance_method" title="Ast::Merge::DebugLogger#debug (method)">debug</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Generated signature</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                        <span class='label'>node_type:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>::</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='comma'>,</span>
+                        <span class='label'>signature:</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span>
+                        <span class='label'>generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span>
+                      <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_result'>result</span>
 <span class='kw'>end</span></pre>
@@ -2804,7 +2804,6 @@ incrementally.</p>
       <pre class="lines">
 
 
-480
 481
 482
 483
@@ -2822,18 +2821,19 @@ incrementally.</p>
 495
 496
 497
-498</pre>
+498
+499</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 480</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 481</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_owners'>owners</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span>
   <span class='id identifier rubyid_augmenter'>augmenter</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owners'>owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+                <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+              <span class='kw'>else</span>
+                <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+              <span class='kw'>end</span>
 
   <span class='id identifier rubyid_inferred_attachment'>inferred_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_augmenter'>augmenter</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
 
@@ -2842,8 +2842,8 @@ incrementally.</p>
     <span class='label'>leading_gap:</span> <span class='id identifier rubyid_inferred_attachment'>inferred_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
     <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_inferred_attachment'>inferred_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
-      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2930,22 +2930,22 @@ blank-line runs from source lines and owner ranges.</p>
       <pre class="lines">
 
 
-510
 511
 512
 513
 514
 515
-516</pre>
+516
+517</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 510</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 511</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="Layout.html" title="Ast::Merge::Layout (module)">Layout</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Layout/Augmenter.html" title="Ast::Merge::Layout::Augmenter (class)">Augmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Layout/Augmenter.html#initialize-instance_method" title="Ast::Merge::Layout::Augmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span>
     <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span>
     <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2991,15 +2991,15 @@ blank-line runs from source lines and owner ranges.</p>
       <pre class="lines">
 
 
-518
 519
 520
 521
 522
-523</pre>
+523
+524</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 518</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 519</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_owner_supported?'>layout_owner_supported?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_owner'>owner</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
@@ -3183,7 +3183,6 @@ leading regions) while preserving tracker-based fallback behavior.</p>
       <pre class="lines">
 
 
-393
 394
 395
 396
@@ -3191,10 +3190,11 @@ leading regions) while preserving tracker-based fallback behavior.</p>
 398
 399
 400
-401</pre>
+401
+402</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 393</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 394</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_augmented_comment_attachment_with_layout'>merge_augmented_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_augmenter_attachment'>augmenter_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
@@ -3202,7 +3202,7 @@ leading regions) while preserving tracker-based fallback behavior.</p>
   <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
     <span class='id identifier rubyid_augmenter_attachment'>augmenter_attachment</span> <span class='op'>||</span> <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3300,7 +3300,6 @@ the shared gap ownership model through the returned comment attachment.</p>
       <pre class="lines">
 
 
-368
 369
 370
 371
@@ -3313,10 +3312,11 @@ the shared gap ownership model through the returned comment attachment.</p>
 378
 379
 380
-381</pre>
+381
+382</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 368</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 369</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_layout_attachment'>layout_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_owner_supported?'>layout_owner_supported?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>nil</span>
@@ -3329,7 +3329,7 @@ the shared gap ownership model through the returned comment attachment.</p>
     <span class='label'>orphan_regions:</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_orphan_regions'>orphan_regions</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>leading_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
     <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='lparen'>(</span><span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_metadata'>metadata</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lparen'>(</span><span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_metadata'>metadata</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3396,7 +3396,6 @@ attachment shape while normalizing that metadata in one place.</p>
       <pre class="lines">
 
 
-430
 431
 432
 433
@@ -3415,10 +3414,11 @@ attachment shape while normalizing that metadata in one place.</p>
 446
 447
 448
-449</pre>
+449
+450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 430</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 431</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_layout_owned_comment_attachment'>normalize_layout_owned_comment_attachment</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_attachment'>attachment</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_region'>leading_region</span>
@@ -3430,14 +3430,14 @@ attachment shape while normalizing that metadata in one place.</p>
     <span class='label'>leading_region:</span> <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Region</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Region.html#initialize-instance_method" title="Ast::Merge::Comment::Region#initialize (method)">new</a></span></span><span class='lparen'>(</span>
       <span class='label'>kind:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span>
       <span class='label'>nodes:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_nodes'>nodes</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>floating:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>metadata:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>floating:</span> <span class='kw'>true</span><span class='rparen'>)</span>
     <span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>inline_region:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_inline_region'>inline_region</span><span class='comma'>,</span>
     <span class='label'>trailing_region:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='comma'>,</span>
     <span class='label'>orphan_regions:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_orphan_regions'>orphan_regions</span><span class='comma'>,</span>
     <span class='label'>leading_gap:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
     <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3533,7 +3533,6 @@ normalize any layout-owned leading region metadata.</p>
       <pre class="lines">
 
 
-410
 411
 412
 413
@@ -3541,18 +3540,19 @@ normalize any layout-owned leading region metadata.</p>
 415
 416
 417
-418</pre>
+418
+419</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 410</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 411</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_tracked_comment_attachment_with_layout'>normalize_tracked_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalize_layout_owned_comment_attachment'>normalize_layout_owned_comment_attachment</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span>
       <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
       <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span>
-      <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
-    <span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+    <span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3727,13 +3727,13 @@ normalize any layout-owned leading region metadata.</p>
       <pre class="lines">
 
 
-531
 532
 533
-534</pre>
+534
+535</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 531</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 532</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owner_leading_comment_freeze?'>owner_leading_comment_freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attachment'>attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -3833,13 +3833,13 @@ normalize any layout-owned leading region metadata.</p>
       <pre class="lines">
 
 
-542
 543
 544
-545</pre>
+545
+546</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 542</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 543</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owner_leading_comment_unfreeze?'>owner_leading_comment_unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attachment'>attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -3908,7 +3908,7 @@ normalize any layout-owned leading region metadata.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_capabilities'>ruleset_capabilities</span>
   <span class='lbrace'>{</span>
     <span class='label'>layout_aware:</span> <span class='kw'>true</span><span class='comma'>,</span>
-    <span class='label'>logical_owner:</span> <span class='id identifier rubyid_ruleset_logical_owners'>ruleset_logical_owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span><span class='comma'>,</span>
+    <span class='label'>logical_owner:</span> <span class='id identifier rubyid_ruleset_logical_owners'>ruleset_logical_owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -4315,12 +4315,14 @@ still preserving any custom tracker attachment selection they need.</p>
 354
 355
 356
-357</pre>
+357
+358</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 344</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span><span class='comma'>,</span>
+                                  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_strategy'>strategy</span>
   <span class='kw'>when</span> <span class='symbol'>:layout_only</span>
     <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -4465,12 +4467,12 @@ their read/write model.</p>
   <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
     <span class='label'>capability:</span> <span class='id identifier rubyid_capability'>capability</span><span class='comma'>,</span>
-    <span class='label'>style:</span> <span class='id identifier rubyid_style'>style</span><span class='comma'>,</span>
+    <span class='label'>style:</span> <span class='id identifier rubyid_style'>style</span>
   <span class='rbrace'>}</span>
 
   <span class='const'><span class='object_link'><a href="Ruleset.html" title="Ast::Merge::Ruleset (module)">Ruleset</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html" title="Ast::Merge::Ruleset::SupportStyleResolver (class)">SupportStyleResolver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html#call-class_method" title="Ast::Merge::Ruleset::SupportStyleResolver.call (method)">call</a></span></span><span class='lparen'>(</span><span class='label'>read:</span> <span class='id identifier rubyid_read_strategy'>read_strategy</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_details'>details</span><span class='rparen'>)</span>
 <span class='kw'>rescue</span> <span class='const'>ArgumentError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown ruleset read strategy:</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown ruleset read strategy:</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown comment support read strategy: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_read_strategy'>read_strategy</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
@@ -4623,9 +4625,9 @@ The default implementation returns @statements if set, otherwise an empty array.
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:47 2026 by
+  Generated on Thu Aug  6 23:41:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

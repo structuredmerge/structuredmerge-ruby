@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::EmitterBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -255,6 +255,29 @@ across unrelated formats</li>
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#blank_lines%3F-instance_method" title="#blank_lines? (instance method)">#<strong>blank_lines?</strong>(candidate_lines)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check whether every provided line is blank.</p>
+</div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -527,6 +550,29 @@ across unrelated formats</li>
 
   
     <span class="summary_desc"><div class='inline'><p>Emit a comment from CommentTracker hash Subclasses should override this to handle format-specific comment syntax.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ends_with_blank_line%3F-instance_method" title="#ends_with_blank_line? (instance method)">#<strong>ends_with_blank_line?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check whether the current emitter output ends with a blank line.</p>
 </div></span>
   
 </li>
@@ -905,7 +951,79 @@ across unrelated formats</li>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="clear-instance_method">
+  <h3 class="signature first" id="blank_lines?-instance_method">
+  
+    #<strong>blank_lines?</strong>(candidate_lines)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check whether every provided line is blank.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>candidate_lines</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lines to classify</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+241
+242
+243</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 241</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_blank_lines?'>blank_lines?</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate_lines'>candidate_lines</span><span class='rparen'>)</span>
+  <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate_lines'>candidate_lines</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_all?'>all?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clear-instance_method">
   
     #<strong>clear</strong>  &#x21d2; <tt>Object</tt> 
   
@@ -929,14 +1047,14 @@ across unrelated formats</li>
       <pre class="lines">
 
 
-228
-229
-230
-231
-232</pre>
+253
+254
+255
+256
+257</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 228</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 253</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear'>clear</span>
   <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -973,12 +1091,12 @@ across unrelated formats</li>
       <pre class="lines">
 
 
-235
-236
-237</pre>
+260
+261
+262</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 235</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear_subclass_state'>clear_subclass_state</span>
   <span class='comment'># Override in subclasses if needed
@@ -1013,12 +1131,12 @@ across unrelated formats</li>
       <pre class="lines">
 
 
-245
-246
-247</pre>
+270
+271
+272</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 245</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 270</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_dedent'>dedent</span>
   <span class='ivar'>@indent_level</span> <span class='op'>-=</span> <span class='int'>1</span> <span class='kw'>if</span> <span class='ivar'>@indent_level</span> <span class='op'>&gt;</span> <span class='int'>0</span>
@@ -1061,7 +1179,7 @@ across unrelated formats</li>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_blank_line'>emit_blank_line</span>
-  <span class='ivar'>@lines</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='ivar'>@lines</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1151,7 +1269,7 @@ Subclasses should override this to support full-line and inline emission.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_comment'>emit_comment</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='comma'>,</span> <span class='label'>inline:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Subclasses must implement emit_comment</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Subclasses must implement emit_comment</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1304,26 +1422,34 @@ Subclasses should override this to support full-line and inline emission.</p>
 134
 135
 136
-137</pre>
+137
+138
+139
+140
+141</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 120</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_emit_comment_attachment'>emit_comment_attachment</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='comma'>,</span> <span class='label'>leading:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>inline:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>trailing:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>orphan:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_emit_comment_attachment'>emit_comment_attachment</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='comma'>,</span> <span class='label'>leading:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>inline:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>trailing:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>orphan:</span> <span class='kw'>false</span><span class='comma'>,</span>
+                            <span class='label'>source_lines:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:leading_region</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:inline_region</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_regions'>regions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_regions'>regions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span> <span class='kw'>if</span> <span class='id identifier rubyid_leading'>leading</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span>
   <span class='id identifier rubyid_regions'>regions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_inline_region'>inline_region</span> <span class='kw'>if</span> <span class='id identifier rubyid_inline'>inline</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_inline_region'>inline_region</span>
-  <span class='id identifier rubyid_regions'>regions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span> <span class='kw'>if</span> <span class='id identifier rubyid_trailing'>trailing</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:trailing_region</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_trailing'>trailing</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:trailing_region</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span>
+    <span class='id identifier rubyid_regions'>regions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span>
+  <span class='kw'>end</span>
   <span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_orphan_regions'>orphan_regions</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_orphan'>orphan</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:orphan_regions</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_previous_region_end_line'>previous_region_end_line</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='op'>|</span>
     <span class='id identifier rubyid_current_region_start_line'>current_region_start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_line</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>:</span> <span class='kw'>nil</span>
     <span class='id identifier rubyid_emit_region_gap_lines'>emit_region_gap_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_previous_region_end_line'>previous_region_end_line</span><span class='comma'>,</span> <span class='id identifier rubyid_current_region_start_line'>current_region_start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_source_lines'>source_lines</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_emit_comment_region'>emit_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_region'>region</span><span class='comma'>,</span> <span class='label'>inline:</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:inline?</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_inline?'>inline?</span> <span class='op'>:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='id identifier rubyid_source_lines'>source_lines</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_emit_comment_region'>emit_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_region'>region</span><span class='comma'>,</span> <span class='label'>inline:</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:inline?</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_inline?'>inline?</span> <span class='op'>:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                                <span class='label'>source_lines:</span> <span class='id identifier rubyid_source_lines'>source_lines</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_previous_region_end_line'>previous_region_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:end_line</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>:</span> <span class='id identifier rubyid_previous_region_end_line'>previous_region_end_line</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -1634,13 +1760,6 @@ expose owner/leading_gap/trailing_gap.</p>
       <pre class="lines">
 
 
-179
-180
-181
-182
-183
-184
-185
 186
 187
 188
@@ -1663,14 +1782,27 @@ expose owner/leading_gap/trailing_gap.</p>
 205
 206
 207
-208</pre>
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 179</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 186</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_emit_layout_attachment'>emit_layout_attachment</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='comma'>,</span> <span class='label'>leading:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>trailing:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>leading_last_emitted_source_line:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_last_emitted_source_line:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_emit_layout_attachment'>emit_layout_attachment</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='comma'>,</span> <span class='label'>leading:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>trailing:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                           <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>leading_last_emitted_source_line:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_last_emitted_source_line:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span>
-  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:owner</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:leading_gap</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:trailing_gap</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:owner</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:leading_gap</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:trailing_gap</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_emitted_lines'>emitted_lines</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
 
@@ -1681,7 +1813,7 @@ expose owner/leading_gap/trailing_gap.</p>
       <span class='label'>source_lines:</span> <span class='id identifier rubyid_source_lines'>source_lines</span><span class='comma'>,</span>
       <span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span><span class='comma'>,</span>
       <span class='label'>removed_owners:</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='comma'>,</span>
-      <span class='label'>last_emitted_source_line:</span> <span class='id identifier rubyid_leading_last_emitted_source_line'>leading_last_emitted_source_line</span><span class='comma'>,</span>
+      <span class='label'>last_emitted_source_line:</span> <span class='id identifier rubyid_leading_last_emitted_source_line'>leading_last_emitted_source_line</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -1692,7 +1824,7 @@ expose owner/leading_gap/trailing_gap.</p>
       <span class='label'>source_lines:</span> <span class='id identifier rubyid_source_lines'>source_lines</span><span class='comma'>,</span>
       <span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span><span class='comma'>,</span>
       <span class='label'>removed_owners:</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='comma'>,</span>
-      <span class='label'>last_emitted_source_line:</span> <span class='id identifier rubyid_trailing_last_emitted_source_line'>trailing_last_emitted_source_line</span><span class='comma'>,</span>
+      <span class='label'>last_emitted_source_line:</span> <span class='id identifier rubyid_trailing_last_emitted_source_line'>trailing_last_emitted_source_line</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -1849,10 +1981,6 @@ expose owner/leading_gap/trailing_gap.</p>
       <pre class="lines">
 
 
-148
-149
-150
-151
 152
 153
 154
@@ -1864,23 +1992,33 @@ expose owner/leading_gap/trailing_gap.</p>
 160
 161
 162
-163</pre>
+163
+164
+165
+166
+167
+168
+169
+170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 148</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 152</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_emit_layout_gap'>emit_layout_gap</span><span class='lparen'>(</span><span class='id identifier rubyid_gap'>gap</span><span class='comma'>,</span> <span class='label'>owner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>last_emitted_source_line:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_emit_layout_gap'>emit_layout_gap</span><span class='lparen'>(</span><span class='id identifier rubyid_gap'>gap</span><span class='comma'>,</span> <span class='label'>owner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                    <span class='label'>last_emitted_source_line:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_gap'>gap</span>
 
-  <span class='id identifier rubyid_emitting_owner'>emitting_owner</span> <span class='op'>=</span> <span class='id identifier rubyid_owner'>owner</span> <span class='op'>||</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_effective_controller'>effective_controller</span><span class='lparen'>(</span><span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_controller'>controller</span>
+  <span class='id identifier rubyid_emitting_owner'>emitting_owner</span> <span class='op'>=</span> <span class='id identifier rubyid_owner'>owner</span> <span class='op'>||</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_effective_controller'>effective_controller</span><span class='lparen'>(</span><span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span><span class='comma'>,</span>
+                                                     <span class='label'>removed_owners:</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_controller'>controller</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_emitting_owner'>emitting_owner</span>
-  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_controls_output_for?'>controls_output_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_emitting_owner'>emitting_owner</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_controls_output_for?'>controls_output_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_emitting_owner'>emitting_owner</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span><span class='comma'>,</span>
+                                                         <span class='label'>removed_owners:</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_last_emitted_source_line'>last_emitted_source_line</span>
-    <span class='lbracket'>[</span><span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_last_emitted_source_line'>last_emitted_source_line</span> <span class='op'>+</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
-  <span class='kw'>end</span>
+                 <span class='lbracket'>[</span><span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_last_emitted_source_line'>last_emitted_source_line</span> <span class='op'>+</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
+               <span class='kw'>else</span>
+                 <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
+               <span class='kw'>end</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
 
   <span class='id identifier rubyid_emit_layout_gap_lines'>emit_layout_gap_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_gap'>gap</span><span class='comma'>,</span> <span class='label'>source_lines:</span> <span class='id identifier rubyid_source_lines'>source_lines</span><span class='comma'>,</span> <span class='label'>line_numbers:</span> <span class='id identifier rubyid_start_line'>start_line</span><span class='op'>..</span><span class='id identifier rubyid_gap'>gap</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span>
@@ -1997,12 +2135,12 @@ expose owner/leading_gap/trailing_gap.</p>
       <pre class="lines">
 
 
-213
-214
-215</pre>
+223
+224
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 213</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 223</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_raw_lines'>emit_raw_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_lines'>raw_lines</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raw_lines'>raw_lines</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span> <span class='ivar'>@lines</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span> <span class='rbrace'>}</span>
@@ -2078,7 +2216,60 @@ Subclasses should override this to handle format-specific comment syntax</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_tracked_comment'>emit_tracked_comment</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Subclasses must implement emit_tracked_comment</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Subclasses must implement emit_tracked_comment</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ends_with_blank_line?-instance_method">
+  
+    #<strong>ends_with_blank_line?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check whether the current emitter output ends with a blank line.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+248
+249
+250</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 248</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ends_with_blank_line?'>ends_with_blank_line?</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_blank_lines?'>blank_lines?</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2110,12 +2301,12 @@ Subclasses should override this to handle format-specific comment syntax</p>
       <pre class="lines">
 
 
-240
-241
-242</pre>
+265
+266
+267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 265</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_indent'>indent</span>
   <span class='ivar'>@indent_level</span> <span class='op'>+=</span> <span class='int'>1</span>
@@ -2223,14 +2414,14 @@ Subclasses may override to customize output format (e.g., to_json, to_yaml)</p>
       <pre class="lines">
 
 
-221
-222
-223
-224
-225</pre>
+231
+232
+233
+234
+235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 221</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/emitter_base.rb', line 231</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -2247,9 +2438,9 @@ Subclasses may override to customize output format (e.g., to_json, to_yaml)</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:49 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

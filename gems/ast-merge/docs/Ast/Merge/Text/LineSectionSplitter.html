@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Text::LineSectionSplitter
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -389,14 +389,14 @@ Useful for documents with consistent structural markers like headings.</p>
       <pre class="lines">
 
 
-309
-310
-311
 312
-313</pre>
+313
+314
+315
+316</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 309</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 312</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>pattern:</span><span class='comma'>,</span> <span class='label'>name_capture:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -457,12 +457,12 @@ Useful for documents with consistent structural markers like headings.</p>
       <pre class="lines">
 
 
-302
-303
-304</pre>
+305
+306
+307</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 302</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 305</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_name_capture'>name_capture</span>
   <span class='ivar'>@name_capture</span>
@@ -516,12 +516,12 @@ Useful for documents with consistent structural markers like headings.</p>
       <pre class="lines">
 
 
-299
-300
-301</pre>
+302
+303
+304</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 299</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 302</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pattern'>pattern</span>
   <span class='ivar'>@pattern</span>
@@ -599,12 +599,12 @@ Useful for documents with consistent structural markers like headings.</p>
       <pre class="lines">
 
 
-380
-381
-382</pre>
+383
+384
+385</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 380</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 383</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_sections'>sections</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sections'>sections</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:full_text</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -675,9 +675,6 @@ Useful for documents with consistent structural markers like headings.</p>
       <pre class="lines">
 
 
-319
-320
-321
 322
 323
 324
@@ -730,10 +727,13 @@ Useful for documents with consistent structural markers like headings.</p>
 371
 372
 373
-374</pre>
+374
+375
+376
+377</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 319</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 322</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -755,7 +755,7 @@ Useful for documents with consistent structural markers like headings.</p>
           <span class='label'>body:</span> <span class='id identifier rubyid_preamble_lines'>preamble_lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='comma'>,</span>
           <span class='label'>start_line:</span> <span class='int'>1</span><span class='comma'>,</span>
           <span class='label'>end_line:</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>-</span> <span class='int'>1</span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='symbol'>:preamble</span><span class='rbrace'>}</span><span class='comma'>,</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:preamble</span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span>
       <span class='kw'>end</span>
 
@@ -764,7 +764,7 @@ Useful for documents with consistent structural markers like headings.</p>
         <span class='label'>name:</span> <span class='id identifier rubyid_section_name'>section_name</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='comma'>,</span>
         <span class='label'>header:</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span>
         <span class='label'>body_lines:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-        <span class='label'>start_line:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
+        <span class='label'>start_line:</span> <span class='id identifier rubyid_line_num'>line_num</span>
       <span class='rbrace'>}</span>
     <span class='kw'>elsif</span> <span class='id identifier rubyid_current_section'>current_section</span>
       <span class='id identifier rubyid_current_section'>current_section</span><span class='lbracket'>[</span><span class='symbol'>:body_lines</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span>
@@ -785,7 +785,7 @@ Useful for documents with consistent structural markers like headings.</p>
       <span class='label'>body:</span> <span class='id identifier rubyid_preamble_lines'>preamble_lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='comma'>,</span>
       <span class='label'>start_line:</span> <span class='int'>1</span><span class='comma'>,</span>
       <span class='label'>end_line:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='symbol'>:preamble</span><span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:preamble</span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -801,9 +801,9 @@ Useful for documents with consistent structural markers like headings.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

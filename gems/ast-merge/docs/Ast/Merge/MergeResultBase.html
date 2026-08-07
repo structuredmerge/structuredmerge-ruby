@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::MergeResultBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -589,6 +589,29 @@ Used for content that exists only in destination and is added to result.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#blank_lines%3F-instance_method" title="#blank_lines? (instance method)">#<strong>blank_lines?</strong>(candidate_lines)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check whether every provided line is blank.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#content-instance_method" title="#content (instance method)">#<strong>content</strong>  &#x21d2; Array&lt;String&gt; </a>
     
 
@@ -704,7 +727,30 @@ Used for content that exists only in destination and is added to result.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_analysis: nil, dest_analysis: nil, conflicts: [], frozen_blocks: [], stats: {}, unresolved_cases: [], **options)  &#x21d2; MergeResultBase </a>
+      <a href="#ends_with_blank_line%3F-instance_method" title="#ends_with_blank_line? (instance method)">#<strong>ends_with_blank_line?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check whether the current result ends with a blank line.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_analysis: nil, dest_analysis: nil, conflicts: [], frozen_blocks: [], stats: {}, unresolved_cases: [], **_options)  &#x21d2; MergeResultBase </a>
     
 
     
@@ -775,6 +821,29 @@ Used for content that exists only in destination and is added to result.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#normalize_blank_line_runs!-instance_method" title="#normalize_blank_line_runs! (instance method)">#<strong>normalize_blank_line_runs!</strong>(max: 1)  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Normalize repeated blank-line runs in the current result.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#record_unresolved_choice-instance_method" title="#record_unresolved_choice (instance method)">#<strong>record_unresolved_choice</strong>(template_text:, destination_text:, provisional_winner:, case_id:, surface_path: nil, reason: :conflict, metadata: {}, conflict_fields: {})  &#x21d2; Object </a>
     
 
@@ -790,6 +859,29 @@ Used for content that exists only in destination and is added to result.</p>
 
   
     <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_trailing_blank_lines-instance_method" title="#remove_trailing_blank_lines (instance method)">#<strong>remove_trailing_blank_lines</strong>(max: nil)  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Remove blank lines from the end of the current result.</p>
 </div></span>
   
 </li>
@@ -899,7 +991,7 @@ Used for content that exists only in destination and is added to result.</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(template_analysis: nil, dest_analysis: nil, conflicts: [], frozen_blocks: [], stats: {}, unresolved_cases: [], **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::MergeResultBase (class)">MergeResultBase</a></span></tt> 
+    #<strong>initialize</strong>(template_analysis: nil, dest_analysis: nil, conflicts: [], frozen_blocks: [], stats: {}, unresolved_cases: [], **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::MergeResultBase (class)">MergeResultBase</a></span></tt> 
   
 
   
@@ -1058,7 +1150,7 @@ Subclasses should call super with the parameters they use.</p>
   <span class='label'>frozen_blocks:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
   <span class='label'>stats:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>unresolved_cases:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+  <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span>
 <span class='rparen'>)</span>
   <span class='ivar'>@template_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_template_analysis'>template_analysis</span>
   <span class='ivar'>@dest_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span>
@@ -1574,13 +1666,13 @@ Subclasses should call super with the parameters they use.</p>
       <pre class="lines">
 
 
-162
-163
-164
-165</pre>
+237
+238
+239
+240</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 237</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_unresolved_case'>add_unresolved_case</span><span class='lparen'>(</span><span class='id identifier rubyid_resolution_case'>resolution_case</span><span class='rparen'>)</span>
   <span class='ivar'>@unresolved_cases</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_resolution_case'>resolution_case</span>
@@ -1606,27 +1698,27 @@ Subclasses should call super with the parameters they use.</p>
       <pre class="lines">
 
 
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223</pre>
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 206</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 281</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_resolutions'>resolutions</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_unresolved_resolutions'>normalize_unresolved_resolutions</span><span class='lparen'>(</span><span class='id identifier rubyid_resolutions'>resolutions</span><span class='rparen'>)</span>
@@ -1666,19 +1758,91 @@ Subclasses should call super with the parameters they use.</p>
       <pre class="lines">
 
 
-234
-235
-236
-237
-238</pre>
+309
+310
+311
+312
+313</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 234</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 309</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply_unresolved_review_state!'>apply_unresolved_review_state!</span><span class='lparen'>(</span><span class='id identifier rubyid_review_state'>review_state</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="UnresolvedReviewState.html" title="Ast::Merge::UnresolvedReviewState (class)">UnresolvedReviewState</a></span></span><span class='period'>.</span><span class='id identifier rubyid_coerce'><span class='object_link'><a href="UnresolvedReviewState.html#coerce-class_method" title="Ast::Merge::UnresolvedReviewState.coerce (method)">coerce</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_review_state'>review_state</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_validate_review_state_compatibility!'>validate_review_state_compatibility!</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_selections'>selections</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="blank_lines?-instance_method">
+  
+    #<strong>blank_lines?</strong>(candidate_lines)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check whether every provided line is blank.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>candidate_lines</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lines to classify</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+154
+155
+156</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 154</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_blank_lines?'>blank_lines?</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate_lines'>candidate_lines</span><span class='rparen'>)</span>
+  <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate_lines'>candidate_lines</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_all?'>all?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1894,14 +2058,14 @@ Used when region substitution replaces the merged content.</p>
       <pre class="lines">
 
 
-242
-243
-244
-245
-246</pre>
+317
+318
+319
+320
+321</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 242</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_decision_summary'>decision_summary</span>
   <span class='id identifier rubyid_summary'>summary</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
@@ -1967,6 +2131,59 @@ Used when region substitution replaces the merged content.</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="ends_with_blank_line?-instance_method">
+  
+    #<strong>ends_with_blank_line?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check whether the current result ends with a blank line.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+161
+162
+163</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 161</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ends_with_blank_line?'>ends_with_blank_line?</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_blank_lines?'>blank_lines?</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="inspect-instance_method">
   
     #<strong>inspect</strong>  &#x21d2; <tt>String</tt> 
@@ -2004,12 +2221,12 @@ Used when region substitution replaces the merged content.</p>
       <pre class="lines">
 
 
-250
-251
-252</pre>
+325
+326
+327</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 250</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 325</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line_count'>line_count</span><span class='embexpr_end'>}</span><span class='tstring_content'> decisions=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@decisions</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -2057,15 +2274,161 @@ Used when region substitution replaces the merged content.</p>
       <pre class="lines">
 
 
-152
-153
-154</pre>
+167
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 152</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_count'>line_count</span>
   <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_blank_line_runs!-instance_method">
+  
+    #<strong>normalize_blank_line_runs!</strong>(max: 1)  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Normalize repeated blank-line runs in the current result.</p>
+
+<p>This is a safety repair for line-oriented semantic merges after<br />
+ownership-aware layout handling has run. It prevents removed/skipped<br />
+owners from leaving impossible interstitial blank runs in generated<br />
+output.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>max</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>1</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Maximum number of consecutive blank lines to retain</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Number of blank lines removed</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 202</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_blank_line_runs!'>normalize_blank_line_runs!</span><span class='lparen'>(</span><span class='label'>max:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_max'>max</span> <span class='op'>=</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_max'>max</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>max must be &gt;= 0</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_max'>max</span><span class='period'>.</span><span class='id identifier rubyid_negative?'>negative?</span>
+
+  <span class='id identifier rubyid_normalized_lines'>normalized_lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_normalized_metadata'>normalized_metadata</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_instance_variable_defined?'>instance_variable_defined?</span><span class='lparen'>(</span><span class='symbol'>:@line_metadata</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@line_metadata</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:each</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_blank_count'>blank_count</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_removed'>removed</span> <span class='op'>=</span> <span class='int'>0</span>
+
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_blank_count'>blank_count</span> <span class='op'>+=</span> <span class='int'>1</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_blank_count'>blank_count</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_max'>max</span>
+        <span class='id identifier rubyid_removed'>removed</span> <span class='op'>+=</span> <span class='int'>1</span>
+        <span class='kw'>next</span>
+      <span class='kw'>end</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_blank_count'>blank_count</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_normalized_lines'>normalized_lines</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span>
+    <span class='id identifier rubyid_normalized_metadata'>normalized_metadata</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@line_metadata</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_normalized_metadata'>normalized_metadata</span>
+  <span class='kw'>end</span>
+
+  <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_normalized_lines'>normalized_lines</span>
+  <span class='ivar'>@line_metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_normalized_metadata'>normalized_metadata</span> <span class='kw'>if</span> <span class='id identifier rubyid_normalized_metadata'>normalized_metadata</span>
+  <span class='id identifier rubyid_removed'>removed</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2087,43 +2450,43 @@ Used when region substitution replaces the merged content.</p>
       <pre class="lines">
 
 
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200</pre>
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 242</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_record_unresolved_choice'>record_unresolved_choice</span><span class='lparen'>(</span>
   <span class='label'>template_text:</span><span class='comma'>,</span>
@@ -2142,7 +2505,7 @@ Used when region substitution replaces the merged content.</p>
     <span class='label'>reason:</span> <span class='id identifier rubyid_reason'>reason</span><span class='comma'>,</span>
     <span class='label'>template:</span> <span class='id identifier rubyid_template_text'>template_text</span><span class='comma'>,</span>
     <span class='label'>destination:</span> <span class='id identifier rubyid_destination_text'>destination_text</span><span class='comma'>,</span>
-    <span class='label'>provisional_winner:</span> <span class='id identifier rubyid_provisional_winner'>provisional_winner</span><span class='comma'>,</span>
+    <span class='label'>provisional_winner:</span> <span class='id identifier rubyid_provisional_winner'>provisional_winner</span>
   <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_compact_hash'>compact_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_conflict_fields'>conflict_fields</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='ivar'>@conflicts</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_conflict'>conflict</span>
 
@@ -2151,13 +2514,115 @@ Used when region substitution replaces the merged content.</p>
     <span class='label'>reason:</span> <span class='id identifier rubyid_reason'>reason</span><span class='comma'>,</span>
     <span class='label'>candidates:</span> <span class='lbrace'>{</span>
       <span class='label'>template:</span> <span class='id identifier rubyid_template_text'>template_text</span><span class='comma'>,</span>
-      <span class='label'>destination:</span> <span class='id identifier rubyid_destination_text'>destination_text</span><span class='comma'>,</span>
+      <span class='label'>destination:</span> <span class='id identifier rubyid_destination_text'>destination_text</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>provisional_winner:</span> <span class='id identifier rubyid_provisional_winner'>provisional_winner</span><span class='comma'>,</span>
     <span class='label'>surface_path:</span> <span class='id identifier rubyid_surface_path'>surface_path</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_compact_hash'>compact_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_compact_hash'>compact_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_add_unresolved_case'>add_unresolved_case</span><span class='lparen'>(</span><span class='id identifier rubyid_resolution_case'>resolution_case</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="remove_trailing_blank_lines-instance_method">
+  
+    #<strong>remove_trailing_blank_lines</strong>(max: nil)  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Remove blank lines from the end of the current result.</p>
+
+<p>Layout-aware merge adapters use this when they later discover that a<br />
+removed owner controlled a leading blank-line gap already emitted as<br />
+part of the preceding output.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>max</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Maximum number of blank lines to remove</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Number of lines removed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 179</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_trailing_blank_lines'>remove_trailing_blank_lines</span><span class='lparen'>(</span><span class='label'>max:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_removed'>removed</span> <span class='op'>=</span> <span class='int'>0</span>
+
+  <span class='kw'>while</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='kw'>break</span> <span class='kw'>if</span> <span class='id identifier rubyid_max'>max</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_removed'>removed</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_max'>max</span>
+
+    <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span>
+    <span class='ivar'>@line_metadata</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span> <span class='kw'>if</span> <span class='id identifier rubyid_instance_variable_defined?'>instance_variable_defined?</span><span class='lparen'>(</span><span class='symbol'>:@line_metadata</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@line_metadata</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:pop</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_removed'>removed</span> <span class='op'>+=</span> <span class='int'>1</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_removed'>removed</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2244,24 +2709,24 @@ and Bash::Merge::MergeResult#to_bash.</p>
       <pre class="lines">
 
 
-225
-226
-227
-228
-229
-230
-231
-232</pre>
+300
+301
+302
+303
+304
+305
+306
+307</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 225</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 300</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_unresolved_review_state'>to_unresolved_review_state</span><span class='lparen'>(</span><span class='label'>selections:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized_selections'>normalized_selections</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_unresolved_resolutions'>normalize_unresolved_resolutions</span><span class='lparen'>(</span><span class='id identifier rubyid_selections'>selections</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="UnresolvedReviewState.html" title="Ast::Merge::UnresolvedReviewState (class)">UnresolvedReviewState</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="UnresolvedReviewState.html#initialize-instance_method" title="Ast::Merge::UnresolvedReviewState#initialize (method)">new</a></span></span><span class='lparen'>(</span>
     <span class='label'>cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
     <span class='label'>selections:</span> <span class='id identifier rubyid_normalized_selections'>normalized_selections</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_review_state_metadata'>review_state_metadata</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span> <span class='id identifier rubyid_normalized_selections'>normalized_selections</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_review_state_metadata'>review_state_metadata</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span> <span class='id identifier rubyid_normalized_selections'>normalized_selections</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2311,12 +2776,12 @@ and Bash::Merge::MergeResult#to_bash.</p>
       <pre class="lines">
 
 
-156
-157
-158</pre>
+231
+232
+233</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 156</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 231</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unresolved?'>unresolved?</span>
   <span class='ivar'>@unresolved_cases</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
@@ -2341,12 +2806,12 @@ and Bash::Merge::MergeResult#to_bash.</p>
       <pre class="lines">
 
 
-202
-203
-204</pre>
+277
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 202</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/merge_result_base.rb', line 277</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unresolved_case'>unresolved_case</span><span class='lparen'>(</span><span class='id identifier rubyid_case_id'>case_id</span><span class='rparen'>)</span>
   <span class='ivar'>@unresolved_cases</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_resolution_case'>resolution_case</span><span class='op'>|</span> <span class='id identifier rubyid_resolution_case'>resolution_case</span><span class='period'>.</span><span class='id identifier rubyid_case_id'>case_id</span> <span class='op'>==</span> <span class='id identifier rubyid_case_id'>case_id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span>
@@ -2361,9 +2826,9 @@ and Bash::Merge::MergeResult#to_bash.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

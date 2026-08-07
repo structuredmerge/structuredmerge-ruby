@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Navigable::InjectionPointFinder
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -192,7 +192,7 @@ Statement interface regardless of the underlying parser.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#find-instance_method" title="#find (instance method)">#<strong>find</strong>(type: nil, text: nil, position:, boundary_type: nil, boundary_text: nil, boundary_matcher: nil, boundary_same_or_shallower: false) {|Statement| ... } &#x21d2; InjectionPoint<sup>?</sup> </a>
+      <a href="#find-instance_method" title="#find (instance method)">#<strong>find</strong>(position:, type: nil, text: nil, boundary_type: nil, boundary_text: nil, boundary_matcher: nil, boundary_same_or_shallower: false) {|Statement| ... } &#x21d2; InjectionPoint<sup>?</sup> </a>
     
 
     
@@ -215,7 +215,7 @@ Statement interface regardless of the underlying parser.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#find_all-instance_method" title="#find_all (instance method)">#<strong>find_all</strong>(type: nil, text: nil, position:, &amp;block)  &#x21d2; Array&lt;InjectionPoint&gt; </a>
+      <a href="#find_all-instance_method" title="#find_all (instance method)">#<strong>find_all</strong>(position:, type: nil, text: nil, &amp;block)  &#x21d2; Array&lt;InjectionPoint&gt; </a>
     
 
     
@@ -381,7 +381,7 @@ Statement interface regardless of the underlying parser.</p>
       <div class="method_details first">
   <h3 class="signature first" id="find-instance_method">
   
-    #<strong>find</strong>(type: nil, text: nil, position:, boundary_type: nil, boundary_text: nil, boundary_matcher: nil, boundary_same_or_shallower: false) {|Statement| ... } &#x21d2; <tt><span class='object_link'><a href="InjectionPoint.html" title="Ast::Merge::Navigable::InjectionPoint (class)">InjectionPoint</a></span></tt><sup>?</sup> 
+    #<strong>find</strong>(position:, type: nil, text: nil, boundary_type: nil, boundary_text: nil, boundary_matcher: nil, boundary_same_or_shallower: false) {|Statement| ... } &#x21d2; <tt><span class='object_link'><a href="InjectionPoint.html" title="Ast::Merge::Navigable::InjectionPoint (class)">InjectionPoint</a></span></tt><sup>?</sup> 
   
 
   
@@ -596,12 +596,15 @@ Statement interface regardless of the underlying parser.</p>
 80
 81
 82
-83</pre>
+83
+84
+85</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/injection_point_finder.rb', line 45</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='label'>type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>position:</span><span class='comma'>,</span> <span class='label'>boundary_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>boundary_text:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>boundary_matcher:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>boundary_same_or_shallower:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='label'>position:</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>boundary_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>boundary_text:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>boundary_matcher:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+         <span class='label'>boundary_same_or_shallower:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_anchor'>anchor</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Statement.html" title="Ast::Merge::Navigable::Statement (class)">Statement</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_first'><span class='object_link'><a href="Statement.html#find_first-class_method" title="Ast::Merge::Navigable::Statement.find_first (method)">find_first</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='id identifier rubyid_text'>text</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_anchor'>anchor</span>
 
@@ -618,6 +621,7 @@ Statement interface regardless of the underlying parser.</p>
         <span class='comment'># Must match type if specified
 </span>        <span class='kw'>next</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_boundary_type'>boundary_type</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_stmt'>stmt</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>!=</span> <span class='id identifier rubyid_boundary_type'>boundary_type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
         <span class='kw'>next</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_boundary_text'>boundary_text</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_stmt'>stmt</span><span class='period'>.</span><span class='id identifier rubyid_text_matches?'>text_matches?</span><span class='lparen'>(</span><span class='id identifier rubyid_boundary_text'>boundary_text</span><span class='rparen'>)</span>
+
         <span class='comment'># Check tree depth
 </span>        <span class='id identifier rubyid_stmt'>stmt</span><span class='period'>.</span><span class='id identifier rubyid_same_or_shallower_than?'>same_or_shallower_than?</span><span class='lparen'>(</span><span class='id identifier rubyid_anchor_depth'>anchor_depth</span><span class='rparen'>)</span>
       <span class='kw'>end</span>
@@ -628,7 +632,7 @@ Statement interface regardless of the underlying parser.</p>
       <span class='id identifier rubyid_boundary'>boundary</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Statement.html" title="Ast::Merge::Navigable::Statement (class)">Statement</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_first'><span class='object_link'><a href="Statement.html#find_first-class_method" title="Ast::Merge::Navigable::Statement.find_first (method)">find_first</a></span></span><span class='lparen'>(</span>
         <span class='id identifier rubyid_remaining'>remaining</span><span class='comma'>,</span>
         <span class='label'>type:</span> <span class='id identifier rubyid_boundary_type'>boundary_type</span><span class='comma'>,</span>
-        <span class='label'>text:</span> <span class='id identifier rubyid_boundary_text'>boundary_text</span><span class='comma'>,</span>
+        <span class='label'>text:</span> <span class='id identifier rubyid_boundary_text'>boundary_text</span>
       <span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
@@ -637,7 +641,7 @@ Statement interface regardless of the underlying parser.</p>
     <span class='label'>anchor:</span> <span class='id identifier rubyid_anchor'>anchor</span><span class='comma'>,</span>
     <span class='label'>position:</span> <span class='id identifier rubyid_position'>position</span><span class='comma'>,</span>
     <span class='label'>boundary:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='comma'>,</span>
-    <span class='label'>match:</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='id identifier rubyid_text'>text</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>match:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='id identifier rubyid_text'>text</span> <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -648,7 +652,7 @@ Statement interface regardless of the underlying parser.</p>
       <div class="method_details ">
   <h3 class="signature " id="find_all-instance_method">
   
-    #<strong>find_all</strong>(type: nil, text: nil, position:, &amp;block)  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="InjectionPoint.html" title="Ast::Merge::Navigable::InjectionPoint (class)">InjectionPoint</a></span>&gt;</tt> 
+    #<strong>find_all</strong>(position:, type: nil, text: nil, &amp;block)  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="InjectionPoint.html" title="Ast::Merge::Navigable::InjectionPoint (class)">InjectionPoint</a></span>&gt;</tt> 
   
 
   
@@ -800,17 +804,17 @@ Statement interface regardless of the underlying parser.</p>
       <pre class="lines">
 
 
-89
-90
 91
 92
 93
-94</pre>
+94
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/injection_point_finder.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/injection_point_finder.rb', line 91</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_find_all'>find_all</span><span class='lparen'>(</span><span class='label'>type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>position:</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_find_all'>find_all</span><span class='lparen'>(</span><span class='label'>position:</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_anchors'>anchors</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Statement.html" title="Ast::Merge::Navigable::Statement (class)">Statement</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_matching'><span class='object_link'><a href="Statement.html#find_matching-class_method" title="Ast::Merge::Navigable::Statement.find_matching (method)">find_matching</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='id identifier rubyid_text'>text</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_anchors'>anchors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_anchor'>anchor</span><span class='op'>|</span>
     <span class='const'><span class='object_link'><a href="InjectionPoint.html" title="Ast::Merge::Navigable::InjectionPoint (class)">InjectionPoint</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="InjectionPoint.html#initialize-instance_method" title="Ast::Merge::Navigable::InjectionPoint#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>anchor:</span> <span class='id identifier rubyid_anchor'>anchor</span><span class='comma'>,</span> <span class='label'>position:</span> <span class='id identifier rubyid_position'>position</span><span class='rparen'>)</span>
@@ -826,9 +830,9 @@ Statement interface regardless of the underlying parser.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:52 2026 by
+  Generated on Thu Aug  6 23:41:38 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Recipe::Config
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -819,12 +819,12 @@ when_missing: skip</code></pre>
 </span>  <span class='id identifier rubyid_effective_path'>effective_path</span> <span class='op'>=</span> <span class='id identifier rubyid_preset_path'>preset_path</span> <span class='op'>||</span> <span class='id identifier rubyid_recipe_path'>recipe_path</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='comma'>,</span> <span class='label'>preset_path:</span> <span class='id identifier rubyid_effective_path'>effective_path</span><span class='rparen'>)</span>
 
-  <span class='ivar'>@template_path</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>template</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
-  <span class='ivar'>@targets</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>targets</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_default_targets_for'>default_targets_for</span><span class='lparen'>(</span><span class='ivar'>@template_path</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
-  <span class='ivar'>@when_missing</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>when_missing</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>skip</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@template_path</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>template</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+  <span class='ivar'>@targets</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>targets</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_default_targets_for'>default_targets_for</span><span class='lparen'>(</span><span class='ivar'>@template_path</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@when_missing</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>when_missing</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>skip</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='id identifier rubyid_validate_top_level_step_contract!'>validate_top_level_step_contract!</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span>
-  <span class='ivar'>@injection</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_injection'>parse_injection</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>injection</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='ivar'>@steps</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_steps'>parse_steps</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>steps</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@injection</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_injection'>parse_injection</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>injection</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='ivar'>@steps</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_steps'>parse_steps</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>steps</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1285,12 +1285,12 @@ when_missing: skip</code></pre>
       <pre class="lines">
 
 
-236
-237
-238</pre>
+234
+235
+236</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 236</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 234</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_content_recipe?'>content_recipe?</span>
   <span class='op'>!</span><span class='id identifier rubyid_file_recipe?'>file_recipe?</span>
@@ -1342,14 +1342,14 @@ when_missing: skip</code></pre>
       <pre class="lines">
 
 
+215
+216
 217
 218
-219
-220
-221</pre>
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 215</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execution_steps'>execution_steps</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_steps'>steps</span> <span class='kw'>unless</span> <span class='id identifier rubyid_steps'>steps</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -1505,12 +1505,12 @@ when_missing: skip</code></pre>
       <pre class="lines">
 
 
-212
-213
-214</pre>
+210
+211
+212</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 212</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 210</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_explicit_steps?'>explicit_steps?</span>
   <span class='op'>!</span><span class='ivar'>@steps</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -1562,12 +1562,12 @@ when_missing: skip</code></pre>
       <pre class="lines">
 
 
-231
-232
-233</pre>
+229
+230
+231</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 229</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_file_recipe?'>file_recipe?</span>
   <span class='op'>!</span><span class='id identifier rubyid_template_path'>template_path</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -1638,9 +1638,7 @@ when_missing: skip</code></pre>
 158
 159
 160
-161
-162
-163</pre>
+161</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 142</span>
@@ -1656,14 +1654,12 @@ when_missing: skip</code></pre>
     <span class='label'>text:</span> <span class='id identifier rubyid_anchor'>anchor</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>position:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:position</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='symbol'>:replace</span><span class='comma'>,</span>
     <span class='label'>boundary_type:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='comma'>,</span>
-    <span class='label'>boundary_text:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>boundary_text:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 
   <span class='comment'># Support tree-depth based boundary detection
 </span>  <span class='comment'># same_or_shallower: true means &quot;end at next sibling (same tree level or above)&quot;
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='lbracket'>[</span><span class='symbol'>:same_or_shallower</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:boundary_same_or_shallower</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
-  <span class='kw'>end</span>
+</span>  <span class='id identifier rubyid_query'>query</span><span class='lbracket'>[</span><span class='symbol'>:boundary_same_or_shallower</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='lbracket'>[</span><span class='symbol'>:same_or_shallower</span><span class='rbracket'>]</span>
 
   <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
 <span class='kw'>end</span></pre>
@@ -1710,12 +1706,12 @@ when_missing: skip</code></pre>
       <pre class="lines">
 
 
-207
-208
-209</pre>
+205
+206
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 205</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_key_path_partial_target?'>key_path_partial_target?</span>
   <span class='id identifier rubyid_partial_target_kind'>partial_target_kind</span> <span class='op'>==</span> <span class='symbol'>:key_path</span>
@@ -1763,12 +1759,12 @@ when_missing: skip</code></pre>
       <pre class="lines">
 
 
-202
-203
-204</pre>
+200
+201
+202</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 202</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 200</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_navigable_partial_target?'>navigable_partial_target?</span>
   <span class='id identifier rubyid_partial_target_kind'>partial_target_kind</span> <span class='op'>==</span> <span class='symbol'>:navigable</span>
@@ -1820,6 +1816,8 @@ the runner itself.</p>
       <pre class="lines">
 
 
+170
+171
 172
 173
 174
@@ -1835,12 +1833,10 @@ the runner itself.</p>
 184
 185
 186
-187
-188
-189</pre>
+187</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 172</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 170</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_partial_target'>partial_target</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_explicit_steps?'>explicit_steps?</span>
@@ -1851,12 +1847,12 @@ the runner itself.</p>
       <span class='label'>kind:</span> <span class='symbol'>:navigable</span><span class='comma'>,</span>
       <span class='label'>anchor:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:anchor</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>position:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:position</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='symbol'>:replace</span><span class='comma'>,</span>
-      <span class='label'>boundary:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:boundary</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>boundary:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:boundary</span><span class='rbracket'>]</span>
     <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
   <span class='kw'>when</span> <span class='symbol'>:key_path</span>
     <span class='lbrace'>{</span>
       <span class='label'>kind:</span> <span class='symbol'>:key_path</span><span class='comma'>,</span>
-      <span class='label'>key_path:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:key_path</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>key_path:</span> <span class='id identifier rubyid_injection'>injection</span><span class='lbracket'>[</span><span class='symbol'>:key_path</span><span class='rbracket'>]</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -1907,17 +1903,17 @@ the runner itself.</p>
       <pre class="lines">
 
 
+190
+191
 192
 193
 194
 195
 196
-197
-198
-199</pre>
+197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 192</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 190</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_partial_target_kind'>partial_target_kind</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_explicit_steps?'>explicit_steps?</span>
@@ -2010,12 +2006,12 @@ the runner itself.</p>
       <pre class="lines">
 
 
-226
-227
-228</pre>
+224
+225
+226</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 226</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/recipe/config.rb', line 224</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_replace_mode?'>replace_mode?</span>
   <span class='id identifier rubyid_merge_config'>merge_config</span><span class='lbracket'>[</span><span class='symbol'>:replace_mode</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='kw'>true</span>
@@ -2116,9 +2112,9 @@ the runner itself.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:49 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

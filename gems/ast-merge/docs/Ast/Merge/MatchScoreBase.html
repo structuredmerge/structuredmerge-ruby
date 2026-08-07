@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::MatchScoreBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -602,7 +602,7 @@ a score between 0.0 (no match) and 1.0 (perfect match).</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/match_score_base.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_node_a'>node_a</span><span class='comma'>,</span> <span class='id identifier rubyid_node_b'>node_b</span><span class='comma'>,</span> <span class='label'>algorithm:</span><span class='comma'>,</span> <span class='label'>threshold:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_THRESHOLD-constant" title="Ast::Merge::MatchScoreBase::DEFAULT_THRESHOLD (constant)">DEFAULT_THRESHOLD</a></span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>algorithm must respond to :call</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_algorithm'>algorithm</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>algorithm must respond to :call</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_algorithm'>algorithm</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
 
   <span class='ivar'>@node_a</span> <span class='op'>=</span> <span class='id identifier rubyid_node_a'>node_a</span>
   <span class='ivar'>@node_b</span> <span class='op'>=</span> <span class='id identifier rubyid_node_b'>node_b</span>
@@ -1205,9 +1205,9 @@ node_a, node_b, and score should have the same hash.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

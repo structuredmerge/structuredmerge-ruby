@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Merge::SectionTyping
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -343,6 +343,7 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
       <pre class="lines">
 
 
+245
 246
 247
 248
@@ -382,10 +383,11 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
 282
 283
 284
-285</pre>
+285
+286</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 246</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 245</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_sections'>merge_sections</span><span class='lparen'>(</span><span class='id identifier rubyid_template_sections'>template_sections</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>add_template_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_dest_by_name'>dest_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
@@ -411,7 +413,7 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
     <span class='kw'>if</span> <span class='id identifier rubyid_dest_section'>dest_section</span>
       <span class='comment'># Section exists in both - choose based on preference
 </span>      <span class='id identifier rubyid_section_pref'>section_pref</span> <span class='op'>=</span> <span class='id identifier rubyid_preference_for'>preference_for</span><span class='lparen'>(</span><span class='id identifier rubyid_template_section'>template_section</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_merged'>merged</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_section_pref'>section_pref</span> <span class='op'>==</span> <span class='symbol'>:template</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_template_section'>template_section</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_merged'>merged</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='id identifier rubyid_section_pref'>section_pref</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>?</span> <span class='id identifier rubyid_template_section'>template_section</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='rparen'>)</span>
     <span class='kw'>elsif</span> <span class='id identifier rubyid_add_template_only'>add_template_only</span>
       <span class='id identifier rubyid_merged'>merged</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_template_section'>template_section</span>
     <span class='kw'>end</span>
@@ -420,8 +422,10 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
   <span class='comment'># Append destination-only sections
 </span>  <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_dest_section'>dest_section</span><span class='op'>|</span>
     <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_unclassified?'>unclassified?</span>
+
     <span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_normalized_name'>normalized_name</span>
     <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_seen_names'>seen_names</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+
     <span class='id identifier rubyid_merged'>merged</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_dest_section'>dest_section</span>
   <span class='kw'>end</span>
 
@@ -508,7 +512,6 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
       <pre class="lines">
 
 
-292
 293
 294
 295
@@ -517,10 +520,11 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
 298
 299
 300
-301</pre>
+301
+302</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 292</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 293</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_preference_for'>preference_for</span><span class='lparen'>(</span><span class='id identifier rubyid_section_name'>section_name</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_preference'>preference</span> <span class='kw'>unless</span> <span class='id identifier rubyid_preference'>preference</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -542,9 +546,9 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:46 2026 by
+  Generated on Thu Aug  6 23:41:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

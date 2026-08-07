@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Merge::TrailingGroups::AlignmentSort
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -216,7 +216,7 @@ destination-backed entries, ordered by +template_index+.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#template_only_sort_key-instance_method" title="#template_only_sort_key (instance method)">#<strong>template_only_sort_key</strong>(entry, dest_size)  &#x21d2; Array </a>
+      <a href="#template_only_sort_key-instance_method" title="#template_only_sort_key (instance method)">#<strong>template_only_sort_key</strong>(entry, _dest_size)  &#x21d2; Array </a>
     
 
     
@@ -519,9 +519,9 @@ in template order</li>
     <span class='kw'>when</span> <span class='symbol'>:template_only</span>
       <span class='id identifier rubyid_template_only_sort_key'>template_only_sort_key</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_size'>dest_size</span><span class='rparen'>)</span>
     <span class='kw'>else</span>
-      <span class='comment'># :nocov: defensive
+      <span class='comment'># simplecov:disable defensive
 </span>      <span class='lbracket'>[</span><span class='int'>999</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rbracket'>]</span>
-      <span class='comment'># :nocov:
+      <span class='comment'># simplecov:enable
 </span>    <span class='kw'>end</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -533,7 +533,7 @@ in template order</li>
       <div class="method_details ">
   <h3 class="signature " id="template_only_sort_key-instance_method">
   
-    #<strong>template_only_sort_key</strong>(entry, dest_size)  &#x21d2; <tt>Array</tt> 
+    #<strong>template_only_sort_key</strong>(entry, _dest_size)  &#x21d2; <tt>Array</tt> 
   
 
   
@@ -617,7 +617,7 @@ interleaving (future enhancement).</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/alignment_sort.rb', line 90</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_template_only_sort_key'>template_only_sort_key</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_size'>dest_size</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_template_only_sort_key'>template_only_sort_key</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='comma'>,</span> <span class='id identifier rubyid__dest_size'>_dest_size</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='int'>2</span><span class='comma'>,</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:template_index</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -630,9 +630,9 @@ interleaving (future enhancement).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:47 2026 by
+  Generated on Thu Aug  6 23:41:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

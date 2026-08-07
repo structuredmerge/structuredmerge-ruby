@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::StructuralEdit::SplicePlan
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -807,12 +807,14 @@ stable place to grow richer ownership-transfer rules.</p>
 50
 51
 52
-53</pre>
+53
+54</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 42</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>source:</span><span class='comma'>,</span> <span class='label'>replacement:</span><span class='comma'>,</span> <span class='label'>replace_start_line:</span><span class='comma'>,</span> <span class='label'>replace_end_line:</span><span class='comma'>,</span> <span class='label'>leading_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>source:</span><span class='comma'>,</span> <span class='label'>replacement:</span><span class='comma'>,</span> <span class='label'>replace_start_line:</span><span class='comma'>,</span> <span class='label'>replace_end_line:</span><span class='comma'>,</span> <span class='label'>leading_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+               <span class='label'>trailing_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='ivar'>@replacement</span> <span class='op'>=</span> <span class='id identifier rubyid_replacement'>replacement</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='ivar'>@replace_start_line</span> <span class='op'>=</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_replace_start_line'>replace_start_line</span><span class='rparen'>)</span>
@@ -2079,12 +2081,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-86
 87
-88</pre>
+88
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 86</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_after_content'>after_content</span>
   <span class='id identifier rubyid_line_chunks'>line_chunks</span><span class='lbracket'>[</span><span class='id identifier rubyid_replace_end_line'>replace_end_line</span><span class='op'>..</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -2153,7 +2155,6 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-112
 113
 114
 115
@@ -2166,10 +2167,11 @@ stable place to grow richer ownership-transfer rules.</p>
 122
 123
 124
-125</pre>
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply_to'>apply_to</span><span class='lparen'>(</span><span class='id identifier rubyid_alternate_source'>alternate_source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_alternate_text'>alternate_text</span> <span class='op'>=</span> <span class='id identifier rubyid_alternate_source'>alternate_source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -2182,7 +2184,7 @@ stable place to grow richer ownership-transfer rules.</p>
     <span class='label'>replace_end_line:</span> <span class='id identifier rubyid_replace_end_line'>replace_end_line</span><span class='comma'>,</span>
     <span class='label'>leading_boundary:</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='comma'>,</span>
     <span class='label'>trailing_boundary:</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merged_content'>merged_content</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2228,12 +2230,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-65
 66
-67</pre>
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_before_content'>before_content</span>
   <span class='id identifier rubyid_line_chunks'>line_chunks</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='lparen'>(</span><span class='id identifier rubyid_replace_start_line'>replace_start_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -2281,12 +2283,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-97
 98
-99</pre>
+99
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_changed?'>changed?</span>
   <span class='id identifier rubyid_merged_content'>merged_content</span> <span class='op'>!=</span> <span class='id identifier rubyid_source'>source</span>
@@ -2334,12 +2336,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-130
 131
-132</pre>
+132
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 131</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_replace_start_line'>replace_start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_replace_end_line'>replace_end_line</span><span class='embexpr_end'>}</span><span class='tstring_content'> changed=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_changed?'>changed?</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -2387,12 +2389,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-58
 59
-60</pre>
+60
+61</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_chunks'>line_chunks</span>
   <span class='ivar'>@line_chunks</span> <span class='op'>||=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -2440,12 +2442,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-72
 73
-74</pre>
+74
+75</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_range'>line_range</span>
   <span class='id identifier rubyid_replace_start_line'>replace_start_line</span><span class='op'>..</span><span class='id identifier rubyid_replace_end_line'>replace_end_line</span>
@@ -2493,12 +2495,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-93
 94
-95</pre>
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 93</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 94</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merged_content'>merged_content</span>
   <span class='op'>+</span><span class='id identifier rubyid_before_content'>before_content</span> <span class='op'>+</span> <span class='id identifier rubyid_replacement_with_preserved_boundary_layout'>replacement_with_preserved_boundary_layout</span> <span class='op'>+</span> <span class='id identifier rubyid_after_content'>after_content</span>
@@ -2546,12 +2548,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-79
 80
-81</pre>
+81
+82</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_removed_content'>removed_content</span>
   <span class='id identifier rubyid_line_chunks'>line_chunks</span><span class='lbracket'>[</span><span class='lparen'>(</span><span class='id identifier rubyid_replace_start_line'>replace_start_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='op'>..</span><span class='lparen'>(</span><span class='id identifier rubyid_replace_end_line'>replace_end_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -2599,12 +2601,12 @@ stable place to grow richer ownership-transfer rules.</p>
       <pre class="lines">
 
 
-104
 105
-106</pre>
+106
+107</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/splice_plan.rb', line 105</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_splice_plan'>to_splice_plan</span>
   <span class='kw'>self</span>
@@ -2619,9 +2621,9 @@ stable place to grow richer ownership-transfer rules.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:52 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

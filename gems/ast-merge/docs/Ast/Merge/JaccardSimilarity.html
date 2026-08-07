@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Merge::JaccardSimilarity
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -383,10 +383,10 @@ with stopwords removed.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_extract_tokens'>extract_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='comma'>,</span> <span class='label'>stopwords:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_STOPWORDS-constant" title="Ast::Merge::JaccardSimilarity::DEFAULT_STOPWORDS (constant)">DEFAULT_STOPWORDS</a></span></span><span class='comma'>,</span> <span class='label'>min_length:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_MIN_TOKEN_LENGTH-constant" title="Ast::Merge::JaccardSimilarity::DEFAULT_MIN_TOKEN_LENGTH (constant)">DEFAULT_MIN_TOKEN_LENGTH</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-    <span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
-    <span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[[:alpha:]][[:alnum:]_-]{</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_length'>min_length</span> <span class='op'>-</span> <span class='int'>1</span><span class='embexpr_end'>}</span><span class='tstring_content'>,}</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
-    <span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_stopwords'>stopwords</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-    <span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
+      <span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
+      <span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[[:alpha:]][[:alnum:]_-]{</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_min_length'>min_length</span> <span class='op'>-</span> <span class='int'>1</span><span class='embexpr_end'>}</span><span class='tstring_content'>,}</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+      <span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_stopwords'>stopwords</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_t'>t</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+      <span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -506,9 +506,9 @@ with stopwords removed.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:47 2026 by
+  Generated on Thu Aug  6 23:41:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

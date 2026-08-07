@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::TokenMatchRefiner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -286,7 +286,7 @@ nodes with minor wording differences (e.g., “Commit changes” vs<br />
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, _context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
     
 
     
@@ -309,7 +309,7 @@ nodes with minor wording differences (e.g., “Commit changes” vs<br />
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(threshold: DEFAULT_TOKEN_THRESHOLD, node_types: [], text_extractor: nil, stopwords: JaccardSimilarity::DEFAULT_STOPWORDS, **options)  &#x21d2; TokenMatchRefiner </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(threshold: DEFAULT_TOKEN_THRESHOLD, node_types: [], text_extractor: nil, stopwords: JaccardSimilarity::DEFAULT_STOPWORDS, **_options)  &#x21d2; TokenMatchRefiner </a>
     
 
     
@@ -365,7 +365,7 @@ nodes with minor wording differences (e.g., “Commit changes” vs<br />
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(threshold: DEFAULT_TOKEN_THRESHOLD, node_types: [], text_extractor: nil, stopwords: JaccardSimilarity::DEFAULT_STOPWORDS, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::TokenMatchRefiner (class)">TokenMatchRefiner</a></span></tt> 
+    #<strong>initialize</strong>(threshold: DEFAULT_TOKEN_THRESHOLD, node_types: [], text_extractor: nil, stopwords: JaccardSimilarity::DEFAULT_STOPWORDS, **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::TokenMatchRefiner (class)">TokenMatchRefiner</a></span></tt> 
   
 
   
@@ -495,7 +495,7 @@ Should accept a node and return a String. Default uses <code>node.text.to_s</cod
   <span class='label'>node_types:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
   <span class='label'>text_extractor:</span> <span class='kw'>nil</span><span class='comma'>,</span>
   <span class='label'>stopwords:</span> <span class='const'><span class='object_link'><a href="JaccardSimilarity.html" title="Ast::Merge::JaccardSimilarity (module)">JaccardSimilarity</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="JaccardSimilarity.html#DEFAULT_STOPWORDS-constant" title="Ast::Merge::JaccardSimilarity::DEFAULT_STOPWORDS (constant)">DEFAULT_STOPWORDS</a></span></span><span class='comma'>,</span>
-  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+  <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span>
 <span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='id identifier rubyid_threshold'>threshold</span><span class='comma'>,</span> <span class='label'>node_types:</span> <span class='id identifier rubyid_node_types'>node_types</span><span class='rparen'>)</span>
   <span class='ivar'>@text_extractor</span> <span class='op'>=</span> <span class='id identifier rubyid_text_extractor'>text_extractor</span>
@@ -639,7 +639,7 @@ Should accept a node and return a String. Default uses <code>node.text.to_s</cod
       <div class="method_details first">
   <h3 class="signature first" id="call-instance_method">
   
-    #<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="MatchRefinerBase/MatchResult.html" title="Ast::Merge::MatchRefinerBase::MatchResult (class)">MatchResult</a></span>&gt;</tt> 
+    #<strong>call</strong>(template_nodes, dest_nodes, _context = {})  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="MatchRefinerBase/MatchResult.html" title="Ast::Merge::MatchRefinerBase::MatchResult (class)">MatchResult</a></span>&gt;</tt> 
   
 
   
@@ -694,8 +694,6 @@ Should accept a node and return a String. Default uses <code>node.text.to_s</cod
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>{}</tt>)</em>
-      
       
         &mdash;
         <div class='inline'><p>Additional context (unused)</p>
@@ -743,7 +741,7 @@ Should accept a node and return a String. Default uses <code>node.text.to_s</cod
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/token_match_refiner.rb', line 69</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid__context'>_context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_t_filtered'>t_filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_node_types'>node_types</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span> <span class='op'>:</span> <span class='id identifier rubyid_filter_nodes'>filter_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_d_filtered'>d_filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_node_types'>node_types</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span> <span class='op'>:</span> <span class='id identifier rubyid_filter_nodes'>filter_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='rparen'>)</span>
 
@@ -763,9 +761,9 @@ Should accept a node and return a String. Default uses <code>node.text.to_s</cod
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

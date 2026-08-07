@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::ContentMatchRefiner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -204,7 +204,7 @@ particularly useful for:</p>
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>content:</span> <span class='float'>0.7</span><span class='comma'>,</span>   <span class='comment'># Text content similarity (Levenshtein)
 </span>  <span class='label'>length:</span> <span class='float'>0.15</span><span class='comma'>,</span>   <span class='comment'># Length similarity
-</span>  <span class='label'>position:</span> <span class='float'>0.15</span><span class='comma'>,</span> <span class='comment'># Position similarity in document
+</span>  <span class='label'>position:</span> <span class='float'>0.15</span> <span class='comment'># Position similarity in document
 </span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
@@ -299,7 +299,7 @@ particularly useful for:</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, _context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
     
 
     
@@ -640,7 +640,7 @@ Should accept a node and return a String</p>
       <div class="method_details first">
   <h3 class="signature first" id="call-instance_method">
   
-    #<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="MatchRefinerBase/MatchResult.html" title="Ast::Merge::MatchRefinerBase::MatchResult (class)">MatchResult</a></span>&gt;</tt> 
+    #<strong>call</strong>(template_nodes, dest_nodes, _context = {})  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="MatchRefinerBase/MatchResult.html" title="Ast::Merge::MatchRefinerBase::MatchResult (class)">MatchResult</a></span>&gt;</tt> 
   
 
   
@@ -694,8 +694,6 @@ Should accept a node and return a String</p>
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>{}</tt>)</em>
       
       
         &mdash;
@@ -758,7 +756,7 @@ Should accept a node and return a String</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/content_match_refiner.rb', line 87</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid__context'>_context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_template_filtered'>template_filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_filter_nodes'>filter_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_dest_filtered'>dest_filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_filter_nodes'>filter_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='rparen'>)</span>
 
@@ -778,7 +776,7 @@ Should accept a node and return a String</p>
       <span class='id identifier rubyid_t_idx'>t_idx</span><span class='comma'>,</span>
       <span class='id identifier rubyid_d_idx'>d_idx</span><span class='comma'>,</span>
       <span class='id identifier rubyid_total_template'>total_template</span><span class='comma'>,</span>
-      <span class='id identifier rubyid_total_dest'>total_dest</span><span class='comma'>,</span>
+      <span class='id identifier rubyid_total_dest'>total_dest</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -792,9 +790,9 @@ Should accept a node and return a String</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

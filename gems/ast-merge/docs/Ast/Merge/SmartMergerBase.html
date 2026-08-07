@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::SmartMergerBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -200,7 +200,7 @@ end
 </div></h5>
       
       <pre class="example code"><code><span class='kw'>def</span> <span class='id identifier rubyid_parse_content'>parse_content</span>
-  <span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:myformat</span><span class='comma'>,</span> <span class='label'>library_path:</span> <span class='ivar'>@parser_path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:myformat</span><span class='comma'>,</span> <span class='label'>backend_type:</span> <span class='symbol'>:tree_sitter</span><span class='rparen'>)</span>
   <span class='ivar'>@ast</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='ivar'>@source</span><span class='rparen'>)</span>
 
   <span class='kw'>if</span> <span class='ivar'>@ast</span><span class='op'>&amp;.</span><span class='id identifier rubyid_root_node'>root_node</span><span class='op'>&amp;.</span><span class='id identifier rubyid_has_error?'>has_error?</span>
@@ -2336,7 +2336,7 @@ can wrap nodes with custom merge_types for use with Hash-based preference.<br />
 
   <span class='lbrace'>{</span>
     <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-    <span class='label'>statistics:</span> <span class='ivar'>@result</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span><span class='comma'>,</span>
+    <span class='label'>statistics:</span> <span class='ivar'>@result</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2408,9 +2408,9 @@ can wrap nodes with custom merge_types for use with Hash-based preference.<br />
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

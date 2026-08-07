@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::SectionTyping::TypedSection
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -585,14 +585,16 @@ with their classification information.</p>
 74
 75
 76
-77</pre>
+77
+78</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalized_name'>normalized_name</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -638,15 +640,15 @@ with their classification information.</p>
       <pre class="lines">
 
 
-82
 83
-84</pre>
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unclassified?'>unclassified?</span>
-  <span class='id identifier rubyid_type'>type</span> <span class='op'>==</span> <span class='symbol'>:unclassified</span> <span class='op'>||</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>==</span> <span class='symbol'>:preamble</span>
+  <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>unclassified</span><span class='words_sep'> </span><span class='tstring_content'>preamble</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -658,9 +660,9 @@ with their classification information.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

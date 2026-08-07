@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::SectionTyping::Classifier
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -275,12 +275,12 @@ and extract section names from AST nodes.</p>
       <pre class="lines">
 
 
+139
 140
-141
-142</pre>
+141</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_classifies?'>classifies?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='id identifier rubyid_classify'>classify</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -369,12 +369,12 @@ and extract section names from AST nodes.</p>
       <pre class="lines">
 
 
-100
 101
-102</pre>
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 100</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_classify'>classify</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>#classify must be implemented</span><span class='tstring_end'>&quot;</span></span>
@@ -448,7 +448,6 @@ unclassified nodes into preamble/interstitial sections.</p>
       <pre class="lines">
 
 
-111
 112
 113
 114
@@ -470,11 +469,10 @@ unclassified nodes into preamble/interstitial sections.</p>
 130
 131
 132
-133
-134</pre>
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 111</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_classify_all'>classify_all</span><span class='lparen'>(</span><span class='id identifier rubyid_children'>children</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sections'>sections</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -494,9 +492,7 @@ unclassified nodes into preamble/interstitial sections.</p>
   <span class='kw'>end</span>
 
   <span class='comment'># Flush remaining unclassified nodes
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_unclassified_buffer'>unclassified_buffer</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
-    <span class='id identifier rubyid_sections'>sections</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_build_unclassified_section'>build_unclassified_section</span><span class='lparen'>(</span><span class='id identifier rubyid_unclassified_buffer'>unclassified_buffer</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+</span>  <span class='id identifier rubyid_sections'>sections</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_build_unclassified_section'>build_unclassified_section</span><span class='lparen'>(</span><span class='id identifier rubyid_unclassified_buffer'>unclassified_buffer</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_unclassified_buffer'>unclassified_buffer</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
 
   <span class='id identifier rubyid_sections'>sections</span>
 <span class='kw'>end</span></pre>
@@ -510,9 +506,9 @@ unclassified nodes into preamble/interstitial sections.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

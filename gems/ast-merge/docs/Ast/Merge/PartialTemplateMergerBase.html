@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::PartialTemplateMergerBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1444,9 +1444,7 @@ layer or concrete partial merger unless it is truly syntax-agnostic</li>
 151
 152
 153
-154
-155
-156</pre>
+154</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 135</span>
@@ -1463,12 +1461,10 @@ layer or concrete partial merger unless it is truly syntax-agnostic</li>
     <span class='label'>position:</span> <span class='symbol'>:replace</span><span class='comma'>,</span>
     <span class='label'>boundary_type:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>boundary_text:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>boundary_same_or_shallower:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:same_or_shallower</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>false</span><span class='comma'>,</span>
+    <span class='label'>boundary_same_or_shallower:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:same_or_shallower</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>false</span>
   <span class='rparen'>)</span>
 
-  <span class='kw'>if</span> <span class='id identifier rubyid_injection_point'>injection_point</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_handle_missing_section'>handle_missing_section</span><span class='lparen'>(</span><span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_handle_missing_section'>handle_missing_section</span><span class='lparen'>(</span><span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_injection_point'>injection_point</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
   <span class='comment'># Found the section - now merge
 </span>  <span class='id identifier rubyid_perform_section_merge'>perform_section_merge</span><span class='lparen'>(</span><span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_d_statements'>d_statements</span><span class='comma'>,</span> <span class='id identifier rubyid_injection_point'>injection_point</span><span class='rparen'>)</span>
@@ -1483,9 +1479,9 @@ layer or concrete partial merger unless it is truly syntax-agnostic</li>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:52 2026 by
+  Generated on Thu Aug  6 23:41:38 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

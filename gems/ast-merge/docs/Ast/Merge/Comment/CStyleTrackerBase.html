@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Comment::CStyleTrackerBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -858,8 +858,6 @@ block spans.</p>
       <pre class="lines">
 
 
-275
-276
 277
 278
 279
@@ -868,10 +866,12 @@ block spans.</p>
 282
 283
 284
-285</pre>
+285
+286
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 275</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 277</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="Augmenter.html" title="Ast::Merge::Comment::Augmenter (class)">Augmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Augmenter.html#initialize-instance_method" title="Ast::Merge::Comment::Augmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span>
@@ -881,7 +881,7 @@ block spans.</p>
     <span class='label'>style:</span> <span class='symbol'>:c_style_line</span><span class='comma'>,</span>
     <span class='label'>total_comment_count:</span> <span class='ivar'>@comments</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
     <span class='label'>block_comment_count:</span> <span class='ivar'>@comments</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span> <span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:block</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -927,14 +927,14 @@ block spans.</p>
       <pre class="lines">
 
 
-255
-256
 257
 258
-259</pre>
+259
+260
+261</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 255</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 257</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_blank_line?'>blank_line?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>&lt;</span> <span class='int'>1</span> <span class='op'>||</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>&gt;</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
@@ -1015,8 +1015,6 @@ block spans.</p>
       <pre class="lines">
 
 
-220
-221
 222
 223
 224
@@ -1039,23 +1037,25 @@ block spans.</p>
 241
 242
 243
-244</pre>
+244
+245
+246</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 220</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 222</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>line_num:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>leading_comments:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>inline_comment:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_comments:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>line_num:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>leading_comments:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>inline_comment:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                           <span class='label'>trailing_comments:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span> <span class='op'>=</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>||</span> <span class='id identifier rubyid_owner_line_num'>owner_line_num</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_resolved_end_line'>resolved_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_end_line'>owner_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span>
   <span class='id identifier rubyid_leading_region'>leading_region</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span>
-    <span class='id identifier rubyid_leading_comment_region_before'>leading_comment_region_before</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span><span class='comma'>,</span> <span class='label'>comments:</span> <span class='id identifier rubyid_leading_comments'>leading_comments</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_inline_region'>inline_region</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span>
-    <span class='id identifier rubyid_inline_comment_region_at'>inline_comment_region_at</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span><span class='comma'>,</span> <span class='label'>comment:</span> <span class='id identifier rubyid_inline_comment'>inline_comment</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+                     <span class='id identifier rubyid_leading_comment_region_before'>leading_comment_region_before</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span><span class='comma'>,</span> <span class='label'>comments:</span> <span class='id identifier rubyid_leading_comments'>leading_comments</span><span class='rparen'>)</span>
+                   <span class='kw'>end</span>
+  <span class='id identifier rubyid_inline_region'>inline_region</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_inline_comment_region_at'>inline_comment_region_at</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span><span class='comma'>,</span> <span class='label'>comment:</span> <span class='id identifier rubyid_inline_comment'>inline_comment</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_trailing_region'>trailing_region</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_resolved_end_line'>resolved_end_line</span>
-    <span class='id identifier rubyid_trailing_comment_region_after'>trailing_comment_region_after</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_end_line'>resolved_end_line</span><span class='comma'>,</span> <span class='label'>comments:</span> <span class='id identifier rubyid_trailing_comments'>trailing_comments</span><span class='comma'>,</span> <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+                      <span class='id identifier rubyid_trailing_comment_region_after'>trailing_comment_region_after</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_end_line'>resolved_end_line</span><span class='comma'>,</span> <span class='label'>comments:</span> <span class='id identifier rubyid_trailing_comments'>trailing_comments</span><span class='comma'>,</span>
+                                                                       <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+                    <span class='kw'>end</span>
 
   <span class='const'><span class='object_link'><a href="Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Attachment</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Attachment.html#initialize-instance_method" title="Ast::Merge::Comment::Attachment#initialize (method)">new</a></span></span><span class='lparen'>(</span>
     <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
@@ -1065,8 +1065,8 @@ block spans.</p>
     <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
       <span class='label'>line_num:</span> <span class='id identifier rubyid_resolved_line_num'>resolved_line_num</span><span class='comma'>,</span>
       <span class='label'>end_line:</span> <span class='id identifier rubyid_resolved_end_line'>resolved_end_line</span><span class='comma'>,</span>
-      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span><span class='comma'>,</span>
-    <span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span>
+    <span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1322,8 +1322,8 @@ block spans.</p>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
       <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span><span class='comma'>,</span>
-      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span>
+    <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1417,13 +1417,13 @@ block spans.</p>
       <pre class="lines">
 
 
-250
-251
 252
-253</pre>
+253
+254
+255</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 250</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 252</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_full_line_comment?'>full_line_comment?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment'>comment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_at'>comment_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
@@ -1608,8 +1608,8 @@ block spans.</p>
     <span class='label'>comments:</span> <span class='id identifier rubyid_selected'>selected</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
-      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span>
+    <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1719,8 +1719,8 @@ block spans.</p>
     <span class='label'>comments:</span> <span class='id identifier rubyid_selected'>selected</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
-      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span>
+    <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1853,14 +1853,14 @@ block spans.</p>
       <pre class="lines">
 
 
-265
-266
 267
 268
-269</pre>
+269
+270
+271</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 265</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 267</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_at'>line_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>&lt;</span> <span class='int'>1</span> <span class='op'>||</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>&gt;</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
@@ -1963,8 +1963,6 @@ block spans.</p>
       <pre class="lines">
 
 
-200
-201
 202
 203
 204
@@ -1977,10 +1975,12 @@ block spans.</p>
 211
 212
 213
-214</pre>
+214
+215
+216</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 200</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 202</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_trailing_comment_region_after'>trailing_comment_region_after</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span> <span class='label'>upper_bound:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>comments:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>owner:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_selected'>selected</span> <span class='op'>=</span> <span class='id identifier rubyid_comments'>comments</span> <span class='op'>||</span> <span class='id identifier rubyid_trailing_comments_after'>trailing_comments_after</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span> <span class='label'>upper_bound:</span> <span class='id identifier rubyid_upper_bound'>upper_bound</span><span class='comma'>,</span> <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
@@ -1993,8 +1993,8 @@ block spans.</p>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
       <span class='label'>upper_bound:</span> <span class='id identifier rubyid_upper_bound'>upper_bound</span><span class='comma'>,</span>
-      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='symbol'>:comment_tracker</span>
+    <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2096,7 +2096,9 @@ between the owner and the first trailing comment.</p>
 189
 190
 191
-192</pre>
+192
+193
+194</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/c_style_tracker_base.rb', line 176</span>
@@ -2109,7 +2111,9 @@ between the owner and the first trailing comment.</p>
 
   <span class='kw'>while</span> <span class='id identifier rubyid_current'>current</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_max_line'>max_line</span>
     <span class='id identifier rubyid_comment'>comment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_at'>comment_at</span><span class='lparen'>(</span><span class='id identifier rubyid_current'>current</span><span class='rparen'>)</span>
-    <span class='kw'>break</span> <span class='kw'>unless</span> <span class='id identifier rubyid_comment'>comment</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:full_line</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_shared_region_comment?'>shared_region_comment?</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_trailing_comment_owned_by?'>trailing_comment_owned_by?</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span> <span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+    <span class='kw'>break</span> <span class='kw'>unless</span> <span class='id identifier rubyid_comment'>comment</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:full_line</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_shared_region_comment?'>shared_region_comment?</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_trailing_comment_owned_by?'>trailing_comment_owned_by?</span><span class='lparen'>(</span>
+      <span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span> <span class='id identifier rubyid_owner'>owner</span>
+    <span class='rparen'>)</span>
 
     <span class='id identifier rubyid_trailing'>trailing</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_comment'>comment</span>
     <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_end_line'>comment_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='int'>1</span>
@@ -2128,9 +2132,9 @@ between the owner and the first trailing comment.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:52 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

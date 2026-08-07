@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Runtime::Session
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -811,7 +811,7 @@
 
   <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
     <span class='label'>frame:</span> <span class='id identifier rubyid_frame_for'>frame_for</span><span class='lparen'>(</span><span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_operation_id'>operation_id</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
-    <span class='label'>children:</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_child'>child</span><span class='op'>|</span> <span class='id identifier rubyid_operation_tree'>operation_tree</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>children:</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_child'>child</span><span class='op'>|</span> <span class='id identifier rubyid_operation_tree'>operation_tree</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1011,7 +1011,13 @@
 78
 79
 80
-81</pre>
+81
+82
+83
+84
+85
+86
+87</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/runtime/session.rb', line 66</span>
@@ -1025,11 +1031,17 @@
     <span class='label'>diagnostic_severity_counts:</span> <span class='id identifier rubyid_tally_by'>tally_by</span><span class='lparen'>(</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='symbol'>:severity</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>delegate_names:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:delegate_name</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>surface_kinds:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_surface'>surface</span><span class='op'>&amp;.</span><span class='id identifier rubyid_surface_kind'>surface_kind</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>effective_languages:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_surface'>surface</span><span class='op'>&amp;.</span><span class='id identifier rubyid_effective_language'>effective_language</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>capabilities_used:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_capabilities_used'>capabilities_used</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>capabilities_missing:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_capabilities_missing'>capabilities_missing</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>effective_languages:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span>
+      <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_surface'>surface</span><span class='op'>&amp;.</span><span class='id identifier rubyid_effective_language'>effective_language</span>
+    <span class='kw'>end</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>capabilities_used:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span>
+      <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_capabilities_used'>capabilities_used</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>capabilities_missing:</span> <span class='id identifier rubyid_normalized_values'>normalized_values</span><span class='lparen'>(</span><span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span>
+      <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_capabilities_missing'>capabilities_missing</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>unresolved_operation_count:</span> <span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:unresolved?</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>unresolved_case_count:</span> <span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_sum'>sum</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='op'>&amp;.</span><span class='id identifier rubyid_length'>length</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>unresolved_case_count:</span> <span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_sum'>sum</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_operation'>operation</span><span class='op'>|</span> <span class='id identifier rubyid_operation'>operation</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='op'>&amp;.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='op'>&amp;.</span><span class='id identifier rubyid_length'>length</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='rbrace'>}</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1052,20 +1064,20 @@
       <pre class="lines">
 
 
-83
-84
-85
-86
-87
-88
 89
 90
 91
 92
-93</pre>
+93
+94
+95
+96
+97
+98
+99</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/runtime/session.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/runtime/session.rb', line 89</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
   <span class='lbrace'>{</span>
@@ -1075,7 +1087,7 @@
     <span class='label'>delegation_registry:</span> <span class='id identifier rubyid_delegation_registry'>delegation_registry</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
     <span class='label'>operations:</span> <span class='id identifier rubyid_operations'>operations</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_h</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>operation_trees:</span> <span class='id identifier rubyid_operation_trees'>operation_trees</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_h</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_h</span><span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1088,9 +1100,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Merge::OwnerSelection
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -283,10 +283,10 @@
       <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_path'>owner_path</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
       <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
 
-      <span class='lbrace'>{</span><span class='label'>template_path:</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>destination_path:</span> <span class='id identifier rubyid_path'>path</span><span class='rbrace'>}</span>
+      <span class='lbrace'>{</span> <span class='label'>template_path:</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>destination_path:</span> <span class='id identifier rubyid_path'>path</span> <span class='rbrace'>}</span>
     <span class='kw'>end</span><span class='comma'>,</span>
     <span class='label'>unmatched_template:</span> <span class='id identifier rubyid_template_paths'>template_paths</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='label'>unmatched_destination:</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_template_paths'>template_paths</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>unmatched_destination:</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_template_paths'>template_paths</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -433,9 +433,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:47 2026 by
+  Generated on Thu Aug  6 23:41:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

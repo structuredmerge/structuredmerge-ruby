@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Comment::Style
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -186,59 +186,59 @@ Mutable to allow runtime registration of custom styles.</p>
         </dt>
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>hash_comment:</span> <span class='lbrace'>{</span>
-    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>#</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*#</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>html_comment:</span> <span class='lbrace'>{</span>
-    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;!--</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>line_end:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--&gt;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>block_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;!--</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>block_end:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--&gt;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;!--</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>--&gt;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;!--</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>--&gt;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--.*--&gt;\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>--&gt;\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>--&gt;\s*$</span><span class='regexp_end'>/</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>c_style_line:</span> <span class='lbrace'>{</span>
-    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>//</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>//</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*//</span><span class='regexp_end'>}</span></span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>c_style_block:</span> <span class='lbrace'>{</span>
     <span class='label'>line_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>block_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/*</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>block_end:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*/</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/*</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>*/</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*/\*</span><span class='regexp_end'>}</span></span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\*/\s*$</span><span class='regexp_end'>}</span></span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\*/\s*$</span><span class='regexp_end'>}</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>semicolon_comment:</span> <span class='lbrace'>{</span>
-    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*;</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>double_dash_comment:</span> <span class='lbrace'>{</span>
-    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>--</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*--</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span>
+  <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="DEFAULT_STYLE-constant" class="">DEFAULT_STYLE =
@@ -996,6 +996,8 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+203
+204
 205
 206
 207
@@ -1004,15 +1006,13 @@ Mutable to allow runtime registration of custom styles.</p>
 210
 211
 212
-213
-214
-215</pre>
+213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 203</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>line_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-  <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+               <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span>
   <span class='ivar'>@line_start</span> <span class='op'>=</span> <span class='id identifier rubyid_line_start'>line_start</span>
   <span class='ivar'>@line_end</span> <span class='op'>=</span> <span class='id identifier rubyid_line_end'>line_end</span>
@@ -1553,12 +1553,12 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
-172
-173
-174</pre>
+170
+171
+172</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 172</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 170</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_styles'>available_styles</span>
   <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
@@ -1889,19 +1889,15 @@ Mutable to allow runtime registration of custom styles.</p>
 162
 163
 164
-165
-166
-167</pre>
+165</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 142</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>line_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-  <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+             <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Style :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> already registered</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Style :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> already registered</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>line_start:</span> <span class='id identifier rubyid_line_start'>line_start</span><span class='comma'>,</span>
@@ -1910,7 +1906,7 @@ Mutable to allow runtime registration of custom styles.</p>
     <span class='label'>block_end:</span> <span class='id identifier rubyid_block_end'>block_end</span><span class='comma'>,</span>
     <span class='label'>line_pattern:</span> <span class='id identifier rubyid_line_pattern'>line_pattern</span><span class='comma'>,</span>
     <span class='label'>block_start_pattern:</span> <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span><span class='comma'>,</span>
-    <span class='label'>block_end_pattern:</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span>
   <span class='rbrace'>}</span>
 
   <span class='comment'># Modify STYLES (it&#39;s frozen, so we need to work around)
@@ -1988,13 +1984,13 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+187
+188
 189
-190
-191
-192</pre>
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 187</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_supports_block_comments?'>supports_block_comments?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
@@ -2066,13 +2062,13 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+178
+179
 180
-181
-182
-183</pre>
+181</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 180</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_supports_line_comments?'>supports_line_comments?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
@@ -2150,28 +2146,24 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+249
+250
 251
 252
 253
 254
 255
 256
-257
-258
-259
-260
-261</pre>
+257</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 251</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 249</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_extract_line_content'>extract_line_content</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>unless</span> <span class='id identifier rubyid_line_start'>line_start</span>
 
-  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_line_start'>line_start</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\s?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_line_end'>line_end</span>
-    <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s*</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_line_end'>line_end</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_line_start'>line_start</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\s?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s*</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_line_end'>line_end</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_line_end'>line_end</span>
   <span class='comment'># Content extraction normalizes trailing spaces for comparison/parsing.
 </span>  <span class='comment'># Callers that need source-preserving output should use the raw line.
 </span>  <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span>
@@ -2223,12 +2215,12 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
-278
-279
-280</pre>
+274
+275
+276</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 278</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 274</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;Comment::Style:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -2299,14 +2291,14 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+239
+240
 241
 242
-243
-244
-245</pre>
+243</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 241</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 239</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_block_end?'>match_block_end?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span>
@@ -2379,14 +2371,14 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+229
+230
 231
 232
-233
-234
-235</pre>
+233</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 229</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_block_start?'>match_block_start?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span>
@@ -2459,14 +2451,14 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
+219
+220
 221
 222
-223
-224
-225</pre>
+223</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 221</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 219</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_line?'>match_line?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_line_pattern'>line_pattern</span>
@@ -2520,12 +2512,12 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
-273
-274
-275</pre>
+269
+270
+271</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 273</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 269</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_supports_block_comments?'>supports_block_comments?</span>
   <span class='op'>!</span><span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2577,12 +2569,12 @@ Mutable to allow runtime registration of custom styles.</p>
       <pre class="lines">
 
 
-266
-267
-268</pre>
+262
+263
+264</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 266</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 262</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_supports_line_comments?'>supports_line_comments?</span>
   <span class='op'>!</span><span class='id identifier rubyid_line_pattern'>line_pattern</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2597,9 +2589,9 @@ Mutable to allow runtime registration of custom styles.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:49 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

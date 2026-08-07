@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::StructuralEdit::RemovePlan
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -880,34 +880,36 @@ Build a plan that removes a contiguous line range and preserves promotable attac
 48
 49
 50
-51</pre>
+51
+52</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 27</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>source:</span><span class='comma'>,</span> <span class='label'>remove_start_line:</span><span class='comma'>,</span> <span class='label'>remove_end_line:</span><span class='comma'>,</span> <span class='label'>leading_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>removed_attachments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>source:</span><span class='comma'>,</span> <span class='label'>remove_start_line:</span><span class='comma'>,</span> <span class='label'>remove_end_line:</span><span class='comma'>,</span> <span class='label'>leading_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+               <span class='label'>removed_attachments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized_removed_attachments'>normalized_removed_attachments</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_removed_attachments'>removed_attachments</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
   <span class='ivar'>@state</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>boundaries:</span> <span class='lbrace'>{</span>
       <span class='label'>leading:</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='comma'>,</span>
-      <span class='label'>trailing:</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='comma'>,</span>
+      <span class='label'>trailing:</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span>
     <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
     <span class='label'>removed_attachments:</span> <span class='id identifier rubyid_normalized_removed_attachments'>normalized_removed_attachments</span><span class='comma'>,</span>
     <span class='label'>removed_owners:</span> <span class='id identifier rubyid_normalize_owners'>normalize_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_removed_owners'>removed_owners</span> <span class='op'>||</span> <span class='id identifier rubyid_removed_attachment_owners'>removed_attachment_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized_removed_attachments'>normalized_removed_attachments</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>retained_owners:</span> <span class='id identifier rubyid_normalize_owners'>normalize_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_retained_owners'>retained_owners</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
   <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
 
   <span class='id identifier rubyid_validate_boundaries!'>validate_boundaries!</span>
   <span class='ivar'>@splice_plan</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="SplicePlan.html" title="Ast::Merge::StructuralEdit::SplicePlan (class)">SplicePlan</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SplicePlan.html#initialize-instance_method" title="Ast::Merge::StructuralEdit::SplicePlan#initialize (method)">new</a></span></span><span class='lparen'>(</span>
     <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
-    <span class='label'>replacement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>replacement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
     <span class='label'>replace_start_line:</span> <span class='id identifier rubyid_remove_start_line'>remove_start_line</span><span class='comma'>,</span>
     <span class='label'>replace_end_line:</span> <span class='id identifier rubyid_remove_end_line'>remove_end_line</span><span class='comma'>,</span>
     <span class='label'>leading_boundary:</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='comma'>,</span>
     <span class='label'>trailing_boundary:</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='comma'>,</span>
     <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='id identifier rubyid_preserve_removed_trailing_blank_lines'>preserve_removed_trailing_blank_lines</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:structural_edit_remove_plan</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:structural_edit_remove_plan</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -960,12 +962,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-140
 141
-142</pre>
+142
+143</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 141</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_after_content'>after_content</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_after_content'>after_content</span>
@@ -1034,12 +1036,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-166
 167
-168</pre>
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply_to'>apply_to</span><span class='lparen'>(</span><span class='id identifier rubyid_alternate_source'>alternate_source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_apply_to'>apply_to</span><span class='lparen'>(</span><span class='id identifier rubyid_alternate_source'>alternate_source</span><span class='rparen'>)</span>
@@ -1087,12 +1089,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-126
 127
-128</pre>
+128
+129</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 126</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 127</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_before_content'>before_content</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_before_content'>before_content</span>
@@ -1140,12 +1142,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-151
 152
-153</pre>
+153
+154</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 151</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_changed?'>changed?</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_changed?'>changed?</span>
@@ -1193,12 +1195,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-194
 195
-196</pre>
+196
+197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 194</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 195</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remove_start_line'>remove_start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remove_end_line'>remove_end_line</span><span class='embexpr_end'>}</span><span class='tstring_content'> removed_owners=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> rehome_plans=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rehome_plans'>rehome_plans</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -1246,12 +1248,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-84
 85
-86</pre>
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span>
   <span class='id identifier rubyid_boundaries'>boundaries</span><span class='lbracket'>[</span><span class='symbol'>:leading</span><span class='rbracket'>]</span>
@@ -1299,12 +1301,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-77
 78
-79</pre>
+79
+80</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_range'>line_range</span>
   <span class='id identifier rubyid_remove_start_line'>remove_start_line</span><span class='op'>..</span><span class='id identifier rubyid_remove_end_line'>remove_end_line</span>
@@ -1352,12 +1354,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-147
 148
-149</pre>
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 147</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merged_content'>merged_content</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_merged_content'>merged_content</span>
@@ -1405,12 +1407,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-119
 120
-121</pre>
+121
+122</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:metadata</span><span class='rbracket'>]</span>
@@ -1458,12 +1460,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-180
 181
-182</pre>
+182
+183</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 180</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 181</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promoted_comment_regions'>promoted_comment_regions</span>
   <span class='id identifier rubyid_rehome_plans'>rehome_plans</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:comment_regions</span><span class='rparen'>)</span>
@@ -1511,12 +1513,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-187
 188
-189</pre>
+189
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 187</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 188</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promoted_layout_gaps'>promoted_layout_gaps</span>
   <span class='id identifier rubyid_rehome_plans'>rehome_plans</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:layout_gaps</span><span class='rparen'>)</span>
@@ -1564,12 +1566,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-173
 174
-175</pre>
+175
+176</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 173</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 174</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_rehome_plans'>rehome_plans</span>
   <span class='id identifier rubyid_removed_attachments'>removed_attachments</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_attachment'>attachment</span><span class='op'>|</span> <span class='id identifier rubyid_build_rehome_plans_for'>build_rehome_plans_for</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -1617,12 +1619,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-70
 71
-72</pre>
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 71</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_end_line'>remove_end_line</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_replace_end_line'>replace_end_line</span>
@@ -1670,12 +1672,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-63
 64
-65</pre>
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_start_line'>remove_start_line</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_replace_start_line'>replace_start_line</span>
@@ -1723,12 +1725,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-98
 99
-100</pre>
+100
+101</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 98</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 99</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_removed_attachments'>removed_attachments</span>
   <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:removed_attachments</span><span class='rbracket'>]</span>
@@ -1776,12 +1778,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-133
 134
-135</pre>
+135
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 133</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 134</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_removed_content'>removed_content</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_removed_content'>removed_content</span>
@@ -1829,12 +1831,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-105
 106
-107</pre>
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 105</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span>
   <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:removed_owners</span><span class='rbracket'>]</span>
@@ -1882,12 +1884,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-112
 113
-114</pre>
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span>
   <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:retained_owners</span><span class='rbracket'>]</span>
@@ -1935,12 +1937,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source'>source</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_source'>source</span>
@@ -1988,12 +1990,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-158
 159
-160</pre>
+160
+161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 158</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 159</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_splice_plan'>to_splice_plan</span>
   <span class='id identifier rubyid_splice_plan'>splice_plan</span>
@@ -2041,12 +2043,12 @@ Build a plan that removes a contiguous line range and preserves promotable attac
       <pre class="lines">
 
 
-91
 92
-93</pre>
+93
+94</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 92</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span>
   <span class='id identifier rubyid_boundaries'>boundaries</span><span class='lbracket'>[</span><span class='symbol'>:trailing</span><span class='rbracket'>]</span>
@@ -2061,9 +2063,9 @@ Build a plan that removes a contiguous line range and preserves promotable attac
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:52 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

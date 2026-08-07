@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Navigable::Statement
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1234,16 +1234,16 @@ while still accessing tree structure for section-aware operations.</p>
       <pre class="lines">
 
 
+365
 366
 367
 368
 369
 370
-371
-372</pre>
+371</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 366</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 365</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
@@ -2001,7 +2001,8 @@ while still accessing tree structure for section-aware operations.</p>
 154
 155
 156
-157</pre>
+157
+158</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 149</span>
@@ -2012,6 +2013,7 @@ while still accessing tree structure for section-aware operations.</p>
   <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_next'>next</span>
   <span class='kw'>while</span> <span class='id identifier rubyid_current'>current</span>
     <span class='kw'>break</span> <span class='kw'>unless</span> <span class='kw'>yield</span><span class='lparen'>(</span><span class='id identifier rubyid_current'>current</span><span class='rparen'>)</span>
+
     <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_next'>next</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -2062,13 +2064,13 @@ while still accessing tree structure for section-aware operations.</p>
       <pre class="lines">
 
 
-295
 296
 297
-298</pre>
+298
+299</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 295</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 296</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
   <span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='id identifier rubyid_source_position'>source_position</span>
@@ -2178,13 +2180,13 @@ while still accessing tree structure for section-aware operations.</p>
       <pre class="lines">
 
 
-220
-221
 222
-223</pre>
+223
+224
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 220</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 222</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_tree_navigation?'>has_tree_navigation?</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -2237,12 +2239,12 @@ while still accessing tree structure for section-aware operations.</p>
       <pre class="lines">
 
 
+355
 356
-357
-358</pre>
+357</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 356</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 355</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;Navigable::Statement[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_index'>index</span><span class='embexpr_end'>}</span><span class='tstring_content'>] type=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_content'> tree=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_has_tree_navigation?'>has_tree_navigation?</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -2444,16 +2446,16 @@ while still accessing tree structure for section-aware operations.</p>
       <pre class="lines">
 
 
-332
 333
 334
 335
 336
 337
-338</pre>
+338
+339</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 332</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 333</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_node_attribute'>node_attribute</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_aliases'>aliases</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -2562,12 +2564,12 @@ while still accessing tree structure for section-aware operations.</p>
       <pre class="lines">
 
 
+373
 374
-375
-376</pre>
+375</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 374</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 373</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -2639,13 +2641,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-253
 254
 255
-256</pre>
+256
+257</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 253</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 254</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_same_or_shallower_than?'>same_or_shallower_than?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_other_depth'>other_depth</span> <span class='op'>=</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Integer</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_other'>other</span> <span class='op'>:</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_tree_depth'>tree_depth</span>
@@ -2698,12 +2700,12 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-272
 273
-274</pre>
+274
+275</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 272</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 273</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_signature'>signature</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:signature</span><span class='rparen'>)</span>
@@ -2755,12 +2757,12 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-284
 285
-286</pre>
+286
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 284</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 285</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source_position'>source_position</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_source_position'>source_position</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:source_position</span><span class='rparen'>)</span>
@@ -2812,13 +2814,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-289
 290
 291
-292</pre>
+292
+293</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 289</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 290</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
   <span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='id identifier rubyid_source_position'>source_position</span>
@@ -2871,12 +2873,12 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-226
-227
-228</pre>
+228
+229
+230</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 226</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 228</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_synthetic?'>synthetic?</span>
   <span class='op'>!</span><span class='id identifier rubyid_has_tree_navigation?'>has_tree_navigation?</span>
@@ -2945,7 +2947,6 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-163
 164
 165
 166
@@ -2953,15 +2954,18 @@ Useful for determining section boundaries.</p>
 168
 169
 170
-171</pre>
+171
+172
+173</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 163</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 164</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_take_until'>take_until</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_each_following'>each_following</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='op'>|</span>
     <span class='kw'>break</span> <span class='kw'>if</span> <span class='kw'>yield</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt'>stmt</span><span class='rparen'>)</span>
+
     <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_stmt'>stmt</span>
     <span class='kw'>true</span>
   <span class='kw'>end</span>
@@ -3014,14 +3018,14 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-277
 278
 279
 280
-281</pre>
+281
+282</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 277</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 278</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text'>text</span>
   <span class='comment'># TreeHaver nodes (and any node conforming to the unified API) provide #text.
@@ -3090,17 +3094,17 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-316
 317
 318
 319
 320
 321
 322
-323</pre>
+323
+324</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 316</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text_matches?'>text_matches?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_pattern'>pattern</span>
@@ -3157,12 +3161,12 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
+360
 361
-362
-363</pre>
+362</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 361</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 360</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='lbracket'>[</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>50</span><span class='rbracket'>]</span>
@@ -3214,8 +3218,6 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-196
-197
 198
 199
 200
@@ -3223,10 +3225,12 @@ Useful for determining section boundaries.</p>
 202
 203
 204
-205</pre>
+205
+206
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 196</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_children'>tree_children</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -3285,8 +3289,6 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-233
-234
 235
 236
 237
@@ -3298,10 +3300,11 @@ Useful for determining section boundaries.</p>
 243
 244
 245
-246</pre>
+246
+247</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 233</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 235</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_depth'>tree_depth</span>
   <span class='id identifier rubyid_depth'>depth</span> <span class='op'>=</span> <span class='int'>0</span>
@@ -3309,11 +3312,10 @@ Useful for determining section boundaries.</p>
   <span class='kw'>while</span> <span class='id identifier rubyid_current'>current</span>
     <span class='id identifier rubyid_depth'>depth</span> <span class='op'>+=</span> <span class='int'>1</span>
     <span class='comment'># Navigate up through parents
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:parent</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_parent'>parent</span>
-    <span class='kw'>else</span>
-      <span class='kw'>break</span>
-    <span class='kw'>end</span>
+</span>    <span class='kw'>break</span> <span class='kw'>unless</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:parent</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_parent'>parent</span>
+
   <span class='kw'>end</span>
   <span class='id identifier rubyid_depth'>depth</span>
 <span class='kw'>end</span></pre>
@@ -3364,13 +3366,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-208
-209
 210
-211</pre>
+211
+212
+213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 208</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 210</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_first_child'>tree_first_child</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -3423,13 +3425,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-214
-215
 216
-217</pre>
+217
+218
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 214</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 216</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_last_child'>tree_last_child</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -3482,13 +3484,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-184
-185
 186
-187</pre>
+187
+188
+189</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 184</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 186</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_next'>tree_next</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -3541,13 +3543,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-178
-179
 180
-181</pre>
+181
+182
+183</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 178</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 180</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_parent'>tree_parent</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -3600,13 +3602,13 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-190
-191
 192
-193</pre>
+193
+194
+195</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 190</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 192</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_previous'>tree_previous</span>
   <span class='id identifier rubyid_inner'>inner</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
@@ -3659,23 +3661,23 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-263
 264
 265
 266
 267
 268
-269</pre>
+269
+270</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 263</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 264</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span>
 
   <span class='comment'># Fallback: derive type from class name (handle anonymous classes)
 </span>  <span class='id identifier rubyid_class_name'>class_name</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
-  <span class='id identifier rubyid_class_name'>class_name</span> <span class='op'>?</span> <span class='id identifier rubyid_class_name'>class_name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>::</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Anonymous</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_class_name'>class_name</span> <span class='op'>?</span> <span class='id identifier rubyid_class_name'>class_name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>::</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Anonymous</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -3739,12 +3741,12 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-308
 309
-310</pre>
+310
+311</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 308</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 309</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type?'>type?</span><span class='lparen'>(</span><span class='id identifier rubyid_expected_type'>expected_type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='id identifier rubyid_expected_type'>expected_type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -3796,22 +3798,18 @@ Useful for determining section boundaries.</p>
       <pre class="lines">
 
 
-347
 348
 349
 350
 351
-352
-353</pre>
+352</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 347</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/navigable/statement.rb', line 348</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unwrapped_node'>unwrapped_node</span>
   <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span>
-  <span class='kw'>while</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:inner_node</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_inner_node'>inner_node</span> <span class='op'>!=</span> <span class='id identifier rubyid_current'>current</span>
-    <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_inner_node'>inner_node</span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_inner_node'>inner_node</span> <span class='kw'>while</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:inner_node</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_inner_node'>inner_node</span> <span class='op'>!=</span> <span class='id identifier rubyid_current'>current</span>
   <span class='id identifier rubyid_current'>current</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3824,9 +3822,9 @@ Useful for determining section boundaries.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

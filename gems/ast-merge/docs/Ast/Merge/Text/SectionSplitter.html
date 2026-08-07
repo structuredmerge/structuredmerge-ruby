@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Text::SectionSplitter
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -739,23 +739,23 @@ have a structured AST. For AST-level node classification (like identifying<br />
       <pre class="lines">
 
 
-274
-275
-276
 277
 278
 279
-280</pre>
+280
+281
+282
+283</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 274</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 277</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
-  <span class='kw'>unless</span> <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>splitter config must be a Hash, got </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>splitter config must be a Hash, got </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1010,7 +1010,7 @@ have a structured AST. For AST-level node classification (like identifying<br />
     <span class='id identifier rubyid_template_sections'>template_sections</span><span class='comma'>,</span>
     <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='comma'>,</span>
     <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
-    <span class='label'>add_template_only:</span> <span class='id identifier rubyid_add_template_only'>add_template_only</span><span class='comma'>,</span>
+    <span class='label'>add_template_only:</span> <span class='id identifier rubyid_add_template_only'>add_template_only</span>
   <span class='rparen'>)</span>
 
   <span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_merged_sections'>merged_sections</span><span class='rparen'>)</span>
@@ -1099,8 +1099,6 @@ for format-specific content merging.</p>
       <pre class="lines">
 
 
-211
-212
 213
 214
 215
@@ -1109,10 +1107,12 @@ for format-specific content merging.</p>
 218
 219
 220
-221</pre>
+221
+222
+223</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 213</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_section_content'>merge_section_content</span><span class='lparen'>(</span><span class='id identifier rubyid_template_section'>template_section</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='rparen'>)</span>
   <span class='comment'># Default: use template header, dest body
@@ -1122,7 +1122,7 @@ for format-specific content merging.</p>
     <span class='label'>body:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='comma'>,</span>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_template_section'>template_section</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_template_section'>template_section</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1276,12 +1276,15 @@ for format-specific content merging.</p>
 174
 175
 176
-177</pre>
+177
+178
+179</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 141</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_section_lists'>merge_section_lists</span><span class='lparen'>(</span><span class='id identifier rubyid_template_sections'>template_sections</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PREFERENCE-constant" title="Ast::Merge::Text::SectionSplitter::DEFAULT_PREFERENCE (constant)">DEFAULT_PREFERENCE</a></span></span><span class='comma'>,</span> <span class='label'>add_template_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_section_lists'>merge_section_lists</span><span class='lparen'>(</span><span class='id identifier rubyid_template_sections'>template_sections</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PREFERENCE-constant" title="Ast::Merge::Text::SectionSplitter::DEFAULT_PREFERENCE (constant)">DEFAULT_PREFERENCE</a></span></span><span class='comma'>,</span>
+                        <span class='label'>add_template_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='comment'># Build lookup by normalized name
 </span>  <span class='id identifier rubyid_dest_by_name'>dest_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
     <span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_name'>normalize_name</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -1313,6 +1316,7 @@ for format-specific content merging.</p>
 </span>  <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_dest_section'>dest_section</span><span class='op'>|</span>
     <span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_name'>normalize_name</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_section'>dest_section</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
     <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_seen_names'>seen_names</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+
     <span class='id identifier rubyid_merged'>merged</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_dest_section'>dest_section</span>
   <span class='kw'>end</span>
 
@@ -1418,8 +1422,6 @@ merging within sections).</p>
       <pre class="lines">
 
 
-189
-190
 191
 192
 193
@@ -1430,10 +1432,12 @@ merging within sections).</p>
 198
 199
 200
-201</pre>
+201
+202
+203</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 191</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_sections'>merge_sections</span><span class='lparen'>(</span><span class='id identifier rubyid_template_section'>template_section</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_section'>dest_section</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_preference'>preference</span>
@@ -1517,19 +1521,21 @@ Subclasses can override for format-specific normalization.</p>
       <pre class="lines">
 
 
-251
-252
 253
 254
-255</pre>
+255
+256
+257
+258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 251</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 253</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_name'>normalize_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1612,8 +1618,6 @@ Subclasses can override for format-specific normalization.</p>
       <pre class="lines">
 
 
-228
-229
 230
 231
 232
@@ -1626,10 +1630,12 @@ Subclasses can override for format-specific normalization.</p>
 239
 240
 241
-242</pre>
+242
+243
+244</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 228</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 230</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_preference_for_section'>preference_for_section</span><span class='lparen'>(</span><span class='id identifier rubyid_section_name'>section_name</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_preference'>preference</span> <span class='kw'>unless</span> <span class='id identifier rubyid_preference'>preference</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -1715,12 +1721,12 @@ sophisticated matching (e.g., including metadata).</p>
       <pre class="lines">
 
 
-264
-265
-266</pre>
+267
+268
+269</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 264</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 267</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_section_signature'>section_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalize_name'>normalize_name</span><span class='lparen'>(</span><span class='id identifier rubyid_section'>section</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -1829,9 +1835,9 @@ sophisticated matching (e.g., including metadata).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

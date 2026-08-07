@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Comment::Attachment
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -858,12 +858,14 @@ around a structural owner node.</p>
 48
 49
 50
-51</pre>
+51
+52</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 42</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>owner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>leading_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>inline_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>orphan_regions:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>leading_gap:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_gap:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>owner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>leading_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>inline_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>orphan_regions:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+               <span class='label'>leading_gap:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_gap:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@owner</span> <span class='op'>=</span> <span class='id identifier rubyid_owner'>owner</span>
   <span class='ivar'>@leading_region</span> <span class='op'>=</span> <span class='id identifier rubyid_leading_region'>leading_region</span>
   <span class='ivar'>@inline_region</span> <span class='op'>=</span> <span class='id identifier rubyid_inline_region'>inline_region</span>
@@ -2128,12 +2130,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-60
 61
-62</pre>
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
   <span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -2181,12 +2183,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-98
 99
-100</pre>
+100
+101</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 98</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 99</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze?'>freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='op'>|</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:freeze?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_freeze?'>freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -2234,12 +2236,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-106
 107
-108</pre>
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 106</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 107</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze_marker?'>freeze_marker?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_freeze?'>freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_unfreeze?'>unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
@@ -2287,7 +2289,6 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-113
 114
 115
 116
@@ -2297,19 +2298,20 @@ around a structural owner node.</p>
 120
 121
 122
-123</pre>
+123
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='id identifier rubyid_owner_desc'>owner_desc</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owner'>owner</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
-  <span class='kw'>elsif</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-    <span class='kw'>nil</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
-  <span class='kw'>end</span>
+                 <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+               <span class='kw'>elsif</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+                 <span class='kw'>nil</span>
+               <span class='kw'>else</span>
+                 <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+               <span class='kw'>end</span>
 
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> owner=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_owner_desc'>owner_desc</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> regions=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> layout_gaps=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_layout_gaps'>layout_gaps</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
@@ -2356,12 +2358,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-67
 68
-69</pre>
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_gaps'>layout_gaps</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span> <span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
@@ -2386,20 +2388,20 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-83
 84
 85
 86
 87
-88</pre>
+88
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_owned_regions'>layout_owned_regions</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span>
     <span class='lparen'>(</span><span class='id identifier rubyid_leading_region'>leading_region</span> <span class='kw'>if</span> <span class='id identifier rubyid_leading_region_layout_owned?'>leading_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='lparen'>(</span><span class='id identifier rubyid_trailing_region'>trailing_region</span> <span class='kw'>if</span> <span class='id identifier rubyid_trailing_region_layout_owned?'>trailing_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='lparen'>(</span><span class='id identifier rubyid_trailing_region'>trailing_region</span> <span class='kw'>if</span> <span class='id identifier rubyid_trailing_region_layout_owned?'>trailing_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2445,12 +2447,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-90
 91
-92</pre>
+92
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_leading_freeze?'>leading_freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:freeze?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_freeze?'>freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
@@ -2498,14 +2500,14 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-71
 72
 73
 74
-75</pre>
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_leading_region_layout_owned?'>leading_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_floating?'>floating?</span> <span class='op'>&amp;&amp;</span>
@@ -2555,12 +2557,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-94
 95
-96</pre>
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 94</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_leading_unfreeze?'>leading_unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unfreeze?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_unfreeze?'>unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
@@ -2608,12 +2610,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_regions'>regions</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='comma'>,</span> <span class='id identifier rubyid_inline_region'>inline_region</span><span class='comma'>,</span> <span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_orphan_regions'>orphan_regions</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
@@ -2661,14 +2663,14 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-77
 78
 79
 80
-81</pre>
+81
+82</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_trailing_region_layout_owned?'>trailing_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_floating?'>floating?</span> <span class='op'>&amp;&amp;</span>
@@ -2718,12 +2720,12 @@ around a structural owner node.</p>
       <pre class="lines">
 
 
-102
 103
-104</pre>
+104
+105</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 103</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unfreeze?'>unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='op'>|</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unfreeze?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_unfreeze?'>unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -2738,9 +2740,9 @@ around a structural owner node.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

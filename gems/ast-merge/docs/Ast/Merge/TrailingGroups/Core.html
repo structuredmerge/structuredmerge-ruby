@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Merge::TrailingGroups::Core
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -392,7 +392,7 @@ preceding matched template node.</p>
       <span class='id identifier rubyid_current_anchor'>current_anchor</span> <span class='op'>=</span> <span class='id identifier rubyid_idx'>idx</span>
       <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
     <span class='kw'>else</span>
-      <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span> <span class='op'>?</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='lbrace'>{</span><span class='label'>node:</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='id identifier rubyid_idx'>idx</span><span class='rbrace'>}</span>
+      <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span> <span class='op'>?</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='lbrace'>{</span> <span class='label'>node:</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='id identifier rubyid_idx'>idx</span> <span class='rbrace'>}</span>
       <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_entry'>entry</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
@@ -702,8 +702,8 @@ relative to the template.</p>
 
     <span class='comment'># Check if all matched template indices 0..anchor have been consumed
 </span>    <span class='id identifier rubyid_ready'>ready</span> <span class='op'>=</span> <span class='id identifier rubyid_matched_indices'>matched_indices</span>
-      <span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='id identifier rubyid_idx'>idx</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_anchor'>anchor</span> <span class='rbrace'>}</span>
-      <span class='period'>.</span><span class='id identifier rubyid_all?'>all?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+            <span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='id identifier rubyid_idx'>idx</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_anchor'>anchor</span> <span class='rbrace'>}</span>
+            <span class='period'>.</span><span class='id identifier rubyid_all?'>all?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
     <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_ready'>ready</span>
 
     <span class='id identifier rubyid_group'>group</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
@@ -724,9 +724,9 @@ relative to the template.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:47 2026 by
+  Generated on Thu Aug  6 23:41:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

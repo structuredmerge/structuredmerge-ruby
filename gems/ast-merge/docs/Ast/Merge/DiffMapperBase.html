@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::DiffMapperBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -377,7 +377,7 @@ Subclasses must implement this to return their format-specific analysis.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/diff_mapper_base.rb', line 190</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create_analysis'>create_analysis</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Subclasses must implement #create_analysis</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Subclasses must implement #create_analysis</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -690,7 +690,7 @@ Subclasses must implement this with format-specific logic.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/diff_mapper_base.rb', line 201</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_map_hunk_to_paths'>map_hunk_to_paths</span><span class='lparen'>(</span><span class='id identifier rubyid_hunk'>hunk</span><span class='comma'>,</span> <span class='id identifier rubyid_original_analysis'>original_analysis</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Subclasses must implement #map_hunk_to_paths</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Subclasses must implement #map_hunk_to_paths</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -860,19 +860,19 @@ Subclasses must implement this with format-specific logic.</p>
     <span class='kw'>case</span> <span class='id identifier rubyid_line'>line</span>
     <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^---\s+(.+)$</span><span class='regexp_end'>/</span></span>
       <span class='comment'># Original file path
-</span>      <span class='id identifier rubyid_old_file'>old_file</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_file_path'>extract_file_path</span><span class='lparen'>(</span><span class='backref'>$1</span><span class='rparen'>)</span>
+</span>      <span class='id identifier rubyid_old_file'>old_file</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_file_path'>extract_file_path</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='rparen'>)</span>
     <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\+\+\+\s+(.+)$</span><span class='regexp_end'>/</span></span>
       <span class='comment'># New file path
-</span>      <span class='id identifier rubyid_new_file'>new_file</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_file_path'>extract_file_path</span><span class='lparen'>(</span><span class='backref'>$1</span><span class='rparen'>)</span>
+</span>      <span class='id identifier rubyid_new_file'>new_file</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_file_path'>extract_file_path</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='rparen'>)</span>
     <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@</span><span class='regexp_end'>/</span></span>
       <span class='comment'># Hunk header
 </span>      <span class='comment'># Finalize previous hunk
 </span>      <span class='id identifier rubyid_hunks'>hunks</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_current_hunk'>current_hunk</span> <span class='kw'>if</span> <span class='id identifier rubyid_current_hunk'>current_hunk</span>
 
-      <span class='id identifier rubyid_old_start'>old_start</span> <span class='op'>=</span> <span class='backref'>$1</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-      <span class='id identifier rubyid_old_count'>old_count</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='backref'>$2</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-      <span class='id identifier rubyid_new_start'>new_start</span> <span class='op'>=</span> <span class='backref'>$3</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-      <span class='id identifier rubyid_new_count'>new_count</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='backref'>$4</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+      <span class='id identifier rubyid_old_start'>old_start</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+      <span class='id identifier rubyid_old_count'>old_count</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+      <span class='id identifier rubyid_new_start'>new_start</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>3</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+      <span class='id identifier rubyid_new_count'>new_count</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
 
       <span class='id identifier rubyid_current_hunk'>current_hunk</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DiffMapperBase/DiffHunk.html" title="Ast::Merge::DiffMapperBase::DiffHunk (class)">DiffHunk</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
         <span class='label'>old_start:</span> <span class='id identifier rubyid_old_start'>old_start</span><span class='comma'>,</span>
@@ -880,7 +880,7 @@ Subclasses must implement this with format-specific logic.</p>
         <span class='label'>new_start:</span> <span class='id identifier rubyid_new_start'>new_start</span><span class='comma'>,</span>
         <span class='label'>new_count:</span> <span class='id identifier rubyid_new_count'>new_count</span><span class='comma'>,</span>
         <span class='label'>lines:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-        <span class='label'>header:</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span>
+        <span class='label'>header:</span> <span class='id identifier rubyid_line'>line</span>
       <span class='rparen'>)</span>
       <span class='id identifier rubyid_old_line_num'>old_line_num</span> <span class='op'>=</span> <span class='id identifier rubyid_old_start'>old_start</span>
       <span class='id identifier rubyid_new_line_num'>new_line_num</span> <span class='op'>=</span> <span class='id identifier rubyid_new_start'>new_start</span>
@@ -890,9 +890,9 @@ Subclasses must implement this with format-specific logic.</p>
 
       <span class='id identifier rubyid_current_hunk'>current_hunk</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="DiffMapperBase/DiffLine.html" title="Ast::Merge::DiffMapperBase::DiffLine (class)">DiffLine</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
         <span class='label'>type:</span> <span class='symbol'>:addition</span><span class='comma'>,</span>
-        <span class='label'>content:</span> <span class='backref'>$1</span><span class='comma'>,</span>
+        <span class='label'>content:</span> <span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='comma'>,</span>
         <span class='label'>old_line_num:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-        <span class='label'>new_line_num:</span> <span class='id identifier rubyid_new_line_num'>new_line_num</span><span class='comma'>,</span>
+        <span class='label'>new_line_num:</span> <span class='id identifier rubyid_new_line_num'>new_line_num</span>
       <span class='rparen'>)</span>
       <span class='id identifier rubyid_new_line_num'>new_line_num</span> <span class='op'>+=</span> <span class='int'>1</span>
     <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^-(.*)$</span><span class='regexp_end'>/</span></span>
@@ -901,9 +901,9 @@ Subclasses must implement this with format-specific logic.</p>
 
       <span class='id identifier rubyid_current_hunk'>current_hunk</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="DiffMapperBase/DiffLine.html" title="Ast::Merge::DiffMapperBase::DiffLine (class)">DiffLine</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
         <span class='label'>type:</span> <span class='symbol'>:removal</span><span class='comma'>,</span>
-        <span class='label'>content:</span> <span class='backref'>$1</span><span class='comma'>,</span>
+        <span class='label'>content:</span> <span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='comma'>,</span>
         <span class='label'>old_line_num:</span> <span class='id identifier rubyid_old_line_num'>old_line_num</span><span class='comma'>,</span>
-        <span class='label'>new_line_num:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+        <span class='label'>new_line_num:</span> <span class='kw'>nil</span>
       <span class='rparen'>)</span>
       <span class='id identifier rubyid_old_line_num'>old_line_num</span> <span class='op'>+=</span> <span class='int'>1</span>
     <span class='kw'>when</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^ (.*)$</span><span class='regexp_end'>/</span></span>
@@ -912,9 +912,9 @@ Subclasses must implement this with format-specific logic.</p>
 
       <span class='id identifier rubyid_current_hunk'>current_hunk</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="DiffMapperBase/DiffLine.html" title="Ast::Merge::DiffMapperBase::DiffLine (class)">DiffLine</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
         <span class='label'>type:</span> <span class='symbol'>:context</span><span class='comma'>,</span>
-        <span class='label'>content:</span> <span class='backref'>$1</span><span class='comma'>,</span>
+        <span class='label'>content:</span> <span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_last_match'>last_match</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='comma'>,</span>
         <span class='label'>old_line_num:</span> <span class='id identifier rubyid_old_line_num'>old_line_num</span><span class='comma'>,</span>
-        <span class='label'>new_line_num:</span> <span class='id identifier rubyid_new_line_num'>new_line_num</span><span class='comma'>,</span>
+        <span class='label'>new_line_num:</span> <span class='id identifier rubyid_new_line_num'>new_line_num</span>
       <span class='rparen'>)</span>
       <span class='id identifier rubyid_old_line_num'>old_line_num</span> <span class='op'>+=</span> <span class='int'>1</span>
       <span class='id identifier rubyid_new_line_num'>new_line_num</span> <span class='op'>+=</span> <span class='int'>1</span>
@@ -927,7 +927,7 @@ Subclasses must implement this with format-specific logic.</p>
   <span class='const'><span class='object_link'><a href="DiffMapperBase/DiffParseResult.html" title="Ast::Merge::DiffMapperBase::DiffParseResult (class)">DiffParseResult</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
     <span class='label'>old_file:</span> <span class='id identifier rubyid_old_file'>old_file</span><span class='comma'>,</span>
     <span class='label'>new_file:</span> <span class='id identifier rubyid_new_file'>new_file</span><span class='comma'>,</span>
-    <span class='label'>hunks:</span> <span class='id identifier rubyid_hunks'>hunks</span><span class='comma'>,</span>
+    <span class='label'>hunks:</span> <span class='id identifier rubyid_hunks'>hunks</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -940,9 +940,9 @@ Subclasses must implement this with format-specific logic.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:50 2026 by
+  Generated on Thu Aug  6 23:41:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

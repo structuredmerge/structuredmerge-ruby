@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Merge::Comment::SupportStyle
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -706,13 +706,13 @@ from parser capability and from ruleset capability declarations.</p>
       <pre class="lines">
 
 
+78
 79
 80
-81
-82</pre>
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>style:</span><span class='comma'>,</span> <span class='label'>details:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@style</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_style'>normalize_style</span><span class='lparen'>(</span><span class='id identifier rubyid_style'>style</span><span class='rparen'>)</span>
@@ -1227,12 +1227,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+115
 116
-117
-118</pre>
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 115</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available?'>available?</span>
   <span class='op'>!</span><span class='id identifier rubyid_unavailable?'>unavailable?</span>
@@ -1280,12 +1280,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+95
 96
-97
-98</pre>
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hybrid_native_owned?'>hybrid_native_owned?</span>
   <span class='id identifier rubyid_style'>style</span> <span class='op'>==</span> <span class='symbol'>:hybrid_native_owned</span>
@@ -1333,12 +1333,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+136
 137
-138
-139</pre>
+138</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 137</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 136</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> style=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_style'>style</span><span class='embexpr_end'>}</span><span class='tstring_content'> details=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -1386,12 +1386,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+91
 92
-93
-94</pre>
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 92</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_native_mutation?'>native_mutation?</span>
   <span class='id identifier rubyid_style'>style</span> <span class='op'>==</span> <span class='symbol'>:native_mutation</span>
@@ -1439,12 +1439,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+107
 108
-109
-110</pre>
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 107</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_native_read?'>native_read?</span>
   <span class='id identifier rubyid_native_read_portable_write?'>native_read_portable_write?</span> <span class='op'>||</span> <span class='id identifier rubyid_native_mutation?'>native_mutation?</span> <span class='op'>||</span> <span class='id identifier rubyid_hybrid_native_owned?'>hybrid_native_owned?</span>
@@ -1492,12 +1492,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+87
 88
-89
-90</pre>
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_native_read_portable_write?'>native_read_portable_write?</span>
   <span class='id identifier rubyid_style'>style</span> <span class='op'>==</span> <span class='symbol'>:native_read_portable_write</span>
@@ -1545,12 +1545,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+111
 112
-113
-114</pre>
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 111</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_native_write?'>native_write?</span>
   <span class='id identifier rubyid_native_mutation?'>native_mutation?</span> <span class='op'>||</span> <span class='id identifier rubyid_hybrid_native_owned?'>hybrid_native_owned?</span>
@@ -1598,12 +1598,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+103
 104
-105
-106</pre>
+105</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 103</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_portable_write?'>portable_write?</span>
   <span class='id identifier rubyid_source_augmented_portable_write?'>source_augmented_portable_write?</span> <span class='op'>||</span> <span class='id identifier rubyid_native_read_portable_write?'>native_read_portable_write?</span>
@@ -1651,12 +1651,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+83
 84
-85
-86</pre>
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source_augmented_portable_write?'>source_augmented_portable_write?</span>
   <span class='id identifier rubyid_style'>style</span> <span class='op'>==</span> <span class='symbol'>:source_augmented_portable_write</span>
@@ -1704,6 +1704,7 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+122
 123
 124
 125
@@ -1712,11 +1713,10 @@ emits them entirely through the merge layer.</p>
 128
 129
 130
-131
-132</pre>
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 123</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
   <span class='lbrace'>{</span>
@@ -1725,7 +1725,7 @@ emits them entirely through the merge layer.</p>
     <span class='label'>portable_write:</span> <span class='id identifier rubyid_portable_write?'>portable_write?</span><span class='comma'>,</span>
     <span class='label'>native_read:</span> <span class='id identifier rubyid_native_read?'>native_read?</span><span class='comma'>,</span>
     <span class='label'>native_write:</span> <span class='id identifier rubyid_native_write?'>native_write?</span><span class='comma'>,</span>
-    <span class='label'>available:</span> <span class='id identifier rubyid_available?'>available?</span><span class='comma'>,</span>
+    <span class='label'>available:</span> <span class='id identifier rubyid_available?'>available?</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1771,12 +1771,12 @@ emits them entirely through the merge layer.</p>
       <pre class="lines">
 
 
+99
 100
-101
-102</pre>
+101</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 100</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/support_style.rb', line 99</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unavailable?'>unavailable?</span>
   <span class='id identifier rubyid_style'>style</span> <span class='op'>==</span> <span class='symbol'>:unavailable</span>
@@ -1791,9 +1791,9 @@ emits them entirely through the merge layer.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:51 2026 by
+  Generated on Thu Aug  6 23:41:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
