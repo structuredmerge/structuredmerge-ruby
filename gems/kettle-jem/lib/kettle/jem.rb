@@ -126,6 +126,7 @@ module Kettle
     ].freeze
     MONOREPO_SUBGEM_TEMPLATE_ENTRIES = [
       "README.md",
+      "Rakefile",
       "LICENSE.md",
       "MIT.md",
       "AGPL-3.0-only.md",
@@ -2027,7 +2028,7 @@ module Kettle
       def write(project_root:, lock:)
         lock_path = path(project_root)
         FileUtils.mkdir_p(File.dirname(lock_path))
-        File.write(lock_path, "#{YAML.dump(lock)}")
+        File.write(lock_path, YAML.dump(lock).to_s)
       end
 
       def remove_legacy(project_root)
@@ -4306,17 +4307,6 @@ module Kettle
             workers: thread_worker_count
           )
         )
-        reports_by_index.merge!(
-          execute_indexed_recipe_reports(
-            project_root: project_root,
-            indexed_recipes: main_only,
-            facts: facts,
-            files: files,
-            template_contents: template_contents,
-            decision_policy: decision_policy,
-            env: env
-          )
-        )
       else
         reports_by_index.merge!(
           if use_ractors
@@ -4342,7 +4332,8 @@ module Kettle
             )
           end
         )
-        reports_by_index.merge!(
+      end
+      reports_by_index.merge!(
           execute_indexed_recipe_reports(
             project_root: project_root,
             indexed_recipes: main_only,
@@ -4353,7 +4344,6 @@ module Kettle
             env: env
           )
         )
-      end
       recipes.each_index.map do |index|
         report = reports_by_index.fetch(index)
         emit_recipe_event(events, report, index: index, total: recipes.length)
@@ -15572,7 +15562,7 @@ module Kettle
       return kind if kind == :class
 
       configured_kinds = version_namespace_kinds_from_facts(facts)
-      target_index = namespace.to_s.split("::").reject(&:empty?).length - 1
+      target_index = namespace.to_s.split("::").count { |element| !element.empty? } - 1
       configured_kind = configured_kinds[target_index]
       return configured_kind if configured_kind
 

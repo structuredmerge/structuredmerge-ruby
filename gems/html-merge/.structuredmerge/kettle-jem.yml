@@ -328,12 +328,14 @@ templates:
     - README.md
     - source: gem.gemspec
       target: html-merge.gemspec
+    - Rakefile
     - LICENSE.md
     - MIT.md
     - AGPL-3.0-only.md
     - PolyForm-Noncommercial-1.0.0.md
     - PolyForm-Small-Business-1.0.0.md
     - Big-Time-Public-License.md
+    - mise.toml
     - Gemfile
     - certs/pboling.pem
     - tmp/.gitignore
@@ -509,9 +511,9 @@ files:
   Gemfile:
     strategy: accept_template
   Rakefile:
-    strategy: merge
-    preference: destination
-    add_template_only_nodes: true
+    # The bootstrap Rakefile contains only kettle-drift's fallback stub.
+    # Replace it with the canonical task scaffold before future merge runs.
+    strategy: accept_template
   .github:
     copilot_instructions.md:
       strategy: accept_template

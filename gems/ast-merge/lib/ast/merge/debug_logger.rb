@@ -70,6 +70,8 @@ module Ast
     #
     # @note Shared examples require +silent_stream+ and +rspec-stubbed_env+ gems.
     module DebugLogger
+      extend self
+
       # Benchmark is optional - gracefully degrade if not available.
       # As of Ruby 4.0, benchmark is a bundled gem (not default), so it may not be available.
       # We attempt to require it at load time and set a flag for later use.

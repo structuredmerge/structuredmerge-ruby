@@ -1393,6 +1393,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Exclude the intentional vHEAD.gemfile appraisal filename from templated RuboCop filename checks.
 
+- Include the canonical Rakefile scaffold in monorepo subgem templates.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

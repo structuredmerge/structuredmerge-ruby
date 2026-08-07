@@ -40,7 +40,7 @@ end
 raise "Unsupported arguments: #{remaining_args.join(" ")}" unless remaining_args.empty?
 
 SUMMARIZE_ONLY = summarize_only
-STDOUT.sync = true
+$stdout.sync = true
 
 RUNS = Integer(ENV.fetch("KETTLE_JEM_BENCHMARK_RUNS", "3"))
 NPROCESSORS = Etc.nprocessors
@@ -463,7 +463,7 @@ def print_readme_timing_table(title, timings)
   puts
   puts title
   puts
-  puts format("%-44s %10s %8s %5s", "step", "duration", "share", "count")
+  puts "step                                           duration    share count"
   timing_entries.each do |entry|
     duration_ms = timing_entry_value(entry, :duration_ms, 0).to_f
     puts format(
@@ -619,29 +619,7 @@ puts
 puts "summary"
 puts
 baseline_median = results.fetch("baseline-main").fetch(:summary).fetch(:median)
-puts format(
-  "%-28s %8s %8s %8s %8s %8s %8s %8s %4s %4s %4s %4s %4s %4s %4s %4s %4s %4s %7s %7s",
-  "variant",
-  "+/-",
-  "min",
-  "median",
-  "mean",
-  "max",
-  "recipes",
-  "cmds",
-  "pr",
-  "pt",
-  "fr",
-  "ft",
-  "safe",
-  "f_units",
-  "pr_job",
-  "pt_job",
-  "fr_job",
-  "ft_job",
-  "recipes",
-  "changed"
-)
+puts "variant                           +/-      min   median     mean      max  recipes     cmds   pr   pt   fr   ft safe f_units pr_job pt_job fr_job ft_job recipes changed"
 results.each do |name, result|
   summary = result.fetch(:summary)
   snapshot = result.fetch(:snapshot)

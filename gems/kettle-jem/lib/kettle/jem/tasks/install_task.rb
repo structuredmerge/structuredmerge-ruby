@@ -1151,7 +1151,7 @@ module Kettle
         end
 
         def bundle_env_fingerprint(env)
-          env.to_h.transform_values { |value| value.nil? ? nil : value.to_s }.reject { |key, _value| ignored_bundle_env_key?(key) }
+          env.to_h.transform_values { |value| value&.to_s }.reject { |key, _value| ignored_bundle_env_key?(key) }
         end
 
         def ignored_bundle_env_key?(key)

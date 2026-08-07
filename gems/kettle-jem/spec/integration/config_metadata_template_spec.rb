@@ -456,7 +456,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(output.scan("# Framework matrix workflows.").size).to eq(1)
     expect(output.scan("# Sections to preserve from the destination README during template merging.").size).to eq(1)
     expect(YAML.safe_load(output).dig("workflows", "exec_cmd")).to eq("kettle-test")
-    expect(YAML.safe_load(output).dig("readme", "badges", "fossa")).to eq(false)
+    expect(YAML.safe_load(output).dig("readme", "badges", "fossa")).to be(false)
   end
 
   it "preserves explicit kettle config values while refreshing the config template" do
@@ -791,7 +791,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       described_class.apply_project(root, env: {})
       gemspec = File.read(File.join(root, "example.gemspec"))
 
-      expect(gemspec).to include('path.delete_prefix("#{gemspec_root}/")')
+      expect(gemspec).to include(%{path.delete_prefix("#{gemspec_root}/")})
       expect(gemspec).to include("filter_map")
       expect(gemspec).not_to include("files = []")
       expect { RubyVM::InstructionSequence.compile(gemspec) }.not_to raise_error

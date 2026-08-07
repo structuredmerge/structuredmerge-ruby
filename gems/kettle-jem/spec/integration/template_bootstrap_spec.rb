@@ -641,6 +641,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config_yaml.dig("templates", "entries")).to include(
         "README.md",
         {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
+        "Rakefile",
         "LICENSE.md",
         "mise.toml",
         "Gemfile",
@@ -684,7 +685,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File).not_to exist(File.join(root, ".github"))
       expect(File.read(File.join(root, "Gemfile"))).to include('gem "nomono"')
       expect(File.read(File.join(root, "Gemfile"))).to include('gem "kettle-family"')
-      expect(File).not_to exist(File.join(root, "Rakefile"))
+      expect(File).to exist(File.join(root, "Rakefile"))
     end
   end
 
