@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Installed the nomono templating bootstrap inside Bundler's isolated path so CI can load nomono/bundler.
 
+- Use setup-ruby-flash pre-bundle gem support for the monorepo nomono bootstrap instead of pinning a CI install path or version.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
