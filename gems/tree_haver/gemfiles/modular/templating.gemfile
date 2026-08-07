@@ -3,7 +3,8 @@
 structuredmerge_remote = ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false').zero?
 kettle_remote = ENV.fetch('KETTLE_DEV_DEV', 'false').casecmp('false').zero?
 
-tslp_dev = ENV.fetch('TSLP_DEV', nil)
+tslp_dev = ENV.fetch('TSLP_DEV', nil).to_s
+tslp_dev = nil if tslp_dev.empty? || %w[false 0 no off].include?(tslp_dev.downcase)
 if tslp_dev.to_s.empty? && structuredmerge_remote
 end
 
