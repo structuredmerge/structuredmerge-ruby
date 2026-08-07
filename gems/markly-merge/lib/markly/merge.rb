@@ -6,7 +6,7 @@ require_relative 'merge/version'
 
 module Markly
   module Merge
-    extend self
+    module_function
 
     PACKAGE_NAME = 'markly-merge'
     BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'markly', family: 'native').freeze

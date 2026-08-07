@@ -2,11 +2,6 @@
   "benchmarks/fixtures/skeleton/Gemfile:3218324611": [
     [8, 1, 9, "Gemspec/DevelopmentDependencies: Specify development dependencies in gemspec.", 1499175571]
   ],
-  "benchmarks/kettle_jem_ractor_planning.rb:4068228537": [
-    [43, 1, 6, "Style/GlobalStdStream: Use `$stdout` instead of `STDOUT`.", 3356722952],
-    [466, 8, 66, "Style/RedundantFormat: Use `\"step                                           duration    share count\"` directly instead of `format`.", 4013676740],
-    [622, 6, 309, "Style/RedundantFormat: Use `\"variant                           +/-      min   median     mean      max  recipes     cmds   pr   pt   fr   ft safe f_units pr_job pt_job fr_job ft_job recipes changed\"` directly instead of `format`.", 3979716419]
-  ],
   "gemfiles/modular/templating.gemfile:4157733937": [
     [15, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 11 of the Gemfile.", 3843603197]
   ],
@@ -31,19 +26,12 @@
     [122, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
     [123, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
   ],
-  "lib/kettle/jem.rb:3799962667": [
-    [2029, 31, 20, "Style/RedundantInterpolation: Prefer `to_s` over string interpolation.", 2134022545],
-    [4308, 9, 337, "Style/IdenticalConditionalBranches: Move `reports_by_index.merge!(\n          execute_indexed_recipe_reports(\n            project_root: project_root,\n            indexed_recipes: main_only,\n            facts: facts,\n            files: files,\n            template_contents: template_contents,\n            decision_policy: decision_policy,\n            env: env\n          )\n        )` out of the conditional.", 1230895451],
-    [4344, 9, 337, "Style/IdenticalConditionalBranches: Move `reports_by_index.merge!(\n          execute_indexed_recipe_reports(\n            project_root: project_root,\n            indexed_recipes: main_only,\n            facts: facts,\n            files: files,\n            template_contents: template_contents,\n            decision_policy: decision_policy,\n            env: env\n          )\n        )` out of the conditional.", 1230895451],
-    [4400, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
-    [6186, 7, 38, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3536678117],
-    [6289, 7, 31, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3672762618],
-    [6293, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 163033044],
-    [13414, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
-    [15569, 49, 23, "Performance/Count: Use `count` instead of `reject...length`.", 4275829615]
-  ],
-  "lib/kettle/jem/tasks/install_task.rb:3141464873": [
-    [1154, 47, 29, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 964126728]
+  "lib/kettle/jem.rb:2761049714": [
+    [4391, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
+    [6177, 7, 38, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3536678117],
+    [6280, 7, 31, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3672762618],
+    [6284, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 163033044],
+    [13410, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361]
   ],
   "spec/e2e/rubygems_thin_vertical_slice_spec.rb:3537117060": [
     [3, 1, 58, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*RubyGems_thin_vertical_slice*_spec.rb`.", 3968596449],
@@ -57,13 +45,11 @@
     [3, 1, 63, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*Appraisals_and_Gemfile_templating*_spec.rb`.", 2367084249],
     [3, 29, 35, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1539510212]
   ],
-  "spec/integration/config_metadata_template_spec.rb:2924436187": [
+  "spec/integration/config_metadata_template_spec.rb:1980357707": [
     [3, 1, 67, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*configuration_and_metadata_templating*_spec.rb`.", 3610099387],
-    [3, 29, 39, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1907259302],
-    [459, 72, 2, "RSpec/BeEq: Prefer `be` over `eq`.", 5860785],
-    [794, 34, 40, "Lint/InterpolationCheck: Interpolation in single quoted string detected. Use double quoted strings if you need interpolation.", 324934760]
+    [3, 29, 39, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1907259302]
   ],
-  "spec/integration/coverage_template_spec.rb:732334429": [
+  "spec/integration/coverage_template_spec.rb:3775667817": [
     [3, 1, 66, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*coverage_bootstrap_template_behavior*_spec.rb`.", 823415992],
     [3, 29, 38, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 151296325]
   ],
@@ -91,7 +77,7 @@
     [3, 1, 64, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*structural_merge_template_behavior*_spec.rb`.", 1693815617],
     [3, 29, 36, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 3903270460]
   ],
-  "spec/integration/template_bootstrap_spec.rb:591714755": [
+  "spec/integration/template_bootstrap_spec.rb:1233719284": [
     [3, 1, 71, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*template_selection_and_bootstrap_behavior*_spec.rb`.", 2832878461],
     [3, 29, 43, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1664161888]
   ],

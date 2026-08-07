@@ -112,9 +112,7 @@ module Plain
           phase: 'exact',
           score: 1.0
         }
-      end
 
-      destination[:blocks].each_with_index do |destination_block, destination_index|
         next if matched_destination[destination_index]
 
         best_template_index = nil
