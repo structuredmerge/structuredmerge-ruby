@@ -4,6 +4,35 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
   include_context "with isolated kettle-jem environment"
   include_context "with kettle-jem fixture contracts"
 
+  it "disables hard coverage gates for monorepo subgem mise templates" do
+    recipe = {target_path: "mise.toml"}
+    template = <<~TOML
+      [env]
+      K_SOUP_COV_MIN_BRANCH = "76"
+      K_SOUP_COV_MIN_HARD = "true"
+      K_SOUP_COV_MIN_LINE = "92"
+    TOML
+    destination = <<~TOML
+      [env]
+      K_SOUP_COV_MIN_BRANCH = "64"
+      K_SOUP_COV_MIN_HARD = "true"
+      K_SOUP_COV_MIN_LINE = "90"
+    TOML
+
+    output = described_class.send(
+      :preserve_mise_project_settings,
+      recipe,
+      template,
+      destination,
+      project_root: "",
+      facts: {template_profile: "monorepo-subgem-package"}
+    )
+
+    expect(output).to include('K_SOUP_COV_MIN_BRANCH = "64"')
+    expect(output).to include('K_SOUP_COV_MIN_HARD = "false"')
+    expect(output).to include('K_SOUP_COV_MIN_LINE = "90"')
+  end
+
   it "removes obsolete SimpleCov setup calls from .simplecov while preserving local config" do
     content = <<~RUBY
       # kettle-jem:freeze

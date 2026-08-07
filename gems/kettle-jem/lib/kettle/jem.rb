@@ -7003,7 +7003,7 @@ module Kettle
       end
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts, env: env)
-        merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root) if template_file_type(recipe) == :toml
+        merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root, facts: facts) if template_file_type(recipe) == :toml
         return finalize_template_source_content(recipe, sync_kettle_config_env_overrides(merged, env)) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
         if github_workflow_template_recipe?(recipe)
@@ -7085,14 +7085,19 @@ module Kettle
       end
     end
 
-    def preserve_mise_project_settings(recipe, content, destination_content, project_root:)
+    def preserve_mise_project_settings(recipe, content, destination_content, project_root:, facts:)
       return content unless recipe.fetch(:target_path).to_s == "mise.toml"
 
       thresholds = coverage_thresholds_from_mise(destination_content)
       thresholds = coverage_thresholds_from_workflow(project_root) if thresholds.empty?
-      thresholds.reduce(content.to_s) do |preserved, (key, value)|
-        replace_toml_string_scalar_line(preserved, key, value)
+      preserved = thresholds.reduce(content.to_s) do |result, (key, value)|
+        replace_toml_string_scalar_line(result, key, value)
       end
+      return preserved unless monorepo_subgem_template_profile?(facts)
+
+      # Subgems generate useful coverage reports, but their narrow suites cannot
+      # satisfy the aggregate thresholds enforced by the monorepo root.
+      replace_toml_string_scalar_line(preserved, "K_SOUP_COV_MIN_HARD", "false")
     end
 
     def coverage_thresholds_from_mise(content)

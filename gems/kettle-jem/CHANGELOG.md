@@ -1389,6 +1389,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep git-blame copyright facts authoritative when migrating legacy MIT LICENSE.txt files.
 
+- Monorepo subgem mise templates no longer enforce aggregate coverage thresholds during per-gem release checks.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
