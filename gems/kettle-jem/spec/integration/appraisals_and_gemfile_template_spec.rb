@@ -1813,7 +1813,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   it "treats falsey TSLP_DEV values as unset rather than as local paths" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating.gemfile.example", __dir__))
 
-    expect(template).to include('tslp_dev = nil if tslp_dev.empty? || %w[false 0 no off].include?(tslp_dev.downcase)')
+    expect(template).to include("tslp_dev = nil if tslp_dev.empty? || %w[false 0 no off].include?(tslp_dev.downcase)")
     expect(template).to include('gem "tree_sitter_language_pack", path: tslp_dev')
   end
 

@@ -16641,7 +16641,7 @@ module Kettle
       else
         {present: true, custom: true, mit: false, copyright_lines: []}
       end
-    rescue StandardError => error
+    rescue => error
       Kettle::Dev.debug_error(error, __method__)
       {present: true, custom: true, mit: false, copyright_lines: []}
     end
