@@ -436,7 +436,7 @@ module Ast
           }
         end
 
-        def inline_comment_candidate?(before_comment, _after_comment, line:, line_num:)
+        def inline_comment_candidate?(before_comment, _after_comment, **)
           quote_count = before_comment.to_s.count('"') - before_comment.to_s.scan('\\"').count
           quote_count.even?
         end

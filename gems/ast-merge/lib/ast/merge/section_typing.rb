@@ -174,6 +174,7 @@ module Ast
         #
         # @param callable [#call] A callable that takes a node and returns TypedSection or nil
         def initialize(callable)
+          super()
           @callable = callable
         end
 
@@ -214,6 +215,7 @@ module Ast
         #
         # @param classifiers [Array<Classifier>] Classifiers to try
         def initialize(*classifiers)
+          super()
           @classifiers = classifiers.flatten
         end
 

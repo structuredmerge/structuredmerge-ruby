@@ -62,7 +62,7 @@ module Ast
               end
             end,
             owner_value_reader: ->(owner) { owner.url.inspect },
-            line_builder: lambda do |name, value, inline: nil|
+            line_builder: lambda do |name, value, inline: _inline|
               "[#{name}]: #{value}"
             end,
             capabilities: {

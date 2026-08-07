@@ -314,11 +314,11 @@ module Ast
         end
       end
 
-      def inline_comment_region_target_column(_region, current_line:)
+      def inline_comment_region_target_column(_region, **)
         nil
       end
 
-      def emit_inline_comment_text(text, region:, target_column: nil)
+      def emit_inline_comment_text(text, **)
         emit_comment(text, inline: true)
       end
 

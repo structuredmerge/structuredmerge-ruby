@@ -11,7 +11,7 @@ RSpec.describe Ast::Merge::ConflictResolverBase do
       lambda { |preference:, template_analysis:, dest_analysis:, **opts|
         # Use an anonymous subclass that provides minimal implementations
         klass = Class.new(described_class) do
-          def resolve_node_pair(template_node, dest_node, template_index:, dest_index:)
+          def resolve_node_pair(template_node, dest_node, **)
             # Minimal implementation for testing
             {
               source: @preference,
@@ -44,7 +44,7 @@ RSpec.describe Ast::Merge::ConflictResolverBase do
     let(:build_conflict_resolver) do
       lambda { |preference:, template_analysis:, dest_analysis:, **opts|
         klass = Class.new(described_class) do
-          def resolve_node_pair(_template_node, _dest_node, template_index:, dest_index:)
+          def resolve_node_pair(_template_node, _dest_node, **)
             { source: @preference, decision: :test }
           end
         end

@@ -313,7 +313,7 @@ module Ast
         )
       end
 
-      def merge_section_content(section_content, section_context: nil)
+      def merge_section_content(section_content, **)
         # Use SmartMerger for intelligent merging of the section
         # The behavior depends on preference setting:
         # - :template with replace_mode: true -> full replacement

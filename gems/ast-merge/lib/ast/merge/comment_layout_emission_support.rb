@@ -136,7 +136,7 @@ module Ast
         (leading_start...owner_start).to_a
       end
 
-      def leading_segment_anchor_line_for(_owner, _analysis, owners: nil, leading_region: nil)
+      def leading_segment_anchor_line_for(_owner, _analysis, owners: _owners, leading_region: nil)
         return unless region_present?(leading_region)
 
         region_start_line(leading_region)

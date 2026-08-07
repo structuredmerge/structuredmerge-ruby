@@ -36,7 +36,7 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
       @attachments.fetch(owner) { Attachment.new }
     end
 
-    def comment_augmenter(owners: nil)
+    def comment_augmenter(owners: _owners)
       Struct.new(:preamble_region, :postlude_region).new(@preamble_region, @postlude_region)
     end
   end

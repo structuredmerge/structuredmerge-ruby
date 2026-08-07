@@ -157,7 +157,7 @@ RSpec.describe Ast::Merge::EmitterBase do
       aligning_emitter_class = Class.new(emitter_class) do
         private
 
-        def inline_comment_region_target_column(_region, current_line:)
+        def inline_comment_region_target_column(_region, current_line: _current_line)
           16
         end
 
