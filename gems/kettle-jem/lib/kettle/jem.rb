@@ -55,6 +55,8 @@ module Kettle
       supported.yml
       unsupported.yml
       main.yml
+      deps_locked.yml
+      deps_unlocked.yml
       hoary.yml
       codeql-analysis.yml
       tests.yml
@@ -17735,7 +17737,7 @@ module Kettle
       return [] if active_basenames.empty?
 
       retained_paths = preferences.map { |preference| preference.fetch(:target_path) }.to_set
-      known_license_template_basenames.filter_map do |basename|
+      cleanups = known_license_template_basenames.filter_map do |basename|
         license_path = "#{basename}.md"
         next if active_basenames.include?(basename)
         next if retained_paths.include?(license_path)
@@ -17743,6 +17745,10 @@ module Kettle
 
         {license_path: license_path, license_basename: basename}
       end
+      if retained_paths.include?("LICENSE.md") && File.exist?(File.join(project_root, "LICENSE.txt"))
+        cleanups << {license_path: "LICENSE.txt", license_basename: "LICENSE"}
+      end
+      cleanups
     end
 
     def template_strategy_config(config, target_path)

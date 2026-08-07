@@ -539,6 +539,38 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "deletes LICENSE.txt when the active packaged license is generated as LICENSE.md" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-license-legacy-cleanup", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.licenses = ["MIT"]
+          end
+        RUBY
+        "LICENSE.txt" => "Legacy license text\n",
+        ".kettle-jem.yml" => <<~YAML
+          licenses:
+            - MIT
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - LICENSE.md
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+
+      expect(apply.fetch(:changed_files)).to include("LICENSE.md", "LICENSE.txt")
+      expect(File).to exist(File.join(root, "LICENSE.md"))
+      expect(File).not_to exist(File.join(root, "LICENSE.txt"))
+    end
+  end
+
   it "bootstraps a monorepo subgem template profile with package-owned entries and Gemfile support files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

@@ -1383,6 +1383,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Define the Discord badge reference in generated CONTRIBUTING.md files.
 
+- Restore legacy LICENSE.txt and workflow cleanup during templating, and treat falsey TSLP_DEV values as unset.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

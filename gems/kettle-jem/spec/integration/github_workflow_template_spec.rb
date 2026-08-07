@@ -68,6 +68,35 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
+  it "removes legacy workflow names replaced by the canonical generated workflows" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-obsolete-legacy-workflows", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".github/workflows/main.yml" => "name: Main\n",
+        ".github/workflows/deps_locked.yml" => "name: Legacy locked\n",
+        ".github/workflows/deps_unlocked.yml" => "name: Legacy unlocked\n"
+      })
+
+      apply = described_class.apply_project(root, env: {})
+
+      expect(apply.fetch(:changed_files)).to include(
+        ".github/workflows/main.yml",
+        ".github/workflows/deps_locked.yml",
+        ".github/workflows/deps_unlocked.yml"
+      )
+      expect(File).not_to exist(File.join(root, ".github/workflows/main.yml"))
+      expect(File).not_to exist(File.join(root, ".github/workflows/deps_locked.yml"))
+      expect(File).not_to exist(File.join(root, ".github/workflows/deps_unlocked.yml"))
+    end
+  end
+
   it "projects configured workflow exec_cmd into GitHub workflow templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
