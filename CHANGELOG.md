@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Refresh the RuboCop Gradual baseline after template-driven source and configuration changes.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
