@@ -150,6 +150,7 @@ release:
   build_command: bundle exec rake build
   publish_command: bundle exec kettle-release
   disable_local_path_env:
+    - K_JEM_TEMPLATING
     - TSLP_DEV
   env:
     GALTZO_FLOSS_DEV: false
