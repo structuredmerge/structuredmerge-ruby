@@ -326,7 +326,7 @@ module Ast
         end
 
         def trailing_comment_owned_by?(comment, owner)
-          return true unless owner&.respond_to?(:indent) && !owner.indent.nil?
+          return true unless owner.respond_to?(:indent) && !owner.indent.nil?
           return true unless comment.key?(:indent)
 
           comment[:indent].to_i == owner.indent.to_i

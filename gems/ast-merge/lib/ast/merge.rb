@@ -2971,7 +2971,7 @@ module Ast
           destination_path: destination_path,
           execution_action: entry[:execution_action] || entry['execution_action'],
           status: entry[:status] || entry['status'],
-          written: !!written
+          written: !written.nil?
         }
       end
 
@@ -3184,7 +3184,7 @@ module Ast
       }
       profile[:owner_selector_family] = owner_selector_family.to_s if owner_selector_family
       profile[:selection_intent_family] = selection_intent_family.to_s if selection_intent_family
-      profile[:comment_region] = comment_region.nil? ? nil : comment_region.to_s
+      profile[:comment_region] = comment_region&.to_s
       profile[:metadata] = deep_dup(metadata) if metadata
       profile
     end
@@ -3200,7 +3200,7 @@ module Ast
         comment_anchored: comment_anchored ? true : false
       }
       selection[:selection_intent_family] = selection_intent_family.to_s if selection_intent_family
-      selection[:comment_region] = comment_region.nil? ? nil : comment_region.to_s
+      selection[:comment_region] = comment_region&.to_s
       selection[:metadata] = deep_dup(metadata) if metadata
       selection
     end

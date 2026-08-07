@@ -268,7 +268,7 @@ module Ast
 
       # Decrease indentation level
       def dedent
-        @indent_level -= 1 if @indent_level > 0
+        @indent_level -= 1 if @indent_level.positive?
       end
 
       protected

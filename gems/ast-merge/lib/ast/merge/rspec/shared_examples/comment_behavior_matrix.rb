@@ -35,11 +35,11 @@
 # - indent [String] textual indentation prefix (defaults to "")
 RSpec.shared_examples('Ast::Merge::CommentBehaviorMatrix') do
   let(:comment_matrix_default_indent) { '' }
-  let(:comment_matrix_owner_value_reader) { ->(owner) { owner.value } }
+  let(:comment_matrix_owner_value_reader) { lambda(&:value) }
   let(:comment_matrix_expected_literal_hash_value) { '"literal # hash"' }
   let(:comment_matrix_capabilities) { {} }
   let(:comment_matrix_line_equivalents) { ->(line) { [line] } }
-  let(:comment_matrix_structural_owners_reader) { ->(analysis) { analysis.statements } }
+  let(:comment_matrix_structural_owners_reader) { lambda(&:statements) }
 
   def comment_matrix_source(*lines)
     comment_matrix_source_builder.call(*lines)

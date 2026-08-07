@@ -714,13 +714,13 @@ RSpec.describe Ast::Merge::Text::SectionSplitter do
     end
 
     it 'excludes template-only sections by default' do
-      template_with_extra = template + "## NewSection\n\nNew content.\n"
+      template_with_extra = "#{template}## NewSection\n\nNew content.\n"
       result = advanced_splitter.merge(template_with_extra, destination)
       expect(result).not_to include('## NewSection')
     end
 
     it 'includes template-only sections when add_template_only is true' do
-      template_with_extra = template + "## NewSection\n\nNew content.\n"
+      template_with_extra = "#{template}## NewSection\n\nNew content.\n"
       result = advanced_splitter.merge(template_with_extra, destination, add_template_only: true)
       expect(result).to include('## NewSection')
     end

@@ -52,9 +52,7 @@ module Ast
         private
 
         def normalize_hash(value)
-          value.to_h.each_with_object({}) do |(key, entry), hash|
-            hash[key.to_sym] = entry
-          end.freeze
+          value.to_h.transform_keys(&:to_sym).freeze
         end
       end
     end

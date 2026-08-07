@@ -122,7 +122,7 @@ module Ast
           start: %r{^\s*/\*\s*[\w-]+:freeze\b.*\*/}i,
           end: %r{^\s*/\*\s*[\w-]+:unfreeze\b.*\*/}i
         }
-      }
+      }.freeze
 
       # Default pattern when none specified
       # @return [Symbol]
@@ -415,7 +415,7 @@ module Ast
       def resolve_lines(lines, analysis, content)
         return lines if lines
 
-        if analysis&.respond_to?(:lines)
+        if analysis.respond_to?(:lines)
           # Extract lines from analysis using line numbers (1-based to 0-based)
           all_lines = analysis.lines
           return all_lines[(@start_line - 1)..(@end_line - 1)] if all_lines

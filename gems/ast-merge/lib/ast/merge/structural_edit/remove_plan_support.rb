@@ -6,7 +6,7 @@ module Ast
       # Shared helpers for parser-agnostic RemovePlan assembly from one contiguous
       # statement run plus explicit neighboring boundary owners.
       module RemovePlanSupport
-        extend self
+        module_function
 
         # Build a {RemovePlan} for a contiguous run of removed statements.
         #

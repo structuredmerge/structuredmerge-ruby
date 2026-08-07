@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Refresh the RuboCop Gradual baseline after template-driven source and configuration changes.
 
+- Apply safe RuboCop autocorrections in ast-merge source and specs.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

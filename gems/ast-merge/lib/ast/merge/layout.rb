@@ -20,7 +20,7 @@ module Ast
       end
 
       def removed_owner_controlled_gaps(attachment)
-        return {} unless attachment&.respond_to?(:owner)
+        return {} unless attachment.respond_to?(:owner)
 
         {
           leading: (attachment.leading_gap if owner_controls_gap?(attachment.owner, attachment.leading_gap)),

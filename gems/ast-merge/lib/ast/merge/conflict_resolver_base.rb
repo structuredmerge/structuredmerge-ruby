@@ -431,9 +431,9 @@ module Ast
       # @raise [ArgumentError] If recursive is invalid
       def validate_recursive!(recursive)
         return if [true, false].include?(recursive)
-        return if recursive.is_a?(Integer) && recursive > 0
+        return if recursive.is_a?(Integer) && recursive.positive?
 
-        raise ArgumentError, 'recursive: 0 is invalid, use false to disable recursive merging' if recursive == 0
+        raise ArgumentError, 'recursive: 0 is invalid, use false to disable recursive merging' if recursive.zero?
 
         raise ArgumentError,
               "Invalid recursive: #{recursive.inspect}. Must be true, false, or a positive Integer"

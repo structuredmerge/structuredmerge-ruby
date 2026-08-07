@@ -96,7 +96,7 @@ module Ast
       # @param index [Integer] Statement index (0-based)
       # @return [Array, nil] Signature array or nil if index out of bounds
       def signature_at(index)
-        return if index < 0 || index >= statements.length
+        return if index.negative? || index >= statements.length
 
         generate_signature(statements[index])
       end
@@ -517,7 +517,7 @@ module Ast
       end
 
       def layout_owner_supported?(owner)
-        owner&.respond_to?(:start_line) &&
+        owner.respond_to?(:start_line) &&
           owner.respond_to?(:end_line) &&
           !owner.start_line.nil? &&
           !owner.end_line.nil?

@@ -120,7 +120,7 @@ RSpec.describe Ast::Merge::Comment::Block do
 
     context 'with very long content' do
       let(:long_line) do
-        Ast::Merge::Comment::Line.new(text: '# ' + 'a' * 200, line_number: 1)
+        Ast::Merge::Comment::Line.new(text: "# #{'a' * 200}", line_number: 1)
       end
       let(:block) { described_class.new(children: [long_line]) }
 

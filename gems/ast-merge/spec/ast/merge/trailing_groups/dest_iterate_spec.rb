@@ -36,7 +36,7 @@ RSpec.describe Ast::Merge::TrailingGroups::DestIterate do
         groups, matched = instance.build_dest_iterate_trailing_groups(
           template_nodes: nodes,
           dest_sigs: Set[:s1],
-          signature_for: ->(node) { node.sig }
+          signature_for: lambda(&:sig)
         )
         expect(matched).to eq(Set[0])
         expect(groups[0]).to be_an(Array)
@@ -86,7 +86,7 @@ RSpec.describe Ast::Merge::TrailingGroups::DestIterate do
         _, _matched = instance.build_dest_iterate_trailing_groups(
           template_nodes: nodes,
           dest_sigs: Set[nodes[0].sig],
-          signature_for: ->(node) { node.name },
+          signature_for: lambda(&:name),
           entry_builder: ->(node, idx) { { item: node, index: idx } }
         )
         # m is at index 0 (matched because name :m is not in dest_sigs Set[nil])
@@ -95,7 +95,7 @@ RSpec.describe Ast::Merge::TrailingGroups::DestIterate do
         groups2, _matched2 = instance.build_dest_iterate_trailing_groups(
           template_nodes: nodes2,
           dest_sigs: Set[:s1],
-          signature_for: ->(node) { node.sig },
+          signature_for: lambda(&:sig),
           entry_builder: ->(node, idx) { { item: node, index: idx } }
         )
         expect(groups2[0].first[:item]).to eq(nodes2[1])
@@ -110,7 +110,7 @@ RSpec.describe Ast::Merge::TrailingGroups::DestIterate do
         groups, matched = instance.build_dest_iterate_trailing_groups(
           template_nodes: nodes,
           dest_sigs: Set[:s1, :s4],
-          signature_for: ->(node) { node.sig }
+          signature_for: lambda(&:sig)
         )
 
         expect(matched).to eq(Set[1, 4])

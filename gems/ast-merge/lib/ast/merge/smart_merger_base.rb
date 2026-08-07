@@ -514,7 +514,7 @@ module Ast
       def build_result
         return unless result_class
 
-        if result_class.instance_method(:initialize).arity == 0
+        if result_class.instance_method(:initialize).arity.zero?
           result_class.new
         else
           result_class.new(

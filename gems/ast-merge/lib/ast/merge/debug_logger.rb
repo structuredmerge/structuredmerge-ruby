@@ -284,7 +284,6 @@ module Ast
       end
 
       # Make all methods available as both instance and module methods
-      extend self
     end
   end
 end

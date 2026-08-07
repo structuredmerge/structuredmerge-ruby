@@ -239,7 +239,7 @@ module Ast
         case when_missing
         when :append
           # Append template to end of destination
-          new_content = destination.chomp + "\n\n" + template
+          new_content = "#{destination.chomp}\n\n#{template}"
           Result.new(
             content: new_content,
             has_section: false,
@@ -248,7 +248,7 @@ module Ast
           )
         when :prepend
           # Prepend template to beginning of destination
-          new_content = template + "\n\n" + destination
+          new_content = "#{template}\n\n#{destination}"
           Result.new(
             content: new_content,
             has_section: false,

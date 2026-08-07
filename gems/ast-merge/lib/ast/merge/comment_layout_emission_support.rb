@@ -15,7 +15,7 @@ module Ast
       private
 
       def leading_region_for(owner, analysis, owners: nil)
-        return unless owner && analysis&.respond_to?(:comment_attachment_for)
+        return unless owner && analysis.respond_to?(:comment_attachment_for)
 
         attachment = if owners.nil?
                        analysis.comment_attachment_for(owner)
@@ -26,7 +26,7 @@ module Ast
       end
 
       def trailing_region_for(owner, analysis, owners: nil)
-        return unless owner && analysis&.respond_to?(:comment_attachment_for)
+        return unless owner && analysis.respond_to?(:comment_attachment_for)
 
         attachment = if owners.nil?
                        analysis.comment_attachment_for(owner)
@@ -191,7 +191,7 @@ module Ast
       end
 
       def retained_owner_leading_gap_for(owner, analysis, owners: nil)
-        return unless owner && analysis&.respond_to?(:layout_attachment_for)
+        return unless owner && analysis.respond_to?(:layout_attachment_for)
 
         attachment = if owners.nil?
                        analysis.layout_attachment_for(owner)
@@ -217,7 +217,7 @@ module Ast
           owner_start_line(entry)
         end
         index = owner_list.index(owner)
-        return unless index && index.positive?
+        return unless index&.positive?
 
         owner_list[index - 1]
       end
@@ -244,7 +244,7 @@ module Ast
         boundary_owners = owners || analysis.statements
         comment_only_lines = comment_only_root_boundary_lines_for(kind, analysis, owners: boundary_owners)
         return comment_only_lines if comment_only_lines.any?
-        return [] unless analysis&.respond_to?(:comment_augmenter)
+        return [] unless analysis.respond_to?(:comment_augmenter)
 
         region = root_boundary_region(kind, analysis, owners: boundary_owners, augmenter_cache: augmenter_cache)
         unless region_present?(region)

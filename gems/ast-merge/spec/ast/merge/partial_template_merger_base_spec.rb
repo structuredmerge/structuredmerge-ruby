@@ -45,7 +45,7 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
 
       def node_to_text(node, analysis = nil)
         pos = node.respond_to?(:source_position) ? node.source_position : nil
-        if analysis&.respond_to?(:source) && pos
+        if analysis.respond_to?(:source) && pos
           analysis.source.lines[(pos[:start_line] - 1)..(pos[:end_line] - 1)].join
         else
           [node, analysis].compact.join('|')

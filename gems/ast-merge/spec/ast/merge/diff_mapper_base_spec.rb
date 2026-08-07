@@ -19,7 +19,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
 
       def map_hunk_to_paths(hunk, _original_analysis)
         # Simple implementation: map each changed line to a path
-        hunk.lines.select { |l| l.type != :context }.map do |line|
+        hunk.lines.reject { |l| l.type == :context }.map do |line|
           Ast::Merge::DiffMapperBase::DiffMapping.new(
             path: ["line_#{line.old_line_num || line.new_line_num}"],
             operation: determine_operation_for_line(line),

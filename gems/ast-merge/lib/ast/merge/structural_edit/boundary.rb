@@ -38,7 +38,7 @@ module Ast
         # @return [Array<Layout::Gap>]
         def gaps
           attachment = layout_attachment
-          return [] unless attachment&.respond_to?(:gaps)
+          return [] unless attachment.respond_to?(:gaps)
 
           Array(attachment.public_send(:gaps))
         end
@@ -48,7 +48,7 @@ module Ast
         # @return [Array<Comment::Region>]
         def regions
           attachment = comment_attachment
-          return [] unless attachment&.respond_to?(:regions)
+          return [] unless attachment.respond_to?(:regions)
 
           Array(attachment.public_send(:regions))
         end

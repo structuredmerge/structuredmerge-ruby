@@ -29,7 +29,7 @@ module Ast
       end
 
       def unresolved_case_id_for(prefix, *parts, node: nil)
-        line = node&.respond_to?(:start_line) ? node.start_line : nil
+        line = node.respond_to?(:start_line) ? node.start_line : nil
         ([prefix] + parts + [line]).compact.join('-')
       end
 
@@ -64,7 +64,7 @@ module Ast
       def unresolved_typed_path_segment(node_type, identifier: nil, node: nil, fallback: node_type)
         return "#{node_type}[#{identifier.inspect}]" if identifier
 
-        line = node&.respond_to?(:start_line) ? node.start_line : nil
+        line = node.respond_to?(:start_line) ? node.start_line : nil
         return "#{node_type}[line=#{line}]" if line
 
         fallback

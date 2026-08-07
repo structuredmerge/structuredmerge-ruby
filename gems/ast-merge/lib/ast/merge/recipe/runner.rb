@@ -583,8 +583,8 @@ module Ast
 
           raise ArgumentError, 'Recipe runner context must be a Hash-like object' unless value.respond_to?(:to_h)
 
-          value.to_h.each_with_object({}) do |(key, context_value), memo|
-            memo[key.respond_to?(:to_sym) ? key.to_sym : key] = context_value
+          value.to_h.transform_keys do |key|
+            key.respond_to?(:to_sym) ? key.to_sym : key
           end
         end
 
@@ -646,7 +646,7 @@ module Ast
                            else
                              { steps: step_results.map(&:stats) }
                            end
-          has_anchor = step_results.any? { |step_result| step_result.has_anchor }
+          has_anchor = step_results.any?(&:has_anchor)
           message = step_results.reverse.find do |step_result|
             step_result.message && !step_result.message.empty?
           end&.message

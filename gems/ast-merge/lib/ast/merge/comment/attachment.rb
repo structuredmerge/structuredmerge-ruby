@@ -72,13 +72,13 @@ module Ast
         def leading_region_layout_owned?(**options)
           !!(leading_region&.floating? &&
             leading_gap&.leading_for?(owner) &&
-            leading_gap&.controls_output_for?(owner, **options))
+            leading_gap.controls_output_for?(owner, **options))
         end
 
         def trailing_region_layout_owned?(**options)
           !!(trailing_region&.floating? &&
             trailing_gap&.trailing_for?(owner) &&
-            trailing_gap&.controls_output_for?(owner, **options))
+            trailing_gap.controls_output_for?(owner, **options))
         end
 
         def layout_owned_regions(**options)
@@ -112,7 +112,7 @@ module Ast
         #
         # @return [String]
         def inspect
-          owner_desc = if owner&.respond_to?(:type)
+          owner_desc = if owner.respond_to?(:type)
                          owner.method(:type).call
                        elsif owner.nil?
                          nil

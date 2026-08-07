@@ -353,7 +353,7 @@ RSpec.describe Ast::Merge::SectionTyping do
         ]
 
         merged = described_class.merge_sections(template_with_unclassified, dest_sections, preference: :destination)
-        unclassified = merged.find { |s| s.unclassified? }
+        unclassified = merged.find(&:unclassified?)
         expect(unclassified).to be_nil
       end
 
@@ -366,7 +366,7 @@ RSpec.describe Ast::Merge::SectionTyping do
 
         merged = described_class.merge_sections(template_with_unclassified, dest_sections, preference: :destination,
                                                                                            add_template_only: true)
-        unclassified = merged.find { |s| s.unclassified? }
+        unclassified = merged.find(&:unclassified?)
         expect(unclassified).not_to be_nil
       end
     end

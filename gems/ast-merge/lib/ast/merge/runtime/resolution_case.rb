@@ -78,9 +78,7 @@ module Ast
         private
 
         def normalize_candidates(candidates)
-          candidates.to_h.each_with_object({}) do |(key, value), hash|
-            hash[key.to_sym] = value
-          end.freeze
+          candidates.to_h.transform_keys(&:to_sym).freeze
         end
 
         def validate_provisional_winner!

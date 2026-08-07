@@ -58,7 +58,7 @@ module Ast
           region_marked = [preferred_region, other_region].compact.any? do |region|
             region.respond_to?(:freeze_marker?) && region.freeze_marker?(freeze_token)
           end
-          attachment_marked = attachment&.respond_to?(:freeze_marker?) && attachment&.freeze_marker?(freeze_token)
+          attachment_marked = attachment.respond_to?(:freeze_marker?) && attachment.freeze_marker?(freeze_token)
 
           region_marked || attachment_marked
         end
