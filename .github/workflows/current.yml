@@ -108,6 +108,7 @@ jobs:
         with:
           ruby-version: ruby
           bundler-cache: false
+          working-directory: ${{ matrix.gem }}
           pre-bundle-gems: |
             nomono --source https://gem.coop --source https://rubygems.org
       - name: Install dependencies
@@ -173,6 +174,7 @@ jobs:
         with:
           ruby-version: ruby
           bundler-cache: false
+          working-directory: gems/tree_haver
           pre-bundle-gems: |
             nomono --source https://gem.coop --source https://rubygems.org
       - name: Install dependencies
