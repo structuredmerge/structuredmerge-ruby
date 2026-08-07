@@ -114,9 +114,9 @@ jobs:
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
-          gem install nomono -v 1.1.4 --source https://gem.coop --source https://rubygems.org
           bundle config set path vendor/bundle
           bundle config set frozen false
+          gem install nomono -v 1.1.4 --install-dir vendor/bundle --source https://gem.coop --source https://rubygems.org
           bundle install --jobs 4
       - name: Run checks
         working-directory: ${{ matrix.gem }}
@@ -178,9 +178,9 @@ jobs:
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
-          gem install nomono -v 1.1.4 --source https://gem.coop --source https://rubygems.org
           bundle config set path vendor/bundle
           bundle config set frozen false
+          gem install nomono -v 1.1.4 --install-dir vendor/bundle --source https://gem.coop --source https://rubygems.org
           bundle install --jobs 4
       - name: Run cold-cache TSLP checks
         working-directory: gems/tree_haver

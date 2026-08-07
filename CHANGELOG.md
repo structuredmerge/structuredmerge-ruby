@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Installed the nomono templating bootstrap inside Bundler's isolated path so CI can load nomono/bundler.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
