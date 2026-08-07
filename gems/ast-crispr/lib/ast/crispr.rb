@@ -1180,9 +1180,9 @@ module Ast
         lines = content.lines
         start_line = statement_start_line(injection_point.anchor)
         end_line = expand_following_blank_lines(lines, statement_end_line(injection_point.anchor))
-        raise Error.new('CRISPR insertion anchor is missing statement location') unless start_line && end_line
+        raise Error, 'CRISPR insertion anchor is missing statement location' unless start_line && end_line
 
-        replacement = lines[(start_line - 1)..(end_line - 1)].join + text.to_s.rstrip + "\n\n"
+        replacement = "#{lines[(start_line - 1)..(end_line - 1)].join}#{text.to_s.rstrip}\n\n"
         Ast::Merge::StructuralEdit::PlanSet.new(
           source: content,
           plans: [
@@ -1214,7 +1214,7 @@ module Ast
         body = content.rstrip
         return text.to_s if body.empty?
 
-        body + "\n\n" + text.to_s
+        "#{body}\n\n#{text}"
       end
 
       def capture_text(content, matches)

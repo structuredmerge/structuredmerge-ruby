@@ -842,7 +842,7 @@ module Prism
       # @return [void]
       def collect_nested_signatures(node, analysis, sigs, depth:, target_sigs: nil)
         actual = unwrap_node(node)
-        if depth > 0
+        if depth.positive?
           sig = analysis.generate_signature(actual)
           if sig
             sigs << sig if target_sigs.nil? || target_sigs.include?(sig)
@@ -879,9 +879,9 @@ module Prism
           children.concat(extract_body(node.statements))
         when :begin
           children.concat(extract_body(node.statements))
-          children.concat(extract_body(node.rescue_clause.statements)) if node.rescue_clause&.respond_to?(:statements)
-          children.concat(extract_body(node.else_clause.statements)) if node.else_clause&.respond_to?(:statements)
-          children.concat(extract_body(node.ensure_clause.statements)) if node.ensure_clause&.respond_to?(:statements)
+          children.concat(extract_body(node.rescue_clause.statements)) if node.rescue_clause.respond_to?(:statements)
+          children.concat(extract_body(node.else_clause.statements)) if node.else_clause.respond_to?(:statements)
+          children.concat(extract_body(node.ensure_clause.statements)) if node.ensure_clause.respond_to?(:statements)
         when :call
           children.concat(extract_body(node.block.body)) if node.block && node.block.type.to_s == 'block_node'
         end

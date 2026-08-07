@@ -329,7 +329,7 @@ RSpec.shared_examples 'top level statements' do
       BASH
       analysis = described_class.new(source)
       statements = analysis.top_level_statements
-      expect(statements.none? { |s| s.comment? }).to be true
+      expect(statements.none?(&:comment?)).to be true
     end
 
     it 'returns empty array when invalid' do

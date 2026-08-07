@@ -36,7 +36,7 @@ module TreeHaver
 
   def parse_with_citrus(source, grammar_module:)
     raw = grammar_module.parse(source)
-    if raw&.respond_to?(:captures)
+    if raw.respond_to?(:captures)
       {
         ok: true,
         backend_ref: CITRUS_BACKEND,

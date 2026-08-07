@@ -10,7 +10,7 @@ RSpec.describe Dotenv::Merge::SmartMerger, 'comment behavior matrix' do
       analysis_class: Dotenv::Merge::FileAnalysis,
       merger_class: Dotenv::Merge::SmartMerger,
       structural_owners_reader: ->(analysis) { analysis.structural_owners.grep(Dotenv::Merge::EnvLine) },
-      owner_value_reader: ->(owner) { owner.value },
+      owner_value_reader: lambda(&:value),
       line_builder: lambda do |name, value, inline: nil|
         line = "#{name}=#{value}"
         inline ? "#{line} # #{inline}" : line

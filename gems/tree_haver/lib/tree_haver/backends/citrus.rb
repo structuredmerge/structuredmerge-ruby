@@ -457,11 +457,12 @@ module TreeHaver
           # If we have a pattern like "(rule1 | rule2)*", we can't determine
           # the type without looking at actual matches, but that causes recursion
           # So just return a generic type based on the pattern
-          if /^\(.*\)\*$/.match?(str)
+          case str
+          when /^\(.*\)\*$/
             return 'repeat'
-          elsif /^\(.*\)\?$/.match?(str)
+          when /^\(.*\)\?$/
             return 'optional'
-          elsif /^.*\|.*$/.match?(str)
+          when /^.*\|.*$/
             return 'choice'
           end
 
@@ -473,7 +474,7 @@ module TreeHaver
 
           lines_before = @source[0...offset].count("\n")
           # Find the newline before this offset (or -1 if we're on line 0)
-          line_start = (@source.rindex("\n", offset - 1) if offset > 0)
+          line_start = (@source.rindex("\n", offset - 1) if offset.positive?)
           line_start ||= -1
           column = offset - line_start - 1
           { row: lines_before, column: column }

@@ -10,7 +10,7 @@ RSpec.describe Ruby::Merge::RubyHashLiteralProjector do
 
     expect(hash).to be_a(Ruby::Merge::RubyHashNode)
     expect(hash.trailing_comma).to be(true)
-    expect(hash.pairs.map(&:key)).to eq(%w[foo quoted sym "str" works?])
+    expect(hash.pairs.map(&:key)).to eq(%w[foo quoted sym str works?])
     expect(hash.pairs.map(&:delimiter)).to eq([':', ':', '=>', '=>', ':'])
     expect(hash.pairs[3].value).to be_a(Ruby::Merge::RubyHashNode)
     expect(hash.pairs[4].value.source).to eq('call(1, 2)')

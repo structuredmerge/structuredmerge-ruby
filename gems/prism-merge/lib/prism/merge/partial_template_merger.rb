@@ -81,7 +81,7 @@ module Prism
                   end_line: node.location.end_line
                 }
               end
-        return node.text.to_s unless analysis&.respond_to?(:source) && pos
+        return node.text.to_s unless analysis.respond_to?(:source) && pos
 
         analysis.source.lines[(pos[:start_line] - 1)..(pos[:end_line] - 1)].join
       end

@@ -6,7 +6,7 @@ require 'toml'
 module Parslet
   module Toml
     module Merge
-      extend self
+      module_function
 
       PACKAGE_NAME = 'parslet-toml-merge'
       BACKEND = TreeHaver::PARSLET_BACKEND

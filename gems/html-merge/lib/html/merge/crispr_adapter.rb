@@ -51,7 +51,7 @@ module Html
       end
 
       def comment_region_text(_document, _comment_region)
-        raise Ast::Crispr::Error.new("HTML CRISPR comment regions are not implemented")
+        raise Ast::Crispr::Error, "HTML CRISPR comment regions are not implemented"
       end
 
       def structure_profile(owner_scope: :html_element)

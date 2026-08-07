@@ -227,7 +227,7 @@ module Rbs
       end
 
       def trailing_lines_for(statement, analysis)
-        return [] unless statement && analysis&.respond_to?(:comment_attachment_for)
+        return [] unless statement && analysis.respond_to?(:comment_attachment_for)
 
         attachment = analysis.comment_attachment_for(statement)
         lines = []
@@ -251,7 +251,7 @@ module Rbs
 
       def layout_gap_lines_for(statement, analysis, side:)
         return [] if statement.is_a?(FreezeNode)
-        return [] unless statement && analysis&.respond_to?(:comment_attachment_for)
+        return [] unless statement && analysis.respond_to?(:comment_attachment_for)
         return [] if @lines.last.to_s.strip.empty?
 
         attachment = analysis.comment_attachment_for(statement)
@@ -262,7 +262,7 @@ module Rbs
       end
 
       def native_comment_fallback_applicable?(statement, analysis)
-        return false if analysis&.respond_to?(:comment_attachment_for)
+        return false if analysis.respond_to?(:comment_attachment_for)
 
         statement.respond_to?(:comment) && statement.comment
       end

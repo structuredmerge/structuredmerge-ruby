@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |spec|
   spec.name = 'mylib'
   spec.add_development_dependency('gitmoji-regex', '~> 1.0', '>= 1.0.3')

@@ -12,8 +12,8 @@ RSpec.describe Toml::Merge::SmartMerger, :toml_parsing do
     hash_comment_line_based_comment_matrix_adapter(
       analysis_class: Toml::Merge::FileAnalysis,
       merger_class: described_class,
-      structural_owners_reader: ->(analysis) { analysis.statements },
-      owner_value_reader: ->(owner) { owner.value },
+      structural_owners_reader: lambda(&:statements),
+      owner_value_reader: lambda(&:value),
       line_builder: lambda do |name, value, inline: nil|
         line = "#{name} = \"#{value}\""
         inline ? "#{line} # #{inline}" : line

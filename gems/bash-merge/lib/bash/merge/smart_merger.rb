@@ -577,7 +577,7 @@ module Bash
       def node_has_leading_comments?(node, analysis)
         attachment = analysis.comment_attachment_for(node)
         leading_region = attachment&.leading_region
-        return false unless leading_region&.respond_to?(:nodes)
+        return false unless leading_region.respond_to?(:nodes)
 
         leading_region.nodes.any? do |comment_node|
           comment_node.respond_to?(:comment?) ? comment_node.comment? : true

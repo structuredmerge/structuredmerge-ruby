@@ -156,8 +156,8 @@ module Toml
           float: :float,
           fractional_float: :float,
           boolean: :boolean,
-          true: :boolean,
-          false: :boolean,
+          true => :boolean,
+          false => :boolean,
           array: :array,
           inline_table: :inline_table,
 
@@ -212,8 +212,8 @@ module Toml
           integer: :integer,
           float: :float,
           boolean: :boolean,
-          true: :boolean,
-          false: :boolean,
+          true => :boolean,
+          false => :boolean,
           array: :array,
 
           # Date/time types

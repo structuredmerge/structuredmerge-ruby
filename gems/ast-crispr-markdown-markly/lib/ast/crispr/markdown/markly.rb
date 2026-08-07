@@ -47,7 +47,7 @@ module Ast
           end
 
           def comment_region_text(_document, _comment_region)
-            raise Ast::Crispr::Error.new('Markdown CRISPR adapter does not expose comment regions')
+            raise Ast::Crispr::Error, 'Markdown CRISPR adapter does not expose comment regions'
           end
 
           def structure_profile(owner_scope: :shared_default)

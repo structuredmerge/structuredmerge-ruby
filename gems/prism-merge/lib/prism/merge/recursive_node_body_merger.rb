@@ -112,11 +112,11 @@ module Prism
         # comment when both inputs already contain it.
         emission_support = merger.send(:node_emission_support)
         last_filtered_comment_line = nil
+        leading_comments, trailing_filtered_line = emission_support.send(
+          :filter_emitted_template_trailing_comments,
+          leading_comments
+        )
         if comment_source == :template
-          leading_comments, trailing_filtered_line = emission_support.send(
-            :filter_emitted_template_trailing_comments,
-            leading_comments
-          )
           leading_comments, leading_filtered_line = emission_support.send(
             :filter_already_emitted_leading_comments,
             leading_comments
@@ -124,10 +124,6 @@ module Prism
           last_filtered_comment_line = leading_filtered_line || trailing_filtered_line
           emission_support.send(:track_emitted_template_leading_comments, leading_comments)
         else
-          leading_comments, trailing_filtered_line = emission_support.send(
-            :filter_emitted_template_trailing_comments,
-            leading_comments
-          )
           leading_comments, template_leading_filtered_line = emission_support.send(
             :filter_emitted_template_leading_comments,
             leading_comments,

@@ -1095,11 +1095,11 @@ module Prism
                        param_names = []
                        param_names.concat(node.parameters.requireds.map(&:name)) if node.parameters.requireds
                        param_names.concat(node.parameters.optionals.map(&:name)) if node.parameters.optionals
-                       param_names << node.parameters.rest.name if node.parameters.rest&.respond_to?(:name)
+                       param_names << node.parameters.rest.name if node.parameters.rest.respond_to?(:name)
                        param_names.concat(node.parameters.posts.map(&:name)) if node.parameters.posts
                        param_names.concat(node.parameters.keywords.map(&:name)) if node.parameters.keywords
                        # keyword_rest can be KeywordRestParameterNode (has name) or ForwardingParameterNode (no name)
-                       if node.parameters.keyword_rest&.respond_to?(:name)
+                       if node.parameters.keyword_rest.respond_to?(:name)
                          param_names << node.parameters.keyword_rest.name
                        elsif node.parameters.keyword_rest.is_a?(Prism::ForwardingParameterNode)
                          param_names << :forwarding

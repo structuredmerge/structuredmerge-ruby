@@ -6,7 +6,7 @@ require_relative 'merge/version'
 
 module Go
   module Merge
-    extend self
+    module_function
 
     PACKAGE_NAME = 'go-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND

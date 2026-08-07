@@ -29,9 +29,6 @@ module Rbs
       #
       # @param template_analysis [FileAnalysis] Analysis of the template file
       # @param dest_analysis [FileAnalysis] Analysis of the destination file
-      def initialize(template_analysis, dest_analysis, **options)
-        super(template_analysis, dest_analysis, **options)
-      end
 
       private
 

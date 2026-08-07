@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'English'
 require 'json'
 
 require_relative 'spec_helper'
@@ -43,7 +44,7 @@ RSpec.describe Smorg::RB do
                                                                                                out: File::NULL, err: File::NULL)
 
     output = IO.popen([{ 'GIT_CONFIG_NOSYSTEM' => '1' }, 'git', *args], chdir: dir, err: %i[child out], &:read)
-    return if $?.success?
+    return if $CHILD_STATUS.success?
 
     raise "git #{args.join(' ')} failed:\n#{output}"
   end
@@ -509,7 +510,7 @@ RSpec.describe Smorg::RB do
 
     plain_diff = IO.popen([{ 'GIT_CONFIG_NOSYSTEM' => '1' }, 'git', '--no-pager', 'diff', '--no-ext-diff',
                            '--no-index', old_path, new_path], err: %i[child out], &:read)
-    expect([0, 1]).to include($?.exitstatus)
+    expect([0, 1]).to include($CHILD_STATUS.exitstatus)
     exit_code = described_class.run(['diff-driver', '--path-name', source_pair.fetch('path'), old_path,
                                      new_path], stdout: stdout, stderr: stderr)
 

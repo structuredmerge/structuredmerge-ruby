@@ -128,7 +128,7 @@ RSpec.describe Json::Merge do
       { 'id' => 'kreuzberg-language-pack', 'family' => 'tree-sitter' }
     )
 
-    expect(json_ready(described_class.json_plan_context.dig(:feature_profile))).to include(
+    expect(json_ready(described_class.json_plan_context[:feature_profile])).to include(
       'backend' => 'kreuzberg-language-pack',
       'supports_dialects' => true
     )
@@ -182,7 +182,7 @@ RSpec.describe Json::Merge do
     expect(object_result[:ok]).to be(true)
     expect(object_result.dig(:analysis, :root_kind)).to eq(object_fixture.dig(:expected, :root_kind))
     expect(
-      json_ready(object_result.dig(:analysis, :owners).map { |owner| owner.compact })
+      json_ready(object_result.dig(:analysis, :owners).map(&:compact))
     ).to eq(json_ready(object_fixture.dig(:expected, :owners)))
 
     jsonc_fixture_data = jsonc_fixture('structure_jsonc')
@@ -190,7 +190,7 @@ RSpec.describe Json::Merge do
     expect(jsonc_result[:ok]).to be(true)
     expect(jsonc_result.dig(:analysis, :root_kind)).to eq(jsonc_fixture_data.dig(:expected, :root_kind))
     expect(
-      json_ready(jsonc_result.dig(:analysis, :owners).map { |owner| owner.compact })
+      json_ready(jsonc_result.dig(:analysis, :owners).map(&:compact))
     ).to eq(json_ready(jsonc_fixture_data.dig(:expected, :owners)))
   end
 

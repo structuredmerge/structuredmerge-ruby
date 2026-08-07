@@ -793,8 +793,8 @@ module Toml
       def dedup_warning_context(region:, analysis:, node:, source_node:)
         {
           file: analysis.respond_to?(:path) ? analysis.path : nil,
-          owner_type: node&.respond_to?(:type) ? node.type : node.class.name.split('::').last,
-          source_owner_type: source_node&.respond_to?(:type) ? source_node.type : source_node&.class&.name&.split('::')&.last,
+          owner_type: node.respond_to?(:type) ? node.type : node.class.name.split('::').last,
+          source_owner_type: source_node.respond_to?(:type) ? source_node.type : source_node&.class&.name&.split('::')&.last,
           region_lines: [region.respond_to?(:start_line) ? region.start_line : nil,
                          region.respond_to?(:end_line) ? region.end_line : nil],
           normalized_content: region.normalized_content
@@ -1020,7 +1020,7 @@ module Toml
 
       def emit_gap_before_node(node, analysis, prev_end_line, prev_analysis, skip_for_borrowed_leading_region: false)
         return unless node && analysis && prev_end_line
-        return unless prev_analysis&.equal?(analysis)
+        return unless prev_analysis.equal?(analysis)
         return unless node.respond_to?(:start_line) && node.start_line
         return if skip_for_borrowed_leading_region
 

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'English'
 require 'go-merge'
 require 'ast/merge'
 require 'ast-merge-git'
@@ -308,8 +309,8 @@ module Smorg
         &:read
       )
       {
-        ok: $?.success?,
-        diagnostics: if $?.success?
+        ok: $CHILD_STATUS.success?,
+        diagnostics: if $CHILD_STATUS.success?
                        []
                      else
                        [{ severity: 'error', category: 'git_merge_file_conflict',
@@ -448,7 +449,7 @@ module Smorg
         profile: result[:profile],
         diagnostics: result.fetch(:diagnostics, [])
       }
-      File.write(report_path, JSON.pretty_generate(Ast::Merge.json_ready(report)) + "\n")
+      File.write(report_path, "#{JSON.pretty_generate(Ast::Merge.json_ready(report))}\n")
       EXIT_SUCCESS
     rescue StandardError => e
       stderr.puts("write report: #{e.message}")

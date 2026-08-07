@@ -210,7 +210,7 @@ module Markdown
 
             # Check if line has content before first definition
             first_bracket = line.index('[')
-            has_prefix = first_bracket && first_bracket > 0 && !line[0...first_bracket].strip.empty?
+            has_prefix = first_bracket&.positive? && !line[0...first_bracket].strip.empty?
 
             # Include if: multiple definitions OR single definition with prefix
             next unless parsed.size > 1 || has_prefix
@@ -355,7 +355,7 @@ module Markdown
 
           # Find where the first definition starts
           first_bracket = line.index('[')
-          prefix = first_bracket && first_bracket > 0 ? line[0...first_bracket].strip : ''
+          prefix = first_bracket&.positive? ? line[0...first_bracket].strip : ''
 
           # Case 1: Multiple definitions - always expand
           if parsed.size > 1

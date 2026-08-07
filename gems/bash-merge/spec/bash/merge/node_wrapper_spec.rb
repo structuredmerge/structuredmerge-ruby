@@ -156,7 +156,7 @@ RSpec.describe Bash::Merge::NodeWrapper do
         source = '# This is a comment'
         analysis = Bash::Merge::FileAnalysis.new(source)
         root = analysis.root_node
-        comment_child = root.children.find { |c| c.comment? }
+        comment_child = root.children.find(&:comment?)
         expect(comment_child).not_to be_nil
         expect(comment_child.comment?).to be true
       end

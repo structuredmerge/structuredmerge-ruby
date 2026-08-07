@@ -241,9 +241,7 @@ module Toml
 
           child_line = wrapper.start_line
           first_table_line = child_line if child_line && (first_table_line.nil? || child_line < first_table_line)
-        end
 
-        root.each do |child|
           wrapper = wrap_node(child, document_root: root)
           next unless wrapper&.pair?
 

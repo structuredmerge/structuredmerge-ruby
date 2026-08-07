@@ -551,7 +551,7 @@ module TreeHaver
         # @param block [Proc] block to pass
         # @return [Object] result from the underlying node
         def method_missing(method_name, *args, **kwargs, &block)
-          if inner_node&.respond_to?(method_name)
+          if inner_node.respond_to?(method_name)
             inner_node.public_send(method_name, *args, **kwargs, &block)
           else
             super

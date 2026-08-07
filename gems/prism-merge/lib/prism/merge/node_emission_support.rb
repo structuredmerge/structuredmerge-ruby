@@ -151,7 +151,7 @@ module Prism
       end
 
       def emit_dest_gap_lines(result:, analysis:, last_output_line:, next_node:)
-        return last_output_line if last_output_line == 0
+        return last_output_line if last_output_line.zero?
 
         leading_comments = next_node.location.respond_to?(:leading_comments) ? next_node.location.leading_comments : []
         pending_leading_comments = leading_comments.select do |comment|

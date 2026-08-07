@@ -49,7 +49,7 @@ module Prism
       def leading_comments
         @leading_comments ||= begin
           first = @nodes&.first
-          if first&.respond_to?(:location) && first.location.respond_to?(:leading_comments)
+          if first.respond_to?(:location) && first.location.respond_to?(:leading_comments)
             first.location.leading_comments.select { |c| c.location.start_line < @start_line }
           else
             []

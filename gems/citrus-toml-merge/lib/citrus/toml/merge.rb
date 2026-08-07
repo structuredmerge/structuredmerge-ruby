@@ -6,7 +6,7 @@ require 'toml-merge'
 module Citrus
   module Toml
     module Merge
-      extend self
+      module_function
 
       PACKAGE_NAME = 'citrus-toml-merge'
       BACKEND = TreeHaver::CITRUS_BACKEND

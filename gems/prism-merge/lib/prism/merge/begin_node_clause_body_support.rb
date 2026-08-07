@@ -32,7 +32,7 @@ module Prism
           operator_loc = node.operator_loc if node.respond_to?(:operator_loc)
           header_lines << operator_loc.end_line if operator_loc
           reference = node.reference if node.respond_to?(:reference)
-          reference_location = reference.location if reference&.respond_to?(:location)
+          reference_location = reference.location if reference.respond_to?(:location)
           header_lines << reference_location.end_line if reference_location
         end
 
@@ -52,7 +52,7 @@ module Prism
         (body_start_line..body_end_line).each do |line_num|
           lines << analysis.line_at(line_num).chomp
         end
-        lines.join("\n") + "\n"
+        "#{lines.join("\n")}\n"
       end
 
       def split_leading_comment_prefix(body_text)
@@ -123,7 +123,7 @@ module Prism
                              ((effective_body_end + 1)..region[:end_line]).each do |line_num|
                                lines << analysis.line_at(line_num).chomp
                              end
-                             lines.join("\n") + "\n"
+                             "#{lines.join("\n")}\n"
                            else
                              ''
                            end

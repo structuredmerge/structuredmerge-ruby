@@ -274,8 +274,8 @@ module Json
         len1 = arr1.respond_to?(:elements) ? arr1.elements.size : 0
         len2 = arr2.respond_to?(:elements) ? arr2.elements.size : 0
 
-        return 1.0 if len1 == 0 && len2 == 0
-        return 0.0 if len1 == 0 || len2 == 0
+        return 1.0 if len1.zero? && len2.zero?
+        return 0.0 if len1.zero? || len2.zero?
 
         [len1, len2].min.to_f / [len1, len2].max
       end

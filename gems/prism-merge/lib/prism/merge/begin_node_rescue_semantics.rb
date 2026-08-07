@@ -186,7 +186,7 @@ module Prism
         @source_defined_exception_definitions ||= begin
           definitions = []
           [template_analysis, dest_analysis].compact.each do |analysis|
-            next unless analysis.respond_to?(:parse_result) && analysis.parse_result&.respond_to?(:value)
+            next unless analysis.respond_to?(:parse_result) && analysis.parse_result.respond_to?(:value)
 
             collect_source_defined_exception_definitions(analysis.parse_result.value, nil, definitions)
           end

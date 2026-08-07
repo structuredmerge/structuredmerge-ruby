@@ -196,7 +196,7 @@ RSpec.describe Dotenv::Merge::FreezeNode do
 
       # Should only include the 2 assignment lines, not the freeze markers
       expect(env_lines.size).to eq(2)
-      expect(env_lines.all? { |l| l.assignment? }).to be true
+      expect(env_lines.all?(&:assignment?)).to be true
     end
 
     it 'returns empty array when @lines is nil' do

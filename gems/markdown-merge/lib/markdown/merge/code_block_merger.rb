@@ -236,7 +236,7 @@ module Markdown
           span: runtime_surface_span(reference_node),
           reconstruction_strategy: :portable_write,
           metadata: {
-            fence_info: reference_node&.respond_to?(:fence_info) ? reference_node.fence_info : nil,
+            fence_info: reference_node.respond_to?(:fence_info) ? reference_node.fence_info : nil,
             language: language
           }.compact
         )
@@ -544,7 +544,7 @@ module Markdown
       # @return [String] The reconstructed code block
       def rebuild_code_block(language, content, _reference_node)
         # Ensure content ends with newline for proper fence closing
-        content = content.chomp + "\n" unless content.end_with?("\n")
+        content = "#{content.chomp}\n" unless content.end_with?("\n")
 
         # Use backticks as default fence
         fence = '```'
@@ -572,7 +572,7 @@ module Markdown
         rescue NoMethodError
           next
         rescue Exception => e
-          next if e.class.name == 'RSpec::Mocks::MockExpectationError'
+          next if e.instance_of?(::RSpec::Mocks::MockExpectationError)
 
           raise
         end

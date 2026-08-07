@@ -461,7 +461,7 @@ module Rbs
               decl,
               analysis
             )
-            return (leading_lines + body_lines).join("\n") + "\n"
+            return "#{(leading_lines + body_lines).join("\n")}\n"
           end
         end
 
@@ -484,7 +484,7 @@ module Rbs
           start_line: start_line,
           end_line: end_line
         )
-        body_lines.join("\n") + "\n"
+        "#{body_lines.join("\n")}\n"
       end
 
       def recursive_body_lines_for_declaration(template_decl, dest_decl, selected_decl, selected_analysis,
@@ -797,7 +797,7 @@ module Rbs
       end
 
       def layout_gap_lines_for(statement, analysis, side:, owners: nil)
-        return [] unless statement && analysis&.respond_to?(:comment_attachment_for)
+        return [] unless statement && analysis.respond_to?(:comment_attachment_for)
 
         attachment = analysis.comment_attachment_for(statement, owners: owners)
         gap = side == :leading ? attachment.leading_gap : attachment.trailing_gap
@@ -861,7 +861,7 @@ module Rbs
       end
 
       def native_comment_fallback_applicable?(decl, analysis)
-        return false if analysis&.respond_to?(:comment_attachment_for)
+        return false if analysis.respond_to?(:comment_attachment_for)
 
         decl.respond_to?(:comment) && decl.comment
       end

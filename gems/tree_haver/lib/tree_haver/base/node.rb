@@ -213,7 +213,7 @@ module TreeHaver
         return unless other.respond_to?(:start_byte) && other.respond_to?(:end_byte)
 
         cmp = start_byte <=> other.start_byte
-        return cmp unless cmp == 0
+        return cmp unless cmp.zero?
 
         end_byte <=> other.end_byte
       end

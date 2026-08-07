@@ -8,7 +8,7 @@ require_relative 'merge/version'
 
 module Prism
   module Merge
-    extend self
+    module_function
 
     PACKAGE_NAME = 'prism-merge'
     BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'prism', family: 'native').freeze
@@ -613,10 +613,7 @@ module Prism
                  source.byteslice(0...delete_range[:start_byte]) + source.byteslice(delete_range[:end_byte]..)
                elsif operation.fetch(:operation) == 'insert_child'
                  insertion_byte = class_body_insertion_byte(source, range)
-                 source.byteslice(0...insertion_byte) +
-                   operation.fetch(:replacement_source) +
-                   "\n" +
-                   source.byteslice(insertion_byte..)
+                 "#{source.byteslice(0...insertion_byte)}#{operation.fetch(:replacement_source)}\n#{source.byteslice(insertion_byte..)}"
                else
                  source.byteslice(0...range[:start_byte]) +
                    operation.fetch(:replacement_source) +

@@ -487,7 +487,7 @@ module Json
 
       def resolution_surface_path(template_node, dest_node)
         segment = resolution_path_segment_for(template_node, dest_node)
-        line = dest_node&.respond_to?(:start_line) ? dest_node.start_line : nil
+        line = dest_node.respond_to?(:start_line) ? dest_node.start_line : nil
         unresolved_surface_path_for(segment, fallback_segment: (line ? "line[#{line}]" : nil))
       end
 
@@ -739,7 +739,7 @@ module Json
       end
 
       def node_has_emittable_leading_comments?(node, analysis)
-        return false unless node&.respond_to?(:start_line) && node.start_line
+        return false unless node.respond_to?(:start_line) && node.start_line
 
         analysis.comment_tracker.leading_comments_before(node.start_line).any?
       end
@@ -779,7 +779,7 @@ module Json
       end
 
       def emit_leading_comments_for(node, analysis)
-        return unless node&.respond_to?(:start_line) && node.start_line
+        return unless node.respond_to?(:start_line) && node.start_line
 
         leading = analysis.comment_tracker.leading_comments_before(node.start_line)
         leading = canonical_tracked_leading_comments(leading, analysis: analysis, node: node)
@@ -881,7 +881,7 @@ module Json
       end
 
       def tracked_inline_comment_for(node, analysis)
-        return unless node&.respond_to?(:start_line) && node.start_line
+        return unless node.respond_to?(:start_line) && node.start_line
 
         analysis.comment_tracker.inline_comment_at(inline_comment_line_for(node))
       end
@@ -889,9 +889,9 @@ module Json
       def dedup_warning_context(region:, analysis:, node:, normalized_content: nil, region_lines: nil)
         {
           file: analysis.respond_to?(:path) ? analysis.path : nil,
-          owner_type: node&.respond_to?(:type) ? node.type : node.class.name.split('::').last,
-          region_lines: region_lines || [region&.respond_to?(:start_line) ? region.start_line : nil,
-                                         region&.respond_to?(:end_line) ? region.end_line : nil],
+          owner_type: node.respond_to?(:type) ? node.type : node.class.name.split('::').last,
+          region_lines: region_lines || [region.respond_to?(:start_line) ? region.start_line : nil,
+                                         region.respond_to?(:end_line) ? region.end_line : nil],
           normalized_content: normalized_content || region&.normalized_content
         }.compact
       end

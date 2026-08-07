@@ -71,7 +71,7 @@ module Prism
 
       def comment_attachment_for(node, source:, analysis: nil)
         attachment = cached_comment_augmenter_for(source)&.attachment_for(node)
-        attachment ||= analysis.comment_attachment_for(node) if analysis&.respond_to?(:comment_attachment_for)
+        attachment ||= analysis.comment_attachment_for(node) if analysis.respond_to?(:comment_attachment_for)
 
         runtime_attachment = runtime_comment_attachment_for(node, source: source, analysis: analysis,
                                                                   base_attachment: attachment)
@@ -160,7 +160,7 @@ module Prism
       end
 
       def emit_comment_region(result, region, analysis:, source:, decision:, previous_line: nil)
-        return unless region&.respond_to?(:nodes)
+        return unless region.respond_to?(:nodes)
         return if region.respond_to?(:empty?) && region.empty?
 
         last_emitted_line = nil

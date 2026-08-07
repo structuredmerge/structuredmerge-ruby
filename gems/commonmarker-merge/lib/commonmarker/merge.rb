@@ -6,7 +6,7 @@ require_relative 'merge/version'
 
 module Commonmarker
   module Merge
-    extend self
+    module_function
 
     PACKAGE_NAME = 'commonmarker-merge'
     BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'commonmarker', family: 'native').freeze

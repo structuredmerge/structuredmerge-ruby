@@ -157,7 +157,7 @@ module Markdown
 
           lines.each_with_index do |line, idx|
             next_line = lines[idx + 1]
-            prev_line = idx > 0 ? lines[idx - 1] : nil
+            prev_line = idx.positive? ? lines[idx - 1] : nil
 
             # Special case: closing tags for markdown containers like </details>
             # These contain markdown content, so we need blank lines before them
@@ -189,7 +189,7 @@ module Markdown
 
             # Check for closing block-level tags
             line.scan(HTML_BLOCK_CLOSE) do
-              html_block_depth -= 1 if html_block_depth > 0
+              html_block_depth -= 1 if html_block_depth.positive?
             end
           end
         end

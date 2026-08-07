@@ -172,7 +172,7 @@ module Prism
               # pre-comment separator. Reattach inline comments with a canonical
               # single space instead of pretending to preserve unavailable spacing.
               inline_text = inline_comments.map { |c| c.slice.strip }.join(' ')
-              node_lines[last_idx] = node_lines[last_idx] + ' ' + inline_text
+              node_lines[last_idx] = "#{node_lines[last_idx]} #{inline_text}"
             end
           end
 
@@ -190,7 +190,7 @@ module Prism
       # Convert to final merged content string
       # @return [String]
       def to_s
-        @lines.join("\n") + "\n"
+        "#{@lines.join("\n")}\n"
       end
 
       # Get statistics about merge decisions

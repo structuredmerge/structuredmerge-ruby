@@ -108,10 +108,10 @@ module Prism
 
         names.concat(params.requireds.map(&:name)) if params.requireds
         names.concat(params.optionals.map(&:name)) if params.optionals
-        names << params.rest.name if params.rest&.respond_to?(:name) && params.rest.name
+        names << params.rest.name if params.rest.respond_to?(:name) && params.rest.name
         names.concat(params.posts.map(&:name)) if params.posts
         names.concat(params.keywords.map(&:name)) if params.keywords
-        names << params.keyword_rest.name if params.keyword_rest&.respond_to?(:name) && params.keyword_rest.name
+        names << params.keyword_rest.name if params.keyword_rest.respond_to?(:name) && params.keyword_rest.name
         names << params.block.name if params.block
 
         names.compact

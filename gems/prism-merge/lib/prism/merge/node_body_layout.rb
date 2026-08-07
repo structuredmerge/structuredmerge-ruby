@@ -25,7 +25,7 @@ module Prism
 
         return '' if lines.empty?
 
-        lines.join("\n") + "\n"
+        "#{lines.join("\n")}\n"
       end
 
       def opening_line_text

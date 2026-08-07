@@ -265,7 +265,7 @@ module Rbs
         if @source
           if @backend == :rbs
             location = @node.respond_to?(:location) ? @node.location : nil
-            if location&.start_pos && location&.end_pos
+            if location&.start_pos && location.end_pos
               exact = @source.byteslice(location.start_pos...location.end_pos)
               return exact unless exact.nil?
             end
@@ -277,7 +277,7 @@ module Rbs
 
         return unless start_line && end_line
 
-        if @lines && start_line > 0 && end_line <= @lines.length
+        if @lines && start_line.positive? && end_line <= @lines.length
           @lines[(start_line - 1)..(end_line - 1)].join("\n")
         elsif @source
           @source.lines[(start_line - 1)..(end_line - 1)]&.join

@@ -122,7 +122,7 @@ module TreeHaver
           return false unless parser
 
           tree = parser.parse(source)
-          return false unless tree&.respond_to?(:root_node)
+          return false unless tree.respond_to?(:root_node)
 
           root = tree.root_node
           root && !node_has_error?(root)

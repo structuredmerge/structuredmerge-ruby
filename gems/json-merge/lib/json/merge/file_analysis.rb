@@ -83,7 +83,7 @@ module Json
       end
 
       def statements
-        @nodes ||= []
+        @statements ||= []
       end
       alias nodes statements
 

@@ -6,7 +6,7 @@ require_relative 'merge/version'
 
 module Kramdown
   module Merge
-    extend self
+    module_function
 
     PACKAGE_NAME = 'kramdown-merge'
     BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'kramdown', family: 'native').freeze
