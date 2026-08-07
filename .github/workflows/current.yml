@@ -114,7 +114,7 @@ jobs:
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
-          gem install nomono -v 1.0.8 --source https://gem.coop --source https://rubygems.org
+          gem install nomono -v 1.1.4 --source https://gem.coop --source https://rubygems.org
           bundle config set path vendor/bundle
           bundle config set frozen false
           bundle install --jobs 4
@@ -178,7 +178,7 @@ jobs:
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
-          gem install nomono -v 1.0.8 --source https://gem.coop --source https://rubygems.org
+          gem install nomono -v 1.1.4 --source https://gem.coop --source https://rubygems.org
           bundle config set path vendor/bundle
           bundle config set frozen false
           bundle install --jobs 4

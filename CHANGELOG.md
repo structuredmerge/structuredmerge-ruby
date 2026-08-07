@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Updated monorepo CI templating bootstraps to install nomono 1.1.4, matching the generated Gemfile requirement.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
