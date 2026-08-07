@@ -1784,7 +1784,7 @@ We [![Keep A Changelog][📗keep-changelog-img]][📗keep-changelog] so if you m
 
 See [CONTRIBUTING.md][🤝contributing] for more detailed instructions.
 
-## Code Coverage
+### Code Coverage
 
 Run the test suite with coverage enabled:
 
