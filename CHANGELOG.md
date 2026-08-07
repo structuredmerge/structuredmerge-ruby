@@ -34,6 +34,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Exclude source-shaped conformance fixture lines from generic line-length lint while retaining the remaining fixture lint checks.
 
+- Restore module-level debug timing used by cross-language template parsing.
+
+- Restore the full templated Rakefile scaffold for this monorepo subgem.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

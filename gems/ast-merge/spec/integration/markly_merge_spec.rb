@@ -144,7 +144,7 @@ RSpec.describe 'Markly partial template merge integration', :markdown_merge, :ma
         it 'appends the template at the end' do
           result = merger.merge
           expect(result.changed).to be true
-          expect(result.content).to end_with(template.chomp + "\n")
+          expect(result.content).to end_with("#{template.chomp}\n")
           expect(result.content).to start_with('# My Project')
         end
       end
