@@ -1784,6 +1784,20 @@ We [![Keep A Changelog][📗keep-changelog-img]][📗keep-changelog] so if you m
 
 See [CONTRIBUTING.md][🤝contributing] for more detailed instructions.
 
+## Code Coverage
+
+Run the test suite with coverage enabled:
+
+```bash
+bundle exec kettle-test
+```
+
+Inspect the generated report with:
+
+```bash
+kettle-soup-cover -d
+```
+
 ## 📌 Versioning
 
 This library follows [![Semantic Versioning 2.0.0][📌semver-img]][📌semver] for its public API where practical.
