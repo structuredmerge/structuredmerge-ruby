@@ -20,6 +20,7 @@ gemspec
 
 gem "kettle-family", "~> 1.2", ">= 1.2.23"
 
+
 # Local workspace dependency wiring for *_local.gemfile overrides
 gem "nomono", "~> 1.1", ">= 1.1.4", require: false # ruby >= 3.2.0
 
@@ -35,8 +36,8 @@ direct_sibling_local =
 direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
 if direct_sibling_gems.any? &&
-   (direct_sibling_local ||
-     ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+    (direct_sibling_local ||
+      ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
   direct_sibling_dev_was_set = ENV.key?("STRUCTUREDMERGE_DEV")
   direct_sibling_dev_original = ENV.fetch("STRUCTUREDMERGE_DEV", nil)
   require "nomono/bundler"
@@ -47,7 +48,7 @@ if direct_sibling_gems.any? &&
       gems: direct_sibling_gems,
       prefix: "STRUCTUREDMERGE",
       path_env: "STRUCTUREDMERGE_DEV",
-      root: %w[src my structuredmerge ruby gems]
+      root: ["src", "my", "structuredmerge", "ruby", "gems"]
     )
   ensure
     if direct_sibling_templating && !direct_sibling_local

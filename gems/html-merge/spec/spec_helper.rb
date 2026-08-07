@@ -14,9 +14,9 @@ begin
     require "kettle/soup/cover/config"
     SimpleCov.start
   end
-rescue LoadError => e
+rescue LoadError => error
   # check the error message and re-raise when unexpected
-  raise e unless e.message.include?("kettle")
+  raise error unless error.message.include?("kettle")
 end
 
 # External RSpec & related config
