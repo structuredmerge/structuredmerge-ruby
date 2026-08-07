@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Layout/LineLength -- conformance fixture payloads preserve their source-shaped JSON and diagnostic lines.
 # rubocop:disable Metrics/BlockLength -- conformance fixture specs intentionally group large executable fixtures.
 RSpec.describe Ast::Merge do
   def fixtures_root

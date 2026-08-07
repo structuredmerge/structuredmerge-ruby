@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Apply safe RuboCop autocorrections in ast-merge source and specs.
 
+- Exclude source-shaped conformance fixture lines from generic line-length lint while retaining the remaining fixture lint checks.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
