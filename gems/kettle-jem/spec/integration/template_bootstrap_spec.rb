@@ -539,7 +539,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-  it "deletes LICENSE.txt when the active packaged license is generated as LICENSE.md" do
+  it "migrates MIT LICENSE.txt copyright text into LICENSE.md and deletes the legacy file" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-license-legacy-cleanup", tmp_root) do |root|
@@ -551,7 +551,13 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
             spec.licenses = ["MIT"]
           end
         RUBY
-        "LICENSE.txt" => "Legacy license text\n",
+        "LICENSE.txt" => <<~TEXT,
+          Copyright (c) 2026 Example Maintainer
+
+          Permission is hereby granted, free of charge, to any person obtaining a copy
+          of this software and associated documentation files (the "Software"), to deal
+          in the Software without restriction.
+        TEXT
         ".kettle-jem.yml" => <<~YAML
           licenses:
             - MIT
@@ -568,6 +574,38 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(apply.fetch(:changed_files)).to include("LICENSE.md", "LICENSE.txt")
       expect(File).to exist(File.join(root, "LICENSE.md"))
       expect(File).not_to exist(File.join(root, "LICENSE.txt"))
+      expect(File.read(File.join(root, "LICENSE.md"))).to include("Copyright (c) 2026 Example Maintainer")
+    end
+  end
+
+  it "preserves custom LICENSE.txt and links to it without inventing an SPDX label" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-custom-license", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        "LICENSE.txt" => "All rights reserved.\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - LICENSE.md
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      license = File.read(File.join(root, "LICENSE.md"))
+
+      expect(apply.fetch(:changed_files)).to include("LICENSE.md")
+      expect(File).to exist(File.join(root, "LICENSE.txt"))
+      expect(license).to include("[LICENSE.txt](LICENSE.txt)")
+      expect(license).not_to include("MIT")
     end
   end
 

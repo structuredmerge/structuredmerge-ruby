@@ -22,6 +22,7 @@ require "rbs"
 require "kettle/dev"
 require "kettle/rb/compat_matrix"
 require_relative "jem/version"
+require_relative "jem/license_txt_migrator"
 
 begin
   require "kettle/drift"
@@ -3102,7 +3103,8 @@ module Kettle
         author: author,
         author_email: author[:email],
         copyright: copyright,
-        source_url: source_url
+        source_url: source_url,
+        license_txt: license_txt_facts(project_root)
       )
       test_min_ruby = config_test_min_ruby(kettle_config, nil)
       project_runtime = project_runtime_facts(
@@ -3291,6 +3293,7 @@ module Kettle
       gemspec_licenses = Array(gemspec_metadata[:licenses])
 
       copyright = copyright_facts(project_root, kettle_config)
+      license_txt = license_txt_facts(project_root)
       author = author_facts(kettle_config, env, gemspec_metadata: gemspec_metadata, copyright: copyright)
       license = license_facts(
         kettle_config,
@@ -3298,7 +3301,8 @@ module Kettle
         author: author,
         author_email: author[:email],
         copyright: copyright,
-        source_url: source_url
+        source_url: source_url,
+        license_txt: license_txt
       )
       gemspec_license_spdx = gemspec_licenses
         .map { |license_id| license_id.to_s.strip }
@@ -3465,7 +3469,7 @@ module Kettle
       template_facts[:shim_profile_cleanups] = shim_cleanups unless shim_cleanups.empty?
       legacy_cleanups = template_legacy_destination_cleanups(project_root, template_preferences)
       template_facts[:legacy_destination_cleanups] = legacy_cleanups unless legacy_cleanups.empty?
-      license_cleanups = template_obsolete_license_cleanups(project_root, template_config, template_preferences)
+      license_cleanups = template_obsolete_license_cleanups(project_root, template_config, template_preferences, license_txt: license_txt)
       template_facts[:obsolete_license_cleanups] = license_cleanups unless license_cleanups.empty?
       unless template_preferences.empty?
         facts[:license] = license unless license.empty?
@@ -16585,19 +16589,31 @@ module Kettle
       nil
     end
 
-    def license_facts(config, gemspec_licenses, author: {}, author_email: nil, copyright: {}, source_url: nil)
-      licenses = resolved_licenses(config, gemspec_licenses)
+    def license_facts(config, gemspec_licenses, author: {}, author_email: nil, copyright: {}, source_url: nil, license_txt: {})
+      configured_licenses = Array(config["licenses"]).map { |license| license.to_s.strip }.reject(&:empty?)
+      gemspec_licenses = Array(gemspec_licenses).map { |license| license.to_s.strip }.reject(&:empty?)
+      licenses = if configured_licenses.any?
+        configured_licenses
+      elsif gemspec_licenses.any?
+        gemspec_licenses
+      elsif license_txt[:present] && !license_txt[:mit]
+        []
+      else
+        ["MIT"]
+      end
+      custom_license = license_txt[:custom] && configured_licenses.empty? && gemspec_licenses.empty?
       primary = licenses.first
       compat_category = license_compat_category(licenses)
       copyright_prefix = polyform_licenses?(licenses) ? "Required Notice: " : ""
       copyright_lines = Array(copyright[:lines])
+      copyright_lines = license_txt[:copyright_lines] + copyright_lines if license_txt[:mit]
       license_source_url = license_source_blob_url(source_url)
       compact_hash(
         spdx: licenses,
         expression: licenses.join(" OR "),
         primary_spdx: primary,
-        license_md_content: license_md_content(licenses, author_email: author_email, license_source_url: license_source_url),
-        readme_license_intro: readme_license_intro(licenses, author_email: author_email, license_source_url: license_source_url),
+        license_md_content: license_md_content(licenses, author_email: author_email, license_source_url: license_source_url, custom_license: custom_license),
+        readme_license_intro: readme_license_intro(licenses, author_email: author_email, license_source_url: license_source_url, custom_license: custom_license),
         readme_license_badge: license_badge(licenses.join(" OR "), ref: :license),
         readme_license_compat_badge: license_compat_badge(compat_category),
         readme_license_eye_workflow_badge: license_eye_workflow_badge(licenses, config),
@@ -16610,6 +16626,21 @@ module Kettle
         readme_copyright_notice: readme_copyright_notice(copyright_lines, copyright_prefix, author),
         copyright_prefix: copyright_prefix
       )
+    end
+
+    def license_txt_facts(project_root)
+      path = File.join(project_root.to_s, "LICENSE.txt")
+      return {} unless File.file?(path)
+
+      migrator = LicenseTxtMigrator.new(File.read(path))
+      if migrator.mit_license?
+        {present: true, mit: true, copyright_lines: migrator.copyright_lines}
+      else
+        {present: true, custom: true, mit: false, copyright_lines: []}
+      end
+    rescue StandardError => error
+      Kettle::Dev.debug_error(error, __method__)
+      {present: true, custom: true, mit: false, copyright_lines: []}
     end
 
     def license_source_blob_url(source_url)
@@ -16678,7 +16709,9 @@ module Kettle
       lines.map { |line| "#{copyright_prefix}#{line}" }
     end
 
-    def license_md_content(licenses, author_email: nil, license_source_url: nil)
+    def license_md_content(licenses, author_email: nil, license_source_url: nil, custom_license: false)
+      return "# License\n\nThe licensing terms for this project are provided in [LICENSE.txt](LICENSE.txt)." if custom_license
+
       content = <<~MARKDOWN.chomp
         # License
 
@@ -16693,7 +16726,9 @@ module Kettle
       content
     end
 
-    def readme_license_intro(licenses, author_email: nil, license_source_url: nil)
+    def readme_license_intro(licenses, author_email: nil, license_source_url: nil, custom_license: false)
+      return "The licensing terms for this project are provided in [LICENSE.txt](LICENSE.txt). See [LICENSE.md](LICENSE.md) for details." if custom_license
+
       return mit_readme_license_intro(license_source_url: license_source_url) if licenses == ["MIT"]
 
       intro = "The gem is available under the following license#{"s" if licenses.size > 1}: " \
@@ -17732,7 +17767,7 @@ module Kettle
       end
     end
 
-    def template_obsolete_license_cleanups(project_root, config, preferences)
+    def template_obsolete_license_cleanups(project_root, config, preferences, license_txt: {})
       active_basenames = active_license_basenames(config)
       return [] if active_basenames.empty?
 
@@ -17745,7 +17780,7 @@ module Kettle
 
         {license_path: license_path, license_basename: basename}
       end
-      if retained_paths.include?("LICENSE.md") && File.exist?(File.join(project_root, "LICENSE.txt"))
+      if license_txt[:mit] && retained_paths.include?("LICENSE.md") && File.exist?(File.join(project_root, "LICENSE.txt"))
         cleanups << {license_path: "LICENSE.txt", license_basename: "LICENSE"}
       end
       cleanups

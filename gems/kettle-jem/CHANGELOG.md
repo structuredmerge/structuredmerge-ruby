@@ -1385,6 +1385,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Restore legacy LICENSE.txt and workflow cleanup during templating, and treat falsey TSLP_DEV values as unset.
 
+- Migrate MIT LICENSE.txt copyright notices safely and preserve custom license files with an unlabelled LICENSE.md link.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
