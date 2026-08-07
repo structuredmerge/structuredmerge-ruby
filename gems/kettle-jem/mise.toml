@@ -4,6 +4,10 @@
 [env]
 KJ_PROJECT_EMOJI = "🔮"
 KETTLE_JEM_TEMPLATE_PROFILE = "full"
+# This project owns a discrete changelog even when released from the
+# StructuredMerge monorepo. The family workflow also detects this local file.
+K_CHANGELOG_PATH = "{{config_root}}/CHANGELOG.md"
+K_CHANGELOG_VERSION_FILE = "{{config_root}}/lib/kettle/jem/version.rb"
 FLOSS_CFG_FUND_DEBUG = "false"
 FLOSS_CFG_FUND_LOGFILE = "tmp/log/debug.log"
 FUNDING_ORG = "kettle-dev"
