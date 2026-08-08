@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Load ast-template's adapter dependencies explicitly in the fixture spec harness.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
