@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Restore per-member commits for family bundle refreshes so valid lockfile updates are recorded.
+
 ### Security
 
 ## [7.1.1] - 2026-08-07
