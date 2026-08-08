@@ -28,16 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Load ast-template's adapter dependencies explicitly in the fixture spec harness.
-
 ### Security
 
 ## [7.1.1] - 2026-08-08
 
 - TAG: [v7.1.1][7.1.1t]
-- COVERAGE: 97.12% -- 505/520 lines in 3 files
-- BRANCH COVERAGE: 86.11% -- 155/180 branches in 3 files
-- 5.15% documented
+- COVERAGE: 95.83% -- 23/24 lines in 3 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 3 files
+- 30.00% documented
 
 ### Changed
 
@@ -108,6 +106,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Restore the Code Coverage section in html-merge README so its local anchor is valid.
 
 - Declare the released adapter gems required by ast-template's default adapter registry test suite.
+
+- Load ast-template's adapter dependencies explicitly in the fixture spec harness.
 
 ## [7.1.0] - 2026-08-07
 
