@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Release kettle-jem independently from the StructuredMerge lock-step family.
+
 ### Deprecated
 
 ### Removed
