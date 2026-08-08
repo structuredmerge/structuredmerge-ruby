@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::BeginNodeMergePlanner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -582,7 +582,9 @@
 69
 70
 71
-72</pre>
+72
+73
+74</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_merge_planner.rb', line 30</span>
@@ -595,10 +597,12 @@
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_template_clause_regions'>template_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_clause_regions'>dest_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='id identifier rubyid_clause_types'>clause_types</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_node_preference'>node_preference</span> <span class='op'>==</span> <span class='symbol'>:template</span>
-    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:merge_ordered_clause_types</span><span class='comma'>,</span> <span class='id identifier rubyid_template_clause_regions'>template_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_clause_regions'>dest_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:merge_ordered_clause_types</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_clause_regions'>dest_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span> <span class='id identifier rubyid_template_clause_regions'>template_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+                   <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:merge_ordered_clause_types</span><span class='comma'>,</span> <span class='id identifier rubyid_template_clause_regions'>template_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span>
+                               <span class='id identifier rubyid_dest_clause_regions'>dest_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+                 <span class='kw'>else</span>
+                   <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:merge_ordered_clause_types</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_clause_regions'>dest_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span>
+                               <span class='id identifier rubyid_template_clause_regions'>template_clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+                 <span class='kw'>end</span>
   <span class='id identifier rubyid_clause_types'>clause_types</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:canonicalize_rescue_clause_order</span><span class='comma'>,</span> <span class='id identifier rubyid_clause_types'>clause_types</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_clause_types'>clause_types</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:canonicalize_begin_clause_kind_order</span><span class='comma'>,</span> <span class='id identifier rubyid_clause_types'>clause_types</span><span class='rparen'>)</span>
 
@@ -614,7 +618,7 @@
         <span class='label'>template_region:</span> <span class='id identifier rubyid_template_region'>template_region</span><span class='comma'>,</span>
         <span class='label'>dest_region:</span> <span class='id identifier rubyid_dest_region'>dest_region</span><span class='comma'>,</span>
         <span class='label'>template_clause_node:</span> <span class='id identifier rubyid_template_clause_node'>template_clause_node</span><span class='comma'>,</span>
-        <span class='label'>dest_clause_node:</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span><span class='comma'>,</span>
+        <span class='label'>dest_clause_node:</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span>
       <span class='rparen'>)</span>
       <span class='id identifier rubyid_steps'>steps</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_merged_step'>merged_step</span>
       <span class='kw'>next</span>
@@ -625,7 +629,7 @@
       <span class='label'>template_region:</span> <span class='id identifier rubyid_template_region'>template_region</span><span class='comma'>,</span>
       <span class='label'>dest_region:</span> <span class='id identifier rubyid_dest_region'>dest_region</span><span class='comma'>,</span>
       <span class='label'>template_clause_node:</span> <span class='id identifier rubyid_template_clause_node'>template_clause_node</span><span class='comma'>,</span>
-      <span class='label'>dest_clause_node:</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span><span class='comma'>,</span>
+      <span class='label'>dest_clause_node:</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span>
     <span class='rparen'>)</span>
     <span class='id identifier rubyid_steps'>steps</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_unmatched_step'>unmatched_step</span> <span class='kw'>if</span> <span class='id identifier rubyid_unmatched_step'>unmatched_step</span>
   <span class='kw'>end</span>
@@ -640,9 +644,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::MergeResult
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -687,7 +687,7 @@ Tracks merge decisions and provenance for validation and debugging.</p>
     <span class='label'>template_line:</span> <span class='id identifier rubyid_template_line'>template_line</span><span class='comma'>,</span>
     <span class='label'>dest_line:</span> <span class='id identifier rubyid_dest_line'>dest_line</span><span class='comma'>,</span>
     <span class='label'>comment:</span> <span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span>
-    <span class='label'>result_line:</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+    <span class='label'>result_line:</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
   <span class='rbrace'>}</span>
   <span class='id identifier rubyid_track_decision'>track_decision</span><span class='lparen'>(</span><span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='id identifier rubyid_template_line'>template_line</span> <span class='op'>?</span> <span class='symbol'>:template</span> <span class='op'>:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>line:</span> <span class='id identifier rubyid_template_line'>template_line</span> <span class='op'>||</span> <span class='id identifier rubyid_dest_line'>dest_line</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1035,7 +1035,15 @@ Tracks merge decisions and provenance for validation and debugging.</p>
 177
 178
 179
-180</pre>
+180
+181
+182
+183
+184
+185
+186
+187
+188</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 67</span>
@@ -1053,11 +1061,15 @@ Tracks merge decisions and provenance for validation and debugging.</p>
     <span class='comment'># Add blank lines between this comment and the previous one
 </span>    <span class='kw'>if</span> <span class='id identifier rubyid_prev_comment_line'>prev_comment_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_comment_line'>comment_line</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_prev_comment_line'>prev_comment_line</span> <span class='op'>+</span> <span class='int'>1</span>
       <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_prev_comment_line'>prev_comment_line</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span><span class='op'>...</span><span class='id identifier rubyid_comment_line'>comment_line</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='op'>|</span>
-        <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_source_analysis'>source_analysis</span> <span class='op'>?</span> <span class='id identifier rubyid_required_source_line'>required_source_line</span><span class='lparen'>(</span>
-          <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
-          <span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='comma'>,</span>
-          <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>emitting preserved blank line between leading comments</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='rparen'>)</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_source_analysis'>source_analysis</span>
+                 <span class='id identifier rubyid_required_source_line'>required_source_line</span><span class='lparen'>(</span>
+                   <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
+                   <span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='comma'>,</span>
+                   <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>emitting preserved blank line between leading comments</span><span class='tstring_end'>&#39;</span></span>
+                 <span class='rparen'>)</span>
+               <span class='kw'>else</span>
+                 <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+               <span class='kw'>end</span>
         <span class='kw'>if</span> <span class='id identifier rubyid_source'>source</span> <span class='op'>==</span> <span class='symbol'>:template</span>
           <span class='id identifier rubyid_add_line'>add_line</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='label'>template_line:</span> <span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='rparen'>)</span>
         <span class='kw'>else</span>
@@ -1068,14 +1080,14 @@ Tracks merge decisions and provenance for validation and debugging.</p>
 
     <span class='comment'># Use source_analysis to get full line with indentation if available
 </span>    <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_source_analysis'>source_analysis</span>
-      <span class='id identifier rubyid_required_comment_line'>required_comment_line</span><span class='lparen'>(</span>
-        <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
-        <span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span>
-        <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>emitting leading comment from analyzed source</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='rparen'>)</span>
-    <span class='kw'>else</span>
-      <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span>
-    <span class='kw'>end</span>
+             <span class='id identifier rubyid_required_comment_line'>required_comment_line</span><span class='lparen'>(</span>
+               <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
+               <span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span>
+               <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>emitting leading comment from analyzed source</span><span class='tstring_end'>&#39;</span></span>
+             <span class='rparen'>)</span>
+           <span class='kw'>else</span>
+             <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span>
+           <span class='kw'>end</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_source'>source</span> <span class='op'>==</span> <span class='symbol'>:template</span>
       <span class='id identifier rubyid_add_line'>add_line</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='label'>template_line:</span> <span class='id identifier rubyid_comment_line'>comment_line</span><span class='rparen'>)</span>
     <span class='kw'>else</span>
@@ -1090,11 +1102,15 @@ Tracks merge decisions and provenance for validation and debugging.</p>
     <span class='id identifier rubyid_last_comment_line'>last_comment_line</span> <span class='op'>=</span> <span class='id identifier rubyid_node_info'>node_info</span><span class='lbracket'>[</span><span class='symbol'>:leading_comments</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_last_comment_line'>last_comment_line</span> <span class='op'>+</span> <span class='int'>1</span>
       <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_last_comment_line'>last_comment_line</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span><span class='op'>...</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='op'>|</span>
-        <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_source_analysis'>source_analysis</span> <span class='op'>?</span> <span class='id identifier rubyid_required_source_line'>required_source_line</span><span class='lparen'>(</span>
-          <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
-          <span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='comma'>,</span>
-          <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>emitting preserved blank line before node body</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='rparen'>)</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_source_analysis'>source_analysis</span>
+                 <span class='id identifier rubyid_required_source_line'>required_source_line</span><span class='lparen'>(</span>
+                   <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
+                   <span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='comma'>,</span>
+                   <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>emitting preserved blank line before node body</span><span class='tstring_end'>&#39;</span></span>
+                 <span class='rparen'>)</span>
+               <span class='kw'>else</span>
+                 <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+               <span class='kw'>end</span>
         <span class='kw'>if</span> <span class='id identifier rubyid_source'>source</span> <span class='op'>==</span> <span class='symbol'>:template</span>
           <span class='id identifier rubyid_add_line'>add_line</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='label'>template_line:</span> <span class='id identifier rubyid_blank_line_num'>blank_line_num</span><span class='rparen'>)</span>
         <span class='kw'>else</span>
@@ -1115,7 +1131,7 @@ Tracks merge decisions and provenance for validation and debugging.</p>
       <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_required_source_line'>required_source_line</span><span class='lparen'>(</span>
         <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='comma'>,</span>
         <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
-        <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>emitting analyzed node source line</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>emitting analyzed node source line</span><span class='tstring_end'>&#39;</span></span>
       <span class='rparen'>)</span>
 
       <span class='kw'>if</span> <span class='id identifier rubyid_source'>source</span> <span class='op'>==</span> <span class='symbol'>:template</span>
@@ -1139,8 +1155,8 @@ Tracks merge decisions and provenance for validation and debugging.</p>
         <span class='comment'># Analysis-free mode only has node.slice, which excludes the original
 </span>        <span class='comment'># pre-comment separator. Reattach inline comments with a canonical
 </span>        <span class='comment'># single space instead of pretending to preserve unavailable spacing.
-</span>        <span class='id identifier rubyid_inline_text'>inline_text</span> <span class='op'>=</span> <span class='id identifier rubyid_inline_comments'>inline_comments</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_c'>c</span><span class='op'>|</span> <span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_node_lines'>node_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_last_idx'>last_idx</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_node_lines'>node_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_last_idx'>last_idx</span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span> <span class='op'>+</span> <span class='id identifier rubyid_inline_text'>inline_text</span>
+</span>        <span class='id identifier rubyid_inline_text'>inline_text</span> <span class='op'>=</span> <span class='id identifier rubyid_inline_comments'>inline_comments</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_c'>c</span><span class='op'>|</span> <span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_node_lines'>node_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_last_idx'>last_idx</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node_lines'>node_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_last_idx'>last_idx</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inline_text'>inline_text</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
       <span class='kw'>end</span>
     <span class='kw'>end</span>
 
@@ -1197,14 +1213,6 @@ Tracks merge decisions and provenance for validation and debugging.</p>
       <pre class="lines">
 
 
-211
-212
-213
-214
-215
-216
-217
-218
 219
 220
 221
@@ -1228,39 +1236,47 @@ Tracks merge decisions and provenance for validation and debugging.</p>
 239
 240
 241
-242</pre>
+242
+243
+244
+245
+246
+247
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 219</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_debug_output'>debug_output</span>
-  <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>=== Merge Result Debug ===</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>=== Merge Result Debug ===</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Total lines: </span><span class='embexpr_beg'>#{</span><span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Statistics: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_statistics'>statistics</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Line-by-line provenance:</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Line-by-line provenance:</span><span class='tstring_end'>&#39;</span></span>
 
   <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span>
     <span class='id identifier rubyid_meta'>meta</span> <span class='op'>=</span> <span class='ivar'>@line_metadata</span><span class='lbracket'>[</span><span class='id identifier rubyid_idx'>idx</span><span class='rbracket'>]</span>
     <span class='id identifier rubyid_parts'>parts</span> <span class='op'>=</span> <span class='lbracket'>[</span>
       <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_idx'>idx</span> <span class='op'>+</span> <span class='int'>1</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:decision</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>20</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:decision</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>20</span><span class='rparen'>)</span>
     <span class='rbracket'>]</span>
 
     <span class='id identifier rubyid_parts'>parts</span> <span class='op'>&lt;&lt;</span> <span class='kw'>if</span> <span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:template_line</span><span class='rbracket'>]</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>T:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:template_line</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>8</span><span class='rparen'>)</span>
-    <span class='kw'>else</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span> <span class='op'>*</span> <span class='int'>8</span>
-    <span class='kw'>end</span>
+               <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>T:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:template_line</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>8</span><span class='rparen'>)</span>
+             <span class='kw'>else</span>
+               <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='int'>8</span>
+             <span class='kw'>end</span>
 
     <span class='id identifier rubyid_parts'>parts</span> <span class='op'>&lt;&lt;</span> <span class='kw'>if</span> <span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:dest_line</span><span class='rbracket'>]</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>D:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:dest_line</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>8</span><span class='rparen'>)</span>
-    <span class='kw'>else</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span> <span class='op'>*</span> <span class='int'>8</span>
-    <span class='kw'>end</span>
+               <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>D:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:dest_line</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>8</span><span class='rparen'>)</span>
+             <span class='kw'>else</span>
+               <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='int'>8</span>
+             <span class='kw'>end</span>
 
     <span class='id identifier rubyid_parts'>parts</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>| </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line'>line</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>60</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_parts'>parts</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_parts'>parts</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_output'>output</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1285,12 +1301,12 @@ Tracks merge decisions and provenance for validation and debugging.</p>
       <pre class="lines">
 
 
-198
-199
-200</pre>
+206
+207
+208</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 198</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 206</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_decision_summary'>decision_summary</span>
   <span class='id identifier rubyid_statistics'>statistics</span>
@@ -1361,12 +1377,12 @@ Tracks merge decisions and provenance for validation and debugging.</p>
       <pre class="lines">
 
 
-205
-206
-207</pre>
+213
+214
+215</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 213</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lines_by_decision'>lines_by_decision</span><span class='lparen'>(</span><span class='id identifier rubyid_decision'>decision</span><span class='rparen'>)</span>
   <span class='ivar'>@line_metadata</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_meta'>meta</span><span class='op'>|</span> <span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:decision</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_decision'>decision</span> <span class='rbrace'>}</span>
@@ -1414,16 +1430,16 @@ Tracks merge decisions and provenance for validation and debugging.</p>
       <pre class="lines">
 
 
-190
-191
-192
-193
-194
-195
-196</pre>
+198
+199
+200
+201
+202
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 190</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_statistics'>statistics</span>
   <span class='id identifier rubyid_stats'>stats</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
@@ -1475,15 +1491,15 @@ Tracks merge decisions and provenance for validation and debugging.</p>
       <pre class="lines">
 
 
-184
-185
-186</pre>
+192
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 184</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/merge_result.rb', line 192</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1495,9 +1511,9 @@ Tracks merge decisions and provenance for validation and debugging.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:09 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::MethodMatchRefiner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -179,7 +179,7 @@
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='float'>0.7</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>MethodSimilarity</span><span class='op'>::</span><span class='const'>DEFAULT_NAME_WEIGHT</span></pre></dd>
       
         <dt id="DEFAULT_PARAMS_WEIGHT-constant" class="">DEFAULT_PARAMS_WEIGHT =
           <div class="docstring">
@@ -194,7 +194,7 @@
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='float'>0.3</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>MethodSimilarity</span><span class='op'>::</span><span class='const'>DEFAULT_PARAMS_WEIGHT</span></pre></dd>
       
     </dl>
   
@@ -277,7 +277,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, _context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
     
 
     
@@ -414,15 +414,25 @@
 48
 49
 50
-51</pre>
+51
+52
+53
+54
+55
+56</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/method_match_refiner.rb', line 47</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='const'>DEFAULT_THRESHOLD</span><span class='comma'>,</span> <span class='label'>name_weight:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_NAME_WEIGHT-constant" title="Prism::Merge::MethodMatchRefiner::DEFAULT_NAME_WEIGHT (constant)">DEFAULT_NAME_WEIGHT</a></span></span><span class='comma'>,</span> <span class='label'>params_weight:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PARAMS_WEIGHT-constant" title="Prism::Merge::MethodMatchRefiner::DEFAULT_PARAMS_WEIGHT (constant)">DEFAULT_PARAMS_WEIGHT</a></span></span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='const'>DEFAULT_THRESHOLD</span><span class='comma'>,</span> <span class='label'>name_weight:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_NAME_WEIGHT-constant" title="Prism::Merge::MethodMatchRefiner::DEFAULT_NAME_WEIGHT (constant)">DEFAULT_NAME_WEIGHT</a></span></span><span class='comma'>,</span>
+               <span class='label'>params_weight:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PARAMS_WEIGHT-constant" title="Prism::Merge::MethodMatchRefiner::DEFAULT_PARAMS_WEIGHT (constant)">DEFAULT_PARAMS_WEIGHT</a></span></span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='id identifier rubyid_threshold'>threshold</span><span class='comma'>,</span> <span class='label'>node_types:</span> <span class='lbracket'>[</span><span class='symbol'>:def</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@name_weight</span> <span class='op'>=</span> <span class='id identifier rubyid_name_weight'>name_weight</span>
   <span class='ivar'>@params_weight</span> <span class='op'>=</span> <span class='id identifier rubyid_params_weight'>params_weight</span>
+  <span class='ivar'>@method_similarity</span> <span class='op'>=</span> <span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>MethodSimilarity</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>name_weight:</span> <span class='id identifier rubyid_name_weight'>name_weight</span><span class='comma'>,</span>
+    <span class='label'>params_weight:</span> <span class='id identifier rubyid_params_weight'>params_weight</span>
+  <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -562,7 +572,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="call-instance_method">
   
-    #<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; <tt>Array&lt;MatchResult&gt;</tt> 
+    #<strong>call</strong>(template_nodes, dest_nodes, _context = {})  &#x21d2; <tt>Array&lt;MatchResult&gt;</tt> 
   
 
   
@@ -617,8 +627,6 @@
         <span class='type'>(<tt>Hash</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>{}</tt>)</em>
-      
       
         &mdash;
         <div class='inline'><p>Additional context</p>
@@ -652,21 +660,21 @@
       <pre class="lines">
 
 
-59
-60
-61
-62
-63
 64
 65
 66
 67
-68</pre>
+68
+69
+70
+71
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/method_match_refiner.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/method_match_refiner.rb', line 64</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid__context'>_context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_template_methods'>template_methods</span> <span class='op'>=</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span> <span class='id identifier rubyid_method_node?'>method_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_dest_methods'>dest_methods</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span> <span class='id identifier rubyid_method_node?'>method_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
 
@@ -686,9 +694,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::ScaffoldChunkRemover
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -126,17 +126,7 @@ by line range, leaving user-added content intact.</p>
   </div>
 
 
-</div><h2>Defined Under Namespace</h2>
-<p class="children">
-  
-    
-  
-    
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="ScaffoldChunkRemover/ChunkSpec.html" title="Prism::Merge::ScaffoldChunkRemover::ChunkSpec (class)">ChunkSpec</a></span>
-    
-  
-</p>
-
+</div>
   
     <h2>
       Constant Summary
@@ -145,58 +135,35 @@ by line range, leaving user-added content intact.</p>
 
     <dl class="constants">
       
+        <dt id="ChunkSpec-constant" class="">ChunkSpec =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='op'>::</span><span class='const'>ChunkSpec</span></pre></dd>
+      
         <dt id="BUNDLER_GEM_TASKS_SPEC-constant" class="">BUNDLER_GEM_TASKS_SPEC =
           
         </dt>
-        <dd><pre class="code"><span class='const'><span class='object_link'><a href="ScaffoldChunkRemover/ChunkSpec.html" title="Prism::Merge::ScaffoldChunkRemover::ChunkSpec (class)">ChunkSpec</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::ScaffoldChunkRemover#initialize (method)">new</a></span></span><span class='lparen'>(</span>
-  <span class='label'>anchor_type:</span> <span class='symbol'>:require_call</span><span class='comma'>,</span>
-  <span class='label'>anchor_value:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bundler/gem_tasks</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='label'>satellite_patterns:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-  <span class='label'>jaccard_threshold:</span> <span class='float'>0.35</span><span class='comma'>,</span>
-  <span class='label'>max_lookahead:</span> <span class='int'>0</span><span class='comma'>,</span>
-  <span class='label'>max_lookbehind:</span> <span class='int'>0</span><span class='comma'>,</span>
-<span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='op'>::</span><span class='const'>BUNDLER_GEM_TASKS_SPEC</span></pre></dd>
       
         <dt id="RSPEC_SPEC-constant" class="">RSPEC_SPEC =
           
         </dt>
-        <dd><pre class="code"><span class='const'><span class='object_link'><a href="ScaffoldChunkRemover/ChunkSpec.html" title="Prism::Merge::ScaffoldChunkRemover::ChunkSpec (class)">ChunkSpec</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::ScaffoldChunkRemover#initialize (method)">new</a></span></span><span class='lparen'>(</span>
-  <span class='label'>anchor_type:</span> <span class='symbol'>:require_call</span><span class='comma'>,</span>
-  <span class='label'>anchor_value:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rspec/core/rake_task</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='label'>satellite_patterns:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>RSpec::Core::RakeTask.new</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
-  <span class='label'>jaccard_threshold:</span> <span class='float'>0.35</span><span class='comma'>,</span>
-  <span class='label'>max_lookahead:</span> <span class='int'>5</span><span class='comma'>,</span>
-  <span class='label'>max_lookbehind:</span> <span class='int'>2</span><span class='comma'>,</span>
-<span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='op'>::</span><span class='const'>RSPEC_SPEC</span></pre></dd>
       
         <dt id="RUBOCOP_SPEC-constant" class="">RUBOCOP_SPEC =
           
         </dt>
-        <dd><pre class="code"><span class='const'><span class='object_link'><a href="ScaffoldChunkRemover/ChunkSpec.html" title="Prism::Merge::ScaffoldChunkRemover::ChunkSpec (class)">ChunkSpec</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::ScaffoldChunkRemover#initialize (method)">new</a></span></span><span class='lparen'>(</span>
-  <span class='label'>anchor_type:</span> <span class='symbol'>:require_call</span><span class='comma'>,</span>
-  <span class='label'>anchor_value:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rubocop/rake_task</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='label'>satellite_patterns:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>RuboCop::RakeTask.new</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
-  <span class='label'>jaccard_threshold:</span> <span class='float'>0.35</span><span class='comma'>,</span>
-  <span class='label'>max_lookahead:</span> <span class='int'>5</span><span class='comma'>,</span>
-  <span class='label'>max_lookbehind:</span> <span class='int'>2</span><span class='comma'>,</span>
-<span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='op'>::</span><span class='const'>RUBOCOP_SPEC</span></pre></dd>
       
         <dt id="DEFAULT_TASK_SPEC-constant" class="">DEFAULT_TASK_SPEC =
           
         </dt>
-        <dd><pre class="code"><span class='const'><span class='object_link'><a href="ScaffoldChunkRemover/ChunkSpec.html" title="Prism::Merge::ScaffoldChunkRemover::ChunkSpec (class)">ChunkSpec</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::ScaffoldChunkRemover#initialize (method)">new</a></span></span><span class='lparen'>(</span>
-  <span class='label'>anchor_type:</span> <span class='symbol'>:task_call</span><span class='comma'>,</span>
-  <span class='label'>anchor_value:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='label'>satellite_patterns:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-  <span class='label'>jaccard_threshold:</span> <span class='float'>0.35</span><span class='comma'>,</span>
-  <span class='label'>max_lookahead:</span> <span class='int'>0</span><span class='comma'>,</span>
-  <span class='label'>max_lookbehind:</span> <span class='int'>0</span><span class='comma'>,</span>
-<span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='op'>::</span><span class='const'>DEFAULT_TASK_SPEC</span></pre></dd>
       
         <dt id="ALL_SPECS-constant" class="">ALL_SPECS =
           
         </dt>
-        <dd><pre class="code"><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BUNDLER_GEM_TASKS_SPEC-constant" title="Prism::Merge::ScaffoldChunkRemover::BUNDLER_GEM_TASKS_SPEC (constant)">BUNDLER_GEM_TASKS_SPEC</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#RSPEC_SPEC-constant" title="Prism::Merge::ScaffoldChunkRemover::RSPEC_SPEC (constant)">RSPEC_SPEC</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#RUBOCOP_SPEC-constant" title="Prism::Merge::ScaffoldChunkRemover::RUBOCOP_SPEC (constant)">RUBOCOP_SPEC</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#DEFAULT_TASK_SPEC-constant" title="Prism::Merge::ScaffoldChunkRemover::DEFAULT_TASK_SPEC (constant)">DEFAULT_TASK_SPEC</a></span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='op'>::</span><span class='const'>ALL_SPECS</span></pre></dd>
       
     </dl>
   
@@ -328,13 +295,13 @@ by line range, leaving user-added content intact.</p>
       <pre class="lines">
 
 
-70
-71
-72
-73</pre>
+29
+30
+31
+32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/scaffold_chunk_remover.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/scaffold_chunk_remover.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_specs'>specs</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#ALL_SPECS-constant" title="Prism::Merge::ScaffoldChunkRemover::ALL_SPECS (constant)">ALL_SPECS</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
@@ -367,12 +334,12 @@ by line range, leaving user-added content intact.</p>
       <pre class="lines">
 
 
-65
-66
-67</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/scaffold_chunk_remover.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/scaffold_chunk_remover.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove'>remove</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_specs'>specs</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#ALL_SPECS-constant" title="Prism::Merge::ScaffoldChunkRemover::ALL_SPECS (constant)">ALL_SPECS</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_specs'>specs</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
@@ -403,6 +370,47 @@ by line range, leaving user-added content intact.</p>
       <pre class="lines">
 
 
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
 75
 76
 77
@@ -416,54 +424,17 @@ by line range, leaving user-added content intact.</p>
 85
 86
 87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127</pre>
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/scaffold_chunk_remover.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/scaffold_chunk_remover.rb', line 34</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span>
   <span class='kw'>return</span> <span class='ivar'>@source</span> <span class='kw'>if</span> <span class='ivar'>@source</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
-  <span class='id identifier rubyid_parse_result'>parse_result</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:ruby</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='ivar'>@source</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse_result'>parse_result</span>
+  <span class='id identifier rubyid_parse_result'>parse_result</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Prism::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html#BACKEND_REFERENCE-constant" title="Prism::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:ruby</span><span class='comma'>,</span> <span class='label'>backend_type:</span> <span class='symbol'>:prism</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='ivar'>@source</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse_result'>parse_result</span>
+  <span class='kw'>end</span>
   <span class='id identifier rubyid_statements'>statements</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_body'>body</span><span class='op'>&amp;.</span><span class='id identifier rubyid_compact'>compact</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='kw'>return</span> <span class='ivar'>@source</span> <span class='kw'>if</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
@@ -480,13 +451,13 @@ by line range, leaving user-added content intact.</p>
       <span class='id identifier rubyid_end_idx'>end_idx</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>-</span> <span class='int'>1</span><span class='comma'>,</span> <span class='id identifier rubyid_anchor_idx'>anchor_idx</span> <span class='op'>+</span> <span class='id identifier rubyid_spec'>spec</span><span class='period'>.</span><span class='id identifier rubyid_max_lookahead'>max_lookahead</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_min'>min</span>
 
       <span class='id identifier rubyid_spec'>spec</span><span class='period'>.</span><span class='id identifier rubyid_satellite_patterns'>satellite_patterns</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_pattern'>pattern</span><span class='op'>|</span>
-        <span class='id identifier rubyid_p_tokens'>p_tokens</span> <span class='op'>=</span> <span class='id identifier rubyid_jaccard_tokens'>jaccard_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_p_tokens'>p_tokens</span> <span class='op'>=</span> <span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='period'>.</span><span class='id identifier rubyid_jaccard_tokens'>jaccard_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span>
         <span class='lparen'>(</span><span class='id identifier rubyid_start_idx'>start_idx</span><span class='op'>..</span><span class='id identifier rubyid_end_idx'>end_idx</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
           <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>==</span> <span class='id identifier rubyid_anchor_idx'>anchor_idx</span>
 
           <span class='id identifier rubyid_candidate'>candidate</span> <span class='op'>=</span> <span class='id identifier rubyid_statements'>statements</span><span class='lbracket'>[</span><span class='id identifier rubyid_i'>i</span><span class='rbracket'>]</span>
-          <span class='id identifier rubyid_c_tokens'>c_tokens</span> <span class='op'>=</span> <span class='id identifier rubyid_jaccard_tokens'>jaccard_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
-          <span class='id identifier rubyid_score'>score</span> <span class='op'>=</span> <span class='id identifier rubyid_jaccard'>jaccard</span><span class='lparen'>(</span><span class='id identifier rubyid_p_tokens'>p_tokens</span><span class='comma'>,</span> <span class='id identifier rubyid_c_tokens'>c_tokens</span><span class='rparen'>)</span>
+          <span class='id identifier rubyid_c_tokens'>c_tokens</span> <span class='op'>=</span> <span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='period'>.</span><span class='id identifier rubyid_jaccard_tokens'>jaccard_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+          <span class='id identifier rubyid_score'>score</span> <span class='op'>=</span> <span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ScaffoldChunkSupport</span><span class='period'>.</span><span class='id identifier rubyid_jaccard'>jaccard</span><span class='lparen'>(</span><span class='id identifier rubyid_p_tokens'>p_tokens</span><span class='comma'>,</span> <span class='id identifier rubyid_c_tokens'>c_tokens</span><span class='rparen'>)</span>
           <span class='id identifier rubyid_nodes_to_remove'>nodes_to_remove</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_candidate'>candidate</span> <span class='kw'>if</span> <span class='id identifier rubyid_score'>score</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_spec'>spec</span><span class='period'>.</span><span class='id identifier rubyid_jaccard_threshold'>jaccard_threshold</span>
         <span class='kw'>end</span>
       <span class='kw'>end</span>
@@ -523,9 +494,9 @@ by line range, leaving user-added content intact.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

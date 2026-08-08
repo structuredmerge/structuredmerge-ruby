@@ -6,7 +6,7 @@
 <title>
   Module: Prism::Merge::NestedStatementWalker
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -187,7 +187,7 @@ parser-agnostic merge primitive.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#walk_with_context-class_method" title="walk_with_context (class method)">.<strong>walk_with_context</strong>(body_node, context_stack: [], next_context:, &amp;block)  &#x21d2; Object </a>
+      <a href="#walk_with_context-class_method" title="walk_with_context (class method)">.<strong>walk_with_context</strong>(body_node, next_context:, context_stack: [], &amp;block)  &#x21d2; Object </a>
     
 
     
@@ -301,13 +301,13 @@ parser-agnostic merge primitive.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_nested_statement_children'>nested_statement_children</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='const'><span class='object_link'><a href="NodeTypeNormalizer.html" title="Prism::Merge::NodeTypeNormalizer (module)">NodeTypeNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'><span class='object_link'><a href="NodeTypeNormalizer.html#canonical_type-class_method" title="Prism::Merge::NodeTypeNormalizer.canonical_type (method)">canonical_type</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='symbol'>:prism</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:call</span>
-    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_block'>block</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='lbrace'>{</span><span class='label'>kind:</span> <span class='symbol'>:call_block</span><span class='comma'>,</span> <span class='label'>body:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='rbrace'>}</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_block'>block</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>kind:</span> <span class='symbol'>:call_block</span><span class='comma'>,</span> <span class='label'>body:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span> <span class='rbrace'>}</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:if</span>
     <span class='id identifier rubyid_conditional_children'>conditional_children</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='symbol'>:if_body</span><span class='comma'>,</span> <span class='symbol'>:if_subsequent</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:unless</span>
     <span class='id identifier rubyid_conditional_children'>conditional_children</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='symbol'>:unless_body</span><span class='comma'>,</span> <span class='symbol'>:unless_subsequent</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:else</span>
-    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='lbrace'>{</span><span class='label'>kind:</span> <span class='symbol'>:else_body</span><span class='comma'>,</span> <span class='label'>body:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='rbrace'>}</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>kind:</span> <span class='symbol'>:else_body</span><span class='comma'>,</span> <span class='label'>body:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span> <span class='rbrace'>}</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='kw'>else</span>
     <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
@@ -364,7 +364,7 @@ parser-agnostic merge primitive.</p>
       <div class="method_details ">
   <h3 class="signature " id="walk_with_context-class_method">
   
-    .<strong>walk_with_context</strong>(body_node, context_stack: [], next_context:, &amp;block)  &#x21d2; <tt>Object</tt> 
+    .<strong>walk_with_context</strong>(body_node, next_context:, context_stack: [], &amp;block)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -400,7 +400,7 @@ parser-agnostic merge primitive.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/nested_statement_walker.rb', line 24</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_walk_with_context'>walk_with_context</span><span class='lparen'>(</span><span class='id identifier rubyid_body_node'>body_node</span><span class='comma'>,</span> <span class='label'>context_stack:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>next_context:</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_walk_with_context'>walk_with_context</span><span class='lparen'>(</span><span class='id identifier rubyid_body_node'>body_node</span><span class='comma'>,</span> <span class='label'>next_context:</span><span class='comma'>,</span> <span class='label'>context_stack:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_enum_for'>enum_for</span><span class='lparen'>(</span><span class='id identifier rubyid___method__'>__method__</span><span class='comma'>,</span> <span class='id identifier rubyid_body_node'>body_node</span><span class='comma'>,</span> <span class='label'>context_stack:</span> <span class='id identifier rubyid_context_stack'>context_stack</span><span class='comma'>,</span> <span class='label'>next_context:</span> <span class='id identifier rubyid_next_context'>next_context</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
 
   <span class='id identifier rubyid_extract_statements'>extract_statements</span><span class='lparen'>(</span><span class='id identifier rubyid_body_node'>body_node</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span>
@@ -412,7 +412,7 @@ parser-agnostic merge primitive.</p>
         <span class='label'>context_stack:</span> <span class='id identifier rubyid_next_context'>next_context</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span>
           <span class='label'>node:</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span>
           <span class='label'>child_kind:</span> <span class='id identifier rubyid_child'>child</span><span class='lbracket'>[</span><span class='symbol'>:kind</span><span class='rbracket'>]</span><span class='comma'>,</span>
-          <span class='label'>current_context:</span> <span class='id identifier rubyid_context_stack'>context_stack</span><span class='comma'>,</span>
+          <span class='label'>current_context:</span> <span class='id identifier rubyid_context_stack'>context_stack</span>
         <span class='rparen'>)</span><span class='comma'>,</span>
         <span class='label'>next_context:</span> <span class='id identifier rubyid_next_context'>next_context</span><span class='comma'>,</span>
         <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span>
@@ -430,9 +430,9 @@ parser-agnostic merge primitive.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:09 2026 by
+  Generated on Sat Aug  8 01:05:27 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

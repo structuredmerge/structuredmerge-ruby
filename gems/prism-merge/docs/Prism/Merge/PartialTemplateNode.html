@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::PartialTemplateNode
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -469,14 +469,14 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-59
 60
 61
 62
-63</pre>
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_public_send'>public_send</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span>
@@ -557,12 +557,12 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-46
 47
-48</pre>
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
   <span class='id identifier rubyid_source_position'>source_position</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:end_line</span><span class='rparen'>)</span>
@@ -587,13 +587,13 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-54
 55
 56
-57</pre>
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inner_node'>inner_node</span>
   <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span>
@@ -619,12 +619,12 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-50
 51
-52</pre>
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_location'>location</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span>
@@ -672,12 +672,12 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-65
 66
-67</pre>
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -702,7 +702,6 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-32
 33
 34
 35
@@ -710,10 +709,11 @@ merger thin without changing the full SmartMerger path.</p>
 37
 38
 39
-40</pre>
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source_position'>source_position</span>
   <span class='id identifier rubyid_loc'>loc</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span>
@@ -721,7 +721,7 @@ merger thin without changing the full SmartMerger path.</p>
 
   <span class='lbrace'>{</span>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_loc'>loc</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
-    <span class='label'>end_line:</span> <span class='id identifier rubyid_loc'>loc</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
+    <span class='label'>end_line:</span> <span class='id identifier rubyid_loc'>loc</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -744,12 +744,12 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-42
 43
-44</pre>
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
   <span class='id identifier rubyid_source_position'>source_position</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:start_line</span><span class='rparen'>)</span>
@@ -774,12 +774,12 @@ merger thin without changing the full SmartMerger path.</p>
       <pre class="lines">
 
 
-28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text'>text</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -810,7 +810,8 @@ merger thin without changing the full SmartMerger path.</p>
 23
 24
 25
-26</pre>
+26
+27</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/partial_template_node.rb', line 20</span>
@@ -820,6 +821,7 @@ merger thin without changing the full SmartMerger path.</p>
 
   <span class='id identifier rubyid_ct'>ct</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="NodeTypeNormalizer.html" title="Prism::Merge::NodeTypeNormalizer (module)">NodeTypeNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'><span class='object_link'><a href="NodeTypeNormalizer.html#canonical_type-class_method" title="Prism::Merge::NodeTypeNormalizer.canonical_type (method)">canonical_type</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='symbol'>:prism</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='symbol'>:call_with_block</span> <span class='kw'>if</span> <span class='id identifier rubyid_ct'>ct</span> <span class='op'>==</span> <span class='symbol'>:call</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_block'>block</span>
+
   <span class='id identifier rubyid_ct'>ct</span> <span class='op'>||</span> <span class='id identifier rubyid_fallback_type_name'>fallback_type_name</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -832,9 +834,9 @@ merger thin without changing the full SmartMerger path.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

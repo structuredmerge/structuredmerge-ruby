@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::BeginNodeClauseHeaderEmitter
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -355,15 +355,17 @@
 40
 41
 42
-43</pre>
+43
+44</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_clause_header_emitter.rb', line 14</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_emit'>emit</span><span class='lparen'>(</span><span class='label'>template_clause_node:</span><span class='comma'>,</span> <span class='label'>template_region:</span><span class='comma'>,</span> <span class='label'>dest_clause_node:</span><span class='comma'>,</span> <span class='label'>dest_region:</span><span class='comma'>,</span> <span class='label'>header_source:</span><span class='comma'>,</span> <span class='label'>decision:</span><span class='comma'>,</span> <span class='label'>template_inline_by_line:</span><span class='comma'>,</span> <span class='label'>dest_inline_by_line:</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_header_node'>header_node</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_template_clause_node'>template_clause_node</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span>
-  <span class='id identifier rubyid_header_region'>header_region</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_template_region'>template_region</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_region'>dest_region</span>
-  <span class='id identifier rubyid_header_analysis'>header_analysis</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span> <span class='op'>:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_emit'>emit</span><span class='lparen'>(</span><span class='label'>template_clause_node:</span><span class='comma'>,</span> <span class='label'>template_region:</span><span class='comma'>,</span> <span class='label'>dest_clause_node:</span><span class='comma'>,</span> <span class='label'>dest_region:</span><span class='comma'>,</span> <span class='label'>header_source:</span><span class='comma'>,</span> <span class='label'>decision:</span><span class='comma'>,</span>
+         <span class='label'>template_inline_by_line:</span><span class='comma'>,</span> <span class='label'>dest_inline_by_line:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_header_node'>header_node</span> <span class='op'>=</span> <span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>?</span> <span class='id identifier rubyid_template_clause_node'>template_clause_node</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span>
+  <span class='id identifier rubyid_header_region'>header_region</span> <span class='op'>=</span> <span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>?</span> <span class='id identifier rubyid_template_region'>template_region</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_region'>dest_region</span>
+  <span class='id identifier rubyid_header_analysis'>header_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>?</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span> <span class='op'>:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span>
   <span class='id identifier rubyid_header_end_line'>header_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:clause_header_end_line</span><span class='comma'>,</span> <span class='id identifier rubyid_header_node'>header_node</span><span class='comma'>,</span> <span class='id identifier rubyid_header_region'>header_region</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_template_header_end_line'>template_header_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:clause_header_end_line</span><span class='comma'>,</span> <span class='id identifier rubyid_template_clause_node'>template_clause_node</span><span class='comma'>,</span> <span class='id identifier rubyid_template_region'>template_region</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_dest_header_end_line'>dest_header_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:clause_header_end_line</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_clause_node'>dest_clause_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_region'>dest_region</span><span class='rparen'>)</span>
@@ -372,12 +374,12 @@
     <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_required_source_line'>required_source_line</span><span class='lparen'>(</span>
       <span class='id identifier rubyid_header_analysis'>header_analysis</span><span class='comma'>,</span>
       <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
-      <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>emitting begin-clause header line</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>context:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>emitting begin-clause header line</span><span class='tstring_end'>&#39;</span></span>
     <span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>&amp;&amp;</span>
-        <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>==</span> <span class='id identifier rubyid_template_header_end_line'>template_header_end_line</span> <span class='op'>&amp;&amp;</span>
-        <span class='id identifier rubyid_template_inline_by_line'>template_inline_by_line</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+       <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>==</span> <span class='id identifier rubyid_template_header_end_line'>template_header_end_line</span> <span class='op'>&amp;&amp;</span>
+       <span class='id identifier rubyid_template_inline_by_line'>template_inline_by_line</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
       <span class='id identifier rubyid_dest_clause_inline'>dest_clause_inline</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_inline_by_line'>dest_inline_by_line</span><span class='lbracket'>[</span><span class='id identifier rubyid_dest_header_end_line'>dest_header_end_line</span><span class='rbracket'>]</span>
       <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:append_inline_comment_entries</span><span class='comma'>,</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_clause_inline'>dest_clause_inline</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_dest_clause_inline'>dest_clause_inline</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
     <span class='kw'>end</span>
@@ -385,8 +387,8 @@
     <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_add_line'>add_line</span><span class='lparen'>(</span>
       <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span>
       <span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span>
-      <span class='label'>template_line:</span> <span class='lparen'>(</span><span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-      <span class='label'>dest_line:</span> <span class='lparen'>(</span><span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:destination</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>template_line:</span> <span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>?</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>dest_line:</span> <span class='id identifier rubyid_header_source'>header_source</span> <span class='op'>==</span> <span class='symbol'>:destination</span> <span class='op'>?</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>:</span> <span class='kw'>nil</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -400,9 +402,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

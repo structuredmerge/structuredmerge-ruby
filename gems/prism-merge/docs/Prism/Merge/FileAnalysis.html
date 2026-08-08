@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::FileAnalysis
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -161,7 +161,7 @@ and the CommentNode class.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>prism-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
         <dt id="GEMSPEC_VAR_PLACEHOLDER-constant" class="">GEMSPEC_VAR_PLACEHOLDER =
           <div class="docstring">
@@ -180,7 +180,7 @@ this placeholder so they match regardless of the variable name chosen by the aut
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='symbol'>:__gemspec_var__</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>GemspecSupport</span><span class='op'>::</span><span class='const'>GEMSPEC_VAR_PLACEHOLDER</span></pre></dd>
       
     </dl>
   
@@ -644,7 +644,7 @@ this placeholder so they match regardless of the variable name chosen by the aut
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **options)  &#x21d2; FileAnalysis </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **_options)  &#x21d2; FileAnalysis </a>
     
 
     
@@ -707,6 +707,29 @@ this placeholder so they match regardless of the variable name chosen by the aut
 
   
     <span class="summary_desc"><div class='inline'><p>Build a shared layout augmenter for this analysis using native Prism locations.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#leading_comments_for_owner-instance_method" title="#leading_comments_for_owner (instance method)">#<strong>leading_comments_for_owner</strong>(owner, owners: statements)  &#x21d2; Array&lt;Prism::Comment&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return comments that lead +owner+ within the provided top-level owner set.</p>
 </div></span>
   
 </li>
@@ -907,7 +930,7 @@ this placeholder so they match regardless of the variable name chosen by the aut
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
+    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
   
 
   
@@ -997,14 +1020,6 @@ this placeholder so they match regardless of the variable name chosen by the aut
       <pre class="lines">
 
 
-204
-205
-206
-207
-208
-209
-210
-211
 212
 213
 214
@@ -1027,12 +1042,24 @@ this placeholder so they match regardless of the variable name chosen by the aut
 231
 232
 233
-234</pre>
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 204</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 212</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Prism::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Prism::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+               <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
   <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
   <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
@@ -1044,9 +1071,11 @@ this placeholder so they match regardless of the variable name chosen by the aut
 </span>  <span class='comment'># Store the full tree_haver result so downstream code can use @tree.comments
 </span>  <span class='comment'># (normalized, deduplicated, with attachment hints) rather than accessing raw
 </span>  <span class='comment'># Prism::Comment objects via @parse_result.comments or node.location.leading_comments.
-</span>  <span class='ivar'>@tree</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Prism::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis#parse</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span>
-    <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:ruby</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
-  <span class='rbrace'>}</span>
+</span>  <span class='ivar'>@tree</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Prism::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis#parse</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Prism::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html#BACKEND_REFERENCE-constant" title="Prism::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='kw'>do</span>
+      <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:ruby</span><span class='comma'>,</span> <span class='label'>backend_type:</span> <span class='symbol'>:prism</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
   <span class='ivar'>@parse_result</span> <span class='op'>=</span> <span class='ivar'>@tree</span><span class='period'>.</span><span class='id identifier rubyid_parse_result'>parse_result</span>
   <span class='ivar'>@gemspec_block_var</span> <span class='op'>=</span> <span class='id identifier rubyid_detect_gemspec_block_var'>detect_gemspec_block_var</span>
 
@@ -1057,11 +1086,11 @@ this placeholder so they match regardless of the variable name chosen by the aut
   <span class='comment'># Extract and validate structure
 </span>  <span class='ivar'>@statements</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_and_integrate_all_nodes'>extract_and_integrate_all_nodes</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Prism::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>frozen_nodes_count:</span> <span class='id identifier rubyid_frozen_nodes'>frozen_nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Prism::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                      <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                      <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>frozen_nodes_count:</span> <span class='id identifier rubyid_frozen_nodes'>frozen_nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+                    <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1102,12 +1131,12 @@ nested body merges where the outer wrapper is not present in the body text.</p>
       <pre class="lines">
 
 
-177
-178
-179</pre>
+184
+185
+186</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 177</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 184</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_gemspec_block_var'>gemspec_block_var</span>
   <span class='ivar'>@gemspec_block_var</span>
@@ -1161,12 +1190,12 @@ nested body merges where the outer wrapper is not present in the body text.</p>
       <pre class="lines">
 
 
-172
-173
-174</pre>
+179
+180
+181</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 172</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 179</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_result'>parse_result</span>
   <span class='ivar'>@parse_result</span>
@@ -1220,12 +1249,12 @@ nested body merges where the outer wrapper is not present in the body text.</p>
       <pre class="lines">
 
 
-169
-170
-171</pre>
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 169</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree'>tree</span>
   <span class='ivar'>@tree</span>
@@ -1291,35 +1320,33 @@ that needs to attach comments to a parse result.</p>
       <pre class="lines">
 
 
-519
-520
-521
-522
-523
-524
-525
-526
-527
-528
-529
-530
-531</pre>
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 519</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 554</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attach_comments_safely!'>attach_comments_safely!</span><span class='lparen'>(</span><span class='id identifier rubyid_parse_result'>parse_result</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_attach_comments!'>attach_comments!</span>
-<span class='comment'># :nocov: defensive - JRuby compatibility for Comments class autoloading
+<span class='comment'># simplecov:disable defensive - JRuby compatibility for Comments class autoloading
 </span><span class='kw'>rescue</span> <span class='const'>NameError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Comments</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='comment'># On JRuby, the Comments class needs to be explicitly required
-</span>    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism/parse_result/comments</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_attach_comments!'>attach_comments!</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span>
-  <span class='kw'>end</span>
-  <span class='comment'># :nocov:
+  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Comments</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='comment'># On JRuby, the Comments class needs to be explicitly required
+</span>  <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>prism/parse_result/comments</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_attach_comments!'>attach_comments!</span>
+
+  <span class='comment'># simplecov:enable
 </span><span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1378,12 +1405,12 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-194
-195
-196</pre>
+202
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 194</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 202</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_claimed_lines'>claimed_lines</span>
   <span class='ivar'>@claimed_lines</span> <span class='op'>||=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -1465,50 +1492,46 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-336
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364</pre>
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 336</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 373</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_leading_entries'>leading_entries</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_leading_comment_entries'>owner_leading_comment_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_split_preamble'>split_preamble</span> <span class='op'>=</span> <span class='id identifier rubyid_split_first_owner_preamble?'>split_first_owner_preamble?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_split_preamble'>split_preamble</span>
-    <span class='id identifier rubyid__preamble_entries'>_preamble_entries</span><span class='comma'>,</span> <span class='id identifier rubyid_leading_entries'>leading_entries</span> <span class='op'>=</span> <span class='id identifier rubyid_split_first_owner_preamble_entries'>split_first_owner_preamble_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid__preamble_entries'>_preamble_entries</span><span class='comma'>,</span> <span class='id identifier rubyid_leading_entries'>leading_entries</span> <span class='op'>=</span> <span class='id identifier rubyid_split_first_owner_preamble_entries'>split_first_owner_preamble_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_split_preamble'>split_preamble</span>
 
   <span class='id identifier rubyid_leading_region'>leading_region</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span>
     <span class='symbol'>:leading</span><span class='comma'>,</span>
     <span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_split_preamble'>split_preamble</span> <span class='op'>?</span> <span class='lbrace'>{</span><span class='label'>floating:</span> <span class='kw'>true</span><span class='rbrace'>}</span> <span class='op'>:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_split_preamble'>split_preamble</span> <span class='op'>?</span> <span class='lbrace'>{</span> <span class='label'>floating:</span> <span class='kw'>true</span> <span class='rbrace'>}</span> <span class='op'>:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_inline_region'>inline_region</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='symbol'>:inline</span><span class='comma'>,</span> <span class='id identifier rubyid_owner_inline_comment_entries'>owner_inline_comment_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_trailing_region'>trailing_region</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='symbol'>:trailing</span><span class='comma'>,</span> <span class='id identifier rubyid_owner_trailing_comment_entries'>owner_trailing_comment_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -1523,8 +1546,8 @@ those comment lines as leading_comments of adjacent code nodes.</p>
     <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>source:</span> <span class='symbol'>:prism_native</span><span class='comma'>,</span>
-      <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1606,12 +1629,12 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-371
-372
-373</pre>
+406
+407
+408</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 371</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 406</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter (class)">NativeCommentAugmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html#initialize-instance_method" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -1659,18 +1682,18 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-251
-252
-253
-254
-255
-256
-257
-258
-259</pre>
+262
+263
+264
+265
+266
+267
+268
+269
+270</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 251</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 262</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
   <span class='ivar'>@comment_capability</span> <span class='op'>||=</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Comment</span><span class='op'>::</span><span class='const'>Capability</span><span class='period'>.</span><span class='id identifier rubyid_native_full'>native_full</span><span class='lparen'>(</span>
@@ -1678,7 +1701,7 @@ those comment lines as leading_comments of adjacent code nodes.</p>
     <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
     <span class='label'>attachment_hints:</span> <span class='kw'>true</span><span class='comma'>,</span>
     <span class='label'>comment_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
-    <span class='label'>comment_count:</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>comment_count:</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1743,12 +1766,12 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-315
-316
-317</pre>
+326
+327
+328</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 315</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 326</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_native_comment_entries'>native_comment_entries</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:line</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='rbrace'>}</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:node</span><span class='rparen'>)</span>
@@ -1796,12 +1819,12 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-307
-308
-309</pre>
+318
+319
+320</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 307</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 318</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
   <span class='id identifier rubyid_native_comment_entries'>native_comment_entries</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:node</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
@@ -1900,19 +1923,19 @@ those comment lines as leading_comments of adjacent code nodes.</p>
       <pre class="lines">
 
 
-325
-326
-327
-328
-329</pre>
+336
+337
+338
+339
+340</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 325</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 336</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>kind:</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='id identifier rubyid_native_comment_entries_in_range'>native_comment_entries_in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:full_line</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span>
-  <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_entries'>entries</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_entries'>entries</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1960,22 +1983,22 @@ still flows through ast-merge’s synthetic ownership/emission layer.</p>
       <pre class="lines">
 
 
-267
-268
-269
-270
-271
-272
-273</pre>
+278
+279
+280
+281
+282
+283
+284</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 267</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 278</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
   <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
     <span class='label'>source:</span> <span class='symbol'>:prism</span><span class='comma'>,</span>
     <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
-    <span class='label'>read_strategy:</span> <span class='symbol'>:native_read_portable_write</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='symbol'>:native_read_portable_write</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2025,12 +2048,12 @@ still flows through ast-merge’s synthetic ownership/emission layer.</p>
       <pre class="lines">
 
 
-244
-245
-246</pre>
+255
+256
+257</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 244</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 255</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
   <span class='ivar'>@parse_result</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span>
@@ -2101,12 +2124,12 @@ still flows through ast-merge’s synthetic ownership/emission layer.</p>
       <pre class="lines">
 
 
-428
-429
-430</pre>
+463
+464
+465</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 428</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 463</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:canonical_type</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'>Node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -2173,17 +2196,17 @@ still flows through ast-merge’s synthetic ownership/emission layer.</p>
       <pre class="lines">
 
 
-487
-488
-489
-490
-491
-492
-493
-494</pre>
+522
+523
+524
+525
+526
+527
+528
+529</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 487</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 522</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze_block_at'>freeze_block_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_block'>block</span><span class='op'>|</span>
@@ -2285,33 +2308,33 @@ body merging, where each nested statement gets its own freeze detection.</p>
       <pre class="lines">
 
 
-446
-447
-448
-449
-450
-451
-452
-453
-454
-455
-456
-457
-458
-459
-460
-461
-462
-463
-464
-465
-466
-467
-468
-469</pre>
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 446</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 481</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_frozen_node?'>frozen_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>claimed_lines:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span>
   <span class='comment'># Already wrapped as frozen
@@ -2386,23 +2409,23 @@ allowing them to satisfy both is_a?(Freezable) and is_a?(NodeTyping::Wrapper).</
       <pre class="lines">
 
 
-501
-502
-503
-504
-505
-506
-507</pre>
+536
+537
+538
+539
+540
+541
+542</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 501</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 536</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_frozen_nodes'>frozen_nodes</span>
   <span class='comment'># Return the underlying Prism nodes for tests and callers that expect
 </span>  <span class='comment'># Prism node types. Statements may be wrapped in FrozenWrapper; unwrap
 </span>  <span class='comment'># them here.
 </span>  <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Freezable</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-    <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span> <span class='rbrace'>}</span>
+            <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2470,12 +2493,12 @@ range checks rather than the FileAnalyzable default.</p>
       <pre class="lines">
 
 
-479
-480
-481</pre>
+514
+515
+516</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 479</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 514</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_in_freeze_block?'>in_freeze_block?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='id identifier rubyid_freeze_block_at'>freeze_block_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2557,40 +2580,40 @@ range checks rather than the FileAnalyzable default.</p>
       <pre class="lines">
 
 
-380
-381
-382
-383
-384
-385
-386
-387
-388
-389
-390
-391
-392
-393
-394
-395</pre>
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 380</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 415</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_owners'>owners</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span>
   <span class='id identifier rubyid_augmenter'>augmenter</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owners'>owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+                <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+              <span class='kw'>else</span>
+                <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+              <span class='kw'>end</span>
 
   <span class='id identifier rubyid_augmenter'>augmenter</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Layout</span><span class='op'>::</span><span class='const'>Attachment</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
     <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>source:</span> <span class='symbol'>:prism_native</span><span class='comma'>,</span>
-      <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2672,16 +2695,16 @@ range checks rather than the FileAnalyzable default.</p>
       <pre class="lines">
 
 
-402
-403
-404
-405
-406
-407
-408</pre>
+437
+438
+439
+440
+441
+442
+443</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 402</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 437</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_owners'>owners</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -2689,6 +2712,126 @@ range checks rather than the FileAnalyzable default.</p>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_build_layout_augmenter'>build_layout_augmenter</span><span class='lparen'>(</span><span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="leading_comments_for_owner-instance_method">
+  
+    #<strong>leading_comments_for_owner</strong>(owner, owners: statements)  &#x21d2; <tt>Array&lt;Prism::Comment&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return comments that lead +owner+ within the provided top-level owner set.</p>
+
+<p>CRISPR adapters use this as a parser-provider-owned projection: CRISPR<br />
+selects and splices, while prism-merge owns Ruby comment attachment.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>owner node from this analysis</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>statements</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>ordered owner set containing +owner+</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Prism::Comment&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 350</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_leading_comments_for_owner'>leading_comments_for_owner</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>owners:</span> <span class='id identifier rubyid_statements'>statements</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_ordered_owners'>ordered_owners</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_owners'>owners</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_index'>index</span> <span class='op'>=</span> <span class='id identifier rubyid_ordered_owners'>ordered_owners</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_index'>index</span>
+
+  <span class='id identifier rubyid_previous_owner'>previous_owner</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span> <span class='op'>?</span> <span class='id identifier rubyid_ordered_owners'>ordered_owners</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span> <span class='op'>-</span> <span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_previous_owner'>previous_owner</span>
+    <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_previous_owner'>previous_owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
+    <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span>
+      <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span>
+      <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_end_line'>end_line</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span> <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2738,12 +2881,12 @@ Comments are now accessed via Prism’s native node.location API</p>
       <pre class="lines">
 
 
-413
-414
-415</pre>
+448
+449
+450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 413</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 448</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_nodes_with_comments'>nodes_with_comments</span>
   <span class='ivar'>@nodes_with_comments</span> <span class='op'>||=</span> <span class='id identifier rubyid_extract_nodes_with_comments'>extract_nodes_with_comments</span>
@@ -2792,12 +2935,12 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-421
-422
-423</pre>
+456
+457
+458</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 421</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 456</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruby_doc_surface_analyzer'>ruby_doc_surface_analyzer</span>
   <span class='ivar'>@ruby_doc_surface_analyzer</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="RubyDocSurfaceAnalyzer.html" title="Prism::Merge::RubyDocSurfaceAnalyzer (class)">RubyDocSurfaceAnalyzer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="RubyDocSurfaceAnalyzer.html#initialize-instance_method" title="Prism::Merge::RubyDocSurfaceAnalyzer#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
@@ -2822,20 +2965,20 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-297
-298
-299
-300
-301
-302</pre>
+308
+309
+310
+311
+312
+313</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 297</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 308</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_delegation_policies'>ruleset_delegation_policies</span>
   <span class='lbracket'>[</span>
-    <span class='lbrace'>{</span><span class='label'>surface_name:</span> <span class='symbol'>:ruby_doc_comment</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:same_ruleset</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>surface_name:</span> <span class='symbol'>:yard_example_block</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:same_ruleset</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>surface_name:</span> <span class='symbol'>:ruby_doc_comment</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:same_ruleset</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>surface_name:</span> <span class='symbol'>:yard_example_block</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:same_ruleset</span> <span class='rbrace'>}</span>
   <span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2858,12 +3001,12 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-275
-276
-277</pre>
+286
+287
+288</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 275</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 286</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_owner_selector'>ruleset_owner_selector</span>
   <span class='symbol'>:prism_statement_sequence</span>
@@ -2888,12 +3031,12 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-279
-280
-281</pre>
+290
+291
+292</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 279</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 290</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_render_family'>ruleset_render_family</span>
   <span class='symbol'>:prism_ruby_source</span>
@@ -2918,20 +3061,20 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-283
-284
-285
-286
-287
-288</pre>
+294
+295
+296
+297
+298
+299</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 283</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 294</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_repair_policies'>ruleset_repair_policies</span>
   <span class='lbracket'>[</span>
-    <span class='lbrace'>{</span><span class='label'>kind:</span> <span class='symbol'>:comment_ownership_overlap</span><span class='comma'>,</span> <span class='label'>handling:</span> <span class='symbol'>:heal</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>kind:</span> <span class='symbol'>:duplicate_template_leading_prefix</span><span class='comma'>,</span> <span class='label'>handling:</span> <span class='symbol'>:heal</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>kind:</span> <span class='symbol'>:comment_ownership_overlap</span><span class='comma'>,</span> <span class='label'>handling:</span> <span class='symbol'>:heal</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>kind:</span> <span class='symbol'>:duplicate_template_leading_prefix</span><span class='comma'>,</span> <span class='label'>handling:</span> <span class='symbol'>:heal</span> <span class='rbrace'>}</span>
   <span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2954,20 +3097,20 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-290
-291
-292
-293
-294
-295</pre>
+301
+302
+303
+304
+305
+306</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 290</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 301</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_surfaces'>ruleset_surfaces</span>
   <span class='lbracket'>[</span>
-    <span class='lbrace'>{</span><span class='label'>name:</span> <span class='symbol'>:ruby_doc_comment</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:native_attachment</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='label'>name:</span> <span class='symbol'>:yard_example_block</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:yard_example_tag</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>name:</span> <span class='symbol'>:ruby_doc_comment</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:native_attachment</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>name:</span> <span class='symbol'>:yard_example_block</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:yard_example_tag</span> <span class='rbrace'>}</span>
   <span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3013,12 +3156,12 @@ taking ownership of reconstruction away from Prism source spans.</p>
       <pre class="lines">
 
 
-238
-239
-240</pre>
+249
+250
+251</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 238</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 249</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='ivar'>@parse_result</span><span class='period'>.</span><span class='id identifier rubyid_success?'>success?</span>
@@ -3033,9 +3176,9 @@ taking ownership of reconstruction away from Prism source spans.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:09 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

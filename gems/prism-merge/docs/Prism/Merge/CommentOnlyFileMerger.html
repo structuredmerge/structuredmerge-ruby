@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::CommentOnlyFileMerger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -296,7 +296,7 @@
   <span class='ivar'>@merger</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span>
   <span class='ivar'>@comment_only_prefix_lines</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>template:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
-    <span class='label'>destination:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
+    <span class='label'>destination:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -517,7 +517,12 @@
 59
 60
 61
-62</pre>
+62
+63
+64
+65
+66
+67</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/comment_only_file_merger.rb', line 27</span>
@@ -525,7 +530,7 @@
 <span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
   <span class='ivar'>@comment_only_prefix_lines</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>template:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
-    <span class='label'>destination:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
+    <span class='label'>destination:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
   <span class='rbrace'>}</span>
 
   <span class='id identifier rubyid_template_lines'>template_lines</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_content'>template_content</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:chomp</span><span class='rparen'>)</span>
@@ -535,24 +540,29 @@
 
   <span class='id identifier rubyid_template_nodes'>template_nodes</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Comment.html" title="Prism::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Parser.html" title="Prism::Merge::Comment::Parser (class)">Parser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'><span class='object_link'><a href="Comment/Parser.html#parse-class_method" title="Prism::Merge::Comment::Parser.parse (method)">parse</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_lines'>template_lines</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_dest_nodes'>dest_nodes</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Comment.html" title="Prism::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Parser.html" title="Prism::Merge::Comment::Parser (class)">Parser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'><span class='object_link'><a href="Comment/Parser.html#parse-class_method" title="Prism::Merge::Comment::Parser.parse (method)">parse</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_dest_lines'>dest_lines</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_template_context'>template_context</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_only_merge_context'>build_comment_only_merge_context</span><span class='lparen'>(</span><span class='label'>nodes:</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_template_lines'>template_lines</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='symbol'>:template</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_template_context'>template_context</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_only_merge_context'>build_comment_only_merge_context</span><span class='lparen'>(</span><span class='label'>nodes:</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_template_lines'>template_lines</span><span class='comma'>,</span>
+                                                      <span class='label'>source:</span> <span class='symbol'>:template</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_dest_context'>dest_context</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_only_merge_context'>build_comment_only_merge_context</span><span class='lparen'>(</span><span class='label'>nodes:</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_dest_lines'>dest_lines</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_output_plan'>output_plan</span> <span class='op'>=</span> <span class='id identifier rubyid_build_output_plan'>build_output_plan</span><span class='lparen'>(</span><span class='label'>template_context:</span> <span class='id identifier rubyid_template_context'>template_context</span><span class='comma'>,</span> <span class='label'>dest_context:</span> <span class='id identifier rubyid_dest_context'>dest_context</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_retained_owners_by_source'>retained_owners_by_source</span> <span class='op'>=</span> <span class='id identifier rubyid_output_plan'>output_plan</span><span class='period'>.</span><span class='id identifier rubyid_group_by'>group_by</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
-    <span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entries'>entries</span><span class='op'>|</span> <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:node</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+                                         <span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entries'>entries</span><span class='op'>|</span>
+    <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span>
+      <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:node</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
   <span class='id identifier rubyid_emitted_gap_keys'>emitted_gap_keys</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>template:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
-    <span class='label'>destination:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
+    <span class='label'>destination:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
   <span class='rbrace'>}</span>
 
   <span class='id identifier rubyid_output_plan'>output_plan</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span>
-    <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:template</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_template_context'>template_context</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_context'>dest_context</span>
+    <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:template</span> <span class='op'>?</span> <span class='id identifier rubyid_template_context'>template_context</span> <span class='op'>:</span> <span class='id identifier rubyid_dest_context'>dest_context</span>
     <span class='id identifier rubyid_emit_comment_node_with_layout'>emit_comment_node_with_layout</span><span class='lparen'>(</span>
       <span class='label'>node:</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:node</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>source:</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>context:</span> <span class='id identifier rubyid_context'>context</span><span class='comma'>,</span>
       <span class='label'>retained_owners:</span> <span class='id identifier rubyid_retained_owners_by_source'>retained_owners_by_source</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>emitted_gap_keys:</span> <span class='id identifier rubyid_emitted_gap_keys'>emitted_gap_keys</span><span class='comma'>,</span>
+      <span class='label'>emitted_gap_keys:</span> <span class='id identifier rubyid_emitted_gap_keys'>emitted_gap_keys</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -568,9 +578,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

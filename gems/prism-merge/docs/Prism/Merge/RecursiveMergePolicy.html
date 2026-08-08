@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::RecursiveMergePolicy
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -383,18 +383,20 @@
       <pre class="lines">
 
 
-38
 39
 40
 41
 42
-43</pre>
+43
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/recursive_merge_policy.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/recursive_merge_policy.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_body_has_mergeable_statements?'>body_has_mergeable_statements?</span><span class='lparen'>(</span><span class='id identifier rubyid_body'>body</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>statements_node</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_body'>body</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>statements_node</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span> <span class='id identifier rubyid_mergeable_statement?'>mergeable_statement?</span><span class='lparen'>(</span><span class='id identifier rubyid_statement'>statement</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -442,8 +444,6 @@
       <pre class="lines">
 
 
-45
-46
 47
 48
 49
@@ -461,10 +461,12 @@
 61
 62
 63
-64</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/recursive_merge_policy.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/recursive_merge_policy.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mergeable_statement?'>mergeable_statement?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ct'>ct</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="NodeTypeNormalizer.html" title="Prism::Merge::NodeTypeNormalizer (module)">NodeTypeNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'><span class='object_link'><a href="NodeTypeNormalizer.html#canonical_type-class_method" title="Prism::Merge::NodeTypeNormalizer.canonical_type (method)">canonical_type</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='symbol'>:prism</span><span class='rparen'>)</span>
@@ -553,7 +555,8 @@
 33
 34
 35
-36</pre>
+36
+37</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/recursive_merge_policy.rb', line 12</span>
@@ -578,7 +581,8 @@
 
     <span class='id identifier rubyid_body_has_mergeable_statements?'>body_has_mergeable_statements?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_body'>template_body</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_body_has_mergeable_statements?'>body_has_mergeable_statements?</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_body'>dest_body</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:begin</span>
-    <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:begin_node_has_clause_or_body?</span><span class='comma'>,</span> <span class='id identifier rubyid_actual_template'>actual_template</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:begin_node_has_clause_or_body?</span><span class='comma'>,</span> <span class='id identifier rubyid_actual_dest'>actual_dest</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:begin_node_has_clause_or_body?</span><span class='comma'>,</span>
+                   <span class='id identifier rubyid_actual_template'>actual_template</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:begin_node_has_clause_or_body?</span><span class='comma'>,</span> <span class='id identifier rubyid_actual_dest'>actual_dest</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>else</span>
     <span class='kw'>false</span>
   <span class='kw'>end</span>
@@ -593,9 +597,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

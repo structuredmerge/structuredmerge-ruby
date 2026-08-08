@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::Comment::Parser
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -453,12 +453,12 @@ Ruby-specific features like magic comment detection.</p>
       <pre class="lines">
 
 
-87
-88
-89</pre>
+85
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/parser.rb', line 87</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/parser.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span>
@@ -563,9 +563,7 @@ Ruby-specific features like magic comment detection.</p>
 75
 76
 77
-78
-79
-80</pre>
+78</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/parser.rb', line 31</span>
@@ -591,12 +589,12 @@ Ruby-specific features like magic comment detection.</p>
         <span class='id identifier rubyid_current_block'>current_block</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
       <span class='kw'>end</span>
       <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>&lt;&lt;</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Comment</span><span class='op'>::</span><span class='const'>Empty</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='id identifier rubyid_raw'>raw</span><span class='rparen'>)</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>#</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
       <span class='comment'># Ruby comment line
 </span>      <span class='id identifier rubyid_current_block'>current_block</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="Line.html" title="Prism::Merge::Comment::Line (class)">Line</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Line.html#initialize-instance_method" title="Prism::Merge::Comment::Line#initialize (method)">new</a></span></span><span class='lparen'>(</span>
         <span class='label'>text:</span> <span class='id identifier rubyid_raw'>raw</span><span class='comma'>,</span>
         <span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
-        <span class='label'>magic_comment_type:</span> <span class='id identifier rubyid_header_magic_comment_types'>header_magic_comment_types</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='label'>magic_comment_type:</span> <span class='id identifier rubyid_header_magic_comment_types'>header_magic_comment_types</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span>
       <span class='rparen'>)</span>
     <span class='kw'>else</span>
       <span class='comment'># Non-comment content (shouldn&#39;t happen in comment-only files)
@@ -608,15 +606,13 @@ Ruby-specific features like magic comment detection.</p>
 </span>      <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>&lt;&lt;</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Comment</span><span class='op'>::</span><span class='const'>Line</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
         <span class='label'>text:</span> <span class='id identifier rubyid_raw'>raw</span><span class='comma'>,</span>
         <span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
-        <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
+        <span class='label'>style:</span> <span class='symbol'>:hash_comment</span>
       <span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Flush remaining block
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_current_block'>current_block</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
-    <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_build_block'>build_block</span><span class='lparen'>(</span><span class='id identifier rubyid_current_block'>current_block</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+</span>  <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_build_block'>build_block</span><span class='lparen'>(</span><span class='id identifier rubyid_current_block'>current_block</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_current_block'>current_block</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
 
   <span class='id identifier rubyid_nodes'>nodes</span>
 <span class='kw'>end</span></pre>
@@ -630,9 +626,9 @@ Ruby-specific features like magic comment detection.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:09 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

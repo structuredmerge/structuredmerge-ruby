@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::Comment::Line
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -142,24 +142,9 @@ encoding, etc.).</p>
     <dl class="constants">
       
         <dt id="MAGIC_COMMENT_PATTERNS-constant" class="">MAGIC_COMMENT_PATTERNS =
-          <div class="docstring">
-  <div class="discussion">
-    <p>Ruby magic comment patterns</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
+          
         </dt>
-        <dd><pre class="code"><span class='lbrace'>{</span>
-  <span class='label'>frozen_string_literal:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^frozen_string_literal:\s*(true|false)$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
-  <span class='label'>encoding:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^(encoding|coding):\s*\S+$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
-  <span class='label'>warn_indent:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^warn_indent:\s*(true|false)$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
-  <span class='label'>shareable_constant_value:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^shareable_constant_value:\s*\S+$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
-<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>MagicCommentSupport</span><span class='op'>::</span><span class='const'>MAGIC_COMMENT_PATTERNS</span></pre></dd>
       
     </dl>
   
@@ -453,13 +438,13 @@ encoding, etc.).</p>
       <pre class="lines">
 
 
-53
-54
-55
-56</pre>
+47
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>text:</span><span class='comma'>,</span> <span class='label'>line_number:</span><span class='comma'>,</span> <span class='label'>magic_comment_type:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@magic_comment_type</span> <span class='op'>=</span> <span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span>
@@ -519,12 +504,12 @@ encoding, etc.).</p>
       <pre class="lines">
 
 
-75
-76
-77</pre>
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span>
   <span class='ivar'>@magic_comment_type</span>
@@ -612,24 +597,24 @@ map of line_number =&gt; magic_comment_type (avoids duplicate lookups)</p>
       <pre class="lines">
 
 
+31
+32
+33
+34
+35
+36
 37
-38
-39
-40
-41
-42
-43
-44</pre>
+38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_from_tree_haver'>from_tree_haver</span><span class='lparen'>(</span><span class='id identifier rubyid_th_comment'>th_comment</span><span class='comma'>,</span> <span class='id identifier rubyid_magic_comment_types'>magic_comment_types</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_line_number'>line_number</span> <span class='op'>=</span> <span class='id identifier rubyid_th_comment'>th_comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
   <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
     <span class='label'>text:</span> <span class='id identifier rubyid_th_comment'>th_comment</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span><span class='comma'>,</span>
     <span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
-    <span class='label'>magic_comment_type:</span> <span class='id identifier rubyid_magic_comment_types'>magic_comment_types</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>magic_comment_type:</span> <span class='id identifier rubyid_magic_comment_types'>magic_comment_types</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -652,12 +637,12 @@ map of line_number =&gt; magic_comment_type (avoids duplicate lookups)</p>
       <pre class="lines">
 
 
-27
-28
-29</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_magic_comment_type_for'>magic_comment_type_for</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Prism::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../MagicCommentSupport.html" title="Prism::Merge::MagicCommentSupport (module)">MagicCommentSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_magic_comment_type_for_text'><span class='object_link'><a href="../MagicCommentSupport.html#magic_comment_type_for_text-class_method" title="Prism::Merge::MagicCommentSupport.magic_comment_type_for_text (method)">magic_comment_type_for_text</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
@@ -715,16 +700,16 @@ map of line_number =&gt; magic_comment_type (avoids duplicate lookups)</p>
       <pre class="lines">
 
 
-106
-107
-108
-109</pre>
+100
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 106</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
-  <span class='id identifier rubyid_magic'>magic</span> <span class='op'>=</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> magic=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_magic'>magic</span> <span class='op'>=</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> magic=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;Prism::Merge::Comment::Line line=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line_number'>line_number</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_magic'>magic</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
@@ -783,12 +768,12 @@ map of line_number =&gt; magic_comment_type (avoids duplicate lookups)</p>
       <pre class="lines">
 
 
-68
-69
-70</pre>
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span>
   <span class='op'>!</span><span class='ivar'>@magic_comment_type</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -840,21 +825,21 @@ map of line_number =&gt; magic_comment_type (avoids duplicate lookups)</p>
       <pre class="lines">
 
 
-80
-81
-82
-83
-84
-85</pre>
+74
+75
+76
+77
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_magic_comment_value'>magic_comment_value</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span>
 
   <span class='id identifier rubyid_stripped'>stripped</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-  <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>:</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='op'>&amp;.</span><span class='id identifier rubyid_strip'>strip</span>
+  <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='op'>&amp;.</span><span class='id identifier rubyid_strip'>strip</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -910,16 +895,16 @@ the same type of magic comment with different values.</p>
       <pre class="lines">
 
 
-97
-98
-99
-100
-101
-102
-103</pre>
+91
+92
+93
+94
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span>
@@ -938,9 +923,9 @@ the same type of magic comment with different values.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:09 2026 by
+  Generated on Sat Aug  8 01:05:27 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

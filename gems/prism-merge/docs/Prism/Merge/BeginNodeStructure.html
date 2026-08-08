@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::BeginNodeStructure
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -401,12 +401,12 @@
       <pre class="lines">
 
 
-22
-23
-24</pre>
+17
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='ivar'>@node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span>
@@ -448,12 +448,12 @@
       <pre class="lines">
 
 
-20
-21
-22</pre>
+15
+16
+17</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_node'>node</span>
   <span class='ivar'>@node</span>
@@ -490,12 +490,7 @@
 9
 10
 11
-12
-13
-14
-15
-16
-17</pre>
+12</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 7</span>
@@ -504,12 +499,7 @@
   <span class='id identifier rubyid_exceptions'>exceptions</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_rescue_node'>rescue_node</span><span class='period'>.</span><span class='id identifier rubyid_exceptions'>exceptions</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_exception_node'>exception_node</span><span class='op'>|</span>
     <span class='id identifier rubyid_exception_node'>exception_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:slice</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_exception_node'>exception_node</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span> <span class='op'>:</span> <span class='id identifier rubyid_exception_node'>exception_node</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='kw'>end</span>
-  <span class='id identifier rubyid_normalized_exceptions'>normalized_exceptions</span> <span class='op'>=</span> <span class='id identifier rubyid_exceptions'>exceptions</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_exception'>exception</span><span class='op'>|</span> <span class='id identifier rubyid_exception'>exception</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A::</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_normalized_exceptions'>normalized_exceptions</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_normalized_exceptions'>normalized_exceptions</span> <span class='op'>==</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>StandardError</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
-    <span class='lbracket'>[</span><span class='symbol'>:standard_error</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_normalized_exceptions'>normalized_exceptions</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span>
-  <span class='kw'>end</span>
+  <span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>RescueSemantics</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_rescue_clause_signature'>rescue_clause_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_exceptions'>exceptions</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -537,20 +527,20 @@
       <pre class="lines">
 
 
+21
+22
+23
+24
+25
 26
 27
 28
 29
 30
-31
-32
-33
-34
-35
-36</pre>
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 26</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_boundary_lines'>boundary_lines</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span> <span class='kw'>unless</span> <span class='id identifier rubyid_begin_node?'>begin_node?</span>
@@ -560,7 +550,7 @@
     <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_rescue_clause'>rescue_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_else_clause'>else_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
-    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
   <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -583,6 +573,11 @@
       <pre class="lines">
 
 
+86
+87
+88
+89
+90
 91
 92
 93
@@ -592,15 +587,10 @@
 97
 98
 99
-100
-101
-102
-103
-104
-105</pre>
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clause_nodes_by_type'>clause_nodes_by_type</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_begin_node?'>begin_node?</span>
@@ -637,6 +627,11 @@
       <pre class="lines">
 
 
+59
+60
+61
+62
+63
 64
 65
 66
@@ -657,15 +652,10 @@
 81
 82
 83
-84
-85
-86
-87
-88
-89</pre>
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clause_regions'>clause_regions</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_begin_node?'>begin_node?</span>
@@ -675,13 +665,13 @@
     <span class='id identifier rubyid_signature'>signature</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_rescue_signature'>rescue_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_rescue_node'>rescue_node</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_occurrence'>occurrence</span> <span class='op'>=</span> <span class='id identifier rubyid_rescue_occurrences'>rescue_occurrences</span><span class='lbracket'>[</span><span class='id identifier rubyid_signature'>signature</span><span class='rbracket'>]</span>
     <span class='id identifier rubyid_rescue_occurrences'>rescue_occurrences</span><span class='lbracket'>[</span><span class='id identifier rubyid_signature'>signature</span><span class='rbracket'>]</span> <span class='op'>+=</span> <span class='int'>1</span>
-    <span class='lbrace'>{</span><span class='label'>type:</span> <span class='lbracket'>[</span><span class='symbol'>:rescue_clause</span><span class='comma'>,</span> <span class='id identifier rubyid_signature'>signature</span><span class='comma'>,</span> <span class='id identifier rubyid_occurrence'>occurrence</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_rescue_node'>rescue_node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rbrace'>}</span>
+    <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='lbracket'>[</span><span class='symbol'>:rescue_clause</span><span class='comma'>,</span> <span class='id identifier rubyid_signature'>signature</span><span class='comma'>,</span> <span class='id identifier rubyid_occurrence'>occurrence</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_rescue_node'>rescue_node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_else_clause'>else_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span>
-    <span class='id identifier rubyid_region_defs'>region_defs</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='symbol'>:else_clause</span><span class='comma'>,</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_else_clause'>else_clause</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_region_defs'>region_defs</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:else_clause</span><span class='comma'>,</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_else_clause'>else_clause</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span>
-    <span class='id identifier rubyid_region_defs'>region_defs</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='symbol'>:ensure_clause</span><span class='comma'>,</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_region_defs'>region_defs</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:ensure_clause</span><span class='comma'>,</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_region_defs'>region_defs</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_region_def'>region_def</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
@@ -689,7 +679,7 @@
     <span class='lbrace'>{</span>
       <span class='label'>type:</span> <span class='id identifier rubyid_region_def'>region_def</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>start_line:</span> <span class='id identifier rubyid_region_def'>region_def</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>end_line:</span> <span class='lparen'>(</span><span class='id identifier rubyid_next_start_line'>next_start_line</span> <span class='op'>?</span> <span class='id identifier rubyid_next_start_line'>next_start_line</span> <span class='op'>-</span> <span class='int'>1</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>end_line:</span> <span class='lparen'>(</span><span class='id identifier rubyid_next_start_line'>next_start_line</span> <span class='op'>?</span> <span class='id identifier rubyid_next_start_line'>next_start_line</span> <span class='op'>-</span> <span class='int'>1</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -713,18 +703,18 @@
       <pre class="lines">
 
 
+33
+34
+35
+36
+37
 38
 39
 40
-41
-42
-43
-44
-45
-46</pre>
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clause_start_line'>clause_start_line</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_begin_node?'>begin_node?</span>
@@ -732,7 +722,7 @@
   <span class='lbracket'>[</span>
     <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_rescue_clause'>rescue_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_else_clause'>else_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
-    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='op'>&amp;.</span><span class='id identifier rubyid_location'>location</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span>
   <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_min'>min</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -778,12 +768,12 @@
       <pre class="lines">
 
 
-107
-108
-109</pre>
+102
+103
+104</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 107</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 102</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_clause_or_body?'>has_clause_or_body?</span>
   <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_begin_node?'>begin_node?</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span> <span class='op'>||</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_rescue_clause'>rescue_clause</span> <span class='op'>||</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_else_clause'>else_clause</span> <span class='op'>||</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_ensure_clause'>ensure_clause</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -808,6 +798,11 @@
       <pre class="lines">
 
 
+106
+107
+108
+109
+110
 111
 112
 113
@@ -817,19 +812,18 @@
 117
 118
 119
-120
-121
-122
-123</pre>
+120</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 111</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_map_for'>line_map_for</span><span class='lparen'>(</span><span class='id identifier rubyid_other_structure'>other_structure</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_begin_node?'>begin_node?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other_structure'>other_structure</span><span class='period'>.</span><span class='id identifier rubyid_begin_node?'>begin_node?</span>
 
   <span class='id identifier rubyid_regions'>regions</span> <span class='op'>=</span> <span class='id identifier rubyid_clause_regions'>clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='comma'>,</span> <span class='id identifier rubyid_by_type'>by_type</span><span class='op'>|</span> <span class='id identifier rubyid_by_type'>by_type</span><span class='lbracket'>[</span><span class='id identifier rubyid_region'>region</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_region'>region</span> <span class='rbrace'>}</span>
-  <span class='id identifier rubyid_other_regions'>other_regions</span> <span class='op'>=</span> <span class='id identifier rubyid_other_structure'>other_structure</span><span class='period'>.</span><span class='id identifier rubyid_clause_regions'>clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='comma'>,</span> <span class='id identifier rubyid_by_type'>by_type</span><span class='op'>|</span> <span class='id identifier rubyid_by_type'>by_type</span><span class='lbracket'>[</span><span class='id identifier rubyid_region'>region</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_region'>region</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_other_regions'>other_regions</span> <span class='op'>=</span> <span class='id identifier rubyid_other_structure'>other_structure</span><span class='period'>.</span><span class='id identifier rubyid_clause_regions'>clause_regions</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='comma'>,</span> <span class='id identifier rubyid_by_type'>by_type</span><span class='op'>|</span>
+    <span class='id identifier rubyid_by_type'>by_type</span><span class='lbracket'>[</span><span class='id identifier rubyid_region'>region</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_region'>region</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_regions'>regions</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_region'>region</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_mapping'>mapping</span><span class='op'>|</span>
     <span class='id identifier rubyid_other_region'>other_region</span> <span class='op'>=</span> <span class='id identifier rubyid_other_regions'>other_regions</span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='rbracket'>]</span>
@@ -858,6 +852,11 @@
       <pre class="lines">
 
 
+43
+44
+45
+46
+47
 48
 49
 50
@@ -867,15 +866,10 @@
 54
 55
 56
-57
-58
-59
-60
-61
-62</pre>
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/begin_node_structure.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_rescue_nodes'>rescue_nodes</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_begin_node?'>begin_node?</span>
@@ -885,10 +879,10 @@
   <span class='kw'>while</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'>RescueNode</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_current'>current</span>
     <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:subsequent</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_subsequent'>subsequent</span>
-    <span class='kw'>else</span>
-      <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_consequent'>consequent</span>
-    <span class='kw'>end</span>
+                <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_subsequent'>subsequent</span>
+              <span class='kw'>else</span>
+                <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_consequent'>consequent</span>
+              <span class='kw'>end</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_nodes'>nodes</span>
 <span class='kw'>end</span></pre>
@@ -902,9 +896,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Prism::Merge::TopLevelMergeRunner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -587,7 +587,28 @@ to avoid spurious matches on trivially short bodies.</p>
 134
 135
 136
-137</pre>
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/prism/merge/top_level_merge_runner.rb', line 66</span>
@@ -596,67 +617,88 @@ to avoid spurious matches on trivially short bodies.</p>
   <span class='id identifier rubyid_root_operation'>root_operation</span> <span class='op'>=</span> <span class='id identifier rubyid_start_runtime_session!'>start_runtime_session!</span>
 
   <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_comment_only_merge?'>comment_only_merge?</span>
-    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:comment_only_file_merger</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_template_by_signature'>template_by_signature</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:build_signature_map</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:build_signature_map</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_prepare_comment_augmenters!'>prepare_comment_augmenters!</span><span class='lparen'>(</span><span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='label'>dest_by_signature:</span> <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
-    <span class='id identifier rubyid_sig_cursor'>sig_cursor</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_output_dest_line_ranges'>output_dest_line_ranges</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:emit_dest_prefix_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:comment_only_file_merger</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span>
+                 <span class='kw'>else</span>
+                   <span class='id identifier rubyid_template_by_signature'>template_by_signature</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:build_signature_map</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:build_signature_map</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_prepare_comment_augmenters!'>prepare_comment_augmenters!</span><span class='lparen'>(</span><span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span>
+                                               <span class='label'>dest_by_signature:</span> <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+                   <span class='id identifier rubyid_sig_cursor'>sig_cursor</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_output_dest_line_ranges'>output_dest_line_ranges</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+                   <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:emit_dest_prefix_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span>
+                                                       <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
 
-    <span class='comment'># Phase 1: exact signature match (existing behavior).
-</span>    <span class='id identifier rubyid_dest_sigs'>dest_sigs</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+                   <span class='comment'># Phase 1: exact signature match (existing behavior).
+</span>                   <span class='id identifier rubyid_dest_sigs'>dest_sigs</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
 
-    <span class='comment'># Phase 2: compute similarity-matched pairs from residual orphans.
-</span>    <span class='ivar'>@similarity_pairs</span> <span class='op'>=</span> <span class='id identifier rubyid_compute_similarity_pairs'>compute_similarity_pairs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='rparen'>)</span>
+                   <span class='comment'># Phase 2: compute similarity-matched pairs from residual orphans.
+</span>                   <span class='ivar'>@similarity_pairs</span> <span class='op'>=</span> <span class='id identifier rubyid_compute_similarity_pairs'>compute_similarity_pairs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='rparen'>)</span>
 
-    <span class='comment'># Phase 3: cross-depth search, but only for orphans surviving Phases 1+2.
-</span>    <span class='ivar'>@deep_dest_sigs</span> <span class='op'>=</span> <span class='id identifier rubyid_compute_deep_sigs_for_orphans'>compute_deep_sigs_for_orphans</span><span class='lparen'>(</span>
-      <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span>
-    <span class='rparen'>)</span>
+                   <span class='comment'># Phase 3: cross-depth search, but only for orphans surviving Phases 1+2.
+</span>                   <span class='ivar'>@deep_dest_sigs</span> <span class='op'>=</span> <span class='id identifier rubyid_compute_deep_sigs_for_orphans'>compute_deep_sigs_for_orphans</span><span class='lparen'>(</span>
+                     <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span>
+                   <span class='rparen'>)</span>
 
-    <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid__matched_indices'>_matched_indices</span> <span class='op'>=</span> <span class='id identifier rubyid_build_dest_iterate_trailing_groups'>build_dest_iterate_trailing_groups</span><span class='lparen'>(</span>
-      <span class='label'>template_nodes:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span>
-      <span class='label'>dest_sigs:</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span><span class='comma'>,</span>
-      <span class='label'>signature_for:</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-      <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span><span class='comma'>,</span>
-    <span class='rparen'>)</span>
+                   <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid__matched_indices'>_matched_indices</span> <span class='op'>=</span> <span class='id identifier rubyid_build_dest_iterate_trailing_groups'>build_dest_iterate_trailing_groups</span><span class='lparen'>(</span>
+                     <span class='label'>template_nodes:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span>
+                     <span class='label'>dest_sigs:</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span><span class='comma'>,</span>
+                     <span class='label'>signature_for:</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+                     <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span>
+                   <span class='rparen'>)</span>
+                   <span class='id identifier rubyid_destination_template_indices'>destination_template_indices</span> <span class='op'>=</span> <span class='id identifier rubyid_destination_template_index_sequence'>destination_template_index_sequence</span><span class='lparen'>(</span>
+                     <span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span>
+                   <span class='rparen'>)</span>
+                   <span class='id identifier rubyid_destination_signatures'>destination_signatures</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='op'>|</span>
+                     <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='rparen'>)</span>
+                   <span class='kw'>end</span>
 
-    <span class='kw'>unless</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
-      <span class='id identifier rubyid_emit_prefix_trailing_group'>emit_prefix_trailing_group</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
-        <span class='id identifier rubyid_emit_template_only_node'>emit_template_only_node</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
-      <span class='kw'>end</span>
-    <span class='kw'>end</span>
+                   <span class='kw'>unless</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+                     <span class='id identifier rubyid_emit_prefix_trailing_group'>emit_prefix_trailing_group</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+                       <span class='id identifier rubyid_emit_template_only_node'>emit_template_only_node</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
+                     <span class='kw'>end</span>
+                   <span class='kw'>end</span>
 
-    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='op'>|</span>
-      <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span> <span class='op'>=</span> <span class='id identifier rubyid_process_dest_node'>process_dest_node</span><span class='lparen'>(</span>
-        <span class='label'>dest_node:</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
-        <span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span>
-        <span class='label'>consumed_template_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='comma'>,</span>
-        <span class='label'>sig_cursor:</span> <span class='id identifier rubyid_sig_cursor'>sig_cursor</span><span class='comma'>,</span>
-        <span class='label'>output_dest_line_ranges:</span> <span class='id identifier rubyid_output_dest_line_ranges'>output_dest_line_ranges</span><span class='comma'>,</span>
-        <span class='label'>last_output_dest_line:</span> <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span><span class='comma'>,</span>
-        <span class='label'>trailing_groups:</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span>
-      <span class='rparen'>)</span>
-    <span class='kw'>end</span>
+                   <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_position'>dest_position</span><span class='op'>|</span>
+                     <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span> <span class='op'>=</span> <span class='id identifier rubyid_process_dest_node'>process_dest_node</span><span class='lparen'>(</span>
+                       <span class='label'>dest_node:</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+                       <span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span>
+                       <span class='label'>consumed_template_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='comma'>,</span>
+                       <span class='label'>sig_cursor:</span> <span class='id identifier rubyid_sig_cursor'>sig_cursor</span><span class='comma'>,</span>
+                       <span class='label'>output_dest_line_ranges:</span> <span class='id identifier rubyid_output_dest_line_ranges'>output_dest_line_ranges</span><span class='comma'>,</span>
+                       <span class='label'>last_output_dest_line:</span> <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span><span class='comma'>,</span>
+                       <span class='label'>dest_position:</span> <span class='id identifier rubyid_dest_position'>dest_position</span><span class='comma'>,</span>
+                       <span class='label'>destination_signatures:</span> <span class='id identifier rubyid_destination_signatures'>destination_signatures</span><span class='comma'>,</span>
+                       <span class='label'>destination_template_indices:</span> <span class='id identifier rubyid_destination_template_indices'>destination_template_indices</span>
+                     <span class='rparen'>)</span>
+                     <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
 
-    <span class='comment'># Safety net: emit any trailing groups whose anchor was never consumed
-</span>    <span class='kw'>unless</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
-      <span class='id identifier rubyid_emit_remaining_trailing_groups'>emit_remaining_trailing_groups</span><span class='lparen'>(</span>
-        <span class='label'>trailing_groups:</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span>
-        <span class='label'>consumed_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='comma'>,</span>
-      <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
-        <span class='id identifier rubyid_emit_template_only_node'>emit_template_only_node</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
-      <span class='kw'>end</span>
-    <span class='kw'>end</span>
-    <span class='id identifier rubyid_emit_tail_template_only_nodes'>emit_tail_template_only_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+                     <span class='id identifier rubyid_emit_available_trailing_groups'>emit_available_trailing_groups</span><span class='lparen'>(</span>
+                       <span class='label'>trailing_groups:</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span>
+                       <span class='label'>consumed_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='comma'>,</span>
+                       <span class='label'>dest_position:</span> <span class='id identifier rubyid_dest_position'>dest_position</span><span class='comma'>,</span>
+                       <span class='label'>destination_template_indices:</span> <span class='id identifier rubyid_destination_template_indices'>destination_template_indices</span>
+                     <span class='rparen'>)</span>
+                   <span class='kw'>end</span>
 
-    <span class='id identifier rubyid_emit_dest_postlude_lines'>emit_dest_postlude_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span><span class='rparen'>)</span>
+                   <span class='comment'># Safety net: emit any trailing groups whose anchor was never consumed
+</span>                   <span class='kw'>unless</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+                     <span class='id identifier rubyid_emit_remaining_trailing_groups'>emit_remaining_trailing_groups</span><span class='lparen'>(</span>
+                       <span class='label'>trailing_groups:</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span>
+                       <span class='label'>consumed_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span>
+                     <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+                       <span class='id identifier rubyid_emit_template_only_node'>emit_template_only_node</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
+                     <span class='kw'>end</span>
+                   <span class='kw'>end</span>
+                   <span class='kw'>if</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+                     <span class='id identifier rubyid_emit_tail_template_only_nodes'>emit_tail_template_only_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
+                   <span class='kw'>end</span>
 
-    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span>
-  <span class='kw'>end</span>
+                   <span class='id identifier rubyid_emit_dest_postlude_lines'>emit_dest_postlude_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span><span class='rparen'>)</span>
+                   <span class='id identifier rubyid_normalize_layout_blank_runs'>normalize_layout_blank_runs</span><span class='lparen'>(</span><span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
+
+                   <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span>
+                 <span class='kw'>end</span>
 
   <span class='id identifier rubyid_complete_runtime_session!'>complete_runtime_session!</span><span class='lparen'>(</span><span class='id identifier rubyid_root_operation'>root_operation</span><span class='comma'>,</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_merge_result'>merge_result</span>
@@ -674,9 +716,9 @@ to avoid spurious matches on trivially short bodies.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:10 2026 by
+  Generated on Sat Aug  8 01:05:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
