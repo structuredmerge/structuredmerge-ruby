@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a family-root mise task for refreshing member bundles against local sibling dependencies.
 
+- Run the local family bup task without committing development-only path lockfiles.
+
 ### Deprecated
 
 ### Removed
