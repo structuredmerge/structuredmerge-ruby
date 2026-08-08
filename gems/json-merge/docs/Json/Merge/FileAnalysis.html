@@ -6,7 +6,7 @@
 <title>
   Class: Json::Merge::FileAnalysis
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -130,7 +130,7 @@ freeze blocks for merging.</p>
         <dt id="DEFAULT_FREEZE_TOKEN-constant" class="">DEFAULT_FREEZE_TOKEN =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>json-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
     </dl>
   
@@ -192,6 +192,34 @@ freeze blocks for merging.</p>
 
   
     <span class="summary_desc"><div class='inline'><p>Returns the value of attribute comment_tracker.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#dialect-instance_method" title="#dialect (instance method)">#<strong>dialect</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute dialect.</p>
 </div></span>
   
 </li>
@@ -550,7 +578,7 @@ freeze blocks for merging.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **options)  &#x21d2; FileAnalysis </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, dialect: :jsonc, **_options)  &#x21d2; FileAnalysis </a>
     
 
     
@@ -792,7 +820,7 @@ freeze blocks for merging.</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Json::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
+    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, dialect: :jsonc, **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Json::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
   
 
   
@@ -835,32 +863,38 @@ freeze blocks for merging.</p>
 38
 39
 40
-41</pre>
+41
+42
+43
+44</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 20</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Json::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parser_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Json::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parser_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='symbol'>:jsonc</span><span class='comma'>,</span>
+               <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
   <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:chomp</span><span class='rparen'>)</span>
   <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
   <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
-  <span class='ivar'>@parser_path</span> <span class='op'>=</span> <span class='id identifier rubyid_parser_path'>parser_path</span> <span class='op'>||</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_find_parser_path'>find_parser_path</span>
+  <span class='ivar'>@parser_path</span> <span class='op'>=</span> <span class='id identifier rubyid_parser_path'>parser_path</span>
+  <span class='ivar'>@dialect</span> <span class='op'>=</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='ivar'>@errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
 
   <span class='ivar'>@comment_tracker</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CommentTracker.html" title="Json::Merge::CommentTracker (class)">CommentTracker</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CommentTracker.html#initialize-instance_method" title="Json::Merge::CommentTracker#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Json::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis#parse_json</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_parse_json'>parse_json</span> <span class='rbrace'>}</span>
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Json::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis#parse_json</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_parse_json'>parse_json</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_validate_jsonc_dialect!'>validate_jsonc_dialect!</span> <span class='kw'>if</span> <span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@dialect</span> <span class='op'>==</span> <span class='symbol'>:jsonc</span>
 
   <span class='ivar'>@freeze_blocks</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_freeze_blocks'>extract_freeze_blocks</span>
   <span class='ivar'>@nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_integrate_nodes_and_freeze_blocks'>integrate_nodes_and_freeze_blocks</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Json::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>nodes_count:</span> <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='ivar'>@freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>valid:</span> <span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Json::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                      <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                      <span class='label'>nodes_count:</span> <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>freeze_blocks:</span> <span class='ivar'>@freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>valid:</span> <span class='id identifier rubyid_valid?'>valid?</span>
+                    <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -950,6 +984,48 @@ freeze blocks for merging.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span>
   <span class='ivar'>@comment_tracker</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="dialect-instance_method">
+  
+    #<strong>dialect</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute dialect.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_dialect'>dialect</span>
+  <span class='ivar'>@dialect</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1056,24 +1132,24 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-153
-154
-155
-156
 157
 158
 159
-160</pre>
+160
+161
+162
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 153</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 157</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>line_num:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
     <span class='label'>tracker_attachment:</span> <span class='ivar'>@comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1119,12 +1195,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-163
-164
-165</pre>
+167
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 163</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span>
   <span class='symbol'>:augmenter_preferred_tracker_layout</span>
@@ -1149,20 +1225,20 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-75
-76
-77
 78
 79
-80</pre>
+80
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span>
     <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1185,12 +1261,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-47
-48
-49</pre>
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
   <span class='ivar'>@comment_capability</span> <span class='op'>||=</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_capability'>capability</span>
@@ -1215,12 +1291,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-63
-64
-65</pre>
+66
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
@@ -1245,12 +1321,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-59
-60
-61</pre>
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
@@ -1275,22 +1351,22 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-67
-68
-69
 70
 71
 72
-73</pre>
+73
+74
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>kind:</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
     <span class='label'>kind:</span> <span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span>
-    <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span><span class='comma'>,</span>
+    <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1313,22 +1389,22 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-51
-52
-53
 54
 55
 56
-57</pre>
+57
+58
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
   <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
     <span class='label'>source:</span> <span class='symbol'>:json_source</span><span class='comma'>,</span>
     <span class='label'>style:</span> <span class='symbol'>:c_style_line</span><span class='comma'>,</span>
-    <span class='label'>read_strategy:</span> <span class='symbol'>:source_augmented_portable_write</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='symbol'>:source_augmented_portable_write</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1374,12 +1450,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-105
-106
-107</pre>
+108
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 105</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 108</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Json::Merge::NodeWrapper (class)">NodeWrapper</a></span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FreezeNode.html" title="Json::Merge::FreezeNode (class)">FreezeNode</a></span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
@@ -1404,12 +1480,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-91
-92
-93</pre>
+94
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 94</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze_block_at'>freeze_block_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='ivar'>@freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fb'>fb</span><span class='op'>|</span> <span class='id identifier rubyid_fb'>fb</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -1434,18 +1510,18 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-95
-96
-97
 98
 99
 100
 101
 102
-103</pre>
+103
+104
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>super</span> <span class='kw'>if</span> <span class='ivar'>@signature_generator</span>
@@ -1499,12 +1575,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-87
-88
-89</pre>
+90
+91
+92</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 87</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_in_freeze_block?'>in_freeze_block?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='ivar'>@freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fb'>fb</span><span class='op'>|</span> <span class='id identifier rubyid_fb'>fb</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -1529,21 +1605,21 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-109
-110
-111
 112
 113
-114</pre>
+114
+115
+116
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 109</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_node'>root_node</span>
   <span class='kw'>return</span> <span class='ivar'>@root_node</span> <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='ivar'>@root_node</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='ivar'>@root_node</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_valid?'>valid?</span>
 
-  <span class='ivar'>@root_node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Json::Merge::NodeWrapper (class)">NodeWrapper</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@ast</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='ivar'>@lines</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
+  <span class='ivar'>@root_node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Json::Merge::NodeWrapper (class)">NodeWrapper</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="NodeWrapper.html#initialize-instance_method" title="Json::Merge::NodeWrapper#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@ast</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='ivar'>@lines</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='ivar'>@dialect</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1565,9 +1641,6 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-116
-117
-118
 119
 120
 121
@@ -1579,10 +1652,14 @@ freeze blocks for merging.</p>
 127
 128
 129
-130</pre>
+130
+131
+132
+133
+134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_object'>root_object</span>
   <span class='kw'>return</span> <span class='ivar'>@root_object</span> <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='ivar'>@root_object</span><span class='rparen'>)</span>
@@ -1592,8 +1669,9 @@ freeze blocks for merging.</p>
   <span class='kw'>return</span> <span class='ivar'>@root_object</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span>
 
   <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_child'>child</span><span class='op'>|</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>object</span><span class='tstring_end'>&quot;</span></span>
-      <span class='kw'>return</span> <span class='ivar'>@root_object</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Json::Merge::NodeWrapper (class)">NodeWrapper</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='ivar'>@lines</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>object</span><span class='tstring_end'>&#39;</span></span>
+      <span class='kw'>return</span> <span class='ivar'>@root_object</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Json::Merge::NodeWrapper (class)">NodeWrapper</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="NodeWrapper.html#initialize-instance_method" title="Json::Merge::NodeWrapper#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='ivar'>@lines</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='comma'>,</span>
+                                                   <span class='label'>dialect:</span> <span class='ivar'>@dialect</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 
@@ -1619,15 +1697,15 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-139
-140
-141
-142
 143
-144</pre>
+144
+145
+146
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 143</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_object_close_line'>root_object_close_line</span>
   <span class='id identifier rubyid_obj'>obj</span> <span class='op'>=</span> <span class='id identifier rubyid_root_object'>root_object</span>
@@ -1655,15 +1733,15 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-132
-133
-134
-135
 136
-137</pre>
+137
+138
+139
+140
+141</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 136</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_object_open_line'>root_object_open_line</span>
   <span class='id identifier rubyid_obj'>obj</span> <span class='op'>=</span> <span class='id identifier rubyid_root_object'>root_object</span>
@@ -1691,15 +1769,15 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-146
-147
-148
-149
 150
-151</pre>
+151
+152
+153
+154
+155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 146</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_pairs'>root_pairs</span>
   <span class='ivar'>@root_pairs</span> <span class='op'>||=</span> <span class='kw'>begin</span>
@@ -1727,12 +1805,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-167
-168
-169</pre>
+171
+172
+173</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 171</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_owner_selector'>ruleset_owner_selector</span>
   <span class='symbol'>:line_bound_statements</span>
@@ -1757,12 +1835,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-171
-172
-173</pre>
+175
+176
+177</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 171</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 175</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_render_family'>ruleset_render_family</span>
   <span class='symbol'>:json_object_pairs</span>
@@ -1791,15 +1869,15 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-82
-83
-84</pre>
+85
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_statements'>statements</span>
-  <span class='ivar'>@nodes</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@nodes</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1844,12 +1922,12 @@ freeze blocks for merging.</p>
       <pre class="lines">
 
 
-43
-44
-45</pre>
+46
+47
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/file_analysis.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='ivar'>@errors</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@ast</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -1864,9 +1942,9 @@ freeze blocks for merging.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:58 2026 by
+  Generated on Sat Aug  8 01:17:56 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

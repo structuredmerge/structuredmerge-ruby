@@ -6,7 +6,7 @@
 <title>
   Class: Json::Merge::ConflictResolver
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -93,7 +93,7 @@
   
   <dl>
       <dt>Includes:</dt>
-      <dd>Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
+      <dd>Ast::Merge::CommentLayoutEmissionSupport, Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
   </dl>
   
   
@@ -243,6 +243,7 @@ using structural signatures and configurable preferences.</p>
   
 
 
+  
   
   
   <div id="constructor_details" class="method_details_list">
@@ -396,7 +397,6 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-33
 34
 35
 36
@@ -413,12 +413,15 @@ for per-node-type preferences</p>
 47
 48
 49
-50</pre>
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/conflict_resolver.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/conflict_resolver.rb', line 34</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span> <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span> <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>merge_arrays:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>preserve_atomic_formatting:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+               <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span> <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span> <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>merge_arrays:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>preserve_atomic_formatting:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span>
     <span class='label'>strategy:</span> <span class='symbol'>:batch</span><span class='comma'>,</span>
     <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
@@ -473,12 +476,12 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-18
 19
-20</pre>
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/conflict_resolver.rb', line 18</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/conflict_resolver.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
   <span class='ivar'>@corruption_handling</span>
@@ -533,15 +536,15 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-92
-93
 94
 95
 96
-97</pre>
+97
+98
+99</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/json/merge/conflict_resolver.rb', line 92</span>
+      <pre class="code"><span class="info file"># File 'lib/json/merge/conflict_resolver.rb', line 94</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_node'>node</span>
@@ -559,9 +562,9 @@ for per-node-type preferences</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:59 2026 by
+  Generated on Sat Aug  8 01:17:57 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
