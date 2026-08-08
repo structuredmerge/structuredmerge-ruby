@@ -28,7 +28,7 @@ require 'ast/merge'
 require 'ast/merge/rspec'
 require 'rbs/merge'
 
-require 'tree_haver/rspec/dependency_tags'
+require 'tree_haver/rspec'
 require_relative 'support/testable_node'
 
 RSpec.configure do |config|

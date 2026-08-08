@@ -50,6 +50,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Implement Ruby namespace-form declaration matching for equivalent qualified and nested declarations.
 
+- Align Bash and RBS spec helpers with TreeHaver registry-driven backend availability tags.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

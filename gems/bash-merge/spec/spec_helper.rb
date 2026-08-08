@@ -27,6 +27,7 @@ require 'kettle/test/rspec'
 require 'ast/merge'
 require 'ast/merge/rspec'
 require 'bash/merge'
+require 'tree_haver/rspec'
 
 require_relative 'support/shared_examples/file_analysis_examples'
 require_relative 'support/shared_examples/smart_merger_examples'
@@ -42,5 +43,4 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.filter_run_excluding(bash_grammar: true) unless Bash::Merge.available?
 end
