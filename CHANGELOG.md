@@ -54,6 +54,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Register Bash grammar availability through TreeHaver so backend-tagged specs skip unavailable parser environments.
 
+- Load merge providers before configuring shared backend availability filters across the family spec harnesses.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

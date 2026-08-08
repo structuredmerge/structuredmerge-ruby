@@ -25,8 +25,8 @@ require 'kettle/test/rspec'
 
 # This library
 require 'ast/merge'
-require 'ast/merge/rspec'
 require 'prism/merge'
+require 'ast/merge/rspec'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
