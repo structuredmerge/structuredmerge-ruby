@@ -28,16 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Declare the released adapter gems required by ast-template's default adapter registry test suite.
-
 ### Security
 
 ## [7.1.1] - 2026-08-08
 
 - TAG: [v7.1.1][7.1.1t]
-- COVERAGE: 94.07% -- 127/135 lines in 3 files
-- BRANCH COVERAGE: 65.12% -- 28/43 branches in 3 files
-- 22.22% documented
+- COVERAGE: 97.12% -- 505/520 lines in 3 files
+- BRANCH COVERAGE: 86.11% -- 155/180 branches in 3 files
+- 5.15% documented
 
 ### Changed
 
@@ -106,6 +104,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Restore the release-profile template files and remove the legacy workflow from html-merge.
 
 - Restore the Code Coverage section in html-merge README so its local anchor is valid.
+
+- Declare the released adapter gems required by ast-template's default adapter registry test suite.
 
 ## [7.1.0] - 2026-08-07
 
