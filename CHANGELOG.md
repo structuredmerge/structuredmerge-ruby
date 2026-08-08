@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Restore per-member commits for family bundle refreshes so valid lockfile updates are recorded.
 
+- Separate local non-committing bundle refreshes from release-mode bundle updates that validate and commit publishable lockfiles.
+
 ### Security
 
 ## [7.1.1] - 2026-08-07
