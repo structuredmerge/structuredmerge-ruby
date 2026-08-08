@@ -3,6 +3,27 @@
 require_relative "bootstrap/tree_haver_backends"
 require_relative "bootstrap/merge_gems"
 
+# Register every parser-backed merge gem before ast-merge installs RSpec's
+# dependency filters. Individual gem helpers do this naturally; the aggregate
+# suite must preserve the same ordering across the whole family.
+%w[
+  bash/merge
+  citrus/toml/merge
+  commonmarker/merge
+  dotenv/merge
+  json/merge
+  kramdown/merge
+  markdown/merge
+  markly/merge
+  parslet/toml/merge
+  prism/merge
+  psych/merge
+  rbs/merge
+  ruby/merge
+  toml/merge
+  yaml/merge
+].each { |require_path| require require_path }
+
 require_relative "../gems/ast-merge/spec/spec_helper"
 require_relative "../gems/ast-merge-git/spec/spec_helper"
 require_relative "../gems/ast-crispr/spec/spec_helper"

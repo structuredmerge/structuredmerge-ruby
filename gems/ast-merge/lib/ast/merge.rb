@@ -2971,7 +2971,7 @@ module Ast
           destination_path: destination_path,
           execution_action: entry[:execution_action] || entry['execution_action'],
           status: entry[:status] || entry['status'],
-          written: !written.nil?
+          written: written == true
         }
       end
 

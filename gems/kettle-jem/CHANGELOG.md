@@ -1395,6 +1395,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Include the canonical Rakefile scaffold in monorepo subgem templates.
 
+- Resolve all local StructuredMerge sibling dependencies in isolated require-boundary tests.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -10,6 +10,7 @@ RSpec.describe "kettle/jem require boundary" do
       env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
       %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
       env["BUNDLE_GEMFILE"] = File.expand_path("../Gemfile", __dir__)
+      env["STRUCTUREDMERGE_DEV"] = File.expand_path("../..", __dir__)
     end
   end
 

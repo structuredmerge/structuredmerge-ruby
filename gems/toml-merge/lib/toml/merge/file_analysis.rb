@@ -237,13 +237,13 @@ module Toml
           wrapper = wrap_node(child, document_root: root)
           next unless wrapper
 
-          next unless wrapper.table? || wrapper.array_of_tables?
+          if wrapper.table? || wrapper.array_of_tables?
+            child_line = wrapper.start_line
+            first_table_line = child_line if child_line && (first_table_line.nil? || child_line < first_table_line)
+            next
+          end
 
-          child_line = wrapper.start_line
-          first_table_line = child_line if child_line && (first_table_line.nil? || child_line < first_table_line)
-
-          wrapper = wrap_node(child, document_root: root)
-          next unless wrapper&.pair?
+          next unless wrapper.pair?
 
           # For Citrus backend, only include pairs before the first table
           if first_table_line

@@ -31,7 +31,7 @@ module Yaml
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
-        return if BACKEND_REGISTRY.registered
+        return if BACKEND_REGISTRY.registered && TreeHaver.registered_languages(:yaml).any?
 
         TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
 

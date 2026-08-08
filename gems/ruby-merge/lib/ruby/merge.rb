@@ -3160,7 +3160,18 @@ TreeHaver::BackendRegistry.register_tag(
   category: :capability,
   backend_name: :tslp_ruby_top_level_call_records
 ) do
-  result = Ruby::Merge.merge_ruby("task :default do\nend\n", "task :default do\nend\n", 'ruby')
+  template = <<~RUBY
+    source "https://gem.coop"
+    gemspec
+    eval_gemfile "gemfiles/modular/style.gemfile"
+    gem "rake"
+  RUBY
+  destination = <<~RUBY
+    source "https://rubygems.org"
+    gem "rspec"
+    eval_gemfile "gemfiles/modular/style.gemfile"
+  RUBY
+  result = Ruby::Merge.merge_ruby(template, destination, 'ruby')
   result[:ok]
 end
 

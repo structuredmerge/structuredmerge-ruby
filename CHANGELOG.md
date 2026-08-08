@@ -64,6 +64,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Skip RBS backend examples when the selected parser backend is not registered.
 
+- Register parser-backed merge gems before aggregate spec filters and preserve TOML root-level owners during analysis.
+
+- Re-register YAML and TOML grammars after backend cache resets in parallel test workers.
+
+- Honor false capability-check results when configuring backend availability tags.
+
+- Report template application writes only for files actually created or updated, including unchanged and blocked reapplications.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

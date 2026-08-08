@@ -251,7 +251,7 @@ module Toml
 
       def register_backend!
         BACKEND_REGISTRY.mutex.synchronize do
-          return if BACKEND_REGISTRY.registered
+          return if BACKEND_REGISTRY.registered && TreeHaver.registered_languages(:toml).any?
 
           TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND_REFERENCE)
 
