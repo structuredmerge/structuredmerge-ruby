@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::FileAnalysisBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -200,7 +200,7 @@
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
     </dl>
   
@@ -930,6 +930,7 @@
       <pre class="lines">
 
 
+60
 61
 62
 63
@@ -957,11 +958,10 @@
 85
 86
 87
-88
-89</pre>
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Markdown::Merge::FileAnalysisBase::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_parser_options'>parser_options</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
@@ -969,7 +969,7 @@
 </span>  <span class='comment'># But remove the final empty string if source ends with newline
 </span>  <span class='comment'># (that empty string represents the &quot;line after the last newline&quot; which doesn&#39;t exist)
 </span>  <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
-  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span> <span class='kw'>if</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_end_with?'>end_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span> <span class='kw'>if</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_end_with?'>end_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='ivar'>@comment_tracker</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CommentTracker.html" title="Markdown::Merge::CommentTracker (class)">CommentTracker</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CommentTracker.html#initialize-instance_method" title="Markdown::Merge::CommentTracker#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@lines</span><span class='rparen'>)</span>
 
   <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
@@ -978,19 +978,19 @@
   <span class='ivar'>@errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
 
   <span class='comment'># Parse the Markdown source - subclasses implement this
-</span>  <span class='ivar'>@document</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysisBase#parse</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+</span>  <span class='ivar'>@document</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysisBase#parse</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_parse_document'>parse_document</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Extract and integrate all nodes including freeze blocks
 </span>  <span class='ivar'>@statements</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_and_integrate_all_nodes'>extract_and_integrate_all_nodes</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysisBase initialized</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>document_children:</span> <span class='id identifier rubyid_count_children'>count_children</span><span class='lparen'>(</span><span class='ivar'>@document</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysisBase initialized</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                      <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                      <span class='label'>document_children:</span> <span class='id identifier rubyid_count_children'>count_children</span><span class='lparen'>(</span><span class='ivar'>@document</span><span class='rparen'>)</span><span class='comma'>,</span>
+                      <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>freeze_blocks:</span> <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+                    <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1046,12 +1046,12 @@
       <pre class="lines">
 
 
+51
 52
-53
-54</pre>
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span>
   <span class='ivar'>@comment_tracker</span>
@@ -1105,12 +1105,12 @@
       <pre class="lines">
 
 
+45
 46
-47
-48</pre>
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_document'>document</span>
   <span class='ivar'>@document</span>
@@ -1164,12 +1164,12 @@
       <pre class="lines">
 
 
+48
 49
-50
-51</pre>
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
   <span class='ivar'>@errors</span>
@@ -1219,12 +1219,12 @@
       <pre class="lines">
 
 
+218
 219
-220
-221</pre>
+220</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 219</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 218</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_statements'>statements</span>
   <span class='ivar'>@statements</span>
@@ -1313,6 +1313,7 @@
       <pre class="lines">
 
 
+171
 172
 173
 174
@@ -1320,11 +1321,10 @@
 176
 177
 178
-179
-180</pre>
+179</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 172</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 171</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_augmented_attachment'>augmented_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
@@ -1332,7 +1332,7 @@
   <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
     <span class='label'>tracker_attachment:</span> <span class='id identifier rubyid_augmented_attachment'>augmented_attachment</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1378,12 +1378,12 @@
       <pre class="lines">
 
 
+182
 183
-184
-185</pre>
+184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 182</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span>
   <span class='symbol'>:normalize_tracked_layout_merge</span>
@@ -1467,20 +1467,20 @@
       <pre class="lines">
 
 
+209
 210
 211
 212
 213
-214
-215</pre>
+214</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 210</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span>
     <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1526,12 +1526,12 @@
       <pre class="lines">
 
 
+119
 120
-121
-122</pre>
+121</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
   <span class='ivar'>@comment_capability</span> <span class='op'>||=</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_capability'>capability</span>
@@ -1598,12 +1598,12 @@
       <pre class="lines">
 
 
+148
 149
-150
-151</pre>
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
@@ -1651,12 +1651,12 @@
       <pre class="lines">
 
 
+140
 141
-142
-143</pre>
+142</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 141</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 140</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
@@ -1755,22 +1755,22 @@
       <pre class="lines">
 
 
+158
 159
 160
 161
 162
 163
-164
-165</pre>
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 159</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 158</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>kind:</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
     <span class='label'>kind:</span> <span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span>
-    <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span><span class='comma'>,</span>
+    <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1819,22 +1819,22 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+129
 130
 131
 132
 133
 134
-135
-136</pre>
+135</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
   <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
     <span class='label'>source:</span> <span class='symbol'>:markdown_source</span><span class='comma'>,</span>
     <span class='label'>style:</span> <span class='symbol'>:html_comment</span><span class='comma'>,</span>
-    <span class='label'>read_strategy:</span> <span class='symbol'>:source_augmented_portable_write</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='symbol'>:source_augmented_portable_write</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1903,6 +1903,7 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+223
 224
 225
 226
@@ -1913,11 +1914,10 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
 231
 232
 233
-234
-235</pre>
+234</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 224</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 223</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_node'>node</span>
@@ -2002,6 +2002,7 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+261
 262
 263
 264
@@ -2069,11 +2070,10 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
 326
 327
 328
-329
-330</pre>
+329</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 262</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 261</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute_parser_signature'>compute_parser_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
@@ -2109,11 +2109,11 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
     <span class='id identifier rubyid_items_text'>items_text</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
     <span class='id identifier rubyid_child'>child</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_first_child'>first_child</span>
     <span class='kw'>while</span> <span class='id identifier rubyid_child'>child</span>
-      <span class='id identifier rubyid_items_text'>items_text</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_extract_text_content'>extract_text_content</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\W+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+      <span class='id identifier rubyid_items_text'>items_text</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_extract_text_content'>extract_text_content</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\W+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
       <span class='id identifier rubyid_child'>child</span> <span class='op'>=</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
       <span class='kw'>break</span> <span class='kw'>if</span> <span class='id identifier rubyid_items_text'>items_text</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;=</span> <span class='int'>5</span>
     <span class='kw'>end</span>
-    <span class='id identifier rubyid_fingerprint'>fingerprint</span> <span class='op'>=</span> <span class='const'>Digest</span><span class='op'>::</span><span class='const'>SHA256</span><span class='period'>.</span><span class='id identifier rubyid_hexdigest'>hexdigest</span><span class='lparen'>(</span><span class='id identifier rubyid_items_text'>items_text</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>16</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_fingerprint'>fingerprint</span> <span class='op'>=</span> <span class='const'>Digest</span><span class='op'>::</span><span class='const'>SHA256</span><span class='period'>.</span><span class='id identifier rubyid_hexdigest'>hexdigest</span><span class='lparen'>(</span><span class='id identifier rubyid_items_text'>items_text</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>|</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>16</span><span class='rbracket'>]</span>
     <span class='lbracket'>[</span><span class='symbol'>:list</span><span class='comma'>,</span> <span class='id identifier rubyid_list_type'>list_type</span><span class='comma'>,</span> <span class='id identifier rubyid_fingerprint'>fingerprint</span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:block_quote</span><span class='comma'>,</span> <span class='symbol'>:blockquote</span>
     <span class='comment'># Content-based: Match block quotes by content hash
@@ -2210,6 +2210,7 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+344
 345
 346
 347
@@ -2219,11 +2220,10 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
 351
 352
 353
-354
-355</pre>
+354</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 345</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 344</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_extract_text_content'>extract_text_content</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_text_parts'>text_parts</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -2302,16 +2302,16 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+239
 240
 241
 242
 243
 244
-245
-246</pre>
+245</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 239</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>FreezeNodeBase</span><span class='rparen'>)</span> <span class='op'>||</span>
@@ -2406,12 +2406,12 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+106
 107
-108
-109</pre>
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 107</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> must implement #next_sibling</span><span class='tstring_end'>&quot;</span></span>
@@ -2500,12 +2500,12 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+95
 96
-97
-98</pre>
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_document'>parse_document</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> must implement #parse_document</span><span class='tstring_end'>&quot;</span></span>
@@ -2576,13 +2576,13 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+251
 252
 253
-254
-255</pre>
+254</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 251</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parser_node?'>parser_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='comment'># Default: check if it responds to :type (common for AST nodes)
@@ -2608,18 +2608,18 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+198
 199
 200
 201
-202
-203</pre>
+202</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 199</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_delegation_policies'>ruleset_delegation_policies</span>
   <span class='lbracket'>[</span>
-    <span class='lbrace'>{</span><span class='label'>surface_name:</span> <span class='symbol'>:fenced_code_block</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:by_language</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>surface_name:</span> <span class='symbol'>:fenced_code_block</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:by_language</span> <span class='rbrace'>}</span>
   <span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2642,18 +2642,18 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+186
 187
 188
 189
-190
-191</pre>
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 187</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 186</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_logical_owners'>ruleset_logical_owners</span>
   <span class='lbrace'>{</span>
-    <span class='label'>link_definition:</span> <span class='symbol'>:preserve_if_referenced</span><span class='comma'>,</span>
+    <span class='label'>link_definition:</span> <span class='symbol'>:preserve_if_referenced</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2676,18 +2676,18 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+192
 193
 194
 195
-196
-197</pre>
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 192</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_surfaces'>ruleset_surfaces</span>
   <span class='lbracket'>[</span>
-    <span class='lbrace'>{</span><span class='label'>name:</span> <span class='symbol'>:fenced_code_block</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:language_tag</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span> <span class='label'>name:</span> <span class='symbol'>:fenced_code_block</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:language_tag</span> <span class='rbrace'>}</span>
   <span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2756,15 +2756,15 @@ shared synthetic comment layer rather than parser-native comment AST.</p>
       <pre class="lines">
 
 
+334
 335
 336
 337
 338
-339
-340</pre>
+339</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 335</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 334</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_safe_string_content'>safe_string_content</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_string_content'>string_content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -2856,6 +2856,7 @@ except for the last line of the file (which may or may not have one in the origi
       <pre class="lines">
 
 
+364
 365
 366
 367
@@ -2875,17 +2876,16 @@ except for the last line of the file (which may or may not have one in the origi
 381
 382
 383
-384
-385</pre>
+384</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 365</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 364</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source_range'>source_range</span><span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&lt;</span> <span class='int'>1</span> <span class='op'>||</span> <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_start_line'>start_line</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&lt;</span> <span class='int'>1</span> <span class='op'>||</span> <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_start_line'>start_line</span>
 
   <span class='id identifier rubyid_extracted_lines'>extracted_lines</span> <span class='op'>=</span> <span class='ivar'>@lines</span><span class='lbracket'>[</span><span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='op'>..</span><span class='lparen'>(</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='rbracket'>]</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_extracted_lines'>extracted_lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_extracted_lines'>extracted_lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='comment'># Add newlines between and after lines, but not after the last line of the file
 </span>  <span class='comment'># unless it originally had one
@@ -2945,12 +2945,12 @@ except for the last line of the file (which may or may not have one in the origi
       <pre class="lines">
 
 
+112
 113
-114
-115</pre>
+114</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis_base.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='ivar'>@errors</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@document</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2965,9 +2965,9 @@ except for the last line of the file (which may or may not have one in the origi
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

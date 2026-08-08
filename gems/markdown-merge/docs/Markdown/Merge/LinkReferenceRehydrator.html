@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::LinkReferenceRehydrator
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1027,8 +1027,8 @@ inner replacements are applied before outer ones.</p>
 </span>  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
   <span class='id identifier rubyid_replacements'>replacements</span><span class='period'>.</span><span class='id identifier rubyid_sort_by'>sort_by</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_r'>r</span><span class='op'>|</span> <span class='op'>-</span><span class='id identifier rubyid_r'>r</span><span class='lbracket'>[</span><span class='symbol'>:start_pos</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_replacement'>replacement</span><span class='op'>|</span>
     <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='id identifier rubyid_replacement'>replacement</span><span class='lbracket'>[</span><span class='symbol'>:start_pos</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>+</span>
-      <span class='id identifier rubyid_replacement'>replacement</span><span class='lbracket'>[</span><span class='symbol'>:replacement</span><span class='rbracket'>]</span> <span class='op'>+</span>
-      <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='id identifier rubyid_replacement'>replacement</span><span class='lbracket'>[</span><span class='symbol'>:end_pos</span><span class='rbracket'>]</span><span class='op'>..</span><span class='rbracket'>]</span>
+             <span class='id identifier rubyid_replacement'>replacement</span><span class='lbracket'>[</span><span class='symbol'>:replacement</span><span class='rbracket'>]</span> <span class='op'>+</span>
+             <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='id identifier rubyid_replacement'>replacement</span><span class='lbracket'>[</span><span class='symbol'>:end_pos</span><span class='rbracket'>]</span><span class='op'>..</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_result'>result</span>
@@ -1043,9 +1043,9 @@ inner replacements are applied before outer ones.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

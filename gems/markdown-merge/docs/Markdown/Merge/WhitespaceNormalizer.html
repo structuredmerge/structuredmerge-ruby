@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::WhitespaceNormalizer
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -832,12 +832,12 @@
       <pre class="lines">
 
 
-88
-89
-90</pre>
+86
+87
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/whitespace_normalizer.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/whitespace_normalizer.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_changed?'>changed?</span>
   <span class='op'>!</span><span class='ivar'>@problems</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -889,12 +889,12 @@
       <pre class="lines">
 
 
-95
-96
-97</pre>
+93
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/whitespace_normalizer.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/whitespace_normalizer.rb', line 93</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalization_count'>normalization_count</span>
   <span class='ivar'>@problems</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
@@ -956,9 +956,7 @@
 78
 79
 80
-81
-82
-83</pre>
+81</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/whitespace_normalizer.rb', line 71</span>
@@ -970,9 +968,7 @@
 </span>  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_collapse_excessive_blank_lines'>collapse_excessive_blank_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
 
   <span class='comment'># Remove blank lines between link refs if mode requires it
-</span>  <span class='kw'>if</span> <span class='ivar'>@mode</span> <span class='op'>==</span> <span class='symbol'>:link_refs</span> <span class='op'>||</span> <span class='ivar'>@mode</span> <span class='op'>==</span> <span class='symbol'>:strict</span>
-    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_blank_lines_between_link_refs'>remove_blank_lines_between_link_refs</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+</span>  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_blank_lines_between_link_refs'>remove_blank_lines_between_link_refs</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@mode</span> <span class='op'>==</span> <span class='symbol'>:link_refs</span> <span class='op'>||</span> <span class='ivar'>@mode</span> <span class='op'>==</span> <span class='symbol'>:strict</span>
 
   <span class='id identifier rubyid_result'>result</span>
 <span class='kw'>end</span></pre>
@@ -986,9 +982,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

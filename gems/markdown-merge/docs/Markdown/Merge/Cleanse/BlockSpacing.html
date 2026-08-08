@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::Cleanse::BlockSpacing
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -214,7 +214,7 @@ have syntax issues.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/[a-zA-Z][a-zA-Z0-9]*&gt;\s*\z</span><span class='regexp_end'>/</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\A\s*&lt;/[a-zA-Z][a-zA-Z0-9]*&gt;\s*\z</span><span class='regexp_end'>}</span></span></pre></dd>
       
         <dt id="HTML_OPEN_TAG-constant" class="">HTML_OPEN_TAG =
           <div class="docstring">
@@ -244,7 +244,7 @@ have syntax issues.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/?[a-zA-Z]</span><span class='regexp_end'>/</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\A\s*&lt;/?[a-zA-Z]</span><span class='regexp_end'>}</span></span></pre></dd>
       
         <dt id="LINK_REF_DEF-constant" class="">LINK_REF_DEF =
           <div class="docstring">
@@ -321,7 +321,7 @@ These create a context where we shouldn’t insert blank lines</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#HTML_BLOCK_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::HTML_BLOCK_ELEMENTS (constant)">HTML_BLOCK_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)(?:\s|&gt;)</span><span class='regexp_end'>/i</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#HTML_BLOCK_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::HTML_BLOCK_ELEMENTS (constant)">HTML_BLOCK_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>|</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)(?:\s|&gt;)</span><span class='regexp_end'>/i</span></span></pre></dd>
       
         <dt id="HTML_BLOCK_CLOSE-constant" class="">HTML_BLOCK_CLOSE =
           <div class="docstring">
@@ -336,7 +336,7 @@ These create a context where we shouldn’t insert blank lines</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#HTML_BLOCK_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::HTML_BLOCK_ELEMENTS (constant)">HTML_BLOCK_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)&gt;</span><span class='regexp_end'>/i</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\A\s*&lt;/(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#HTML_BLOCK_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::HTML_BLOCK_ELEMENTS (constant)">HTML_BLOCK_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>|</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)&gt;</span><span class='regexp_end'>}i</span></span></pre></dd>
       
         <dt id="MARKDOWN_CONTAINER_ELEMENTS-constant" class="">MARKDOWN_CONTAINER_ELEMENTS =
           <div class="docstring">
@@ -367,7 +367,7 @@ These should have blank lines before their closing tags</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#MARKDOWN_CONTAINER_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::MARKDOWN_CONTAINER_ELEMENTS (constant)">MARKDOWN_CONTAINER_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)&gt;</span><span class='regexp_end'>/i</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\A\s*&lt;/(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#MARKDOWN_CONTAINER_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::MARKDOWN_CONTAINER_ELEMENTS (constant)">MARKDOWN_CONTAINER_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>|</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)&gt;</span><span class='regexp_end'>}i</span></span></pre></dd>
       
         <dt id="MARKDOWN_CONTENT-constant" class="">MARKDOWN_CONTENT =
           <div class="docstring">
@@ -382,11 +382,12 @@ These should have blank lines before their closing tags</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+        <dd><pre class="code"><span class='id identifier rubyid_lambda'>lambda</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
   <span class='id identifier rubyid_stripped'>stripped</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#LINK_REF_DEF-constant" title="Markdown::Merge::Cleanse::BlockSpacing::LINK_REF_DEF (constant)">LINK_REF_DEF</a></span></span><span class='rparen'>)</span>
+
   <span class='kw'>true</span>
 <span class='rbrace'>}</span></pre></dd>
       
@@ -613,14 +614,14 @@ These should have blank lines before their closing tags</p>
       <pre class="lines">
 
 
-108
 109
 110
 111
-112</pre>
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 109</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
@@ -681,12 +682,12 @@ These should have blank lines before their closing tags</p>
       <pre class="lines">
 
 
-103
 104
-105</pre>
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 103</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 104</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_issues'>issues</span>
   <span class='ivar'>@issues</span>
@@ -740,12 +741,12 @@ These should have blank lines before their closing tags</p>
       <pre class="lines">
 
 
-100
 101
-102</pre>
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 100</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_source'>source</span>
   <span class='ivar'>@source</span>
@@ -804,7 +805,6 @@ These should have blank lines before their closing tags</p>
       <pre class="lines">
 
 
-131
 132
 133
 134
@@ -819,11 +819,10 @@ These should have blank lines before their closing tags</p>
 143
 144
 145
-146
-147</pre>
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 131</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 132</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fix'>fix</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_source'>source</span> <span class='kw'>unless</span> <span class='id identifier rubyid_malformed?'>malformed?</span>
@@ -835,10 +834,8 @@ These should have blank lines before their closing tags</p>
   <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span>
     <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span>
     <span class='comment'># If this line needs a blank line after it, add one
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_insertions'>insertions</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='comment'># issues use 1-based line numbers
-</span>      <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-    <span class='kw'>end</span>
-  <span class='kw'>end</span>
+</span>    <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_insertions'>insertions</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='comment'># issues use 1-based line numbers
+</span>  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
 <span class='kw'>end</span></pre>
@@ -889,12 +886,12 @@ These should have blank lines before their closing tags</p>
       <pre class="lines">
 
 
-124
 125
-126</pre>
+126
+127</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 124</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 125</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_issue_count'>issue_count</span>
   <span class='ivar'>@issues</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
@@ -946,12 +943,12 @@ These should have blank lines before their closing tags</p>
       <pre class="lines">
 
 
-117
 118
-119</pre>
+119
+120</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 117</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 118</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_malformed?'>malformed?</span>
   <span class='ivar'>@issues</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
@@ -966,9 +963,9 @@ These should have blank lines before their closing tags</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

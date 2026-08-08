@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::SmartMergerBase
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1042,6 +1042,7 @@ to reference-style when a matching link reference definition exists. Default: fa
       <pre class="lines">
 
 
+148
 149
 150
 151
@@ -1140,7 +1141,7 @@ to reference-style when a matching link reference definition exists. Default: fa
 244</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
@@ -1167,7 +1168,7 @@ to reference-style when a matching link reference definition exists. Default: fa
   <span class='ivar'>@corruption_handling</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Healer</span><span class='period'>.</span><span class='id identifier rubyid_normalize_mode'>normalize_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_corruption_handling'>corruption_handling</span><span class='rparen'>)</span>
   <span class='ivar'>@match_refiner</span> <span class='op'>=</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span> <span class='op'>||</span> <span class='id identifier rubyid_default_match_refiner'>default_match_refiner</span><span class='lparen'>(</span>
     <span class='label'>inner_merge_lists:</span> <span class='id identifier rubyid_inner_merge_lists'>inner_merge_lists</span><span class='comma'>,</span>
-    <span class='label'>inner_merge_code_blocks:</span> <span class='id identifier rubyid_inner_merge_code_blocks'>inner_merge_code_blocks</span><span class='comma'>,</span>
+    <span class='label'>inner_merge_code_blocks:</span> <span class='id identifier rubyid_inner_merge_code_blocks'>inner_merge_code_blocks</span>
   <span class='rparen'>)</span>
   <span class='ivar'>@node_typing</span> <span class='op'>=</span> <span class='id identifier rubyid_node_typing'>node_typing</span>
   <span class='ivar'>@resolution_mode</span> <span class='op'>=</span> <span class='id identifier rubyid_resolution_mode'>resolution_mode</span>
@@ -1181,27 +1182,28 @@ to reference-style when a matching link reference definition exists. Default: fa
 
   <span class='comment'># Set up code block merger
 </span>  <span class='ivar'>@code_block_merger</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_inner_merge_code_blocks'>inner_merge_code_blocks</span>
-  <span class='kw'>when</span> <span class='kw'>true</span>
-    <span class='const'><span class='object_link'><a href="CodeBlockMerger.html" title="Markdown::Merge::CodeBlockMerger (class)">CodeBlockMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CodeBlockMerger.html#initialize-instance_method" title="Markdown::Merge::CodeBlockMerger#initialize (method)">new</a></span></span>
-  <span class='kw'>when</span> <span class='kw'>false</span>
-    <span class='kw'>nil</span>
-  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="CodeBlockMerger.html" title="Markdown::Merge::CodeBlockMerger (class)">CodeBlockMerger</a></span></span>
-    <span class='id identifier rubyid_inner_merge_code_blocks'>inner_merge_code_blocks</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>inner_merge_code_blocks must be true, false, or a CodeBlockMerger instance</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
+                       <span class='kw'>when</span> <span class='kw'>true</span>
+                         <span class='const'><span class='object_link'><a href="CodeBlockMerger.html" title="Markdown::Merge::CodeBlockMerger (class)">CodeBlockMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CodeBlockMerger.html#initialize-instance_method" title="Markdown::Merge::CodeBlockMerger#initialize (method)">new</a></span></span>
+                       <span class='kw'>when</span> <span class='kw'>false</span>
+                         <span class='kw'>nil</span>
+                       <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="CodeBlockMerger.html" title="Markdown::Merge::CodeBlockMerger (class)">CodeBlockMerger</a></span></span>
+                         <span class='id identifier rubyid_inner_merge_code_blocks'>inner_merge_code_blocks</span>
+                       <span class='kw'>else</span>
+                         <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span>
+                               <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>inner_merge_code_blocks must be true, false, or a CodeBlockMerger instance</span><span class='tstring_end'>&#39;</span></span>
+                       <span class='kw'>end</span>
 
   <span class='comment'># Set up list merger
 </span>  <span class='ivar'>@list_merger</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_inner_merge_lists'>inner_merge_lists</span>
-  <span class='kw'>when</span> <span class='kw'>true</span>
-    <span class='const'><span class='object_link'><a href="ListMerger.html" title="Markdown::Merge::ListMerger (class)">ListMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
-  <span class='kw'>when</span> <span class='kw'>false</span>
-    <span class='kw'>nil</span>
-  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="ListMerger.html" title="Markdown::Merge::ListMerger (class)">ListMerger</a></span></span>
-    <span class='id identifier rubyid_inner_merge_lists'>inner_merge_lists</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>inner_merge_lists must be true, false, or a ListMerger instance</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
+                 <span class='kw'>when</span> <span class='kw'>true</span>
+                   <span class='const'><span class='object_link'><a href="ListMerger.html" title="Markdown::Merge::ListMerger (class)">ListMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+                 <span class='kw'>when</span> <span class='kw'>false</span>
+                   <span class='kw'>nil</span>
+                 <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="ListMerger.html" title="Markdown::Merge::ListMerger (class)">ListMerger</a></span></span>
+                   <span class='id identifier rubyid_inner_merge_lists'>inner_merge_lists</span>
+                 <span class='kw'>else</span>
+                   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>inner_merge_lists must be true, false, or a ListMerger instance</span><span class='tstring_end'>&#39;</span></span>
+                 <span class='kw'>end</span>
 
   <span class='comment'># Parse template
 </span>  <span class='kw'>begin</span>
@@ -1209,7 +1211,7 @@ to reference-style when a matching link reference definition exists. Default: fa
       <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
       <span class='label'>freeze_token:</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span>
       <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='comma'>,</span>
-      <span class='op'>**</span><span class='id identifier rubyid_parser_options'>parser_options</span><span class='comma'>,</span>
+      <span class='op'>**</span><span class='id identifier rubyid_parser_options'>parser_options</span>
     <span class='rparen'>)</span>
   <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='id identifier rubyid_template_parse_error_class'>template_parse_error_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>errors:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_e'>e</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1221,7 +1223,7 @@ to reference-style when a matching link reference definition exists. Default: fa
       <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
       <span class='label'>freeze_token:</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span>
       <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='comma'>,</span>
-      <span class='op'>**</span><span class='id identifier rubyid_parser_options'>parser_options</span><span class='comma'>,</span>
+      <span class='op'>**</span><span class='id identifier rubyid_parser_options'>parser_options</span>
     <span class='rparen'>)</span>
   <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='id identifier rubyid_destination_parse_error_class'>destination_parse_error_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>errors:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_e'>e</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1233,7 +1235,7 @@ to reference-style when a matching link reference definition exists. Default: fa
     <span class='label'>template_analysis:</span> <span class='ivar'>@template_analysis</span><span class='comma'>,</span>
     <span class='label'>dest_analysis:</span> <span class='ivar'>@dest_analysis</span><span class='comma'>,</span>
     <span class='label'>resolution_mode:</span> <span class='ivar'>@resolution_mode</span><span class='comma'>,</span>
-    <span class='label'>unresolved_policy:</span> <span class='ivar'>@unresolved_policy</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='ivar'>@unresolved_policy</span>
   <span class='rparen'>)</span>
   <span class='ivar'>@runtime_session</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='ivar'>@runtime_root_operation</span> <span class='op'>=</span> <span class='kw'>nil</span>
@@ -1553,12 +1555,12 @@ to reference-style when a matching link reference definition exists. Default: fa
       <pre class="lines">
 
 
+66
 67
-68
-69</pre>
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolution_mode'>resolution_mode</span>
   <span class='ivar'>@resolution_mode</span>
@@ -1772,12 +1774,12 @@ to reference-style when a matching link reference definition exists. Default: fa
       <pre class="lines">
 
 
+66
 67
-68
-69</pre>
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unresolved_policy'>unresolved_policy</span>
   <span class='ivar'>@unresolved_policy</span>
@@ -2146,7 +2148,8 @@ to reference-style when a matching link reference definition exists. Default: fa
 334
 335
 336
-337</pre>
+337
+338</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 294</span>
@@ -2154,21 +2157,21 @@ to reference-style when a matching link reference definition exists. Default: fa
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='kw'>return</span> <span class='ivar'>@merge_result</span> <span class='kw'>if</span> <span class='ivar'>@merge_result</span>
 
-  <span class='ivar'>@merge_result</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SmartMergerBase#merge</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+  <span class='ivar'>@merge_result</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SmartMergerBase#merge</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_prepare_runtime_session!'>prepare_runtime_session!</span>
-    <span class='id identifier rubyid_alignment'>alignment</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SmartMergerBase#align</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_alignment'>alignment</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SmartMergerBase#align</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='ivar'>@aligner</span><span class='period'>.</span><span class='id identifier rubyid_align'>align</span>
     <span class='kw'>end</span>
 
-    <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Alignment complete</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-      <span class='label'>total_entries:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-      <span class='label'>matches:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:match</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-      <span class='label'>template_only:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:template_only</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-      <span class='label'>dest_only:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:dest_only</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Alignment complete</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                        <span class='label'>total_entries:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                        <span class='label'>matches:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:match</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+                        <span class='label'>template_only:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:template_only</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+                        <span class='label'>dest_only:</span> <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:dest_only</span> <span class='rbrace'>}</span>
+                      <span class='rbrace'>}</span><span class='rparen'>)</span>
 
     <span class='comment'># Process alignment using OutputBuilder
-</span>    <span class='id identifier rubyid_builder'>builder</span><span class='comma'>,</span> <span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span> <span class='id identifier rubyid_frozen_blocks'>frozen_blocks</span><span class='comma'>,</span> <span class='id identifier rubyid_conflicts'>conflicts</span><span class='comma'>,</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SmartMergerBase#process</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+</span>    <span class='id identifier rubyid_builder'>builder</span><span class='comma'>,</span> <span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span> <span class='id identifier rubyid_frozen_blocks'>frozen_blocks</span><span class='comma'>,</span> <span class='id identifier rubyid_conflicts'>conflicts</span><span class='comma'>,</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Markdown::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SmartMergerBase#process</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='id identifier rubyid_process_alignment'>process_alignment</span><span class='lparen'>(</span><span class='id identifier rubyid_alignment'>alignment</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
 
@@ -2181,7 +2184,8 @@ to reference-style when a matching link reference definition exists. Default: fa
 
     <span class='comment'># Apply post-processing transformations
 </span>    <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_problems'>problems</span> <span class='op'>=</span> <span class='id identifier rubyid_apply_post_processing'>apply_post_processing</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_problems'>problems</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_complete_runtime_session!'>complete_runtime_session!</span><span class='lparen'>(</span><span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>stats:</span> <span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span> <span class='label'>problems:</span> <span class='id identifier rubyid_problems'>problems</span><span class='comma'>,</span> <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_complete_runtime_session!'>complete_runtime_session!</span><span class='lparen'>(</span><span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>stats:</span> <span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span> <span class='label'>problems:</span> <span class='id identifier rubyid_problems'>problems</span><span class='comma'>,</span>
+                              <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='rparen'>)</span>
 
     <span class='comment'># Get final content from OutputBuilder
 </span>    <span class='const'><span class='object_link'><a href="MergeResult.html" title="Markdown::Merge::MergeResult (class)">MergeResult</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="MergeResult.html#initialize-instance_method" title="Markdown::Merge::MergeResult#initialize (method)">new</a></span></span><span class='lparen'>(</span>
@@ -2191,7 +2195,7 @@ to reference-style when a matching link reference definition exists. Default: fa
       <span class='label'>frozen_blocks:</span> <span class='id identifier rubyid_frozen_blocks'>frozen_blocks</span><span class='comma'>,</span>
       <span class='label'>stats:</span> <span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
       <span class='label'>problems:</span> <span class='id identifier rubyid_problems'>problems</span><span class='comma'>,</span>
-      <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+      <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -2242,7 +2246,6 @@ to reference-style when a matching link reference definition exists. Default: fa
       <pre class="lines">
 
 
-342
 343
 344
 345
@@ -2271,20 +2274,21 @@ to reference-style when a matching link reference definition exists. Default: fa
 368
 369
 370
-371</pre>
+371
+372</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 342</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 343</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@template_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>||</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>statements:</span> <span class='ivar'>@template_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+    <span class='label'>statements:</span> <span class='ivar'>@template_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span>
   <span class='rbrace'>}</span>
   <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@dest_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>||</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>statements:</span> <span class='ivar'>@dest_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+    <span class='label'>statements:</span> <span class='ivar'>@dest_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span>
   <span class='rbrace'>}</span>
 
   <span class='lbrace'>{</span>
@@ -2297,13 +2301,13 @@ to reference-style when a matching link reference definition exists. Default: fa
       <span class='label'>remove_template_missing_nodes:</span> <span class='ivar'>@remove_template_missing_nodes</span><span class='comma'>,</span>
       <span class='label'>corruption_handling:</span> <span class='ivar'>@corruption_handling</span><span class='comma'>,</span>
       <span class='label'>runtime_operation_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_operations'>operations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
-      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>runtime:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
     <span class='label'>statistics:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
     <span class='label'>decisions:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
     <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='comma'>,</span>
-    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2353,12 +2357,12 @@ to reference-style when a matching link reference definition exists. Default: fa
       <pre class="lines">
 
 
-376
 377
-378</pre>
+378
+379</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 376</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger_base.rb', line 377</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_stats'>stats</span>
   <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span>
@@ -2432,9 +2436,9 @@ to reference-style when a matching link reference definition exists. Default: fa
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

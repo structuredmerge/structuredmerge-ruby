@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::FileAnalysis
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -169,7 +169,17 @@ enabling portable merge rules across backends.</p>
     
   </ul>
 
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="FileAnalysis/HeadingSectionOwner.html" title="Markdown::Merge::FileAnalysis::HeadingSectionOwner (class)">HeadingSectionOwner</a></span>, <span class='object_link'><a href="FileAnalysis/HtmlCommentOwner.html" title="Markdown::Merge::FileAnalysis::HtmlCommentOwner (class)">HtmlCommentOwner</a></span>, <span class='object_link'><a href="FileAnalysis/InlineReferenceOwner.html" title="Markdown::Merge::FileAnalysis::InlineReferenceOwner (class)">InlineReferenceOwner</a></span>, <span class='object_link'><a href="FileAnalysis/LinkDefinitionOwner.html" title="Markdown::Merge::FileAnalysis::LinkDefinitionOwner (class)">LinkDefinitionOwner</a></span>, <span class='object_link'><a href="FileAnalysis/ListItemOwner.html" title="Markdown::Merge::FileAnalysis::ListItemOwner (class)">ListItemOwner</a></span>, <span class='object_link'><a href="FileAnalysis/Location.html" title="Markdown::Merge::FileAnalysis::Location (class)">Location</a></span>, <span class='object_link'><a href="FileAnalysis/TableRowOwner.html" title="Markdown::Merge::FileAnalysis::TableRowOwner (class)">TableRowOwner</a></span>
+    
+  
+</p>
+
   
     <h2>
       Constant Summary
@@ -204,7 +214,7 @@ enabling portable merge rules across backends.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
     </dl>
   
@@ -237,7 +247,7 @@ enabling portable merge rules across backends.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>The backend being used (:commonmarker, :markly).</p>
+    <span class="summary_desc"><div class='inline'><p>The backend being used (:commonmarker, :markly, :kramdown).</p>
 </div></span>
   
 </li>
@@ -509,6 +519,52 @@ enabling portable merge rules across backends.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#heading_section_owners-instance_method" title="#heading_section_owners (instance method)">#<strong>heading_section_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#html_comment_owners-instance_method" title="#html_comment_owners (instance method)">#<strong>html_comment_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, backend: self.class.default_backend, freeze_token: self.class.default_freeze_token, signature_generator: nil, **parser_options)  &#x21d2; FileAnalysis </a>
     
 
@@ -526,6 +582,75 @@ enabling portable merge rules across backends.</p>
 
   
     <span class="summary_desc"><div class='inline'><p>Initialize file analysis with tree_haver backend.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inline_reference_owners-instance_method" title="#inline_reference_owners (instance method)">#<strong>inline_reference_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#link_definition_owners-instance_method" title="#link_definition_owners (instance method)">#<strong>link_definition_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#list_item_owners-instance_method" title="#list_item_owners (instance method)">#<strong>list_item_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
 </div></span>
   
 </li>
@@ -623,6 +748,29 @@ enabling portable merge rules across backends.</p>
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#table_row_owners-instance_method" title="#table_row_owners (instance method)">#<strong>table_row_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
     </ul>
     
   
@@ -690,7 +838,7 @@ enabling portable merge rules across backends.</p>
       
       
         &mdash;
-        <div class='inline'><p>Backend to use (:commonmarker, :markly, :auto)</p>
+        <div class='inline'><p>Backend to use (:commonmarker, :markly, :kramdown, :auto)</p>
 </div>
       
     </li>
@@ -755,25 +903,25 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
       <pre class="lines">
 
 
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94</pre>
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 97</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
@@ -814,7 +962,7 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns The backend being used (:commonmarker, :markly).</p>
+    <p>Returns The backend being used (:commonmarker, :markly, :kramdown).</p>
 
 
   </div>
@@ -832,7 +980,7 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
       
       
         &mdash;
-        <div class='inline'><p>The backend being used (:commonmarker, :markly)</p>
+        <div class='inline'><p>The backend being used (:commonmarker, :markly, :kramdown)</p>
 </div>
       
     </li>
@@ -1094,20 +1242,20 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
       <pre class="lines">
 
 
-263
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273</pre>
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 263</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 281</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_collect_top_level_nodes'>collect_top_level_nodes</span>
   <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1188,24 +1336,6 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
       <pre class="lines">
 
 
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185
 186
 187
 188
@@ -1247,18 +1377,36 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
 224
 225
 226
-227</pre>
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 168</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 186</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute_parser_signature'>compute_parser_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='comment'># Get canonical type from wrapper or normalize raw type
 </span>  <span class='id identifier rubyid_canonical_type'>canonical_type</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_typed_node?'>typed_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
-    <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_merge_type_for'>merge_type_for</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='const'><span class='object_link'><a href="NodeTypeNormalizer.html" title="Markdown::Merge::NodeTypeNormalizer (module)">NodeTypeNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='ivar'>@backend</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+                     <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_merge_type_for'>merge_type_for</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+                   <span class='kw'>else</span>
+                     <span class='const'><span class='object_link'><a href="NodeTypeNormalizer.html" title="Markdown::Merge::NodeTypeNormalizer (module)">NodeTypeNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='ivar'>@backend</span><span class='rparen'>)</span>
+                   <span class='kw'>end</span>
 
   <span class='comment'># Unwrap to access underlying node methods
 </span>  <span class='id identifier rubyid_raw_node'>raw_node</span> <span class='op'>=</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
@@ -1381,14 +1529,14 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-236
-237
-238
-239
-240</pre>
+254
+255
+256
+257
+258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 236</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 254</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_extract_text_content'>extract_text_content</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_text_parts'>text_parts</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1461,15 +1609,15 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-155
-156
-157
-158
-159
-160</pre>
+173
+174
+175
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 155</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 173</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_typed_node?'>typed_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span> <span class='op'>||</span>
@@ -1524,15 +1672,249 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-136
-137
-138</pre>
+154
+155
+156</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 136</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 154</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze_node_class'>freeze_node_class</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_default_freeze_node_class'>default_freeze_node_class</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="heading_section_owners-instance_method">
+  
+    #<strong>heading_section_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 293</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_heading_section_owners'>heading_section_owners</span>
+  <span class='id identifier rubyid_headings'>headings</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_heading_statement?'>heading_statement?</span><span class='lparen'>(</span><span class='id identifier rubyid_statement'>statement</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_build_heading_owner'>build_heading_owner</span><span class='lparen'>(</span><span class='id identifier rubyid_statement'>statement</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_headings'>headings</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='id identifier rubyid_branch_end_line'>branch_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_branch_end_line'>branch_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_headings'>headings</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
+    <span class='const'><span class='object_link'><a href="FileAnalysis/HeadingSectionOwner.html" title="Markdown::Merge::FileAnalysis::HeadingSectionOwner (class)">HeadingSectionOwner</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>location:</span> <span class='const'><span class='object_link'><a href="FileAnalysis/Location.html" title="Markdown::Merge::FileAnalysis::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>start_line:</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='id identifier rubyid_branch_end_line'>branch_end_line</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>heading_text:</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_heading_text'>heading_text</span><span class='comma'>,</span>
+      <span class='label'>heading_source:</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_heading_source'>heading_source</span><span class='comma'>,</span>
+      <span class='label'>level:</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span>
+      <span class='label'>base:</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_base'>base</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="html_comment_owners-instance_method">
+  
+    #<strong>html_comment_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+333
+334
+335
+336
+337
+338
+339
+340
+341</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 333</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_html_comment_owners'>html_comment_owners</span>
+  <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_nodes'>comment_nodes</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span>
+    <span class='const'><span class='object_link'><a href="FileAnalysis/HtmlCommentOwner.html" title="Markdown::Merge::FileAnalysis::HtmlCommentOwner (class)">HtmlCommentOwner</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>location:</span> <span class='const'><span class='object_link'><a href="FileAnalysis/Location.html" title="Markdown::Merge::FileAnalysis::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>start_line:</span> <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>text:</span> <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inline_reference_owners-instance_method">
+  
+    #<strong>inline_reference_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+349
+350
+351
+352
+353</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 349</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inline_reference_owners'>inline_reference_owners</span>
+  <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='id identifier rubyid_inline_references_for_line'>inline_references_for_line</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="link_definition_owners-instance_method">
+  
+    #<strong>link_definition_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 312</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_link_definition_owners'>link_definition_owners</span>
+  <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:merge_type</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_merge_type'>merge_type</span> <span class='op'>==</span> <span class='symbol'>:link_definition</span>
+
+    <span class='id identifier rubyid_position'>position</span> <span class='op'>=</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_source_position'>source_position</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_position'>position</span>
+
+    <span class='const'><span class='object_link'><a href="FileAnalysis/LinkDefinitionOwner.html" title="Markdown::Merge::FileAnalysis::LinkDefinitionOwner (class)">LinkDefinitionOwner</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>location:</span> <span class='const'><span class='object_link'><a href="FileAnalysis/Location.html" title="Markdown::Merge::FileAnalysis::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>start_line:</span> <span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:end_line</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>label:</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_label'>label</span><span class='comma'>,</span>
+      <span class='label'>url:</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span><span class='comma'>,</span>
+      <span class='label'>title:</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='kw'>if</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:content</span><span class='rparen'>)</span>
+                <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span>
+              <span class='kw'>else</span>
+                <span class='id identifier rubyid_source_range'>source_range</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:end_line</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span>
+              <span class='kw'>end</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="list_item_owners-instance_method">
+  
+    #<strong>list_item_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+343
+344
+345
+346
+347</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 343</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_list_item_owners'>list_item_owners</span>
+  <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+    <span class='id identifier rubyid_collect_list_item_owners'>collect_list_item_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_unwrap_markdown_statement'>unwrap_markdown_statement</span><span class='lparen'>(</span><span class='id identifier rubyid_statement'>statement</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>depth:</span> <span class='int'>0</span><span class='rparen'>)</span>
+  <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_sort_by'>sort_by</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1606,17 +1988,17 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-124
-125
-126
-127
-128
-129
-130
-131</pre>
+142
+143
+144
+145
+146
+147
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 124</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 142</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='comment'># tree_haver normalizes this, but handle both patterns for safety
@@ -1700,18 +2082,18 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-106
-107
-108
-109
-110
-111
-112
-113
-114</pre>
+124
+125
+126
+127
+128
+129
+130
+131
+132</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 106</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_document'>parse_document</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='ivar'>@parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
@@ -1788,16 +2170,16 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-144
-145
-146
-147
-148
-149
-150</pre>
+162
+163
+164
+165
+166
+167
+168</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 162</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parser_node?'>parser_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='comment'># Check for tree_haver node or wrapped node
@@ -1874,20 +2256,20 @@ Uses recursive traversal via <code>children</code> instead.</p>
       <pre class="lines">
 
 
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258</pre>
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 248</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 266</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_safe_string_content'>safe_string_content</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:string_content</span><span class='rparen'>)</span>
@@ -1905,14 +2287,118 @@ Uses recursive traversal via <code>children</code> instead.</p>
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="table_row_owners-instance_method">
+  
+    #<strong>table_row_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/file_analysis.rb', line 355</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_table_row_owners'>table_row_owners</span>
+  <span class='id identifier rubyid_ast_table_lines'>ast_table_lines</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_ast_rows'>ast_rows</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+    <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_unwrap_markdown_statement'>unwrap_markdown_statement</span><span class='lparen'>(</span><span class='id identifier rubyid_statement'>statement</span><span class='rparen'>)</span>
+    <span class='kw'>next</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>table</span><span class='tstring_end'>&#39;</span></span>
+
+    <span class='id identifier rubyid_table_position'>table_position</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_source_position'>source_position</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_table_position'>table_position</span>
+      <span class='lparen'>(</span><span class='id identifier rubyid_table_position'>table_position</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='op'>..</span><span class='id identifier rubyid_table_position'>table_position</span><span class='lbracket'>[</span><span class='symbol'>:end_line</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
+        <span class='id identifier rubyid_ast_table_lines'>ast_table_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_line'>line</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_child'>child</span><span class='op'>|</span>
+      <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>table_row</span><span class='tstring_end'>&#39;</span></span>
+
+      <span class='id identifier rubyid_position'>position</span> <span class='op'>=</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_source_position'>source_position</span>
+      <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_position'>position</span>
+
+      <span class='const'><span class='object_link'><a href="FileAnalysis/TableRowOwner.html" title="Markdown::Merge::FileAnalysis::TableRowOwner (class)">TableRowOwner</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+        <span class='label'>location:</span> <span class='const'><span class='object_link'><a href="FileAnalysis/Location.html" title="Markdown::Merge::FileAnalysis::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>start_line:</span> <span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:end_line</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+        <span class='label'>source:</span> <span class='id identifier rubyid_source_range'>source_range</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_position'>position</span><span class='lbracket'>[</span><span class='symbol'>:end_line</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+        <span class='label'>text:</span> <span class='id identifier rubyid_extract_text_content'>extract_text_content</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
+      <span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_ast_lines'>ast_lines</span> <span class='op'>=</span> <span class='id identifier rubyid_ast_rows'>ast_rows</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_loose_rows'>loose_rows</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='id identifier rubyid_line_number'>line_number</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_ast_lines'>ast_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_ast_table_lines'>ast_table_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_loose_table_row_line?'>loose_table_row_line?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+
+    <span class='const'><span class='object_link'><a href="FileAnalysis/TableRowOwner.html" title="Markdown::Merge::FileAnalysis::TableRowOwner (class)">TableRowOwner</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>location:</span> <span class='const'><span class='object_link'><a href="FileAnalysis/Location.html" title="Markdown::Merge::FileAnalysis::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::FileAnalysis#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>start_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span>
+      <span class='label'>text:</span> <span class='id identifier rubyid_line'>line</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_ast_rows'>ast_rows</span> <span class='op'>+</span> <span class='id identifier rubyid_loose_rows'>loose_rows</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

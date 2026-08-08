@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::MergeResult
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -1248,7 +1248,7 @@ Overrides base class for string-based content.</p>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/merge_result.rb', line 141</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
-  <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='id identifier rubyid_success?'>success?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>success</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>failed</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='id identifier rubyid_success?'>success?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>success</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed</span><span class='tstring_end'>&#39;</span></span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_status'>status</span><span class='embexpr_end'>}</span><span class='tstring_content'> conflicts=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_conflicts'>conflicts</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> frozen=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_frozen_blocks'>frozen_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span> \
     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>added=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_nodes_added'>nodes_added</span><span class='embexpr_end'>}</span><span class='tstring_content'> removed=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_nodes_removed'>nodes_removed</span><span class='embexpr_end'>}</span><span class='tstring_content'> modified=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_nodes_modified'>nodes_modified</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
@@ -1592,7 +1592,7 @@ Overrides base class for string-based content.</p>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/merge_result.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='id identifier rubyid_content'>content</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1631,7 +1631,7 @@ Overrides base class for string-based content.</p>
   <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>UnresolvedReviewState</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
     <span class='label'>cases:</span> <span class='id identifier rubyid_serializable_unresolved_cases'>serializable_unresolved_cases</span><span class='comma'>,</span>
     <span class='label'>selections:</span> <span class='id identifier rubyid_delegated_applied_selections'>delegated_applied_selections</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized_selections'>normalized_selections</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_review_state_metadata'>review_state_metadata</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span> <span class='id identifier rubyid_normalized_selections'>normalized_selections</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_review_state_metadata'>review_state_metadata</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span> <span class='id identifier rubyid_normalized_selections'>normalized_selections</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1644,9 +1644,9 @@ Overrides base class for string-based content.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

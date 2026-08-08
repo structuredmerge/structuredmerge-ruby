@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::GapLineNode
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -565,14 +565,14 @@ parsed nodes, allowing them to be preserved during merge operations.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>line_number:</span><span class='rparen'>)</span>
   <span class='ivar'>@content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span>
   <span class='ivar'>@line_number</span> <span class='op'>=</span> <span class='id identifier rubyid_line_number'>line_number</span>
-  <span class='ivar'>@preceding_node</span> <span class='op'>=</span> <span class='kw'>nil</span>  <span class='comment'># Set later during integration
+  <span class='ivar'>@preceding_node</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='comment'># Set later during integration
 </span>  <span class='ivar'>@preceding_signature</span> <span class='op'>=</span> <span class='kw'>nil</span>
 
   <span class='id identifier rubyid_location'>location</span> <span class='op'>=</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>AstNode</span><span class='op'>::</span><span class='const'>Location</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
     <span class='label'>start_column:</span> <span class='int'>0</span><span class='comma'>,</span>
-    <span class='label'>end_column:</span> <span class='ivar'>@content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+    <span class='label'>end_column:</span> <span class='ivar'>@content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
   <span class='rparen'>)</span>
 
   <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>slice:</span> <span class='ivar'>@content</span><span class='comma'>,</span> <span class='label'>location:</span> <span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span>
@@ -1150,7 +1150,7 @@ For gap lines after a structural node, we use offset from that node’s end line
     <span class='label'>start_line:</span> <span class='ivar'>@line_number</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='ivar'>@line_number</span><span class='comma'>,</span>
     <span class='label'>start_column:</span> <span class='int'>0</span><span class='comma'>,</span>
-    <span class='label'>end_column:</span> <span class='ivar'>@content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+    <span class='label'>end_column:</span> <span class='ivar'>@content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1338,9 +1338,9 @@ For gap lines after a structural node, we use offset from that node’s end line
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

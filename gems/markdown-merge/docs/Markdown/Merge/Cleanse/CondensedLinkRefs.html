@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::Cleanse::CondensedLinkRefs
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -772,8 +772,8 @@ handles the case where definitions are concatenated without separators.</p>
     <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_parsed'>parsed</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_parsed'>parsed</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
     <span class='comment'># Check if line has content before first definition
-</span>    <span class='id identifier rubyid_first_bracket'>first_bracket</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_has_prefix'>has_prefix</span> <span class='op'>=</span> <span class='id identifier rubyid_first_bracket'>first_bracket</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_first_bracket'>first_bracket</span> <span class='op'>&gt;</span> <span class='int'>0</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_line'>line</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='id identifier rubyid_first_bracket'>first_bracket</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+</span>    <span class='id identifier rubyid_first_bracket'>first_bracket</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>[</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_has_prefix'>has_prefix</span> <span class='op'>=</span> <span class='id identifier rubyid_first_bracket'>first_bracket</span><span class='op'>&amp;.</span><span class='id identifier rubyid_positive?'>positive?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_line'>line</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='id identifier rubyid_first_bracket'>first_bracket</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
     <span class='comment'># Include if: multiple definitions OR single definition with prefix
 </span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_parsed'>parsed</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>1</span> <span class='op'>||</span> <span class='id identifier rubyid_has_prefix'>has_prefix</span>
@@ -871,9 +871,9 @@ is preserved exactly as-is.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:07 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

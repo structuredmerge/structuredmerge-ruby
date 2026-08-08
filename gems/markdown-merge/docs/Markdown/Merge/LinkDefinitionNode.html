@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::LinkDefinitionNode
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -691,7 +691,7 @@ can be preserved during merge operations.</p>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
     <span class='label'>start_column:</span> <span class='int'>0</span><span class='comma'>,</span>
-    <span class='label'>end_column:</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+    <span class='label'>end_column:</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
   <span class='rparen'>)</span>
 
   <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>slice:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>location:</span> <span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span>
@@ -1126,7 +1126,7 @@ can be preserved during merge operations.</p>
     <span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
     <span class='label'>label:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:label</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>url:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:url</span><span class='rbracket'>]</span><span class='comma'>,</span>
-    <span class='label'>title:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:title</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>title:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:title</span><span class='rbracket'>]</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1180,8 +1180,8 @@ can be preserved during merge operations.</p>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/link_definition_node.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parser'>parser</span>
-  <span class='ivar'>@parser</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="LinkParser.html" title="Markdown::Merge::LinkParser (class)">LinkParser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LinkParser.html#initialize-instance_method" title="Markdown::Merge::LinkParser#initialize (method)">new</a></span></span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span><span class='kw'>end</span></pre>
+  <span class='ivar'>@parser</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="LinkParser.html" title="Markdown::Merge::LinkParser (class)">LinkParser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LinkParser.html#initialize-instance_method" title="Markdown::Merge::LinkParser#initialize (method)">new</a></span></span>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -1407,7 +1407,7 @@ Link definitions are matched by their label (case-insensitive in Markdown).</p>
     <span class='label'>start_line:</span> <span class='ivar'>@location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='ivar'>@location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
     <span class='label'>start_column:</span> <span class='ivar'>@location</span><span class='period'>.</span><span class='id identifier rubyid_start_column'>start_column</span><span class='comma'>,</span>
-    <span class='label'>end_column:</span> <span class='ivar'>@location</span><span class='period'>.</span><span class='id identifier rubyid_end_column'>end_column</span><span class='comma'>,</span>
+    <span class='label'>end_column:</span> <span class='ivar'>@location</span><span class='period'>.</span><span class='id identifier rubyid_end_column'>end_column</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1595,9 +1595,9 @@ Link definitions are matched by their label (case-insensitive in Markdown).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

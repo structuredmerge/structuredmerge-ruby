@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::CodeBlockMatchRefiner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -284,8 +284,8 @@ so inner code-block merging can run even when block content itself differs.</p>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_match_refiner.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_template_blocks'>template_blocks</span> <span class='op'>=</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node_type'>node_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>code_block</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
-  <span class='id identifier rubyid_dest_blocks'>dest_blocks</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node_type'>node_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>code_block</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_template_blocks'>template_blocks</span> <span class='op'>=</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node_type'>node_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>code_block</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_dest_blocks'>dest_blocks</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node_type'>node_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>code_block</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_template_blocks'>template_blocks</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_dest_blocks'>dest_blocks</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='id identifier rubyid_greedy_match'>greedy_match</span><span class='lparen'>(</span><span class='id identifier rubyid_template_blocks'>template_blocks</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_blocks'>dest_blocks</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='op'>|</span>
@@ -302,9 +302,9 @@ so inner code-block merging can run even when block content itself differs.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Module: Markdown::Merge::BackendSupport
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -114,7 +114,7 @@
   <span class='label'>incremental:</span> <span class='kw'>false</span><span class='comma'>,</span>
   <span class='label'>pure_ruby:</span> <span class='kw'>false</span><span class='comma'>,</span>
   <span class='label'>markdown_only:</span> <span class='kw'>true</span><span class='comma'>,</span>
-  <span class='label'>error_tolerant:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>error_tolerant:</span> <span class='kw'>true</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
@@ -160,7 +160,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#configure_node_heading_and_code_block_helpers!-class_method" title="configure_node_heading_and_code_block_helpers! (class method)">.<strong>configure_node_heading_and_code_block_helpers!</strong>(klass, heading_matcher:, code_block_matcher:)  &#x21d2; Object </a>
+      <a href="#configure_node_heading_and_code_block_helpers!-class_method" title="configure_node_heading_and_code_block_helpers! (class method)">.<strong>configure_node_heading_and_code_block_helpers!</strong>(klass, heading_matcher:, code_block_matcher:, heading_level_extractor: nil, code_block_info_extractor: nil)  &#x21d2; Object </a>
     
 
     
@@ -268,22 +268,24 @@
 48
 49
 50
-51</pre>
+51
+52</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/backend_support.rb', line 34</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_configure_markdown_only_language_class!'>configure_markdown_only_language_class!</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>backend_label:</span><span class='comma'>,</span> <span class='label'>factory_method:</span> <span class='symbol'>:markdown</span><span class='comma'>,</span> <span class='label'>unsupported_language_message:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_configure_markdown_only_language_class!'>configure_markdown_only_language_class!</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>backend_label:</span><span class='comma'>,</span> <span class='label'>factory_method:</span> <span class='symbol'>:markdown</span><span class='comma'>,</span>
+                                            <span class='label'>unsupported_language_message:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_klass'>klass</span><span class='period'>.</span><span class='id identifier rubyid_singleton_class'>singleton_class</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='symbol'>:from_library</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__path'>_path</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='kw'>nil</span><span class='op'>|</span>
-      <span class='id identifier rubyid_lang_name'>lang_name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='op'>&amp;.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^tree_sitter_</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>||</span> <span class='symbol'>:markdown</span>
+      <span class='id identifier rubyid_lang_name'>lang_name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='id identifier rubyid_symbol'>symbol</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='op'>&amp;.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^tree_sitter_</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>||</span> <span class='symbol'>:markdown</span>
 
       <span class='kw'>unless</span> <span class='id identifier rubyid_lang_name'>lang_name</span> <span class='op'>==</span> <span class='symbol'>:markdown</span>
         <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_unsupported_language_message'>unsupported_language_message</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
-          <span class='id identifier rubyid_unsupported_language_message'>unsupported_language_message</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_lang_name'>lang_name</span><span class='rparen'>)</span>
-        <span class='kw'>else</span>
-          <span class='id identifier rubyid_unsupported_language_message'>unsupported_language_message</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_backend_label'>backend_label</span><span class='embexpr_end'>}</span><span class='tstring_content'> backend only supports Markdown, not </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang_name'>lang_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span>
-        <span class='kw'>end</span>
+                    <span class='id identifier rubyid_unsupported_language_message'>unsupported_language_message</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_lang_name'>lang_name</span><span class='rparen'>)</span>
+                  <span class='kw'>else</span>
+                    <span class='id identifier rubyid_unsupported_language_message'>unsupported_language_message</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_backend_label'>backend_label</span><span class='embexpr_end'>}</span><span class='tstring_content'> backend only supports Markdown, not </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lang_name'>lang_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span>
+                  <span class='kw'>end</span>
         <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>NotAvailable</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span>
       <span class='kw'>end</span>
 
@@ -299,7 +301,7 @@
       <div class="method_details ">
   <h3 class="signature " id="configure_node_heading_and_code_block_helpers!-class_method">
   
-    .<strong>configure_node_heading_and_code_block_helpers!</strong>(klass, heading_matcher:, code_block_matcher:)  &#x21d2; <tt>Object</tt> 
+    .<strong>configure_node_heading_and_code_block_helpers!</strong>(klass, heading_matcher:, code_block_matcher:, heading_level_extractor: nil, code_block_info_extractor: nil)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -311,8 +313,6 @@
       <pre class="lines">
 
 
-80
-81
 82
 83
 84
@@ -325,23 +325,45 @@
 91
 92
 93
-94</pre>
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/backend_support.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/backend_support.rb', line 82</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_configure_node_heading_and_code_block_helpers!'>configure_node_heading_and_code_block_helpers!</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>heading_matcher:</span><span class='comma'>,</span> <span class='label'>code_block_matcher:</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_configure_node_heading_and_code_block_helpers!'>configure_node_heading_and_code_block_helpers!</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>heading_matcher:</span><span class='comma'>,</span> <span class='label'>code_block_matcher:</span><span class='comma'>,</span>
+                                                   <span class='label'>heading_level_extractor:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                                                   <span class='label'>code_block_info_extractor:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_klass'>klass</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='symbol'>:header_level</span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:node_helper_match?</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_heading_matcher'>heading_matcher</span><span class='rparen'>)</span>
 
-      <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:safe_inner_node_call</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='comma'>,</span> <span class='symbol'>:header_level</span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_heading_level_extractor'>heading_level_extractor</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_heading_level_extractor'>heading_level_extractor</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_inner_node'>inner_node</span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:safe_inner_node_call</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='comma'>,</span> <span class='symbol'>:header_level</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
     <span class='kw'>end</span>
 
     <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='symbol'>:fence_info</span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:node_helper_match?</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_code_block_matcher'>code_block_matcher</span><span class='rparen'>)</span>
 
-      <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:safe_inner_node_call</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='comma'>,</span> <span class='symbol'>:fence_info</span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_code_block_info_extractor'>code_block_info_extractor</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_code_block_info_extractor'>code_block_info_extractor</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_inner_node'>inner_node</span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:safe_inner_node_call</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='comma'>,</span> <span class='symbol'>:fence_info</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -365,7 +387,6 @@
       <pre class="lines">
 
 
-53
 54
 55
 56
@@ -390,12 +411,15 @@
 75
 76
 77
-78</pre>
+78
+79
+80</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/backend_support.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/backend_support.rb', line 54</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_configure_node_link_and_navigation!'>configure_node_link_and_navigation!</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>next_sibling_selector:</span><span class='comma'>,</span> <span class='label'>prev_sibling_selector:</span><span class='comma'>,</span> <span class='label'>parent_selector:</span> <span class='symbol'>:parent</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_configure_node_link_and_navigation!'>configure_node_link_and_navigation!</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='comma'>,</span> <span class='label'>next_sibling_selector:</span><span class='comma'>,</span> <span class='label'>prev_sibling_selector:</span><span class='comma'>,</span>
+                                        <span class='label'>parent_selector:</span> <span class='symbol'>:parent</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_klass'>klass</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span> <span class='kw'>do</span>
     <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='symbol'>:url</span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Markdown::Merge::BackendSupport (module)">BackendSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:safe_inner_node_call</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='comma'>,</span> <span class='symbol'>:url</span><span class='rparen'>)</span>
@@ -465,14 +489,14 @@
     <span class='label'>backend_module:</span> <span class='id identifier rubyid_backend_module'>backend_module</span><span class='comma'>,</span>
     <span class='label'>backend_name:</span> <span class='id identifier rubyid_backend_name'>backend_name</span><span class='comma'>,</span>
     <span class='label'>gem_name:</span> <span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span>
-    <span class='label'>capabilities:</span> <span class='id identifier rubyid_capabilities'>capabilities</span><span class='comma'>,</span>
+    <span class='label'>capabilities:</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_install_tree_wrapper!'>install_tree_wrapper!</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_module'>backend_module</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_register_backend!'>register_backend!</span><span class='lparen'>(</span>
     <span class='label'>backend_module:</span> <span class='id identifier rubyid_backend_module'>backend_module</span><span class='comma'>,</span>
     <span class='label'>backend_name:</span> <span class='id identifier rubyid_backend_name'>backend_name</span><span class='comma'>,</span>
     <span class='label'>gem_name:</span> <span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span>
-    <span class='label'>require_path:</span> <span class='id identifier rubyid_require_path'>require_path</span><span class='comma'>,</span>
+    <span class='label'>require_path:</span> <span class='id identifier rubyid_require_path'>require_path</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -485,9 +509,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:04 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

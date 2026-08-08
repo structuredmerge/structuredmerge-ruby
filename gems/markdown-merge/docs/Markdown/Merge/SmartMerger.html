@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::SmartMerger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -206,7 +206,7 @@ HTML comments are preserved exactly as-is.</p>
         <dt id="VALID_BACKENDS-constant" class="">VALID_BACKENDS =
           
         </dt>
-        <dd><pre class="code"><span class='qsymbols_beg'>%i[</span><span class='tstring_content'>auto</span><span class='words_sep'> </span><span class='tstring_content'>commonmarker</span><span class='words_sep'> </span><span class='tstring_content'>markly</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='qsymbols_beg'>%i[</span><span class='tstring_content'>auto</span><span class='words_sep'> </span><span class='tstring_content'>commonmarker</span><span class='words_sep'> </span><span class='tstring_content'>markly</span><span class='words_sep'> </span><span class='tstring_content'>kramdown</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
   
@@ -1342,7 +1342,7 @@ For markly: { flags: Markly::DEFAULT, extensions: [:table] }</p>
     <span class='label'>backend:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:backend</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='ivar'>@requested_backend</span><span class='comma'>,</span>
     <span class='label'>freeze_token:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:freeze_token</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>signature_generator:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:signature_generator</span><span class='rbracket'>]</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='ivar'>@parser_options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='ivar'>@parser_options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1514,25 +1514,17 @@ and link definition nodes created during gap detection.</p>
 254
 255
 256
-257
-258
-259
-260
-261</pre>
+257</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/smart_merger.rb', line 229</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_node_to_source'>node_to_source</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
   <span class='comment'># Check for any FreezeNode type (base class or subclass)
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>FreezeNodeBase</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_full_text'>full_text</span>
-  <span class='kw'>end</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_full_text'>full_text</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>FreezeNodeBase</span><span class='rparen'>)</span>
 
   <span class='comment'># Handle gap line nodes (created for blank lines and link definitions)
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="LinkDefinitionNode.html" title="Markdown::Merge::LinkDefinitionNode (class)">LinkDefinitionNode</a></span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="GapLineNode.html" title="Markdown::Merge::GapLineNode (class)">GapLineNode</a></span></span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span>
-  <span class='kw'>end</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="LinkDefinitionNode.html" title="Markdown::Merge::LinkDefinitionNode (class)">LinkDefinitionNode</a></span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="GapLineNode.html" title="Markdown::Merge::GapLineNode (class)">GapLineNode</a></span></span><span class='rparen'>)</span>
 
   <span class='comment'># Unwrap if needed to access source_position
 </span>  <span class='id identifier rubyid_raw_node'>raw_node</span> <span class='op'>=</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
@@ -1623,9 +1615,9 @@ and link definition nodes created during gap detection.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::TableMatchAlgorithm
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -177,7 +177,7 @@ partial matches (e.g., “Value” vs “Values” would get a high similarity s
 </span>  <span class='label'>first_column:</span> <span class='float'>0.20</span><span class='comma'>,</span>      <span class='comment'># (B) First column matching
 </span>  <span class='label'>row_content:</span> <span class='float'>0.25</span><span class='comma'>,</span>       <span class='comment'># (C) Content in matching rows
 </span>  <span class='label'>total_cells:</span> <span class='float'>0.15</span><span class='comma'>,</span>       <span class='comment'># (D) Overall cell matching
-</span>  <span class='label'>position:</span> <span class='float'>0.15</span><span class='comma'>,</span>          <span class='comment'># (E) Position distance
+</span>  <span class='label'>position:</span> <span class='float'>0.15</span> <span class='comment'># (E) Position distance
 </span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="FIRST_COLUMN_SIMILARITY_THRESHOLD-constant" class="">FIRST_COLUMN_SIMILARITY_THRESHOLD =
@@ -579,12 +579,14 @@ for first column lookup (used in row content matching)</p>
 75
 76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 71</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>position_a:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>position_b:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>total_tables_a:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>total_tables_b:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>weights:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='symbol'>:commonmarker</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>position_a:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>position_b:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>total_tables_a:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>total_tables_b:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>weights:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span>
+               <span class='label'>backend:</span> <span class='symbol'>:commonmarker</span><span class='rparen'>)</span>
   <span class='ivar'>@position_a</span> <span class='op'>=</span> <span class='id identifier rubyid_position_a'>position_a</span>
   <span class='ivar'>@position_b</span> <span class='op'>=</span> <span class='id identifier rubyid_position_b'>position_b</span>
   <span class='ivar'>@total_tables_a</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_total_tables_a'>total_tables_a</span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
@@ -1039,7 +1041,6 @@ for first column lookup (used in row content matching)</p>
       <pre class="lines">
 
 
-85
 86
 87
 88
@@ -1054,10 +1055,11 @@ for first column lookup (used in row content matching)</p>
 97
 98
 99
-100</pre>
+100
+101</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_table_a'>table_a</span><span class='comma'>,</span> <span class='id identifier rubyid_table_b'>table_b</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_rows_a'>rows_a</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_rows'>extract_rows</span><span class='lparen'>(</span><span class='id identifier rubyid_table_a'>table_a</span><span class='rparen'>)</span>
@@ -1070,7 +1072,7 @@ for first column lookup (used in row content matching)</p>
     <span class='label'>first_column:</span> <span class='id identifier rubyid_compute_first_column_match'>compute_first_column_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>row_content:</span> <span class='id identifier rubyid_compute_row_content_match'>compute_row_content_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>total_cells:</span> <span class='id identifier rubyid_compute_total_cells_match'>compute_total_cells_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>position:</span> <span class='id identifier rubyid_compute_position_score'>compute_position_score</span><span class='comma'>,</span>
+    <span class='label'>position:</span> <span class='id identifier rubyid_compute_position_score'>compute_position_score</span>
   <span class='rbrace'>}</span>
 
   <span class='id identifier rubyid_weighted_average'>weighted_average</span><span class='lparen'>(</span><span class='id identifier rubyid_scores'>scores</span><span class='rparen'>)</span>
@@ -1085,9 +1087,9 @@ for first column lookup (used in row content matching)</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

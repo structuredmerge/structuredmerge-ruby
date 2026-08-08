@@ -6,7 +6,7 @@
 <title>
   Module: Markdown::Merge::MarkdownStructure
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -643,9 +643,7 @@ between consecutive nodes of the same type).</p>
 97
 98
 99
-100
-101
-102</pre>
+100</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/markdown_structure.rb', line 90</span>
@@ -657,9 +655,7 @@ between consecutive nodes of the same type).</p>
   <span class='id identifier rubyid_next_sym'>next_sym</span> <span class='op'>=</span> <span class='id identifier rubyid_next_type'>next_type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
 
   <span class='comment'># Same contiguous type - no blank line between them
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_prev_sym'>prev_sym</span> <span class='op'>==</span> <span class='id identifier rubyid_next_sym'>next_sym</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_contiguous_type?'>contiguous_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_prev_sym'>prev_sym</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='kw'>false</span>
-  <span class='kw'>end</span>
+</span>  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_prev_sym'>prev_sym</span> <span class='op'>==</span> <span class='id identifier rubyid_next_sym'>next_sym</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_contiguous_type?'>contiguous_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_prev_sym'>prev_sym</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_needs_blank_after?'>needs_blank_after?</span><span class='lparen'>(</span><span class='id identifier rubyid_prev_sym'>prev_sym</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_needs_blank_before?'>needs_blank_before?</span><span class='lparen'>(</span><span class='id identifier rubyid_next_sym'>next_sym</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -735,6 +731,8 @@ between consecutive nodes of the same type).</p>
       <pre class="lines">
 
 
+110
+111
 112
 113
 114
@@ -742,12 +740,10 @@ between consecutive nodes of the same type).</p>
 116
 117
 118
-119
-120
-121</pre>
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/markdown_structure.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/markdown_structure.rb', line 110</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_node_type'>node_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_node'>node</span>
@@ -769,9 +765,9 @@ between consecutive nodes of the same type).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:04 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

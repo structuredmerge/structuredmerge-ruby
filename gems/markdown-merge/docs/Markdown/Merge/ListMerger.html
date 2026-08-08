@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::ListMerger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -414,16 +414,16 @@ passed to the caller via <code>add_raw</code> on the OutputBuilder.</p>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/list_merger.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_lists'>merge_lists</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
-  <span class='label'>preference:</span><span class='comma'>,</span>
-  <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
-  <span class='label'>template_analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-  <span class='label'>dest_analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
-  <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span>
-  <span class='label'>unresolved_policy:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+                <span class='label'>preference:</span><span class='comma'>,</span>
+                <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
+                <span class='label'>template_analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                <span class='label'>dest_analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+                <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span>
+                <span class='label'>unresolved_policy:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_t_items'>t_items</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_items'>extract_items</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_d_items'>d_items</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_items'>extract_items</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='rparen'>)</span>
 
-  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>empty list</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_t_items'>t_items</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_d_items'>d_items</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>empty list</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_t_items'>t_items</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_d_items'>d_items</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='id identifier rubyid_alignment'>alignment</span> <span class='op'>=</span> <span class='id identifier rubyid_align_items'>align_items</span><span class='lparen'>(</span><span class='id identifier rubyid_t_items'>t_items</span><span class='comma'>,</span> <span class='id identifier rubyid_d_items'>d_items</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span> <span class='op'>=</span> <span class='id identifier rubyid_emit_lines'>emit_lines</span><span class='lparen'>(</span>
@@ -435,15 +435,15 @@ passed to the caller via <code>add_raw</code> on the OutputBuilder.</p>
     <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span>
     <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span>
     <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_resolution_mode'>resolution_mode</span><span class='comma'>,</span>
-    <span class='label'>unresolved_policy:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>UnresolvedPolicy</span><span class='period'>.</span><span class='id identifier rubyid_coerce'>coerce</span><span class='lparen'>(</span><span class='id identifier rubyid_unresolved_policy'>unresolved_policy</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>UnresolvedPolicy</span><span class='period'>.</span><span class='id identifier rubyid_coerce'>coerce</span><span class='lparen'>(</span><span class='id identifier rubyid_unresolved_policy'>unresolved_policy</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no lines emitted</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no lines emitted</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
     <span class='label'>content:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>stats:</span> <span class='lbrace'>{</span><span class='label'>decision:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='symbol'>:merged</span> <span class='op'>:</span> <span class='symbol'>:unresolved</span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='lbrace'>{</span> <span class='label'>decision:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='symbol'>:merged</span> <span class='op'>:</span> <span class='symbol'>:unresolved</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -456,9 +456,9 @@ passed to the caller via <code>add_raw</code> on the OutputBuilder.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

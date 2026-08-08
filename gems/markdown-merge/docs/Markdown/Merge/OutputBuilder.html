@@ -6,7 +6,7 @@
 <title>
   Class: Markdown::Merge::OutputBuilder
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -513,12 +513,12 @@ source preservation and reconstruction rather than generation from scratch.</p>
       <pre class="lines">
 
 
-96
-97
-98</pre>
+91
+92
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_gap_line'>add_gap_line</span><span class='lparen'>(</span><span class='label'>count:</span> <span class='int'>1</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_append_part'>append_part</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_count'>count</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_count'>count</span> <span class='op'>&gt;</span> <span class='int'>0</span>
@@ -572,13 +572,13 @@ source preservation and reconstruction rather than generation from scratch.</p>
       <pre class="lines">
 
 
-88
-89
-90
-91</pre>
+83
+84
+85
+86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_link_definition'>add_link_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_formatted'>formatted</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LinkDefinitionFormatter.html" title="Markdown::Merge::LinkDefinitionFormatter (module)">LinkDefinitionFormatter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_format'><span class='object_link'><a href="LinkDefinitionFormatter.html#format-class_method" title="Markdown::Merge::LinkDefinitionFormatter.format (method)">format</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
@@ -684,12 +684,7 @@ formatting is preserved by the source extraction.</p>
 75
 76
 77
-78
-79
-80
-81
-82
-83</pre>
+78</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 47</span>
@@ -704,32 +699,27 @@ formatting is preserved by the source extraction.</p>
 </span>  <span class='comment'># - Skip if nodes are adjacent in the same source (original spacing is correct)
 </span>  <span class='comment'># - Otherwise, check MarkdownStructure.needs_blank_between? which handles
 </span>  <span class='comment'>#   contiguous types (like link_definitions that shouldn&#39;t have blanks between them)
-</span>  <span class='kw'>unless</span> <span class='lbracket'>[</span><span class='symbol'>:gap_line</span><span class='comma'>,</span> <span class='symbol'>:freeze_block</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_current_type'>current_type</span><span class='rparen'>)</span> <span class='op'>||</span>
-      <span class='ivar'>@last_node_type</span> <span class='op'>==</span> <span class='symbol'>:gap_line</span>
-    <span class='kw'>if</span> <span class='ivar'>@auto_spacing</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@last_node_type</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_current_type'>current_type</span>
-      <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="MarkdownStructure.html" title="Markdown::Merge::MarkdownStructure (module)">MarkdownStructure</a></span></span><span class='period'>.</span><span class='id identifier rubyid_needs_blank_between?'><span class='object_link'><a href="MarkdownStructure.html#needs_blank_between%3F-class_method" title="Markdown::Merge::MarkdownStructure.needs_blank_between? (method)">needs_blank_between?</a></span></span><span class='lparen'>(</span><span class='ivar'>@last_node_type</span><span class='comma'>,</span> <span class='id identifier rubyid_current_type'>current_type</span><span class='rparen'>)</span>
-        <span class='comment'># Skip auto-spacing when nodes are adjacent lines in the same source.
-</span>        <span class='comment'># The original source formatting is correct — no blank line was there.
-</span>        <span class='kw'>unless</span> <span class='id identifier rubyid_same_source_adjacent?'>same_source_adjacent?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
-          <span class='comment'># Only add spacing if we don&#39;t already have adequate blank lines
-</span>          <span class='comment'># Check the last part to see if it already ends with blank line(s)
-</span>          <span class='kw'>unless</span> <span class='ivar'>@parts</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_blank_line_terminated?'>blank_line_terminated?</span>
-            <span class='id identifier rubyid_add_gap_line'>add_gap_line</span><span class='lparen'>(</span><span class='label'>count:</span> <span class='int'>1</span><span class='rparen'>)</span>
-          <span class='kw'>end</span>
-        <span class='kw'>end</span>
-      <span class='kw'>end</span>
-    <span class='kw'>end</span>
+</span>  <span class='comment'># Skip auto-spacing when nodes are adjacent lines in the same source.
+</span>  <span class='comment'># The original source formatting is correct — no blank line was there.
+</span>  <span class='kw'>if</span> <span class='op'>!</span><span class='lparen'>(</span><span class='qsymbols_beg'>%i[</span><span class='tstring_content'>gap_line</span><span class='words_sep'> </span><span class='tstring_content'>freeze_block</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_current_type'>current_type</span><span class='rparen'>)</span> <span class='op'>||</span>
+                 <span class='ivar'>@last_node_type</span> <span class='op'>==</span> <span class='symbol'>:gap_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@auto_spacing</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@last_node_type</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_current_type'>current_type</span> <span class='op'>&amp;&amp;</span> <span class='const'><span class='object_link'><a href="MarkdownStructure.html" title="Markdown::Merge::MarkdownStructure (module)">MarkdownStructure</a></span></span><span class='period'>.</span><span class='id identifier rubyid_needs_blank_between?'><span class='object_link'><a href="MarkdownStructure.html#needs_blank_between%3F-class_method" title="Markdown::Merge::MarkdownStructure.needs_blank_between? (method)">needs_blank_between?</a></span></span><span class='lparen'>(</span><span class='ivar'>@last_node_type</span><span class='comma'>,</span>
+                                                                                                                                             <span class='id identifier rubyid_current_type'>current_type</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_same_source_adjacent?'>same_source_adjacent?</span><span class='lparen'>(</span>
+                                                                                                                                               <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_analysis'>analysis</span>
+                                                                                                                                             <span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='lparen'>(</span><span class='ivar'>@parts</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_blank_line_terminated?'>blank_line_terminated?</span><span class='rparen'>)</span>
+    <span class='comment'># Only add spacing if we don&#39;t already have adequate blank lines
+</span>    <span class='comment'># Check the last part to see if it already ends with blank line(s)
+</span>    <span class='id identifier rubyid_add_gap_line'>add_gap_line</span><span class='lparen'>(</span><span class='label'>count:</span> <span class='int'>1</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_source'>extract_source</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_content'>content</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-    <span class='id identifier rubyid_range'>range</span> <span class='op'>=</span> <span class='id identifier rubyid_append_part'>append_part</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
-    <span class='comment'># Update last node type (track all node types for proper spacing)
-</span>    <span class='ivar'>@last_node_type</span> <span class='op'>=</span> <span class='id identifier rubyid_current_type'>current_type</span>
-    <span class='ivar'>@last_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_node_end_line'>node_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
-    <span class='ivar'>@last_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_analysis'>analysis</span>
-    <span class='id identifier rubyid_range'>range</span>
-  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_content'>content</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_range'>range</span> <span class='op'>=</span> <span class='id identifier rubyid_append_part'>append_part</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+  <span class='comment'># Update last node type (track all node types for proper spacing)
+</span>  <span class='ivar'>@last_node_type</span> <span class='op'>=</span> <span class='id identifier rubyid_current_type'>current_type</span>
+  <span class='ivar'>@last_end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_node_end_line'>node_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='ivar'>@last_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_analysis'>analysis</span>
+  <span class='id identifier rubyid_range'>range</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -780,12 +770,12 @@ formatting is preserved by the source extraction.</p>
       <pre class="lines">
 
 
-103
-104
-105</pre>
+98
+99
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 103</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_raw'>add_raw</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_append_part'>append_part</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_text'>text</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -836,6 +826,11 @@ separate content + gap parts still counts as an existing separator.</p>
       <pre class="lines">
 
 
+122
+123
+124
+125
+126
 127
 128
 129
@@ -847,15 +842,10 @@ separate content + gap parts still counts as an existing separator.</p>
 135
 136
 137
-138
-139
-140
-141
-142
-143</pre>
+138</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_blank_line_terminated?'>blank_line_terminated?</span>
   <span class='id identifier rubyid_trailing_newlines'>trailing_newlines</span> <span class='op'>=</span> <span class='int'>0</span>
@@ -904,13 +894,13 @@ separate content + gap parts still counts as an existing separator.</p>
       <pre class="lines">
 
 
-146
-147
-148
-149</pre>
+141
+142
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 146</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 141</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear'>clear</span>
   <span class='ivar'>@parts</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
@@ -959,12 +949,12 @@ separate content + gap parts still counts as an existing separator.</p>
       <pre class="lines">
 
 
-117
-118
-119</pre>
+112
+113
+114</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 117</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
   <span class='ivar'>@parts</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -1016,12 +1006,12 @@ separate content + gap parts still counts as an existing separator.</p>
       <pre class="lines">
 
 
-110
-111
-112</pre>
+105
+106
+107</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 110</span>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/output_builder.rb', line 105</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='ivar'>@parts</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -1036,9 +1026,9 @@ separate content + gap parts still counts as an existing separator.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:05 2026 by
+  Generated on Sat Aug  8 01:12:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
