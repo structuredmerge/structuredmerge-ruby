@@ -42,3 +42,26 @@ require "ast/merge/rspec/shared_examples"
 require_relative "../gems/ast-merge/spec/support/fictive_language_harness"
 require_relative "../gems/bash-merge/spec/support/shared_examples/file_analysis_examples"
 require_relative "../gems/bash-merge/spec/support/shared_examples/smart_merger_examples"
+
+# Individual gem helpers are loaded after ast-merge's initial RSpec filter
+# configuration. Reapply availability filters after all backend registrations
+# so aggregate runs exclude unavailable explicit backend contexts.
+RSpec.configure do |config|
+  registry = Ast::Merge::RSpec::MergeGemRegistry
+  registry.force_check_availability!
+  TreeHaver::RSpec::DependencyTags.configure_filters(config)
+
+  registry.registered_gems.each do |tag|
+    if registry.available?(tag)
+      config.filter_run_excluding("not_#{tag}": true)
+    else
+      config.filter_run_excluding(tag => true)
+    end
+  end
+
+  if Ast::Merge::RSpec::DependencyTags.any_markdown_merge_available?
+    config.filter_run_excluding(not_any_markdown_merge: true)
+  else
+    config.filter_run_excluding(any_markdown_merge: true)
+  end
+end

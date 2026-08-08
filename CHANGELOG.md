@@ -60,6 +60,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Reapply TreeHaver backend filters after late provider registration during shared spec discovery.
 
+- Reapply backend availability filters after aggregate spec harness registration.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
