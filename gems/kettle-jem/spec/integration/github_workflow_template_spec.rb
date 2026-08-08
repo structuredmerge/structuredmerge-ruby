@@ -986,6 +986,7 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
         ".kettle-jem.yml" => <<~YAML
           engines:
             - ruby
+            - jruby
           templates:
             root: packaged
             apply: true
@@ -1004,9 +1005,9 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
         content = reports.fetch(path).fetch(:final_content)
         workflow = YAML.safe_load(content, permitted_classes: [], aliases: true)
 
-        expect(workflow.fetch("jobs").keys).to eq(["ruby"])
+        expect(workflow.fetch("jobs").keys).to eq(["ruby", "jruby"])
         expect(content).not_to include("  truffleruby:")
-        expect(content).not_to include("  jruby:")
+        expect(content).to include("  jruby:")
       end
     end
   end

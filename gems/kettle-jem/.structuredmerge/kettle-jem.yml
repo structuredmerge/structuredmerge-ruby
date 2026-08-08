@@ -95,14 +95,15 @@ project_emoji: 🔮
 engines:
   - ruby
   - jruby
-  - truffleruby
+  # TruffleRuby currently targets Ruby 3.x and cannot satisfy kettle-jem's
+  # published Ruby 4.0 runtime floor.
 # Ruby version policy.
 ruby:
   # Lowest MRI Ruby version for generated CI workflows, Appraisals, and
   # test/development dependency assumptions. This is intentionally separate
   # from the gemspec required_ruby_version, which describes the published
   # runtime contract. Effective CI minimum is max(gemspec minimum, this value).
-  test_minimum: "2.4"
+  test_minimum: "4.0.0"
 # RubyGems packaging/runtime shape.
 rubygems:
   # Published runtime Ruby floor used for generated gemspec metadata and README

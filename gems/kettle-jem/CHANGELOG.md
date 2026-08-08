@@ -22,11 +22,19 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Align generated compatibility workflows with the Ruby 4.0 runtime floor by excluding unsupported TruffleRuby targets
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Preserve enabled engine workflow jobs when pruning disabled jobs from generated YAML
+
+- Generate README compatibility prose from the configured Ruby engine set
+
+- Honor disabled README integrations after destination content is merged
 
 ### Security
 
@@ -1255,9 +1263,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem-template-20260726-003 - Coverage upload steps now treat Coveralls,
   QLTY, and Codecov as optional, so provider outages do not fail CI when local
   coverage thresholds still pass.
-- kettle-jem-template-20260728-003 - Generated dep-heads workflows now run
-  TruffleRuby jobs with current RubyGems and Bundler, avoiding setup failures
-  before the test suite starts.
 - kettle-jem-template-20260728-004 - Generated dep-heads workflows now use the
   setup-ruby Bundler install path for direct appraisal Gemfiles, avoiding rv
   lockfile parser failures on Git and path dependencies.

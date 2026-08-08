@@ -6988,7 +6988,13 @@ module Kettle
           destination_content: original
         )
         return with_readme_timing("readme.append_used_link_definitions") do
-          append_used_markdown_link_definitions(processed, resolved)
+          appended = append_used_markdown_link_definitions(processed, resolved)
+          postprocess_readme_content(
+            appended,
+            facts,
+            project_root: project_root,
+            destination_content: original
+          )
         end
       end
       if strategy.empty? || strategy == "merge"
@@ -7174,7 +7180,7 @@ module Kettle
       ranges = parent.children.each_slice(2).filter_map do |key_node, value_node|
         next unless child_key_set.include?(key_node.value.to_s)
 
-        key_node.start_line..value_node.end_line
+        key_node.start_line...value_node.end_line
       end
       return content if ranges.empty?
 
@@ -7231,6 +7237,9 @@ module Kettle
           min_ruby: minimum_ruby_token(facts.dig(:rubygems, :min_ruby)),
           engines: facts.dig(:rubygems, :engines)
         )
+      end
+      processed = with_readme_timing("postprocess.compatibility_summary") do
+        normalize_readme_compatibility_summary(processed, facts.dig(:rubygems, :engines))
       end
       processed = with_readme_timing("postprocess.project_heading") { normalize_readme_project_heading(processed, facts) }
       processed = with_readme_timing("postprocess.synopsis_heading") { normalize_readme_synopsis_heading(processed, facts) }
@@ -7364,7 +7373,27 @@ module Kettle
           )
         end
       end
+      Array(facts.dig(:readme_style, :disabled_integrations)).each do |integration|
+        patterns = README_INTEGRATION_BADGE_PATTERNS.fetch(integration.to_s, [])
+        labels = README_INTEGRATION_LINK_LABELS.fetch(integration.to_s, [])
+        processed = patterns.reduce(processed) { |content, pattern| content.gsub(pattern, "") }
+        processed = ReadmePostProcessor.delete_markdown_link_definitions(processed, labels)
+      end
       processed
+    end
+
+    def normalize_readme_compatibility_summary(content, engines)
+      enabled = Array(engines).map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).uniq
+      return content if enabled.empty?
+
+      runtime_engines = ["MRI Ruby"]
+      runtime_engines << "JRuby" if enabled.include?("jruby")
+      runtime_engines << "TruffleRuby" if enabled.include?("truffleruby") || enabled.include?("truby")
+      description = runtime_engines.one? ? runtime_engines.first : runtime_engines[0...-1].join(", ") + ", and #{runtime_engines.last}"
+      content.to_s.sub(
+        /Compatible with MRI Ruby [^\n]+\./,
+        "Compatible with #{description}."
+      )
     end
 
     def remove_readme_badge_and_refs(content, badge_source, link_labels)
