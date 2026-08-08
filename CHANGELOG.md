@@ -58,6 +58,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Expose Bash analysis nodes through the statements API so parsed structures reach merge consumers.
 
+- Reapply TreeHaver backend filters after late provider registration during shared spec discovery.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

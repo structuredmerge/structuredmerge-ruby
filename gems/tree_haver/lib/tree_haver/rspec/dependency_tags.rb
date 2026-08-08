@@ -6,6 +6,16 @@ module TreeHaver
   module RSpec
     module DependencyTags
       class << self
+        def configure_filters(config)
+          TreeHaver::BackendRegistry.registered_tags.each do |tag|
+            if TreeHaver::BackendRegistry.tag_available?(tag)
+              config.filter_run_excluding("not_#{tag}": true)
+            else
+              config.filter_run_excluding(tag => true)
+            end
+          end
+        end
+
         def available?(tag_name)
           TreeHaver::BackendRegistry.tag_available?(tag_name)
         end
@@ -30,13 +40,7 @@ end
 
 if defined?(::RSpec)
   ::RSpec.configure do |config|
-    TreeHaver::BackendRegistry.registered_tags.each do |tag|
-      if TreeHaver::BackendRegistry.tag_available?(tag)
-        config.filter_run_excluding("not_#{tag}": true)
-      else
-        config.filter_run_excluding(tag => true)
-      end
-    end
+    TreeHaver::RSpec::DependencyTags.configure_filters(config)
 
     config.before(:suite) do
       next if ENV.fetch('TREE_HAVER_DEBUG', 'false').casecmp?('false')

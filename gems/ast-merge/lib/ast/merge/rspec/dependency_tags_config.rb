@@ -39,6 +39,13 @@ RSpec.configure do |config|
   # the code (since this file is required AFTER ast-merge loads in spec_helper.rb)
   registry.force_check_availability!
 
+  # Provider loading during availability checks can register additional
+  # TreeHaver backend and grammar tags. Reapply the shared filters after that
+  # discovery so late-registered unavailable backends remain excluded.
+  if defined?(TreeHaver::RSpec::DependencyTags)
+    TreeHaver::RSpec::DependencyTags.configure_filters(config)
+  end
+
   # Now configure exclusion filters based on actual availability
   registry.registered_gems.each do |tag|
     if registry.available?(tag)
