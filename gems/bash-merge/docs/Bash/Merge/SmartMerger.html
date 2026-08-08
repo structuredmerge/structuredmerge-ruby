@@ -6,7 +6,7 @@
 <title>
   Class: Bash::Merge::SmartMerger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -93,7 +93,7 @@
   
   <dl>
       <dt>Includes:</dt>
-      <dd>Ast::Merge::Runtime::RootSessionSupport, Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
+      <dd>Ast::Merge::CommentLayoutEmissionSupport, Ast::Merge::Runtime::RootSessionSupport, Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
   </dl>
   
   
@@ -419,6 +419,7 @@ and MergeResult to merge two Bash scripts intelligently.</p>
   
   
   
+  
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -670,6 +671,8 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
+62
+63
 64
 65
 66
@@ -699,12 +702,10 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
 90
 91
 92
-93
-94
-95</pre>
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
@@ -775,12 +776,12 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
-43
-44
-45</pre>
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
   <span class='ivar'>@corruption_handling</span>
@@ -817,12 +818,12 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
-97
-98
-99</pre>
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
   <span class='ivar'>@remove_template_missing_nodes</span>
@@ -859,12 +860,12 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
-42
-43
-44</pre>
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span>
   <span class='ivar'>@runtime_session</span>
@@ -923,20 +924,20 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
+167
+168
 169
 170
 171
-172
-173
-174</pre>
+172</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 169</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
   <span class='id identifier rubyid_errors'>errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_errors'>errors</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -986,12 +987,12 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
-102
-103
-104</pre>
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
   <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_bash'>to_bash</span>
@@ -1043,6 +1044,8 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
+107
+108
 109
 110
 111
@@ -1051,12 +1054,10 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
 114
 115
 116
-117
-118
-119</pre>
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 109</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 107</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='kw'>return</span> <span class='ivar'>@merge_result</span> <span class='kw'>if</span> <span class='ivar'>@merge_result</span>
@@ -1116,6 +1117,8 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
+122
+123
 124
 125
 126
@@ -1147,24 +1150,22 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
 152
 153
 154
-155
-156
-157</pre>
+155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 124</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
   <span class='id identifier rubyid_result_obj'>result_obj</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
     <span class='label'>nodes:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_nodes'>nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>freeze_blocks:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
   <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
     <span class='label'>nodes:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_nodes'>nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>freeze_blocks:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
 
   <span class='lbrace'>{</span>
@@ -1179,13 +1180,13 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <span class='label'>corruption_handling:</span> <span class='ivar'>@corruption_handling</span><span class='comma'>,</span>
       <span class='label'>freeze_token:</span> <span class='ivar'>@freeze_token</span><span class='comma'>,</span>
       <span class='label'>runtime_operation_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_operations'>operations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
-      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>runtime:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
     <span class='label'>statistics:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_statistics'>statistics</span><span class='comma'>,</span>
     <span class='label'>decisions:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span><span class='comma'>,</span>
     <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='comma'>,</span>
-    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1231,12 +1232,12 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
       <pre class="lines">
 
 
-162
-163
-164</pre>
+160
+161
+162</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 160</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>
@@ -1251,9 +1252,9 @@ variable. This is handled by tree_haver’s GrammarFinder.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:54 2026 by
+  Generated on Sat Aug  8 01:23:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

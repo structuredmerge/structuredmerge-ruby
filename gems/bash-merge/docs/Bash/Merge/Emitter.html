@@ -6,7 +6,7 @@
 <title>
   Class: Bash::Merge::Emitter
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -545,7 +545,7 @@ the original structure, comments, and style choices.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#emit_shebang-instance_method" title="#emit_shebang (instance method)">#<strong>emit_shebang</strong>(interpreter = &quot;/bin/bash&quot;, metadata: nil)  &#x21d2; Object </a>
+      <a href="#emit_shebang-instance_method" title="#emit_shebang (instance method)">#<strong>emit_shebang</strong>(interpreter = &#39;/bin/bash&#39;, metadata: nil)  &#x21d2; Object </a>
     
 
     
@@ -637,7 +637,7 @@ the original structure, comments, and style choices.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize_subclass_state-instance_method" title="#initialize_subclass_state (instance method)">#<strong>initialize_subclass_state</strong>(**options)  &#x21d2; Object </a>
+      <a href="#initialize_subclass_state-instance_method" title="#initialize_subclass_state (instance method)">#<strong>initialize_subclass_state</strong>(**_options)  &#x21d2; Object </a>
     
 
     
@@ -755,7 +755,7 @@ the original structure, comments, and style choices.</p>
       <pre class="code"><span class="info file"># File 'lib/bash/merge/emitter.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_blank_line'>emit_blank_line</span>
-  <span class='id identifier rubyid_append_line'>append_line</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_append_line'>append_line</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1585,7 +1585,7 @@ the original structure, comments, and style choices.</p>
       <div class="method_details ">
   <h3 class="signature " id="emit_shebang-instance_method">
   
-    #<strong>emit_shebang</strong>(interpreter = &quot;/bin/bash&quot;, metadata: nil)  &#x21d2; <tt>Object</tt> 
+    #<strong>emit_shebang</strong>(interpreter = &#39;/bin/bash&#39;, metadata: nil)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1610,7 +1610,7 @@ the original structure, comments, and style choices.</p>
         <span class='type'>(<tt>String</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>&quot;/bin/bash&quot;</tt>)</em>
+        <em class="default">(defaults to: <tt>&#39;/bin/bash&#39;</tt>)</em>
       
       
         &mdash;
@@ -1635,7 +1635,7 @@ the original structure, comments, and style choices.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/bash/merge/emitter.rb', line 57</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_emit_shebang'>emit_shebang</span><span class='lparen'>(</span><span class='id identifier rubyid_interpreter'>interpreter</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/bin/bash</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_emit_shebang'>emit_shebang</span><span class='lparen'>(</span><span class='id identifier rubyid_interpreter'>interpreter</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/bin/bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_append_line'>append_line</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#!</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interpreter'>interpreter</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1696,7 +1696,7 @@ the original structure, comments, and style choices.</p>
       <pre class="code"><span class="info file"># File 'lib/bash/merge/emitter.rb', line 34</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_tracked_comment'>emit_tracked_comment</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_indent'>indent</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:indent</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='int'>0</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_indent'>indent</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:indent</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='int'>0</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_append_line'>append_line</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_indent'>indent</span><span class='embexpr_end'>}</span><span class='tstring_content'># </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1808,7 +1808,7 @@ the original structure, comments, and style choices.</p>
       <pre class="code"><span class="info file"># File 'lib/bash/merge/emitter.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_emit_variable_assignment'>emit_variable_assignment</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>export:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>inline_comment:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_prefix'>prefix</span> <span class='op'>=</span> <span class='id identifier rubyid_export'>export</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>export </span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_prefix'>prefix</span> <span class='op'>=</span> <span class='id identifier rubyid_export'>export</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>export </span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
   <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_current_indent'>current_indent</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_prefix'>prefix</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='id identifier rubyid_line'>line</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> # </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inline_comment'>inline_comment</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_inline_comment'>inline_comment</span>
   <span class='id identifier rubyid_append_line'>append_line</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span>
@@ -1882,7 +1882,7 @@ the original structure, comments, and style choices.</p>
       <div class="method_details ">
   <h3 class="signature " id="initialize_subclass_state-instance_method">
   
-    #<strong>initialize_subclass_state</strong>(**options)  &#x21d2; <tt>Object</tt> 
+    #<strong>initialize_subclass_state</strong>(**_options)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1911,7 +1911,7 @@ the original structure, comments, and style choices.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/bash/merge/emitter.rb', line 19</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize_subclass_state'>initialize_subclass_state</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize_subclass_state'>initialize_subclass_state</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_initialize_line_metadata_state'>initialize_line_metadata_state</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1977,9 +1977,9 @@ the original structure, comments, and style choices.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:54 2026 by
+  Generated on Sat Aug  8 01:23:06 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
