@@ -22,11 +22,26 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Expose separate family-root test and lint tasks in mise configuration.
+- Add a family-root mise task for refreshing member bundles against local sibling dependencies.
 
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.1] - 2026-08-07
+
+- TAG: [v7.1.1][7.1.1t]
+- COVERAGE: 47.29% -- 1581/3343 lines in 37 files
+- BRANCH COVERAGE: 13.47% -- 185/1373 branches in 37 files
+- 73.88% documented
+
+### Changed
+
+- Expose separate family-root test and lint tasks in mise configuration.
 
 ### Fixed
 
@@ -73,8 +88,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Report template application writes only for files actually created or updated, including unchanged and blocked reapplications.
 
 - Keep aggregate RSpec dependency tags aligned with late parser-provider registration and backend availability.
-
-### Security
 
 ## [7.1.0] - 2026-08-07
 
@@ -370,7 +383,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.0...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.1...HEAD
+[7.1.1]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.0...v7.1.1
+[7.1.1t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.1
 [7.1.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...v7.1.0
 [7.1.0t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.0
 [7.0.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/0aae485e7ca20583b73f8c146f467a64e526ca41...v7.0.0

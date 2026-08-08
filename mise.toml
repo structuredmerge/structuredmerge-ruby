@@ -17,3 +17,7 @@ run = "bundle exec kettle-family test --execute"
 [tasks.lint]
 description = "Run lint across family members"
 run = "bundle exec kettle-family lint --execute"
+
+[tasks.bup]
+description = "Refresh all member bundles against local family dependencies"
+run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute"
