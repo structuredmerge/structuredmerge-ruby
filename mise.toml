@@ -28,4 +28,5 @@ run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bun
 
 [tasks.release]
 description = "Publish the family in dependency waves with shrinking local sibling paths"
+raw = true
 run = "KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --execute --publish --secrets-provider op --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
