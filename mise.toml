@@ -21,3 +21,7 @@ run = "bundle exec kettle-family lint --execute"
 [tasks.bup]
 description = "Refresh member bundles against local dependencies without committing path locks"
 run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --no-commit"
+
+[tasks.release]
+description = "Publish the family in dependency waves with shrinking local sibling paths"
+run = "KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --execute --publish --secrets-provider op --env STRUCTUREDMERGE_DEV={{config_root}}/gems"

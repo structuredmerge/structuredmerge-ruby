@@ -26,6 +26,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Run the local family bup task without committing development-only path lockfiles.
 
+- Add a wave-aware family release task that switches selected sibling dependencies from local paths to released gems as waves complete.
+
 ### Deprecated
 
 ### Removed

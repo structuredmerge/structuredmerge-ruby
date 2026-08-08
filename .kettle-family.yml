@@ -147,6 +147,9 @@ install:
     - ../../appraisal-rb/kettle-jem-appraisals
 
 release:
+  # The release task supplies the local workspace path. kettle-family turns it
+  # off for each member once its selected sibling dependencies are released.
+  local_path_strategy: waves
   build_command: bundle exec rake build
   publish_command: bundle exec kettle-release
   waves:
