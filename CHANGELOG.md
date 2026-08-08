@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Skip unresolved contrib.rocks template image placeholders during release validation.
 
+- Preserve kettle-jem template tokens during release Markdown image URL normalization.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
