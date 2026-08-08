@@ -595,7 +595,7 @@
   <span class='kw'>end</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_checker'>checker</span>
 
-  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='op'>!</span><span class='op'>!</span><span class='id identifier rubyid_checker'>checker</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_checker'>checker</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
   <span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_availability_cache'>availability_cache</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_result'>result</span>
 <span class='kw'>rescue</span> <span class='const'>StandardError</span>
@@ -1254,7 +1254,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Aug  7 06:29:11 2026 by
+  Generated on Fri Aug  7 21:34:15 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

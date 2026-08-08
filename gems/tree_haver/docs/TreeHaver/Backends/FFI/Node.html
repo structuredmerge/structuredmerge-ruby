@@ -1009,7 +1009,7 @@ tree-sitter C library. The wrapper adds Ruby-level conveniences.</p>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 743</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_child_count'>child_count</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_child_count'>child_count</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_negative?'>negative?</span>
 
   <span class='id identifier rubyid_child_node'>child_node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_child'>ts_node_child</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="" title="TreeHaver::Backends::FFI::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="TreeHaver::Backends::FFI::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='rparen'>)</span>
@@ -1898,7 +1898,7 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 888</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_child'>named_child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&lt;</span> <span class='int'>0</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_named_child_count'>named_child_count</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_negative?'>negative?</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_named_child_count'>named_child_count</span>
 
   <span class='id identifier rubyid_child_node'>child_node</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_named_child'>ts_node_named_child</span><span class='lparen'>(</span><span class='ivar'>@val</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="Native.html" title="TreeHaver::Backends::FFI::Native (module)">Native</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ts_node_is_null'>ts_node_is_null</span><span class='lparen'>(</span><span class='id identifier rubyid_child_node'>child_node</span><span class='rparen'>)</span>
@@ -2712,7 +2712,7 @@ Anonymous nodes represent syntax/punctuation (e.g., “{“, “,”).</p>
 </div>
 
       <div id="footer">
-  Generated on Fri Aug  7 06:29:13 2026 by
+  Generated on Fri Aug  7 21:34:16 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

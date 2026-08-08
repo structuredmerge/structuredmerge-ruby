@@ -22,12 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Add a family-root mise task for refreshing member bundles against local sibling dependencies.
-
-- Run the local family bup task without committing development-only path lockfiles.
-
-- Add a wave-aware family release task that switches selected sibling dependencies from local paths to released gems as waves complete.
-
 ### Deprecated
 
 ### Removed
@@ -40,12 +34,18 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - TAG: [v7.1.1][7.1.1t]
 - COVERAGE: 47.29% -- 1581/3343 lines in 37 files
-- BRANCH COVERAGE: 13.47% -- 185/1373 branches in 37 files
+- BRANCH COVERAGE: 13.67% -- 188/1375 branches in 37 files
 - 73.88% documented
 
 ### Changed
 
 - Expose separate family-root test and lint tasks in mise configuration.
+
+- Add a family-root mise task for refreshing member bundles against local sibling dependencies.
+
+- Run the local family bup task without committing development-only path lockfiles.
+
+- Add a wave-aware family release task that switches selected sibling dependencies from local paths to released gems as waves complete.
 
 ### Fixed
 

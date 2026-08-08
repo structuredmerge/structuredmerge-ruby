@@ -2885,7 +2885,7 @@ providing all the necessary functionality.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_with_citrus'>parse_with_citrus</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>grammar_module:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raw'>raw</span> <span class='op'>=</span> <span class='id identifier rubyid_grammar_module'>grammar_module</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_raw'>raw</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:captures</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_raw'>raw</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:captures</span><span class='rparen'>)</span>
     <span class='lbrace'>{</span>
       <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
       <span class='label'>backend_ref:</span> <span class='const'><span class='object_link'><a href="#CITRUS_BACKEND-constant" title="TreeHaver::CITRUS_BACKEND (constant)">CITRUS_BACKEND</a></span></span><span class='comma'>,</span>
@@ -4153,7 +4153,7 @@ providing all the necessary functionality.</p>
 </div>
 
       <div id="footer">
-  Generated on Fri Aug  7 06:29:11 2026 by
+  Generated on Fri Aug  7 21:34:15 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

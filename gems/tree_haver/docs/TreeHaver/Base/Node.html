@@ -1281,7 +1281,7 @@ They return raw <code>::TreeSitter::Node</code> objects which are wrapped by<br 
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_byte</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:end_byte</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_cmp'>cmp</span> <span class='op'>=</span> <span class='id identifier rubyid_start_byte'>start_byte</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_start_byte'>start_byte</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_cmp'>cmp</span> <span class='kw'>unless</span> <span class='id identifier rubyid_cmp'>cmp</span> <span class='op'>==</span> <span class='int'>0</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_cmp'>cmp</span> <span class='kw'>unless</span> <span class='id identifier rubyid_cmp'>cmp</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span>
 
   <span class='id identifier rubyid_end_byte'>end_byte</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_end_byte'>end_byte</span>
 <span class='kw'>end</span></pre>
@@ -2962,7 +2962,7 @@ vocabulary aliases. Backends without aliases use their public type.</p>
 </div>
 
       <div id="footer">
-  Generated on Fri Aug  7 06:29:12 2026 by
+  Generated on Fri Aug  7 21:34:15 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
