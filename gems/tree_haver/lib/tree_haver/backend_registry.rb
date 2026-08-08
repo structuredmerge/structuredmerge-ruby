@@ -45,7 +45,7 @@ module TreeHaver
       end
       return false unless checker
 
-      result = !!checker.call
+      result = checker.call ? true : false
       mutex.synchronize { availability_cache[key] = result }
       result
     rescue StandardError
