@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Separate local non-committing bundle refreshes from release-mode bundle updates that validate and commit publishable lockfiles.
 
+- Keep release-mode bundle refreshes independent of the released templating dependency set.
+
 ### Security
 
 ## [7.1.1] - 2026-08-07

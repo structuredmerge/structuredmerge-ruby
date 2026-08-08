@@ -24,7 +24,7 @@ run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/.
 
 [tasks.bup-release]
 description = "Refresh member bundles against released dependencies and commit lockfile updates"
-run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute"
 
 [tasks.release]
 description = "Publish the family in dependency waves with shrinking local sibling paths"
