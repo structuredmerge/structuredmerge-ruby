@@ -153,6 +153,15 @@ GEM
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     logger (1.7.0)
+    markdown-merge (7.1.1)
+      ast-merge (= 7.1.1)
+      tree_haver (= 7.1.1)
+      version_gem (~> 1.1, >= 1.1.15)
+    markly (0.16.0)
+    markly-merge (7.1.1)
+      markdown-merge (= 7.1.1)
+      markly (~> 0.9)
+      version_gem (~> 1.1, >= 1.1.15)
     mister_bin (0.9.0)
       colsole (~> 1.0.0)
       docopt_ng (~> 0.7.1)
@@ -184,6 +193,10 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
+    prism-merge (7.1.1)
+      prism (~> 1.6)
+      ruby-merge (= 7.1.1)
+      version_gem (~> 1.1, >= 1.1.15)
     psych (5.4.0)
       date
       stringio
@@ -318,6 +331,10 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-ast (>= 1.44.0, < 2.0)
+    ruby-merge (7.1.1)
+      ast-merge (= 7.1.1)
+      tree_haver (= 7.1.1)
+      version_gem (~> 1.1, >= 1.1.15)
     ruby-progressbar (1.13.0)
     ruby_engine (2.0.3)
     ruby_version (1.0.3)
@@ -374,6 +391,10 @@ GEM
       timecop (>= 0.7, < 1)
     token-resolver (2.0.9)
       parslet (~> 2.0)
+      version_gem (~> 1.1, >= 1.1.15)
+    toml-merge (7.1.1)
+      ast-merge (= 7.1.1)
+      tree_haver (= 7.1.1)
       version_gem (~> 1.1, >= 1.1.15)
     tree_haver (7.1.1)
       citrus (~> 3.0)
@@ -460,8 +481,10 @@ DEPENDENCIES
   kettle-test (~> 2.0, >= 2.0.19)
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-parser-gfm (~> 1.1)
+  markly-merge (~> 7.1, >= 7.1.0)
   mutex_m (~> 0.2)
   nomono (~> 1.1, >= 1.1.4)
+  prism-merge (~> 7.1, >= 7.1.0)
   rake (~> 13.0)
   rbs (>= 3.0)
   reek (~> 6.5, >= 6.5.0)
@@ -477,6 +500,7 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8)
   stringio (>= 3.0)
+  toml-merge (~> 7.1, >= 7.1.0)
   turbo_tests2 (~> 3.2, >= 3.2.4)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.4)
@@ -545,6 +569,9 @@ CHECKSUMS
   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+  markdown-merge (7.1.1) sha256=a854f99b77c09d552d48fe94641a886f943be66c3bf3b1a7060eef69af5246ad
+  markly (0.16.0) sha256=6f70d79e385b1efc9e171f74c81628826259039fe6c778e03c3924c71dac5511
+  markly-merge (7.1.1) sha256=ecd802d3b4f57ee20150dc3685054900e3c0d26d26ac596322a65d5fab1ac39b
   mister_bin (0.9.0) sha256=624fe401db4faf1978e84c17e0b320827697a13a6cba4fe656001269079be7d3
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
   nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
@@ -563,6 +590,7 @@ CHECKSUMS
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
+  prism-merge (7.1.1) sha256=001d45222a07167030ead23e7a228282d19777fcdf1116cde68021b52c029bc8
   psych (5.4.0) sha256=14f72d69a611af663d7d70e4a7b67d9eb1f3ae9f8d916b478961d5a0075ba5b7
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
@@ -603,6 +631,7 @@ CHECKSUMS
   rubocop-rspec_rails (2.32.0) sha256=4a0d641c72f6ebb957534f539d9d0a62c47abd8ce0d0aeee1ef4701e892a9100
   rubocop-ruby3_2 (3.0.7) sha256=f53dd6d286fb05186214fc6ec116783e7f837030918e8931c05de773e98f8466
   rubocop-thread_safety (0.7.3) sha256=067cdd52fbf5deffc18995437e45b5194236eaff4f71de3375a1f6052e48f431
+  ruby-merge (7.1.1) sha256=584cdedd7632c64423ab62ef40a73771ae7b0a2b8875cd53357c22cb94b6d475
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   ruby_engine (2.0.3) sha256=ca2ae7def8cfcdc2bfb6a186d36d5d59c8b403245dc0256c3802b767fa278aaa
   ruby_version (1.0.3) sha256=5930f9950746b7e6c973184398ee364ee7440b170fef7922b9f5cdf317f1ccb5
@@ -627,6 +656,7 @@ CHECKSUMS
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
   token-resolver (2.0.9) sha256=4d0a6f3cdd252538f949edd94dd2b88f52c0fb02f1d1cd6073af6d7b1f549fe1
+  toml-merge (7.1.1) sha256=cca20bd6c276fff5c2771e9d23c616a9618f21bedde364ebd47a3c3a2410159b
   tree_haver (7.1.1) sha256=9ace0047514fce53780238d7f087a30df64c52deadeeb9a5aacc6213f64d1880
   tree_sitter_language_pack (1.14.3-aarch64-linux) sha256=4f29f21e189e4f77478b56873dc3b9b60368b074d05328e0eed429f3fb147bbf
   tree_sitter_language_pack (1.14.3-arm64-darwin) sha256=37d9972478328f389b78ae9688580d96b7ec0dfe8bbcf89998a9d027e3ffae10

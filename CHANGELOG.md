@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Declare the released adapter gems required by ast-template's default adapter registry test suite.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
