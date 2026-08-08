@@ -2516,7 +2516,7 @@ top of the merged output.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/hash_tracker_base.rb', line 373</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_trailing_comment_owned_by?'>trailing_comment_owned_by?</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span> <span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>unless</span> <span class='id identifier rubyid_owner'>owner</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:indent</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_indent'>indent</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>unless</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:indent</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_indent'>indent</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>unless</span> <span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:indent</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_comment'>comment</span><span class='lbracket'>[</span><span class='symbol'>:indent</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>==</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_indent'>indent</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
@@ -2783,7 +2783,7 @@ preserved inside the trailing region.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:37 2026 by
+  Generated on Sat Aug  8 00:13:19 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

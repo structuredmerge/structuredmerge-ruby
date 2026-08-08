@@ -783,7 +783,7 @@ work can build on the same object without inventing a new boundary shape.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_gaps'>gaps</span>
   <span class='id identifier rubyid_attachment'>attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span>
-  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:gaps</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:gaps</span><span class='rparen'>)</span>
 
   <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_public_send'>public_send</span><span class='lparen'>(</span><span class='symbol'>:gaps</span><span class='rparen'>)</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -948,7 +948,7 @@ work can build on the same object without inventing a new boundary shape.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_regions'>regions</span>
   <span class='id identifier rubyid_attachment'>attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span>
-  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:regions</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:regions</span><span class='rparen'>)</span>
 
   <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_public_send'>public_send</span><span class='lparen'>(</span><span class='symbol'>:regions</span><span class='rparen'>)</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1015,7 +1015,7 @@ work can build on the same object without inventing a new boundary shape.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:37 2026 by
+  Generated on Sat Aug  8 00:13:19 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

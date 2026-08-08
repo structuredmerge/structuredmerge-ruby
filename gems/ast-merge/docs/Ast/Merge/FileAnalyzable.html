@@ -3002,7 +3002,7 @@ blank-line runs from source lines and owner ranges.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 519</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_layout_owner_supported?'>layout_owner_supported?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_owner'>owner</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
+  <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
     <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:end_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
     <span class='op'>!</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span>
     <span class='op'>!</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -4552,7 +4552,7 @@ their read/write model.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_signature_at'>signature_at</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&lt;</span> <span class='int'>0</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_negative?'>negative?</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
 
   <span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -4625,7 +4625,7 @@ The default implementation returns @statements if set, otherwise an empty array.
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:32 2026 by
+  Generated on Sat Aug  8 00:13:13 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

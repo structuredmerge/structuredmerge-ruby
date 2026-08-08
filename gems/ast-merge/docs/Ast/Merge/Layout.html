@@ -325,7 +325,7 @@ controls output at a time.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/layout.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_removed_owner_controlled_gaps'>removed_owner_controlled_gaps</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:owner</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:owner</span><span class='rparen'>)</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>leading:</span> <span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span> <span class='kw'>if</span> <span class='id identifier rubyid_owner_controls_gap?'>owner_controls_gap?</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
@@ -342,7 +342,7 @@ controls output at a time.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:32 2026 by
+  Generated on Sat Aug  8 00:13:12 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

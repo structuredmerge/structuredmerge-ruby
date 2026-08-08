@@ -291,12 +291,14 @@
 
 176
 177
-178</pre>
+178
+179</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_callable'>callable</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span>
   <span class='ivar'>@callable</span> <span class='op'>=</span> <span class='id identifier rubyid_callable'>callable</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -432,7 +434,6 @@
       <pre class="lines">
 
 
-184
 185
 186
 187
@@ -442,10 +443,11 @@
 191
 192
 193
-194</pre>
+194
+195</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 184</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 185</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_classify'>classify</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_callable'>callable</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
@@ -468,7 +470,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:35 2026 by
+  Generated on Sat Aug  8 00:13:17 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

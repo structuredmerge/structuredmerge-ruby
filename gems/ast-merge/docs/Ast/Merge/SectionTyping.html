@@ -343,8 +343,6 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
       <pre class="lines">
 
 
-245
-246
 247
 248
 249
@@ -384,10 +382,12 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
 283
 284
 285
-286</pre>
+286
+287
+288</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 245</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 247</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_sections'>merge_sections</span><span class='lparen'>(</span><span class='id identifier rubyid_template_sections'>template_sections</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>add_template_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_dest_by_name'>dest_by_name</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_sections'>dest_sections</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
@@ -512,8 +512,6 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
       <pre class="lines">
 
 
-293
-294
 295
 296
 297
@@ -521,10 +519,12 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
 299
 300
 301
-302</pre>
+302
+303
+304</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 293</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/section_typing.rb', line 295</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_preference_for'>preference_for</span><span class='lparen'>(</span><span class='id identifier rubyid_section_name'>section_name</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_preference'>preference</span> <span class='kw'>unless</span> <span class='id identifier rubyid_preference'>preference</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -546,7 +546,7 @@ structural boundaries. This eliminates the need for regex pattern matching.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:32 2026 by
+  Generated on Sat Aug  8 00:13:13 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

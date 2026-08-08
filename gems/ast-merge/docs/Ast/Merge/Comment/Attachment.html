@@ -2305,7 +2305,7 @@ around a structural owner node.</p>
       <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/attachment.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
-  <span class='id identifier rubyid_owner_desc'>owner_desc</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owner'>owner</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_owner_desc'>owner_desc</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span>
                  <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
                <span class='kw'>elsif</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
                  <span class='kw'>nil</span>
@@ -2512,7 +2512,7 @@ around a structural owner node.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_leading_region_layout_owned?'>leading_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_floating?'>floating?</span> <span class='op'>&amp;&amp;</span>
     <span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_for?'>leading_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
-    <span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='op'>&amp;.</span><span class='id identifier rubyid_controls_output_for?'>controls_output_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='period'>.</span><span class='id identifier rubyid_controls_output_for?'>controls_output_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2675,7 +2675,7 @@ around a structural owner node.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_trailing_region_layout_owned?'>trailing_region_layout_owned?</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_floating?'>floating?</span> <span class='op'>&amp;&amp;</span>
     <span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_for?'>trailing_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
-    <span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='op'>&amp;.</span><span class='id identifier rubyid_controls_output_for?'>controls_output_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='period'>.</span><span class='id identifier rubyid_controls_output_for?'>controls_output_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2740,7 +2740,7 @@ around a structural owner node.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:36 2026 by
+  Generated on Sat Aug  8 00:13:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

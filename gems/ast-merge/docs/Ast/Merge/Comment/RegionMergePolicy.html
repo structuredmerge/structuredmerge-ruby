@@ -887,7 +887,7 @@ so format gems can adopt textual comment-region merging consistently.</p>
   <span class='id identifier rubyid_region_marked'>region_marked</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_preferred_region'>preferred_region</span><span class='comma'>,</span> <span class='id identifier rubyid_other_region'>other_region</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_region'>region</span><span class='op'>|</span>
     <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:freeze_marker?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_region'>region</span><span class='period'>.</span><span class='id identifier rubyid_freeze_marker?'>freeze_marker?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
-  <span class='id identifier rubyid_attachment_marked'>attachment_marked</span> <span class='op'>=</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:freeze_marker?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_freeze_marker?'>freeze_marker?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attachment_marked'>attachment_marked</span> <span class='op'>=</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:freeze_marker?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_freeze_marker?'>freeze_marker?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_region_marked'>region_marked</span> <span class='op'>||</span> <span class='id identifier rubyid_attachment_marked'>attachment_marked</span>
 <span class='kw'>end</span></pre>
@@ -1312,7 +1312,7 @@ so format gems can adopt textual comment-region merging consistently.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Aug  6 23:41:37 2026 by
+  Generated on Sat Aug  8 00:13:19 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
