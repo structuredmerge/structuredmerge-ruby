@@ -22,27 +22,19 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Pin each release to a versioned StructuredMerge fixtures release and validate the paired fixture SHA before tests.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Restore per-member commits for family bundle refreshes so valid lockfile updates are recorded.
-
-- Separate local non-committing bundle refreshes from release-mode bundle updates that validate and commit publishable lockfiles.
-
-- Keep release-mode bundle refreshes independent of the released templating dependency set.
-
 ### Security
 
-## [7.1.1] - 2026-08-07
+## [7.1.1] - 2026-08-08
 
 - TAG: [v7.1.1][7.1.1t]
-- COVERAGE: 47.29% -- 1581/3343 lines in 37 files
-- BRANCH COVERAGE: 13.67% -- 188/1375 branches in 37 files
+- COVERAGE: 47.32% -- 1582/3343 lines in 37 files
+- BRANCH COVERAGE: 13.75% -- 189/1375 branches in 37 files
 - 73.88% documented
 
 ### Changed
@@ -54,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Run the local family bup task without committing development-only path lockfiles.
 
 - Add a wave-aware family release task that switches selected sibling dependencies from local paths to released gems as waves complete.
+
+- Pin each release to a versioned StructuredMerge fixtures release and validate the paired fixture SHA before tests.
 
 ### Fixed
 
@@ -100,6 +94,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - Report template application writes only for files actually created or updated, including unchanged and blocked reapplications.
 
 - Keep aggregate RSpec dependency tags aligned with late parser-provider registration and backend availability.
+
+- Restore per-member commits for family bundle refreshes so valid lockfile updates are recorded.
+
+- Separate local non-committing bundle refreshes from release-mode bundle updates that validate and commit publishable lockfiles.
+
+- Keep release-mode bundle refreshes independent of the released templating dependency set.
 
 ## [7.1.0] - 2026-08-07
 
