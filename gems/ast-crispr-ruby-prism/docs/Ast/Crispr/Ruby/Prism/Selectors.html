@@ -6,7 +6,7 @@
 <title>
   Module: Ast::Crispr::Ruby::Prism::Selectors
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -195,6 +195,27 @@
       <pre class="lines">
 
 
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
 136
 137
 138
@@ -242,28 +263,13 @@
 180
 181
 182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199</pre>
+183</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr/ruby/prism.rb', line 136</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr/ruby/prism.rb', line 115</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_comment_line_block'>comment_line_block</span><span class='lparen'>(</span><span class='label'>start_text:</span><span class='comma'>,</span> <span class='label'>end_text:</span><span class='comma'>,</span> <span class='label'>id:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>span:</span> <span class='symbol'>:nearest</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_line_block'>comment_line_block</span><span class='lparen'>(</span><span class='label'>start_text:</span><span class='comma'>,</span> <span class='label'>end_text:</span><span class='comma'>,</span> <span class='label'>id:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>span:</span> <span class='symbol'>:nearest</span><span class='comma'>,</span>
+                       <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>OwnerSelector</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
     <span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ruby_comment_line_block_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_start_text'>start_text</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='label'>limit:</span> <span class='id identifier rubyid_limit'>limit</span><span class='comma'>,</span>
@@ -272,12 +278,14 @@
       <span class='label'>owner_scope:</span> <span class='symbol'>:ruby_comments</span><span class='comma'>,</span>
       <span class='label'>selector_kind:</span> <span class='symbol'>:ruby_comment_line_block</span><span class='comma'>,</span>
       <span class='label'>selection_intent:</span> <span class='symbol'>:line_marker_block</span><span class='comma'>,</span>
-      <span class='label'>include_trailing_gap:</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span><span class='comma'>,</span>
+      <span class='label'>include_trailing_gap:</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span>
     <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>locate:</span> <span class='id identifier rubyid_lambda'>lambda</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_context'>context</span><span class='op'>|</span>
       <span class='id identifier rubyid_comments'>comments</span> <span class='op'>=</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_structural_owners'>structural_owners</span><span class='lparen'>(</span><span class='label'>owner_scope:</span> <span class='symbol'>:ruby_comments</span><span class='rparen'>)</span>
       <span class='kw'>if</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>==</span> <span class='symbol'>:outermost</span>
-        <span class='id identifier rubyid_opening'>opening</span> <span class='op'>=</span> <span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_location_slice'>location_slice</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span> <span class='op'>==</span> <span class='id identifier rubyid_start_text'>start_text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_opening'>opening</span> <span class='op'>=</span> <span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span>
+          <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_location_slice'>location_slice</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span> <span class='op'>==</span> <span class='id identifier rubyid_start_text'>start_text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+        <span class='kw'>end</span>
         <span class='id identifier rubyid_closing'>closing</span> <span class='op'>=</span> <span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='op'>|</span>
           <span class='id identifier rubyid_opening'>opening</span> <span class='op'>&amp;&amp;</span>
             <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_location_slice'>location_slice</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span> <span class='op'>==</span> <span class='id identifier rubyid_end_text'>end_text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>&amp;&amp;</span>
@@ -297,16 +305,18 @@
               <span class='label'>end_boundary:</span> <span class='lparen'>(</span><span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span> <span class='op'>?</span> <span class='symbol'>:owner_end_plus_trailing_gap</span> <span class='op'>:</span> <span class='symbol'>:owner_end</span><span class='rparen'>)</span><span class='comma'>,</span>
               <span class='label'>payload_kind:</span> <span class='symbol'>:comment_owned_body</span><span class='comma'>,</span>
               <span class='label'>start_text:</span> <span class='id identifier rubyid_start_text'>start_text</span><span class='comma'>,</span>
-              <span class='label'>end_text:</span> <span class='id identifier rubyid_end_text'>end_text</span><span class='comma'>,</span>
-            <span class='rbrace'>}</span><span class='comma'>,</span>
-          <span class='rparen'>)</span><span class='comma'>,</span>
+              <span class='label'>end_text:</span> <span class='id identifier rubyid_end_text'>end_text</span>
+            <span class='rbrace'>}</span>
+          <span class='rparen'>)</span>
         <span class='rbracket'>]</span>
       <span class='kw'>end</span>
 
       <span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_comment'>comment</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
         <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_location_slice'>location_slice</span><span class='lparen'>(</span><span class='id identifier rubyid_comment'>comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span> <span class='op'>==</span> <span class='id identifier rubyid_start_text'>start_text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
 
-        <span class='id identifier rubyid_closing'>closing</span> <span class='op'>=</span> <span class='id identifier rubyid_comments'>comments</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span><span class='op'>..</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_location_slice'>location_slice</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span> <span class='op'>==</span> <span class='id identifier rubyid_end_text'>end_text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_closing'>closing</span> <span class='op'>=</span> <span class='id identifier rubyid_comments'>comments</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span><span class='op'>..</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span>
+          <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_location_slice'>location_slice</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span> <span class='op'>==</span> <span class='id identifier rubyid_end_text'>end_text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+        <span class='kw'>end</span>
         <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_closing'>closing</span>
 
         <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_closing'>closing</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
@@ -320,11 +330,11 @@
             <span class='label'>end_boundary:</span> <span class='lparen'>(</span><span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span> <span class='op'>?</span> <span class='symbol'>:owner_end_plus_trailing_gap</span> <span class='op'>:</span> <span class='symbol'>:owner_end</span><span class='rparen'>)</span><span class='comma'>,</span>
             <span class='label'>payload_kind:</span> <span class='symbol'>:comment_owned_body</span><span class='comma'>,</span>
             <span class='label'>start_text:</span> <span class='id identifier rubyid_start_text'>start_text</span><span class='comma'>,</span>
-            <span class='label'>end_text:</span> <span class='id identifier rubyid_end_text'>end_text</span><span class='comma'>,</span>
-          <span class='rbrace'>}</span><span class='comma'>,</span>
+            <span class='label'>end_text:</span> <span class='id identifier rubyid_end_text'>end_text</span>
+          <span class='rbrace'>}</span>
         <span class='rparen'>)</span>
       <span class='kw'>end</span>
-    <span class='kw'>end</span><span class='comma'>,</span>
+    <span class='kw'>end</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -347,24 +357,26 @@
       <pre class="lines">
 
 
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134</pre>
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr/ruby/prism.rb', line 122</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr/ruby/prism.rb', line 100</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_comment_region_owned_owner'>comment_region_owned_owner</span><span class='lparen'>(</span><span class='label'>marker:</span><span class='comma'>,</span> <span class='label'>id:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>owner_scope:</span> <span class='symbol'>:shared_default</span><span class='comma'>,</span> <span class='label'>comment_region:</span> <span class='symbol'>:leading</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_region_owned_owner'>comment_region_owned_owner</span><span class='lparen'>(</span><span class='label'>marker:</span><span class='comma'>,</span> <span class='label'>id:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>owner_scope:</span> <span class='symbol'>:shared_default</span><span class='comma'>,</span>
+                               <span class='label'>comment_region:</span> <span class='symbol'>:leading</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>Selectors</span><span class='period'>.</span><span class='id identifier rubyid_comment_region_owned_owner'>comment_region_owned_owner</span><span class='lparen'>(</span>
     <span class='label'>marker:</span> <span class='id identifier rubyid_marker'>marker</span><span class='comma'>,</span>
     <span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
@@ -374,7 +386,7 @@
     <span class='label'>include_trailing_gap:</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span><span class='comma'>,</span>
     <span class='label'>adapter:</span> <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Ruby.html" title="Ast::Crispr::Ruby (module)">Ruby</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Prism.html" title="Ast::Crispr::Ruby::Prism (module)">Prism</a></span></span><span class='period'>.</span><span class='id identifier rubyid_adapter'><span class='object_link'><a href="../Prism.html#adapter-class_method" title="Ast::Crispr::Ruby::Prism.adapter (method)">adapter</a></span></span><span class='comma'>,</span>
     <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -397,22 +409,24 @@
       <pre class="lines">
 
 
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120</pre>
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr/ruby/prism.rb', line 110</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr/ruby/prism.rb', line 87</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_owner_filter'>owner_filter</span><span class='lparen'>(</span><span class='label'>id:</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>owner_scope:</span> <span class='symbol'>:shared_default</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_filter'>owner_filter</span><span class='lparen'>(</span><span class='label'>id:</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>owner_scope:</span> <span class='symbol'>:shared_default</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span>
+                 <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>Selectors</span><span class='period'>.</span><span class='id identifier rubyid_owner_filter'>owner_filter</span><span class='lparen'>(</span>
     <span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
     <span class='label'>limit:</span> <span class='id identifier rubyid_limit'>limit</span><span class='comma'>,</span>
@@ -433,9 +447,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:44 2026 by
+  Generated on Sat Aug  8 01:07:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
