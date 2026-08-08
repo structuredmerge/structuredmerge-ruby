@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Load merge providers before configuring shared backend availability filters across the family spec harnesses.
 
+- Expose Bash analysis nodes through the statements API so parsed structures reach merge consumers.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

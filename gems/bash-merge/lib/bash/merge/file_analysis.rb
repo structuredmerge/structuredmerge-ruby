@@ -166,7 +166,7 @@ module Bash
       # The base module uses 'statements' - provide both names for compatibility
       # @return [Array<NodeWrapper, FreezeNodeBase>]
       def statements
-        @statements ||= []
+        @nodes || []
       end
 
       # Alias for convenience - bash-merge prefers "nodes" terminology
