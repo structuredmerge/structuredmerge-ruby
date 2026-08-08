@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Temporarily pin generated RuboCop Packaging style Gemfiles to the nested-project config-root fix.
 
+- Keep scoped kettle-jem template runs from applying unselected post-template mutations.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08

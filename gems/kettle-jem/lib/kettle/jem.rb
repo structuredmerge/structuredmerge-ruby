@@ -4790,6 +4790,10 @@ module Kettle
     end
 
     def post_apply_steps(project_root, report)
+      selection = report.fetch(:template_selection, {})
+      scoped_template = Array(selection[:only]).any?
+      return [kettle_jem_state_sync_step(project_root, report)].compact if scoped_template
+
       [
         *[template_version_gem_bootstrap_step(project_root, report)].flatten,
         executable_version_entrypoint_sync_step(project_root, report),

@@ -1491,6 +1491,24 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "keeps post-apply work scoped when only selected template paths are requested" do
+    allow(described_class).to receive(:kettle_jem_state_sync_step).and_return(
+      name: "kettle_jem_state_sync",
+      status: "already_current",
+      changed_files: []
+    )
+    allow(described_class).to receive(:monorepo_subgem_kettle_config_profile_sync_step)
+
+    steps = described_class.send(
+      :post_apply_steps,
+      "/workspace/project",
+      template_selection: {only: ["gemfiles/modular/style.gemfile"]}
+    )
+
+    expect(steps.map { |step| step.fetch(:name) }).to eq(["kettle_jem_state_sync"])
+    expect(described_class).not_to have_received(:monorepo_subgem_kettle_config_profile_sync_step)
+  end
+
   it "makes generated git hook scripts executable during template apply" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
