@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Crispr::SelectionProfile
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -124,16 +124,16 @@
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>predicate_filter:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:predicate</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Predicate-based structural owner filtering</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Predicate-based structural owner filtering</span><span class='tstring_end'>&#39;</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>comment_anchored_owner:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Comment-region marker anchored owner selection</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Comment-region marker anchored owner selection</span><span class='tstring_end'>&#39;</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>section_branch:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:section_branch</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Heading-owned section branch selection</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Heading-owned section branch selection</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="KNOWN_SELECTOR_KINDS-constant" class="">KNOWN_SELECTOR_KINDS =
@@ -143,7 +143,7 @@
   <span class='label'>owner_filter:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:owner_filter</span> <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>comment_region_owner:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span> <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>comment_region_owned_owner:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='label'>heading_section:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:section_branch</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>heading_section:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:section_branch</span> <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="KNOWN_COMMENT_REGIONS-constant" class="">KNOWN_COMMENT_REGIONS =
@@ -152,7 +152,7 @@
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>leading:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:leading</span> <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>trailing:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:trailing</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='label'>inline:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:inline</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>inline:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:inline</span> <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="COMPAT_SELECTION_INTENT_FAMILIES-constant" class="">COMPAT_SELECTION_INTENT_FAMILIES =
@@ -163,7 +163,7 @@
   <span class='label'>comment_anchored_owner:</span> <span class='symbol'>:comment_anchor</span><span class='comma'>,</span>
   <span class='label'>comment_region_filter:</span> <span class='symbol'>:comment</span><span class='comma'>,</span>
   <span class='label'>section_branch:</span> <span class='symbol'>:section_branch</span><span class='comma'>,</span>
-  <span class='label'>section_heading:</span> <span class='symbol'>:section</span><span class='comma'>,</span>
+  <span class='label'>section_heading:</span> <span class='symbol'>:section</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
@@ -458,98 +458,6 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_comment_region-instance_method" title="#normalize_comment_region (instance method)">#<strong>normalize_comment_region</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#normalize_owner_selector-instance_method" title="#normalize_owner_selector (instance method)">#<strong>normalize_owner_selector</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#normalize_selection_intent-instance_method" title="#normalize_selection_intent (instance method)">#<strong>normalize_selection_intent</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#normalize_selector_kind-instance_method" title="#normalize_selector_kind (instance method)">#<strong>normalize_selector_kind</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#owner_selector-instance_method" title="#owner_selector (instance method)">#<strong>owner_selector</strong>  &#x21d2; Object </a>
     
 
@@ -724,26 +632,38 @@
       <pre class="lines">
 
 
-502
-503
-504
-505
-506
-507
-508
-509
-510</pre>
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 502</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 511</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>owner_scope:</span><span class='comma'>,</span> <span class='label'>selector_kind:</span><span class='comma'>,</span> <span class='label'>selection_intent:</span><span class='comma'>,</span> <span class='label'>structure_profile:</span><span class='comma'>,</span> <span class='label'>comment_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>owner_scope:</span><span class='comma'>,</span> <span class='label'>selector_kind:</span><span class='comma'>,</span> <span class='label'>selection_intent:</span><span class='comma'>,</span> <span class='label'>structure_profile:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>owner_selector:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+               <span class='label'>comment_region:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+               <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@owner_scope</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='ivar'>@selector_kind</span> <span class='op'>=</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='ivar'>@selection_intent</span> <span class='op'>=</span> <span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='ivar'>@comment_region</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_region'>comment_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='ivar'>@include_trailing_gap</span> <span class='op'>=</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
-  <span class='ivar'>@structure_profile</span> <span class='op'>=</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span>
+  <span class='ivar'>@structure_profile</span> <span class='op'>=</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="StructureProfile.html" title="Ast::Crispr::StructureProfile (class)">StructureProfile</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="StructureProfile.html#initialize-instance_method" title="Ast::Crispr::StructureProfile#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>owner_scope:</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span><span class='comma'>,</span>
+    <span class='label'>owner_selector:</span> <span class='id identifier rubyid_owner_selector'>owner_selector</span> <span class='op'>||</span> <span class='symbol'>:line_bound_statements</span><span class='comma'>,</span>
+    <span class='label'>supported_comment_regions:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_comment_region'>comment_region</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+  <span class='rparen'>)</span>
   <span class='ivar'>@metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -783,12 +703,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region'>comment_region</span>
   <span class='ivar'>@comment_region</span>
@@ -825,12 +745,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span>
   <span class='ivar'>@include_trailing_gap</span>
@@ -867,12 +787,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='ivar'>@metadata</span>
@@ -909,12 +829,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span>
   <span class='ivar'>@owner_scope</span>
@@ -951,12 +871,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selection_intent'>selection_intent</span>
   <span class='ivar'>@selection_intent</span>
@@ -993,12 +913,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span>
   <span class='ivar'>@selector_kind</span>
@@ -1035,12 +955,12 @@
       <pre class="lines">
 
 
-500
-501
-502</pre>
+508
+509
+510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 508</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span>
   <span class='ivar'>@structure_profile</span>
@@ -1095,12 +1015,12 @@
       <pre class="lines">
 
 
-532
-533
-534</pre>
+547
+548
+549</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 532</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 547</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_anchored?'>comment_anchored?</span>
   <span class='op'>!</span><span class='id identifier rubyid_comment_region'>comment_region</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -1148,139 +1068,15 @@
       <pre class="lines">
 
 
-528
-529
-530</pre>
+543
+544
+545</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 528</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 543</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_known_selection_intent?'>known_selection_intent?</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_SELECTION_INTENTS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_SELECTION_INTENTS (constant)">KNOWN_SELECTION_INTENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_comment_region-instance_method">
-  
-    #<strong>normalize_comment_region</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-1462
-1463
-1464
-1465
-1466</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1462</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_comment_region'>normalize_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-
-  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_owner_selector-instance_method">
-  
-    #<strong>normalize_owner_selector</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-1450
-1451
-1452</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1450</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_owner_selector'>normalize_owner_selector</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_selection_intent-instance_method">
-  
-    #<strong>normalize_selection_intent</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-1458
-1459
-1460</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1458</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_selection_intent'>normalize_selection_intent</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_selector_kind-instance_method">
-  
-    #<strong>normalize_selector_kind</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-1454
-1455
-1456</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1454</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_selector_kind'>normalize_selector_kind</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1302,12 +1098,12 @@
       <pre class="lines">
 
 
-516
-517
-518</pre>
+531
+532
+533</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 516</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 531</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owner_selector'>owner_selector</span>
   <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector'>owner_selector</span>
@@ -1332,12 +1128,12 @@
       <pre class="lines">
 
 
-520
-521
-522</pre>
+535
+536
+537</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 520</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 535</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span>
   <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span>
@@ -1362,28 +1158,28 @@
       <pre class="lines">
 
 
-1430
-1431
-1432
-1433
-1434
-1435
-1436
-1437
-1438
-1439
-1440
-1441
-1442
-1443
-1444
-1445
-1446
-1447
-1448</pre>
+1621
+1622
+1623
+1624
+1625
+1626
+1627
+1628
+1629
+1630
+1631
+1632
+1633
+1634
+1635
+1636
+1637
+1638
+1639</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1430</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1621</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_report'>report</span>
   <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span>
@@ -1400,7 +1196,7 @@
     <span class='label'>known_selection_intent:</span> <span class='const'><span class='object_link'><a href="#COMPAT_SELECTION_INTENT_FAMILIES-constant" title="Ast::Crispr::SelectionProfile::COMPAT_SELECTION_INTENT_FAMILIES (constant)">COMPAT_SELECTION_INTENT_FAMILIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>comment_region_family:</span> <span class='id identifier rubyid_comment_region_family'>comment_region_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
     <span class='label'>known_comment_region:</span> <span class='id identifier rubyid_known_comment_region'>known_comment_region</span><span class='comma'>,</span>
-    <span class='label'>comment_anchored:</span> <span class='id identifier rubyid_known_comment_region'>known_comment_region</span> <span class='op'>||</span> <span class='id identifier rubyid_selector_kind_family'>selector_kind_family</span> <span class='op'>==</span> <span class='symbol'>:comment_anchor</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#COMPAT_SELECTION_INTENT_FAMILIES-constant" title="Ast::Crispr::SelectionProfile::COMPAT_SELECTION_INTENT_FAMILIES (constant)">COMPAT_SELECTION_INTENT_FAMILIES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:comment</span><span class='comma'>,</span>
+    <span class='label'>comment_anchored:</span> <span class='id identifier rubyid_known_comment_region'>known_comment_region</span> <span class='op'>||</span> <span class='id identifier rubyid_selector_kind_family'>selector_kind_family</span> <span class='op'>==</span> <span class='symbol'>:comment_anchor</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#COMPAT_SELECTION_INTENT_FAMILIES-constant" title="Ast::Crispr::SelectionProfile::COMPAT_SELECTION_INTENT_FAMILIES (constant)">COMPAT_SELECTION_INTENT_FAMILIES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:comment</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_stringified_report'>stringified_report</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1424,12 +1220,12 @@
       <pre class="lines">
 
 
-524
-525
-526</pre>
+539
+540
+541</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 524</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 539</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selection_intent_family'>selection_intent_family</span>
   <span class='id identifier rubyid_selection_intent_metadata'>selection_intent_metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -1454,12 +1250,12 @@
       <pre class="lines">
 
 
-512
-513
-514</pre>
+527
+528
+529</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 512</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 527</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selection_intent_metadata'>selection_intent_metadata</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_SELECTION_INTENTS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_SELECTION_INTENTS (constant)">KNOWN_SELECTION_INTENTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dup'>dup</span><span class='op'>&amp;.</span><span class='id identifier rubyid_freeze'>freeze</span>
@@ -1484,24 +1280,24 @@
       <pre class="lines">
 
 
-536
-537
-538
-539
-540
-541
-542
-543
-544
-545
-546
-547
-548
-549
-550</pre>
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 536</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 551</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
   <span class='lbrace'>{</span>
@@ -1515,7 +1311,7 @@
     <span class='label'>comment_region:</span> <span class='id identifier rubyid_comment_region'>comment_region</span><span class='comma'>,</span>
     <span class='label'>include_trailing_gap:</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span><span class='comma'>,</span>
     <span class='label'>comment_anchored:</span> <span class='id identifier rubyid_comment_anchored?'>comment_anchored?</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1528,9 +1324,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:42 2026 by
+  Generated on Sat Aug  8 00:59:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  Class: Ast::Crispr::Delete
+  Class: Ast::Crispr::MergeReplace
   
     &mdash; Documentation by YARD 0.9.45
   
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../../css/common.css" type="text/css">
 
 <script type="text/javascript">
-  pathId = "Ast::Crispr::Delete";
+  pathId = "Ast::Crispr::MergeReplace";
   relpath = '../../';
 </script>
 
@@ -38,10 +38,10 @@
       <div id="header">
         <div id="menu">
   
-    <a href="../../_index.html">Index (D)</a> &raquo;
+    <a href="../../_index.html">Index (M)</a> &raquo;
     <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span>
      &raquo; 
-    <span class="title">Delete</span>
+    <span class="title">MergeReplace</span>
   
 </div>
 
@@ -61,7 +61,7 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><h1>Class: Ast::Crispr::Delete
+      <div id="content"><h1>Class: Ast::Crispr::MergeReplace
   
   
   
@@ -78,7 +78,7 @@
           
             <li class="next">Actor</li>
           
-            <li class="next">Ast::Crispr::Delete</li>
+            <li class="next">Ast::Crispr::MergeReplace</li>
           
         </ul>
         <a href="#" class="inheritanceTree">show all</a>
@@ -192,41 +192,55 @@
       <pre class="lines">
 
 
-1403
-1404
-1405
-1406
-1407
-1408
-1409
-1410
-1411
-1412
-1413
-1414
-1415
-1416
-1417
-1418</pre>
+1310
+1311
+1312
+1313
+1314
+1315
+1316
+1317
+1318
+1319
+1320
+1321
+1322
+1323
+1324
+1325
+1326
+1327
+1328
+1329
+1330
+1331
+1332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1403</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1310</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_operation_profile'>operation_profile</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_operation_profile'>operation_profile</span>
-  <span class='id identifier rubyid_actor'>actor</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Replace.html" title="Ast::Crispr::Replace (class)">Replace</a></span></span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='lparen'>(</span>
-    <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-    <span class='label'>target:</span> <span class='id identifier rubyid_target'>target</span><span class='comma'>,</span>
-    <span class='label'>replacement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-    <span class='label'>source_label:</span> <span class='id identifier rubyid_source_label'>source_label</span>
-  <span class='rparen'>)</span>
-  <span class='id identifier rubyid_fail!'>fail!</span><span class='lparen'>(</span><span class='label'>error:</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span><span class='comma'>,</span> <span class='label'>details:</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_failure?'>failure?</span>
+  <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='id identifier rubyid_context_for'>context_for</span><span class='lparen'>(</span><span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='id identifier rubyid_source_label'>source_label</span><span class='comma'>,</span> <span class='label'>target:</span> <span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_matches'>matches</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_matches'>normalize_matches</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_match_count'>match_count</span> <span class='op'>=</span> <span class='id identifier rubyid_matches'>matches</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_captured_text'>captured_text</span> <span class='op'>=</span> <span class='id identifier rubyid_capture_text'>capture_text</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_matches'>matches</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_matches'>matches</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_updated_content'>updated_content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='kw'>return</span>
+  <span class='kw'>end</span>
 
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_updated_content'>updated_content</span> <span class='op'>=</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_updated_content'>updated_content</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_matches'>matches</span> <span class='op'>=</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_matches'>matches</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_match_count'>match_count</span> <span class='op'>=</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_match_count'>match_count</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span> <span class='op'>=</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_captured_text'>captured_text</span> <span class='op'>=</span> <span class='id identifier rubyid_actor'>actor</span><span class='period'>.</span><span class='id identifier rubyid_captured_text'>captured_text</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_updated_content'>updated_content</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_merge_results'>merge_results</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_replace_line_ranges'>merge_replace_line_ranges</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_matches'>matches</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_replacement'>replacement</span><span class='comma'>,</span>
+    <span class='label'>merger_class:</span> <span class='id identifier rubyid_merger_class'>merger_class</span><span class='comma'>,</span>
+    <span class='label'>merger_options:</span> <span class='id identifier rubyid_merger_options'>merger_options</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span> <span class='op'>=</span> <span class='id identifier rubyid_updated_content'>updated_content</span> <span class='op'>!=</span> <span class='id identifier rubyid_content'>content</span>
+<span class='kw'>rescue</span> <span class='const'><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_crispr_fail!'>crispr_fail!</span><span class='lparen'>(</span><span class='id identifier rubyid_e'>e</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>

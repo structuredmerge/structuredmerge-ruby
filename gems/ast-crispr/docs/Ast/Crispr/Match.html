@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Crispr::Match
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -265,7 +265,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(target: nil, node: nil, start_line:, end_line:, metadata: {}, **options)  &#x21d2; Match </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(start_line:, end_line:, target: nil, node: nil, metadata: {}, **options)  &#x21d2; Match </a>
     
 
     
@@ -389,7 +389,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(target: nil, node: nil, start_line:, end_line:, metadata: {}, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Crispr::Match (class)">Match</a></span></tt> 
+    #<strong>initialize</strong>(start_line:, end_line:, target: nil, node: nil, metadata: {}, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Crispr::Match (class)">Match</a></span></tt> 
   
 
   
@@ -424,25 +424,31 @@
       <pre class="lines">
 
 
-104
-105
-106
-107
-108
-109
-110
-111</pre>
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 126</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>target:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>node:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>start_line:</span><span class='comma'>,</span> <span class='label'>end_line:</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>start_line:</span><span class='comma'>,</span> <span class='label'>end_line:</span><span class='comma'>,</span> <span class='label'>target:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>node:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@target</span> <span class='op'>=</span> <span class='id identifier rubyid_target'>target</span>
   <span class='ivar'>@node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span>
   <span class='ivar'>@start_line</span> <span class='op'>=</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rparen'>)</span>
   <span class='ivar'>@end_line</span> <span class='op'>=</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span>
   <span class='ivar'>@metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Error.html#initialize-instance_method" title="Ast::Crispr::Error#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CRISPR match end_line must be &gt;= start_line</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>details:</span> <span class='lbrace'>{</span><span class='label'>start_line:</span> <span class='ivar'>@start_line</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='ivar'>@end_line</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@end_line</span> <span class='op'>&lt;</span> <span class='ivar'>@start_line</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@end_line</span> <span class='op'>&lt;</span> <span class='ivar'>@start_line</span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Error.html#initialize-instance_method" title="Ast::Crispr::Error#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>CRISPR match end_line must be &gt;= start_line</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                  <span class='label'>details:</span> <span class='lbrace'>{</span> <span class='label'>start_line:</span> <span class='ivar'>@start_line</span><span class='comma'>,</span> <span class='label'>end_line:</span> <span class='ivar'>@end_line</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -481,12 +487,12 @@
       <pre class="lines">
 
 
-102
-103
-104</pre>
+124
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
   <span class='ivar'>@end_line</span>
@@ -523,12 +529,12 @@
       <pre class="lines">
 
 
-102
-103
-104</pre>
+124
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='ivar'>@metadata</span>
@@ -565,12 +571,12 @@
       <pre class="lines">
 
 
-102
-103
-104</pre>
+124
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_node'>node</span>
   <span class='ivar'>@node</span>
@@ -607,12 +613,12 @@
       <pre class="lines">
 
 
-102
-103
-104</pre>
+124
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
   <span class='ivar'>@start_line</span>
@@ -649,12 +655,12 @@
       <pre class="lines">
 
 
-102
-103
-104</pre>
+124
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_target'>target</span>
   <span class='ivar'>@target</span>
@@ -686,12 +692,12 @@
       <pre class="lines">
 
 
-125
-126
-127</pre>
+150
+151
+152</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 125</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_range'>line_range</span>
   <span class='id identifier rubyid_start_line'>start_line</span><span class='op'>..</span><span class='id identifier rubyid_end_line'>end_line</span>
@@ -716,24 +722,24 @@
       <pre class="lines">
 
 
-136
-137
-138
-139
-140
-141
-142
-143</pre>
+161
+162
+163
+164
+165
+166
+167
+168</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 136</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 161</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_profile'>match_profile</span>
   <span class='const'><span class='object_link'><a href="MatchProfile.html" title="Ast::Crispr::MatchProfile (class)">MatchProfile</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="MatchProfile.html#initialize-instance_method" title="Ast::Crispr::MatchProfile#initialize (method)">new</a></span></span><span class='lparen'>(</span>
     <span class='label'>start_boundary:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:start_boundary</span><span class='comma'>,</span> <span class='symbol'>:owner_start</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>end_boundary:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:end_boundary</span><span class='comma'>,</span> <span class='symbol'>:owner_end</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>payload_kind:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:payload_kind</span><span class='comma'>,</span> <span class='symbol'>:structural_owner_body</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -756,19 +762,19 @@
       <pre class="lines">
 
 
-129
-130
-131
-132
-133
-134</pre>
+154
+155
+156
+157
+158
+159</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 129</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 154</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_slice_from'>slice_from</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
   <span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='op'>..</span><span class='lparen'>(</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>-</span> <span class='int'>1</span><span class='rparen'>)</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
 <span class='kw'>end</span></pre>
@@ -792,20 +798,20 @@
       <pre class="lines">
 
 
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123</pre>
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_with_target'>with_target</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
@@ -815,7 +821,7 @@
     <span class='label'>node:</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span>
     <span class='label'>start_line:</span> <span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='label'>end_line:</span> <span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -828,9 +834,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:42 2026 by
+  Generated on Sat Aug  8 00:59:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Crispr::OwnerSelector
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -577,24 +577,24 @@
       <pre class="lines">
 
 
-758
-759
-760
-761
-762
-763
-764
-765</pre>
+777
+778
+779
+780
+781
+782
+783
+784</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 758</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 777</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>id:</span><span class='comma'>,</span> <span class='label'>locate:</span><span class='comma'>,</span> <span class='label'>owned_span:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>anchor:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>limit:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='id identifier rubyid_id'>id</span>
   <span class='ivar'>@locate</span> <span class='op'>=</span> <span class='id identifier rubyid_locate'>locate</span>
   <span class='ivar'>@owned_span</span> <span class='op'>=</span> <span class='id identifier rubyid_owned_span'>owned_span</span>
   <span class='ivar'>@anchor</span> <span class='op'>=</span> <span class='id identifier rubyid_anchor'>anchor</span>
-  <span class='ivar'>@limit</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Limit.html" title="Ast::Crispr::Limit (class)">Limit</a></span></span><span class='period'>.</span><span class='id identifier rubyid_coerce'><span class='object_link'><a href="Limit.html#coerce-class_method" title="Ast::Crispr::Limit.coerce (method)">coerce</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_limit'>limit</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='lbrace'>{</span><span class='label'>exactly:</span> <span class='int'>1</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='ivar'>@limit</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Limit.html" title="Ast::Crispr::Limit (class)">Limit</a></span></span><span class='period'>.</span><span class='id identifier rubyid_coerce'><span class='object_link'><a href="Limit.html#coerce-class_method" title="Ast::Crispr::Limit.coerce (method)">coerce</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_limit'>limit</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='lbrace'>{</span> <span class='label'>exactly:</span> <span class='int'>1</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -634,12 +634,12 @@
       <pre class="lines">
 
 
-756
-757
-758</pre>
+775
+776
+777</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 756</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_anchor'>anchor</span>
   <span class='ivar'>@anchor</span>
@@ -676,12 +676,12 @@
       <pre class="lines">
 
 
-756
-757
-758</pre>
+775
+776
+777</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 756</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
   <span class='ivar'>@id</span>
@@ -718,12 +718,12 @@
       <pre class="lines">
 
 
-756
-757
-758</pre>
+775
+776
+777</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 756</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_limit'>limit</span>
   <span class='ivar'>@limit</span>
@@ -760,12 +760,12 @@
       <pre class="lines">
 
 
-756
-757
-758</pre>
+775
+776
+777</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 756</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_locate'>locate</span>
   <span class='ivar'>@locate</span>
@@ -802,12 +802,12 @@
       <pre class="lines">
 
 
-756
-757
-758</pre>
+775
+776
+777</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 756</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='ivar'>@metadata</span>
@@ -844,12 +844,12 @@
       <pre class="lines">
 
 
-756
-757
-758</pre>
+775
+776
+777</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 756</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 775</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owned_span'>owned_span</span>
   <span class='ivar'>@owned_span</span>
@@ -881,12 +881,12 @@
       <pre class="lines">
 
 
-798
-799
-800</pre>
+817
+818
+819</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 798</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 817</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region'>comment_region</span>
   <span class='id identifier rubyid_metadata'>metadata</span><span class='lbracket'>[</span><span class='symbol'>:comment_region</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -934,12 +934,12 @@
       <pre class="lines">
 
 
-802
-803
-804</pre>
+821
+822
+823</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 802</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 821</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_trailing_gap?'>include_trailing_gap?</span>
   <span class='id identifier rubyid_metadata'>metadata</span><span class='lbracket'>[</span><span class='symbol'>:include_trailing_gap</span><span class='rbracket'>]</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
@@ -964,12 +964,12 @@
       <pre class="lines">
 
 
-767
-768
-769</pre>
+786
+787
+788</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 767</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 786</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_locate_matches'>locate_matches</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
   <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_invoke'>invoke</span><span class='lparen'>(</span><span class='id identifier rubyid_locate'>locate</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_coerce_match'>coerce_match</span><span class='lparen'>(</span><span class='id identifier rubyid_candidate'>candidate</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -994,12 +994,12 @@
       <pre class="lines">
 
 
-782
-783
-784</pre>
+801
+802
+803</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 782</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 801</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span>
   <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:owner_scope</span><span class='comma'>,</span> <span class='symbol'>:shared_default</span><span class='rparen'>)</span>
@@ -1024,14 +1024,14 @@
       <pre class="lines">
 
 
-776
-777
-778
-779
-780</pre>
+795
+796
+797
+798
+799</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 776</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 795</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve_anchor'>resolve_anchor</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='comma'>,</span> <span class='id identifier rubyid_match'>match</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_anchor'>anchor</span>
@@ -1058,13 +1058,13 @@
       <pre class="lines">
 
 
-771
-772
-773
-774</pre>
+790
+791
+792
+793</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 771</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 790</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve_owned_match'>resolve_owned_match</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='comma'>,</span> <span class='id identifier rubyid_match'>match</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_candidate'>candidate</span> <span class='op'>=</span> <span class='id identifier rubyid_owned_span'>owned_span</span> <span class='op'>?</span> <span class='id identifier rubyid_invoke'>invoke</span><span class='lparen'>(</span><span class='id identifier rubyid_owned_span'>owned_span</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='comma'>,</span> <span class='id identifier rubyid_match'>match</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_match'>match</span>
@@ -1090,12 +1090,12 @@
       <pre class="lines">
 
 
-794
-795
-796</pre>
+813
+814
+815</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 794</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 813</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selection_intent'>selection_intent</span>
   <span class='id identifier rubyid_metadata'>metadata</span><span class='lbracket'>[</span><span class='symbol'>:selection_intent</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -1120,20 +1120,20 @@
       <pre class="lines">
 
 
-806
-807
-808
-809
-810
-811
-812
-813
-814
-815
-816</pre>
+825
+826
+827
+828
+829
+830
+831
+832
+833
+834
+835</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 806</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 825</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selection_profile'>selection_profile</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="SelectionProfile.html" title="Ast::Crispr::SelectionProfile (class)">SelectionProfile</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SelectionProfile.html#initialize-instance_method" title="Ast::Crispr::SelectionProfile#initialize (method)">new</a></span></span><span class='lparen'>(</span>
@@ -1143,7 +1143,7 @@
     <span class='label'>comment_region:</span> <span class='id identifier rubyid_comment_region'>comment_region</span><span class='comma'>,</span>
     <span class='label'>include_trailing_gap:</span> <span class='id identifier rubyid_include_trailing_gap?'>include_trailing_gap?</span><span class='comma'>,</span>
     <span class='label'>structure_profile:</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1166,12 +1166,12 @@
       <pre class="lines">
 
 
-790
-791
-792</pre>
+809
+810
+811</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 790</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 809</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span>
   <span class='id identifier rubyid_metadata'>metadata</span><span class='lbracket'>[</span><span class='symbol'>:selector_kind</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -1196,12 +1196,12 @@
       <pre class="lines">
 
 
-786
-787
-788</pre>
+805
+806
+807</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 786</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 805</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='lparen'>(</span><span class='label'>owner_scope:</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span><span class='rparen'>)</span>
@@ -1216,9 +1216,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:42 2026 by
+  Generated on Sat Aug  8 00:59:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

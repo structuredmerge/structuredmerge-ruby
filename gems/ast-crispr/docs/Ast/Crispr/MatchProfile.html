@@ -6,7 +6,7 @@
 <title>
   Class: Ast::Crispr::MatchProfile
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -124,12 +124,12 @@
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>owner_start:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:structural_owner</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span starts at the structural owner&#39;s boundary</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span starts at the structural owner&#39;s boundary</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>comment_region_start:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span starts at an owning comment-region boundary</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Span starts at an owning comment-region boundary</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="KNOWN_END_BOUNDARIES-constant" class="">KNOWN_END_BOUNDARIES =
@@ -138,12 +138,12 @@
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>owner_end:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:structural_owner</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span ends at the structural owner&#39;s boundary</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span ends at the structural owner&#39;s boundary</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>owner_end_plus_trailing_gap:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:gap_extension</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span extends past the owner boundary to include trailing blank-line gap</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Span extends past the owner boundary to include trailing blank-line gap</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="KNOWN_PAYLOAD_KINDS-constant" class="">KNOWN_PAYLOAD_KINDS =
@@ -152,16 +152,16 @@
         <dd><pre class="code"><span class='lbrace'>{</span>
   <span class='label'>structural_owner_body:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:owner_body</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span represents a structural owner&#39;s body</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span represents a structural owner&#39;s body</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>comment_owned_body:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:comment_owned</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span represents a structural owner body selected through an owning comment marker</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Span represents a structural owner body selected through an owning comment marker</span><span class='tstring_end'>&#39;</span></span>
   <span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='label'>section_branch:</span> <span class='lbrace'>{</span>
     <span class='label'>family:</span> <span class='symbol'>:section_branch</span><span class='comma'>,</span>
-    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Span represents a heading-owned section branch payload</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Span represents a heading-owned section branch payload</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
     </dl>
@@ -487,75 +487,6 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#normalize_end_boundary-instance_method" title="#normalize_end_boundary (instance method)">#<strong>normalize_end_boundary</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#normalize_payload_kind-instance_method" title="#normalize_payload_kind (instance method)">#<strong>normalize_payload_kind</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#normalize_start_boundary-instance_method" title="#normalize_start_boundary (instance method)">#<strong>normalize_start_boundary</strong>(value)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#payload_family-instance_method" title="#payload_family (instance method)">#<strong>payload_family</strong>  &#x21d2; Object </a>
     
 
@@ -799,15 +730,15 @@
       <pre class="lines">
 
 
-184
-185
-186
-187
-188
-189</pre>
+209
+210
+211
+212
+213
+214</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 184</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>start_boundary:</span><span class='comma'>,</span> <span class='label'>end_boundary:</span><span class='comma'>,</span> <span class='label'>payload_kind:</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@start_boundary</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_start_boundary'>normalize_start_boundary</span><span class='lparen'>(</span><span class='id identifier rubyid_start_boundary'>start_boundary</span><span class='rparen'>)</span>
@@ -852,12 +783,12 @@
       <pre class="lines">
 
 
-182
-183
-184</pre>
+207
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 182</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_boundary'>end_boundary</span>
   <span class='ivar'>@end_boundary</span>
@@ -894,12 +825,12 @@
       <pre class="lines">
 
 
-182
-183
-184</pre>
+207
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 182</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='ivar'>@metadata</span>
@@ -936,12 +867,12 @@
       <pre class="lines">
 
 
-182
-183
-184</pre>
+207
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 182</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_payload_kind'>payload_kind</span>
   <span class='ivar'>@payload_kind</span>
@@ -978,12 +909,12 @@
       <pre class="lines">
 
 
-182
-183
-184</pre>
+207
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 182</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_boundary'>start_boundary</span>
   <span class='ivar'>@start_boundary</span>
@@ -1038,12 +969,12 @@
       <pre class="lines">
 
 
-227
-228
-229</pre>
+252
+253
+254</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 227</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 252</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_anchored?'>comment_anchored?</span>
   <span class='id identifier rubyid_start_boundary'>start_boundary</span> <span class='op'>==</span> <span class='symbol'>:comment_region_start</span>
@@ -1091,12 +1022,12 @@
       <pre class="lines">
 
 
-239
-240
-241</pre>
+264
+265
+266</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 239</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 264</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_owned_body?'>comment_owned_body?</span>
   <span class='id identifier rubyid_payload_kind'>payload_kind</span> <span class='op'>==</span> <span class='symbol'>:comment_owned_body</span>
@@ -1121,12 +1052,12 @@
       <pre class="lines">
 
 
-203
-204
-205</pre>
+228
+229
+230</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 203</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 228</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_boundary_family'>end_boundary_family</span>
   <span class='id identifier rubyid_end_boundary_metadata'>end_boundary_metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -1151,12 +1082,12 @@
       <pre class="lines">
 
 
-195
-196
-197</pre>
+220
+221
+222</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 195</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 220</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_boundary_metadata'>end_boundary_metadata</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_END_BOUNDARIES-constant" title="Ast::Crispr::MatchProfile::KNOWN_END_BOUNDARIES (constant)">KNOWN_END_BOUNDARIES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_end_boundary'>end_boundary</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dup'>dup</span><span class='op'>&amp;.</span><span class='id identifier rubyid_freeze'>freeze</span>
@@ -1204,12 +1135,12 @@
       <pre class="lines">
 
 
-211
-212
-213</pre>
+236
+237
+238</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 236</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_known_end_boundary?'>known_end_boundary?</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_END_BOUNDARIES-constant" title="Ast::Crispr::MatchProfile::KNOWN_END_BOUNDARIES (constant)">KNOWN_END_BOUNDARIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_end_boundary'>end_boundary</span><span class='rparen'>)</span>
@@ -1257,12 +1188,12 @@
       <pre class="lines">
 
 
-223
-224
-225</pre>
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 223</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 248</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_known_payload_kind?'>known_payload_kind?</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_PAYLOAD_KINDS-constant" title="Ast::Crispr::MatchProfile::KNOWN_PAYLOAD_KINDS (constant)">KNOWN_PAYLOAD_KINDS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_payload_kind'>payload_kind</span><span class='rparen'>)</span>
@@ -1310,192 +1241,15 @@
       <pre class="lines">
 
 
-207
-208
-209</pre>
+232
+233
+234</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 232</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_known_start_boundary?'>known_start_boundary?</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_START_BOUNDARIES-constant" title="Ast::Crispr::MatchProfile::KNOWN_START_BOUNDARIES (constant)">KNOWN_START_BOUNDARIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_start_boundary'>start_boundary</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_end_boundary-instance_method">
-  
-    #<strong>normalize_end_boundary</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-273
-274
-275
-276
-277
-278</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 273</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_end_boundary'>normalize_end_boundary</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_boundary'>boundary</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_boundary'>boundary</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#KNOWN_END_BOUNDARIES-constant" title="Ast::Crispr::MatchProfile::KNOWN_END_BOUNDARIES (constant)">KNOWN_END_BOUNDARIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_boundary'>boundary</span><span class='rparen'>)</span>
-
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Error.html#initialize-instance_method" title="Ast::Crispr::Error#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported CRISPR match end boundary</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>details:</span> <span class='lbrace'>{</span><span class='label'>end_boundary:</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_payload_kind-instance_method">
-  
-    #<strong>normalize_payload_kind</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-280
-281
-282
-283
-284
-285</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 280</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_payload_kind'>normalize_payload_kind</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_kind'>kind</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_kind'>kind</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#KNOWN_PAYLOAD_KINDS-constant" title="Ast::Crispr::MatchProfile::KNOWN_PAYLOAD_KINDS (constant)">KNOWN_PAYLOAD_KINDS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='rparen'>)</span>
-
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Error.html#initialize-instance_method" title="Ast::Crispr::Error#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported CRISPR match payload kind</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>details:</span> <span class='lbrace'>{</span><span class='label'>payload_kind:</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="normalize_start_boundary-instance_method">
-  
-    #<strong>normalize_start_boundary</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-266
-267
-268
-269
-270
-271</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 266</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_normalize_start_boundary'>normalize_start_boundary</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_boundary'>boundary</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_boundary'>boundary</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#KNOWN_START_BOUNDARIES-constant" title="Ast::Crispr::MatchProfile::KNOWN_START_BOUNDARIES (constant)">KNOWN_START_BOUNDARIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_boundary'>boundary</span><span class='rparen'>)</span>
-
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Error.html" title="Ast::Crispr::Error (class)">Error</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Error.html#initialize-instance_method" title="Ast::Crispr::Error#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported CRISPR match start boundary</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>details:</span> <span class='lbrace'>{</span><span class='label'>start_boundary:</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1517,12 +1271,12 @@
       <pre class="lines">
 
 
-219
-220
-221</pre>
+244
+245
+246</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 219</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 244</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_payload_family'>payload_family</span>
   <span class='id identifier rubyid_payload_kind_metadata'>payload_kind_metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -1547,12 +1301,12 @@
       <pre class="lines">
 
 
-215
-216
-217</pre>
+240
+241
+242</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 215</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 240</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_payload_kind_metadata'>payload_kind_metadata</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_PAYLOAD_KINDS-constant" title="Ast::Crispr::MatchProfile::KNOWN_PAYLOAD_KINDS (constant)">KNOWN_PAYLOAD_KINDS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_payload_kind'>payload_kind</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dup'>dup</span><span class='op'>&amp;.</span><span class='id identifier rubyid_freeze'>freeze</span>
@@ -1577,23 +1331,23 @@
       <pre class="lines">
 
 
-1372
-1373
-1374
-1375
-1376
-1377
-1378
-1379</pre>
+1589
+1590
+1591
+1592
+1593
+1594
+1595
+1596</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1372</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1589</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_report'>report</span>
   <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
     <span class='label'>start_boundary_family:</span> <span class='id identifier rubyid_start_boundary_family'>start_boundary_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
     <span class='label'>end_boundary_family:</span> <span class='id identifier rubyid_end_boundary_family'>end_boundary_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
-    <span class='label'>payload_family:</span> <span class='id identifier rubyid_payload_family'>payload_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
+    <span class='label'>payload_family:</span> <span class='id identifier rubyid_payload_family'>payload_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_stringified_report'>stringified_report</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1640,12 +1394,12 @@
       <pre class="lines">
 
 
-243
-244
-245</pre>
+268
+269
+270</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 243</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 268</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_section_branch?'>section_branch?</span>
   <span class='id identifier rubyid_payload_kind'>payload_kind</span> <span class='op'>==</span> <span class='symbol'>:section_branch</span>
@@ -1670,12 +1424,12 @@
       <pre class="lines">
 
 
-199
-200
-201</pre>
+224
+225
+226</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 199</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 224</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_boundary_family'>start_boundary_family</span>
   <span class='id identifier rubyid_start_boundary_metadata'>start_boundary_metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -1700,12 +1454,12 @@
       <pre class="lines">
 
 
-191
-192
-193</pre>
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 191</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 216</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_boundary_metadata'>start_boundary_metadata</span>
   <span class='const'><span class='object_link'><a href="#KNOWN_START_BOUNDARIES-constant" title="Ast::Crispr::MatchProfile::KNOWN_START_BOUNDARIES (constant)">KNOWN_START_BOUNDARIES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_start_boundary'>start_boundary</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dup'>dup</span><span class='op'>&amp;.</span><span class='id identifier rubyid_freeze'>freeze</span>
@@ -1753,12 +1507,12 @@
       <pre class="lines">
 
 
-235
-236
-237</pre>
+260
+261
+262</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 235</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_structural_owner_body?'>structural_owner_body?</span>
   <span class='id identifier rubyid_payload_kind'>payload_kind</span> <span class='op'>==</span> <span class='symbol'>:structural_owner_body</span>
@@ -1783,25 +1537,25 @@
       <pre class="lines">
 
 
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260
-261
-262</pre>
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 247</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 272</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
   <span class='lbrace'>{</span>
@@ -1816,7 +1570,7 @@
     <span class='label'>known_payload_kind:</span> <span class='id identifier rubyid_known_payload_kind?'>known_payload_kind?</span><span class='comma'>,</span>
     <span class='label'>comment_anchored:</span> <span class='id identifier rubyid_comment_anchored?'>comment_anchored?</span><span class='comma'>,</span>
     <span class='label'>trailing_gap_extended:</span> <span class='id identifier rubyid_trailing_gap_extended?'>trailing_gap_extended?</span><span class='comma'>,</span>
-    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1862,12 +1616,12 @@
       <pre class="lines">
 
 
-231
-232
-233</pre>
+256
+257
+258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 256</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_trailing_gap_extended?'>trailing_gap_extended?</span>
   <span class='id identifier rubyid_end_boundary'>end_boundary</span> <span class='op'>==</span> <span class='symbol'>:owner_end_plus_trailing_gap</span>
@@ -1882,9 +1636,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:42 2026 by
+  Generated on Sat Aug  8 00:59:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
