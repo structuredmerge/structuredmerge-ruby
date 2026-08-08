@@ -6,7 +6,7 @@
 <title>
   Module: Psych::Merge::DebugLogger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -138,7 +138,7 @@ Extends the base Ast::Merge::DebugLogger with Psych-specific configuration.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#log_node-class_method" title="log_node (class method)">.<strong>log_node</strong>(node, label: &quot;Node&quot;)  &#x21d2; Object </a>
+      <a href="#log_node-class_method" title="log_node (class method)">.<strong>log_node</strong>(node, label: &#39;Node&#39;)  &#x21d2; Object </a>
     
 
     
@@ -172,7 +172,7 @@ Extends the base Ast::Merge::DebugLogger with Psych-specific configuration.</p>
       <div class="method_details first">
   <h3 class="signature first" id="log_node-class_method">
   
-    .<strong>log_node</strong>(node, label: &quot;Node&quot;)  &#x21d2; <tt>Object</tt> 
+    .<strong>log_node</strong>(node, label: &#39;Node&#39;)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -212,7 +212,7 @@ Extends the base Ast::Merge::DebugLogger with Psych-specific configuration.</p>
         <span class='type'>(<tt>String</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>&quot;Node&quot;</tt>)</em>
+        <em class="default">(defaults to: <tt>&#39;Node&#39;</tt>)</em>
       
       
         &mdash;
@@ -250,19 +250,19 @@ Extends the base Ast::Merge::DebugLogger with Psych-specific configuration.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/psych/merge/debug_logger.rb', line 26</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_log_node'>log_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Node</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_log_node'>log_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Node</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_enabled?'>enabled?</span>
 
   <span class='id identifier rubyid_info'>info</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_node'>node</span>
-  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../Psych.html" title="Psych (module)">Psych</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Psych::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="FreezeNode.html" title="Psych::Merge::FreezeNode (class)">FreezeNode</a></span></span>
-    <span class='lbrace'>{</span><span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FreezeNode</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
-  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../Psych.html" title="Psych (module)">Psych</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Psych::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="MappingEntry.html" title="Psych::Merge::MappingEntry (class)">MappingEntry</a></span></span>
-    <span class='lbrace'>{</span><span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>MappingEntry</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>key:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key_name'>key_name</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
-  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../Psych.html" title="Psych (module)">Psych</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Psych::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Psych::Merge::NodeWrapper (class)">NodeWrapper</a></span></span>
-    <span class='lbrace'>{</span><span class='label'>type:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>::</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_extract_node_info'>extract_node_info</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+         <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../Psych.html" title="Psych (module)">Psych</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Psych::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="FreezeNode.html" title="Psych::Merge::FreezeNode (class)">FreezeNode</a></span></span>
+           <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FreezeNode</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+         <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../Psych.html" title="Psych (module)">Psych</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Psych::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="MappingEntry.html" title="Psych::Merge::MappingEntry (class)">MappingEntry</a></span></span>
+           <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>MappingEntry</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>key:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key_name'>key_name</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+         <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../Psych.html" title="Psych (module)">Psych</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Psych::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Psych::Merge::NodeWrapper (class)">NodeWrapper</a></span></span>
+           <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>::</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+         <span class='kw'>else</span>
+           <span class='id identifier rubyid_extract_node_info'>extract_node_info</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+         <span class='kw'>end</span>
 
   <span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='id identifier rubyid_label'>label</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -276,9 +276,9 @@ Extends the base Ast::Merge::DebugLogger with Psych-specific configuration.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:11 2026 by
+  Generated on Sat Aug  8 02:20:15 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Psych::Merge::ConflictResolver
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -93,7 +93,7 @@
   
   <dl>
       <dt>Includes:</dt>
-      <dd>Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
+      <dd>Ast::Merge::CommentLayoutEmissionSupport, Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
   </dl>
   
   
@@ -231,6 +231,7 @@ which resolves all conflicts at once using signature maps.</p>
   
 
 
+  
   
   
   <div id="constructor_details" class="method_details_list">
@@ -423,7 +424,6 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-48
 49
 50
 51
@@ -442,12 +442,15 @@ for per-node-type preferences</p>
 64
 65
 66
-67</pre>
+67
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/conflict_resolver.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/conflict_resolver.rb', line 49</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>add_template_only_sequence_items:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span> <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span> <span class='label'>recursive:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>comment_merge_policy:</span> <span class='symbol'>:preserve_destination</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+               <span class='label'>add_template_only_sequence_items:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span> <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span> <span class='label'>recursive:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>comment_merge_policy:</span> <span class='symbol'>:preserve_destination</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span>
     <span class='label'>strategy:</span> <span class='symbol'>:batch</span><span class='comma'>,</span>
     <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
@@ -504,12 +507,12 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/conflict_resolver.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/conflict_resolver.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
   <span class='ivar'>@corruption_handling</span>
@@ -525,9 +528,9 @@ for per-node-type preferences</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:11 2026 by
+  Generated on Sat Aug  8 02:20:16 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

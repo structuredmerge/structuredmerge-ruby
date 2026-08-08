@@ -6,7 +6,7 @@
 <title>
   Class: Psych::Merge::SmartMerger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -794,6 +794,7 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+81
 82
 83
 84
@@ -829,11 +830,10 @@ when the destination node has no comments.</p>
 114
 115
 116
-117
-118</pre>
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
@@ -926,12 +926,12 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+126
 127
-128
-129</pre>
+128</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_merge_policy'>comment_merge_policy</span>
   <span class='ivar'>@comment_merge_policy</span>
@@ -968,12 +968,12 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+48
 49
-50
-51</pre>
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
   <span class='ivar'>@corruption_handling</span>
@@ -1027,12 +1027,12 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+123
 124
-125
-126</pre>
+125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 124</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 123</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_recursive'>recursive</span>
   <span class='ivar'>@recursive</span>
@@ -1086,12 +1086,12 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+120
 121
-122
-123</pre>
+122</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
   <span class='ivar'>@remove_template_missing_nodes</span>
@@ -1192,20 +1192,20 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+199
 200
 201
 202
 203
-204
-205</pre>
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 200</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 199</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
   <span class='id identifier rubyid_errors'>errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_errors'>errors</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1255,12 +1255,12 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+131
 132
-133
-134</pre>
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 131</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
   <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_yaml'>to_yaml</span>
@@ -1312,6 +1312,7 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+138
 139
 140
 141
@@ -1321,11 +1322,10 @@ when the destination node has no comments.</p>
 145
 146
 147
-148
-149</pre>
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='kw'>return</span> <span class='ivar'>@merge_result</span> <span class='kw'>if</span> <span class='ivar'>@merge_result</span>
@@ -1385,6 +1385,7 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+153
 154
 155
 156
@@ -1418,23 +1419,22 @@ when the destination node has no comments.</p>
 184
 185
 186
-187
-188</pre>
+187</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 154</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 153</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
   <span class='id identifier rubyid_result_obj'>result_obj</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
     <span class='label'>statements:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>freeze_blocks:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
   <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
     <span class='label'>statements:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>freeze_blocks:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
 
   <span class='lbrace'>{</span>
@@ -1450,13 +1450,13 @@ when the destination node has no comments.</p>
       <span class='label'>recursive:</span> <span class='ivar'>@recursive</span><span class='comma'>,</span>
       <span class='label'>freeze_token:</span> <span class='ivar'>@freeze_token</span><span class='comma'>,</span>
       <span class='label'>runtime_operation_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_operations'>operations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
-      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>runtime:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
     <span class='label'>statistics:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_statistics'>statistics</span><span class='comma'>,</span>
     <span class='label'>decisions:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span><span class='comma'>,</span>
     <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='comma'>,</span>
-    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1502,12 +1502,12 @@ when the destination node has no comments.</p>
       <pre class="lines">
 
 
+192
 193
-194
-195</pre>
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/smart_merger.rb', line 192</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>
@@ -1522,9 +1522,9 @@ when the destination node has no comments.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:11 2026 by
+  Generated on Sat Aug  8 02:20:15 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

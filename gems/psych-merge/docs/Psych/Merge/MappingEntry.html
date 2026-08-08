@@ -6,7 +6,7 @@
 <title>
   Class: Psych::Merge::MappingEntry
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -733,15 +733,15 @@
       <pre class="lines">
 
 
+452
 453
 454
 455
 456
-457
-458</pre>
+457</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 453</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 452</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>key:</span><span class='comma'>,</span> <span class='label'>value:</span><span class='comma'>,</span> <span class='label'>lines:</span><span class='comma'>,</span> <span class='label'>comment_tracker:</span><span class='rparen'>)</span>
   <span class='ivar'>@key</span> <span class='op'>=</span> <span class='id identifier rubyid_key'>key</span>
@@ -803,12 +803,12 @@
       <pre class="lines">
 
 
+446
 447
-448
-449</pre>
+448</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 447</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 446</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span>
   <span class='ivar'>@comment_tracker</span>
@@ -862,12 +862,12 @@
       <pre class="lines">
 
 
+437
 438
-439
-440</pre>
+439</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 438</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 437</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_key'>key</span>
   <span class='ivar'>@key</span>
@@ -921,12 +921,12 @@
       <pre class="lines">
 
 
+443
 444
-445
-446</pre>
+445</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 444</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 443</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lines'>lines</span>
   <span class='ivar'>@lines</span>
@@ -980,12 +980,12 @@
       <pre class="lines">
 
 
+440
 441
-442
-443</pre>
+442</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 441</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 440</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span>
   <span class='ivar'>@value</span>
@@ -1040,12 +1040,12 @@
       <pre class="lines">
 
 
+553
 554
-555
-556</pre>
+555</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 554</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 553</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_anchor'>anchor</span>
   <span class='ivar'>@value</span><span class='period'>.</span><span class='id identifier rubyid_anchor'>anchor</span>
@@ -1093,6 +1093,7 @@
       <pre class="lines">
 
 
+462
 463
 464
 465
@@ -1100,11 +1101,10 @@
 467
 468
 469
-470
-471</pre>
+470</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 463</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 462</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span>
   <span class='ivar'>@comment_attachment</span> <span class='op'>||=</span> <span class='ivar'>@comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span>
@@ -1112,7 +1112,7 @@
     <span class='label'>line_num:</span> <span class='ivar'>@key</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
     <span class='label'>leading_comments:</span> <span class='ivar'>@comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_leading_comments_before'>leading_comments_before</span><span class='lparen'>(</span><span class='ivar'>@key</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>||</span> <span class='int'>1</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>inline_comment:</span> <span class='ivar'>@comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_inline_comment_at'>inline_comment_at</span><span class='lparen'>(</span><span class='ivar'>@key</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>||</span> <span class='int'>1</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>key_name:</span> <span class='id identifier rubyid_key_name'>key_name</span><span class='comma'>,</span>
+    <span class='label'>key_name:</span> <span class='id identifier rubyid_key_name'>key_name</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1158,17 +1158,17 @@
       <pre class="lines">
 
 
+510
 511
 512
 513
-514
-515</pre>
+514</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 511</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 510</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_content'>content</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_line'>end_line</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_line'>end_line</span>
 
   <span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span><span class='op'>..</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_ln'>ln</span><span class='op'>|</span> <span class='ivar'>@lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_ln'>ln</span> <span class='op'>-</span> <span class='int'>1</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1215,12 +1215,12 @@
       <pre class="lines">
 
 
+496
 497
-498
-499</pre>
+498</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 497</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 496</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
   <span class='ivar'>@value</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>||</span> <span class='ivar'>@key</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
@@ -1268,12 +1268,12 @@
       <pre class="lines">
 
 
+529
 530
-531
-532</pre>
+531</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 530</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 529</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span>
   <span class='kw'>false</span>
@@ -1321,12 +1321,12 @@
       <pre class="lines">
 
 
+478
 479
-480
-481</pre>
+480</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 479</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 478</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inline_comment_region'>inline_comment_region</span>
   <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='period'>.</span><span class='id identifier rubyid_inline_region'>inline_region</span>
@@ -1374,12 +1374,12 @@
       <pre class="lines">
 
 
+559
 560
-561
-562</pre>
+561</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 560</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 559</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> key=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_key_name'>key_name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -1427,12 +1427,12 @@
       <pre class="lines">
 
 
+484
 485
-486
-487</pre>
+486</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 485</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 484</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_key_name'>key_name</span>
   <span class='ivar'>@key</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
@@ -1480,12 +1480,12 @@
       <pre class="lines">
 
 
+473
 474
-475
-476</pre>
+475</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 474</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 473</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_leading_comment_region'>leading_comment_region</span>
   <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span>
@@ -1533,14 +1533,14 @@
       <pre class="lines">
 
 
+502
 503
 504
 505
-506
-507</pre>
+506</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 503</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 502</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_range'>line_range</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_line'>end_line</span>
@@ -1577,12 +1577,12 @@
       <pre class="lines">
 
 
+523
 524
-525
-526</pre>
+525</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 524</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 523</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_location'>location</span>
   <span class='ivar'>@location</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="FreezeNode.html" title="Psych::Merge::FreezeNode (class)">FreezeNode</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="FreezeNode.html#Location-constant" title="Psych::Merge::FreezeNode::Location (constant)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="FreezeNode.html#initialize-instance_method" title="Psych::Merge::FreezeNode#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span>
@@ -1630,12 +1630,12 @@
       <pre class="lines">
 
 
+535
 536
-537
-538</pre>
+537</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 536</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 535</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mapping?'>mapping?</span>
   <span class='ivar'>@value</span><span class='period'>.</span><span class='id identifier rubyid_mapping?'>mapping?</span>
@@ -1683,12 +1683,12 @@
       <pre class="lines">
 
 
+547
 548
-549
-550</pre>
+549</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 548</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 547</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scalar?'>scalar?</span>
   <span class='ivar'>@value</span><span class='period'>.</span><span class='id identifier rubyid_scalar?'>scalar?</span>
@@ -1736,12 +1736,12 @@
       <pre class="lines">
 
 
+541
 542
-543
-544</pre>
+543</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 542</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 541</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sequence?'>sequence?</span>
   <span class='ivar'>@value</span><span class='period'>.</span><span class='id identifier rubyid_sequence?'>sequence?</span>
@@ -1789,12 +1789,12 @@
       <pre class="lines">
 
 
+518
 519
-520
-521</pre>
+520</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 519</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 518</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
   <span class='lbracket'>[</span><span class='symbol'>:mapping_entry</span><span class='comma'>,</span> <span class='id identifier rubyid_key_name'>key_name</span><span class='rbracket'>]</span>
@@ -1842,12 +1842,12 @@
       <pre class="lines">
 
 
+490
 491
-492
-493</pre>
+492</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 491</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/file_analysis.rb', line 490</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
   <span class='id identifier rubyid_leading_comment_region'>leading_comment_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>||</span> <span class='ivar'>@key</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
@@ -1862,9 +1862,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:11 2026 by
+  Generated on Sat Aug  8 02:20:16 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
