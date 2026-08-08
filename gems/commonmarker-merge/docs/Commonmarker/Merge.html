@@ -6,7 +6,7 @@
 <title>
   Module: Commonmarker::Merge
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -71,20 +71,10 @@
 
   
   
-  <dl>
-      <dt>Extended by:</dt>
-      <dd><span class='object_link'><a href="" title="Commonmarker::Merge (module)">Merge</a></span></dd>
-  </dl>
-  
   
   
   
 
-  
-  <dl>
-    <dt>Included in:</dt>
-    <dd><span class='object_link'><a href="" title="Commonmarker::Merge (module)">Merge</a></span></dd>
-  </dl>
   
 
   
@@ -122,17 +112,17 @@
         <dt id="PACKAGE_NAME-constant" class="">PACKAGE_NAME =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>commonmarker-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>commonmarker-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
         <dt id="BACKEND_REFERENCE-constant" class="">BACKEND_REFERENCE =
           
         </dt>
-        <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendReference</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>commonmarker</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>native</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendReference</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>commonmarker</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>native</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="VERSION-constant" class="">VERSION =
           <div class="docstring">
   <div class="discussion">
-    <p>Traditional Constant Location</p>
+    <p>Current gem version exposed at the traditional constant location.</p>
 
 
   </div>
@@ -518,12 +508,12 @@
       <pre class="lines">
 
 
-29
-30
-31</pre>
+27
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 27</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_markdown_backends'>available_markdown_backends</span>
   <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span>
@@ -548,6 +538,8 @@
       <pre class="lines">
 
 
+31
+32
 33
 34
 35
@@ -556,11 +548,13 @@
 38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_backend_feature_profile'>markdown_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_markdown_feature_profile'>markdown_feature_profile</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>backend_ref:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -584,12 +578,12 @@
       <pre class="lines">
 
 
-177
-178
-179</pre>
+196
+197
+198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 177</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 196</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_embedded_families'>markdown_embedded_families</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_markdown_embedded_families'>markdown_embedded_families</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
@@ -614,12 +608,12 @@
       <pre class="lines">
 
 
-25
-26
-27</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_feature_profile'>markdown_feature_profile</span>
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_markdown_feature_profile'>markdown_feature_profile</span>
@@ -694,12 +688,12 @@
       <pre class="lines">
 
 
-80
-81
-82</pre>
+82
+83
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_markdown_owners'>match_markdown_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_match_markdown_owners'>match_markdown_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
@@ -724,8 +718,6 @@
       <pre class="lines">
 
 
-84
-85
 86
 87
 88
@@ -754,14 +746,20 @@
 111
 112
 113
-114</pre>
+114
+115
+116
+117
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown'>merge_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_template'>template</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_markdown'>parse_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_template'>template</span> <span class='kw'>unless</span> <span class='id identifier rubyid_template'>template</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
@@ -779,9 +777,9 @@
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_destination_paths'>destination_paths</span> <span class='op'>=</span> <span class='id identifier rubyid_destination_sections'>destination_sections</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_merged_sections'>merged_sections</span> <span class='op'>=</span> <span class='id identifier rubyid_destination_sections'>destination_sections</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='op'>|</span> <span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span> <span class='op'>+</span>
-    <span class='id identifier rubyid_template_sections'>template_sections</span>
-      <span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='lbracket'>[</span><span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='rbrace'>}</span>
-      <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='op'>|</span> <span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+                    <span class='id identifier rubyid_template_sections'>template_sections</span>
+                    <span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='lbracket'>[</span><span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='rbrace'>}</span>
+                    <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_section'>section</span><span class='op'>|</span> <span class='id identifier rubyid_section'>section</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
@@ -810,10 +808,6 @@
       <pre class="lines">
 
 
-116
-117
-118
-119
 120
 121
 122
@@ -821,14 +815,24 @@
 124
 125
 126
-127</pre>
+127
+128
+129
+130
+131
+132
+133
+134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 120</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs'>merge_markdown_with_reviewed_nested_outputs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span> <span class='id identifier rubyid_applied_children'>applied_children</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs'>merge_markdown_with_reviewed_nested_outputs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span>
+                                                <span class='id identifier rubyid_applied_children'>applied_children</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs'>merge_markdown_with_reviewed_nested_outputs</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -858,24 +862,30 @@
       <pre class="lines">
 
 
-129
-130
-131
-132
-133
-134
-135
 136
 137
 138
-139</pre>
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 129</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 136</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_replay_bundle'>replay_bundle</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
+                                                                   <span class='id identifier rubyid_replay_bundle'>replay_bundle</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -904,24 +914,30 @@
       <pre class="lines">
 
 
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151</pre>
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 141</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 151</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span>
+                                                                            <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -950,24 +966,30 @@
       <pre class="lines">
 
 
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162
-163</pre>
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 153</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 166</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state'>merge_markdown_with_reviewed_nested_outputs_from_review_state</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state'>merge_markdown_with_reviewed_nested_outputs_from_review_state</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
+                                                                  <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state'>merge_markdown_with_reviewed_nested_outputs_from_review_state</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -996,24 +1018,30 @@
       <pre class="lines">
 
 
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175</pre>
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 165</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 181</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope'>merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope'>merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span>
+                                                                           <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope'>merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -1066,25 +1094,29 @@
 75
 76
 77
-78</pre>
+78
+79
+80</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_markdown'>parse_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
-  <span class='op'>::</span><span class='const'><span class='object_link'><a href="../Commonmarker.html" title="Commonmarker (module)">Commonmarker</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+  <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Commonmarker::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:markdown</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_normalize_source'>normalize_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
     <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>analysis:</span> <span class='lbrace'>{</span>
-      <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>dialect:</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
       <span class='label'>normalized_source:</span> <span class='id identifier rubyid_normalized'>normalized</span><span class='comma'>,</span>
-      <span class='label'>root_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>document</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>root_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>document</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>owners:</span> <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_collect_markdown_owners'>collect_markdown_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized'>normalized</span><span class='rparen'>)</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1092,7 +1124,7 @@
 <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parse_error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parse_error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1116,21 +1148,21 @@
       <pre class="lines">
 
 
-181
-182
-183
-184
-185
-186
-187</pre>
+200
+201
+202
+203
+204
+205
+206</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 181</span>
+      <pre class="code"><span class="info file"># File 'lib/commonmarker/merge.rb', line 200</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1144,9 +1176,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:28:56 2026 by
+  Generated on Sat Aug  8 02:25:34 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
