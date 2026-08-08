@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Skip unresolved contrib.rocks template image placeholders during release validation.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08

@@ -94,9 +94,9 @@ I am a full-time FLOSS maintainer. If you find [my work](github.com/pboling) val
 [🖇osc-sponsors-i]: https://raster.shields.io/opencollective/sponsors/rubocop-lts.png?style=for-the-badge
 [🖇sponsor-img]: https://raster.shields.io/badge/Sponsor_Me!-pboling.png?style=social&logo=github
 [🖇sponsor]: https://github.com/sponsors/pboling
-[🖇kofi-img]: https://raster.shields.io/badge/ko--fi-✓-a51611.png?style=flat
+[🖇kofi-img]: https://raster.shields.io/badge/ko--fi-%E2%9C%93-a51611.png?style=flat
 [🖇kofi]: https://ko-fi.com/O5O86SNP4
-[🖇buyme-small-img]: https://raster.shields.io/badge/buy_me_a_coffee-✓-a51611.png?style=flat
+[🖇buyme-small-img]: https://raster.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.png?style=flat
 [🖇buyme]: https://www.buymeacoffee.com/pboling
 [🖇paypal-img]: https://raster.shields.io/badge/donate-paypal-a51611.png?style=flat&logo=paypal
 [🖇paypal]: https://www.paypal.com/paypalme/peterboling
