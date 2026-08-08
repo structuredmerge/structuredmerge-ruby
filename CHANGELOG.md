@@ -28,14 +28,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Restore the release-profile template files and remove the legacy workflow from html-merge.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
 
 - TAG: [v7.1.1][7.1.1t]
-- COVERAGE: 74.32% -- 1120/1507 lines in 14 files
-- BRANCH COVERAGE: 47.87% -- 416/869 branches in 14 files
-- 95.24% documented
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 54.55% documented
 
 ### Changed
 
