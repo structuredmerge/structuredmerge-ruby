@@ -28,16 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Restore the Code Coverage section in html-merge README so its local anchor is valid.
-
 ### Security
 
 ## [7.1.1] - 2026-08-08
 
 - TAG: [v7.1.1][7.1.1t]
-- COVERAGE: 0.00% -- 0/0 lines in 0 files
-- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
-- 73.88% documented
+- COVERAGE: 87.29% -- 529/606 lines in 9 files
+- BRANCH COVERAGE: 62.40% -- 161/258 branches in 9 files
+- 25.00% documented
 
 ### Changed
 
@@ -104,6 +102,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Keep release-mode bundle refreshes independent of the released templating dependency set.
 
 - Restore the release-profile template files and remove the legacy workflow from html-merge.
+
+- Restore the Code Coverage section in html-merge README so its local anchor is valid.
 
 ## [7.1.0] - 2026-08-07
 

@@ -6,7 +6,7 @@
 <title>
   Module: Yaml::Merge
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/yaml/merge.rb<span class="defines">,<br>
-  lib/yaml/merge/version.rb</span>
+  lib/yaml/merge/emitter.rb,<br> lib/yaml/merge/version.rb,<br> lib/yaml/merge/debug_logger.rb,<br> lib/yaml/merge/merge_result.rb,<br> lib/yaml/merge/node_wrapper.rb,<br> lib/yaml/merge/smart_merger.rb,<br> lib/yaml/merge/file_analysis.rb</span>
 
 </dd>
   </dl>
@@ -92,9 +92,11 @@
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Merge/Version.html" title="Yaml::Merge::Version (module)">Version</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Merge/DebugLogger.html" title="Yaml::Merge::DebugLogger (module)">DebugLogger</a></span>, <span class='object_link'><a href="Merge/Version.html" title="Yaml::Merge::Version (module)">Version</a></span>
     
   
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/DestinationParseError.html" title="Yaml::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Yaml::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Yaml::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Yaml::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Yaml::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Yaml::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Yaml::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Yaml::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Yaml::Merge::TemplateParseError (class)">TemplateParseError</a></span>
     
   
 </p>
@@ -110,14 +112,14 @@
         <dt id="PACKAGE_NAME-constant" class="">PACKAGE_NAME =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
         <dt id="DESTINATION_WINS_ARRAY_POLICY-constant" class="">DESTINATION_WINS_ARRAY_POLICY =
           
         </dt>
         <dd><pre class="code"><span class='lbrace'>{</span>
-  <span class='label'>surface:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>array</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>destination_wins_array</span><span class='tstring_end'>&quot;</span></span>
+  <span class='label'>surface:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>array</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>destination_wins_array</span><span class='tstring_end'>&#39;</span></span>
 <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="BACKEND_REFERENCE-constant" class="">BACKEND_REFERENCE =
@@ -125,10 +127,15 @@
         </dt>
         <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>KREUZBERG_LANGUAGE_PACK_BACKEND</span></pre></dd>
       
+        <dt id="BACKEND_REGISTRY-constant" class="">BACKEND_REGISTRY =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:registered</span><span class='comma'>,</span> <span class='symbol'>:mutex</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>false</span><span class='comma'>,</span> <span class='const'>Mutex</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span></pre></dd>
+      
         <dt id="VERSION-constant" class="">VERSION =
           <div class="docstring">
   <div class="discussion">
-    <p>Traditional Constant Location</p>
+    <p>Current gem version exposed at the traditional constant location.</p>
 
 
   </div>
@@ -252,7 +259,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#merge_yaml_with_parser-class_method" title="merge_yaml_with_parser (class method)">.<strong>merge_yaml_with_parser</strong>(template_source, destination_source, dialect)  &#x21d2; Object </a>
+      <a href="#merge_yaml_with_parser-class_method" title="merge_yaml_with_parser (class method)">.<strong>merge_yaml_with_parser</strong>(template_source, destination_source, dialect, backend: nil)  &#x21d2; Object </a>
     
 
     
@@ -276,6 +283,29 @@
   <span class="summary_signature">
     
       <a href="#parse_yaml-class_method" title="parse_yaml (class method)">.<strong>parse_yaml</strong>(source, dialect, backend: nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
     
 
     
@@ -389,45 +419,47 @@
       <pre class="lines">
 
 
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93</pre>
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 74</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_analyze_yaml_document'>analyze_yaml_document</span><span class='lparen'>(</span><span class='id identifier rubyid_parsed'>parsed</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_parse_error_result'>parse_error_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>YAML documents must parse to a mapping root.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_parsed'>parsed</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_parse_error_result'>parse_error_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>YAML documents must parse to a mapping root.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_parsed'>parsed</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_validated'>validated</span> <span class='op'>=</span> <span class='id identifier rubyid_validate_yaml_node'>validate_yaml_node</span><span class='lparen'>(</span><span class='id identifier rubyid_parsed'>parsed</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_validated'>validated</span> <span class='op'>=</span> <span class='id identifier rubyid_validate_yaml_node'>validate_yaml_node</span><span class='lparen'>(</span><span class='id identifier rubyid_parsed'>parsed</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_validated'>validated</span><span class='lbracket'>[</span><span class='symbol'>:diagnostic</span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_validated'>validated</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
     <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>analysis:</span> <span class='lbrace'>{</span>
-      <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>normalized_source:</span> <span class='id identifier rubyid_canonical_yaml'>canonical_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_validated'>validated</span><span class='lbracket'>[</span><span class='symbol'>:value</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>root_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>mapping</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>document:</span> <span class='id identifier rubyid_validated'>validated</span><span class='lbracket'>[</span><span class='symbol'>:value</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>root_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>mapping</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>owners:</span> <span class='id identifier rubyid_collect_yaml_owners'>collect_yaml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_validated'>validated</span><span class='lbracket'>[</span><span class='symbol'>:value</span><span class='rbracket'>]</span><span class='rparen'>)</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -453,15 +485,15 @@
       <pre class="lines">
 
 
-29
-30
-31</pre>
+53
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_yaml_backends'>available_yaml_backends</span>
-  <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_yaml_backend_available_for_analysis?'>yaml_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -483,21 +515,21 @@
       <pre class="lines">
 
 
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106</pre>
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_yaml_owners'>match_yaml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_destination_paths'>destination_paths</span> <span class='op'>=</span> <span class='id identifier rubyid_destination'>destination</span><span class='lbracket'>[</span><span class='symbol'>:owners</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
@@ -505,8 +537,8 @@
 
   <span class='lbrace'>{</span>
     <span class='label'>matched:</span> <span class='id identifier rubyid_template'>template</span><span class='lbracket'>[</span><span class='symbol'>:owners</span><span class='rbracket'>]</span>
-      <span class='period'>.</span><span class='id identifier rubyid_filter'>filter</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
-      <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>template_path:</span> <span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>destination_path:</span> <span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+             <span class='period'>.</span><span class='id identifier rubyid_filter'>filter</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+             <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>template_path:</span> <span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>destination_path:</span> <span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>unmatched_template:</span> <span class='id identifier rubyid_template'>template</span><span class='lbracket'>[</span><span class='symbol'>:owners</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='lbracket'>[</span><span class='id identifier rubyid_path'>path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>unmatched_destination:</span> <span class='id identifier rubyid_destination'>destination</span><span class='lbracket'>[</span><span class='symbol'>:owners</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='id identifier rubyid_owner'>owner</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_template_paths'>template_paths</span><span class='lbracket'>[</span><span class='id identifier rubyid_path'>path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
   <span class='rbrace'>}</span>
@@ -531,64 +563,6 @@
       <pre class="lines">
 
 
-108
-109
-110
-111
-112
-113
-114
-115</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 108</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_yaml'>merge_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_backend'>resolve_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_merge_result'>unsupported_feature_merge_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resolved_backend'>resolved_backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
-
-  <span class='id identifier rubyid_merge_yaml_with_parser'>merge_yaml_with_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_dialect'>parse_dialect</span><span class='op'>|</span>
-    <span class='id identifier rubyid_parse_yaml'>parse_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_dialect'>parse_dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='id identifier rubyid_resolved_backend'>resolved_backend</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="merge_yaml_with_parser-class_method">
-  
-    .<strong>merge_yaml_with_parser</strong>(template_source, destination_source, dialect)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
 135
 136
 137
@@ -600,16 +574,89 @@
 143
 144
 145
-146
-147
-148
-149
-150</pre>
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 117</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 135</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_yaml_with_parser'>merge_yaml_with_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_yaml'>merge_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_yaml_backend_available_for_analysis?'>yaml_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='id identifier rubyid_requested'>requested</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_diagnostic_backend'>diagnostic_backend</span> <span class='op'>=</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>||</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_current_backend_id'>current_backend_id</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_merge_result'>unsupported_feature_merge_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_diagnostic_backend'>diagnostic_backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_merge_yaml_with_parser'>merge_yaml_with_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
+                         <span class='label'>backend:</span> <span class='id identifier rubyid_requested'>requested</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_dialect'>parse_dialect</span><span class='op'>|</span>
+    <span class='id identifier rubyid_parse_yaml'>parse_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_dialect'>parse_dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='id identifier rubyid_requested'>requested</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_yaml_with_parser-class_method">
+  
+    .<strong>merge_yaml_with_parser</strong>(template_source, destination_source, dialect, backend: nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 148</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_yaml_with_parser'>merge_yaml_with_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_template'>template</span> <span class='op'>=</span> <span class='kw'>yield</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='id identifier rubyid_template'>template</span><span class='lbracket'>[</span><span class='symbol'>:diagnostics</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_template'>template</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
 
@@ -618,28 +665,35 @@
     <span class='kw'>return</span> <span class='lbrace'>{</span>
       <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
       <span class='label'>diagnostics:</span> <span class='id identifier rubyid_destination'>destination</span><span class='lbracket'>[</span><span class='symbol'>:diagnostics</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='op'>|</span>
-        <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='lbracket'>[</span><span class='symbol'>:category</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parse_error</span><span class='tstring_end'>&quot;</span></span> <span class='op'>?</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>destination_parse_error</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span>
+        <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='lbracket'>[</span><span class='symbol'>:category</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parse_error</span><span class='tstring_end'>&#39;</span></span> <span class='op'>?</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>destination_parse_error</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span>
       <span class='kw'>end</span><span class='comma'>,</span>
       <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_template_document'>template_document</span> <span class='op'>=</span> <span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_safe_load'>safe_load</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:normalized_source</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>permitted_classes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>aliases:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_destination_document'>destination_document</span> <span class='op'>=</span> <span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_safe_load'>safe_load</span><span class='lparen'>(</span><span class='id identifier rubyid_destination'>destination</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:normalized_source</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>permitted_classes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>aliases:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_template_document'>template_document</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:document</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_destination_document'>destination_document</span> <span class='op'>=</span> <span class='id identifier rubyid_destination'>destination</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:document</span><span class='rparen'>)</span>
   <span class='kw'>unless</span> <span class='id identifier rubyid_template_document'>template_document</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_destination_document'>destination_document</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_parse_error_merge_result'>parse_error_merge_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>YAML documents must parse to a mapping root.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_parse_error_merge_result'>parse_error_merge_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>YAML documents must parse to a mapping root.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
     <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-    <span class='label'>output:</span> <span class='id identifier rubyid_canonical_yaml'>canonical_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_yaml_mappings'>merge_yaml_mappings</span><span class='lparen'>(</span><span class='id identifier rubyid_template_document'>template_document</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_document'>destination_document</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>output:</span> <span class='id identifier rubyid_with_tree_sitter_backend'>with_tree_sitter_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span> <span class='kw'>do</span>
+      <span class='const'><span class='object_link'><a href="Merge/SmartMerger.html" title="Yaml::Merge::SmartMerger (class)">SmartMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Merge/SmartMerger.html#initialize-instance_method" title="Yaml::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+        <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
+        <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span>
+        <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
+        <span class='label'>merge_sequences:</span> <span class='kw'>false</span>
+      <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_yaml'>to_yaml</span>
+    <span class='kw'>end</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#DESTINATION_WINS_ARRAY_POLICY-constant" title="Yaml::Merge::DESTINATION_WINS_ARRAY_POLICY (constant)">DESTINATION_WINS_ARRAY_POLICY</a></span></span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>destination_parse_error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>destination_parse_error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -663,41 +717,89 @@
       <pre class="lines">
 
 
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72</pre>
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_yaml'>parse_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span>
 
-  <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_backend'>resolve_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resolved_backend'>resolved_backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_yaml_backend_available_for_analysis?'>yaml_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='id identifier rubyid_requested'>requested</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_diagnostic_backend'>diagnostic_backend</span> <span class='op'>=</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>||</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_current_backend_id'>current_backend_id</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_diagnostic_backend'>diagnostic_backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_syntax_result'>syntax_result</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parse_with_language_pack'>parse_with_language_pack</span><span class='lparen'>(</span>
-    <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>ParserRequest</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>language:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='id identifier rubyid_syntax_result'>syntax_result</span><span class='lbracket'>[</span><span class='symbol'>:diagnostics</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_syntax_result'>syntax_result</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_tree_sitter_source'>parse_tree_sitter_source</span><span class='lparen'>(</span><span class='symbol'>:yaml</span><span class='comma'>,</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='id identifier rubyid_requested'>requested</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_collect_parse_errors'>collect_parse_errors</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_parsed'>parsed</span> <span class='op'>=</span> <span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_safe_load'>safe_load</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>permitted_classes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>aliases:</span> <span class='kw'>false</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_analyze_yaml_document'>analyze_yaml_document</span><span class='lparen'>(</span><span class='id identifier rubyid_parsed'>parsed</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
-<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_analyze_yaml_document'>analyze_yaml_document</span><span class='lparen'>(</span><span class='id identifier rubyid_yaml_value_from_tree'>yaml_value_from_tree</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span><span class='comma'>,</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
+<span class='kw'>rescue</span> <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='id identifier rubyid_parse_error_result'>parse_error_result</span><span class='lparen'>(</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_backend!-class_method">
+  
+    .<strong>register_backend!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
+  <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Yaml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='kw'>return</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Yaml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'>registered</span> <span class='op'>&amp;&amp;</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_registered_languages'>registered_languages</span><span class='lparen'>(</span><span class='symbol'>:yaml</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+
+    <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendRegistry</span><span class='period'>.</span><span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_grammar_finder'>grammar_finder</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>GrammarFinder</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:yaml</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_grammar_finder'>grammar_finder</span><span class='period'>.</span><span class='id identifier rubyid_register!'>register!</span> <span class='kw'>if</span> <span class='id identifier rubyid_grammar_finder'>grammar_finder</span><span class='period'>.</span><span class='id identifier rubyid_available?'>available?</span>
+
+    <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Yaml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'>registered</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -719,22 +821,26 @@
       <pre class="lines">
 
 
-33
-34
-35
-36
-37
-38
-39
-40
-41</pre>
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_backend_feature_profile'>yaml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_backend'>resolve_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resolved_backend'>resolved_backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_resolved_backend'>resolved_backend</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_yaml_backend_available_for_analysis?'>yaml_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='id identifier rubyid_resolved_backend'>resolved_backend</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resolved_backend'>resolved_backend</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_yaml_feature_profile'>yaml_feature_profile</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
     <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Yaml::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
@@ -761,21 +867,21 @@
       <pre class="lines">
 
 
-21
-22
-23
-24
-25
-26
-27</pre>
+45
+46
+47
+48
+49
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_feature_profile'>yaml_feature_profile</span>
   <span class='lbrace'>{</span>
-    <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>supported_dialects:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>supported_dialects:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>supported_policies:</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#DESTINATION_WINS_ARRAY_POLICY-constant" title="Yaml::Merge::DESTINATION_WINS_ARRAY_POLICY (constant)">DESTINATION_WINS_ARRAY_POLICY</a></span></span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -799,22 +905,22 @@
       <pre class="lines">
 
 
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55</pre>
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/yaml/merge.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_plan_context'>yaml_plan_context</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_yaml_backend_feature_profile'>yaml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -839,9 +945,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:17 2026 by
+  Generated on Sat Aug  8 01:44:17 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
