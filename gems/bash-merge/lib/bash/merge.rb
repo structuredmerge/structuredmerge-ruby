@@ -202,6 +202,12 @@ end
 
 Bash::Merge.register_backend!
 
+# Register grammar availability with TreeHaver so shared RSpec dependency tags
+# can exclude Bash grammar examples when no parser and grammar are available.
+TreeHaver::BackendRegistry.register_tag(:bash_grammar, category: :grammar, backend_name: :bash_grammar) do
+  Bash::Merge.available?
+end
+
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)

@@ -52,6 +52,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Align Bash and RBS spec helpers with TreeHaver registry-driven backend availability tags.
 
+- Register Bash grammar availability through TreeHaver so backend-tagged specs skip unavailable parser environments.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
