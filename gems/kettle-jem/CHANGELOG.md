@@ -36,6 +36,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Honor disabled README integrations after destination content is merged
 
+- Temporarily pin generated RuboCop Packaging style Gemfiles to the nested-project config-root fix.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
