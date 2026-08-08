@@ -72,6 +72,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Report template application writes only for files actually created or updated, including unchanged and blocked reapplications.
 
+- Keep aggregate RSpec dependency tags aligned with late parser-provider registration and backend availability.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07
