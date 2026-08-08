@@ -6,7 +6,7 @@
 <title>
   Class: Toml::Merge::FileAnalysis
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -488,7 +488,7 @@ This is the main analysis class that prepares TOML content for merging.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, signature_generator: nil, parser_path: nil, **options)  &#x21d2; FileAnalysis </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, signature_generator: nil, parser_path: nil, **_options)  &#x21d2; FileAnalysis </a>
     
 
     
@@ -682,7 +682,7 @@ This is the main analysis class that prepares TOML content for merging.</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(source, signature_generator: nil, parser_path: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Toml::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
+    #<strong>initialize</strong>(source, signature_generator: nil, parser_path: nil, **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Toml::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
   
 
   
@@ -819,25 +819,25 @@ TreeHaver handles backend selection, auto-detection, and fallback.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/toml/merge/file_analysis.rb', line 72</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parser_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parser_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
   <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:chomp</span><span class='rparen'>)</span>
   <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
   <span class='ivar'>@parser_path</span> <span class='op'>=</span> <span class='id identifier rubyid_parser_path'>parser_path</span>
   <span class='ivar'>@errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='symbol'>:tree_sitter</span>  <span class='comment'># Default, will be updated during parsing
+  <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='symbol'>:tree_sitter</span> <span class='comment'># Default, will be updated during parsing
 </span>  <span class='comment'># **options captures any additional parameters (e.g., freeze_token, node_typing) for forward compatibility
 </span>
   <span class='comment'># Parse the TOML
-</span>  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Toml::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis#parse_toml</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_parse_toml'>parse_toml</span> <span class='rbrace'>}</span>
+</span>  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Toml::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis#parse_toml</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_parse_toml'>parse_toml</span> <span class='rbrace'>}</span>
 
   <span class='ivar'>@statements</span> <span class='op'>=</span> <span class='id identifier rubyid_integrate_nodes'>integrate_nodes</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Toml::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>valid:</span> <span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Toml::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                      <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                      <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>valid:</span> <span class='id identifier rubyid_valid?'>valid?</span>
+                    <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1202,7 +1202,7 @@ TreeHaver handles backend selection, auto-detection, and fallback.</p>
     <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
     <span class='label'>tracker_attachment:</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>line_num:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1632,7 +1632,7 @@ synthetic ownership model with a source-augmented read path.</p>
   <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
     <span class='label'>source:</span> <span class='id identifier rubyid_native_comment_backend?'>native_comment_backend?</span> <span class='op'>?</span> <span class='ivar'>@backend</span> <span class='op'>:</span> <span class='symbol'>:toml_source</span><span class='comma'>,</span>
     <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
-    <span class='label'>read_strategy:</span> <span class='id identifier rubyid_native_comment_backend?'>native_comment_backend?</span> <span class='op'>?</span> <span class='symbol'>:native_read_portable_write</span> <span class='op'>:</span> <span class='symbol'>:source_augmented_portable_write</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='id identifier rubyid_native_comment_backend?'>native_comment_backend?</span> <span class='op'>?</span> <span class='symbol'>:native_read_portable_write</span> <span class='op'>:</span> <span class='symbol'>:source_augmented_portable_write</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1848,11 +1848,7 @@ We must filter to only include pairs that appear BEFORE the first table header.<
 254
 255
 256
-257
-258
-259
-260
-261</pre>
+257</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/toml/merge/file_analysis.rb', line 228</span>
@@ -1871,15 +1867,11 @@ We must filter to only include pairs that appear BEFORE the first table header.<
 
     <span class='kw'>if</span> <span class='id identifier rubyid_wrapper'>wrapper</span><span class='period'>.</span><span class='id identifier rubyid_table?'>table?</span> <span class='op'>||</span> <span class='id identifier rubyid_wrapper'>wrapper</span><span class='period'>.</span><span class='id identifier rubyid_array_of_tables?'>array_of_tables?</span>
       <span class='id identifier rubyid_child_line'>child_line</span> <span class='op'>=</span> <span class='id identifier rubyid_wrapper'>wrapper</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
-      <span class='kw'>if</span> <span class='id identifier rubyid_child_line'>child_line</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_first_table_line'>first_table_line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_child_line'>child_line</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_first_table_line'>first_table_line</span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_first_table_line'>first_table_line</span> <span class='op'>=</span> <span class='id identifier rubyid_child_line'>child_line</span>
-      <span class='kw'>end</span>
+      <span class='id identifier rubyid_first_table_line'>first_table_line</span> <span class='op'>=</span> <span class='id identifier rubyid_child_line'>child_line</span> <span class='kw'>if</span> <span class='id identifier rubyid_child_line'>child_line</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_first_table_line'>first_table_line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_child_line'>child_line</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_first_table_line'>first_table_line</span><span class='rparen'>)</span>
+      <span class='kw'>next</span>
     <span class='kw'>end</span>
-  <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_child'>child</span><span class='op'>|</span>
-    <span class='id identifier rubyid_wrapper'>wrapper</span> <span class='op'>=</span> <span class='id identifier rubyid_wrap_node'>wrap_node</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='label'>document_root:</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='rparen'>)</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_wrapper'>wrapper</span><span class='op'>&amp;.</span><span class='id identifier rubyid_pair?'>pair?</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_wrapper'>wrapper</span><span class='period'>.</span><span class='id identifier rubyid_pair?'>pair?</span>
 
     <span class='comment'># For Citrus backend, only include pairs before the first table
 </span>    <span class='kw'>if</span> <span class='id identifier rubyid_first_table_line'>first_table_line</span>
@@ -2144,9 +2136,9 @@ Passes document_root to enable Citrus backend normalization (pairs as siblings).
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:16 2026 by
+  Generated on Sat Aug  8 01:46:08 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Toml::Merge::SmartMerger
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -665,6 +665,7 @@ within gap-separated blocks after merging</p>
       <pre class="lines">
 
 
+72
 73
 74
 75
@@ -701,11 +702,10 @@ within gap-separated blocks after merging</p>
 106
 107
 108
-109
-110</pre>
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
@@ -841,12 +841,12 @@ within gap-separated blocks after merging</p>
       <pre class="lines">
 
 
-50
-51
-52</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
   <span class='ivar'>@corruption_handling</span>
@@ -1008,6 +1008,7 @@ promoting their attached comments</p>
       <pre class="lines">
 
 
+129
 130
 131
 132
@@ -1017,11 +1018,10 @@ promoting their attached comments</p>
 136
 137
 138
-139
-140</pre>
+139</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='kw'>return</span> <span class='ivar'>@merge_result</span> <span class='kw'>if</span> <span class='ivar'>@merge_result</span>
@@ -1081,6 +1081,7 @@ promoting their attached comments</p>
       <pre class="lines">
 
 
+144
 145
 146
 147
@@ -1113,21 +1114,20 @@ promoting their attached comments</p>
 174
 175
 176
-177
-178</pre>
+177</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 145</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 144</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
   <span class='id identifier rubyid_result_obj'>result_obj</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
   <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
-    <span class='label'>statements:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>statements:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
   <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
     <span class='label'>valid:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
-    <span class='label'>statements:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>statements:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
   <span class='rbrace'>}</span>
 
   <span class='lbrace'>{</span>
@@ -1144,13 +1144,13 @@ promoting their attached comments</p>
       <span class='label'>sort_keys:</span> <span class='ivar'>@sort_keys</span><span class='comma'>,</span>
       <span class='label'>backend:</span> <span class='ivar'>@backend</span><span class='comma'>,</span>
       <span class='label'>runtime_operation_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_operations'>operations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
-      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>runtime:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
     <span class='label'>statistics:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_statistics'>statistics</span><span class='comma'>,</span>
     <span class='label'>decisions:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span><span class='comma'>,</span>
     <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='comma'>,</span>
-    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1200,6 +1200,7 @@ promoting their attached comments</p>
       <pre class="lines">
 
 
+114
 115
 116
 117
@@ -1209,11 +1210,10 @@ promoting their attached comments</p>
 121
 122
 123
-124
-125</pre>
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 115</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/smart_merger.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_options'>options</span>
   <span class='lbrace'>{</span>
@@ -1223,7 +1223,7 @@ promoting their attached comments</p>
     <span class='label'>resolution_mode:</span> <span class='ivar'>@resolution_mode</span><span class='comma'>,</span>
     <span class='label'>unresolved_policy:</span> <span class='ivar'>@unresolved_policy</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
     <span class='label'>corruption_handling:</span> <span class='ivar'>@corruption_handling</span><span class='comma'>,</span>
-    <span class='label'>match_refiner:</span> <span class='ivar'>@match_refiner</span><span class='comma'>,</span>
+    <span class='label'>match_refiner:</span> <span class='ivar'>@match_refiner</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1236,9 +1236,9 @@ promoting their attached comments</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:16 2026 by
+  Generated on Sat Aug  8 01:46:08 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

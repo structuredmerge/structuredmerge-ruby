@@ -6,7 +6,7 @@
 <title>
   Class: Toml::Merge::CommentTracker
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -513,8 +513,8 @@ match across their full line range.</p>
     <span class='label'>metadata:</span> <span class='lbrace'>{</span>
       <span class='label'>source:</span> <span class='id identifier rubyid_native_comment_backend?'>native_comment_backend?</span> <span class='op'>?</span> <span class='symbol'>:toml_native</span> <span class='op'>:</span> <span class='symbol'>:toml_source</span><span class='comma'>,</span>
       <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_line'>owner_line</span><span class='comma'>,</span>
-      <span class='label'>end_line:</span> <span class='id identifier rubyid_owner_last_line'>owner_last_line</span><span class='comma'>,</span>
-    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>end_line:</span> <span class='id identifier rubyid_owner_last_line'>owner_last_line</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -590,10 +590,10 @@ match across their full line range.</p>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_start_line'>start_line</span>
 
   <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owner_table_like?'>owner_table_like?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_start_line'>start_line</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_owner_end_line'>owner_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_start_line'>start_line</span>
-  <span class='kw'>end</span>
+               <span class='id identifier rubyid_start_line'>start_line</span>
+             <span class='kw'>else</span>
+               <span class='id identifier rubyid_owner_end_line'>owner_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_start_line'>start_line</span>
+             <span class='kw'>end</span>
 
   <span class='ivar'>@comment_entries</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span>
     <span class='op'>!</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:full_line</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span><span class='op'>..</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:line</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -609,9 +609,9 @@ match across their full line range.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:16 2026 by
+  Generated on Sat Aug  8 01:46:08 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
