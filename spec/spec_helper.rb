@@ -2,6 +2,9 @@
 
 require_relative "bootstrap/tree_haver_backends"
 require_relative "bootstrap/merge_gems"
+require_relative "support/fixture_repository"
+
+warn StructuredMerge::FixtureRepository.report
 
 # Register every parser-backed merge gem before ast-merge installs RSpec's
 # dependency filters. Individual gem helpers do this naturally; the aggregate

@@ -102,7 +102,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git clone --depth 1 https://github.com/structuredmerge/structuredmerge-fixtures ../fixtures
+          fixtures_repository="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("repository")')"
+          fixtures_tag="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("tag")')"
+          fixtures_revision="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("revision")')"
+          git clone --filter=blob:none --no-checkout "${fixtures_repository}" ../fixtures
+          git -C ../fixtures fetch --depth 1 origin "refs/tags/${fixtures_tag}:refs/tags/${fixtures_tag}"
+          git -C ../fixtures checkout --detach "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse "refs/tags/${fixtures_tag}^{commit}")" = "${fixtures_revision}"
       - name: Setup Ruby
         uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
         with:

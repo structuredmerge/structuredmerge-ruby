@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Pin each release to a versioned StructuredMerge fixtures release and validate the paired fixture SHA before tests.
+
 ### Deprecated
 
 ### Removed
