@@ -6,7 +6,7 @@
 <title>
   Class: Markly::Merge::Backend::Language
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -361,6 +361,19 @@ and to pass through Markly-specific options (flags, extensions).</p>
   
 </ul>
 
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>TreeHaver::NotAvailable</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -384,15 +397,15 @@ and to pass through Markly-specific options (flags, extensions).</p>
       <pre class="code"><span class="info file"># File 'lib/markly/merge/backend.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='symbol'>:markdown</span><span class='comma'>,</span> <span class='label'>flags:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>extensions:</span> <span class='lbracket'>[</span><span class='symbol'>:table</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>options:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='symbol'>:markly</span><span class='comma'>,</span> <span class='label'>options:</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='label'>flags:</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='label'>extensions:</span> <span class='id identifier rubyid_extensions'>extensions</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='rparen'>)</span>
-  <span class='ivar'>@flags</span> <span class='op'>=</span> <span class='id identifier rubyid_flags'>flags</span>  <span class='comment'># Will use Markly::DEFAULT if nil at parse time
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='symbol'>:markly</span><span class='comma'>,</span> <span class='label'>options:</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>flags:</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='label'>extensions:</span> <span class='id identifier rubyid_extensions'>extensions</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@flags</span> <span class='op'>=</span> <span class='id identifier rubyid_flags'>flags</span> <span class='comment'># Will use Markly::DEFAULT if nil at parse time
 </span>  <span class='ivar'>@extensions</span> <span class='op'>=</span> <span class='id identifier rubyid_extensions'>extensions</span>
 
-  <span class='kw'>unless</span> <span class='ivar'>@name</span> <span class='op'>==</span> <span class='symbol'>:markdown</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>NotAvailable</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Markly backend only supports Markdown parsing. </span><span class='tstring_end'>&quot;</span></span> \
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Got language: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='ivar'>@name</span> <span class='op'>==</span> <span class='symbol'>:markdown</span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>NotAvailable</span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Markly backend only supports Markdown parsing. </span><span class='tstring_end'>&#39;</span></span> \
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Got language: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -638,9 +651,9 @@ and to pass through Markly-specific options (flags, extensions).</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:13:47 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

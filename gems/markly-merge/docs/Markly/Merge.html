@@ -6,7 +6,7 @@
 <title>
   Module: Markly::Merge
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -71,20 +71,10 @@
 
   
   
-  <dl>
-      <dt>Extended by:</dt>
-      <dd><span class='object_link'><a href="" title="Markly::Merge (module)">Merge</a></span></dd>
-  </dl>
-  
   
   
   
 
-  
-  <dl>
-    <dt>Included in:</dt>
-    <dd><span class='object_link'><a href="" title="Markly::Merge (module)">Merge</a></span></dd>
-  </dl>
   
 
   
@@ -122,17 +112,17 @@
         <dt id="PACKAGE_NAME-constant" class="">PACKAGE_NAME =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markly-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markly-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
         <dt id="BACKEND_REFERENCE-constant" class="">BACKEND_REFERENCE =
           
         </dt>
-        <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendReference</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markly</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>native</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BackendReference</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markly</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>native</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="VERSION-constant" class="">VERSION =
           <div class="docstring">
   <div class="discussion">
-    <p>Traditional Constant Location</p>
+    <p>Current gem version exposed at the traditional constant location.</p>
 
 
   </div>
@@ -679,12 +669,12 @@
       <pre class="lines">
 
 
-29
-30
-31</pre>
+27
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 27</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_markdown_backends'>available_markdown_backends</span>
   <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span>
@@ -709,6 +699,8 @@
       <pre class="lines">
 
 
+31
+32
 33
 34
 35
@@ -717,11 +709,13 @@
 38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_backend_feature_profile'>markdown_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='id identifier rubyid_markdown_feature_profile'>markdown_feature_profile</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>backend_ref:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -745,12 +739,12 @@
       <pre class="lines">
 
 
-471
-472
-473</pre>
+490
+491
+492</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 471</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 490</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_embedded_families'>markdown_embedded_families</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_markdown_embedded_families'>markdown_embedded_families</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
@@ -775,12 +769,12 @@
       <pre class="lines">
 
 
-25
-26
-27</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_feature_profile'>markdown_feature_profile</span>
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_markdown_feature_profile'>markdown_feature_profile</span>
@@ -877,7 +871,7 @@
     <span class='label'>structured_edit_application:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_application'>structured_edit_application</span><span class='lparen'>(</span>
       <span class='label'>request:</span> <span class='id identifier rubyid_markdown_structured_edit_request_projection'>markdown_structured_edit_request_projection</span><span class='lbracket'>[</span><span class='symbol'>:structured_edit_request</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>result:</span> <span class='id identifier rubyid_markdown_structured_edit_result_projection'>markdown_structured_edit_result_projection</span><span class='lbracket'>[</span><span class='symbol'>:structured_edit_result</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1056,134 +1050,134 @@
         <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_execution_report'>structured_edit_execution_report</span><span class='lparen'>(</span>
           <span class='label'>application:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_application'>structured_edit_application</span><span class='lparen'>(</span>
             <span class='label'>request:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-              <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Synopsis@2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Synopsis@2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>payload_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>## Synopsis\n\nNew synopsis.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
             <span class='rparen'>)</span><span class='comma'>,</span>
             <span class='label'>result:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_result'>structured_edit_result</span><span class='lparen'>(</span>
-              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>updated_content:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># Title\n\n## Synopsis\n\nNew synopsis.\n\n## Usage\n\nExisting text.\n\n## Deprecated\n\nDeprecated text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
               <span class='label'>changed:</span> <span class='kw'>true</span><span class='comma'>,</span>
               <span class='label'>captured_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>## Synopsis\n\nOld synopsis.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
               <span class='label'>match_count:</span> <span class='int'>1</span><span class='comma'>,</span>
               <span class='label'>operation_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_operation_profile'>structured_edit_operation_profile</span><span class='lparen'>(</span>
-                <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rewrite</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rewrite</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>known_operation_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
-                <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>required</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>explicit_text</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>required</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>explicit_text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>captures_source_text:</span> <span class='kw'>true</span><span class='comma'>,</span>
                 <span class='label'>supports_if_missing:</span> <span class='kw'>false</span><span class='comma'>,</span>
-                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
               <span class='rparen'>)</span><span class='comma'>,</span>
-              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
             <span class='rparen'>)</span><span class='comma'>,</span>
-            <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+            <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
           <span class='rparen'>)</span><span class='comma'>,</span>
-          <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>provider_backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
           <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span><span class='comma'>,</span>
         <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_execution_report'>structured_edit_execution_report</span><span class='lparen'>(</span>
           <span class='label'>application:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_application'>structured_edit_application</span><span class='lparen'>(</span>
             <span class='label'>request:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-              <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>source</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>destination_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/heading/usage</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>destination_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>destination_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/heading/usage</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>destination_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>payload_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Managed Usage\n\nInserted usage text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>if_missing:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>append</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+              <span class='label'>if_missing:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>append</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
             <span class='rparen'>)</span><span class='comma'>,</span>
             <span class='label'>result:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_result'>structured_edit_result</span><span class='lparen'>(</span>
-              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>updated_content:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># Title\n\n## Synopsis\n\nOld synopsis.\n\n## Usage\n\nExisting text.\n### Managed Usage\n\nInserted usage text.\n\n## Deprecated\n\nDeprecated text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
               <span class='label'>changed:</span> <span class='kw'>true</span><span class='comma'>,</span>
               <span class='label'>operation_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_operation_profile'>structured_edit_operation_profile</span><span class='lparen'>(</span>
-                <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>insertion</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>insertion</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>known_operation_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
-                <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>optional</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>explicit_text</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>optional</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>explicit_text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>captures_source_text:</span> <span class='kw'>false</span><span class='comma'>,</span>
                 <span class='label'>supports_if_missing:</span> <span class='kw'>true</span><span class='comma'>,</span>
-                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
               <span class='rparen'>)</span><span class='comma'>,</span>
               <span class='label'>destination_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_destination_profile'>structured_edit_destination_profile</span><span class='lparen'>(</span>
-                <span class='label'>resolution_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>append_fallback</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>resolution_source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>anchor_boundary:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>resolution_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>append</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>resolution_source_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>implicit</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>anchor_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>resolution_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>append_fallback</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>resolution_source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>anchor_boundary:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>resolution_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>append</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>resolution_source_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>implicit</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>anchor_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>known_resolution_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
                 <span class='label'>known_resolution_source:</span> <span class='kw'>true</span><span class='comma'>,</span>
                 <span class='label'>known_anchor_boundary:</span> <span class='kw'>true</span><span class='comma'>,</span>
                 <span class='label'>used_if_missing:</span> <span class='kw'>true</span><span class='comma'>,</span>
-                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>shared</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>shared</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
               <span class='rparen'>)</span><span class='comma'>,</span>
-              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
             <span class='rparen'>)</span><span class='comma'>,</span>
-            <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+            <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
           <span class='rparen'>)</span><span class='comma'>,</span>
-          <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>provider_backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
           <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span><span class='comma'>,</span>
         <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_execution_report'>structured_edit_execution_report</span><span class='lparen'>(</span>
           <span class='label'>application:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_application'>structured_edit_application</span><span class='lparen'>(</span>
             <span class='label'>request:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-              <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Deprecated@2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+              <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Deprecated@2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
             <span class='rparen'>)</span><span class='comma'>,</span>
             <span class='label'>result:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_result'>structured_edit_result</span><span class='lparen'>(</span>
-              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
               <span class='label'>updated_content:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># Title\n\n## Synopsis\n\nOld synopsis.\n\n## Usage\n\nExisting text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
               <span class='label'>changed:</span> <span class='kw'>true</span><span class='comma'>,</span>
               <span class='label'>captured_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>## Deprecated\n\nDeprecated text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
               <span class='label'>match_count:</span> <span class='int'>1</span><span class='comma'>,</span>
               <span class='label'>operation_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_operation_profile'>structured_edit_operation_profile</span><span class='lparen'>(</span>
-                <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>removal</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>removal</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>known_operation_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
-                <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>required</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>required</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
                 <span class='label'>captures_source_text:</span> <span class='kw'>true</span><span class='comma'>,</span>
                 <span class='label'>supports_if_missing:</span> <span class='kw'>false</span><span class='comma'>,</span>
-                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
               <span class='rparen'>)</span><span class='comma'>,</span>
-              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+              <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
             <span class='rparen'>)</span><span class='comma'>,</span>
-            <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+            <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
           <span class='rparen'>)</span><span class='comma'>,</span>
-          <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>provider_backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
           <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span>
       <span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>diagnostics:</span> <span class='lbracket'>[</span>
         <span class='lbrace'>{</span>
-          <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>info</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>assumed_default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown batch preserved request ordering.</span><span class='tstring_end'>&quot;</span></span>
+          <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>info</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>assumed_default</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown batch preserved request ordering.</span><span class='tstring_end'>&#39;</span></span>
         <span class='rbrace'>}</span>
       <span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>batch_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown_markly_triad</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>batch_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown_markly_triad</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1258,34 +1252,34 @@
     <span class='label'>structured_edit_batch_request:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_batch_request'>structured_edit_batch_request</span><span class='lparen'>(</span>
       <span class='label'>requests:</span> <span class='lbracket'>[</span>
         <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-          <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-          <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Synopsis@2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Synopsis@2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>payload_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>## Synopsis\n\nNew synopsis.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span><span class='comma'>,</span>
         <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-          <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>insert</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-          <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>source</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>destination_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/heading/usage</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>destination_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>destination_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/heading/usage</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>destination_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>payload_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Managed Usage\n\nInserted usage text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>if_missing:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>append</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+          <span class='label'>if_missing:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>append</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span><span class='comma'>,</span>
         <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-          <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+          <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>delete</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
           <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
-          <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Deprecated@2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+          <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Deprecated@2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
         <span class='rparen'>)</span>
       <span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>batch_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown_markly_triad</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>batch_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown_markly_triad</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1332,10 +1326,10 @@
     <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
     <span class='label'>structured_edit_execution_report:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_execution_report'>structured_edit_execution_report</span><span class='lparen'>(</span>
       <span class='label'>application:</span> <span class='id identifier rubyid_markdown_structured_edit_application_projection'>markdown_structured_edit_application_projection</span><span class='lbracket'>[</span><span class='symbol'>:structured_edit_application</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>provider_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>provider_backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
       <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1412,41 +1406,41 @@
     <span class='label'>package:</span> <span class='const'><span class='object_link'><a href="#PACKAGE_NAME-constant" title="Markly::Merge::PACKAGE_NAME (constant)">PACKAGE_NAME</a></span></span><span class='comma'>,</span>
     <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
     <span class='label'>structured_edit_profile:</span> <span class='lbrace'>{</span>
-      <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>structure_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_structure_profile'>structured_edit_structure_profile</span><span class='lparen'>(</span>
-        <span class='label'>owner_scope:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>owner_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>owner_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>owner_scope:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>owner_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>owner_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_owner_selector:</span> <span class='kw'>true</span><span class='comma'>,</span>
         <span class='label'>supported_comment_regions:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
       <span class='rparen'>)</span><span class='comma'>,</span>
       <span class='label'>selection_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_selection_profile'>structured_edit_selection_profile</span><span class='lparen'>(</span>
-        <span class='label'>owner_scope:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>owner_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>owner_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>selector_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>heading_section</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>selection_intent:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>selection_intent_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>owner_scope:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>owner_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>heading_sections</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>owner_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>selector_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>heading_section</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>selection_intent:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>selection_intent_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_selection_intent:</span> <span class='kw'>true</span><span class='comma'>,</span>
         <span class='label'>comment_region:</span> <span class='kw'>nil</span><span class='comma'>,</span>
         <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span>
         <span class='label'>comment_anchored:</span> <span class='kw'>false</span><span class='comma'>,</span>
-        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
       <span class='rparen'>)</span><span class='comma'>,</span>
       <span class='label'>match_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_match_profile'>structured_edit_match_profile</span><span class='lparen'>(</span>
-        <span class='label'>start_boundary:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>owner_start</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>start_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>start_boundary:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>owner_start</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>start_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_start_boundary:</span> <span class='kw'>true</span><span class='comma'>,</span>
-        <span class='label'>end_boundary:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>owner_end</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>end_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>end_boundary:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>owner_end</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>end_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_end_boundary:</span> <span class='kw'>true</span><span class='comma'>,</span>
-        <span class='label'>payload_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>payload_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>payload_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>payload_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_payload_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
         <span class='label'>comment_anchored:</span> <span class='kw'>false</span><span class='comma'>,</span>
         <span class='label'>trailing_gap_extended:</span> <span class='kw'>false</span><span class='comma'>,</span>
-        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
       <span class='rparen'>)</span>
     <span class='rbrace'>}</span>
   <span class='rbrace'>}</span>
@@ -1519,37 +1513,37 @@
     <span class='label'>package:</span> <span class='const'><span class='object_link'><a href="#PACKAGE_NAME-constant" title="Markly::Merge::PACKAGE_NAME (constant)">PACKAGE_NAME</a></span></span><span class='comma'>,</span>
     <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
     <span class='label'>structured_edit_request:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_request'>structured_edit_request</span><span class='lparen'>(</span>
-      <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>content:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># Title\n\n## Synopsis\n\nOld synopsis.\n\n## Install\n\nInstall text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Synopsis@2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>target_selector:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Synopsis@2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+      <span class='label'>target_selector_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>target_selection:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_target_selection'>structured_edit_target_selection</span><span class='lparen'>(</span>
-        <span class='label'>selector_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>heading_section</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>selection_intent:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>selection_intent_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>selector_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>heading_section</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>selection_intent:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>selection_intent_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_selection_intent:</span> <span class='kw'>true</span><span class='comma'>,</span>
         <span class='label'>comment_region:</span> <span class='kw'>nil</span><span class='comma'>,</span>
         <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span>
         <span class='label'>comment_anchored:</span> <span class='kw'>false</span><span class='comma'>,</span>
-        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
       <span class='rparen'>)</span><span class='comma'>,</span>
       <span class='label'>target_match:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_target_match'>structured_edit_target_match</span><span class='lparen'>(</span>
-        <span class='label'>start_boundary:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>owner_start</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>start_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>start_boundary:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>owner_start</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>start_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_start_boundary:</span> <span class='kw'>true</span><span class='comma'>,</span>
-        <span class='label'>end_boundary:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>owner_end</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>end_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>end_boundary:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>owner_end</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>end_boundary_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>structural_owner</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_end_boundary:</span> <span class='kw'>true</span><span class='comma'>,</span>
-        <span class='label'>payload_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>payload_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>payload_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>payload_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>section_branch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_payload_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
         <span class='label'>comment_anchored:</span> <span class='kw'>false</span><span class='comma'>,</span>
         <span class='label'>trailing_gap_extended:</span> <span class='kw'>false</span><span class='comma'>,</span>
-        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
       <span class='rparen'>)</span><span class='comma'>,</span>
       <span class='label'>payload_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>## Synopsis\n\nNew synopsis.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1607,23 +1601,23 @@
     <span class='label'>package:</span> <span class='const'><span class='object_link'><a href="#PACKAGE_NAME-constant" title="Markly::Merge::PACKAGE_NAME (constant)">PACKAGE_NAME</a></span></span><span class='comma'>,</span>
     <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
     <span class='label'>structured_edit_result:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_result'>structured_edit_result</span><span class='lparen'>(</span>
-      <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>updated_content:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># Title\n\n## Synopsis\n\nNew synopsis.\n\n## Install\n\nInstall text.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
       <span class='label'>changed:</span> <span class='kw'>true</span><span class='comma'>,</span>
       <span class='label'>captured_text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>## Synopsis\n\nOld synopsis.\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
       <span class='label'>match_count:</span> <span class='int'>1</span><span class='comma'>,</span>
       <span class='label'>operation_profile:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_structured_edit_operation_profile'>structured_edit_operation_profile</span><span class='lparen'>(</span>
-        <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rewrite</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>operation_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>replace</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>operation_family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rewrite</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>known_operation_kind:</span> <span class='kw'>true</span><span class='comma'>,</span>
-        <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>required</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>none</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>explicit_text</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>source_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>required</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>destination_requirement:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+        <span class='label'>replacement_source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>explicit_text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
         <span class='label'>captures_source_text:</span> <span class='kw'>true</span><span class='comma'>,</span>
         <span class='label'>supports_if_missing:</span> <span class='kw'>false</span><span class='comma'>,</span>
-        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
       <span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>provider:</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>legacy_crispr_reference</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -1647,12 +1641,12 @@
       <pre class="lines">
 
 
-399
-400
-401</pre>
+401
+402
+403</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 399</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 401</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_markdown_owners'>match_markdown_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_match_markdown_owners'>match_markdown_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
@@ -1677,19 +1671,23 @@
       <pre class="lines">
 
 
-403
-404
 405
 406
 407
-408</pre>
+408
+409
+410
+411
+412</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 403</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 405</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown'>merge_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown'>merge_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -1713,10 +1711,6 @@
       <pre class="lines">
 
 
-410
-411
-412
-413
 414
 415
 416
@@ -1724,14 +1718,24 @@
 418
 419
 420
-421</pre>
+421
+422
+423
+424
+425
+426
+427
+428</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 410</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 414</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs'>merge_markdown_with_reviewed_nested_outputs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span> <span class='id identifier rubyid_applied_children'>applied_children</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs'>merge_markdown_with_reviewed_nested_outputs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span>
+                                                <span class='id identifier rubyid_applied_children'>applied_children</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs'>merge_markdown_with_reviewed_nested_outputs</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -1761,24 +1765,30 @@
       <pre class="lines">
 
 
-423
-424
-425
-426
-427
-428
-429
 430
 431
 432
-433</pre>
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 423</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 430</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_replay_bundle'>replay_bundle</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
+                                                                   <span class='id identifier rubyid_replay_bundle'>replay_bundle</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -1807,24 +1817,30 @@
       <pre class="lines">
 
 
-435
-436
-437
-438
-439
-440
-441
-442
-443
-444
-445</pre>
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 435</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 445</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span>
+                                                                            <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope'>merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -1853,24 +1869,30 @@
       <pre class="lines">
 
 
-447
-448
-449
-450
-451
-452
-453
-454
-455
-456
-457</pre>
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 447</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 460</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state'>merge_markdown_with_reviewed_nested_outputs_from_review_state</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state'>merge_markdown_with_reviewed_nested_outputs_from_review_state</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
+                                                                  <span class='id identifier rubyid_review_state'>review_state</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state'>merge_markdown_with_reviewed_nested_outputs_from_review_state</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -1899,24 +1921,30 @@
       <pre class="lines">
 
 
-459
-460
-461
-462
-463
-464
-465
-466
-467
-468
-469</pre>
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 459</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 475</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope'>merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope'>merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span>
+                                                                           <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='id identifier rubyid_envelope'>envelope</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope'>merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -1969,25 +1997,29 @@
 394
 395
 396
-397</pre>
+397
+398
+399</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 373</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_markdown'>parse_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Markdown backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
-  <span class='op'>::</span><span class='const'><span class='object_link'><a href="../Markly.html" title="Markly (module)">Markly</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>flags:</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../Markly.html" title="Markly (module)">Markly</a></span></span><span class='op'>::</span><span class='const'>DEFAULT</span><span class='comma'>,</span> <span class='label'>extensions:</span> <span class='lbracket'>[</span><span class='symbol'>:table</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Markly::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:markdown</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_normalize_source'>normalize_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
     <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>analysis:</span> <span class='lbrace'>{</span>
-      <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>dialect:</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
       <span class='label'>normalized_source:</span> <span class='id identifier rubyid_normalized'>normalized</span><span class='comma'>,</span>
-      <span class='label'>root_kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>document</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>root_kind:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>document</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
       <span class='label'>owners:</span> <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_collect_markdown_owners'>collect_markdown_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized'>normalized</span><span class='rparen'>)</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1995,7 +2027,7 @@
 <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parse_error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parse_error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -2019,21 +2051,21 @@
       <pre class="lines">
 
 
-475
-476
-477
-478
-479
-480
-481</pre>
+494
+495
+496
+497
+498
+499
+500</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 475</span>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge.rb', line 494</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -2047,9 +2079,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:06 2026 by
+  Generated on Sat Aug  8 01:13:47 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
