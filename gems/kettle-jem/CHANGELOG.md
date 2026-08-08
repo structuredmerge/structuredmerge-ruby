@@ -20,6 +20,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.1] - 2026-08-08
+
+- TAG: [v7.1.1][7.1.1t]
+- COVERAGE: 93.95% -- 10635/11320 lines in 15 files
+- BRANCH COVERAGE: 77.25% -- 4549/5889 branches in 15 files
+- 18.04% documented
+
+### Added
+
 - Template NDJSON summaries now distinguish checksum write bypasses, planned
   files left unchanged after rendering, and changed destination files.
 - Source-template fingerprinting now uses an explicit renderer-semantics
@@ -259,10 +278,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Scope direct-versus-modular conflict discovery to active top-level fragments and x_std_libs; framework appraisal matrix files remain under appraisal resolution.
 
 - Record explicit modular dependency removals and compatible keep_both decisions so repeated templating remains deterministic.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -1397,8 +1412,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Resolve all local StructuredMerge sibling dependencies in isolated require-boundary tests.
 
-### Security
-
 ## [7.0.0] - 2026-05-05
 
 - TAG: [v7.0.0][7.0.0t]
@@ -1408,6 +1421,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.1...HEAD
+[7.1.1]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...v7.1.1
+[7.1.1t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.1
 [7.0.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/0aae485e7ca20583b73f8c146f467a64e526ca41...v7.0.0
 [7.0.0t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.0.0

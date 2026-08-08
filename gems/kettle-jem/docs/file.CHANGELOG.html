@@ -70,11 +70,41 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 and <a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">yes</a>, platform and engine support are part of the <a href="https://github.com/semver/semver/issues/716#issuecomment-869336139">public API</a>.<br>
 Please file a bug if you notice a violation of semantic versioning.</p>
 
-<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD">Unreleased</a></h2>
+<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.1...HEAD">Unreleased</a></h2>
 
 <h3 id="added">Added</h3>
 
+<h3 id="changed">Changed</h3>
+
+<h3 id="deprecated">Deprecated</h3>
+
+<h3 id="removed">Removed</h3>
+
+<h3 id="fixed">Fixed</h3>
+
+<h3 id="security">Security</h3>
+
+<h2 id="711---2026-08-08">
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...v7.1.1">7.1.1</a> - 2026-08-08</h2>
+
 <ul>
+  <li>TAG: <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.1">v7.1.1</a>
+</li>
+  <li>COVERAGE: 93.95% – 10635/11320 lines in 15 files</li>
+  <li>BRANCH COVERAGE: 77.25% – 4549/5889 branches in 15 files</li>
+  <li>18.04% documented</li>
+</ul>
+
+<h3 id="added-1">Added</h3>
+
+<ul>
+  <li>Template NDJSON summaries now distinguish checksum write bypasses, planned<br>
+files left unchanged after rendering, and changed destination files.</li>
+  <li>
+    <p>Source-template fingerprinting now uses an explicit renderer-semantics<br>
+version, so unrelated Kettle-Jem code changes do not invalidate every<br>
+destination checksum record.</p>
+  </li>
   <li>
 <code>kettle-jem-deps-floor</code> now keeps a 30-day persistent per-gem RubyGems<br>
 version cache and honors <code>kettle-release</code> cache-bust markers, so recently<br>
@@ -121,12 +151,10 @@ to tagged RubyForum pages instead of GitHub Discussions.</p>
     <p>kettle-jem-template-20260727-001 - Spec harness documentation now lists the<br>
 RSpec helpers provided by <code>kettle-test</code>.</p>
   </li>
-  <li>kettle-jem-template-20260729-005 - Gemspec metadata now publishes this<br>
-project’s RubyForum tag as <code>mailing_list_uri</code>, and support docs link to the<br>
-tagged RubyForum community alongside Discord.</li>
+  <li>Transfer changelog replay now supports destination applicability filters and filter-aware status reporting.</li>
 </ul>
 
-<h3 id="changed">Changed</h3>
+<h3 id="changed-1">Changed</h3>
 
 <ul>
   <li>Runtime dependency metadata now requires <code>kettle-ndjson</code> 0.1.3 or newer and<br>
@@ -298,38 +326,113 @@ reserving <code>appraisal:update</code> for intentional lock refreshes.</li>
   <li>
     <p>kettle-jem now requires <code>kettle-rb</code> &gt;= 0.1.2.</p>
   </li>
-  <li>kettle-jem-template-20260716-001 - Shim gems now package <code>LICENSE.md</code> instead<br>
-of a missing <code>LICENSE.txt</code> file.</li>
   <li>
     <p>kettle-jem-template-20260716-002 - Gemspecs now ship fewer repository-only<br>
 files, reducing package noise for downstream packagers.</p>
   </li>
-  <li>kettle-jem-template-20260720-001 - READMEs can now display configured<br>
-corporate sponsor logos.</li>
   <li>kettle-jem-template-20260720-002 - Development Gemfiles now use the released<br>
 <code>tree_sitter_language_pack</code> gem 1.13.3 or newer by default.</li>
   <li>kettle-jem-template-20260720-003 - StructuredMerge Git diff driver config now<br>
 uses the installed <code>smorg-rb</code> driver command.</li>
-  <li>kettle-jem-template-20260720-004 - MRI-only projects now omit JRuby and<br>
-TruffleRuby workflow jobs.</li>
   <li>
     <p>kettle-jem-template-20260720-005 - README Support &amp; Community links now<br>
 include RubyForum.</p>
   </li>
   <li>kettle-jem-template-20260725-001 - Release pull request branches beginning<br>
 with <code>feature/release</code> now run JRuby and TruffleRuby workflows.</li>
-  <li>kettle-jem-template-20260725-002 - Version specs now use <code>anonymous_loader</code> to<br>
+  <li>
+    <p>kettle-jem-template-20260725-002 - Version specs now use <code>anonymous_loader</code> to<br>
 cover <code>version.rb</code> without redefining constants, or are removed when version<br>
-specs are not managed for the project.</li>
+specs are not managed for the project.</p>
+  </li>
+  <li>
+    <p>Recognize legacy git ls-files spec.files pipelines when merging gemspec templates.</p>
+  </li>
+  <li>
+    <p>Replace legacy byebug-named Gemfile dependencies with debug during templating.</p>
+  </li>
+  <li>
+    <p>Generated README gem dashboard links now use ClickGems instead of BestGems.</p>
+  </li>
+  <li>
+    <p>Clarify that transferable changelog entries are destination release notes, not internal template metadata.</p>
+  </li>
+  <li>
+    <p>kettle-jem-template-20260801-001 - Generated README gem dashboard links now<br>
+use ClickGems instead of BestGems.</p>
+  </li>
+  <li>
+    <p>Bootstrap direct-versus-modular dependency conflicts into a reviewable dependency_conflicts.resolve list, including keep_both for compatible overlapping ranges.</p>
+  </li>
+  <li>
+    <p>Scope direct-versus-modular conflict discovery to active top-level fragments and x_std_libs; framework appraisal matrix files remain under appraisal resolution.</p>
+  </li>
+  <li>Record explicit modular dependency removals and compatible keep_both decisions so repeated templating remains deterministic.</li>
 </ul>
 
-<h3 id="deprecated">Deprecated</h3>
-
-<h3 id="removed">Removed</h3>
-
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed-1">Fixed</h3>
 
 <ul>
+  <li>Templating now removes the obsolete <code>tree_sitter_language_pack</code> entry from<br>
+managed StructuredMerge local-gem lists, keeping <code>STRUCTUREDMERGE_DEV</code> from<br>
+resolving it under the sibling gems directory.</li>
+  <li>Unset optional author ORCIDs now resolve to an empty citation value rather<br>
+than leaking their template token and aborting templating.</li>
+  <li>
+    <p>Gemspec package manifest merging now recognizes the historical generated<br>
+<code>Dir[...] + [...]</code> shape structurally, retains legitimate destination globs,<br>
+and removes only obsolete generated <code>certs</code> and <code>sig</code> package helpers.</p>
+  </li>
+  <li>
+    <p>Prepare every modular Gemfile referenced by the generated Gemfile before Bundler bootstraps templating dependencies.</p>
+  </li>
+  <li>
+    <p>Preserve an existing main Gemfile source while applying templates.</p>
+  </li>
+  <li>
+    <p>Use bundle install when a legacy lockfile lacks the required templating bootstrap gems.</p>
+  </li>
+  <li>
+    <p>Respect per-file Ruby merge settings when applying templates.</p>
+  </li>
+  <li>
+    <p>Canonicalize legacy release headings before replaying transfer changelog entries.</p>
+  </li>
+  <li>
+    <p>Generated CI workflows now retry compatibility dependency installation while newly published runtime floors propagate through gem sources.</p>
+  </li>
+  <li>
+    <p>Template merges now normalize managed RSpec block bindings structurally, preventing invalid mixed parameter names.</p>
+  </li>
+  <li>
+    <p>Template runtime and config synchronization now normalize invalid underscore hostnames in generated documentation and gemspec metadata.</p>
+  </li>
+  <li>
+    <p>Generated organization README logos now use GitHub’s stable avatar endpoint when no Galtzo-hosted asset is guaranteed.</p>
+  </li>
+  <li>
+    <p>Preserve flat Ruby entrypoints and avoid duplicating equivalent version requires during template bootstrap.</p>
+  </li>
+  <li>
+    <p>Honor explicit VersionGem disablement and default supported Ruby gems to VersionGem during templating.</p>
+  </li>
+  <li>
+    <p>Prune stale template lock records after managed files are removed.</p>
+  </li>
+  <li>
+    <p>Avoid recursive project fact discovery while evaluating transfer changelog filters during templating.</p>
+  </li>
+  <li>
+    <p>Templating now removes duplicated legacy configuration comments and repeated generated SimpleCov usage guidance from destinations.</p>
+  </li>
+  <li>
+    <p>Generated RubyGems download badges now use Shields.io total downloads instead of the discontinued download-rank endpoint.</p>
+  </li>
+  <li>
+    <p>Generated documentation Gemfiles now correctly document that <code>yard-lint</code><br>
+1.10 requires Ruby 3.3 or newer; projects testing older Rubies must keep<br>
+documentation tooling out of those targeted appraisals.</p>
+  </li>
   <li>Main Gemfile templating now removes stale direct <code>tree_sitter_language_pack</code><br>
 declarations when the current templates own that dependency through the<br>
 modular templating Gemfile, preventing duplicate Bundler requirements during<br>
@@ -345,16 +448,10 @@ example when the destination cannot depend on VersionGem.</li>
   <li>Generated gemspec package file enumeration now honors the destination Ruby<br>
 floor, so old-Ruby and JRuby workflows can parse gemspecs during Bundler<br>
 install while modern gems keep modern helper code.</li>
-  <li>kettle-jem-template-20260729-001 - Generated JRuby 9.4 workflows now use the<br>
-legacy manual bundle install path, avoiding setup-time Bundler full-index<br>
-failures against <code>gem.coop</code>.</li>
   <li>kettle-jem-template-20260729-002 - VersionGem bootstrap now preserves<br>
 and templates dedicated <code>version_gem.rb</code> entrypoints even when the gemspec<br>
 dependency is intentionally omitted, and generated anonymous-loader specs<br>
 cover both <code>version.rb</code> and <code>version_gem.rb</code>.</li>
-  <li>kettle-jem-template-20260729-003 - Old-Ruby gems below the VersionGem runtime<br>
-floor now get managed minimal <code>version.rb</code> files and anonymous-loader version<br>
-specs without adding <code>version_gem</code>.</li>
   <li>
 <code>kettle-jem prepare</code> now skips release lockfile reset while local path<br>
 development env is active, so self-templating unreleased template stacks does<br>
@@ -1312,12 +1409,220 @@ lockfile parser failures on Git and path dependencies.</li>
 missing canonical version spec when a project only has shim namespace version<br>
 specs.</p>
   </li>
-  <li>kettle-jem-template-20260730-001 - Gemspec package file enumeration now runs<br>
+  <li>
+    <p>kettle-jem-template-20260730-001 - Gemspec package file enumeration now runs<br>
 relative to the gemspec directory, so packaged template assets are included<br>
-even when the gemspec is loaded from another working directory.</li>
+even when the gemspec is loaded from another working directory.</p>
+  </li>
+  <li>kettle-jem-template-20260801-002 - Generated RSpec helpers now normalize<br>
+managed configuration block bindings structurally, preventing mixed block<br>
+parameter names from producing invalid configuration after a merge.</li>
+  <li>kettle-jem-template-20260801-003 - Generated project metadata and<br>
+documentation now normalize configured underscore hostnames to valid<br>
+hyphenated hostnames.</li>
+  <li>
+    <p>kettle-jem-template-20260801-004 - Generated organization README logos now<br>
+use GitHub’s stable organization avatar endpoint instead of assuming a<br>
+matching Galtzo-hosted asset exists.</p>
+  </li>
+  <li>
+    <p>Repair stale executable version headers when a configured entrypoint differs from the package name.</p>
+  </li>
+  <li>
+    <p>Generated README titles now lead with the package name when a gem retains a different legacy namespace.</p>
+  </li>
+  <li>
+    <p>Generated gitignore files now ignore nested modular Gemfile lockfiles.</p>
+  </li>
+  <li>
+    <p>Preserve destination README KLOC badges when current changelog coverage metadata is unavailable.</p>
+  </li>
+  <li>
+    <p>Allow local Gemfile bootstraps to reuse an already activated compatible nomono version instead of pinning an older lockfile version.</p>
+  </li>
+  <li>
+    <p>Remove legacy rubocop-rspec development dependencies that conflict with generated rubocop-lts-rspec tooling.</p>
+  </li>
+  <li>
+    <p>Recover legacy lockfiles with unsupported tree_sitter_language_pack platforms during templating bootstrap.</p>
+  </li>
+  <li>
+    <p>Remove legacy yard-junk development dependencies that conflict with generated documentation tooling.</p>
+  </li>
+  <li>
+    <p>Gemfile accept-template strategy now replaces an existing dependency source instead of retaining it.</p>
+  </li>
+  <li>
+    <p>Transfer changelog filters now remove inapplicable template-owned entries from released and Unreleased sections.</p>
+  </li>
+  <li>
+    <p>Preserve generated version requires before executable entrypoint code when later requires exist.</p>
+  </li>
+  <li>
+    <p>Merge devcontainer JSON files as JSONC so comments and trailing commas are supported.</p>
+  </li>
+  <li>
+    <p>Keep parser-backed and stateful template recipes out of parallel planning workers.</p>
+  </li>
+  <li>
+    <p>Preserve destination-specific SimpleCov filters and formatters when migrating legacy SimpleCov.start configuration blocks.</p>
+  </li>
+  <li>
+    <p>Remove legacy standard-library declarations from Appraisals blocks managed by modular x_std_libs gemfiles.</p>
+  </li>
+  <li>
+    <p>Recreate missing managed modular Gemfiles instead of treating empty checksum records as cache hits.</p>
+  </li>
+  <li>
+    <p>Recognize legacy Dir.chdir-wrapped git ls-files gemspec package manifests during templating.</p>
+  </li>
+  <li>
+    <p>Replace stale byebug-family spec helper requires with debug during templating.</p>
+  </li>
+  <li>
+    <p>Migrate byebug-family dependencies to debug independently within each appraisal.</p>
+  </li>
+  <li>
+    <p>Remove preserved duplicate gemspec dependency declarations after template merge.</p>
+  </li>
+  <li>
+    <p>Template policy fingerprints now invalidate cached Appraisal, gemspec, and spec helper transforms when their merge behavior changes.</p>
+  </li>
+  <li>
+    <p>Modular Gemfile fragments now retain their named runtime dependency when materializing missing files.</p>
+  </li>
+  <li>
+    <p>kettle-jem-template-20260802-001 - Devcontainer JSON files now merge as JSONC,<br>
+preserving comments and trailing commas during template updates.</p>
+  </li>
+  <li>
+    <p>Fail templating when direct project dependencies collide with templated modular Gemfiles unless an exact decision is recorded in kettle-jem configuration.</p>
+  </li>
+  <li>
+    <p>Preserve explicit Bundler checksum validation settings during template setup.</p>
+  </li>
+  <li>
+    <p>Prevent local modular Gemfiles from evaluating the destination gem as a sibling path dependency.</p>
+  </li>
+  <li>
+    <p>Avoid pinning local nomono bootstraps to unavailable versions from stale lockfiles.</p>
+  </li>
+  <li>
+    <p>Clarify modular dependency conflict decisions and reject incompatible keep_both requirements.</p>
+  </li>
+  <li>
+    <p>Repair legacy local Gemfile nomono bootstraps before the templating dependency bundle starts.</p>
+  </li>
+  <li>
+    <p>Run legacy local Gemfile bootstrap repair after managed template application so stale nomono pins cannot reach Bundler.</p>
+  </li>
+  <li>
+    <p>Remove direct rdoc development dependencies from templated gemspecs; Yard owns documentation dependencies.</p>
+  </li>
+  <li>
+    <p>Remove explicit rdoc development dependency declarations from documentation modular Gemfiles.</p>
+  </li>
+  <li>
+    <p>Generate engine-specific dependency lockfiles for JRuby CI workflows</p>
+  </li>
+  <li>
+    <p>Generate JRuby dependency lockfiles directly instead of requiring ignored appraisal lockfiles</p>
+  </li>
+  <li>
+    <p>Refresh kettle-family with nomono in the templating workflow.</p>
+  </li>
+  <li>
+    <p>Guard generated debug requires for Ruby versions below the debug gem support floor.</p>
+  </li>
+  <li>
+    <p>Bootstrap VersionGem wiring in existing package-level shims instead of nested implementation files.</p>
+  </li>
+  <li>
+    <p>Infer direct VERSION namespaces and remove stale VersionGem wiring from former nested implementation entrypoints.</p>
+  </li>
+  <li>
+    <p>Allow legacy appraisal projects to opt into a compatible Bundler via KJ_BUNDLER_VERSION.</p>
+  </li>
+  <li>
+    <p>Normalize stale VersionGem class extensions when repairing an existing package shim.</p>
+  </li>
+  <li>
+    <p>Remove legacy VersionGem extensions from nested implementation files during package-shim repair.</p>
+  </li>
+  <li>
+    <p>Preserve local modular Gemfile bodies during template finalization.</p>
+  </li>
+  <li>
+    <p>Avoid duplicate version requires when a package shim delegates version loading to its implementation.</p>
+  </li>
+  <li>
+    <p>Version specs now load inline version-gem package entrypoints before exercising the VersionGem API.</p>
+  </li>
+  <li>
+    <p>Version specs now require the discovered Ruby entrypoint for hyphenated package names.</p>
+  </li>
+  <li>
+    <p>Version bootstrap repairs remove stale package-name requires when the discovered Ruby entrypoint uses a different require path.</p>
+  </li>
+  <li>
+    <p>Version specs for packages with nested version entrypoints now load the package shim when it owns the version bootstrap.</p>
+  </li>
+  <li>
+    <p>Use the canonical version file when deriving a gem namespace during templating.</p>
+  </li>
+  <li>
+    <p>Invalidate version namespace template checksums after renderer policy changes so corrected bootstrap output can repair prior template damage.</p>
+  </li>
+  <li>
+    <p>Reconcile malformed version namespaces against destination class declarations during templating.</p>
+  </li>
+  <li>
+    <p>Preserve class-based version namespaces during template bootstrap.</p>
+  </li>
+  <li>
+    <p>Preserve modular Gemfile content while filtering direct dependency conflicts.</p>
+  </li>
+  <li>
+    <p>Keep policy-preserving modular Gemfile rewrites during lint autocorrection.</p>
+  </li>
+  <li>
+    <p>Preserve explicit class namespace superclasses when generating VersionGem version files.</p>
+  </li>
+  <li>
+    <p>Preserve tracked project-owned Bundler binstubs during template bootstrap.</p>
+  </li>
+  <li>
+    <p>Preserve existing Version module includes when templating version files.</p>
+  </li>
+  <li>
+    <p>Generated workflows now pin the setup-ruby-flash revision that supports compatibility-bundle retries.</p>
+  </li>
+  <li>
+    <p>Debug requires generated by templating now remain opt-in and disabled in CI</p>
+  </li>
+  <li>
+    <p>Define the Discord badge reference in generated CONTRIBUTING.md files.</p>
+  </li>
+  <li>
+    <p>Restore legacy LICENSE.txt and workflow cleanup during templating, and treat falsey TSLP_DEV values as unset.</p>
+  </li>
+  <li>
+    <p>Migrate MIT LICENSE.txt copyright notices safely and preserve custom license files with an unlabelled LICENSE.md link.</p>
+  </li>
+  <li>
+    <p>Keep git-blame copyright facts authoritative when migrating legacy MIT LICENSE.txt files.</p>
+  </li>
+  <li>
+    <p>Monorepo subgem mise templates no longer enforce aggregate coverage thresholds during per-gem release checks.</p>
+  </li>
+  <li>
+    <p>Exclude the intentional vHEAD.gemfile appraisal filename from templated RuboCop filename checks.</p>
+  </li>
+  <li>
+    <p>Include the canonical Rakefile scaffold in monorepo subgem templates.</p>
+  </li>
+  <li>Resolve all local StructuredMerge sibling dependencies in isolated require-boundary tests.</li>
 </ul>
-
-<h3 id="security">Security</h3>
 
 <h2 id="700---2026-05-05">
 <a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/0aae485e7ca20583b73f8c146f467a64e526ca41...v7.0.0">7.0.0</a> - 2026-05-05</h2>
@@ -1327,7 +1632,7 @@ even when the gemspec is loaded from another working directory.</li>
 </li>
 </ul>
 
-<h3 id="added-1">Added</h3>
+<h3 id="added-2">Added</h3>
 
 <ul>
   <li>Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.</li>
@@ -1337,7 +1642,7 @@ even when the gemspec is loaded from another working directory.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Fri Jul 31 07:18:35 2026 by
+  Generated on Sat Aug  8 02:52:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

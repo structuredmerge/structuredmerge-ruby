@@ -28,18 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Skip unresolved contrib.rocks template image placeholders during release validation.
-
-- Preserve kettle-jem template tokens during release Markdown image URL normalization.
-
 ### Security
 
 ## [7.1.1] - 2026-08-08
 
 - TAG: [v7.1.1][7.1.1t]
-- COVERAGE: 90.32% -- 112/124 lines in 4 files
-- BRANCH COVERAGE: 64.29% -- 27/42 branches in 4 files
-- 10.81% documented
+- COVERAGE: 86.11% -- 124/144 lines in 3 files
+- BRANCH COVERAGE: 54.17% -- 26/48 branches in 3 files
+- 34.09% documented
 
 ### Changed
 
@@ -112,6 +108,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Declare the released adapter gems required by ast-template's default adapter registry test suite.
 
 - Load ast-template's adapter dependencies explicitly in the fixture spec harness.
+
+- Skip unresolved contrib.rocks template image placeholders during release validation.
+
+- Preserve kettle-jem template tokens during release Markdown image URL normalization.
 
 ## [7.1.0] - 2026-08-07
 
