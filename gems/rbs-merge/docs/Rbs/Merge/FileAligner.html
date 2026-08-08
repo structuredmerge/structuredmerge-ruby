@@ -6,7 +6,7 @@
 <title>
   Class: Rbs::Merge::FileAligner
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -121,7 +121,7 @@ Produces alignment information used by SmartMerger to combine files.</p>
         <h5 class="example_title"><div class='inline'><p>Basic usage</p>
 </div></h5>
       
-      <pre class="example code"><code><span class='id identifier rubyid_aligner'>aligner</span> <span class='op'>=</span> <span class='const'>FileAligner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::FileAligner#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_aligner'>aligner</span> <span class='op'>=</span> <span class='const'>FileAligner</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_alignment'>alignment</span> <span class='op'>=</span> <span class='id identifier rubyid_aligner'>aligner</span><span class='period'>.</span><span class='id identifier rubyid_align'>align</span>
 <span class='id identifier rubyid_alignment'>alignment</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span>
@@ -205,123 +205,8 @@ Produces alignment information used by SmartMerger to combine files.</p>
 
 
 
-  
-    <h2>
-      Instance Method Summary
-      <small><a href="#" class="summary_toggle">collapse</a></small>
-    </h2>
-
-    <ul class="summary">
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_analysis, dest_analysis, **options)  &#x21d2; FileAligner </a>
-    
-
-    
-  </span>
-  
-  
-    <span class="note title constructor">constructor</span>
-  
-  
-  
-  
-  
-  
 
   
-    <span class="summary_desc"><div class='inline'><p>Initialize a file aligner.</p>
-</div></span>
-  
-</li>
-
-      
-    </ul>
-    
-  
-
-
-  <div id="constructor_details" class="method_details_list">
-  <h2>Constructor Details</h2>
-  
-    <div class="method_details first">
-  <h3 class="signature first" id="initialize-instance_method">
-  
-    #<strong>initialize</strong>(template_analysis, dest_analysis, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rbs::Merge::FileAligner (class)">FileAligner</a></span></tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Initialize a file aligner</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>template_analysis</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Analysis of the template file</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>dest_analysis</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Analysis of the destination file</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-32
-33
-34</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/file_aligner.rb', line 32</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-  
-</div>
-
   <div id="instance_attr_details" class="attr_details">
     <h2>Instance Attribute Details</h2>
     
@@ -449,9 +334,9 @@ Produces alignment information used by SmartMerger to combine files.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:12 2026 by
+  Generated on Sat Aug  8 01:26:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

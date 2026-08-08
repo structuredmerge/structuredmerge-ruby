@@ -6,7 +6,7 @@
 <title>
   Module: Rbs::Merge::NodeTypeNormalizer
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -590,10 +590,10 @@ refinement when a backend uses generic wrapper/member node types.</p>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
   <span class='id identifier rubyid_backend_type'>backend_type</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_backend'>backend</span> <span class='op'>==</span> <span class='symbol'>:tree_sitter</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
-  <span class='kw'>end</span>
+                   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
+                 <span class='kw'>else</span>
+                   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+                 <span class='kw'>end</span>
 
   <span class='id identifier rubyid_canonical'>canonical</span> <span class='op'>=</span> <span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_type'>backend_type</span><span class='comma'>,</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_canonical'>canonical</span> <span class='kw'>unless</span> <span class='id identifier rubyid_backend'>backend</span> <span class='op'>==</span> <span class='symbol'>:tree_sitter</span>
@@ -669,13 +669,13 @@ refinement when a backend uses generic wrapper/member node types.</p>
       <pre class="lines">
 
 
-305
-306
 307
-308</pre>
+308
+309
+310</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 305</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 307</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_container_type?'>container_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_canonical'>canonical</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -747,14 +747,16 @@ Also includes :declaration_wrapper which wraps declarations in tree-sitter-rbs</
 287
 288
 289
-290</pre>
+290
+291</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 287</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_declaration_type?'>declaration_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_canonical'>canonical</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>class</span><span class='words_sep'> </span><span class='tstring_content'>module</span><span class='words_sep'> </span><span class='tstring_content'>interface</span><span class='words_sep'> </span><span class='tstring_content'>type_alias</span><span class='words_sep'> </span><span class='tstring_content'>constant</span><span class='words_sep'> </span><span class='tstring_content'>global</span><span class='words_sep'> </span><span class='tstring_content'>class_alias</span><span class='words_sep'> </span><span class='tstring_content'>module_alias</span><span class='words_sep'> </span><span class='tstring_content'>declaration_wrapper</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_canonical'>canonical</span><span class='rparen'>)</span>
+  <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>class</span><span class='words_sep'> </span><span class='tstring_content'>module</span><span class='words_sep'> </span><span class='tstring_content'>interface</span><span class='words_sep'> </span><span class='tstring_content'>type_alias</span><span class='words_sep'> </span><span class='tstring_content'>constant</span><span class='words_sep'> </span><span class='tstring_content'>global</span><span class='words_sep'> </span><span class='tstring_content'>class_alias</span><span class='words_sep'> </span><span class='tstring_content'>module_alias</span><span class='words_sep'>
+</span><span class='words_sep'>     </span><span class='tstring_content'>declaration_wrapper</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_canonical'>canonical</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -818,17 +820,19 @@ Also includes :declaration_wrapper which wraps declarations in tree-sitter-rbs</
       <pre class="lines">
 
 
-296
 297
 298
-299</pre>
+299
+300
+301</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 296</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 297</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_member_type?'>member_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_canonical'>canonical</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>method</span><span class='words_sep'> </span><span class='tstring_content'>alias</span><span class='words_sep'> </span><span class='tstring_content'>attr_reader</span><span class='words_sep'> </span><span class='tstring_content'>attr_writer</span><span class='words_sep'> </span><span class='tstring_content'>attr_accessor</span><span class='words_sep'> </span><span class='tstring_content'>include</span><span class='words_sep'> </span><span class='tstring_content'>extend</span><span class='words_sep'> </span><span class='tstring_content'>prepend</span><span class='words_sep'> </span><span class='tstring_content'>ivar</span><span class='words_sep'> </span><span class='tstring_content'>civar</span><span class='words_sep'> </span><span class='tstring_content'>cvar</span><span class='words_sep'> </span><span class='tstring_content'>visibility</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_canonical'>canonical</span><span class='rparen'>)</span>
+  <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>method</span><span class='words_sep'> </span><span class='tstring_content'>alias</span><span class='words_sep'> </span><span class='tstring_content'>attr_reader</span><span class='words_sep'> </span><span class='tstring_content'>attr_writer</span><span class='words_sep'> </span><span class='tstring_content'>attr_accessor</span><span class='words_sep'> </span><span class='tstring_content'>include</span><span class='words_sep'> </span><span class='tstring_content'>extend</span><span class='words_sep'> </span><span class='tstring_content'>prepend</span><span class='words_sep'> </span><span class='tstring_content'>ivar</span><span class='words_sep'> </span><span class='tstring_content'>civar</span><span class='words_sep'> </span><span class='tstring_content'>cvar</span><span class='words_sep'>
+</span><span class='words_sep'>     </span><span class='tstring_content'>visibility</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_canonical'>canonical</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -892,13 +896,13 @@ Also includes :declaration_wrapper which wraps declarations in tree-sitter-rbs</
       <pre class="lines">
 
 
-314
-315
 316
-317</pre>
+317
+318
+319</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 314</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/node_type_normalizer.rb', line 316</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type_definition?'>type_definition?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_canonical'>canonical</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -1008,9 +1012,9 @@ Overrides the shared Normalizer to default to :rbs backend.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:12 2026 by
+  Generated on Sat Aug  8 01:26:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Rbs::Merge::FileAnalysis
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -182,7 +182,7 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rbs-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
     </dl>
   
@@ -681,7 +681,7 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **options)  &#x21d2; FileAnalysis </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **_options)  &#x21d2; FileAnalysis </a>
     
 
     
@@ -806,7 +806,7 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
+    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **_options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
   
 
   
@@ -939,32 +939,32 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
     <td>
       <pre class="code"><span class="info file"># File 'lib/rbs/merge/file_analysis.rb', line 59</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Rbs::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Rbs::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__options'>_options</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
   <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
   <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
   <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
   <span class='ivar'>@errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='kw'>nil</span>  <span class='comment'># Will be set during parsing
+  <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='comment'># Will be set during parsing
 </span>  <span class='ivar'>@directives</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='ivar'>@declarations</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='ivar'>@ast</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='ivar'>@comment_tracker</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CommentTracker.html" title="Rbs::Merge::CommentTracker (class)">CommentTracker</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CommentTracker.html#initialize-instance_method" title="Rbs::Merge::CommentTracker#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@lines</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
 
   <span class='comment'># Parse the RBS source
-</span>  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Rbs::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis#parse</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_parse_rbs'>parse_rbs</span> <span class='rbrace'>}</span>
+</span>  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Rbs::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis#parse</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_parse_rbs'>parse_rbs</span> <span class='rbrace'>}</span>
 
   <span class='comment'># Extract and integrate all nodes including freeze blocks
 </span>  <span class='ivar'>@statements</span> <span class='op'>=</span> <span class='id identifier rubyid_integrate_nodes'>integrate_nodes</span>
 
-  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Rbs::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
-    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>backend:</span> <span class='ivar'>@backend</span><span class='comma'>,</span>
-    <span class='label'>declarations_count:</span> <span class='ivar'>@declarations</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>freeze_blocks:</span> <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
-    <span class='label'>valid:</span> <span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
-  <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Rbs::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                      <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>default</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                      <span class='label'>backend:</span> <span class='ivar'>@backend</span><span class='comma'>,</span>
+                      <span class='label'>declarations_count:</span> <span class='ivar'>@declarations</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>freeze_blocks:</span> <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+                      <span class='label'>valid:</span> <span class='id identifier rubyid_valid?'>valid?</span>
+                    <span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1483,7 +1483,7 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
   <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
     <span class='label'>tracker_attachment:</span> <span class='id identifier rubyid_augmented_attachment'>augmented_attachment</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1631,7 +1631,7 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span>
     <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span>
-    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1921,7 +1921,7 @@ Supports multiple backends: RBS gem (MRI only) and tree-sitter-rbs (cross-platfo
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span>
     <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
     <span class='label'>kind:</span> <span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span>
-    <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span><span class='comma'>,</span>
+    <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1985,7 +1985,7 @@ synthetic merge layer rather than via editable parser-native comment AST.</p>
   <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
     <span class='label'>source:</span> <span class='symbol'>:rbs_source</span><span class='comma'>,</span>
     <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
-    <span class='label'>read_strategy:</span> <span class='symbol'>:source_augmented_portable_write</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='symbol'>:source_augmented_portable_write</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2207,23 +2207,23 @@ synthetic merge layer rather than via editable parser-native comment AST.</p>
 
   <span class='kw'>case</span> <span class='id identifier rubyid_canonical'>canonical</span>
   <span class='kw'>when</span> <span class='symbol'>:class</span>
-    <span class='lbracket'>[</span><span class='symbol'>:class</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:class</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:module</span>
-    <span class='lbracket'>[</span><span class='symbol'>:module</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:module</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:interface</span>
-    <span class='lbracket'>[</span><span class='symbol'>:interface</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:interface</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:type_alias</span>
-    <span class='lbracket'>[</span><span class='symbol'>:type_alias</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:type_alias</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:constant</span>
-    <span class='lbracket'>[</span><span class='symbol'>:constant</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:constant</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:global</span>
-    <span class='lbracket'>[</span><span class='symbol'>:global</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:global</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:class_alias</span>
-    <span class='lbracket'>[</span><span class='symbol'>:class_alias</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:class_alias</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:module_alias</span>
-    <span class='lbracket'>[</span><span class='symbol'>:module_alias</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:module_alias</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>when</span> <span class='symbol'>:method</span>
-    <span class='lbracket'>[</span><span class='symbol'>:method</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+    <span class='lbracket'>[</span><span class='symbol'>:method</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>anonymous</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>else</span>
     <span class='lbracket'>[</span><span class='id identifier rubyid_canonical'>canonical</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>||</span> <span class='id identifier rubyid_node_type'>node_type</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
@@ -2340,20 +2340,20 @@ synthetic merge layer rather than via editable parser-native comment AST.</p>
 </span><span class='words_sep'>  </span><span class='tstring_end'>]</span></span>
 
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_child'>child</span><span class='op'>|</span>
-    <span class='id identifier rubyid_child_type'>child_type</span> <span class='op'>=</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_name_node_types'>name_node_types</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_child_type'>child_type</span><span class='rparen'>)</span>
-      <span class='comment'># Name nodes often have a constant or identifier child
-</span>      <span class='kw'>if</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:each</span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_inner'>inner</span><span class='op'>|</span>
-          <span class='id identifier rubyid_inner_type'>inner_type</span> <span class='op'>=</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
-          <span class='kw'>if</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>constant</span><span class='words_sep'> </span><span class='tstring_content'>identifier</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_inner_type'>inner_type</span><span class='rparen'>)</span>
-            <span class='kw'>return</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>:</span> <span class='kw'>nil</span>
-          <span class='kw'>end</span>
+    <span class='id identifier rubyid_child_type'>child_type</span> <span class='op'>=</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_name_node_types'>name_node_types</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_child_type'>child_type</span><span class='rparen'>)</span>
+
+    <span class='comment'># Name nodes often have a constant or identifier child
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:each</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_inner'>inner</span><span class='op'>|</span>
+        <span class='id identifier rubyid_inner_type'>inner_type</span> <span class='op'>=</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>if</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>constant</span><span class='words_sep'> </span><span class='tstring_content'>identifier</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_inner_type'>inner_type</span><span class='rparen'>)</span>
+          <span class='kw'>return</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_inner'>inner</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>:</span> <span class='kw'>nil</span>
         <span class='kw'>end</span>
       <span class='kw'>end</span>
-      <span class='comment'># If no inner constant/identifier, try the name node itself
-</span>      <span class='kw'>return</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>:</span> <span class='kw'>nil</span>
     <span class='kw'>end</span>
+    <span class='comment'># If no inner constant/identifier, try the name node itself
+</span>    <span class='kw'>return</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>:</span> <span class='kw'>nil</span>
   <span class='kw'>end</span>
 
   <span class='kw'>nil</span>
@@ -2527,7 +2527,7 @@ synthetic merge layer rather than via editable parser-native comment AST.</p>
       <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='comma'>,</span>
       <span class='label'>lines:</span> <span class='ivar'>@lines</span><span class='comma'>,</span>
       <span class='label'>source:</span> <span class='ivar'>@source</span><span class='comma'>,</span>
-      <span class='label'>backend:</span> <span class='ivar'>@backend</span><span class='comma'>,</span>
+      <span class='label'>backend:</span> <span class='ivar'>@backend</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
@@ -2658,9 +2658,9 @@ synthetic merge layer rather than via editable parser-native comment AST.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:12 2026 by
+  Generated on Sat Aug  8 01:26:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

@@ -6,7 +6,7 @@
 <title>
   Class: Rbs::Merge::Backends::RbsBackend::Tree
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -355,15 +355,15 @@
       <pre class="lines">
 
 
-219
-220
 221
 222
 223
-224</pre>
+224
+225
+226</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 219</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 221</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_declarations'>declarations</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>directives:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>errors:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_declarations'>declarations</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
@@ -429,12 +429,12 @@
       <pre class="lines">
 
 
-211
-212
-213</pre>
+213
+214
+215</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 213</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_declarations'>declarations</span>
   <span class='ivar'>@declarations</span>
@@ -492,12 +492,12 @@
       <pre class="lines">
 
 
-214
-215
-216</pre>
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 214</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 216</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_directives'>directives</span>
   <span class='ivar'>@directives</span>
@@ -555,12 +555,12 @@
       <pre class="lines">
 
 
-217
-218
-219</pre>
+219
+220
+221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 219</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
   <span class='ivar'>@errors</span>
@@ -619,12 +619,12 @@
       <pre class="lines">
 
 
-238
-239
-240</pre>
+240
+241
+242</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 238</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 240</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_errors?'>has_errors?</span>
   <span class='ivar'>@errors</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
@@ -677,12 +677,12 @@ Overrides inner_tree to return declarations</p>
       <pre class="lines">
 
 
-246
-247
-248</pre>
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 246</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 248</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inner_tree'>inner_tree</span>
   <span class='ivar'>@declarations</span>
@@ -740,12 +740,12 @@ Overrides inner_tree to return declarations</p>
       <pre class="lines">
 
 
-231
-232
-233</pre>
+233
+234
+235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 233</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_root_node'>root_node</span>
   <span class='const'><span class='object_link'><a href="Node.html" title="Rbs::Merge::Backends::RbsBackend::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new_root'><span class='object_link'><a href="Node.html#new_root-class_method" title="Rbs::Merge::Backends::RbsBackend::Node.new_root (method)">new_root</a></span></span><span class='lparen'>(</span><span class='ivar'>@declarations</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span>
@@ -760,9 +760,9 @@ Overrides inner_tree to return declarations</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:13 2026 by
+  Generated on Sat Aug  8 01:26:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

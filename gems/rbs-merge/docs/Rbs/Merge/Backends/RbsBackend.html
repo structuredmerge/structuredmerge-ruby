@@ -6,7 +6,7 @@
 <title>
   Module: Rbs::Merge::Backends::RbsBackend
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -325,27 +325,29 @@ The RBS gem is specifically designed for parsing RBS type signature files.</p>
 60
 61
 62
-63</pre>
+63
+64</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available?'>available?</span>
-  <span class='kw'>return</span> <span class='ivar'>@loaded</span> <span class='kw'>if</span> <span class='ivar'>@load_attempted</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>begin</span>
-    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>return</span> <span class='ivar'>@loaded</span> <span class='kw'>if</span> <span class='ivar'>@load_attempted</span>
+
+  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>begin</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span>
     <span class='comment'># Verify it can actually parse - just requiring isn&#39;t enough
-</span>    <span class='id identifier rubyid_buffer'>buffer</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>RBS</span><span class='op'>::</span><span class='const'>Buffer</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>test.rbs</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>content:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>class Foo end</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</span>    <span class='id identifier rubyid_buffer'>buffer</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>RBS</span><span class='op'>::</span><span class='const'>Buffer</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>test.rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>content:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>class Foo end</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
     <span class='op'>::</span><span class='const'>RBS</span><span class='op'>::</span><span class='const'>Parser</span><span class='period'>.</span><span class='id identifier rubyid_parse_signature'>parse_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_buffer'>buffer</span><span class='rparen'>)</span>
-    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>rescue</span> <span class='const'>LoadError</span>
-    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>rescue</span> <span class='const'>StandardError</span>
-    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='kw'>end</span>
-  <span class='ivar'>@loaded</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span><span class='kw'>end</span></pre>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>rescue</span> <span class='const'>LoadError</span>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='kw'>rescue</span> <span class='const'>StandardError</span>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@loaded</span>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -402,7 +404,6 @@ The RBS gem is specifically designed for parsing RBS type signature files.</p>
       <pre class="lines">
 
 
-80
 81
 82
 83
@@ -414,13 +415,16 @@ The RBS gem is specifically designed for parsing RBS type signature files.</p>
 89
 90
 91
-92</pre>
+92
+93
+94</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
+
   <span class='lbrace'>{</span>
     <span class='label'>backend:</span> <span class='symbol'>:rbs</span><span class='comma'>,</span>
     <span class='label'>query:</span> <span class='kw'>false</span><span class='comma'>,</span>           <span class='comment'># RBS doesn&#39;t have tree-sitter-style queries
@@ -429,7 +433,7 @@ The RBS gem is specifically designed for parsing RBS type signature files.</p>
 </span>    <span class='label'>pure_ruby:</span> <span class='kw'>false</span><span class='comma'>,</span>       <span class='comment'># RBS gem has native C extension
 </span>    <span class='label'>rbs_only:</span> <span class='kw'>true</span><span class='comma'>,</span>         <span class='comment'># RBS gem only parses RBS type signatures
 </span>    <span class='label'>error_tolerant:</span> <span class='kw'>false</span><span class='comma'>,</span>  <span class='comment'># RBS parser raises on errors
-</span>    <span class='label'>mri_only:</span> <span class='kw'>true</span><span class='comma'>,</span>         <span class='comment'># RBS gem C extension only works on MRI
+</span>    <span class='label'>mri_only:</span> <span class='kw'>true</span> <span class='comment'># RBS gem C extension only works on MRI
 </span>  <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -466,18 +470,18 @@ The RBS gem is specifically designed for parsing RBS type signature files.</p>
       <pre class="lines">
 
 
-69
 70
 71
-72</pre>
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 69</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/backends/rbs_backend.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset!'>reset!</span>
-  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span>  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
-</span><span class='kw'>end</span></pre>
+  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -488,9 +492,9 @@ The RBS gem is specifically designed for parsing RBS type signature files.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:12 2026 by
+  Generated on Sat Aug  8 01:26:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

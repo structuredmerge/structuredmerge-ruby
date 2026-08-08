@@ -6,7 +6,7 @@
 <title>
   Class: Rbs::Merge::ConflictResolver
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -90,6 +90,11 @@
   
   
   
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Ast::Merge::CommentLayoutEmissionSupport</dd>
+  </dl>
   
   
 
@@ -246,6 +251,7 @@ with matching signatures but different content.</p>
   
 
 
+  
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -357,8 +363,6 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-26
-27
 28
 29
 30
@@ -366,10 +370,12 @@ for per-node-type preferences</p>
 32
 33
 34
-35</pre>
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 26</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>preference:</span><span class='comma'>,</span> <span class='label'>template_analysis:</span><span class='comma'>,</span> <span class='label'>dest_analysis:</span><span class='comma'>,</span> <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span>
@@ -465,8 +471,6 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-99
-100
 101
 102
 103
@@ -479,10 +483,12 @@ for per-node-type preferences</p>
 110
 111
 112
-113</pre>
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 99</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_can_recursive_merge?'>can_recursive_merge?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
   <span class='comment'># Only container types can be recursively merged
@@ -576,18 +582,18 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-85
-86
 87
 88
 89
 90
 91
 92
-93</pre>
+93
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_declarations_identical?'>declarations_identical?</span><span class='lparen'>(</span><span class='id identifier rubyid_decl1'>decl1</span><span class='comma'>,</span> <span class='id identifier rubyid_decl2'>decl2</span><span class='rparen'>)</span>
   <span class='comment'># Compare text content for backend-agnostic comparison
@@ -709,8 +715,6 @@ for per-node-type preferences</p>
       <pre class="lines">
 
 
-44
-45
 46
 47
 48
@@ -744,27 +748,29 @@ for per-node-type preferences</p>
 76
 77
 78
-79</pre>
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>template_index:</span><span class='comma'>,</span> <span class='label'>dest_index:</span><span class='rparen'>)</span>
   <span class='comment'># Freeze blocks always win (they represent protected content)
 </span>  <span class='comment'># Template freeze blocks take precedence - frozen content from template is preserved
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_FREEZE_BLOCK</span><span class='rbrace'>}</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_FREEZE_BLOCK</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Destination freeze blocks also win (though less common)
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
-    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_FREEZE_BLOCK</span><span class='rbrace'>}</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_FREEZE_BLOCK</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Check if declarations are identical
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_declarations_identical?'>declarations_identical?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
     <span class='comment'># Prefer destination to minimize diffs
-</span>    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_DESTINATION</span><span class='rbrace'>}</span>
+</span>    <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_DESTINATION</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Check if we should recursively merge (for container types)
@@ -773,16 +779,16 @@ for per-node-type preferences</p>
       <span class='label'>source:</span> <span class='symbol'>:recursive</span><span class='comma'>,</span>
       <span class='label'>template_declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span>
       <span class='label'>dest_declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span>
-      <span class='label'>decision:</span> <span class='const'>DECISION_RECURSIVE</span><span class='comma'>,</span>
+      <span class='label'>decision:</span> <span class='const'>DECISION_RECURSIVE</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 
   <span class='comment'># Apply preference (supports per-node-type preferences with node_typing)
 </span>  <span class='kw'>case</span> <span class='id identifier rubyid_resolve_preference'>resolve_preference</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:template</span>
-    <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_TEMPLATE</span><span class='rbrace'>}</span>
+    <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_TEMPLATE</span> <span class='rbrace'>}</span>
   <span class='kw'>else</span> <span class='comment'># :destination (validated in initialize)
-</span>    <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_DESTINATION</span><span class='rbrace'>}</span>
+</span>    <span class='lbrace'>{</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_DESTINATION</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -795,9 +801,9 @@ for per-node-type preferences</p>
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:13 2026 by
+  Generated on Sat Aug  8 01:26:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
