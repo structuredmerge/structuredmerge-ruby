@@ -21,6 +21,10 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
+Html::Merge provides TreeHaver-backed HTML parsing and structural analysis for
+the StructuredMerge Ruby family, including feature profiles and YARD content
+wrapper repair helpers.
+
 ## 💡 Info you can shake a stick at
 
 | Tokens to Remember | [![Gem name][⛳️name-img]][⛳️gem-name] [![Gem namespace][⛳️namespace-img]][⛳️gem-namespace] |
@@ -78,9 +82,26 @@ gem install html-merge
 
 ## ⚙️ Configuration
 
+HTML parsing is registered through TreeHaver. The gem currently supports the
+HTML dialect and its configured Kreuzberg language-pack backend; inspect
+`Html::Merge.html_plan_context` before selecting a backend in a host merge
+pipeline. No global initializer is required.
+
 ## 🔧 Basic Usage
 
-TODO: Write usage instructions here
+Parse and inspect HTML through the module API:
+
+```ruby
+require "html/merge"
+
+result = Html::Merge.parse_html("<main><h1>Hello</h1></main>")
+raise result[:diagnostics].inspect unless result[:ok]
+
+puts result.dig(:analysis, :nodes)
+```
+
+Use `Html::Merge.html_plan_context` to advertise the available backend and
+`Html::Merge.ensure_yard_content_wrapper` when repairing YARD-generated HTML.
 
 ## 🔐 Security
 
