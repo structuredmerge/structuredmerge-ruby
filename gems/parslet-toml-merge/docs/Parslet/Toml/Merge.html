@@ -6,7 +6,7 @@
 <title>
   Module: Parslet::Toml::Merge
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -71,20 +71,10 @@
 
   
   
-  <dl>
-      <dt>Extended by:</dt>
-      <dd><span class='object_link'><a href="" title="Parslet::Toml::Merge (module)">Merge</a></span></dd>
-  </dl>
-  
   
   
   
 
-  
-  <dl>
-    <dt>Included in:</dt>
-    <dd><span class='object_link'><a href="" title="Parslet::Toml::Merge (module)">Merge</a></span></dd>
-  </dl>
   
 
   
@@ -122,17 +112,22 @@
         <dt id="PACKAGE_NAME-constant" class="">PACKAGE_NAME =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parslet-toml-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parslet-toml-merge</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
         <dt id="BACKEND-constant" class="">BACKEND =
           
         </dt>
         <dd><pre class="code"><span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>PARSLET_BACKEND</span></pre></dd>
       
+        <dt id="BACKEND_REGISTRY-constant" class="">BACKEND_REGISTRY =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Struct</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='symbol'>:registered</span><span class='comma'>,</span> <span class='symbol'>:mutex</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>false</span><span class='comma'>,</span> <span class='const'>Mutex</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span></pre></dd>
+      
         <dt id="VERSION-constant" class="">VERSION =
           <div class="docstring">
   <div class="discussion">
-    <p>Traditional Constant Location</p>
+    <p>Current gem version exposed at the traditional constant location.</p>
 
 
   </div>
@@ -234,6 +229,52 @@
   <span class="summary_signature">
     
       <a href="#parse_toml-class_method" title="parse_toml (class method)">.<strong>parse_toml</strong>(source, dialect, backend: nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#provider_parse_failure-class_method" title="provider_parse_failure (class method)">.<strong>provider_parse_failure</strong>(category, parse_result)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
     
 
     
@@ -370,12 +411,12 @@
       <pre class="lines">
 
 
-21
-22
-23</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_toml_backends'>available_toml_backends</span>
   <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='rbracket'>]</span>
@@ -400,12 +441,12 @@
       <pre class="lines">
 
 
-60
-61
-62</pre>
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_toml_owners'>match_toml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
   <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_match_toml_owners'>match_toml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
@@ -430,25 +471,77 @@
       <pre class="lines">
 
 
-64
-65
-66
-67
-68
-69
-70
-71</pre>
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_toml'>merge_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
 
-  <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_merge_toml_with_parser'>merge_toml_with_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_dialect'>parse_dialect</span><span class='op'>|</span>
-    <span class='id identifier rubyid_parse_toml'>parse_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_dialect'>parse_dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
+
+  <span class='id identifier rubyid_template_parse'>template_parse</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_toml'>parse_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_provider_parse_failure'>provider_parse_failure</span><span class='lparen'>(</span><span class='symbol'>:template_parse_error</span><span class='comma'>,</span> <span class='id identifier rubyid_template_parse'>template_parse</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_template_parse'>template_parse</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_destination_parse'>destination_parse</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_toml'>parse_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_provider_parse_failure'>provider_parse_failure</span><span class='lparen'>(</span><span class='symbol'>:destination_parse_error</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_parse'>destination_parse</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_destination_parse'>destination_parse</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Merge/SmartMerger.html" title="Parslet::Toml::Merge::SmartMerger (class)">SmartMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Merge/SmartMerger.html#initialize-instance_method" title="Parslet::Toml::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span>
+  <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'><span class='object_link'><a href="Merge/SmartMerger.html#merge_result-instance_method" title="Parslet::Toml::Merge::SmartMerger#merge_result (method)">merge_result</a></span></span><span class='period'>.</span><span class='id identifier rubyid_to_toml'>to_toml</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>output:</span> <span class='id identifier rubyid_output'>output</span><span class='comma'>,</span>
+    <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>DESTINATION_WINS_ARRAY_POLICY</span><span class='rbracket'>]</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>TemplateParseError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>template_parse_error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>DestinationParseError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>destination_parse_error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>merge_error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -470,29 +563,109 @@
       <pre class="lines">
 
 
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58</pre>
+61
+62
+63
+64
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_toml'>parse_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML backend </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_requested'>requested</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_requested'>requested</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
 
-  <span class='id identifier rubyid_syntax_result'>syntax_result</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parse_with_parslet'>parse_with_parslet</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>grammar_class:</span> <span class='const'>TOML</span><span class='op'>::</span><span class='const'>Parslet</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='id identifier rubyid_syntax_result'>syntax_result</span><span class='lbracket'>[</span><span class='symbol'>:diagnostics</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_syntax_result'>syntax_result</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span>
+  <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_analyze_toml_source'>analyze_toml_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="provider_parse_failure-class_method">
+  
+    .<strong>provider_parse_failure</strong>(category, parse_result)  &#x21d2; <tt>Object</tt> 
+  
 
-  <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_analyze_toml_source'>analyze_toml_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+116
+117
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 116</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_provider_parse_failure'>provider_parse_failure</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='comma'>,</span> <span class='id identifier rubyid_parse_result'>parse_result</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_diagnostics'>diagnostics</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_parse_result'>parse_result</span><span class='lbracket'>[</span><span class='symbol'>:diagnostics</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='op'>|</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>message</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>; </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>provider parse failed</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_backend!-class_method">
+  
+    .<strong>register_backend!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 15</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
+  <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Parslet::Toml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='kw'>return</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Parslet::Toml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'>registered</span>
+
+    <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_register_language'>register_language</span><span class='lparen'>(</span>
+      <span class='symbol'>:toml</span><span class='comma'>,</span>
+      <span class='label'>grammar_class:</span> <span class='const'>TOML</span><span class='op'>::</span><span class='const'>Parslet</span><span class='comma'>,</span>
+      <span class='label'>gem_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
+    <span class='rparen'>)</span>
+
+    <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Parslet::Toml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'>registered</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -514,18 +687,18 @@
       <pre class="lines">
 
 
-25
-26
-27
-28
-29
-30
-31
-32
-33</pre>
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_toml_backend_feature_profile'>toml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND-constant" title="Parslet::Toml::Merge::BACKEND (constant)">BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -556,12 +729,12 @@
       <pre class="lines">
 
 
-17
-18
-19</pre>
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_toml_feature_profile'>toml_feature_profile</span>
   <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_toml_feature_profile'>toml_feature_profile</span>
@@ -586,22 +759,22 @@
       <pre class="lines">
 
 
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47</pre>
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_toml_plan_context'>toml_plan_context</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_toml_backend_feature_profile'>toml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -636,21 +809,21 @@
       <pre class="lines">
 
 
-73
-74
-75
-76
-77
-78
-79</pre>
+108
+109
+110
+111
+112
+113
+114</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/parslet/toml/merge.rb', line 108</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
     <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -664,9 +837,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:07 2026 by
+  Generated on Sat Aug  8 02:23:48 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>
