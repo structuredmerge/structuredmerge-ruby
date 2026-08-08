@@ -62,6 +62,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Reapply backend availability filters after aggregate spec harness registration.
 
+- Skip RBS backend examples when the selected parser backend is not registered.
+
 ### Security
 
 ## [7.1.0] - 2026-08-07

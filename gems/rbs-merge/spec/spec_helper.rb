@@ -41,4 +41,12 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  # A grammar can be available without being registered for every native
+  # backend. Exclude unsupported RBS grammar/backend combinations explicitly.
+  %i[mri java rust ffi].each do |backend|
+    next if TreeHaver.registered_languages(:rbs).key?(backend)
+
+    config.filter_run_excluding(rbs_grammar: true, "#{backend}_backend": true)
+  end
 end
