@@ -58,6 +58,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add and promote the ruby.typescript source-preserving provider for TypeScript/TSX, including smorg-rb and real Git-driver routing.
 
+- Add and promote the ruby.rust source-preserving provider for Rust, including native AST ownership, promoted merge3 fixtures, smorg-rb routing, and real Git-driver coverage.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

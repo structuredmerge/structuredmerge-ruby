@@ -652,6 +652,7 @@ module Smorg
         '*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown',
         '*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby',
         '*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs',
+        '*.rs merge=smorg-rb diff=smorg-rb smorg.language=rust',
         '*.toml merge=smorg-rb diff=smorg-rb smorg.language=toml',
         '*.ts merge=smorg-rb diff=smorg-rb smorg.language=typescript',
         '*.tsx merge=smorg-rb diff=smorg-rb smorg.language=tsx',
@@ -738,6 +739,22 @@ module Smorg
             family: 'rbs',
             dialect: 'rbs',
             backend: 'rbs',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
+      when 'rust'
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.rust',
+            family: 'rust',
+            dialect: 'rust',
+            backend: 'kreuzberg-language-pack',
             profile_id: 'source_preserving',
             fallback_policy: fallback_policy,
             conflict_marker_size: conflict_marker_size
@@ -985,6 +1002,7 @@ module Smorg
 
     def normalize_language(language, path_name)
       return 'go' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.go'
+      return 'rust' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.rs'
       return 'typescript' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.ts'
       return 'tsx' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.tsx'
 
@@ -1005,6 +1023,8 @@ module Smorg
         'ruby'
       when 'rbs'
         'rbs'
+      when 'rust', 'rs', 'application/rust', 'text/rust'
+        'rust'
       when 'toml', 'application/toml'
         'toml'
       when 'typescript', 'ts', 'application/typescript', 'text/typescript'
@@ -1127,3 +1147,5 @@ module Smorg
     end
   end
 end
+
+require 'rust/merge'

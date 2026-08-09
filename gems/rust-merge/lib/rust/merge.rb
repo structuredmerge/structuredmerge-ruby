@@ -238,3 +238,5 @@ module Rust
 end
 
 Rust::Merge.register_backend!
+require_relative 'merge/provider'
+Rust::Merge.register_provider!

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength -- legacy and promoted fixture contracts share one integration boundary
 RSpec.describe Rust::Merge do
   def fixtures_root = Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   def read_json(path) = Ast::Merge.normalize_value(JSON.parse(path.read))
@@ -81,4 +82,31 @@ RSpec.describe Rust::Merge do
          message: 'Unsupported Rust backend tree-sitter.' }]
     )
   end
+
+  it 'conforms to the promoted Rust merge3 provider fixtures' do
+    fixture = read_json(fixtures_root.join('rust', 'slice-1020-rust-merge3', 'rust-merge3.json'))
+
+    fixture.fetch(:cases).each do |test_case|
+      result = described_class.merge_provider.merge3(
+        base_source: test_case.fetch(:base_source),
+        ours_source: test_case.fetch(:ours_source),
+        theirs_source: test_case.fetch(:theirs_source),
+        dialect: :rust,
+        backend: :'kreuzberg-language-pack',
+        profile_id: :source_preserving
+      )
+      expected = test_case.fetch(:expected)
+
+      expect(result[:ok]).to eq(expected.fetch(:ok)), test_case.fetch(:case_id)
+      expect(result.dig(:render_report, :strategy)).to eq(expected.fetch(:strategy).to_sym)
+      if expected[:output]
+        expect(result[:output]).to eq(expected[:output])
+        expect(result.dig(:verification, :base_participated)).to be(true)
+      else
+        expect(result.fetch(:conflicts)).to include(hash_including(category: expected.fetch(:conflict_category).to_sym))
+        expect(result[:conflicted_output]).to end_with(expected[:stable_suffix]) if expected[:stable_suffix]
+      end
+    end
+  end
 end
+# rubocop:enable Metrics/BlockLength

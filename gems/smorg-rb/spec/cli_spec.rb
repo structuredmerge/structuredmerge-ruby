@@ -237,6 +237,7 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.go merge=smorg-rb diff=smorg-rb smorg.language=go')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
     expect(stdout.string).to include('*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs')
+    expect(stdout.string).to include('*.rs merge=smorg-rb diff=smorg-rb smorg.language=rust')
     expect(stdout.string).to include('*.ts merge=smorg-rb diff=smorg-rb smorg.language=typescript')
     expect(stdout.string).to include('*.tsx merge=smorg-rb diff=smorg-rb smorg.language=tsx')
     expect(stdout.string).to include('*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
@@ -378,6 +379,29 @@ RSpec.describe Smorg::RB do
     expect(report.dig('provider', 'family')).to eq('rbs')
     expect(report.dig('provider', 'backend')).to eq('rbs')
     expect(report.dig('profile', 'profile_id')).to eq('source_preserving')
+    expect(report.dig('verification', 'base_participated')).to be(true)
+  end
+
+  it 'routes Rust paths only through the exact base-aware workflow provider' do
+    ancestor = write_file(@dir, 'ancestor.rs', "fn shared() {}\n")
+    current = write_file(@dir, 'current.tmp', "fn shared() {}\nfn ours() {}\n")
+    other = write_file(@dir, 'other.tmp', "fn shared() {}\nfn theirs() {}\n")
+    report_path = File.join(@dir, 'rust-report.json')
+    stderr = StringIO.new
+
+    expect(Rust::Merge).not_to receive(:merge_rust)
+    exit_code = described_class.run(
+      ['merge-driver', '--report', report_path, '--path-name', 'example.rs', ancestor, current, other],
+      stdout: StringIO.new,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("fn shared() {}\nfn ours() {}\nfn theirs() {}\n")
+    report = JSON.parse(File.read(report_path))
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.rust')
+    expect(report.dig('provider', 'family')).to eq('rust')
+    expect(report.dig('provider', 'dialect')).to eq('rust')
     expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
