@@ -2,6 +2,8 @@
 
 require 'toml-rb'
 require 'toml-merge'
+require 'ast/merge'
+require_relative 'merge/version'
 
 module Citrus
   module Toml
@@ -146,4 +148,7 @@ module Citrus
   end
 end
 
+require_relative 'merge/provider'
+
 Citrus::Toml::Merge.register_backend!
+Citrus::Toml::Merge.register_provider!

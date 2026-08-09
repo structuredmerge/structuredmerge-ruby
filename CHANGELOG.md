@@ -46,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the ruby.ruby workflow provider over ruby.ruby.prism and route smorg-rb Ruby merge3 operations through it with delegated backend provenance.
 
+- Add the source-preserving ruby.toml.citrus backend provider with base-aware root-key merges and conservative structural conflicts.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
