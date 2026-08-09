@@ -439,7 +439,7 @@ module Kettle
       KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MIN_DIVERGENCE_THRESHOLD
       KJ|MIN_RUBY
-      KJ|KETTLE_CHANGELOG_DEV_DEPENDENCY
+      KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY
       KJ|OPENCOLLECTIVE_ORG
       KJ|README:COPYRIGHT_NOTICE
       KJ|README:CORPORATE_SPONSORS
@@ -13837,9 +13837,8 @@ module Kettle
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
         "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
-        "KJ|KETTLE_CHANGELOG_DEV_DEPENDENCY" => kettle_changelog_development_dependency_token(
-          package.fetch(:name).to_s,
-          facts.dig(:project_runtime, :test_min_ruby).to_s
+        "KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY" => kettle_changelog_gemfile_dependency_token(
+          package.fetch(:name).to_s
         ),
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
         "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
@@ -13879,10 +13878,26 @@ module Kettle
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
     end
 
-    def kettle_changelog_development_dependency_token(package_name, min_test_ruby)
+    def kettle_changelog_gemfile_dependency_token(package_name)
       return "" if package_name == "kettle-changelog"
 
-      %(  spec.add_development_dependency("kettle-changelog", "~> 0.1", ">= 0.1.0")       # ruby >= #{min_test_ruby})
+      <<~RUBY.chomp
+        kettle_changelog_local = ENV.fetch("KETTLE_DEV_DEV", "false").downcase
+        kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)
+        if kettle_changelog_local
+          require "nomono/bundler"
+          eval_nomono_gems(
+            gems: ["kettle-changelog"],
+            prefix: "KETTLE_DEV",
+            path_env: "KETTLE_DEV_DEV",
+            root: ["src", "my", "kettle-dev"]
+          )
+        else
+          if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
+            gem "kettle-changelog", "~> 0.1", ">= 0.1.0"
+          end
+        end
+      RUBY
     end
 
     def readme_title_token(package, rubygems)
@@ -14830,7 +14845,7 @@ module Kettle
     end
 
     def kettle_dev_local_gems(config)
-      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover kettle-changelog]
+      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover]
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
       gems.uniq.join(" ")

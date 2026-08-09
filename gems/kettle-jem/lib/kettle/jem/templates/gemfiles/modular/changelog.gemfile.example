@@ -1,0 +1,6 @@
+# frozen_string_literal: true
+
+# kettle-changelog depends on the current kettle-dev APIs and the structured
+# Markdown merger. Keep it out of older appraisal jobs whose Ruby cannot load
+# its runtime dependency floor.
+{KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY}

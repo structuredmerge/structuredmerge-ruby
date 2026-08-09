@@ -28,6 +28,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Align generated compatibility workflows with the Ruby 4.0 runtime floor by excluding unsupported TruffleRuby targets
 
+- Resolve kettle-changelog through a Ruby-compatible modular development Gemfile instead of every generated gemspec.
+
+- Keep the standalone kettle-changelog tool in a Ruby-compatible modular Gemfile with explicit local-path wiring, rather than adding it to every generated gemspec.
+
 ### Deprecated
 
 ### Removed
