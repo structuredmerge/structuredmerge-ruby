@@ -3,7 +3,6 @@
 # External gems
 require 'psych'
 require 'tree_haver'
-require 'yaml/merge'
 
 # Shared merge infrastructure
 require 'ast/merge'
@@ -158,13 +157,13 @@ module Psych
         return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
 
         parsed = yaml_value_for_source(source)
-        Yaml::Merge.analyze_yaml_document(parsed, dialect)
+        Ast::Merge::YamlDocument.analyze(parsed, dialect)
       rescue TreeHaver::Error, StandardError => e
         parse_error_result(e.message)
       end
 
       def match_yaml_owners(template, destination)
-        Yaml::Merge.match_yaml_owners(template, destination)
+        Ast::Merge::YamlDocument.match_owners(template, destination)
       end
 
       def merge_yaml(

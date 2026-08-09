@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a genuinely base-aware Psych YAML provider with source-preserving top-level mapping merges and conservative conflict handling.
 
+- Add the ruby.yaml source-preserving workflow provider, delegate it to the Psych backend, and route smorg-rb YAML merges through it.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

@@ -210,6 +210,8 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
+    expect(stdout.string).to include('*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
+    expect(stdout.string).to include('*.yaml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
     expect(stdout.string).to include('.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
   end
@@ -254,10 +256,10 @@ RSpec.describe Smorg::RB do
     expect(File.read(current)).to eq("VALUE = 0\nOURS = 1\nTHEIRS = 2\n")
   end
 
-  it 'falls back from unsupported structured file types instead of failing closed' do
-    ancestor = write_file(@dir, 'ancestor.yml', "name: structuredmerge\ncurrent: false\n\nother: false\n")
-    current = write_file(@dir, 'current.yml', "name: structuredmerge\ncurrent: true\n\nother: false\n")
-    other = write_file(@dir, 'other.yml', "name: structuredmerge\ncurrent: false\n\nother: true\n")
+  it 'routes YAML paths through the base-aware workflow provider' do
+    ancestor = write_file(@dir, 'ancestor.yml', "obsolete: true\nstable: true\n")
+    current = write_file(@dir, 'current.yml', "obsolete: true\nstable: true\nours: left\n")
+    other = write_file(@dir, 'other.yml', "stable: true\ntheirs: right\n")
     report_path = File.join(@dir, 'merge-report.json')
     stdout = StringIO.new
     stderr = StringIO.new
@@ -266,18 +268,16 @@ RSpec.describe Smorg::RB do
                                     stdout: stdout, stderr: stderr)
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
-    merged = File.read(current)
-    expect(merged).to include('current: true')
-    expect(merged).to include('other: true')
+    expect(File.read(current)).to eq("stable: true\nours: left\ntheirs: right\n")
     report = JSON.parse(File.read(report_path))
     expect(report.fetch('ok')).to be(true)
-    expect(report.fetch('fallbacks')).to include(
-      a_hash_including(
-        'mode' => 'git_merge_file',
-        'reason' => 'unsupported_language',
-        'applied' => true
-      )
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.yaml')
+    expect(report.dig('provider', 'backend')).to eq('kreuzberg-language-pack')
+    expect(report.dig('provider', 'delegated_provider')).to include(
+      'provider_id' => 'ruby.yaml.psych',
+      'backend' => 'psych'
     )
+    expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
   it 'returns conflict exit code for strict merge failures' do
