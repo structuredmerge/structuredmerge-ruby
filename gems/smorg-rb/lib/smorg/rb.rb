@@ -13,6 +13,7 @@ require 'kettle/jem'
 require 'kettle/jem/tasks/install_task'
 require 'markly/merge'
 require 'plain-merge'
+require 'rbs/merge'
 require 'ruby/merge'
 require 'toml/merge'
 require 'yaml/merge'
@@ -649,6 +650,7 @@ module Smorg
         '*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown',
         '*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown',
         '*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby',
+        '*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs',
         '*.toml merge=smorg-rb diff=smorg-rb smorg.language=toml',
         '*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml',
         '*.yaml merge=smorg-rb diff=smorg-rb smorg.language=yaml'
@@ -703,6 +705,22 @@ module Smorg
             family: 'ruby',
             dialect: 'ruby',
             backend: 'prism',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
+      when 'rbs'
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.rbs',
+            family: 'rbs',
+            dialect: 'rbs',
+            backend: 'rbs',
             profile_id: 'source_preserving',
             fallback_policy: fallback_policy,
             conflict_marker_size: conflict_marker_size
@@ -947,6 +965,8 @@ module Smorg
         'markdown'
       when 'ruby', 'rb', 'application/x-ruby'
         'ruby'
+      when 'rbs'
+        'rbs'
       when 'toml', 'application/toml'
         'toml'
       when 'yaml', 'yml', 'application/yaml', 'text/yaml'

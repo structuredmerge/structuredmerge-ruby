@@ -52,6 +52,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the source-preserving ruby.toml workflow provider on kreuzberg-language-pack, route smorg-rb TOML merges through it, and promote its tested selector.
 
+- Add the source-preserving ruby.rbs workflow provider with native RBS declaration analysis, conservative base-aware merges, exact source provenance, smorg-rb routing, and installed Git-driver coverage.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

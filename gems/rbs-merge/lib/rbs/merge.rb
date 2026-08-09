@@ -137,12 +137,23 @@ module Rbs
         backends << TREE_SITTER_BACKEND_REFERENCE if registrations.key?(:tree_sitter) || registrations.key?(:tslp)
         backends
       end
+
+      def merge_provider
+        @merge_provider ||= Provider.new
+      end
+
+      def register_provider!(replace: false)
+        Ast::Merge.register_provider(merge_provider, replace: replace)
+      end
     end
   end
 end
 
+Rbs::Merge.autoload :Provider, 'rbs/merge/provider'
+
 # Register the RBS backend with TreeHaver when this gem is loaded
 Rbs::Merge.register_backend!
+Rbs::Merge.register_provider!
 
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)

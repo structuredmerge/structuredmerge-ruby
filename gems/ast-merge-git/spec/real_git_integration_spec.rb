@@ -5,6 +5,7 @@ require 'fileutils'
 require 'json'
 require 'open3'
 require 'psych'
+require 'rbs/merge'
 require 'shellwords'
 require 'zip/merge'
 
@@ -259,6 +260,38 @@ RSpec.describe 'ast-merge-git executable' do
     expect(baseline_output).to include('<<<<<<< baseline-ours.json')
     expect(status.exitstatus).to eq(0), stderr
     expect(repository.join(path).binread).to eq("VALUE = 0\nOURS = 1\nTHEIRS = 2\n")
+  end
+
+  it 'runs the exact RBS selector where baseline text merge conflicts' do
+    base = "class Shared\nend\n"
+    ours = "class Shared\nend\nclass Ours\nend\n"
+    theirs = "class Shared\nend\nclass Theirs\nend\n"
+    path = configure_opaque_repository(
+      extension: 'rbs',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'rbs/merge',
+      provider_id: 'ruby.rbs',
+      family: 'rbs',
+      dialect: 'rbs',
+      backend: 'rbs',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq(
+      "class Shared\nend\nclass Ours\nend\nclass Theirs\nend\n"
+    )
   end
 
   it 'runs the dotenv provider through the installed Git-driver path' do

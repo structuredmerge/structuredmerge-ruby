@@ -235,6 +235,7 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
+    expect(stdout.string).to include('*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs')
     expect(stdout.string).to include('*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.yaml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
@@ -288,6 +289,31 @@ RSpec.describe Smorg::RB do
       'provider_id' => 'ruby.ruby.prism',
       'backend' => 'prism'
     )
+    expect(report.dig('verification', 'base_participated')).to be(true)
+  end
+
+  it 'routes RBS paths through the exact base-aware workflow provider' do
+    ancestor = write_file(@dir, 'ancestor.rbs', "class Obsolete\nend\nclass Stable\nend\n")
+    current = write_file(@dir, 'current.tmp', "class Obsolete\nend\nclass Stable\nend\nclass Ours\nend\n")
+    other = write_file(@dir, 'other.tmp', "class Stable\nend\nclass Theirs\nend\n")
+    report_path = File.join(@dir, 'rbs-report.json')
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(
+      ['merge-driver', '--report', report_path, '--path-name', 'example.rbs', ancestor, current, other],
+      stdout: stdout,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("class Stable\nend\nclass Ours\nend\nclass Theirs\nend\n")
+    report = JSON.parse(File.read(report_path))
+    expect(report.fetch('ok')).to be(true)
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.rbs')
+    expect(report.dig('provider', 'family')).to eq('rbs')
+    expect(report.dig('provider', 'backend')).to eq('rbs')
+    expect(report.dig('profile', 'profile_id')).to eq('source_preserving')
     expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
