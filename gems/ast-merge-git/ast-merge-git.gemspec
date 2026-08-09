@@ -12,8 +12,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Peter H. Boling']
   spec.email = ['floss@galtzo.com']
 
-  spec.summary = '☯️ Three-way git merge semantics for StructuredMerge'
-  spec.description = '☯️ Git-specific merge3 contracts and conflict classification over ast-merge primitives.'
+  spec.summary = '☯️ Format-neutral Git merge-driver adapter for StructuredMerge'
+  spec.description = '☯️ Git protocol adaptation and provider dispatch over ast-merge primitives.'
   spec.homepage = 'https://github.com/structuredmerge/structuredmerge-ruby'
   spec.licenses = ['AGPL-3.0-only', 'PolyForm-Small-Business-1.0.0']
   spec.required_ruby_version = '>= 4.0.0'
@@ -91,7 +91,7 @@ Gem::Specification.new do |spec|
   ]
   spec.bindir = 'exe'
   # Listed files are the relative paths from bindir above.
-  spec.executables = []
+  spec.executables = ['ast-merge-git']
 
   # kettle-jem:freeze
   # To retain chunks of comments & code during ast-merge-git templating:
@@ -103,7 +103,6 @@ Gem::Specification.new do |spec|
 
   # Utilities
   spec.add_dependency 'ast-merge', "= #{spec.version}"
-  spec.add_dependency 'json-merge', "= #{spec.version}"
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.15') # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased

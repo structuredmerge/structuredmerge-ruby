@@ -26,7 +26,7 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 ### Key Features
 
 - Git-oriented request and response shaping for three-way merge driver integrations.
-- Family detection from path, extension, and configured merge behavior.
+- Provider selection from explicit family/provider, dialect, backend, and profile selectors.
 - JSON-compatible reports that can be logged, inspected, or replayed by higher-level tooling.
 - Fallback-friendly behavior for unsupported families or unsafe parser results.
 
@@ -87,17 +87,29 @@ gem install ast-merge-git
 
 ## ⚙️ Configuration
 
-Configure `ast-merge-git` through the repository's Git attributes and StructuredMerge family settings. The gem expects callers to provide the ancestor, current, and incoming file contents that Git passes to a custom merge driver.
+Configure `ast-merge-git` through the repository's Git attributes and StructuredMerge provider settings. The gem expects callers to provide the ancestor, current, and incoming file contents that Git passes to a custom merge driver.
 
 Keep family-specific parser configuration in the corresponding merge gem. For example, Markdown backend choices belong to `markdown-merge` or its provider gems, while Ruby source backend choices belong to `ruby-merge` or `prism-merge`.
+
+The executable does not infer or require family implementations. Configure
+`AST_MERGE_REQUIRE` with comma-separated provider require paths and select a
+provider with `AST_MERGE_FAMILY` or `AST_MERGE_PROVIDER`. Optional selectors are
+`AST_MERGE_DIALECT`, `AST_MERGE_BACKEND`, and `AST_MERGE_PROFILE`.
+
+```ini
+[merge "structured-json"]
+  name = StructuredMerge JSON-family driver
+  driver = AST_MERGE_REQUIRE=json/merge AST_MERGE_FAMILY=json AST_MERGE_DIALECT=json ast-merge-git %O %A %B %P %L
+```
 
 ## 🔧 Basic Usage
 
 ```ruby
 require "ast/merge/git"
+require "json/merge"
 
 result = Ast::Merge::Git.merge3(
-  language: "json",
+  family: "json",
   dialect: "json",
   base_source: File.binread("%O"),
   ours_source: File.binread("%A"),
@@ -111,6 +123,12 @@ else
   abort result.fetch(:diagnostics).inspect
 end
 ```
+
+For direct Git-driver execution, `ast-merge-git` writes clean provider output to
+`%A` and exits `0`. Unresolved conflicts exit `1`; unsupported capabilities,
+invalid provider output, configuration failures, and file errors exit `2`.
+`AST_MERGE_CONFLICT_POLICY=leave_ours` prevents conflicted output from replacing
+`%A`; the default `write` policy writes provider conflict output when available.
 
 ## 🔐 Security
 

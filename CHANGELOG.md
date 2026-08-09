@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
 
+- Refactor ast-merge-git into a format-neutral provider adapter with explicit conflict-write policy, stable Git exit codes, and no runtime dependency on json-merge.
+
 ### Deprecated
 
 ### Removed

@@ -474,6 +474,7 @@ module Json
           base: conflict_side_fragment(:base, ranges[:base]),
           ours: conflict_side_fragment(:ours, ranges[:ours]),
           theirs: conflict_side_fragment(:theirs, ranges[:theirs]),
+          labels: request.fetch(:labels, {}),
           marker_size: request.fetch(:conflict_marker_size, 7),
           metadata: { path: conflict.fetch(:path), category: conflict.fetch(:category) }
         )
@@ -501,6 +502,7 @@ module Json
               base: [source_fragment(:base, request.fetch(:base_source))],
               ours: [source_fragment(:ours, request.fetch(:ours_source))],
               theirs: [source_fragment(:theirs, request.fetch(:theirs_source))],
+              labels: request.fetch(:labels, {}),
               marker_size: request.fetch(:conflict_marker_size, 7),
               metadata: { conflicts: decision.conflicts.map { |conflict| conflict[:conflict_id] } }
             )

@@ -5,6 +5,21 @@ module Ast
         VERSION: String
       end
       VERSION: String
+
+      EXIT_SUCCESS: Integer
+      EXIT_CONFLICT: Integer
+      EXIT_ERROR: Integer
+
+      def self.merge3: (Hash[Symbol | String, untyped] request) -> Hash[Symbol, untyped]
+      def self.merge_files: (
+        base_path: String | Pathname,
+        ours_path: String | Pathname,
+        theirs_path: String | Pathname,
+        ?conflict_policy: Symbol | String,
+        **untyped
+      ) -> Hash[Symbol, untyped]
+      def self.run: (Array[String] argv, ?env: Hash[String, String], ?stderr: IO) -> Integer
+      def self.git_exit_code: (Hash[Symbol, untyped] result) -> Integer
     end
   end
 end

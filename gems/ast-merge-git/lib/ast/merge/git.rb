@@ -1,412 +1,263 @@
 # frozen_string_literal: true
 
 require 'ast/merge'
-require 'json'
-require 'json/merge'
 
 module Ast
   module Merge
+    # Adapts Git merge-driver roles and outcomes to the portable provider API.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ModuleLength -- Git protocol translation is one cohesive adapter boundary
     module Git
       PACKAGE_NAME = 'ast-merge-git'
-      MERGE_CONFLICT_CATEGORY = 'merge_conflict'
-      MISSING = Object.new.freeze
+      EXIT_SUCCESS = 0
+      EXIT_CONFLICT = 1
+      EXIT_ERROR = 2
+      CONFLICT_POLICIES = %i[write leave_ours].freeze
+      ADAPTER_ERROR_CATEGORIES = %i[
+        file_error
+        invalid_provider_output
+        invalid_provider_result
+      ].freeze
 
       module_function
 
       def merge3(request)
         normalized = normalize_request(request)
-        case normalize_language(normalized)
-        when 'json'
-          merge3_json(normalized)
-        else
-          response(
-            ok: false,
-            request: normalized,
-            diagnostics: [{
-              severity: 'error',
-              category: 'unsupported_feature',
-              message: 'ast-merge-git currently supports only json merge3.'
-            }]
-          )
-        end
+        provider_result = Ast::Merge.dispatch_provider(:merge3, provider_request(normalized))
+        adapt_provider_result(provider_result)
+      rescue Ast::Merge::ProviderContract::Error, ArgumentError, KeyError => e
+        adapt_provider_result(adapter_failure(:invalid_provider_result, e.message))
       end
 
-      def merge3_json(request)
-        parsed = parse_json_merge3_inputs(request)
-        return parsed unless parsed.is_a?(Hash) && parsed[:ok]
-
-        merge = merge_json_values(
-          parsed.fetch(:base),
-          parsed.fetch(:ours),
-          parsed.fetch(:theirs),
-          path: ''
+      def merge_files(base_path:, ours_path:, theirs_path:, conflict_policy: :write, **request)
+        policy = normalize_conflict_policy(conflict_policy)
+        result = merge3(
+          request.merge(
+            base_source: File.binread(base_path),
+            ours_source: File.binread(ours_path),
+            theirs_source: File.binread(theirs_path),
+            path_name: request[:path_name] || ours_path
+          )
         )
-
-        if merge.fetch(:conflicts).empty?
-          merged_source = "#{JSON.pretty_generate(merge.fetch(:value))}\n"
-          return response(
-            ok: true,
-            request: request,
-            merged_source: merged_source,
-            change_classifications: merge.fetch(:change_classifications),
-            reparse_after_render: reparse_json_source(merged_source),
-            formatting_preservation: {
-              line_diff_score: 1.0,
-              character_diff_score: 1.0
-            }
-          )
-        end
-
-        render_conflicted_json(request, merge)
+        write_result(result, ours_path, policy)
+      rescue SystemCallError => e
+        file_failure = adapt_provider_result(adapter_failure(:file_error, e.message))
+        file_failure.merge(git: git_report(file_failure, ours_path, policy, output_written: false))
       end
 
-      def parse_json_merge3_inputs(request)
-        dialect = request[:dialect].to_s.empty? ? 'json' : request[:dialect].to_s
-        {
-          ok: true,
-          base: Json::Merge.json_value_for_source(request.fetch(:base_source), dialect: dialect),
-          ours: Json::Merge.json_value_for_source(request.fetch(:ours_source), dialect: dialect),
-          theirs: Json::Merge.json_value_for_source(request.fetch(:theirs_source), dialect: dialect)
-        }
-      rescue Json::Merge::ParseError => e
-        source_role = parse_error_role(request, dialect)
-        response(
-          ok: false,
-          request: request,
-          diagnostics: [{
-            severity: 'error',
-            category: 'parse_error',
-            message: "#{source_role} parse error: #{e.message}"
-          }]
-        )
+      def run(argv, env: ENV, stderr: $stderr)
+        load_provider_requirements(env['AST_MERGE_REQUIRE'])
+        request = command_request(argv, env)
+        result = merge_files(**request)
+        emit_diagnostics(result, stderr)
+        result.dig(:git, :exit_code)
+      rescue ArgumentError, LoadError => e
+        stderr.puts("#{PACKAGE_NAME}: #{e.message}")
+        EXIT_ERROR
       end
 
-      def parse_error_role(request, dialect)
-        %i[base ours theirs].find do |role|
-          Json::Merge.json_value_for_source(request.fetch(:"#{role}_source"), dialect: dialect)
-          false
-        rescue Json::Merge::ParseError
-          true
-        end || :unknown
+      def git_exit_code(result)
+        return EXIT_SUCCESS if result[:ok]
+        return EXIT_ERROR if adapter_error?(result)
+        return EXIT_CONFLICT unless result.fetch(:conflicts, []).empty?
+
+        EXIT_ERROR
       end
 
-      def merge_json_values(base, ours, theirs, path:)
-        if ours == theirs
-          return merge_success(ours)
-        elsif base == ours
-          return merge_success(theirs, change: classify_json_change(path, base, ours, theirs))
-        elsif base == theirs
-          return merge_success(ours, change: classify_json_change(path, base, ours, theirs))
-        end
-
-        if base.is_a?(Hash) && ours.is_a?(Hash) && theirs.is_a?(Hash)
-          return merge_json_objects(base, ours, theirs, path: path)
-        end
-
-        conflict = json_conflict(path, base, ours, theirs)
-        {
-          value: ours.equal?(MISSING) ? theirs : ours,
-          conflicts: [conflict],
-          change_classifications: [conflict.fetch(:change_classification)]
-        }
-      end
-
-      def merge_json_objects(base, ours, theirs, path:)
-        merged = {}
-        conflicts = []
-        change_classifications = []
-        ordered_keys(base, ours, theirs).each do |key|
-          child_path = "#{path}/#{key}"
-          child = merge_json_values(
-            base.fetch(key, MISSING),
-            ours.fetch(key, MISSING),
-            theirs.fetch(key, MISSING),
-            path: child_path
-          )
-          merged[key] = child.fetch(:value) unless child.fetch(:value).equal?(MISSING)
-          conflicts.concat(child.fetch(:conflicts))
-          change_classifications.concat(child.fetch(:change_classifications))
-        end
-
-        {
-          value: merged,
-          conflicts: conflicts,
-          change_classifications: change_classifications
-        }
-      end
-
-      def ordered_keys(*objects)
-        objects.each_with_object([]) do |object, keys|
-          next unless object.is_a?(Hash)
-
-          object.each_key { |key| keys << key unless keys.include?(key) }
+      def adapter_error?(result)
+        result.fetch(:diagnostics, []).any? do |item|
+          ADAPTER_ERROR_CATEGORIES.include?(item[:category].to_s.to_sym)
         end
       end
+      private_class_method :adapter_error?
 
-      def merge_success(value, change: nil)
-        {
-          value: value,
-          conflicts: [],
-          change_classifications: change ? [change] : []
-        }
+      def provider_request(request)
+        request.slice(
+          :provider_id,
+          :family,
+          :dialect,
+          :backend,
+          :profile_id,
+          :base_source,
+          :ours_source,
+          :theirs_source,
+          :path_name,
+          :labels,
+          :conflict_marker_size
+        ).compact
       end
+      private_class_method :provider_request
 
-      def classify_json_change(path, base, ours, theirs)
-        {
-          path: path,
-          ours: json_change_state(base, ours),
-          theirs: json_change_state(base, theirs)
-        }
-      end
-
-      def json_change_state(base, value)
-        return 'unchanged' if base == value
-        return 'added' if base.equal?(MISSING)
-        return 'deleted' if value.equal?(MISSING)
-
-        'edited'
-      end
-
-      def json_conflict(path, base, ours, theirs)
-        category =
-          if ours.equal?(MISSING) || theirs.equal?(MISSING)
-            'delete_edit'
-          else
-            'edit_edit'
+      def adapt_provider_result(result)
+        if result[:ok]
+          output = result[:output]
+          unless output.is_a?(String)
+            return invalid_output_result(result, 'Successful provider result is missing String output.')
           end
-        {
-          conflict_id: "json-conflict-#{path.delete_prefix('/').tr('/', '-')}",
-          category: category,
-          path: path,
-          message: "JSON value changed incompatibly at #{path}",
-          base: base,
-          ours: ours,
-          theirs: theirs,
-          change_classification: classify_json_change(path, base, ours, theirs)
-        }
-      end
 
-      def render_conflicted_json(request, merge)
-        conflicts = merge.fetch(:conflicts)
-        full_file = conflicts.any? { |conflict| conflict.fetch(:category) == 'delete_edit' }
-        conflicted_source = if full_file
-                              render_conflict_source(request, conflicts)
-                            else
-                              render_owned_json_conflict_source(request, conflicts.first)
-                            end
-        response(
+          result.merge(
+            merged_source: output,
+            conflicted_source: nil,
+            change_classifications: result.fetch(:changes)
+          )
+        else
+          conflicted = result[:conflicted_output]
+          if conflicted && !conflicted.is_a?(String)
+            return invalid_output_result(result, 'Provider conflicted_output must be a String when present.')
+          end
+
+          result.merge(
+            merged_source: nil,
+            conflicted_source: conflicted,
+            change_classifications: result.fetch(:changes)
+          )
+        end
+      end
+      private_class_method :adapt_provider_result
+
+      def invalid_output_result(result, message)
+        result.merge(
           ok: false,
-          request: request,
-          conflicted_source: conflicted_source,
-          conflicts: conflicts.map { |conflict| conflict.slice(:conflict_id, :category, :path, :message) },
-          change_classifications: merge.fetch(:change_classifications),
-          diagnostics: [{
-            severity: 'error',
-            category: MERGE_CONFLICT_CATEGORY,
-            message: "#{conflicts.length} unresolved JSON merge conflict(s)."
-          }],
-          owned_regions: full_file ? [] : [owned_json_region(conflicts.first)],
-          reparse_after_render: nil,
-          render_strategy: full_file ? 'full_file_conflict_markers' : 'owned_region_conflict_markers'
+          output: nil,
+          merged_source: nil,
+          conflicted_source: nil,
+          diagnostics: result.fetch(:diagnostics) + [diagnostic(:invalid_provider_output, message)]
         )
       end
+      private_class_method :invalid_output_result
 
-      def render_owned_json_conflict_source(request, conflict)
-        marker_size = request[:conflict_marker_size].to_i
-        marker_size = 7 unless marker_size.positive?
-        key = conflict.fetch(:path).split('/').last
-        [
-          '{',
-          "#{'<' * marker_size} ours",
-          "#{JSON.generate(key)}:#{JSON.generate(conflict.fetch(:ours))}",
-          "#{'|' * marker_size} base",
-          "#{JSON.generate(key)}:#{JSON.generate(conflict.fetch(:base))}",
-          '=' * marker_size,
-          "#{JSON.generate(key)}:#{JSON.generate(conflict.fetch(:theirs))}",
-          "#{'>' * marker_size} theirs",
-          '}',
-          ''
-        ].join("\n")
+      def adapter_failure(category, message)
+        Ast::Merge::ProviderResult.build(
+          operation: :merge3,
+          success: false,
+          envelope: {
+            provider: { adapter: PACKAGE_NAME },
+            diagnostics: [diagnostic(category, message)],
+            verification: { base_participated: false }
+          }
+        )
       end
+      private_class_method :adapter_failure
 
-      def owned_json_region(conflict)
+      def diagnostic(category, message)
         {
-          owner_path: conflict.fetch(:path),
-          node_id: "json:key:#{conflict.fetch(:path).split('/').last}",
-          region_kind: 'node',
-          line_range: { start: 1, end: 1 },
-          attached_spans: [],
-          backend_id: 'tree-haver',
-          parser_identity: 'tree_sitter_language_pack',
-          can_replace: true,
-          can_line_merge: false,
-          requires_reparse: true
+          severity: :error,
+          category: category,
+          message: message,
+          blocking: true
         }
       end
+      private_class_method :diagnostic
 
-      def reparse_json_source(source)
-        Json::Merge.json_value_for_source(source)
-        true
-      rescue Json::Merge::ParseError
-        false
+      def write_result(result, ours_path, policy)
+        if missing_required_conflict_output?(result, policy)
+          result = invalid_output_result(result, 'Conflict write policy requires String conflicted_output.')
+        end
+        output = writable_output(result, policy)
+        File.binwrite(ours_path, output) if output
+        result.merge(git: git_report(result, ours_path, policy, output_written: !output.nil?))
+      rescue SystemCallError => e
+        failed = result.merge(
+          ok: false,
+          diagnostics: result.fetch(:diagnostics) + [diagnostic(:file_error, e.message)]
+        )
+        failed.merge(git: git_report(failed, ours_path, policy, output_written: false))
       end
+      private_class_method :write_result
+
+      def missing_required_conflict_output?(result, policy)
+        policy == :write &&
+          !result[:ok] &&
+          !result.fetch(:conflicts, []).empty? &&
+          !result[:conflicted_source].is_a?(String)
+      end
+      private_class_method :missing_required_conflict_output?
+
+      def writable_output(result, policy)
+        return result.fetch(:merged_source) if result[:ok]
+        return unless policy == :write
+        return if result.fetch(:conflicts, []).empty?
+
+        result[:conflicted_source]
+      end
+      private_class_method :writable_output
+
+      def git_report(result, ours_path, policy, output_written:)
+        {
+          exit_code: git_exit_code(result),
+          output_written: output_written,
+          output_path: ours_path.to_s,
+          conflict_policy: policy
+        }
+      end
+      private_class_method :git_report
 
       def normalize_request(request)
-        request.transform_keys(&:to_sym)
-      end
-
-      def merge_comment_delta(base_comment:, ours_comment:, theirs_comment:, owner_path: '/')
-        conflicts = []
-        merged_comment =
-          if ours_comment == theirs_comment
-            ours_comment
-          elsif base_comment == ours_comment
-            theirs_comment
-          elsif base_comment == theirs_comment
-            ours_comment
-          elsif ours_comment.nil?
-            conflicts << comment_conflict('delete_edit', owner_path, 'ours deleted a comment that theirs edited')
-            theirs_comment
-          elsif theirs_comment.nil?
-            conflicts << comment_conflict('delete_edit', owner_path, 'theirs deleted a comment that ours edited')
-            ours_comment
-          else
-            conflicts << comment_conflict('edit_edit', owner_path, 'comment changed differently in ours and theirs')
-            ours_comment
-          end
-
-        {
-          ok: conflicts.empty?,
-          merged_comment: conflicts.empty? ? merged_comment : nil,
-          conflicts: conflicts
-        }
-      end
-
-      def response(ok:, request:, merged_source: nil, conflicted_source: nil, conflicts: [],
-                   change_classifications: [], diagnostics: [], fallbacks: [], owned_regions: [], reparse_after_render: nil, formatting_preservation: {}, secondary_formatting_metrics: nil, render_strategy: nil)
-        {
-          ok: ok,
-          merged_source: merged_source,
-          conflicted_source: conflicted_source,
-          conflicts: conflicts,
-          change_classifications: change_classifications,
-          diagnostics: diagnostics,
-          fallbacks: fallbacks,
-          owned_regions: owned_regions,
-          profile: {
-            profile_id: request[:profile_id].to_s,
-            language: normalize_language(request),
-            dialect: request[:dialect].to_s
-          },
-          render_report: {
-            strategy: render_strategy || (request[:render_policy].to_s.empty? ? 'canonical' : request[:render_policy].to_s),
-            **render_identity(request)
-          },
-          formatting_preservation: {
-            line_diff_score: 0.0,
-            character_diff_score: 0.0
-          }.merge(formatting_preservation),
-          secondary_formatting_metrics: secondary_formatting_metrics || secondary_formatting_metrics_for(ok && merged_source),
-          default_driver_evaluation: default_driver_evaluation(
-            formatting_preservation: {
-              line_diff_score: 0.0,
-              character_diff_score: 0.0
-            }.merge(formatting_preservation),
-            reparse_after_render: reparse_after_render,
-            render_strategy: render_strategy || (request[:render_policy].to_s.empty? ? 'canonical' : request[:render_policy].to_s)
-          ),
-          reparse_after_render: reparse_after_render
-        }
-      end
-
-      def default_driver_evaluation(formatting_preservation:, reparse_after_render:, render_strategy:)
-        threshold = 0.95
-        score = (formatting_preservation.fetch(:line_diff_score) + formatting_preservation.fetch(:character_diff_score)) / 2.0
-        reparse_passed = reparse_after_render == true
-        no_full_file_rewrite = render_strategy != 'full_file_conflict_markers'
-        coherent_conflict_markers = render_strategy != 'full_file_conflict_markers'
-        blocking_reasons = []
-        blocking_reasons << 'rendered output did not reparse' unless reparse_passed
-        blocking_reasons << 'formatting score is below threshold' if score < threshold
-        blocking_reasons << 'full-file rewrite or conflict markers were used' unless no_full_file_rewrite
-        blocking_reasons << 'conflict marker placement is not syntactically coherent' unless coherent_conflict_markers
-
-        {
-          status: blocking_reasons.empty? ? 'recommended' : 'not_recommended',
-          formatting_threshold: threshold,
-          formatting_score: score,
-          hard_gates: [
-            { name: 'reparse_after_render', passed: reparse_passed, weighted: false },
-            { name: 'no_full_file_rewrite', passed: no_full_file_rewrite, weighted: false },
-            { name: 'coherent_conflict_marker_placement', passed: coherent_conflict_markers, weighted: false }
-          ],
-          blocking_reasons: blocking_reasons,
-          diagnostics: ['default-driver evaluation is advisory unless explicitly required']
-        }
-      end
-
-      def secondary_formatting_metrics_for(merged)
-        if merged
-          {
-            unchanged_line_churn: 0,
-            output_diff_size: 0,
-            source_fragment_retention: 1.0,
-            weighted: false,
-            diagnostics: ['canonical JSON has no trivia-preserving source fragments yet']
-          }
-        else
-          {
-            unchanged_line_churn: 0,
-            output_diff_size: 0,
-            source_fragment_retention: 0.0,
-            weighted: false,
-            diagnostics: ['unresolved conflict did not produce a merged source-fragment retention measurement']
-          }
+        request.transform_keys(&:to_sym).then do |normalized|
+          normalized[:family] ||= normalized.delete(:language)
+          normalized[:labels] = normalize_labels(normalized)
+          normalized
         end
       end
+      private_class_method :normalize_request
 
-      def render_identity(request)
-        case normalize_language(request)
-        when 'json'
-          { backend_id: 'tree-haver', parser_identity: 'tree_sitter_language_pack' }
-        else
-          {}
+      def normalize_labels(request)
+        labels = request.fetch(:labels, {}).transform_keys(&:to_sym)
+        labels[:base] ||= request[:base_label]
+        labels[:ours] ||= request[:ours_label]
+        labels[:theirs] ||= request[:theirs_label]
+        labels.compact
+      end
+      private_class_method :normalize_labels
+
+      def normalize_conflict_policy(policy)
+        normalized = policy.to_s.strip.to_sym
+        return normalized if CONFLICT_POLICIES.include?(normalized)
+
+        raise ArgumentError, "Unknown conflict policy: #{policy.inspect}"
+      end
+      private_class_method :normalize_conflict_policy
+
+      def command_request(argv, env)
+        unless argv.length.between?(3, 8)
+          raise ArgumentError,
+                'usage: ast-merge-git BASE OURS THEIRS [PATH [MARKER_SIZE [BASE_LABEL OURS_LABEL THEIRS_LABEL]]]'
+        end
+
+        family = env['AST_MERGE_FAMILY']
+        provider_id = env['AST_MERGE_PROVIDER']
+        if family.to_s.empty? && provider_id.to_s.empty?
+          raise ArgumentError, 'AST_MERGE_FAMILY or AST_MERGE_PROVIDER is required'
+        end
+
+        {
+          base_path: argv.fetch(0),
+          ours_path: argv.fetch(1),
+          theirs_path: argv.fetch(2),
+          path_name: argv[3],
+          conflict_marker_size: argv[4],
+          labels: { base: argv[5], ours: argv[6], theirs: argv[7] }.compact,
+          family: family,
+          provider_id: provider_id,
+          dialect: env['AST_MERGE_DIALECT'],
+          backend: env['AST_MERGE_BACKEND'],
+          profile_id: env['AST_MERGE_PROFILE'],
+          conflict_policy: env.fetch('AST_MERGE_CONFLICT_POLICY', :write)
+        }.compact
+      end
+      private_class_method :command_request
+
+      def load_provider_requirements(value)
+        value.to_s.split(',').map(&:strip).reject(&:empty?).each { |require_path| require require_path }
+      end
+      private_class_method :load_provider_requirements
+
+      def emit_diagnostics(result, stderr)
+        result.fetch(:diagnostics).each do |item|
+          stderr.puts("#{PACKAGE_NAME}: #{item[:category]}: #{item[:message]}")
         end
       end
-
-      def render_conflict_source(request, conflicts)
-        marker_size = request[:conflict_marker_size].to_i
-        marker_size = 7 unless marker_size.positive?
-        header = "/* smorg structured conflicts: #{conflicts.length} unresolved */"
-        [
-          header,
-          "#{'<' * marker_size} ours",
-          request.fetch(:ours_source),
-          "#{'|' * marker_size} base",
-          request.fetch(:base_source),
-          '=' * marker_size,
-          request.fetch(:theirs_source),
-          "#{'>' * marker_size} theirs",
-          ''
-        ].join("\n")
-      end
-
-      def comment_conflict(category, path, message)
-        {
-          conflict_id: 'comment-conflict-1',
-          category: category,
-          path: path.to_s.empty? ? '/' : path,
-          message: message
-        }
-      end
-
-      def normalize_language(request)
-        language = request[:language].to_s.strip.downcase
-        return 'json' if language == 'json'
-        return 'json' if request[:path_name].to_s.downcase.end_with?('.json')
-
-        language
-      end
+      private_class_method :emit_diagnostics
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ModuleLength
   end
 end
