@@ -45,8 +45,8 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
   it 'covers all 22 providers while advertising only tested rows' do
     matrix = described_class.new(fixture).validate!
 
-    expect(matrix.advertised_provider_ids).to eq(%w[ruby.binary ruby.json ruby.text ruby.zip])
-    expect(matrix.blocked_provider_ids.length).to eq(18)
+    expect(matrix.advertised_provider_ids).to eq(%w[ruby.binary ruby.json ruby.ruby.prism ruby.text ruby.zip])
+    expect(matrix.blocked_provider_ids.length).to eq(17)
     expect(
       matrix.tested?(
         provider_id: 'ruby.json',
@@ -57,12 +57,12 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
     ).to be(true)
     expect(
       matrix.tested?(
-        provider_id: 'ruby.ruby',
+        provider_id: 'ruby.ruby.prism',
         dialect: :ruby,
         backend: :prism,
         profile_id: :source_preserving
       )
-    ).to be(false)
+    ).to be(true)
   end
 end
 # rubocop:enable Metrics/BlockLength

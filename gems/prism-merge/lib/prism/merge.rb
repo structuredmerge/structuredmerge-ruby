@@ -62,6 +62,7 @@ module Prism
     autoload :NodeWrapper, 'prism/merge/node_wrapper'
     autoload :PartialTemplateMerger, 'prism/merge/partial_template_merger'
     autoload :PartialTemplateNode, 'prism/merge/partial_template_node'
+    autoload :Provider, 'prism/merge/provider'
     autoload :RecursiveMergePolicy, 'prism/merge/recursive_merge_policy'
     autoload :RecursiveNodeBodyMerger, 'prism/merge/recursive_node_body_merger'
     autoload :RubyDocSurfaceAnalyzer, 'prism/merge/ruby_doc_surface_analyzer'
@@ -88,6 +89,14 @@ module Prism
 
     def ruby_feature_profile
       Ruby::Merge.ruby_feature_profile
+    end
+
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!(replace: false)
+      Ast::Merge.register_provider(merge_provider, replace: replace)
     end
 
     def available_ruby_backends
@@ -1333,6 +1342,7 @@ module Prism
 end
 
 Prism::Merge.register_backend!
+Prism::Merge.register_provider!
 
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(

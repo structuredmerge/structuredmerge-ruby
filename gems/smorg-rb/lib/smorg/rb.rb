@@ -12,6 +12,7 @@ require 'kettle/jem'
 require 'kettle/jem/tasks/install_task'
 require 'markly/merge'
 require 'plain-merge'
+require 'prism/merge'
 require_relative 'rb/version'
 
 module Smorg
@@ -640,7 +641,8 @@ module Smorg
         '*.jsonc merge=smorg-rb diff=smorg-rb smorg.language=jsonc',
         '*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5',
         '*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown',
-        '*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown'
+        '*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown',
+        '*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby'
       ].each { |line| stdout.puts(line) }
       EXIT_SUCCESS
     end
@@ -666,6 +668,21 @@ module Smorg
         )
       when 'markdown'
         merge_markdown(ancestor_source, current_source, other_source)
+      when 'ruby'
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            family: 'ruby',
+            dialect: 'ruby',
+            backend: 'prism',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
       when 'text'
         merge3_result(
           Ast::Merge::Git.merge3(
@@ -869,6 +886,8 @@ module Smorg
         'json5'
       when 'markdown', 'md', 'gfm', 'text/markdown'
         'markdown'
+      when 'ruby', 'rb', 'application/x-ruby'
+        'ruby'
       when 'plain', 'text', 'plaintext', 'text/plain'
         'text'
       else

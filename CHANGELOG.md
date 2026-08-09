@@ -36,6 +36,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add safety-first base-aware providers for opaque binary and ZIP documents, including exact byte preservation, marker-free conflict reporting, ZIP input validation, and installed Git-driver coverage.
 
+- Add a genuinely base-aware Prism Ruby provider with exact top-level owner fragments, conservative localized conflicts, semantic reparse verification, shared conformance, and installed Git-driver coverage.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
@@ -51,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Route smorg-rb JSON, JSONC, and JSON5 merge-driver operations through the base-aware json-merge provider and preserve provider conflicts, fallbacks, verification, and metadata in reports.
 
 - Route smorg-rb plain-text merge-driver operations through the base-aware text provider instead of a two-way merge that ignored the ancestor.
+
+- Route smorg-rb Ruby merge-driver operations through the base-aware Prism provider and advertise the tested Ruby selector in generated attributes.
 
 ### Security
 

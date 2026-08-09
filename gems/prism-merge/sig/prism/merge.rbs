@@ -1,5 +1,18 @@
 module Prism
   module Merge
+    class Provider
+      def provider_id: () -> String
+      def family: () -> String
+      def capabilities: () -> Ast::Merge::provider_capabilities
+      def analyze: (Ast::Merge::provider_request request) -> Ast::Merge::provider_result
+      def diff2: (Ast::Merge::provider_request request) -> Ast::Merge::provider_result
+      def merge2: (Ast::Merge::provider_request request) -> Ast::Merge::provider_result
+      def merge3: (Ast::Merge::provider_request request) -> Ast::Merge::provider_result
+    end
+
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> Ast::Merge::_MergeProvider
+
     module Version
       VERSION: String
     end

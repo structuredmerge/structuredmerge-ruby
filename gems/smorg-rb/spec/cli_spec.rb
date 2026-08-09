@@ -209,6 +209,24 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
+    expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
+  end
+
+  it 'routes Ruby paths through the base-aware Prism provider' do
+    ancestor = write_file(@dir, 'ancestor.rb', "VALUE = 0\n")
+    current = write_file(@dir, 'current.rb', "VALUE = 0\nOURS = 1\n")
+    other = write_file(@dir, 'other.rb', "VALUE = 0\nTHEIRS = 2\n")
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(
+      ['merge-driver', '--path-name', 'example.rb', ancestor, current, other],
+      stdout: stdout,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("VALUE = 0\nOURS = 1\nTHEIRS = 2\n")
   end
 
   it 'falls back from unsupported structured file types instead of failing closed' do
