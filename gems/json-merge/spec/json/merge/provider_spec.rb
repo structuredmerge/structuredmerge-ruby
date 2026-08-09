@@ -197,9 +197,31 @@ RSpec.describe Json::Merge::Provider do
     expect(result.fetch(:conflicts)).to contain_exactly(
       hash_including(category: :edit_edit, path: '/value')
     )
+    expect(result.fetch(:changes)).to contain_exactly(
+      path: '/value',
+      ours: :edited,
+      theirs: :edited
+    )
     expect(result.dig(:render_report, :strategy)).to eq(:full_file_conflict)
     expect(result.fetch(:fallbacks)).to contain_exactly(
       hash_including(to: :full_file_conflict, reason: :owner_not_whole_line_addressable)
+    )
+  end
+
+  it 'synthesizes explicit line boundaries for conflict sources without final newlines' do
+    result = provider.merge3(
+      base_source: '{"value":0}',
+      ours_source: '{"value":1}',
+      theirs_source: '{"value":2}',
+      dialect: :json
+    )
+
+    expect(result).to include(ok: false, operation: :merge3)
+    expect(result.fetch(:conflicted_output)).to include(
+      "<<<<<<< ours\n{\"value\":1}\n||||||| base\n{\"value\":0}\n"
+    )
+    expect(result.dig(:render_report, :synthesized_fragments)).to include(
+      hash_including(reason: :conflict_line_boundary, conflict_side: :ours)
     )
   end
 

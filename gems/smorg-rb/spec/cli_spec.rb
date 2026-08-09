@@ -335,7 +335,7 @@ RSpec.describe Smorg::RB do
     expect(stderr.string).to include('merge_conflict')
   end
 
-  it 'includes owned-region placement in merge-driver reports' do
+  it 'reports an explicit full-file fallback when an owner shares a source line' do
     ancestor = write_file(@dir, 'ancestor.json', '{"name":"demo","enabled":true}')
     current = write_file(@dir, 'current.json', '{"name":"demo","enabled":false}')
     other = write_file(@dir, 'other.json', '{"name":"demo","enabled":"yes"}')
@@ -350,7 +350,7 @@ RSpec.describe Smorg::RB do
 
     expect(exit_code).to eq(described_class::EXIT_UNRESOLVED_CONFLICT)
     report = JSON.parse(File.read(report_path))
-    expect(report.dig('render_report', 'strategy')).to eq('owned_region_conflict_markers')
+    expect(report.dig('render_report', 'strategy')).to eq('full_file_conflict')
     expect(report.fetch('change_classifications')).to eq(
       [
         {
@@ -360,12 +360,17 @@ RSpec.describe Smorg::RB do
         }
       ]
     )
-    expect(report.dig('owned_regions', 0, 'owner_path')).to eq('/enabled')
-    expect(report.dig('owned_regions', 0, 'region_kind')).to eq('node')
-    expect(report.dig('profile', 'profile_id')).to eq('json.keyed-object')
-    expect(report.dig('profile', 'language')).to eq('json')
-    expect(report.dig('formatting_preservation', 'line_diff_score')).not_to be_nil
-    expect(report.dig('default_driver_evaluation', 'status')).to be_a(String)
+    expect(report.fetch('owned_regions')).to be_empty
+    expect(report.fetch('fallbacks')).to include(
+      hash_including(
+        'to' => 'full_file_conflict',
+        'reason' => 'owner_not_whole_line_addressable'
+      )
+    )
+    expect(report.dig('profile', 'profile_id')).to eq('source_preserving')
+    expect(report.dig('verification', 'base_participated')).to be(true)
+    expect(report.dig('provider', 'family')).to eq('json')
+    expect(report.dig('provider', 'dialect')).to eq('json')
   end
 
   it 'conforms to the git-driver JSON integration fixture in a repository' do

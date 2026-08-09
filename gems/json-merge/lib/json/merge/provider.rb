@@ -499,9 +499,9 @@ module Json
           [
             Ast::Merge::SourceRender::ConflictFragment.new(
               conflict_id: decision.conflicts.first.fetch(:conflict_id),
-              base: [source_fragment(:base, request.fetch(:base_source))],
-              ours: [source_fragment(:ours, request.fetch(:ours_source))],
-              theirs: [source_fragment(:theirs, request.fetch(:theirs_source))],
+              base: [conflict_source_fragment(:base, request.fetch(:base_source))],
+              ours: [conflict_source_fragment(:ours, request.fetch(:ours_source))],
+              theirs: [conflict_source_fragment(:theirs, request.fetch(:theirs_source))],
               labels: request.fetch(:labels, {}),
               marker_size: request.fetch(:conflict_marker_size, 7),
               metadata: { conflicts: decision.conflicts.map { |conflict| conflict[:conflict_id] } }
@@ -529,6 +529,7 @@ module Json
           request,
           category: :merge_conflict,
           message: "#{decision.conflicts.length} unresolved JSON merge conflict(s).",
+          changes: decision.changes,
           conflicts: decision.conflicts,
           fallbacks: fallbacks,
           conflicted_output: rendered.content,
@@ -558,6 +559,17 @@ module Json
           start_line: 1,
           end_line: line_count,
           metadata: { source_role: role }
+        )
+      end
+
+      def conflict_source_fragment(role, source)
+        return source_fragment(role, source) if source.end_with?("\n")
+
+        Ast::Merge::SourceRender::SynthesizedFragment.new(
+          content: "#{source}\n",
+          reason: :conflict_line_boundary,
+          producer: provider_id,
+          metadata: { source_role: role, copied_source: true }
         )
       end
 
@@ -601,7 +613,9 @@ module Json
         )
       end
 
-      def failure(operation, request, category:, message:, conflicts: [], fallbacks: [], render_report: {}, **payload)
+      def failure(
+        operation, request, category:, message:, changes: [], conflicts: [], fallbacks: [], render_report: {}, **payload
+      )
         Ast::Merge::ProviderResult.build(
           operation: operation,
           success: false,
@@ -609,6 +623,7 @@ module Json
             provider: provider_metadata(request),
             profile: profile_metadata(request),
             diagnostics: [{ category: category, severity: :error, message: message, blocking: true }],
+            changes: changes,
             conflicts: conflicts,
             fallbacks: fallbacks,
             render_report: render_report,

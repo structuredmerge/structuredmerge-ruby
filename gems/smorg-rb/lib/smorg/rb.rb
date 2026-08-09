@@ -438,7 +438,8 @@ module Smorg
         path_name: path_name,
         ok: ok,
         exit_code: exit_code,
-        fallbacks: fallbacks,
+        fallbacks: result.fetch(:fallbacks, []) + fallbacks,
+        conflicts: result.fetch(:conflicts, []),
         change_classifications: result.fetch(:change_classifications, []),
         owned_regions: result.fetch(:owned_regions, []),
         render_report: result[:render_report],
@@ -447,6 +448,8 @@ module Smorg
         secondary_formatting_metrics: result[:secondary_formatting_metrics],
         default_driver_evaluation: result[:default_driver_evaluation],
         profile: result[:profile],
+        provider: result[:provider],
+        verification: result[:verification],
         diagnostics: result.fetch(:diagnostics, [])
       }
       File.write(report_path, "#{JSON.pretty_generate(Ast::Merge.json_ready(report))}\n")
@@ -647,25 +650,20 @@ module Smorg
       case normalize_language(language, path_name)
       when 'go'
         Go::Merge.merge_go(other_source, current_source, 'go')
-      when 'json'
+      when 'json', 'jsonc', 'json5'
         merge3_result(
           Ast::Merge::Git.merge3(
             base_source: ancestor_source,
             ours_source: current_source,
             theirs_source: other_source,
             path_name: path_name,
-            language: 'json',
-            dialect: 'json',
-            profile_id: 'json.keyed-object',
+            family: 'json',
+            dialect: normalize_language(language, path_name),
+            profile_id: 'source_preserving',
             fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size,
-            render_policy: 'canonical'
+            conflict_marker_size: conflict_marker_size
           )
         )
-      when 'jsonc'
-        Json::Merge.merge_json(other_source, current_source, 'jsonc')
-      when 'json5'
-        Json::Merge.merge_json(other_source, current_source, 'json5')
       when 'markdown'
         merge_markdown(ancestor_source, current_source, other_source)
       when 'text'
@@ -807,10 +805,10 @@ module Smorg
     def merge3_result(result)
       merge3_report_fields = {
         change_classifications: result.fetch(:change_classifications, []),
-        reparse_after_render: result[:reparse_after_render],
-        formatting_preservation: result[:formatting_preservation],
-        secondary_formatting_metrics: result[:secondary_formatting_metrics],
-        default_driver_evaluation: result[:default_driver_evaluation]
+        conflicts: result.fetch(:conflicts, []),
+        fallbacks: result.fetch(:fallbacks, []),
+        provider: result.fetch(:provider, {}),
+        verification: result.fetch(:verification, {})
       }
       if result[:ok] && result[:merged_source]
         {

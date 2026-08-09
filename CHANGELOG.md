@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Route smorg-rb JSON, JSONC, and JSON5 merge-driver operations through the base-aware json-merge provider and preserve provider conflicts, fallbacks, verification, and metadata in reports.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
