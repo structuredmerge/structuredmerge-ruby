@@ -10,6 +10,16 @@ module Json
       def merge3: (Ast::Merge::provider_request request) -> Ast::Merge::provider_result
     end
 
+    class SourceLocator
+      class Range < Data
+        attr_reader start_line: Integer
+        attr_reader end_line: Integer
+      end
+
+      def initialize: (String source, dialect: Symbol, ?backend: String | Symbol?) -> void
+      def pair_range: (String path) -> Range?
+    end
+
     def self.merge_provider: () -> Provider
     def self.register_provider!: (?replace: bool) -> Ast::Merge::_MergeProvider
 

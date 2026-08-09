@@ -39,6 +39,19 @@ RSpec.describe Json::Merge::Provider do
     )
   end
 
+  it 'registers as the JSON-family workflow provider after dialect conformance loads' do
+    Json::Merge.register_provider!(replace: true)
+    resolved = Ast::Merge.resolve_provider(
+      family: :json,
+      operation: :merge3,
+      dialect: :json5,
+      backend: provider.capabilities.fetch(:backends).first,
+      profile_id: :source_preserving
+    )
+
+    expect(resolved).to equal(Json::Merge.merge_provider)
+  end
+
   it 'analyzes a selected JSON-family dialect' do
     result = provider.analyze(source: "// retained\n{\"value\": true,}\n", dialect: :jsonc)
 
@@ -131,6 +144,41 @@ RSpec.describe Json::Merge::Provider do
     expect(result.dig(:verification, :semantic_match)).to be(true)
   end
 
+  it 'falls back to exact owner replacement when two-way synthesis would restore a three-way deletion' do
+    result = provider.merge3(
+      base_source: "{\n  \"remove\": true,\n  \"value\": 0\n}\n",
+      ours_source: "{\n  \"value\": 0\n}\n",
+      theirs_source: "{\n  \"remove\": true,\n  \"value\": 1\n}\n",
+      dialect: :json
+    )
+
+    expect(result).to include(ok: true, operation: :merge3)
+    expect(result.fetch(:output)).to eq("{\n  \"value\": 1\n}\n")
+    expect(result.dig(:render_report, :strategy)).to eq(:exact_owner_composite)
+    expect(result.fetch(:fallbacks)).to contain_exactly(
+      hash_including(from: :family_composite, to: :exact_owner_composite)
+    )
+    expect(result.dig(:verification, :semantic_match)).to be(true)
+  end
+
+  it 'preserves JSON5 key, quote, comment, and trailing-comma syntax' do
+    result = provider.merge3(
+      base_source: "{\n  stable: 'base',\n}\n",
+      ours_source: "{\n  // ours retained\n  stable: 'base',\n  ours: 'left',\n}\n",
+      theirs_source: "{\n  stable: 'base',\n  theirs: 'right',\n}\n",
+      dialect: :json5
+    )
+
+    expect(result).to include(ok: true, operation: :merge3)
+    expect(result.fetch(:output)).to include(
+      '// ours retained',
+      "stable: 'base'",
+      "ours: 'left'",
+      "theirs: 'right'"
+    )
+    expect(result.dig(:verification, :semantic_match)).to be(true)
+  end
+
   it 'returns explicit full-file conflicts with source provenance' do
     result = provider.merge3(
       base_source: "{\"value\": 0}\n",
@@ -148,6 +196,47 @@ RSpec.describe Json::Merge::Provider do
     )
     expect(result.fetch(:conflicts)).to contain_exactly(
       hash_including(category: :edit_edit, path: '/value')
+    )
+    expect(result.dig(:render_report, :strategy)).to eq(:full_file_conflict)
+    expect(result.fetch(:fallbacks)).to contain_exactly(
+      hash_including(to: :full_file_conflict, reason: :owner_not_whole_line_addressable)
+    )
+  end
+
+  it 'localizes conflicts to whole-line object-pair owners' do
+    result = provider.merge3(
+      base_source: "{\n  \"stable\": true,\n  \"value\": 0\n}\n",
+      ours_source: "{\n  \"stable\": true,\n  \"value\": 1\n}\n",
+      theirs_source: "{\n  \"stable\": true,\n  \"value\": 2\n}\n",
+      dialect: :json
+    )
+
+    expect(result).to include(ok: false, operation: :merge3)
+    expect(result.fetch(:conflicted_output)).to start_with("{\n  \"stable\": true,\n<<<<<<< ours\n")
+    expect(result.fetch(:conflicted_output)).to end_with(">>>>>>> theirs\n}\n")
+    expect(result.dig(:render_report, :strategy)).to eq(:owner_localized_conflict)
+    expect(result.dig(:render_report, :conflicts, 0, :metadata)).to include(path: '/value')
+  end
+
+  it 'localizes delete/edit conflicts with an explicit empty side' do
+    result = provider.merge3(
+      base_source: "{\n  \"value\": 0,\n  \"stable\": true\n}\n",
+      ours_source: "{\n  \"stable\": true,\n  \"ours\": 1\n}\n",
+      theirs_source: "{\n  \"value\": 2,\n  \"stable\": true\n}\n",
+      dialect: :json
+    )
+
+    expect(result).to include(ok: false, operation: :merge3)
+    expect(result.fetch(:conflicted_output)).to include(
+      "<<<<<<< ours\n||||||| base\n  \"value\": 0,\n=======\n  \"value\": 2,\n>>>>>>> theirs\n"
+    )
+    expect(result.fetch(:conflicted_output)).to include('"ours": 1')
+    expect(result.dig(:render_report, :strategy)).to eq(:synthesized_owner_localized_conflict)
+    expect(result.fetch(:fallbacks)).to contain_exactly(
+      hash_including(to: :synthesized_conflict_context, reason: :missing_side_owner)
+    )
+    expect(result.fetch(:conflicts)).to contain_exactly(
+      hash_including(category: :delete_edit, path: '/value')
     )
   end
 

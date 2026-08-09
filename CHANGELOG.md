@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an explicit json-merge provider for portable analyze, diff2, merge2, and base-aware merge3 dispatch across JSON, JSONC, and JSON5.
 
+- Localize JSON-family three-way conflicts to structural owner lines when possible, with semantically verified synthesized context and explicit fallback provenance.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

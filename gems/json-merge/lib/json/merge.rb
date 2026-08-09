@@ -39,6 +39,7 @@ module Json
     autoload :SmartMerger, 'json/merge/smart_merger'
     autoload :ObjectMatchRefiner, 'json/merge/object_match_refiner'
     autoload :Provider, 'json/merge/provider'
+    autoload :SourceLocator, 'json/merge/source_locator'
     autoload :ThreeWayDecision, 'json/merge/three_way_decision'
 
     class << self
@@ -520,6 +521,7 @@ module Json
 end
 
 Json::Merge.register_backend!
+Json::Merge.register_provider!
 
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(
