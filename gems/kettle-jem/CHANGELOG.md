@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Template generated projects now receive kettle-changelog as a development dependency; kettle-changelog itself is excluded to avoid a self-dependency.
+
 ### Changed
 
 - Align generated compatibility workflows with the Ruby 4.0 runtime floor by excluding unsupported TruffleRuby targets

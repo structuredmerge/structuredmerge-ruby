@@ -678,6 +678,11 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(facts.dig(:rubygems, :namespace)).to eq("Warden::OAuth")
       expect(facts.dig(:rubygems, :namespace)).not_to eq("WardenOauth")
       expect(tokens.fetch("KJ|NAMESPACE_SHIELD")).to eq("Warden::OAuth")
+      expect(tokens.fetch("KJ|KETTLE_CHANGELOG_DEV_DEPENDENCY")).to include('spec.add_development_dependency("kettle-changelog"')
+
+      facts[:package][:name] = "kettle-changelog"
+      self_tokens = described_class.send(:template_tokens, facts, {})
+      expect(self_tokens.fetch("KJ|KETTLE_CHANGELOG_DEV_DEPENDENCY")).to eq("")
     end
   end
 

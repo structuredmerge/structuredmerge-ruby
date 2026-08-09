@@ -439,6 +439,7 @@ module Kettle
       KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MIN_DIVERGENCE_THRESHOLD
       KJ|MIN_RUBY
+      KJ|KETTLE_CHANGELOG_DEV_DEPENDENCY
       KJ|OPENCOLLECTIVE_ORG
       KJ|README:COPYRIGHT_NOTICE
       KJ|README:CORPORATE_SPONSORS
@@ -13836,6 +13837,10 @@ module Kettle
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
         "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
+        "KJ|KETTLE_CHANGELOG_DEV_DEPENDENCY" => kettle_changelog_development_dependency_token(
+          package.fetch(:name).to_s,
+          facts.dig(:project_runtime, :test_min_ruby).to_s
+        ),
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
         "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
       }.merge(
@@ -13872,6 +13877,12 @@ module Kettle
       tokens.merge!(shim_template_tokens(facts.fetch(:shim, {})))
 
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
+    end
+
+    def kettle_changelog_development_dependency_token(package_name, min_test_ruby)
+      return "" if package_name == "kettle-changelog"
+
+      %(  spec.add_development_dependency("kettle-changelog", "~> 0.1", ">= 0.1.0")       # ruby >= #{min_test_ruby})
     end
 
     def readme_title_token(package, rubygems)
