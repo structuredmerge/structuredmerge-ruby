@@ -210,6 +210,31 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
+    expect(stdout.string).to include('*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
+    expect(stdout.string).to include('.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
+  end
+
+  it 'routes dotenv paths through the base-aware dotenv provider' do
+    ancestor = write_file(@dir, 'ancestor.env', "SHARED=1\n")
+    current = write_file(@dir, 'current.env', "SHARED=1\nOURS=left\n")
+    other = write_file(@dir, 'other.env', "SHARED=1\nTHEIRS=right\n")
+    stdout = StringIO.new
+    stderr = StringIO.new
+    report_path = File.join(@dir, 'dotenv-report.json')
+
+    exit_code = described_class.run(
+      ['merge-driver', '--path-name', '.env', '--report', report_path, ancestor, current, other],
+      stdout: stdout,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("SHARED=1\nOURS=left\nTHEIRS=right\n")
+    report = JSON.parse(File.read(report_path))
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.dotenv')
+    expect(report.dig('provider', 'backend')).to eq('dotenv-line')
+    expect(report.dig('profile', 'profile_id')).to eq('source_preserving')
+    expect(report.dig('render_report', 'strategy')).to eq('exact_assignment_composite')
   end
 
   it 'routes Ruby paths through the base-aware Prism provider' do

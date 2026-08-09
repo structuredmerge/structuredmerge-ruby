@@ -254,6 +254,35 @@ RSpec.describe 'ast-merge-git executable' do
     expect(repository.join(path).binread).to eq("VALUE = 0\nOURS = 1\nTHEIRS = 2\n")
   end
 
+  it 'runs the dotenv provider through the installed Git-driver path' do
+    base = "SHARED=1\n"
+    ours = "SHARED=1\nOURS=left\n"
+    theirs = "SHARED=1\nTHEIRS=right\n"
+    path = configure_opaque_repository(
+      extension: 'env',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'dotenv/merge',
+      family: 'dotenv',
+      dialect: 'dotenv',
+      backend: 'dotenv-line',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq("SHARED=1\nOURS=left\nTHEIRS=right\n")
+  end
+
   it 'reports an opaque binary conflict without changing ours bytes' do
     ours = "\x00ours\xFF".b
     path = configure_opaque_repository(

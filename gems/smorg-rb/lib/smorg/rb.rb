@@ -6,6 +6,7 @@ require 'ast/merge'
 require 'ast-merge-git'
 require 'diff/lcs'
 require 'diff/lcs/hunk'
+require 'dotenv/merge'
 require 'json'
 require 'json-merge'
 require 'kettle/jem'
@@ -637,6 +638,9 @@ module Smorg
 
       [
         '*.go merge=smorg-rb diff=smorg-rb smorg.language=go',
+        '*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
+        '.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
+        '.env.* merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
         '*.json merge=smorg-rb diff=smorg-rb smorg.language=json',
         '*.jsonc merge=smorg-rb diff=smorg-rb smorg.language=jsonc',
         '*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5',
@@ -652,6 +656,21 @@ module Smorg
       case normalize_language(language, path_name)
       when 'go'
         Go::Merge.merge_go(other_source, current_source, 'go')
+      when 'dotenv'
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            family: 'dotenv',
+            dialect: 'dotenv',
+            backend: 'dotenv-line',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
       when 'json', 'jsonc', 'json5'
         merge3_result(
           Ast::Merge::Git.merge3(
@@ -878,6 +897,8 @@ module Smorg
       case language.to_s.strip.downcase
       when 'go', 'golang'
         'go'
+      when 'dotenv', 'env', 'config-env'
+        'dotenv'
       when 'json'
         'json'
       when 'jsonc', 'json with comments'

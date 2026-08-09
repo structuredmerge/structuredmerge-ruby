@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a genuinely base-aware Prism Ruby provider with exact top-level owner fragments, conservative localized conflicts, semantic reparse verification, shared conformance, and installed Git-driver coverage.
 
+- Add a source-preserving, base-aware dotenv provider with exact assignment composites, conservative ambiguity handling, localized conflicts, Git-driver coverage, and smorg-rb routing.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

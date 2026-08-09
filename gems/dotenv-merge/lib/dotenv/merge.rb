@@ -69,12 +69,24 @@ module Dotenv
     autoload :FreezeNode, 'dotenv/merge/freeze_node'
     autoload :FileAnalysis, 'dotenv/merge/file_analysis'
     autoload :MergeResult, 'dotenv/merge/merge_result'
+    autoload :Provider, 'dotenv/merge/provider'
     autoload :SmartMerger, 'dotenv/merge/smart_merger'
+
+    module_function
+
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!(replace: false)
+      Ast::Merge.register_provider(merge_provider, replace: replace)
+    end
   end
 end
 
 require_relative 'merge/backend'
 Dotenv::Merge.register_backend!
+Dotenv::Merge.register_provider!
 
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)

@@ -29,7 +29,7 @@ module Dotenv
       DEFAULT_FREEZE_TOKEN = 'dotenv-merge'
 
       # @return [CommentTracker] Comment tracker for this file
-      attr_reader :comment_tracker
+      attr_reader :comment_tracker, :structural_diagnostics
 
       # Initialize file analysis with dotenv parser
       #
@@ -41,6 +41,7 @@ module Dotenv
         @source = source
         @freeze_token = freeze_token
         @signature_generator = signature_generator
+        @structural_diagnostics = []
         # **options captures any additional parameters (e.g., node_typing) for forward compatibility
 
         # Parse all lines
@@ -285,6 +286,11 @@ module Dotenv
           case marker[:type]
           when :freeze
             if open_marker
+              @structural_diagnostics << {
+                category: :freeze_ambiguity,
+                line: marker[:line],
+                message: 'Nested freeze marker'
+              }.freeze
               DebugLogger.warning("Nested freeze block at line #{marker[:line]}, ignoring")
             else
               open_marker = marker
@@ -299,12 +305,24 @@ module Dotenv
               )
               open_marker = nil
             else
+              @structural_diagnostics << {
+                category: :freeze_ambiguity,
+                line: marker[:line],
+                message: 'Unfreeze marker without matching freeze marker'
+              }.freeze
               DebugLogger.warning("Unfreeze without freeze at line #{marker[:line]}, ignoring")
             end
           end
         end
 
-        DebugLogger.warning("Unclosed freeze block starting at line #{open_marker[:line]}") if open_marker
+        if open_marker
+          @structural_diagnostics << {
+            category: :freeze_ambiguity,
+            line: open_marker[:line],
+            message: 'Unclosed freeze marker'
+          }.freeze
+          DebugLogger.warning("Unclosed freeze block starting at line #{open_marker[:line]}")
+        end
 
         blocks
       end
