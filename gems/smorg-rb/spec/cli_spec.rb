@@ -237,6 +237,8 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.go merge=smorg-rb diff=smorg-rb smorg.language=go')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
     expect(stdout.string).to include('*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs')
+    expect(stdout.string).to include('*.ts merge=smorg-rb diff=smorg-rb smorg.language=typescript')
+    expect(stdout.string).to include('*.tsx merge=smorg-rb diff=smorg-rb smorg.language=tsx')
     expect(stdout.string).to include('*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.yaml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
@@ -268,6 +270,40 @@ RSpec.describe Smorg::RB do
     expect(report.dig('provider', 'provider_id')).to eq('ruby.go')
     expect(report.dig('provider', 'backend')).to eq('kreuzberg-language-pack')
     expect(report.dig('verification', 'base_participated')).to be(true)
+  end
+
+  it 'routes TypeScript and TSX paths only through the exact base-aware provider' do
+    %w[ts tsx].each do |extension|
+      ancestor = write_file(@dir, "ancestor.#{extension}", "export function obsolete() {}\nexport function stable() {}\n")
+      current = write_file(
+        @dir,
+        "current-#{extension}.tmp",
+        "export function obsolete() {}\nexport function stable() {}\nexport function ours() {}\n"
+      )
+      other = write_file(
+        @dir,
+        "other-#{extension}.tmp",
+        "export function stable() {}\nexport function theirs() {}\n"
+      )
+      report_path = File.join(@dir, "typescript-#{extension}-report.json")
+      stderr = StringIO.new
+
+      expect(TypeScript::Merge).not_to receive(:merge_type_script)
+      exit_code = described_class.run(
+        ['merge-driver', '--report', report_path, '--path-name', "example.#{extension}", ancestor, current, other],
+        stdout: StringIO.new,
+        stderr: stderr
+      )
+
+      expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+      expect(File.read(current)).to eq(
+        "export function stable() {}\nexport function ours() {}\nexport function theirs() {}\n"
+      )
+      report = JSON.parse(File.read(report_path))
+      expect(report.dig('provider', 'provider_id')).to eq('ruby.typescript')
+      expect(report.dig('provider', 'dialect')).to eq(extension == 'tsx' ? 'tsx' : 'typescript')
+      expect(report.dig('verification', 'base_participated')).to be(true)
+    end
   end
 
   it 'routes dotenv paths through the base-aware dotenv provider' do

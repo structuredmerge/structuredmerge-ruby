@@ -40,7 +40,7 @@ RSpec.describe TypeScript::Merge do
     backend_profiles = read_json(fixtures_root.join('diagnostics', 'slice-122-source-family-backend-feature-profiles',
                                                     'typescript-backend-feature-profiles.json'))
     expect(json_ready(described_class.type_script_backend_feature_profile)).to eq(
-      json_ready(backend_profiles[:tree_sitter].merge(family: 'typescript', supported_dialects: ['typescript']))
+      json_ready(backend_profiles[:tree_sitter].merge(family: 'typescript', supported_dialects: %w[typescript tsx]))
     )
 
     plan_contexts = read_json(fixtures_root.join('diagnostics', 'slice-123-source-family-plan-contexts',

@@ -7,6 +7,7 @@ require 'open3'
 require 'psych'
 require 'rbs/merge'
 require 'go/merge'
+require 'typescript/merge'
 require 'shellwords'
 require 'zip/merge'
 
@@ -323,6 +324,36 @@ RSpec.describe 'ast-merge-git executable' do
     expect(baseline_output).to include('<<<<<<< baseline-ours.json')
     expect(status.exitstatus).to eq(0), stderr
     expect(repository.join(path).binread).to eq("#{base}func Ours() {}\nfunc Theirs() {}\n")
+  end
+
+  it 'runs the exact TypeScript selector where baseline text merge conflicts' do
+    base = "export function shared() {}\n"
+    ours = "#{base}export function ours() {}\n"
+    theirs = "#{base}export function theirs() {}\n"
+    path = configure_opaque_repository(
+      extension: 'ts',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'typescript/merge',
+      provider_id: 'ruby.typescript',
+      family: 'typescript',
+      dialect: 'typescript',
+      backend: 'kreuzberg-language-pack',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq("#{base}export function ours() {}\nexport function theirs() {}\n")
   end
 
   it 'runs the dotenv provider through the installed Git-driver path' do

@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the source-preserving ruby.go workflow provider with native Go AST ownership, conservative base-aware merges, exact source provenance, smorg-rb routing, and installed Git-driver coverage.
 
+- Add and promote the ruby.typescript source-preserving provider for TypeScript/TSX, including smorg-rb and real Git-driver routing.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

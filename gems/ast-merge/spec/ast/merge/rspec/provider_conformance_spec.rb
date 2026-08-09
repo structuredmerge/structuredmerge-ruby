@@ -47,9 +47,9 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
 
     expect(matrix.advertised_provider_ids).to eq(
       %w[ruby.binary ruby.dotenv ruby.go ruby.json ruby.rbs ruby.ruby ruby.ruby.prism ruby.text ruby.toml ruby.toml.citrus ruby.toml.parslet
-         ruby.yaml ruby.yaml.psych ruby.zip]
+         ruby.typescript ruby.yaml ruby.yaml.psych ruby.zip]
     )
-    expect(matrix.blocked_provider_ids.length).to eq(8)
+    expect(matrix.blocked_provider_ids.length).to eq(7)
     expect(
       matrix.tested?(
         provider_id: 'ruby.go',
@@ -58,6 +58,16 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
         profile_id: :source_preserving
       )
     ).to be(true)
+    %i[typescript tsx].each do |dialect|
+      expect(
+        matrix.tested?(
+          provider_id: 'ruby.typescript',
+          dialect: dialect,
+          backend: :'kreuzberg-language-pack',
+          profile_id: :source_preserving
+        )
+      ).to be(true)
+    end
     expect(
       matrix.tested?(
         provider_id: 'ruby.rbs',

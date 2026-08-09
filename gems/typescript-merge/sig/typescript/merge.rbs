@@ -1,5 +1,51 @@
 module TypeScript
   module Merge
+    class NodeWrapper
+      DECLARATION_TYPES: Array[String]
+      NAMED_DECLARATIONS: Hash[String, [Symbol, Array[String]]]
+
+      attr_reader node: untyped
+      attr_reader source: String
+      attr_reader leading_comments: Array[untyped]
+      attr_reader trailing_comments: Array[untyped]
+
+      def initialize: (untyped node, source: String, ?leading_comments: Array[untyped]) -> void
+      def signature: () -> Array[untyped]
+      def membership_signature: () -> Array[untyped]
+      def grouped?: () -> bool
+      def start_byte: () -> Integer
+      def end_byte: () -> Integer
+      def start_line: () -> Integer
+      def end_line: () -> Integer
+      def source_text: () -> String
+      def semantic_tree: () -> Array[untyped]
+      def attach_trailing_comment!: (untyped comment) -> untyped
+    end
+
+    class FileAnalysis
+      attr_reader source: String
+      attr_reader root_node: untyped
+      attr_reader declarations: Array[NodeWrapper]
+      attr_reader errors: Array[StandardError]
+      attr_reader backend: Symbol
+      attr_reader dialect: Symbol
+
+      def initialize: (String source, ?dialect: Symbol) -> void
+    end
+
+    class Provider
+      def provider_id: () -> String
+      def family: () -> String
+      def capabilities: () -> Hash[Symbol, untyped]
+      def analyze: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def diff2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge3: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+    end
+
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> untyped
+
     module Version
       VERSION: String
     end

@@ -16,6 +16,7 @@ require 'plain-merge'
 require 'rbs/merge'
 require 'ruby/merge'
 require 'toml/merge'
+require 'typescript/merge'
 require 'yaml/merge'
 require_relative 'rb/version'
 
@@ -652,6 +653,8 @@ module Smorg
         '*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby',
         '*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs',
         '*.toml merge=smorg-rb diff=smorg-rb smorg.language=toml',
+        '*.ts merge=smorg-rb diff=smorg-rb smorg.language=typescript',
+        '*.tsx merge=smorg-rb diff=smorg-rb smorg.language=tsx',
         '*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml',
         '*.yaml merge=smorg-rb diff=smorg-rb smorg.language=yaml'
       ].each { |line| stdout.puts(line) }
@@ -750,6 +753,23 @@ module Smorg
             provider_id: 'ruby.toml',
             family: 'toml',
             dialect: 'toml',
+            backend: 'kreuzberg-language-pack',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
+      when 'typescript', 'tsx'
+        dialect = normalize_language(language, path_name)
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.typescript',
+            family: 'typescript',
+            dialect: dialect,
             backend: 'kreuzberg-language-pack',
             profile_id: 'source_preserving',
             fallback_policy: fallback_policy,
@@ -965,6 +985,8 @@ module Smorg
 
     def normalize_language(language, path_name)
       return 'go' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.go'
+      return 'typescript' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.ts'
+      return 'tsx' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.tsx'
 
       case language.to_s.strip.downcase
       when 'go', 'golang'
@@ -985,6 +1007,10 @@ module Smorg
         'rbs'
       when 'toml', 'application/toml'
         'toml'
+      when 'typescript', 'ts', 'application/typescript', 'text/typescript'
+        'typescript'
+      when 'tsx', 'typescriptreact'
+        'tsx'
       when 'yaml', 'yml', 'application/yaml', 'text/yaml'
         'yaml'
       when 'plain', 'text', 'plaintext', 'text/plain'

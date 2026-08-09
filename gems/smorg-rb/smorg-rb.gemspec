@@ -114,6 +114,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rbs-merge', "= #{spec.version}"
   spec.add_dependency 'ruby-merge', "= #{spec.version}"
   spec.add_dependency 'toml-merge', "= #{spec.version}"
+  spec.add_dependency 'typescript-merge', "= #{spec.version}"
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.15') # ruby >= 2.2.0
   spec.add_dependency 'yaml-merge', "= #{spec.version}"
 
