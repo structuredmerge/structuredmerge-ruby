@@ -44,6 +44,7 @@ module Kettle
           install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
           install_steps << run_distinct_bundle_install_step(project_root, env: env, setup_env: setup_env, run_options: effective_run_options, command_runner: command_runner)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
+          install_steps << appraisal_generate_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
@@ -188,6 +189,7 @@ module Kettle
               git_drivers
               rubocop_lts_local_branch
               bundle_install_requested_env
+              appraisal_generate
               bin_setup_executable
               bin_setup
               bundle_binstubs
@@ -627,6 +629,47 @@ module Kettle
             steps << validate_bundle_binstub_location(project_root)
           end
           steps
+        end
+
+        def appraisal_generate_step(project_root, env: nil, run_options: {})
+          if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_appraisal_generate])
+            return {
+              name: "appraisal_generate",
+              status: "skipped",
+              reason: "skip_appraisal_generate"
+            }
+          end
+
+          unless Array((run_options || {})[:only]).empty?
+            return {
+              name: "appraisal_generate",
+              status: "skipped",
+              reason: "template_selection"
+            }
+          end
+
+          unless File.file?(File.join(project_root.to_s, "Appraisals")) && File.file?(File.join(project_root.to_s, "bin", "rake"))
+            return {
+              name: "appraisal_generate",
+              status: "skipped",
+              reason: "missing_appraisals_entrypoint"
+            }
+          end
+
+          unless rake_task_available?(project_root, "appraisal:generate", env: env)
+            return {
+              name: "appraisal_generate",
+              status: "skipped",
+              reason: "missing_appraisal_generate_task"
+            }
+          end
+
+          {
+            name: "appraisal_generate",
+            command: ["bin/rake", "appraisal:generate"],
+            status: "ready",
+            reason: "post_template_appraisal_generation"
+          }
         end
 
         def bundle_binstubs_command(project_root = Dir.pwd, env: ENV)
@@ -1092,6 +1135,8 @@ module Kettle
             when "rubocop_lts_local_branch"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_install_requested_env"
+              execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "appraisal_generate"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "rubocop_gradual_autocorrect"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)

@@ -644,6 +644,35 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "generates Appraisal gemfiles during a full install" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisal-generation-step", tmp_root) do |root|
+      write_tree(root, {
+        "Appraisals" => "appraise \"current\" do\nend\n",
+        "bin/rake" => "#!/usr/bin/env ruby\n",
+        "Rakefile" => "task \"appraisal:generate\"\n"
+      })
+      FileUtils.chmod("+x", File.join(root, "bin/rake"))
+
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:rake_task_available?)
+        .with(root, "appraisal:generate", env: {})
+        .and_return(true)
+
+      expect(Kettle::Jem::Tasks::InstallTask.appraisal_generate_step(root, env: {})).to eq(
+        name: "appraisal_generate",
+        command: ["bin/rake", "appraisal:generate"],
+        status: "ready",
+        reason: "post_template_appraisal_generation"
+      )
+      expect(Kettle::Jem::Tasks::InstallTask.appraisal_generate_step(root, env: {}, run_options: {only: "Appraisals"})).to include(
+        name: "appraisal_generate",
+        status: "skipped",
+        reason: "template_selection"
+      )
+    end
+  end
+
   it "preserves tracked project-owned Bundler binstubs during pruning" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

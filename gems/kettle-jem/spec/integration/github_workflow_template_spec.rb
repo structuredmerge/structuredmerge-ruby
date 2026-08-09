@@ -1090,8 +1090,10 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
             entries:
               - gemfiles/modular/x_std_libs/r2.3/libs.gemfile
               - gemfiles/modular/x_std_libs/r2.4/libs.gemfile
+              - gemfiles/modular/x_std_libs/r3.1/libs.gemfile
         YAML
-        "gemfiles/modular/x_std_libs/r2.3/libs.gemfile" => "stale ruby 2.3 gemfile\n"
+        "gemfiles/modular/x_std_libs/r2.3/libs.gemfile" => "stale ruby 2.3 gemfile\n",
+        "gemfiles/modular/x_std_libs/r3.1/libs.gemfile" => "stale ruby 3.1 gemfile\n"
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -1101,8 +1103,14 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       paths = plan.fetch(:recipe_reports).map { |report| report.fetch(:relative_path) }
 
       expect(paths).to include("gemfiles/modular/x_std_libs/r2.4/libs.gemfile")
+      expect(paths).to include("gemfiles/modular/x_std_libs/r3.1/libs.gemfile")
       expect(r23_report.fetch(:recipe_name)).to start_with("template_inactive_packaged_cleanup_")
       expect(r23_report.fetch(:metadata)).to include(delete_file: true)
+      r31_report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/x_std_libs/r3.1/libs.gemfile"
+      end
+      expect(r31_report.fetch(:recipe_name)).to eq("template_source_application_gemfiles_modular_x_std_libs_r3_1_libs_gemfile")
+      expect(r31_report.fetch(:metadata)).not_to include(delete_file: true)
     end
   end
 

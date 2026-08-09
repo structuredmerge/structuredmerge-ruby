@@ -17682,7 +17682,7 @@ module Kettle
         relative_path = path.delete_prefix("#{project_root}/")
         next unless preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
 
-        {target_path: relative_path} if skip_packaged_gemfile_template?(relative_path, config)
+        {target_path: relative_path} if skip_packaged_gemfile_template?(relative_path, config, project_root: project_root)
       end
       (gemfile_cleanups + disabled_integration_config_cleanups(project_root, config)).sort_by { |cleanup| cleanup.fetch(:target_path) }
     end
@@ -17765,7 +17765,7 @@ module Kettle
       return if source_path.to_s.empty? || target_path.to_s.empty?
       return if skip_packaged_workflow_template?(target_path, config, include_patterns: include_patterns)
       return if skip_disabled_integration_template?(target_path, config)
-      return if skip_packaged_gemfile_template?(target_path, config)
+      return if skip_packaged_gemfile_template?(target_path, config, project_root: project_root, template_root_path: template_root.fetch(:path))
       return if skip_packaged_license_template?(target_path, config)
       return if skip_packaged_version_gem_entrypoint_template?(project_root, source_path, target_path, config)
       return if template_root.fetch(:kind) == "packaged" && opencollective_disabled && opencollective_disabled_file?(target_path)
@@ -18001,8 +18001,10 @@ module Kettle
       Gem::Version.new(version) < min_ruby
     end
 
-    def skip_packaged_gemfile_template?(target_path, config)
+    def skip_packaged_gemfile_template?(target_path, config, project_root: nil, template_root_path: PACKAGED_TEMPLATE_ROOT)
       return true if target_path.to_s.include?("gemfiles/modular/recording/") && !appraisal_recording_enabled?(config)
+
+      return false if packaged_gemfile_referenced_by_x_std_libs?(target_path, project_root: project_root, template_root_path: template_root_path)
 
       version = packaged_gemfile_template_ruby_floor(target_path)
       return false unless version
@@ -18011,6 +18013,21 @@ module Kettle
       return false unless min_ruby
 
       Gem::Version.new(version) < min_ruby
+    end
+
+    def packaged_gemfile_referenced_by_x_std_libs?(target_path, project_root:, template_root_path:)
+      relative_path = target_path.to_s.delete_prefix("gemfiles/modular/")
+      return false unless relative_path.start_with?("x_std_libs/")
+
+      aggregate_paths = [
+        File.join(template_root_path.to_s, "gemfiles/modular/x_std_libs.gemfile.example"),
+        File.join(project_root.to_s, "gemfiles/modular/x_std_libs.gemfile")
+      ].select { |path| File.file?(path) }
+      aggregate_paths.any? do |path|
+        gemfile_eval_paths(File.read(path)).include?(relative_path)
+      end
+    rescue StandardError
+      false
     end
 
     def skip_disabled_integration_template?(target_path, config)

@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination-only gemspec metadata when the template does not define that key.
 
+- Keep aggregate standard-library Gemfile references available when Ruby-floor pruning would otherwise remove their targets, and generate Appraisal Gemfiles during full kettle-jem installs.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
