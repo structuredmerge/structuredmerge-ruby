@@ -1,5 +1,28 @@
 module Json
   module Merge
+    class ThreeWayDecision
+      class State < Data
+        attr_reader present: bool
+        attr_reader value: untyped
+
+        def self.present: (untyped value) -> State
+        def self.missing: () -> State
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+
+      class Result < Data
+        attr_reader state: State
+        attr_reader conflicts: Array[Hash[Symbol, untyped]]
+        attr_reader changes: Array[Hash[Symbol, untyped]]
+
+        def present?: () -> bool
+        def value: () -> untyped
+        def conflicted?: () -> bool
+      end
+
+      def call: (base: untyped, ours: untyped, theirs: untyped) -> Result
+    end
+
     module Version
       VERSION: String
     end

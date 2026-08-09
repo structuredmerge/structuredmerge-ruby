@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add universal source render plans for exact revision fragments, explicit synthesis, localized conflicts, and line provenance.
 
+- Add renderer-independent, base-aware JSON-family three-way semantic decisions and conflict classifications.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

@@ -38,6 +38,7 @@ module Json
     autoload :ConflictResolver, 'json/merge/conflict_resolver'
     autoload :SmartMerger, 'json/merge/smart_merger'
     autoload :ObjectMatchRefiner, 'json/merge/object_match_refiner'
+    autoload :ThreeWayDecision, 'json/merge/three_way_decision'
 
     class << self
       def register_backend!
