@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a uniform merge-provider registry and dispatch contract for analyze, diff2, merge2, and base-aware merge3 operations.
 
+- Add universal source render plans for exact revision fragments, explicit synthesis, localized conflicts, and line provenance.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

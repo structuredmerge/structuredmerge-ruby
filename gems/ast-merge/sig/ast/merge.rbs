@@ -57,6 +57,81 @@ module Ast
       def clear: () -> ProviderRegistry
     end
 
+    module SourceRender
+      REVISION_ROLES: Array[Symbol]
+      FRAGMENT_KINDS: Array[Symbol]
+
+      class Error < Ast::Merge::Error
+      end
+      class InvalidPlanError < Error
+      end
+
+      class SourceFragment
+        attr_reader revision: Symbol
+        attr_reader start_line: Integer
+        attr_reader end_line: Integer
+        attr_reader metadata: Hash[untyped, untyped]
+
+        def initialize: (revision: Symbol | String, start_line: Integer, end_line: Integer, ?metadata: Hash[untyped, untyped]) -> void
+        def kind: () -> :source
+        def line_range: () -> Range[Integer]
+      end
+
+      class SynthesizedFragment
+        attr_reader content: String
+        attr_reader reason: Symbol
+        attr_reader producer: Symbol
+        attr_reader metadata: Hash[untyped, untyped]
+
+        def initialize: (content: String, reason: Symbol | String, producer: Symbol | String, ?metadata: Hash[untyped, untyped]) -> void
+        def kind: () -> :synthesized
+      end
+
+      class ConflictFragment
+        DEFAULT_MARKER_SIZE: Integer
+
+        attr_reader conflict_id: String
+        attr_reader base: Array[SourceFragment | SynthesizedFragment]
+        attr_reader ours: Array[SourceFragment | SynthesizedFragment]
+        attr_reader theirs: Array[SourceFragment | SynthesizedFragment]
+        attr_reader labels: Hash[Symbol, String]
+        attr_reader marker_size: Integer
+        attr_reader metadata: Hash[untyped, untyped]
+
+        def initialize: (conflict_id: String, base: Array[SourceFragment | SynthesizedFragment], ours: Array[SourceFragment | SynthesizedFragment], theirs: Array[SourceFragment | SynthesizedFragment], ?labels: Hash[Symbol | String, String], ?marker_size: Integer, ?metadata: Hash[untyped, untyped]) -> void
+        def kind: () -> :conflict
+        def children_for: (:base | :ours | :theirs side) -> Array[SourceFragment | SynthesizedFragment]
+      end
+
+      type fragment = SourceFragment | SynthesizedFragment | ConflictFragment
+
+      class Plan
+        attr_reader sources: Hash[Symbol, String]
+        attr_reader fragments: Array[fragment]
+        attr_reader metadata: Hash[untyped, untyped]
+
+        def initialize: (sources: Hash[Symbol | String, String], fragments: Array[fragment], ?metadata: Hash[untyped, untyped]) -> void
+        def source_lines: (Symbol | String revision) -> Array[String]
+        def source_content: (SourceFragment fragment) -> String
+      end
+
+      class Result
+        attr_reader content: String
+        attr_reader line_records: Array[Hash[untyped, untyped]]
+        attr_reader synthesized_fragments: Array[Hash[untyped, untyped]]
+        attr_reader conflicts: Array[Hash[untyped, untyped]]
+        attr_reader verification_input: Hash[untyped, untyped]
+
+        def initialize: (content: String, line_records: Array[Hash[untyped, untyped]], synthesized_fragments: Array[Hash[untyped, untyped]], conflicts: Array[Hash[untyped, untyped]], verification_input: Hash[untyped, untyped]) -> void
+        def conflicted?: () -> bool
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+
+      class Renderer
+        def render: (Plan plan) -> Result
+      end
+    end
+
     def self.register_provider: (_MergeProvider provider, ?replace: bool) -> _MergeProvider
     def self.resolve_provider: (**untyped selectors) -> _MergeProvider?
     def self.dispatch_provider: (provider_operation operation, provider_request request) -> provider_result
