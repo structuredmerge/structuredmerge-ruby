@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'English'
+require 'bash/merge'
 require 'go-merge'
 require 'ast/merge'
 require 'ast-merge-git'
@@ -641,6 +642,7 @@ module Smorg
       end
 
       [
+        '*.bash merge=smorg-rb diff=smorg-rb smorg.language=bash',
         '*.go merge=smorg-rb diff=smorg-rb smorg.language=go',
         '*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
         '.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
@@ -653,6 +655,7 @@ module Smorg
         '*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby',
         '*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs',
         '*.rs merge=smorg-rb diff=smorg-rb smorg.language=rust',
+        '*.sh merge=smorg-rb diff=smorg-rb smorg.language=bash',
         '*.toml merge=smorg-rb diff=smorg-rb smorg.language=toml',
         '*.ts merge=smorg-rb diff=smorg-rb smorg.language=typescript',
         '*.tsx merge=smorg-rb diff=smorg-rb smorg.language=tsx',
@@ -665,6 +668,22 @@ module Smorg
     def merge_by_path(path_name, language, conflict_marker_size, fallback_policy, ancestor_source, current_source,
                       other_source)
       case normalize_language(language, path_name)
+      when 'bash'
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.bash',
+            family: 'bash',
+            dialect: 'bash',
+            backend: 'kreuzberg-language-pack',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
       when 'go'
         merge3_result(
           Ast::Merge::Git.merge3(
@@ -1001,12 +1020,15 @@ module Smorg
     end
 
     def normalize_language(language, path_name)
+      return 'bash' if language.to_s.strip.empty? && %w[.bash .sh].include?(File.extname(path_name.to_s).downcase)
       return 'go' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.go'
       return 'rust' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.rs'
       return 'typescript' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.ts'
       return 'tsx' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.tsx'
 
       case language.to_s.strip.downcase
+      when 'bash', 'sh', 'application/x-sh', 'text/x-shellscript'
+        'bash'
       when 'go', 'golang'
         'go'
       when 'dotenv', 'env', 'config-env'

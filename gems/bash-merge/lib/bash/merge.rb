@@ -119,6 +119,7 @@ module Bash
     autoload :FileAnalysis, 'bash/merge/file_analysis'
     autoload :MergeResult, 'bash/merge/merge_result'
     autoload :NodeWrapper, 'bash/merge/node_wrapper'
+    autoload :Provider, 'bash/merge/provider'
     autoload :SmartMerger, 'bash/merge/smart_merger'
 
     class << self
@@ -207,6 +208,9 @@ Bash::Merge.register_backend!
 TreeHaver::BackendRegistry.register_tag(:bash_grammar, category: :grammar, backend_name: :bash_grammar) do
   Bash::Merge.available?
 end
+
+require_relative 'merge/provider'
+Bash::Merge.register_provider!
 
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)

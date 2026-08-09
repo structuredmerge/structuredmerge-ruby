@@ -1,5 +1,27 @@
 module Bash
   module Merge
+    class NodeWrapper
+      attr_reader node: untyped
+      def start_byte: () -> Integer
+      def end_byte: () -> Integer
+      def source_text: () -> String
+      def semantic_tree: () -> Array[untyped]
+      def heredoc?: () -> bool
+    end
+
+    class Provider
+      def provider_id: () -> String
+      def family: () -> String
+      def capabilities: () -> Hash[Symbol, untyped]
+      def analyze: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def diff2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge3: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+    end
+
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> untyped
+
     module Version
       VERSION: String
     end

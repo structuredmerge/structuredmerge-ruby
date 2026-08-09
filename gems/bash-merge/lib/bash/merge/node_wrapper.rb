@@ -19,6 +19,8 @@ module Bash
     #
     # @see Ast::Merge::NodeWrapperBase
     class NodeWrapper < Ast::Merge::NodeWrapperBase
+      attr_reader :node
+
       # Check if this is a function definition
       # @return [Boolean]
       def function_definition?
@@ -107,6 +109,18 @@ module Bash
         nil
       end
 
+      def start_byte = node.start_byte
+      def end_byte = node.end_byte
+      def source_text = @source.byteslice(start_byte...end_byte).to_s
+
+      def semantic_tree
+        semantic_node(node)
+      end
+
+      def heredoc?
+        descendant_type?(node, %w[heredoc_redirect heredoc_body])
+      end
+
       # Find a child by field name
       # @param field_name [String] Field name to look for
       # @return [TreeSitter::Node, nil]
@@ -192,6 +206,19 @@ module Bash
       end
 
       private
+
+      def semantic_node(value)
+        children = value.children
+        return [value.type.to_s, @source.byteslice(value.start_byte...value.end_byte).to_s] if children.empty?
+
+        [value.type.to_s, children.select(&:named?).map { |child| semantic_node(child) }]
+      end
+
+      def descendant_type?(value, types)
+        return true if types.include?(value.type.to_s)
+
+        value.children.any? { |child| descendant_type?(child, types) }
+      end
 
       def extract_command_signature_context(node)
         # Extract additional context like redirections

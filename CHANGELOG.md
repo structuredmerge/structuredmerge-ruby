@@ -60,6 +60,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add and promote the ruby.rust source-preserving provider for Rust, including native AST ownership, promoted merge3 fixtures, smorg-rb routing, and real Git-driver coverage.
 
+- Promote the ruby.bash provider with conservative native TreeHaver ownership, base-aware merges, and Git/smorg-rb routing.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

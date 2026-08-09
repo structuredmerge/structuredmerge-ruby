@@ -231,6 +231,8 @@ RSpec.describe Smorg::RB do
     exit_code = described_class.run(['languages', '--gitattributes'], stdout: stdout, stderr: stderr)
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(stdout.string).to include('*.bash merge=smorg-rb diff=smorg-rb smorg.language=bash')
+    expect(stdout.string).to include('*.sh merge=smorg-rb diff=smorg-rb smorg.language=bash')
     expect(stdout.string).to include('*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
@@ -402,6 +404,32 @@ RSpec.describe Smorg::RB do
     expect(report.dig('provider', 'provider_id')).to eq('ruby.rust')
     expect(report.dig('provider', 'family')).to eq('rust')
     expect(report.dig('provider', 'dialect')).to eq('rust')
+    expect(report.dig('verification', 'base_participated')).to be(true)
+  end
+
+  it 'routes Bash extensions and identifiers only through the exact workflow provider' do
+    expect(described_class.normalize_language('', 'example.bash')).to eq('bash')
+    expect(described_class.normalize_language('sh', 'extensionless')).to eq('bash')
+
+    ancestor = write_file(@dir, 'ancestor.sh', "shared() { :; }\n")
+    current = write_file(@dir, 'current.tmp', "shared() { :; }\nours() { :; }\n")
+    other = write_file(@dir, 'other.tmp', "shared() { :; }\ntheirs() { :; }\n")
+    report_path = File.join(@dir, 'bash-report.json')
+    stderr = StringIO.new
+
+    expect(Bash::Merge::SmartMerger).not_to receive(:new)
+    exit_code = described_class.run(
+      ['merge-driver', '--report', report_path, '--path-name', 'example.sh', ancestor, current, other],
+      stdout: StringIO.new,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("shared() { :; }\nours() { :; }\ntheirs() { :; }\n")
+    report = JSON.parse(File.read(report_path))
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.bash')
+    expect(report.dig('provider', 'family')).to eq('bash')
+    expect(report.dig('provider', 'dialect')).to eq('bash')
     expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
