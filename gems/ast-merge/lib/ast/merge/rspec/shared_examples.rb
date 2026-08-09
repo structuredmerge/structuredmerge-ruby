@@ -21,6 +21,7 @@
 # - "Ast::Merge::Layout::Attachment" - validates merge-facing layout attachments
 # - "Ast::Merge::Layout::Augmenter" - validates shared layout gap inference
 # - "Ast::Merge::MergeResultBase" - validates merge result implementation
+# - "Ast::Merge::ProviderConformance" - validates executable portable provider claims
 # - "Ast::Merge::MergerConfig" - validates merger configuration
 # - "Ast::Merge::Recipe::PresetContract" - validates preset loading and companion-script resolution
 # - "Ast::Merge::RemovalModeCompliance" - validates generic remove_template_missing_nodes behavior
@@ -48,6 +49,8 @@ require_relative 'shared_examples/freeze_node_base'
 require_relative 'shared_examples/layout_attachment'
 require_relative 'shared_examples/layout_augmenter'
 require_relative 'shared_examples/merge_result_base'
+require_relative 'provider_conformance'
+require_relative 'shared_examples/provider_conformance'
 require_relative 'shared_examples/merger_config'
 require_relative 'shared_examples/recipe_preset_contract'
 require_relative 'shared_examples/recursive_retained_blank_gap_compliance'

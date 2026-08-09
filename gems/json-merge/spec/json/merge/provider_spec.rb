@@ -255,3 +255,90 @@ RSpec.describe Json::Merge::Provider do
   end
 end
 # rubocop:enable Metrics/BlockLength
+
+# rubocop:disable Metrics/AbcSize, Metrics/BlockLength, Metrics/MethodLength, Style/HashLikeCase -- dialect fixtures stay explicit
+RSpec.describe 'Json::Merge provider conformance' do
+  subject(:provider) { Json::Merge.merge_provider }
+
+  def conformance_sources(dialect)
+    case dialect
+    when :json
+      {
+        base: "{\"obsolete\": true, \"stable\": true}\n",
+        theirs: "{\"stable\": true}\n",
+        stable: "{\"stable\": true}\n",
+        ours_add: "{\"stable\": true, \"ours\": 1}\n",
+        theirs_add: "{\"stable\": true, \"theirs\": 2}\n"
+      }
+    when :jsonc
+      {
+        base: "// base\n{\n  \"obsolete\": true,\n  \"stable\": true,\n}\n",
+        theirs: "// theirs\n{\n  \"stable\": true,\n}\n",
+        stable: "// stable\n{\n  \"stable\": true,\n}\n",
+        ours_add: "// ours\n{\n  \"stable\": true,\n  \"ours\": 1,\n}\n",
+        theirs_add: "// theirs\n{\n  \"stable\": true,\n  \"theirs\": 2,\n}\n"
+      }
+    when :json5
+      {
+        base: "{\n  obsolete: true,\n  stable: 'base',\n}\n",
+        theirs: "{\n  stable: 'base',\n}\n",
+        stable: "{\n  stable: 'base',\n}\n",
+        ours_add: "{\n  stable: 'base',\n  ours: 'left',\n}\n",
+        theirs_add: "{\n  stable: 'base',\n  theirs: 'right',\n}\n"
+      }
+    end
+  end
+
+  def conformance_for(dialect)
+    sources = conformance_sources(dialect)
+    {
+      dialect: dialect,
+      backend: provider.capabilities.fetch(:backends).first,
+      profile_id: :source_preserving,
+      role: :workflow,
+      requests: {
+        analyze: { source: sources.fetch(:stable) },
+        diff2: { before_source: sources.fetch(:stable), after_source: sources.fetch(:ours_add) },
+        merge2: { current_source: sources.fetch(:ours_add), incoming_source: sources.fetch(:theirs_add) },
+        merge3: {
+          base_source: sources.fetch(:stable),
+          ours_source: sources.fetch(:ours_add),
+          theirs_source: sources.fetch(:theirs_add)
+        }
+      },
+      invalid_merge3: {
+        base_source: sources.fetch(:base),
+        ours_source: '{broken',
+        theirs_source: sources.fetch(:theirs),
+        source_role: :ours
+      },
+      base_adversarial_merge3: {
+        request: {
+          base_source: sources.fetch(:base),
+          ours_source: sources.fetch(:base),
+          theirs_source: sources.fetch(:theirs)
+        },
+        expected_value: Json::Merge.json_value_for_source(sources.fetch(:theirs), dialect: dialect)
+      },
+      synthesized_merge3: {
+        request: {
+          base_source: sources.fetch(:stable),
+          ours_source: sources.fetch(:ours_add),
+          theirs_source: sources.fetch(:theirs_add)
+        }
+      },
+      parse_output: lambda { |source|
+        Json::Merge.json_value_for_source(source, dialect: dialect)
+      }
+    }
+  end
+
+  %i[json jsonc json5].each do |dialect|
+    context "with #{dialect}" do
+      let(:provider_conformance) { conformance_for(dialect) }
+
+      it_behaves_like 'Ast::Merge::ProviderConformance'
+    end
+  end
+end
+# rubocop:enable Metrics/AbcSize, Metrics/BlockLength, Metrics/MethodLength, Style/HashLikeCase

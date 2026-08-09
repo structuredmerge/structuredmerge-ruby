@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Localize JSON-family three-way conflicts to structural owner lines when possible, with semantically verified synthesized context and explicit fallback provenance.
 
+- Add executable provider conformance for advertised operations, request roles, parse diagnostics, adversarial base participation, source provenance, reparsing, and selector rejection.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
