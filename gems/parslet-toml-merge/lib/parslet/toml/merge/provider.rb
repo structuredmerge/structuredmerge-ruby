@@ -2,13 +2,13 @@
 
 require 'toml/merge/source_preserving_provider'
 
-module Citrus
+module Parslet
   module Toml
-    # Citrus-backed TOML structural merge provider integration.
+    # Parslet-backed TOML structural merge provider integration.
     module Merge
-      # Conservative source-preserving provider configured for the Citrus backend.
+      # Conservative source-preserving provider configured for the Parslet backend.
       class Provider < ::Toml::Merge::SourcePreservingProvider
-        PROVIDER_ID = 'ruby.toml.citrus'
+        PROVIDER_ID = 'ruby.toml.parslet'
         BACKEND = Merge::BACKEND
         PACKAGE_NAME = Merge::PACKAGE_NAME
         PACKAGE_VERSION = Version::VERSION

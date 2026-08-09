@@ -25,7 +25,10 @@ gem 'nomono', '~> 1.1', '>= 1.1.4', require: false # ruby >= 3.2.0
 
 # Direct sibling dependencies (env-switched via STRUCTUREDMERGE_DEV)
 direct_sibling_gems = %w[
+  ast-merge
+  citrus-toml-merge
   toml-merge
+  tree_haver
 ]
 direct_sibling_dev = ENV.fetch('STRUCTUREDMERGE_DEV', '')
 direct_sibling_local =

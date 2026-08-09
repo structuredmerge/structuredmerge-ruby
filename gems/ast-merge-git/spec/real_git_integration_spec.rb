@@ -351,6 +351,38 @@ RSpec.describe 'ast-merge-git executable' do
     )
   end
 
+  it 'runs the exact Parslet TOML selector where baseline text merge conflicts' do
+    base = "shared = true\n"
+    ours = "shared = true\nours = \"left\"\n"
+    theirs = "shared = true\ntheirs = [1, 2]\n"
+    path = configure_opaque_repository(
+      extension: 'toml',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'parslet/toml/merge',
+      provider_id: 'ruby.toml.parslet',
+      family: 'toml',
+      dialect: 'toml',
+      backend: 'parslet',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq(
+      "shared = true\nours = \"left\"\ntheirs = [1, 2]\n"
+    )
+  end
+
   it 'runs the YAML workflow provider through the installed Git-driver path' do
     base = "shared: true\n"
     ours = "shared: true\nours: left\n"

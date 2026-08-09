@@ -108,6 +108,7 @@ module Toml
     autoload :NodeWrapper, 'toml/merge/node_wrapper'
     autoload :ConflictResolver, 'toml/merge/conflict_resolver'
     autoload :SmartMerger, 'toml/merge/smart_merger'
+    autoload :SourcePreservingProvider, 'toml/merge/source_preserving_provider'
     autoload :TableMatchRefiner, 'toml/merge/table_match_refiner'
 
     class << self

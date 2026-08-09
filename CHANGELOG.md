@@ -48,6 +48,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the source-preserving ruby.toml.citrus backend provider with base-aware root-key merges and conservative structural conflicts.
 
+- Add the source-preserving ruby.toml.parslet backend provider on the shared TOML provider base, with conservative parser limitation diagnostics and cross-backend parity coverage.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

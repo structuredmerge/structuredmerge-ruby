@@ -2,6 +2,8 @@
 
 require 'toml-merge'
 require 'toml'
+require 'ast/merge'
+require_relative 'merge/version'
 
 module Parslet
   module Toml
@@ -146,4 +148,7 @@ module Parslet
   end
 end
 
+require_relative 'merge/provider'
+
 Parslet::Toml::Merge.register_backend!
+Parslet::Toml::Merge.register_provider!
