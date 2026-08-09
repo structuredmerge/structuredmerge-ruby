@@ -389,5 +389,7 @@ end
 
 require 'binary/merge'
 require_relative 'merge/backend'
+require_relative 'merge/provider'
 
 Zip::Merge.register_backend!
+Zip::Merge.register_provider!

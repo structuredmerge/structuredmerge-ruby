@@ -21,6 +21,7 @@ end
 
 # External RSpec & related config
 require 'kettle/test/rspec'
+require 'ast/merge/rspec'
 # `kettle/test/rspec` installs harness helpers documented in spec/README.md.
 
 # This library

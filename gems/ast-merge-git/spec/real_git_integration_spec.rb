@@ -5,6 +5,7 @@ require 'fileutils'
 require 'json'
 require 'open3'
 require 'shellwords'
+require 'zip/merge'
 
 # rubocop:disable Metrics/AbcSize, Metrics/BlockLength, Metrics/MethodLength -- real Git setup and assertions form one integration boundary
 RSpec.describe 'ast-merge-git executable' do
@@ -117,6 +118,52 @@ RSpec.describe 'ast-merge-git executable' do
     git('config', 'merge.structuredmerge.driver', command)
   end
 
+  def configure_opaque_repository(extension:, base:, ours:, theirs:, **driver)
+    path = "document.#{extension}"
+    FileUtils.rm_rf(repository)
+    FileUtils.mkdir_p(repository)
+    git('init', '--quiet', '--initial-branch=main')
+    git('config', 'user.name', 'StructuredMerge Test')
+    git('config', 'user.email', 'structuredmerge@example.invalid')
+    write('.gitattributes', "*.#{extension} merge=structuredmerge\n")
+    write(path, base)
+    git('add', '.gitattributes', path)
+    git('commit', '--quiet', '-m', 'base')
+
+    git('checkout', '--quiet', '-b', 'ours')
+    write(path, ours)
+    ours == base ? git('commit', '--quiet', '--allow-empty', '-m', 'ours') : git('commit', '--quiet', '-am', 'ours')
+
+    git('checkout', '--quiet', '-b', 'theirs', 'main')
+    write(path, theirs)
+    git('commit', '--quiet', '-am', 'theirs')
+    git('checkout', '--quiet', 'ours')
+    configure_opaque_driver(**driver)
+    path
+  end
+
+  def configure_opaque_driver(require_path:, family:, dialect:, backend:, profile:)
+    command = [
+      'env',
+      "BUNDLE_GEMFILE=#{Shellwords.escape(ruby_root.join('Gemfile').to_s)}",
+      "AST_MERGE_REQUIRE=#{require_path}",
+      "AST_MERGE_FAMILY=#{family}",
+      "AST_MERGE_DIALECT=#{dialect}",
+      "AST_MERGE_BACKEND=#{backend}",
+      "AST_MERGE_PROFILE=#{profile}",
+      'bundle',
+      'exec',
+      Shellwords.escape(executable.to_s),
+      '%O',
+      '%A',
+      '%B',
+      '%P',
+      '%L'
+    ].join(' ')
+    git('config', 'merge.structuredmerge.name', "StructuredMerge #{family} provider")
+    git('config', 'merge.structuredmerge.driver', command)
+  end
+
   def text_git_baseline(base:, ours:, theirs:)
     write('baseline-base.json', base)
     write('baseline-ours.json', ours)
@@ -176,6 +223,48 @@ RSpec.describe 'ast-merge-git executable' do
 
     expect(status.exitstatus).to eq(0), stderr
     expect(repository.join('notes.txt').binread).to eq("theirs\n")
+  end
+
+  it 'reports an opaque binary conflict without changing ours bytes' do
+    ours = "\x00ours\xFF".b
+    path = configure_opaque_repository(
+      extension: 'bin',
+      base: "\x00base".b,
+      ours: ours,
+      theirs: "\x00theirs".b,
+      require_path: 'binary/merge',
+      family: 'binary',
+      dialect: 'binary',
+      backend: 'raw_bytes',
+      profile: 'opaque_document'
+    )
+
+    _stdout, _stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(status.exitstatus).to eq(1)
+    expect(repository.join(path).binread).to eq(ours)
+    expect(git('status', '--short').first).to include("UU #{path}")
+  end
+
+  it 'runs a valid ZIP archive through the installed Git-driver path' do
+    base = Zip::Merge.new_stored_zip('docs/readme.md' => "# Base\n")
+    theirs = Zip::Merge.new_stored_zip('docs/readme.md' => "# Theirs\n")
+    path = configure_opaque_repository(
+      extension: 'zip',
+      base: base,
+      ours: base,
+      theirs: theirs,
+      require_path: 'zip/merge',
+      family: 'zip',
+      dialect: 'zip',
+      backend: Zip::Merge::BACKEND_REFERENCE.id,
+      profile: 'opaque_archive'
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq(theirs)
   end
 end
 # rubocop:enable Metrics/AbcSize, Metrics/BlockLength, Metrics/MethodLength

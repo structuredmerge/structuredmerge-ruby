@@ -102,6 +102,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Utilities
+  spec.add_dependency 'ast-merge', "= #{spec.version}"
   spec.add_dependency 'tree_haver', "= #{spec.version}"
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.15') # ruby >= 2.2.0
 

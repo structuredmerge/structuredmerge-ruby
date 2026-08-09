@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 require 'tree_haver'
+require 'ast/merge'
 require_relative 'merge/version'
+require_relative 'merge/provider'
 
+# Binary preservation contracts and provider registration.
 module Binary
+  # Binary merge reports, diagnostics, and the opaque-document provider.
   module Merge
     PACKAGE_NAME = 'binary-merge'
 
@@ -49,5 +53,15 @@ module Binary
         diagnostics: []
       )
     end
+
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!
+      Ast::Merge.register_provider(merge_provider, replace: true)
+    end
   end
 end
+
+Binary::Merge.register_provider!

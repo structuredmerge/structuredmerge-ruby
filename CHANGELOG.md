@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a coarse base-aware plain-text provider with exact-revision output, whole-document conflicts, shared conformance, and installed Git-driver coverage.
 
+- Add safety-first base-aware providers for opaque binary and ZIP documents, including exact byte preservation, marker-free conflict reporting, ZIP input validation, and installed Git-driver coverage.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
