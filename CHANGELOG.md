@@ -26,6 +26,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add renderer-independent, base-aware JSON-family three-way semantic decisions and conflict classifications.
 
+- Add an explicit json-merge provider for portable analyze, diff2, merge2, and base-aware merge3 dispatch across JSON, JSONC, and JSON5.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

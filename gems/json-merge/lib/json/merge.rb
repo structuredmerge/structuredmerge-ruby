@@ -38,6 +38,7 @@ module Json
     autoload :ConflictResolver, 'json/merge/conflict_resolver'
     autoload :SmartMerger, 'json/merge/smart_merger'
     autoload :ObjectMatchRefiner, 'json/merge/object_match_refiner'
+    autoload :Provider, 'json/merge/provider'
     autoload :ThreeWayDecision, 'json/merge/three_way_decision'
 
     class << self
@@ -66,6 +67,14 @@ module Json
         supported_dialects: %w[json jsonc json5],
         supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
+    end
+
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!(replace: false)
+      Ast::Merge.register_provider(merge_provider, replace: replace)
     end
 
     def available_json_backends
