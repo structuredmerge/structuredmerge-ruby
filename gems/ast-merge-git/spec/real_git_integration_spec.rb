@@ -4,6 +4,7 @@ require_relative 'spec_helper'
 require 'fileutils'
 require 'json'
 require 'open3'
+require 'psych'
 require 'shellwords'
 require 'zip/merge'
 
@@ -281,6 +282,39 @@ RSpec.describe 'ast-merge-git executable' do
     expect(baseline_output).to include('<<<<<<< baseline-ours.json')
     expect(status.exitstatus).to eq(0), stderr
     expect(repository.join(path).binread).to eq("SHARED=1\nOURS=left\nTHEIRS=right\n")
+  end
+
+  it 'runs the Psych YAML provider through the installed Git-driver path' do
+    base = "shared: true\n"
+    ours = "shared: true\nours: left\n"
+    theirs = "shared: true\ntheirs: right\n"
+    path = configure_opaque_repository(
+      extension: 'yml',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'psych/merge',
+      family: 'yaml',
+      dialect: 'yaml',
+      backend: 'psych',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(Psych.safe_load(repository.join(path).binread)).to eq(
+      'shared' => true,
+      'ours' => 'left',
+      'theirs' => 'right'
+    )
   end
 
   it 'reports an opaque binary conflict without changing ours bytes' do

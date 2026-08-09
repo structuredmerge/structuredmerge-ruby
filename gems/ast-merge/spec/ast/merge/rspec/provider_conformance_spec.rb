@@ -46,9 +46,9 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
     matrix = described_class.new(fixture).validate!
 
     expect(matrix.advertised_provider_ids).to eq(
-      %w[ruby.binary ruby.dotenv ruby.json ruby.ruby.prism ruby.text ruby.zip]
+      %w[ruby.binary ruby.dotenv ruby.json ruby.ruby.prism ruby.text ruby.yaml.psych ruby.zip]
     )
-    expect(matrix.blocked_provider_ids.length).to eq(16)
+    expect(matrix.blocked_provider_ids.length).to eq(15)
     expect(
       matrix.tested?(
         provider_id: 'ruby.json',
@@ -62,6 +62,14 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
         provider_id: 'ruby.ruby.prism',
         dialect: :ruby,
         backend: :prism,
+        profile_id: :source_preserving
+      )
+    ).to be(true)
+    expect(
+      matrix.tested?(
+        provider_id: 'ruby.yaml.psych',
+        dialect: :yaml,
+        backend: :psych,
         profile_id: :source_preserving
       )
     ).to be(true)

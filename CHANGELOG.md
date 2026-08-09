@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a source-preserving, base-aware dotenv provider with exact assignment composites, conservative ambiguity handling, localized conflicts, Git-driver coverage, and smorg-rb routing.
 
+- Add a genuinely base-aware Psych YAML provider with source-preserving top-level mapping merges and conservative conflict handling.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

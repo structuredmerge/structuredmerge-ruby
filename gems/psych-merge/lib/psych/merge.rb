@@ -306,7 +306,10 @@ module Psych
   end
 end
 
+require_relative 'merge/provider'
+
 Psych::Merge.register_backend!
+Psych::Merge.register_provider!
 
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)
