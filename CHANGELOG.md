@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add executable provider conformance for advertised operations, request roles, parse diagnostics, adversarial base participation, source provenance, reparsing, and selector rejection.
 
+- Add a coarse base-aware plain-text provider with exact-revision output, whole-document conflicts, shared conformance, and installed Git-driver coverage.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
@@ -45,6 +47,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 - Route smorg-rb JSON, JSONC, and JSON5 merge-driver operations through the base-aware json-merge provider and preserve provider conflicts, fallbacks, verification, and metadata in reports.
+
+- Route smorg-rb plain-text merge-driver operations through the base-aware text provider instead of a two-way merge that ignored the ancestor.
 
 ### Security
 

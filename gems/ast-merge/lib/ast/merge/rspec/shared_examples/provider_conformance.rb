@@ -53,11 +53,15 @@ RSpec.shared_examples 'Ast::Merge::ProviderConformance' do
   end
 
   it 'reports a source-role parse diagnostic' do
-    invalid = provider_conformance.fetch(:invalid_merge3)
-    result = Ast::Merge.dispatch_provider(:merge3, provider_selectors.merge(invalid))
+    if provider_conformance[:invalid_merge3]
+      invalid = provider_conformance.fetch(:invalid_merge3)
+      result = Ast::Merge.dispatch_provider(:merge3, provider_selectors.merge(invalid))
 
-    expect(result).to include(ok: false, source_role: invalid.fetch(:source_role))
-    expect(result.fetch(:diagnostics)).to include(hash_including(category: :parse_error))
+      expect(result).to include(ok: false, source_role: invalid.fetch(:source_role))
+      expect(result.fetch(:diagnostics)).to include(hash_including(category: :parse_error))
+    else
+      expect(provider_conformance.fetch(:parse_failures)).to be(false)
+    end
   end
 
   it 'uses the base in an adversarial merge3 that merge2 substitution gets wrong' do
@@ -76,14 +80,18 @@ RSpec.shared_examples 'Ast::Merge::ProviderConformance' do
   end
 
   it 'reports source preservation, synthesis, reparsing, and semantic verification' do
-    synthesis = provider_conformance.fetch(:synthesized_merge3)
-    result = Ast::Merge.dispatch_provider(:merge3, provider_selectors.merge(synthesis.fetch(:request)))
+    if provider_conformance[:synthesized_merge3]
+      synthesis = provider_conformance.fetch(:synthesized_merge3)
+      result = Ast::Merge.dispatch_provider(:merge3, provider_selectors.merge(synthesis.fetch(:request)))
 
-    expect(result).to include(ok: true)
-    expect(result.dig(:verification, :output_reparsed)).to be(true)
-    expect(result.dig(:verification, :semantic_match)).to be(true)
-    expect(result.dig(:render_report, :synthesized_fragments)).not_to be_empty
-    expect(result.dig(:render_report, :line_records)).not_to be_empty
+      expect(result).to include(ok: true)
+      expect(result.dig(:verification, :output_reparsed)).to be(true)
+      expect(result.dig(:verification, :semantic_match)).to be(true)
+      expect(result.dig(:render_report, :synthesized_fragments)).not_to be_empty
+      expect(result.dig(:render_report, :line_records)).not_to be_empty
+    else
+      expect(provider_capabilities.fetch(:source_preservation)).to include(:exact_source)
+    end
   end
 
   it 'rejects selectors outside advertised dialect capabilities' do

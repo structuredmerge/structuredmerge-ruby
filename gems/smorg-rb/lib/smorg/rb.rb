@@ -667,7 +667,19 @@ module Smorg
       when 'markdown'
         merge_markdown(ancestor_source, current_source, other_source)
       when 'text'
-        Plain::Merge.merge_text(other_source, current_source)
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            family: 'text',
+            dialect: 'text',
+            profile_id: 'coarse_document',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
       else
         unsupported_language_result(normalize_language(language, path_name), path_name)
       end

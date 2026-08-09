@@ -108,3 +108,59 @@ RSpec.describe 'Plain::Merge TreeHaver backend registration' do
     expect(plain_analysis).to eq(text_analysis)
   end
 end
+
+# rubocop:disable Metrics/BlockLength -- complete portable provider operation matrix
+RSpec.describe 'Plain::Merge provider conformance' do
+  subject(:provider) { Plain::Merge.merge_provider }
+
+  let(:provider_conformance) do
+    {
+      dialect: :text,
+      backend: :'plain-line',
+      profile_id: :coarse_document,
+      role: :workflow,
+      parse_failures: false,
+      requests: {
+        analyze: { source: "stable\n" },
+        diff2: { before_source: "stable\n", after_source: "changed\n" },
+        merge2: { current_source: "ours\n", incoming_source: "theirs\n" },
+        merge3: {
+          base_source: "base\n",
+          ours_source: "base\n",
+          theirs_source: "theirs\n"
+        }
+      },
+      base_adversarial_merge3: {
+        request: {
+          base_source: "obsolete\nstable\n",
+          ours_source: "obsolete\nstable\n",
+          theirs_source: "stable\n"
+        },
+        expected_value: "stable\n"
+      },
+      parse_output: ->(source) { source }
+    }
+  end
+
+  it_behaves_like 'Ast::Merge::ProviderConformance'
+
+  it 'reports a whole-document conflict when both sides differ from base' do
+    result = provider.merge3(
+      base_source: "base\n",
+      ours_source: "ours\n",
+      theirs_source: "theirs\n",
+      dialect: :text,
+      profile_id: :coarse_document
+    )
+
+    expect(result).to include(ok: false, operation: :merge3)
+    expect(result.fetch(:conflicts)).to contain_exactly(
+      hash_including(category: :edit_edit, path: '')
+    )
+    expect(result.fetch(:conflicted_output)).to include(
+      "<<<<<<< ours\nours\n||||||| base\nbase\n=======\ntheirs\n>>>>>>> theirs\n"
+    )
+    expect(result.dig(:verification, :base_participated)).to be(true)
+  end
+end
+# rubocop:enable Metrics/BlockLength

@@ -75,6 +75,48 @@ RSpec.describe 'ast-merge-git executable' do
     git('config', 'merge.structuredmerge.driver', command)
   end
 
+  def configure_text_repository
+    FileUtils.rm_rf(repository)
+    FileUtils.mkdir_p(repository)
+    git('init', '--quiet', '--initial-branch=main')
+    git('config', 'user.name', 'StructuredMerge Test')
+    git('config', 'user.email', 'structuredmerge@example.invalid')
+    write('.gitattributes', "*.txt merge=structuredmerge\n")
+    write('notes.txt', "base\n")
+    git('add', '.gitattributes', 'notes.txt')
+    git('commit', '--quiet', '-m', 'base')
+
+    git('checkout', '--quiet', '-b', 'ours')
+    git('commit', '--quiet', '--allow-empty', '-m', 'ours')
+
+    git('checkout', '--quiet', '-b', 'theirs', 'main')
+    write('notes.txt', "theirs\n")
+    git('commit', '--quiet', '-am', 'theirs')
+    git('checkout', '--quiet', 'ours')
+    configure_text_driver
+  end
+
+  def configure_text_driver
+    command = [
+      'env',
+      "BUNDLE_GEMFILE=#{Shellwords.escape(ruby_root.join('Gemfile').to_s)}",
+      'AST_MERGE_REQUIRE=plain/merge',
+      'AST_MERGE_FAMILY=text',
+      'AST_MERGE_DIALECT=text',
+      'AST_MERGE_PROFILE=coarse_document',
+      'bundle',
+      'exec',
+      Shellwords.escape(executable.to_s),
+      '%O',
+      '%A',
+      '%B',
+      '%P',
+      '%L'
+    ].join(' ')
+    git('config', 'merge.structuredmerge.name', 'StructuredMerge text provider')
+    git('config', 'merge.structuredmerge.driver', command)
+  end
+
   def text_git_baseline(base:, ours:, theirs:)
     write('baseline-base.json', base)
     write('baseline-ours.json', ours)
@@ -125,6 +167,15 @@ RSpec.describe 'ast-merge-git executable' do
     expect(conflicted).to start_with("{\n  \"stable\": true,\n<<<<<<< ours\n")
     expect(conflicted).to end_with(">>>>>>> theirs\n}\n")
     expect(git('status', '--short').first).to include('UU package.json')
+  end
+
+  it 'runs the coarse text provider through the installed Git-driver path' do
+    configure_text_repository
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join('notes.txt').binread).to eq("theirs\n")
   end
 end
 # rubocop:enable Metrics/AbcSize, Metrics/BlockLength, Metrics/MethodLength

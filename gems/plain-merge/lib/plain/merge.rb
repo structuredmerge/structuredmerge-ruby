@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'ast/merge'
 require 'tree_haver'
 require_relative 'merge/version'
 
@@ -13,6 +14,8 @@ module Plain
       position: 0.15
     }.freeze
 
+    autoload :Provider, 'plain/merge/provider'
+
     module_function
 
     def text_feature_profile
@@ -21,6 +24,14 @@ module Plain
         supported_dialects: [],
         supported_policies: []
       }
+    end
+
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!(replace: false)
+      Ast::Merge.register_provider(merge_provider, replace: replace)
     end
 
     def text_parse_request(source)
@@ -263,3 +274,4 @@ end
 
 require_relative 'merge/backend'
 Plain::Merge.register_backend!
+Plain::Merge.register_provider!
