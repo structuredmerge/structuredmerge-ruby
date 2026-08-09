@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep scoped kettle-jem template runs from applying unselected post-template mutations.
 
+- Preserve destination-only gemspec metadata when the template does not define that key.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08

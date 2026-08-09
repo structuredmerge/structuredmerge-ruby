@@ -1004,8 +1004,8 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     twice = described_class.merge_gemspec_template_source(template, once, facts: facts)
 
     expect { RubyVM::InstructionSequence.compile(once) }.not_to raise_error
-    expect(once).to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n\n  # Specify which files")
-    expect(once).not_to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n\n\n  # Specify which files")
+    expect(once).to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n  spec.metadata[\"allowed_push_host\"] = \"https://rubygems.org\"\n\n  # Specify which files")
+    expect(once).not_to include("spec.metadata[\"allowed_push_host\"] = \"https://rubygems.org\"\n\n\n  # Specify which files")
     expect(once).to include("spec.require_paths = [\"lib\"]\n\n  # Utilities")
     expect(once).not_to include("spec.require_paths = [\"lib\"]\n\n\n  # Utilities")
     expect_gemspec_dependency_declared(once, "kettle-dev", kind: :add_development_dependency)
@@ -1014,6 +1014,31 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(once).to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n  # Tasks")
     expect(once).not_to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n\n  # Tasks")
     expect(twice).to eq(once)
+  end
+
+  it "preserves destination-only gemspec metadata while allowing template metadata to win" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.homepage = "https://example.test/demo"
+        spec.metadata["rubygems_mfa_required"] = "true"
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.homepage = "https://example.test/demo"
+        spec.metadata["rubygems_mfa_required"] = "false"
+        spec.metadata["default_lint_roller_plugin"] = "RuboCop::Lts::Ruby::Plugin"
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+    remerged = described_class.merge_gemspec_template_source(template, merged, facts: {package: {name: "demo"}})
+
+    expect(merged).to include('spec.metadata["rubygems_mfa_required"] = "true"')
+    expect(merged).to include('spec.metadata["default_lint_roller_plugin"] = "RuboCop::Lts::Ruby::Plugin"')
+    expect(remerged).to eq(merged)
   end
 
   it "replaces executable destination gemspec files assignments with template package collections" do

@@ -10292,6 +10292,13 @@ module Kettle
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
       merged = apply_configured_gemspec_required_ruby_version(merged, facts, receiver: template_receiver)
       merged = apply_configured_gemspec_metadata(merged, facts, receiver: template_receiver)
+      merged = preserve_destination_only_gemspec_metadata(
+        merged,
+        template_content: template_content,
+        destination_content: destination_content,
+        template_receiver: template_receiver,
+        destination_receiver: destination_receiver
+      )
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
       merged = remove_gemspec_version_gem_dependency_when_disabled(
@@ -10558,6 +10565,34 @@ module Kettle
       return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
 
       content
+    end
+
+    def preserve_destination_only_gemspec_metadata(
+      content,
+      template_content:,
+      destination_content:,
+      template_receiver:,
+      destination_receiver:
+    )
+      template_keys = gemspec_metadata_assignment_records(template_content, receiver: template_receiver).map do |record|
+        record.fetch(:key)
+      end
+      merged_keys = gemspec_metadata_assignment_records(content, receiver: template_receiver).map do |record|
+        record.fetch(:key)
+      end
+      destination_records = gemspec_metadata_assignment_records(destination_content, receiver: destination_receiver).select do |record|
+        !template_keys.include?(record.fetch(:key)) && !merged_keys.include?(record.fetch(:key))
+      end
+      return content if destination_records.empty?
+
+      insertion = destination_records.map do |record|
+        normalize_gemspec_receiver(record.fetch(:source).rstrip, from: destination_receiver, to: template_receiver)
+      end.join("\n") + "\n"
+      anchor = gemspec_metadata_assignment_records(content, receiver: template_receiver).last
+      anchor ||= gemspec_assignment_records(content, receiver: template_receiver).find { |record| record.fetch(:field) == "homepage" }
+      return content unless anchor
+
+      insert_lines_after(content, anchor.fetch(:end_line), insertion)
     end
 
     def gemspec_metadata_assignment_records(content, receiver:)
