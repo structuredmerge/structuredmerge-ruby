@@ -37,6 +37,7 @@ module Toml
       def backend_id = backend_reference.id
       def package_name = self.class::PACKAGE_NAME
       def package_version = self.class::PACKAGE_VERSION
+      def role = self.class.const_defined?(:ROLE, false) ? self.class::ROLE : :backend
 
       def capabilities
         {
@@ -44,7 +45,7 @@ module Toml
           dialects: DIALECTS,
           backends: [backend_id.to_sym],
           profiles: [DEFAULT_PROFILE],
-          role: :backend,
+          role: role,
           source_preservation: %i[
             exact_source
             mapping_entry_fragments

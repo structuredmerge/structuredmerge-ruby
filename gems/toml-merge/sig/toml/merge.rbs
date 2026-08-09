@@ -7,12 +7,19 @@ module Toml
       def backend_id: () -> String
       def package_name: () -> String
       def package_version: () -> String
+      def role: () -> Symbol
       def capabilities: () -> Hash[Symbol, untyped]
       def analyze: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
       def diff2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
       def merge2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
       def merge3: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
     end
+
+    class Provider < SourcePreservingProvider
+    end
+
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> untyped
 
     module Version
       VERSION: String

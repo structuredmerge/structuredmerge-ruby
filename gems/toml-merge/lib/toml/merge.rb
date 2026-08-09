@@ -366,6 +366,8 @@ module Toml
 end
 
 Toml::Merge.register_backend!
+require_relative 'merge/provider'
+Toml::Merge.register_provider!
 
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)

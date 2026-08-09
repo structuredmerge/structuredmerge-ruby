@@ -2,13 +2,15 @@
 
 require 'spec_helper'
 require 'citrus/toml/merge'
+require 'toml/merge'
 
 # rubocop:disable Metrics/BlockLength -- shared safe corpus compares complete merge classifications
 RSpec.describe 'source-preserving TOML backend parity' do
   subject(:providers) do
     {
       citrus: Citrus::Toml::Merge::Provider.new,
-      parslet: Parslet::Toml::Merge::Provider.new
+      parslet: Parslet::Toml::Merge::Provider.new,
+      klp: Toml::Merge::Provider.new
     }
   end
 
@@ -60,7 +62,24 @@ RSpec.describe 'source-preserving TOML backend parity' do
       results = providers.transform_values { |provider| parity_projection(provider.merge3(request)) }
 
       expect(results[:parslet]).to eq(results[:citrus]), request.inspect
+      expect(results[:klp]).to eq(results[:citrus]), request.inspect
     end
+  end
+
+  it 'retains backend identity and native AST attributes outside the parity projection' do
+    source = "published = 1979-05-27T07:32:00Z\nnumbers = [1, 2]\n"
+    analyses = providers.transform_values { |provider| provider.analyze(source: source) }
+
+    expect(analyses.transform_values { |result| result.dig(:analysis, :backend) }).to eq(
+      citrus: 'citrus',
+      parslet: 'parslet',
+      klp: 'kreuzberg-language-pack'
+    )
+    expect(analyses.values).to all(include(ok: true))
+    expect(analyses.values.map { |result| result.dig(:analysis, :entries, 1, :source_lines) }).to all(eq([2, 2]))
+    expect(analyses.values.map { |result| result.dig(:analysis, :entries, 1, :attributes) }).to all(
+      include(canonical_type: 'array')
+    )
   end
 end
 # rubocop:enable Metrics/BlockLength

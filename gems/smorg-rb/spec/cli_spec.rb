@@ -103,6 +103,31 @@ RSpec.describe Smorg::RB do
     expect(File.read(current)).to include('current: true', 'other: true')
   end
 
+  it 'routes TOML through the base-aware workflow and propagates its exact report' do
+    ancestor = write_file(@dir, 'ancestor.toml', "obsolete = true\nstable = true\n")
+    current = write_file(@dir, 'current.tmp', "obsolete = true\nstable = true\nours = 'left'\n")
+    other = write_file(@dir, 'other.tmp', "stable = true\ntheirs = { enabled = true }\n")
+    report_path = File.join(@dir, 'merge-report.json')
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    expect(Toml::Merge::SmartMerger).not_to receive(:new)
+    exit_code = described_class.run(
+      ['merge-driver', '--report', report_path, '--path-name', 'config.toml', ancestor, current, other],
+      stdout: stdout,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("stable = true\nours = 'left'\ntheirs = { enabled = true }\n")
+    report = JSON.parse(File.read(report_path))
+    expect(report.fetch('ok')).to be(true)
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.toml')
+    expect(report.dig('provider', 'backend')).to eq('kreuzberg-language-pack')
+    expect(report.dig('verification', 'base_participated')).to be(true)
+    expect(report.dig('render_report', 'strategy')).to eq('exact_mapping_entry_composite')
+  end
+
   it 'installs local Git diff driver attributes' do
     fixture = git_install_report_fixture
     stdout = StringIO.new
@@ -601,5 +626,6 @@ RSpec.describe Smorg::RB do
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     expect(stdout.string).to include('*.go merge=smorg-rb diff=smorg-rb smorg.language=go')
+    expect(stdout.string).to include('*.toml merge=smorg-rb diff=smorg-rb smorg.language=toml')
   end
 end

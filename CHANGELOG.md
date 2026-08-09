@@ -50,6 +50,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the source-preserving ruby.toml.parslet backend provider on the shared TOML provider base, with conservative parser limitation diagnostics and cross-backend parity coverage.
 
+- Add the source-preserving ruby.toml workflow provider on kreuzberg-language-pack, route smorg-rb TOML merges through it, and promote its tested selector.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

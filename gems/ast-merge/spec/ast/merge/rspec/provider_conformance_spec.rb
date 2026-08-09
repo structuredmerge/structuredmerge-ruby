@@ -46,10 +46,18 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
     matrix = described_class.new(fixture).validate!
 
     expect(matrix.advertised_provider_ids).to eq(
-      %w[ruby.binary ruby.dotenv ruby.json ruby.ruby ruby.ruby.prism ruby.text ruby.toml.citrus ruby.toml.parslet
+      %w[ruby.binary ruby.dotenv ruby.json ruby.ruby ruby.ruby.prism ruby.text ruby.toml ruby.toml.citrus ruby.toml.parslet
          ruby.yaml ruby.yaml.psych ruby.zip]
     )
-    expect(matrix.blocked_provider_ids.length).to eq(11)
+    expect(matrix.blocked_provider_ids.length).to eq(10)
+    expect(
+      matrix.tested?(
+        provider_id: 'ruby.toml',
+        dialect: :toml,
+        backend: :'kreuzberg-language-pack',
+        profile_id: :source_preserving
+      )
+    ).to be(true)
     expect(
       matrix.tested?(
         provider_id: 'ruby.toml.citrus',

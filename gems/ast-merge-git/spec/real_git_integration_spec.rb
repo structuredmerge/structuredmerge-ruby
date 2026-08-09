@@ -18,6 +18,10 @@ RSpec.describe 'ast-merge-git executable' do
     ruby_root.join('gems', 'ast-merge-git', 'exe', 'ast-merge-git')
   end
 
+  def driver_gemfile
+    ruby_root.join('gems', 'ast-merge-git', 'Gemfile')
+  end
+
   def repository
     ruby_root.join('tmp', "real-git-driver-#{Process.pid}")
   end
@@ -60,7 +64,7 @@ RSpec.describe 'ast-merge-git executable' do
   def configure_driver
     command = [
       'env',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(ruby_root.join('Gemfile').to_s)}",
+      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}",
       'AST_MERGE_REQUIRE=json/merge',
       'AST_MERGE_FAMILY=json',
       'AST_MERGE_DIALECT=json',
@@ -101,7 +105,7 @@ RSpec.describe 'ast-merge-git executable' do
   def configure_text_driver
     command = [
       'env',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(ruby_root.join('Gemfile').to_s)}",
+      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}",
       'AST_MERGE_REQUIRE=plain/merge',
       'AST_MERGE_FAMILY=text',
       'AST_MERGE_DIALECT=text',
@@ -146,7 +150,7 @@ RSpec.describe 'ast-merge-git executable' do
   def configure_opaque_driver(provider_id: nil, **driver)
     command = [
       'env',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(ruby_root.join('Gemfile').to_s)}",
+      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}",
       "AST_MERGE_REQUIRE=#{driver.fetch(:require_path)}",
       ("AST_MERGE_PROVIDER=#{provider_id}" if provider_id),
       "AST_MERGE_FAMILY=#{driver.fetch(:family)}",
@@ -380,6 +384,38 @@ RSpec.describe 'ast-merge-git executable' do
     expect(status.exitstatus).to eq(0), stderr
     expect(repository.join(path).binread).to eq(
       "shared = true\nours = \"left\"\ntheirs = [1, 2]\n"
+    )
+  end
+
+  it 'runs the exact TOML workflow selector where baseline text merge conflicts' do
+    base = "shared = true\n"
+    ours = "shared = true\nours = 'left'\n"
+    theirs = "shared = true\ntheirs = { enabled = true }\n"
+    path = configure_opaque_repository(
+      extension: 'toml',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'toml/merge',
+      provider_id: 'ruby.toml',
+      family: 'toml',
+      dialect: 'toml',
+      backend: 'kreuzberg-language-pack',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq(
+      "shared = true\nours = 'left'\ntheirs = { enabled = true }\n"
     )
   end
 
