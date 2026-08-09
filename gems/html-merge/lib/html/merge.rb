@@ -16,6 +16,9 @@ module Html
     class ParseError < Ast::Merge::ParseError; end
 
     autoload :CrisprAdapter, "html/merge/crispr_adapter"
+    autoload :NodeWrapper, "html/merge/node_wrapper"
+    autoload :FileAnalysis, "html/merge/file_analysis"
+    autoload :Provider, "html/merge/provider"
 
     module_function
 
@@ -249,9 +252,22 @@ module Html
 
       actor.updated_content
     end
+
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!(replace: false)
+      return unless Ast::Merge.respond_to?(:register_provider)
+
+      Ast::Merge.register_provider(merge_provider, replace: replace)
+    end
   end
 end
 
 Html::Merge::Version.class_eval do
   extend VersionGem::Basic
 end
+
+Html::Merge.register_backend!
+Html::Merge.register_provider!

@@ -237,6 +237,8 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
     expect(stdout.string).to include('*.go merge=smorg-rb diff=smorg-rb smorg.language=go')
+    expect(stdout.string).to include('*.htm merge=smorg-rb diff=smorg-rb smorg.language=html')
+    expect(stdout.string).to include('*.html merge=smorg-rb diff=smorg-rb smorg.language=html')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
     expect(stdout.string).to include('*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs')
     expect(stdout.string).to include('*.rs merge=smorg-rb diff=smorg-rb smorg.language=rust')
@@ -305,6 +307,44 @@ RSpec.describe Smorg::RB do
       report = JSON.parse(File.read(report_path))
       expect(report.dig('provider', 'provider_id')).to eq('ruby.typescript')
       expect(report.dig('provider', 'dialect')).to eq(extension == 'tsx' ? 'tsx' : 'typescript')
+      expect(report.dig('verification', 'base_participated')).to be(true)
+    end
+  end
+
+  it 'routes HTML extensions and identifiers only through the exact base-aware provider' do
+    expect(described_class.normalize_language('', 'example.htm')).to eq('html')
+    expect(described_class.normalize_language('text/html', 'extensionless')).to eq('html')
+    %w[htm html].each do |extension|
+      ancestor = write_file(
+        @dir,
+        "ancestor.#{extension}",
+        "<main id=content>base</main>\n<footer id=footer>base</footer>\n"
+      )
+      current = write_file(
+        @dir,
+        "current-#{extension}.tmp",
+        "<main id=content>ours</main>\n<footer id=footer>base</footer>\n"
+      )
+      other = write_file(
+        @dir,
+        "other-#{extension}.tmp",
+        "<main id=content>base</main>\n<footer id=footer>theirs</footer>\n"
+      )
+      report_path = File.join(@dir, "html-#{extension}-report.json")
+      stderr = StringIO.new
+
+      exit_code = described_class.run(
+        ['merge-driver', '--report', report_path, '--path-name', "example.#{extension}", ancestor, current, other],
+        stdout: StringIO.new,
+        stderr: stderr
+      )
+
+      expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+      expect(File.read(current)).to eq(
+        "<main id=content>ours</main>\n<footer id=footer>theirs</footer>\n"
+      )
+      report = JSON.parse(File.read(report_path))
+      expect(report.dig('provider', 'provider_id')).to eq('ruby.html')
       expect(report.dig('verification', 'base_participated')).to be(true)
     end
   end

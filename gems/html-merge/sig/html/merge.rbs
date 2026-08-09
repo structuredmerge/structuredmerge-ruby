@@ -5,6 +5,47 @@ module Html
       VERSION: String
     end
 
+    class NodeWrapper
+      ELEMENT_TYPES: Array[String]
+      attr_reader node: untyped
+      attr_reader source: String
+      attr_reader parent: NodeWrapper?
+      def initialize: (untyped node, source: String, ?parent: NodeWrapper?) -> void
+      def element?: () -> bool
+      def start_byte: () -> Integer
+      def end_byte: () -> Integer
+      def source_text: () -> String
+      def tag_name: () -> String?
+      def explicit_end_tag?: () -> bool
+      def self_closing?: () -> bool
+      def attributes: () -> Hash[String, String | true]
+      def explicit_id: () -> (String | true)?
+      def semantic_tree: () -> untyped
+    end
+
+    class FileAnalysis
+      attr_reader source: String
+      attr_reader root_node: untyped
+      attr_reader wrappers: Array[NodeWrapper]
+      attr_reader errors: Array[untyped]
+      attr_reader backend: Symbol
+      attr_reader document_semantics: untyped
+      attr_reader issues: Array[Hash[Symbol, untyped]]
+      def initialize: (String source) -> void
+      def valid?: () -> bool
+    end
+
+    class Provider
+      DEFAULT_PROFILE: Symbol
+      def provider_id: () -> String
+      def family: () -> String
+      def capabilities: () -> Hash[Symbol, untyped]
+      def analyze: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def diff2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge3: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+    end
+
     def self.register_backend!: () -> nil
     def self.html_feature_profile: () -> Hash[Symbol, untyped]
     def self.available_html_backends: () -> Array[untyped]
@@ -14,5 +55,7 @@ module Html
     def self.document_context: (content: String, ?source_label: String) -> untyped
     def self.element_text_selector: (text: String, ?id: String?) -> untyped
     def self.ensure_yard_content_wrapper: (String source) -> String
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> untyped
   end
 end

@@ -3,6 +3,7 @@
 require 'English'
 require 'bash/merge'
 require 'go-merge'
+require 'html/merge'
 require 'ast/merge'
 require 'ast-merge-git'
 require 'diff/lcs'
@@ -644,6 +645,8 @@ module Smorg
       [
         '*.bash merge=smorg-rb diff=smorg-rb smorg.language=bash',
         '*.go merge=smorg-rb diff=smorg-rb smorg.language=go',
+        '*.htm merge=smorg-rb diff=smorg-rb smorg.language=html',
+        '*.html merge=smorg-rb diff=smorg-rb smorg.language=html',
         '*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
         '.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
         '.env.* merge=smorg-rb diff=smorg-rb smorg.language=dotenv',
@@ -694,6 +697,22 @@ module Smorg
             provider_id: 'ruby.go',
             family: 'go',
             dialect: 'go',
+            backend: 'kreuzberg-language-pack',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
+      when 'html'
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.html',
+            family: 'html',
+            dialect: 'html',
             backend: 'kreuzberg-language-pack',
             profile_id: 'source_preserving',
             fallback_policy: fallback_policy,
@@ -1022,6 +1041,7 @@ module Smorg
     def normalize_language(language, path_name)
       return 'bash' if language.to_s.strip.empty? && %w[.bash .sh].include?(File.extname(path_name.to_s).downcase)
       return 'go' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.go'
+      return 'html' if language.to_s.strip.empty? && %w[.htm .html].include?(File.extname(path_name.to_s).downcase)
       return 'rust' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.rs'
       return 'typescript' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.ts'
       return 'tsx' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.tsx'
@@ -1031,6 +1051,8 @@ module Smorg
         'bash'
       when 'go', 'golang'
         'go'
+      when 'html', 'htm', 'text/html', 'html5'
+        'html'
       when 'dotenv', 'env', 'config-env'
         'dotenv'
       when 'json'

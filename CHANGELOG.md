@@ -62,6 +62,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Promote the ruby.bash provider with conservative native TreeHaver ownership, base-aware merges, and Git/smorg-rb routing.
 
+- Implement the source-preserving, base-aware ruby.html provider and wire HTML Git/smorg dispatch.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

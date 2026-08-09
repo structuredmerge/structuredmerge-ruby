@@ -9,6 +9,7 @@ require 'bash/merge'
 require 'rbs/merge'
 require 'rust/merge'
 require 'go/merge'
+require 'html/merge'
 require 'typescript/merge'
 require 'shellwords'
 require 'zip/merge'
@@ -416,6 +417,38 @@ RSpec.describe 'ast-merge-git executable' do
     expect(baseline_output).to include('<<<<<<< baseline-ours.json')
     expect(status.exitstatus).to eq(0), stderr
     expect(repository.join(path).binread).to eq("#{base}export function ours() {}\nexport function theirs() {}\n")
+  end
+
+  it 'runs the exact HTML selector where baseline text merge conflicts' do
+    base = "<main id=content>base</main>\n<footer id=footer>base</footer>\n"
+    ours = "<main id=content>ours</main>\n<footer id=footer>base</footer>\n"
+    theirs = "<main id=content>base</main>\n<footer id=footer>theirs</footer>\n"
+    path = configure_opaque_repository(
+      extension: 'html',
+      base: base,
+      ours: ours,
+      theirs: theirs,
+      require_path: 'html/merge',
+      provider_id: 'ruby.html',
+      family: 'html',
+      dialect: 'html',
+      backend: 'kreuzberg-language-pack',
+      profile: 'source_preserving'
+    )
+    baseline_output, _baseline_error, baseline_status = text_git_baseline(
+      base: base,
+      ours: ours,
+      theirs: theirs
+    )
+
+    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+    expect(baseline_status.exitstatus).to eq(1)
+    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
+    expect(status.exitstatus).to eq(0), stderr
+    expect(repository.join(path).binread).to eq(
+      "<main id=content>ours</main>\n<footer id=footer>theirs</footer>\n"
+    )
   end
 
   it 'runs the dotenv provider through the installed Git-driver path' do
