@@ -234,12 +234,40 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include('*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown')
     expect(stdout.string).to include('*.json5 merge=smorg-rb diff=smorg-rb smorg.language=json5')
+    expect(stdout.string).to include('*.go merge=smorg-rb diff=smorg-rb smorg.language=go')
     expect(stdout.string).to include('*.rb merge=smorg-rb diff=smorg-rb smorg.language=ruby')
     expect(stdout.string).to include('*.rbs merge=smorg-rb diff=smorg-rb smorg.language=rbs')
     expect(stdout.string).to include('*.yml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.yaml merge=smorg-rb diff=smorg-rb smorg.language=yaml')
     expect(stdout.string).to include('*.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
     expect(stdout.string).to include('.env merge=smorg-rb diff=smorg-rb smorg.language=dotenv')
+  end
+
+  it 'routes Go paths only through the exact base-aware provider' do
+    ancestor = write_file(@dir, 'ancestor.go', "package demo\n\nfunc Obsolete() {}\nfunc Stable() {}\n")
+    current = write_file(
+      @dir,
+      'current.tmp',
+      "package demo\n\nfunc Obsolete() {}\nfunc Stable() {}\nfunc Ours() {}\n"
+    )
+    other = write_file(@dir, 'other.tmp', "package demo\n\nfunc Stable() {}\nfunc Theirs() {}\n")
+    report_path = File.join(@dir, 'go-report.json')
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    expect(Go::Merge).not_to receive(:merge_go)
+    exit_code = described_class.run(
+      ['merge-driver', '--report', report_path, '--path-name', 'example.go', ancestor, current, other],
+      stdout: stdout,
+      stderr: stderr
+    )
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq("package demo\n\nfunc Stable() {}\nfunc Ours() {}\nfunc Theirs() {}\n")
+    report = JSON.parse(File.read(report_path))
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.go')
+    expect(report.dig('provider', 'backend')).to eq('kreuzberg-language-pack')
+    expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
   it 'routes dotenv paths through the base-aware dotenv provider' do

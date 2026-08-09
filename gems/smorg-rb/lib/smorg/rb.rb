@@ -662,7 +662,21 @@ module Smorg
                       other_source)
       case normalize_language(language, path_name)
       when 'go'
-        Go::Merge.merge_go(other_source, current_source, 'go')
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.go',
+            family: 'go',
+            dialect: 'go',
+            backend: 'kreuzberg-language-pack',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
       when 'dotenv'
         merge3_result(
           Ast::Merge::Git.merge3(
@@ -950,6 +964,8 @@ module Smorg
     end
 
     def normalize_language(language, path_name)
+      return 'go' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.go'
+
       case language.to_s.strip.downcase
       when 'go', 'golang'
         'go'

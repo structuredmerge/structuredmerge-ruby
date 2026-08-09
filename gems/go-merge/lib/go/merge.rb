@@ -4,7 +4,9 @@ require 'tree_haver'
 require 'ast/merge'
 require_relative 'merge/version'
 
+# rubocop:disable Metrics/ModuleLength -- legacy API and native workflow registration share the public Go::Merge surface
 module Go
+  # Native Go parsing and source-preserving merge APIs.
   module Merge
     module_function
 
@@ -12,6 +14,10 @@ module Go
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+    autoload :NodeWrapper, 'go/merge/node_wrapper'
+    autoload :FileAnalysis, 'go/merge/file_analysis'
+    autoload :Provider, 'go/merge/provider'
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
@@ -68,8 +74,7 @@ module Go
       end
       return analyze_go_module(source) if dialect == 'go'
 
-      { ok: false,
-        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: "Unsupported Go dialect #{dialect}." }], policies: [] }
+      unsupported_feature_result("Unsupported Go dialect #{dialect}.")
     end
 
     def go_backend_available_for_analysis?(backend_id)
@@ -97,6 +102,15 @@ module Go
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
     end
 
+    def merge_provider
+      @merge_provider ||= Provider.new
+    end
+
+    def register_provider!(replace: false)
+      Ast::Merge.register_provider(merge_provider, replace: replace)
+    end
+
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity -- legacy merge result assembly remains one compatibility boundary
     def merge_go(template_source, destination_source, dialect)
       template = parse_go(template_source, dialect)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
@@ -113,43 +127,44 @@ module Go
       end
 
       destination_declarations = destination.dig(:analysis, :declarations).to_h { |item| [item[:path], item] }
+      template_additions = template.dig(:analysis, :declarations).reject do |item|
+        destination_declarations[item[:path]]
+      end
       merged_declaration_texts = destination.dig(:analysis, :declarations).map { |item| item[:text] } +
-                                 template.dig(:analysis, :declarations).reject do |item|
-                                   destination_declarations[item[:path]]
-                                 end.map { |item| item[:text] }
+                                 template_additions.map { |item| item[:text] }
       import_block = destination.dig(:analysis, :imports).map { |item| item[:text] }.join
       declaration_block = merged_declaration_texts.join("\n").rstrip
       sections = [import_block.rstrip, declaration_block].reject(&:empty?)
       { ok: true, diagnostics: [], output: "#{sections.join("\n\n").rstrip}\n",
         policies: [DESTINATION_WINS_ARRAY_POLICY] }
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength -- one AST pass builds the legacy owner projection
     def analyze_go_module(source)
-      parser = TreeHaver.parser_for(:go, backend_type: :tree_sitter)
-      tree = parser.parse(source)
-      collect_parse_errors(tree.root_node)
+      analysis = FileAnalysis.new(source, require_package: false)
+      raise analysis.errors.first unless analysis.errors.empty?
 
       imports = []
       declarations = []
-      tree.root_node.children.each do |node|
-        case node.type
+      analysis.declarations.each do |wrapper|
+        case wrapper.node.type
         when 'import_declaration'
-          import_source = line_anchored_slice(source, node)
+          signature = wrapper.signature
+
           imports << {
             path: "/imports/#{imports.length}",
             owner_kind: 'import',
-            match_key: normalize_go_import_path(import_source),
-            text: import_text(source, node)
+            match_key: signature.first == :import ? signature.last.last : signature,
+            text: "#{wrapper.source_text}\n"
           }
         when 'function_declaration', 'method_declaration', 'type_declaration', 'const_declaration', 'var_declaration'
-          name = first_named_descendant_text(source, node, %w[identifier type_identifier field_identifier])
-          next unless name
-
+          name = legacy_declaration_key(wrapper.signature)
           declarations << {
             path: "/declarations/#{name}",
             owner_kind: 'declaration',
             match_key: name,
-            text: declaration_text(source, node)
+            text: "#{wrapper.source_text}\n"
           }
         end
       end
@@ -169,16 +184,15 @@ module Go
     rescue TreeHaver::Error, StandardError => e
       parse_failure_result(e)
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
     private_class_method :analyze_go_module
 
-    def collect_parse_errors(node)
-      raise TreeHaver::NotAvailable, 'Go parse returned no root node' unless node
-      return unless node.respond_to?(:has_error?) && node.has_error?
+    def legacy_declaration_key(signature)
+      return "#{signature.fetch(1)}.#{signature.fetch(2)}" if signature.first == :method
 
-      raise TreeHaver::NotAvailable,
-            'Go parse contains syntax errors'
+      signature.last
     end
-    private_class_method :collect_parse_errors
+    private_class_method :legacy_declaration_key
 
     def parse_failure_result(error)
       { ok: false,
@@ -186,23 +200,6 @@ module Go
         policies: [] }
     end
     private_class_method :parse_failure_result
-
-    def normalize_go_import_path(import_source)
-      match = import_source.match(/"([^"]+)"/)
-      match ? match[1] : import_source.sub(/\Aimport\s+/, '').strip
-    end
-    private_class_method :normalize_go_import_path
-
-    def first_named_descendant_text(source, node, types)
-      return slice_span(source, node) if types.include?(node.type)
-
-      node.children.each do |child|
-        value = first_named_descendant_text(source, child, types)
-        return value if value && !value.empty?
-      end
-      nil
-    end
-    private_class_method :first_named_descendant_text
 
     def owner_view(item)
       item.slice(:path, :owner_kind, :match_key)
@@ -214,17 +211,6 @@ module Go
     end
     private_class_method :owner_views
 
-    def import_text(source, span) = "#{slice_span(source, span)}\n"
-    def declaration_text(source, span) = "#{line_anchored_slice(source, span)}\n"
-    def slice_span(source, span) = source[span.start_byte...span.end_byte].strip
-
-    def line_anchored_slice(source, span)
-      line_start = source.rindex("\n", [span.start_byte - 1, 0].max)
-      line_start = line_start ? line_start + 1 : 0
-      source[line_start...span.end_byte].strip
-    end
-    private_class_method :import_text, :declaration_text, :slice_span, :line_anchored_slice
-
     def unsupported_feature_result(message)
       {
         ok: false,
@@ -235,5 +221,7 @@ module Go
     private_class_method :unsupported_feature_result
   end
 end
+# rubocop:enable Metrics/ModuleLength
 
 Go::Merge.register_backend!
+Go::Merge.register_provider!
