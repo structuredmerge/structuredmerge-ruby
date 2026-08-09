@@ -46,9 +46,9 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
     matrix = described_class.new(fixture).validate!
 
     expect(matrix.advertised_provider_ids).to eq(
-      %w[ruby.binary ruby.dotenv ruby.json ruby.ruby.prism ruby.text ruby.yaml ruby.yaml.psych ruby.zip]
+      %w[ruby.binary ruby.dotenv ruby.json ruby.ruby ruby.ruby.prism ruby.text ruby.yaml ruby.yaml.psych ruby.zip]
     )
-    expect(matrix.blocked_provider_ids.length).to eq(14)
+    expect(matrix.blocked_provider_ids.length).to eq(13)
     expect(
       matrix.tested?(
         provider_id: 'ruby.yaml',
@@ -62,6 +62,14 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
         provider_id: 'ruby.json',
         dialect: :json5,
         backend: :'kreuzberg-language-pack',
+        profile_id: :source_preserving
+      )
+    ).to be(true)
+    expect(
+      matrix.tested?(
+        provider_id: 'ruby.ruby',
+        dialect: :ruby,
+        backend: :prism,
         profile_id: :source_preserving
       )
     ).to be(true)

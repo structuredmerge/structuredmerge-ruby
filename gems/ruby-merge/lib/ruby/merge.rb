@@ -1,20 +1,10 @@
 # frozen_string_literal: true
 
 require 'digest'
+require 'prism/merge'
 require 'tree_haver'
 require 'ast/merge'
 require_relative 'merge/version'
-require_relative 'merge/block_directive_detector'
-require_relative 'merge/block_binding_support'
-require_relative 'merge/doc_comment_support'
-require_relative 'merge/gemspec_support'
-require_relative 'merge/magic_comment_support'
-require_relative 'merge/method_similarity'
-require_relative 'merge/nocov_node_base'
-require_relative 'merge/nocov_wrapper_base'
-require_relative 'merge/rescue_semantics'
-require_relative 'merge/scaffold_chunk_support'
-require_relative 'merge/signature_support'
 
 module Ruby
   module Merge
@@ -3143,6 +3133,8 @@ module Ruby
 end
 
 Ruby::Merge.register_backend!
+require_relative 'merge/provider'
+Ruby::Merge.register_provider!
 
 TreeHaver::BackendRegistry.register_tag(
   :tslp_ruby_import_records,

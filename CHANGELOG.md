@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the ruby.yaml source-preserving workflow provider, delegate it to the Psych backend, and route smorg-rb YAML merges through it.
 
+- Add the ruby.ruby workflow provider over ruby.ruby.prism and route smorg-rb Ruby merge3 operations through it with delegated backend provenance.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

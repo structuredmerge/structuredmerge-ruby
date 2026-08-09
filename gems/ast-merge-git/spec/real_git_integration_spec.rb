@@ -143,15 +143,16 @@ RSpec.describe 'ast-merge-git executable' do
     path
   end
 
-  def configure_opaque_driver(require_path:, family:, dialect:, backend:, profile:)
+  def configure_opaque_driver(provider_id: nil, **driver)
     command = [
       'env',
       "BUNDLE_GEMFILE=#{Shellwords.escape(ruby_root.join('Gemfile').to_s)}",
-      "AST_MERGE_REQUIRE=#{require_path}",
-      "AST_MERGE_FAMILY=#{family}",
-      "AST_MERGE_DIALECT=#{dialect}",
-      "AST_MERGE_BACKEND=#{backend}",
-      "AST_MERGE_PROFILE=#{profile}",
+      "AST_MERGE_REQUIRE=#{driver.fetch(:require_path)}",
+      ("AST_MERGE_PROVIDER=#{provider_id}" if provider_id),
+      "AST_MERGE_FAMILY=#{driver.fetch(:family)}",
+      "AST_MERGE_DIALECT=#{driver.fetch(:dialect)}",
+      "AST_MERGE_BACKEND=#{driver.fetch(:backend)}",
+      "AST_MERGE_PROFILE=#{driver.fetch(:profile)}",
       'bundle',
       'exec',
       Shellwords.escape(executable.to_s),
@@ -160,8 +161,8 @@ RSpec.describe 'ast-merge-git executable' do
       '%B',
       '%P',
       '%L'
-    ].join(' ')
-    git('config', 'merge.structuredmerge.name', "StructuredMerge #{family} provider")
+    ].compact.join(' ')
+    git('config', 'merge.structuredmerge.name', "StructuredMerge #{driver.fetch(:family)} provider")
     git('config', 'merge.structuredmerge.driver', command)
   end
 
@@ -226,7 +227,7 @@ RSpec.describe 'ast-merge-git executable' do
     expect(repository.join('notes.txt').binread).to eq("theirs\n")
   end
 
-  it 'runs the Prism Ruby provider through the installed Git-driver path' do
+  it 'runs the Ruby workflow provider through the installed Git-driver path' do
     base = "VALUE = 0\n"
     ours = "VALUE = 0\nOURS = 1\n"
     theirs = "VALUE = 0\nTHEIRS = 2\n"
@@ -235,7 +236,8 @@ RSpec.describe 'ast-merge-git executable' do
       base: base,
       ours: ours,
       theirs: theirs,
-      require_path: 'prism/merge',
+      require_path: 'ruby/merge',
+      provider_id: 'ruby.ruby',
       family: 'ruby',
       dialect: 'ruby',
       backend: 'prism',
