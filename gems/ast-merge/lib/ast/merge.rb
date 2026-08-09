@@ -83,6 +83,9 @@ module Ast
     autoload :OwnerSelection, 'ast/merge/owner_selection'
     autoload :KeyPathPartialTemplateMergerBase, 'ast/merge/key_path_partial_template_merger_base'
     autoload :PartialTemplateMergerBase, 'ast/merge/partial_template_merger_base'
+    autoload :ProviderContract, 'ast/merge/provider_contract'
+    autoload :ProviderRegistry, 'ast/merge/provider_registry'
+    autoload :ProviderResult, 'ast/merge/provider_result'
     autoload :SectionTyping, 'ast/merge/section_typing'
     autoload :SmartMergerBase, 'ast/merge/smart_merger_base'
     autoload :SourceRegionReportSupport, 'ast/merge/source_region_report_support'
@@ -110,7 +113,23 @@ module Ast
     def merge_engine_from_environment(env = ENV)
       normalize_merge_engine(env[MERGE_ENGINE_ENVIRONMENT_VARIABLE])
     end
-    module_function :normalize_merge_engine, :merge_engine_from_environment
+
+    def register_provider(provider, replace: false)
+      ProviderRegistry.default.register(provider, replace: replace)
+    end
+
+    def resolve_provider(**selectors)
+      ProviderRegistry.default.resolve(**selectors)
+    end
+
+    def dispatch_provider(operation, request)
+      ProviderRegistry.default.dispatch(operation, request)
+    end
+    module_function :normalize_merge_engine,
+      :merge_engine_from_environment,
+      :register_provider,
+      :resolve_provider,
+      :dispatch_provider
 
     COMPACT_RULESET_REPEATABLE_KEYED_DIRECTIVES = %w[
       backend node_role atomic child_group capability logical_owner repair surface delegate

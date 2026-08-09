@@ -1,5 +1,66 @@
 module Ast
   module Merge
+    type provider_operation = :analyze | :diff2 | :merge2 | :merge3
+    type provider_request = Hash[Symbol, untyped]
+    type provider_result = Hash[Symbol, untyped]
+    type provider_capabilities = Hash[Symbol, untyped]
+
+    interface _MergeProvider
+      def provider_id: () -> String
+      def family: () -> String
+      def capabilities: () -> provider_capabilities
+      def analyze: (provider_request request) -> provider_result
+      def diff2: (provider_request request) -> provider_result
+      def merge2: (provider_request request) -> provider_result
+      def merge3: (provider_request request) -> provider_result
+    end
+
+    class Error < StandardError
+    end
+
+    module ProviderContract
+      OPERATIONS: Array[provider_operation]
+      REQUIRED_METHODS: Array[Symbol]
+      REQUEST_ROLES: Hash[provider_operation, Array[Symbol]]
+      REQUIRED_RESULT_FIELDS: Array[Symbol]
+      REQUIRED_CAPABILITY_FIELDS: Array[Symbol]
+      RESULT_SCHEMA: String
+      PROVIDER_ROLES: Array[Symbol]
+
+      class Error < Ast::Merge::Error
+      end
+      class InvalidProviderError < Error
+      end
+      class DuplicateProviderError < Error
+      end
+      class InvalidRequestError < Error
+      end
+      class InvalidResultError < Error
+      end
+    end
+
+    class ProviderResult
+      def self.build: (operation: provider_operation, success: bool, ?envelope: Hash[untyped, untyped], **untyped payload) -> provider_result
+      def self.invalid_request: (operation: provider_operation, message: String) -> provider_result
+      def self.unsupported: (operation: provider_operation, message: String, ?selectors: Hash[untyped, untyped]) -> provider_result
+    end
+
+    class ProviderRegistry
+      def self.default: () -> ProviderRegistry
+
+      def initialize: () -> void
+      def register: (_MergeProvider provider, ?replace: bool) -> _MergeProvider
+      def fetch: (String provider_id) -> Hash[Symbol, untyped]?
+      def providers: () -> Array[Hash[Symbol, untyped]]
+      def resolve: (?provider_id: String?, ?family: String?, ?dialect: String?, ?backend: String?, ?profile_id: String?, ?operation: provider_operation?) -> _MergeProvider?
+      def dispatch: (provider_operation operation, provider_request request) -> provider_result
+      def clear: () -> ProviderRegistry
+    end
+
+    def self.register_provider: (_MergeProvider provider, ?replace: bool) -> _MergeProvider
+    def self.resolve_provider: (**untyped selectors) -> _MergeProvider?
+    def self.dispatch_provider: (provider_operation operation, provider_request request) -> provider_result
+
     module Version
       VERSION: String
     end

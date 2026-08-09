@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Add a uniform merge-provider registry and dispatch contract for analyze, diff2, merge2, and base-aware merge3 operations.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
