@@ -70,6 +70,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an offline portable benchmark contract consumer and conformance gate with deterministic safety-focused summaries.
 
+- Add an offline micro/dev paired benchmark runner and reviewed CC0 curated corpus contract with non-compensable false-auto-merge gating.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

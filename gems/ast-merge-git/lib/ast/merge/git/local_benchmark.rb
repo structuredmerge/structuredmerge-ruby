@@ -1,0 +1,864 @@
+# frozen_string_literal: true
+
+require 'digest'
+require 'fileutils'
+require 'json'
+require 'open3'
+require 'rbconfig'
+
+module Ast
+  module Merge
+    module Git
+      # Offline Slice 1022-compatible corpus validation and deterministic selection.
+      # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity -- benchmark evidence is intentionally explicit
+      class LocalBenchmark
+        Error = Class.new(StandardError)
+        SCHEMA = 'structuredmerge.benchmark.corpus/v1'
+        CASE_SCHEMA = 'structuredmerge.benchmark/v1'
+        OPERATIONS = %w[merge3 metamorphic diff].freeze
+        PARTITIONS = %w[sentinel gold metamorphic].freeze
+        EXPECTATIONS = %w[clean conflict error excluded_ambiguous].freeze
+        SEVERITIES = %w[none low high critical].freeze
+        PRESERVATION = %w[required allowed_to_change not_applicable].freeze
+        TRANSFORMATIONS = %w[
+          rename move reorder formatting comment independent_edit delete_modify duplicate_key_identity
+          schema_aware_mutation
+        ].freeze
+        ID_PATTERN = /\A[a-z0-9]+(?:[.-][a-z0-9]+)*\z/
+        PROVENANCE_FIELDS = %w[
+          origin_uri revision spdx_license license_evidence_uri authorship author_review reviewer derivation
+        ].freeze
+        SELECTOR_FIELDS = %w[provider_id family dialect backend profile require].freeze
+        INPUT_ROLES = {
+          'merge3' => %w[base ours theirs],
+          'metamorphic' => %w[source transformed],
+          'diff' => %w[before after]
+        }.freeze
+
+        attr_reader :document, :corpus_digest, :path
+
+        def self.load(path)
+          source = File.binread(path)
+          new(JSON.parse(source), path: path, corpus_digest: Digest::SHA256.hexdigest(source)).tap(&:validate!)
+        rescue JSON::ParserError => e
+          raise Error, "invalid corpus JSON: #{e.message}"
+        rescue SystemCallError => e
+          raise Error, "cannot read corpus: #{e.message}"
+        end
+
+        def initialize(document, path: nil, corpus_digest: nil)
+          @document = document
+          @path = path && Pathname(path).expand_path
+          @corpus_digest = corpus_digest || digest(canonical_json(document))
+        end
+
+        def validate!
+          require_keys(document, %w[schema_version kind id version extends provenance profiles capability_map
+                                    selection cases expected_summary], 'corpus')
+          error!('unsupported corpus schema') unless document['schema_version'] == SCHEMA
+          error!('corpus must extend Slice 1022 v1') unless document['extends'] == CASE_SCHEMA
+          error!('network must be denied') unless document['network_policy'] == 'denied'
+          error!('services must be empty') unless document['services'] == []
+          validate_provenance!(document['provenance'], 'corpus')
+          validate_profiles!
+          validate_capability_map!
+          validate_cases!
+          validate_summary!
+          true
+        end
+
+        def cases
+          validate!
+          document.fetch('cases')
+        end
+
+        def select(profile:, changed_paths: [])
+          validate!
+          profile = profile.to_s
+          definition = document.fetch('profiles')[profile]
+          error!("unknown profile: #{profile}") unless definition
+          paths = changed_paths.map(&:to_s).uniq.sort
+          inferred = paths.to_h { |changed| [changed, capabilities_for(changed)] }
+          capabilities = inferred.values.flatten.uniq.sort
+          direct = cases.select { |item| direct_case?(item, capabilities) }.map { |item| item.fetch('id') }
+          sentinels = definition.fetch('mandatory_sentinels')
+          selected = ordered(sentinels + direct)
+          population = cases.map { |item| item.fetch('id') } - selected
+          neighbors = neighbor_order(population).first(definition.fetch('neighbor_count'))
+          selected = ordered(selected + neighbors)
+          selected = sentinels if profile == 'micro'
+
+          {
+            'profile' => profile,
+            'seed' => document.dig('selection', 'seed'),
+            'selected_case_ids' => selected,
+            'excluded_case_ids' => cases.map { |item| item.fetch('id') } - selected,
+            'changed_paths' => inferred.map { |changed, caps| { 'path' => changed, 'capabilities' => caps } },
+            'inferred_capabilities' => capabilities,
+            'direct_cases' => direct,
+            'direct_case_reasons' => capabilities.to_h do |capability|
+              matching = cases.filter_map do |item|
+                item['id'] if direct_case?(item, [capability])
+              end
+              [capability, matching]
+            end,
+            'sentinels' => sentinels,
+            'neighbor_sample' => {
+              'population' => population,
+              'ordering_algorithm' => document.dig('selection', 'neighbor_order'),
+              'seed' => document.dig('selection', 'seed'),
+              'selected_case_ids' => neighbors
+            },
+            'unsupported_selected_cases' => selected.reject { |id| case_by_id(id)['operation'] == 'merge3' },
+            'budgets' => definition.fetch('budgets'),
+            'explanation' => explanation(
+              profile,
+              inferred: inferred,
+              direct: direct,
+              sentinels: sentinels,
+              population: population,
+              neighbors: neighbors
+            )
+          }
+        end
+
+        def case_by_id(id)
+          document.fetch('cases').find { |item| item['id'] == id } || error!("unknown case: #{id}")
+        end
+
+        private
+
+        def validate_profiles!
+          error!('profiles must be exactly micro and dev') unless document['profiles'].keys.sort == %w[dev micro]
+          document['profiles'].each do |name, profile|
+            require_keys(profile, %w[mandatory_sentinels neighbor_count budgets], "profile #{name}")
+            require_keys(profile['budgets'], %w[wall_seconds case_count output_bytes], "profile #{name} budgets")
+          end
+        end
+
+        def validate_capability_map!
+          error!('capability_map must not be empty') unless document['capability_map'].is_a?(Array) &&
+                                                            document['capability_map'].any?
+          document['capability_map'].each do |entry|
+            require_keys(entry, %w[path_prefix capabilities], 'capability map entry')
+            error!('capability map path must be relative') if Pathname(entry['path_prefix']).absolute?
+            unless entry['capabilities'] == entry['capabilities'].sort
+              error!('capability map capabilities must be sorted')
+            end
+          end
+        end
+
+        def validate_cases!
+          records = document['cases']
+          error!('cases must not be empty') unless records.is_a?(Array) && records.any?
+          ids = records.map { |item| validate_case!(item) }
+          error!('duplicate case ID') unless ids.uniq.length == ids.length
+          id_set = ids.to_h { |id| [id, true] }
+          records.select { |item| item['operation'] == 'metamorphic' }.each do |item|
+            error!("#{item['id']}: parent case is dangling") unless id_set[item['parent_case_id']]
+          end
+          sentinels = records.select { |item| item['partition'] == 'sentinel' }.map { |item| item['id'] }
+          document['profiles'].each_value do |profile|
+            error!('profile sentinels differ from corpus sentinels') unless profile['mandatory_sentinels'] == sentinels
+          end
+        end
+
+        def validate_case!(item)
+          require_keys(item, %w[schema_version kind id operation family provider dialect capabilities partition
+                                provenance oracle acceptable_equivalence preservation_policy
+                                false_auto_merge_severity selector inputs independent_edits independent_edit_ids
+                                expected_conflict_regions], 'case')
+          id = item['id']
+          error!("#{id}: invalid stable case ID") unless ID_PATTERN.match?(id.to_s)
+          error!("#{id}: incompatible case schema") unless item['schema_version'] == CASE_SCHEMA
+          error!("#{id}: invalid kind") unless item['kind'] == 'benchmark_case'
+          error!("#{id}: unsupported operation") unless OPERATIONS.include?(item['operation'])
+          error!("#{id}: unsupported partition") unless PARTITIONS.include?(item['partition'])
+          unless item['capabilities'] == item['capabilities'].uniq.sort
+            error!("#{id}: capabilities must be unique and sorted")
+          end
+          error!("#{id}: unsupported severity") unless SEVERITIES.include?(item['false_auto_merge_severity'])
+          validate_provenance!(item['provenance'], id)
+          validate_oracle!(item, id)
+          validate_selector!(item['selector'], id)
+          validate_inputs!(item, id)
+          validate_edits!(item, id)
+          validate_preservation!(item, id)
+          validate_operation!(item, id)
+          id
+        end
+
+        def validate_provenance!(provenance, label)
+          require_keys(provenance, PROVENANCE_FIELDS, "#{label} provenance")
+          error!("#{label}: authorship must be reviewed") unless provenance['author_review'] == 'reviewed'
+          error!("#{label}: SPDX license is required") if provenance['spdx_license'].to_s.empty?
+        end
+
+        def validate_oracle!(item, id)
+          oracle = item['oracle']
+          require_keys(oracle, %w[class artifact admission score_eligible procedure], "#{id} oracle")
+          validate_inline!(oracle['artifact'], "#{id} oracle artifact")
+          error!("#{id}: oracle procedure cannot accept parse validity alone") if oracle['procedure'].to_s.empty?
+          error!("#{id}: acceptable equivalence must be explicit") unless item['acceptable_equivalence'].is_a?(Array) &&
+                                                                          item['acceptable_equivalence'].any?
+          return unless oracle['class'] == 'exact' && item.dig('expected', 'outcome') == 'clean'
+          return if oracle.dig('artifact', 'bytes') == item.dig('expected', 'output', 'bytes')
+
+          error!("#{id}: exact oracle artifact must match expected output bytes")
+        end
+
+        def validate_selector!(selector, id)
+          require_keys(selector, SELECTOR_FIELDS, "#{id} selector")
+        end
+
+        def validate_inputs!(item, id)
+          roles = INPUT_ROLES.fetch(item['operation'])
+          require_keys(item['inputs'], roles, "#{id} inputs")
+          item['inputs'].each { |role, record| validate_inline!(record, "#{id} #{role}") }
+        end
+
+        def validate_inline!(record, label)
+          require_keys(record, %w[mode bytes sha256], label)
+          error!("#{label}: only inline authored evidence is admitted") unless record['mode'] == 'inline'
+          error!("#{label}: input exceeds Slice 1022 inline limit") if record['bytes'].bytesize > 4096
+          error!("#{label}: SHA-256 does not match exact bytes") unless record['sha256'] == digest(record['bytes'])
+        end
+
+        def validate_edits!(item, id)
+          edits = item['independent_edits']
+          error!("#{id}: independent edits must be an array") unless edits.is_a?(Array)
+          edit_ids = edits.map { |edit| edit.fetch('id') }
+          error!("#{id}: duplicate independent edit ID") unless edit_ids.uniq.length == edit_ids.length
+          error!("#{id}: independent edit IDs differ") unless item['independent_edit_ids'] == edit_ids
+        end
+
+        def validate_preservation!(item, id)
+          required = %w[comments formatting order encoding line_endings unknown_fields source_regions]
+          require_keys(item['preservation_policy'], required, "#{id} preservation")
+          return if item['preservation_policy'].values.all? { |value| PRESERVATION.include?(value) }
+
+          error!("#{id}: invalid preservation requirement")
+        end
+
+        def validate_operation!(item, id)
+          if item['operation'] == 'merge3'
+            require_keys(item, %w[expected expected_conflicts], id)
+            expectation = item.dig('expected', 'outcome')
+            error!("#{id}: unsupported expected outcome") unless EXPECTATIONS.include?(expectation)
+            output = item.dig('expected', 'output')
+            validate_inline!(output, "#{id} expected output") if output
+            expected_conflict = expectation == 'conflict'
+            error!("#{id}: conflict expectation mismatch") unless item['expected_conflicts'] == expected_conflict
+          elsif item['operation'] == 'metamorphic'
+            validate_metamorphic!(item, id)
+          end
+        end
+
+        def validate_metamorphic!(item, id)
+          require_keys(item, %w[generator parent_case_id transformations expected_invariants], id)
+          require_keys(item['generator'], %w[id version sha256 seed], "#{id} generator")
+          digest = item.dig('generator', 'sha256')
+          error!("#{id}: generator SHA-256 is malformed") unless /\A[0-9a-f]{64}\z/.match?(digest)
+          error!("#{id}: expected invariants must not be empty") if item['expected_invariants'].empty?
+          item['transformations'].each do |transformation|
+            require_keys(transformation, %w[id type parameters], "#{id} transformation")
+            error!("#{id}: unknown transformation") unless TRANSFORMATIONS.include?(transformation['type'])
+            next if transformation.dig('parameters', 'deterministic')
+
+            error!("#{id}: transformation must be deterministic")
+          end
+        end
+
+        def validate_summary!
+          summary = document['expected_summary']
+          error!('expected case count differs') unless summary['case_count'] == document['cases'].length
+          actual = document['cases'].group_by { |item| item['partition'] }.transform_values(&:length)
+          error!('expected partition counts differ') unless summary['partition_counts'] == actual
+          operations = document['cases'].group_by { |item| item['operation'] }.transform_values(&:length)
+          error!('expected operation counts differ') unless summary['operation_counts'] == operations
+          families = document['cases'].map { |item| item['family'] }.uniq.sort
+          error!('expected families differ') unless summary['families'] == families
+          expected_micro = document.dig('profiles', 'micro', 'mandatory_sentinels')
+          error!('expected micro case IDs differ') unless summary['micro_case_ids'] == expected_micro
+        end
+
+        def capabilities_for(path)
+          document['capability_map'].filter_map do |entry|
+            entry['capabilities'] if path.start_with?(entry['path_prefix'])
+          end.flatten.uniq.sort
+        end
+
+        def direct_case?(item, capabilities)
+          case_capabilities = item['capabilities'] + [item['family'], item['dialect']]
+          (case_capabilities & capabilities).any?
+        end
+
+        def ordered(ids)
+          order = document['cases'].map { |item| item['id'] }
+          ids.uniq.sort_by { |id| order.index(id) }
+        end
+
+        def neighbor_order(ids)
+          seed = document.dig('selection', 'seed')
+          ids.sort_by { |id| [digest("#{seed}\0#{id}"), id] }
+        end
+
+        def explanation(profile, details)
+          {
+            'profile_rule' => profile == 'micro' ? 'mandatory sentinels only' : 'sentinels + direct + neighbors',
+            'changed_paths' => details[:inferred].map { |path, caps| "#{path} => #{caps.join(',')}" },
+            'direct_cases' => details[:direct],
+            'sentinels' => details[:sentinels],
+            'neighbors' => {
+              'population' => details[:population],
+              'algorithm' => document.dig('selection', 'neighbor_order'),
+              'selected' => details[:neighbors]
+            },
+            'budget_rule' => 'selection fits declared case budget; no silent extension or dropping'
+          }
+        end
+
+        def require_keys(hash, keys, label)
+          error!("#{label} must be an object") unless hash.is_a?(Hash)
+          missing = keys.reject { |key| hash.key?(key) }
+          error!("#{label} missing: #{missing.join(', ')}") if missing.any?
+        end
+
+        def digest(content)
+          Digest::SHA256.hexdigest(content)
+        end
+
+        def canonical_json(value)
+          JSON.generate(deep_sort(value))
+        end
+
+        def deep_sort(value)
+          case value
+          when Hash then value.keys.sort.to_h { |key| [key, deep_sort(value.fetch(key))] }
+          when Array then value.map { |item| deep_sort(item) }
+          else value
+          end
+        end
+
+        def error!(message)
+          raise Error, message
+        end
+      end
+
+      # Executes the same authored merge bytes through Git and the installed driver.
+      class LocalBenchmarkRunner
+        DEFAULT_TIMEOUT = 30
+
+        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT)
+          @benchmark = benchmark
+          @driver_path = Pathname(driver_path).expand_path
+          @tmp_root = Pathname(tmp_root).expand_path
+          @timeout = Integer(timeout)
+        end
+
+        def run(profile:, changed_paths: [])
+          verify_environment!
+          selection = @benchmark.select(profile: profile, changed_paths: changed_paths)
+          original_cwd = Dir.pwd
+          results = selection['selected_case_ids'].flat_map do |id|
+            execute_case(@benchmark.case_by_id(id))
+          end
+          raise LocalBenchmark::Error, 'runner changed its working directory' unless Dir.pwd == original_cwd
+
+          {
+            'schema_version' => 'structuredmerge.benchmark.run/v1',
+            'kind' => 'paired_local_run',
+            'corpus_id' => @benchmark.document['id'],
+            'corpus_digest' => @benchmark.corpus_digest,
+            'selection' => selection,
+            'cache_identity' => cache_identity(selection),
+            'results' => results
+          }
+        ensure
+          Dir.chdir(original_cwd) if original_cwd && Dir.pwd != original_cwd
+        end
+
+        private
+
+        def verify_environment!
+          error!("missing installed driver: #{@driver_path}") unless @driver_path.file? && @driver_path.executable?
+          root = Pathname(__dir__).join('..', '..', '..', '..').realpath
+          resolved = @tmp_root.exist? ? @tmp_root.realpath : @tmp_root.dirname.realpath.join(@tmp_root.basename)
+          error!('tmp_root must be inside the ast-merge-git repository') unless resolved.to_s.start_with?("#{root}/")
+        end
+
+        def execute_case(item)
+          return unsupported_pair(item) unless item['operation'] == 'merge3'
+
+          workspace = @tmp_root.join("#{safe_id(item['id'])}-#{Process.pid}")
+          FileUtils.rm_rf(workspace)
+          FileUtils.mkdir_p(workspace)
+          baseline = execute_baseline(item, workspace)
+          candidate = execute_candidate(item, workspace)
+          rerun = execute_candidate(item, workspace)
+          candidate['deterministic_correctness_rerun'] = correctness_record(candidate) == correctness_record(rerun)
+          [baseline, candidate]
+        ensure
+          FileUtils.rm_rf(workspace) if workspace
+        end
+
+        def unsupported_pair(item)
+          %w[git.merge-file ast-merge-git].map do |adapter|
+            raw_result(item, adapter, nil, outcome: 'unsupported',
+                                           unsupported_reason: "no installed #{item['operation']} adapter")
+          end
+        end
+
+        def execute_baseline(item, workspace)
+          write_roles(item, workspace)
+          capture = timed_capture({}, 'git', 'merge-file', '-p', 'ours', 'base', 'theirs', chdir: workspace)
+          capture[:output] = capture[:stdout]
+          raw_result(item, 'git.merge-file', capture)
+        end
+
+        def execute_candidate(item, workspace)
+          write_roles(item, workspace)
+          selector = item.fetch('selector')
+          capture = timed_capture(
+            candidate_env(selector),
+            @driver_path.to_s, 'base', 'ours', 'theirs', "#{item['id']}.#{item['dialect']}", '7',
+            chdir: workspace
+          )
+          capture[:output] = workspace.join('ours').binread
+          raw_result(item, 'ast-merge-git', capture)
+        end
+
+        def write_roles(item, workspace)
+          %w[base ours theirs].each do |role|
+            workspace.join(role).binwrite(item.dig('inputs', role, 'bytes'))
+          end
+        end
+
+        def timed_capture(env, *command, chdir:)
+          started = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+          stdin, stdout_io, stderr_io, process = Open3.popen3(env, *command, chdir: chdir.to_s)
+          [stdin, stdout_io, stderr_io].each(&:binmode)
+          stdin.close
+          stdout_reader = Thread.new { stdout_io.read }
+          stderr_reader = Thread.new { stderr_io.read }
+          timed_out = process.join(@timeout).nil?
+          terminate_process(process) if timed_out
+          stdout = stdout_reader.value
+          stderr = stderr_reader.value
+          stderr = [stderr, "timeout after #{@timeout}s"].reject(&:empty?).join("\n") if timed_out
+          { stdout: stdout, stderr: stderr, status: timed_out ? 2 : process.value.exitstatus,
+            duration_ns: Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - started }
+        rescue Errno::ENOENT => e
+          { stdout: '', stderr: e.message, status: 2, output: '', duration_ns: 0 }
+        ensure
+          [stdin, stdout_io, stderr_io].compact.each { |io| io.close unless io.closed? }
+        end
+
+        def terminate_process(process)
+          Process.kill('TERM', process.pid)
+          return if process.join(1)
+
+          Process.kill('KILL', process.pid)
+          process.join
+        rescue Errno::ESRCH, Errno::ECHILD
+          process.join
+        end
+
+        def raw_result(item, adapter, capture, outcome: nil, unsupported_reason: nil)
+          output = capture&.fetch(:output, '') || ''
+          checks = equivalence_checks(item, output)
+          markers = conflict_regions(output)
+          classified = outcome || classify(item, capture.fetch(:status), checks)
+          eligible = item.dig('oracle', 'score_eligible') && !%w[unsupported excluded_ambiguous].include?(classified)
+          {
+            'schema_version' => 'structuredmerge.benchmark.result/v1',
+            'id' => "result.#{safe_id(item['id'])}.#{safe_id(adapter)}",
+            'case_id' => item['id'],
+            'adapter_id' => adapter,
+            'case_tags' => item.slice(
+              'operation', 'partition', 'family', 'provider', 'dialect',
+              'capabilities', 'false_auto_merge_severity'
+            ),
+            'outcome' => classified,
+            'score_eligible' => eligible,
+            'provenance' => item['provenance'],
+            'process' => capture && { 'status' => capture[:status],
+                                      'exit_classification' => exit_class(capture[:status]) },
+            'raw' => {
+              'stdout' => raw_record(capture&.fetch(:stdout, '') || ''),
+              'stderr' => raw_record(capture&.fetch(:stderr, '') || ''),
+              'output' => raw_record(output)
+            },
+            'diagnostics' => diagnostics(capture&.fetch(:stderr, '') || '', unsupported_reason),
+            'conflict_regions' => region_evidence(item, markers),
+            'checks' => checks,
+            'independent_edit_evidence' => independent_edit_evidence(item, checks, classified),
+            'dimensions' => dimensions(item, classified, checks),
+            'runtime' => capture && { 'duration_ns' => capture[:duration_ns], 'comparable' => true }
+          }
+        end
+
+        def classify(item, status, checks)
+          expected = item.dig('expected', 'outcome')
+          return 'excluded_ambiguous' if expected == 'excluded_ambiguous'
+          return 'error' if status.nil? || status >= 2
+          return status == 1 ? 'false_conflict' : 'false_auto_merge' if expected == 'error'
+          return status == 1 ? 'true_conflict' : 'false_auto_merge' if expected == 'conflict'
+          return 'false_conflict' if status == 1
+          return 'correct_clean' if checks['acceptable']
+
+          'false_auto_merge'
+        end
+
+        def equivalence_checks(item, output)
+          expected = item.dig('expected', 'output', 'bytes')
+          exact = !expected.nil? && output == expected
+          structural = structural_equivalence(item, output, expected)
+          evaluations = item.fetch('acceptable_equivalence').map do |policy|
+            matched = case policy.fetch('class')
+                      when 'exact_bytes' then exact
+                      when 'structural_ast' then structural == true && structural_provider_matches?(item, policy)
+                      else false
+                      end
+            { 'class' => policy.fetch('class'), 'matched' => matched }
+          end
+          selected = evaluations.find { |evaluation| evaluation['matched'] }
+          checks = {
+            'exact' => exact,
+            'structural' => structural,
+            'structural_provider' => item.dig('selector', 'provider_id'),
+            'acceptable_equivalence_evaluations' => evaluations,
+            'accepted_equivalence' => selected&.fetch('class'),
+            'parse_validity_only_accepted' => false
+          }
+          violations = preservation_violations(item, checks, output)
+          checks.merge('preservation_violations' => violations, 'acceptable' => !selected.nil? && violations.empty?)
+        end
+
+        def structural_equivalence(item, output, expected)
+          return nil unless expected
+
+          selector = item.fetch('selector')
+          require selector.fetch('require')
+          result = Ast::Merge.dispatch_provider(
+            :diff2,
+            {
+              provider_id: selector.fetch('provider_id'),
+              family: selector.fetch('family'),
+              dialect: selector.fetch('dialect'),
+              backend: selector.fetch('backend'),
+              profile_id: selector.fetch('profile'),
+              before_source: expected,
+              after_source: output,
+              path_name: "#{item['id']}.#{item['dialect']}"
+            }
+          )
+          result[:ok] == true && result.fetch(:changes).empty?
+        rescue Ast::Merge::Error, KeyError, LoadError
+          false
+        end
+
+        def structural_provider_matches?(item, policy)
+          policy['provider'].to_s == item.dig('selector', 'provider_id').to_s
+        end
+
+        def dimensions(item, outcome, checks)
+          eligible = item.dig('oracle', 'score_eligible')
+          {
+            'safety' => {
+              'eligible' => eligible,
+              'false_auto_merge' => outcome == 'false_auto_merge',
+              'severity' => item['false_auto_merge_severity'],
+              'compensable' => false
+            },
+            'effectiveness' => {
+              'eligible' => eligible,
+              'success' => %w[correct_clean true_conflict].include?(outcome)
+            },
+            'preservation' => {
+              'eligible' => eligible,
+              'requirements' => item['preservation_policy'],
+              'violations' => checks.fetch('preservation_violations')
+            },
+            'performance' => { 'quality_offset_allowed' => false }
+          }
+        end
+
+        def preservation_violations(item, checks, output)
+          return [] if checks['exact']
+
+          expected = item.dig('expected', 'output', 'bytes')
+          return [] unless expected
+
+          item['preservation_policy'].filter_map do |name, requirement|
+            next unless requirement == 'required'
+            next unless preservation_violation?(name, output, expected, checks)
+
+            name
+          end
+        end
+
+        def preservation_violation?(name, output, expected, checks)
+          case name
+          when 'encoding' then output.encoding != expected.encoding
+          when 'line_endings' then line_ending_style(output) != line_ending_style(expected)
+          when 'unknown_fields' then checks['structural'] != true
+          else output != expected
+          end
+        end
+
+        def line_ending_style(content)
+          return 'crlf' if content.include?("\r\n")
+
+          'lf'
+        end
+
+        def independent_edit_evidence(item, checks, outcome)
+          item['independent_edit_ids'].to_h do |id|
+            [id,
+             { 'preserved' => outcome == 'correct_clean' && checks['acceptable'], 'method' => 'oracle equivalence' }]
+          end
+        end
+
+        def conflict_regions(output)
+          ranges = []
+          start_byte = nil
+          offset = 0
+          output.each_line do |line|
+            start_byte = offset if line.start_with?('<<<<<<<')
+            if start_byte && line.start_with?('>>>>>>>')
+              ranges << { 'start_byte' => start_byte, 'end_byte' => offset + line.bytesize }
+              start_byte = nil
+            end
+            offset += line.bytesize
+          end
+          ranges
+        end
+
+        def region_evidence(item, observed)
+          expected = item['expected_conflict_regions']
+          observed = observed.each_with_index.map { |region, index| region.merge('id' => "observed.#{index + 1}") }
+          localization_status = expected.empty? && observed.empty? ? 'not_applicable' : 'unknown'
+          {
+            'expected' => expected,
+            'observed' => observed,
+            'matched_region_ids' => [],
+            'missed_region_ids' => expected.map { |region| region['id'] },
+            'false_positive_region_ids' => observed.map { |region| region['id'] },
+            'localization_status' => localization_status,
+            'matching_basis' => 'unknown: expected role ranges/paths and observed output ranges have no proven mapping',
+            'localization_error_bytes' => nil
+          }
+        end
+
+        def raw_record(content)
+          { 'inline' => content, 'bytes' => content.bytesize, 'sha256' => Digest::SHA256.hexdigest(content) }
+        end
+
+        def diagnostics(stderr, unsupported_reason)
+          lines = stderr.lines.map(&:strip).reject(&:empty?)
+          lines << unsupported_reason if unsupported_reason
+          lines.map do |line|
+            match = /\Aast-merge-git: ([a-z_]+):/.match(line)
+            category = match&.[](1) || (unsupported_reason == line ? 'unsupported' : 'process')
+            { 'severity' => 'error', 'category' => category, 'message' => line }
+          end
+        end
+
+        def selector_env(selector)
+          {
+            'AST_MERGE_PROVIDER' => selector['provider_id'],
+            'AST_MERGE_FAMILY' => selector['family'],
+            'AST_MERGE_DIALECT' => selector['dialect'],
+            'AST_MERGE_BACKEND' => selector['backend'],
+            'AST_MERGE_PROFILE' => selector['profile'],
+            'AST_MERGE_REQUIRE' => selector['require']
+          }
+        end
+
+        def candidate_env(selector)
+          forbidden = ENV.keys.grep(/(?:ORACLE|EXPECTED)/i).to_h { |name| [name, nil] }
+          forbidden.merge(selector_env(selector))
+        end
+
+        def cache_identity(selection)
+          source_sha, = Open3.capture2('git', '-C', Pathname(__dir__).join('..', '..', '..', '..').to_s,
+                                       'rev-parse', 'HEAD')
+          environment = {
+            'ruby' => RUBY_DESCRIPTION,
+            'platform' => RUBY_PLATFORM,
+            'host_os' => RbConfig::CONFIG['host_os'],
+            'host_cpu' => RbConfig::CONFIG['host_cpu']
+          }
+          configuration = selection['selected_case_ids'].map do |id|
+            @benchmark.case_by_id(id).slice('id', 'selector')
+          end
+          identity = {
+            'adapter_source_sha' => source_sha.strip,
+            'adapter_artifact_sha256' => Digest::SHA256.file(@driver_path).hexdigest,
+            'configuration_sha256' => Digest::SHA256.hexdigest(JSON.generate(configuration)),
+            'corpus_sha256' => @benchmark.corpus_digest,
+            'environment' => environment,
+            'profile' => selection['profile'],
+            'changed_paths' => selection['changed_paths'],
+            'inferred_capabilities' => selection['inferred_capabilities'],
+            'selection_explanation_sha256' => Digest::SHA256.hexdigest(
+              JSON.generate(deep_sort(selection.fetch('explanation')))
+            ),
+            'selected_case_ids' => selection['selected_case_ids']
+          }
+          identity.merge('sha256' => Digest::SHA256.hexdigest(JSON.generate(identity)))
+        end
+
+        def deep_sort(value)
+          case value
+          when Hash then value.keys.sort.to_h { |key| [key, deep_sort(value.fetch(key))] }
+          when Array then value.map { |item| deep_sort(item) }
+          else value
+          end
+        end
+
+        def correctness_record(result)
+          result.reject { |key, _value| %w[runtime deterministic_correctness_rerun].include?(key) }
+        end
+
+        def exit_class(status)
+          { 0 => 'clean', 1 => 'conflict', 2 => 'error' }.fetch(status, 'error')
+        end
+
+        def safe_id(value)
+          value.gsub(/[^a-zA-Z0-9.-]/, '-')
+        end
+
+        def error!(message)
+          raise LocalBenchmark::Error, message
+        end
+      end
+
+      # Builds a non-scalar paired report from local benchmark raw evidence.
+      class LocalBenchmarkReport
+        SUCCESS = %w[correct_clean true_conflict].freeze
+
+        def self.build(run)
+          new(run).build
+        end
+
+        def initialize(run)
+          @run = run
+          @results = run.fetch('results')
+        end
+
+        def build
+          pairs = @results.group_by { |result| result['case_id'] }.values.map { |items| transition(items) }
+          false_auto_merges = eligible.select { |item| item['outcome'] == 'false_auto_merge' }
+          {
+            'schema_version' => 'structuredmerge.benchmark.report/v1',
+            'kind' => 'paired_aggregate_report',
+            'corpus_id' => @run['corpus_id'],
+            'corpus_digest' => @run['corpus_digest'],
+            'selection' => @run['selection'],
+            'cache_identity' => @run['cache_identity'],
+            'dimensions' => {
+              'safety' => {
+                'eligible' => eligible.length,
+                'false_auto_merge_result_ids' => false_auto_merges.map { |item| item['id'] },
+                'gate' => false_auto_merges.empty? ? 'pass' : 'fail',
+                'non_compensable' => true
+              },
+              'effectiveness' => outcome_counts,
+              'preservation' => {
+                'eligible' => eligible.length,
+                'violation_result_ids' => eligible.filter_map do |item|
+                  item['id'] if item.dig('dimensions', 'preservation', 'violations').any?
+                end
+              },
+              'performance' => performance,
+              'reliability' => { 'error_result_ids' => @results.filter_map do |item|
+                item['id'] if item['outcome'] == 'error'
+              end },
+              'coverage' => coverage
+            },
+            'strata' => strata,
+            'transitions' => pairs,
+            'newly_passing_case_ids' => pairs.filter_map { |pair| pair['case_id'] if pair['newly_passing'] },
+            'newly_failing_case_ids' => pairs.filter_map { |pair| pair['case_id'] if pair['newly_failing'] },
+            'changed_conflict_case_ids' => pairs.filter_map { |pair| pair['case_id'] if pair['changed_conflict'] },
+            'hard_gate_failed' => false_auto_merges.any?,
+            'scalar_score' => nil
+          }
+        end
+
+        private
+
+        def eligible
+          @eligible ||= @results.select { |item| item['score_eligible'] }
+        end
+
+        def outcome_counts
+          %w[correct_clean false_conflict true_conflict false_auto_merge error unsupported
+             excluded_ambiguous].to_h do |outcome|
+            [outcome, @results.count { |item| item['outcome'] == outcome }]
+          end
+        end
+
+        def transition(items)
+          baseline = items.find { |item| item['adapter_id'] == 'git.merge-file' }
+          candidate = items.find { |item| item['adapter_id'] == 'ast-merge-git' }
+          {
+            'case_id' => items.first['case_id'],
+            'baseline_result_id' => baseline['id'],
+            'candidate_result_id' => candidate['id'],
+            'from' => baseline['outcome'],
+            'to' => candidate['outcome'],
+            'newly_passing' => !SUCCESS.include?(baseline['outcome']) && SUCCESS.include?(candidate['outcome']),
+            'newly_failing' => SUCCESS.include?(baseline['outcome']) && !SUCCESS.include?(candidate['outcome']),
+            'changed_conflict' => conflict?(baseline) && conflict?(candidate) &&
+              baseline.dig('raw', 'output', 'sha256') != candidate.dig('raw', 'output', 'sha256')
+          }
+        end
+
+        def conflict?(result)
+          %w[false_conflict true_conflict].include?(result['outcome'])
+        end
+
+        def performance
+          @results.group_by { |item| item['adapter_id'] }.transform_values do |items|
+            values = items.filter_map { |item| item.dig('runtime', 'duration_ns') }
+            { 'samples' => values.length, 'total_ns' => values.sum, 'runtime_values_excluded_from_correctness' => true }
+          end
+        end
+
+        def coverage
+          selected = @run.dig('selection', 'selected_case_ids').length
+          unsupported = @results.select do |item|
+            item['adapter_id'] == 'ast-merge-git' && item['outcome'] == 'unsupported'
+          end
+          { 'selected_cases' => selected, 'executed_candidate_cases' => selected - unsupported.length,
+            'unsupported_case_ids' => unsupported.map { |item| item['case_id'] },
+            'unsupported_is_quality_failure' => false }
+        end
+
+        def strata
+          case_results = @results.select { |item| item['adapter_id'] == 'ast-merge-git' }
+          tag_fields = %w[operation partition family provider dialect false_auto_merge_severity]
+          tag_strata = tag_fields.to_h do |field|
+            [field, case_results.group_by { |item| item.dig('case_tags', field) }.transform_values(&:length)]
+          end
+          transitions = @results.group_by { |item| item['case_id'] }.values
+          tag_strata.merge(
+            'capability' => case_results.each_with_object(Hash.new(0)) do |item, counts|
+              item.dig('case_tags', 'capabilities').each { |capability| counts[capability] += 1 }
+            end,
+            'outcome' => @results.group_by { |item| item['outcome'] }.transform_values(&:length),
+            'adapter' => @results.group_by { |item| item['adapter_id'] }.transform_values(&:length),
+            'transition' => transitions.each_with_object(Hash.new(0)) do |items, counts|
+              pair = transition(items)
+              counts["#{pair['from']}->#{pair['to']}"] += 1
+            end
+          )
+        end
+      end
+      # rubocop:enable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+    end
+  end
+end

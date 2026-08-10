@@ -2,6 +2,7 @@
 
 require 'ast/merge'
 require_relative 'git/corpus'
+require_relative 'git/local_benchmark'
 
 module Ast
   module Merge

@@ -3,6 +3,60 @@
 
 require 'ast/merge/git'
 
+if ARGV.first == 'benchmark'
+  require 'json'
+  require 'optparse'
+
+  command = ARGV.fetch(1, 'help')
+  options = {
+    profile: 'micro',
+    changed_paths: [],
+    tmp_root: File.expand_path('../tmp/benchmark', __dir__),
+    timeout: 30
+  }
+  parser = OptionParser.new do |opts|
+    opts.banner = 'usage: ast-merge-git benchmark validate|select|run|report [options]'
+    opts.on('--corpus PATH') { |value| options[:corpus] = value }
+    opts.on('--profile PROFILE') { |value| options[:profile] = value }
+    opts.on('--changed-path PATH') { |value| options[:changed_paths] << value }
+    opts.on('--driver PATH') { |value| options[:driver] = value }
+    opts.on('--tmp-root PATH') { |value| options[:tmp_root] = value }
+    opts.on('--timeout SECONDS', Integer) { |value| options[:timeout] = value }
+  end
+
+  begin
+    parser.parse!(ARGV.drop(2))
+    raise Ast::Merge::Git::LocalBenchmark::Error, '--corpus is required' unless options[:corpus]
+
+    benchmark = Ast::Merge::Git::LocalBenchmark.load(options[:corpus])
+    output = case command
+             when 'validate'
+               { schema_version: 1, valid: benchmark.validate!, corpus_id: benchmark.document['id'],
+                 corpus_digest: benchmark.corpus_digest, cases: benchmark.cases.length }
+             when 'select'
+               benchmark.select(profile: options[:profile], changed_paths: options[:changed_paths])
+             when 'run', 'report'
+               driver = options[:driver] || Gem.bin_path('ast-merge-git', 'ast-merge-git')
+               run = Ast::Merge::Git::LocalBenchmarkRunner.new(
+                 benchmark: benchmark,
+                 driver_path: driver,
+                 tmp_root: options[:tmp_root],
+                 timeout: options[:timeout]
+               ).run(profile: options[:profile], changed_paths: options[:changed_paths])
+               command == 'report' ? Ast::Merge::Git::LocalBenchmarkReport.build(run) : run
+             else
+               warn parser
+               exit 2
+             end
+    puts JSON.generate(output)
+    exit 1 if command == 'report' && output['hard_gate_failed']
+  rescue Ast::Merge::Git::LocalBenchmark::Error, OptionParser::ParseError => e
+    warn "ast-merge-git benchmark: #{e.message}"
+    exit 2
+  end
+  exit 0
+end
+
 if ARGV.first == 'corpus'
   require 'json'
   require 'optparse'

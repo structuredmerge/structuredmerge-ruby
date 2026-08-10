@@ -60,6 +60,55 @@ module Ast
           tmp_root: String | Pathname
         ) -> Pathname
       end
+
+      class LocalBenchmark
+        class Error < StandardError
+        end
+
+        SCHEMA: String
+        CASE_SCHEMA: String
+        OPERATIONS: Array[String]
+        PARTITIONS: Array[String]
+        EXPECTATIONS: Array[String]
+        SEVERITIES: Array[String]
+        PRESERVATION: Array[String]
+        TRANSFORMATIONS: Array[String]
+        ID_PATTERN: Regexp
+        PROVENANCE_FIELDS: Array[String]
+        SELECTOR_FIELDS: Array[String]
+        INPUT_ROLES: Hash[String, Array[String]]
+
+        attr_reader document: Hash[String, untyped]
+        attr_reader corpus_digest: String
+        attr_reader path: Pathname?
+
+        def self.load: (String | Pathname path) -> LocalBenchmark
+        def initialize: (Hash[String, untyped] document, ?path: (String | Pathname)?, ?corpus_digest: String?) -> void
+        def validate!: () -> true
+        def cases: () -> Array[Hash[String, untyped]]
+        def select: (profile: String | Symbol, ?changed_paths: Array[String]) -> Hash[String, untyped]
+        def case_by_id: (String id) -> Hash[String, untyped]
+      end
+
+      class LocalBenchmarkRunner
+        DEFAULT_TIMEOUT: Integer
+
+        def initialize: (
+          benchmark: LocalBenchmark,
+          driver_path: String | Pathname,
+          tmp_root: String | Pathname,
+          ?timeout: Integer
+        ) -> void
+        def run: (profile: String | Symbol, ?changed_paths: Array[String]) -> Hash[String, untyped]
+      end
+
+      class LocalBenchmarkReport
+        SUCCESS: Array[String]
+
+        def self.build: (Hash[String, untyped] run) -> Hash[String, untyped]
+        def initialize: (Hash[String, untyped] run) -> void
+        def build: () -> Hash[String, untyped]
+      end
     end
   end
 end
