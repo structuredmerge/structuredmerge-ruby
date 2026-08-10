@@ -4,5 +4,12 @@ module Markly
       VERSION: String
     end
     VERSION: String
+
+    class Provider < Markdown::Merge::SourcePreservingProvider
+      def initialize: () -> void
+    end
+
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> untyped
   end
 end

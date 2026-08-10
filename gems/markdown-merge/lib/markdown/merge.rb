@@ -54,12 +54,48 @@ module Markdown
     autoload :OutputBuilder, 'markdown/merge/output_builder'
     autoload :PartialTemplateMerger, 'markdown/merge/partial_template_merger'
     autoload :PreservationSupport, 'markdown/merge/preservation_support'
+    autoload :ProviderBackend, 'markdown/merge/source_preserving_provider'
+    autoload :SourcePreservingProvider, 'markdown/merge/source_preserving_provider'
     autoload :SmartMerger, 'markdown/merge/smart_merger'
     autoload :SmartMergerBase, 'markdown/merge/smart_merger_base'
     autoload :TableMatchAlgorithm, 'markdown/merge/table_match_algorithm'
     autoload :TableMatchRefiner, 'markdown/merge/table_match_refiner'
     autoload :WhitespaceNormalizer, 'markdown/merge/whitespace_normalizer'
     autoload :WrapperSupport, 'markdown/merge/wrapper_support'
+
+    # Default acyclic Markdown workflow provider backed by the language pack.
+    class Provider < SourcePreservingProvider
+      # rubocop:disable Metrics/MethodLength -- constructor declares the complete provider boundary
+      def initialize
+        super(
+          provider_id: 'ruby.markdown',
+          role: :workflow,
+          backend: ProviderBackend.new(
+            id: :'kreuzberg-language-pack',
+            package: PACKAGE_NAME,
+            dialects: %i[markdown],
+            parser: lambda { |source|
+              Markdown::Merge.register_backend!
+              TreeHaver.with_backend('kreuzberg-language-pack') { TreeHaver.parser_for(:markdown).parse(source) }
+            },
+            headings: ProviderBackend.method(:tree_sitter_headings)
+          )
+        )
+      end
+      # rubocop:enable Metrics/MethodLength
+    end
+
+    class << self
+      def merge_provider
+        @merge_provider ||= Provider.new
+      end
+
+      def register_provider!(replace: false)
+        return unless Ast::Merge.respond_to?(:register_provider)
+
+        Ast::Merge.register_provider(merge_provider, replace: replace)
+      end
+    end
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
@@ -674,6 +710,8 @@ module Markdown
     )
   end
 end
+
+Markdown::Merge.register_provider!
 
 %w[
   commonmarker/merge/backend

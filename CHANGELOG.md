@@ -64,6 +64,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Implement the source-preserving, base-aware ruby.html provider and wire HTML Git/smorg dispatch.
 
+- Add source-preserving Markdown workflow and Commonmarker, Kramdown, and Markly backend providers with base-aware three-way merge and Git-driver dispatch.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

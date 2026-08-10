@@ -3,6 +3,7 @@
 require 'markdown-merge'
 require 'commonmarker'
 require_relative 'merge/version'
+require_relative 'merge/backend'
 
 module Commonmarker
   module Merge
@@ -223,5 +224,8 @@ module Commonmarker
     )
   end
 end
+
+require_relative 'merge/provider'
+Commonmarker::Merge.register_provider!
 
 Commonmarker::Merge.ensure_backend_loaded!

@@ -111,7 +111,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'html-merge', "= #{spec.version}"
   spec.add_dependency 'json-merge', "= #{spec.version}"
   spec.add_dependency 'kettle-jem', "= #{spec.version}"
-  spec.add_dependency 'markly-merge', "= #{spec.version}"
+  spec.add_dependency 'markdown-merge', "= #{spec.version}"
   spec.add_dependency 'plain-merge', "= #{spec.version}"
   spec.add_dependency 'rbs-merge', "= #{spec.version}"
   spec.add_dependency 'ruby-merge', "= #{spec.version}"

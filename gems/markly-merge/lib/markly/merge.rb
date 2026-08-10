@@ -3,6 +3,7 @@
 require 'markdown-merge'
 require 'markly'
 require_relative 'merge/version'
+require_relative 'merge/backend'
 
 module Markly
   module Merge
@@ -524,5 +525,8 @@ module Markly
     )
   end
 end
+
+require_relative 'merge/provider'
+Markly::Merge.register_provider!
 
 Markly::Merge.ensure_backend_loaded!

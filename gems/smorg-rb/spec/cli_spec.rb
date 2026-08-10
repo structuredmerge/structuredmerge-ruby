@@ -164,46 +164,49 @@ RSpec.describe Smorg::RB do
   end
 
   it 'routes Markdown paths through the Markdown merge backend' do
-    ancestor = write_file(@dir, 'ancestor.md', "# Project\n\n## Usage\n\nBase usage.\n")
+    ancestor = write_file(@dir, 'ancestor.md', "# Usage\n\nBase usage.\n")
     current = write_file(
       @dir,
       'current.md',
-      "# Project\n\n## Usage\n\nBase usage.\n\n## Local\n\nKeep local notes.\n"
+      "# Usage\n\nBase usage.\n\n# Local\n\nKeep local notes.\n"
     )
     other = write_file(
       @dir,
       'other.md',
-      "# Project\n\n## Usage\n\nBase usage.\n\n## Remote\n\nInclude remote notes.\n"
+      "# Usage\n\nBase usage.\n\n# Remote\n\nInclude remote notes.\n"
     )
+    report = File.join(@dir, 'markdown-report.json')
     stdout = StringIO.new
     stderr = StringIO.new
 
     expect(Plain::Merge).not_to receive(:merge_text)
-    exit_code = described_class.run(['merge-driver', ancestor, current, other, 'README.md'], stdout: stdout,
-                                                                                             stderr: stderr)
+    exit_code = described_class.run(
+      ['merge-driver', '--report', report, ancestor, current, other, 'README.md'],
+      stdout: stdout,
+      stderr: stderr
+    )
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     merged = File.read(current)
-    expect(merged).to include("## Local\n\nKeep local notes.")
-    expect(merged).to include("## Remote\n\nInclude remote notes.")
+    expect(merged).to include("# Local\n\nKeep local notes.")
+    expect(merged).to include("# Remote\n\nInclude remote notes.")
+    expect(JSON.parse(File.read(report)).dig('provider', 'provider_id')).to eq('ruby.markdown')
   end
 
-  it 'keeps current Markdown when theirs is already present in the matching section' do
+  it 'fails closed instead of using the removed two-way Markdown containment heuristic' do
     ancestor = write_file(
       @dir,
       'ancestor.md',
-      "# Project\n\n## Links\n\nRead http://example.com/posts/old-page/ for details.\n"
+      "# Links\n\nRead http://example.com/posts/old-page/ for details.\n"
     )
     current_source = [
-      '# Project',
-      '',
-      '## Links',
+      '# Links',
       '',
       'Read',
       'https://example.com/docs/new-page/',
       'for details.',
       '',
-      '## Local',
+      '# Local',
       '',
       'Keep local notes.',
       ''
@@ -212,7 +215,7 @@ RSpec.describe Smorg::RB do
     other = write_file(
       @dir,
       'other.md',
-      "# Project\n\n## Links\n\nRead https://example.com/docs/new-page/ for details.\n"
+      "# Links\n\nRead https://example.com/docs/new-page/ for details.\n"
     )
     stdout = StringIO.new
     stderr = StringIO.new
@@ -220,8 +223,8 @@ RSpec.describe Smorg::RB do
     exit_code = described_class.run(['merge-driver', ancestor, current, other, 'README.md'], stdout: stdout,
                                                                                              stderr: stderr)
 
-    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
-    expect(File.read(current)).to eq(current_source)
+    expect(exit_code).to eq(described_class::EXIT_UNRESOLVED_CONFLICT)
+    expect(File.read(current)).to include('<<<<<<< ours', '||||||| base', '>>>>>>> theirs', '# Local')
   end
 
   it 'advertises Markdown paths in generated gitattributes' do

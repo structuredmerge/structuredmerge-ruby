@@ -4,5 +4,59 @@ module Markdown
       VERSION: String
     end
     VERSION: String
+
+    class ProviderBackend
+      attr_reader id: Symbol
+      attr_reader package: String
+      attr_reader dialects: Array[Symbol]
+
+      def initialize: (
+        id: Symbol | String,
+        package: String,
+        dialects: Array[Symbol | String],
+        parser: Proc,
+        headings: Proc
+      ) -> void
+      def parse: (String source) -> [untyped, Array[ProviderBackend::Heading]]
+
+      def self.native_headings: (untyped root, String source, ?kramdown: bool) -> Array[ProviderBackend::Heading]
+      def self.tree_sitter_headings: (untyped root, String source) -> Array[ProviderBackend::Heading]
+
+      class Heading
+        attr_reader level: Integer
+        attr_reader text: String
+        attr_reader start_line: Integer
+        attr_reader end_line: Integer
+        attr_reader style: Symbol
+
+        def initialize: (
+          level: Integer,
+          text: String,
+          start_line: Integer,
+          end_line: Integer,
+          style: Symbol
+        ) -> void
+      end
+    end
+
+    class SourcePreservingProvider
+      attr_reader backend: ProviderBackend
+
+      def initialize: (provider_id: String, role: Symbol, backend: ProviderBackend) -> void
+      def provider_id: () -> String
+      def family: () -> String
+      def capabilities: () -> Hash[Symbol, untyped]
+      def analyze: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def diff2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge2: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+      def merge3: (Hash[Symbol, untyped] request) -> Hash[Symbol, untyped]
+    end
+
+    class Provider < SourcePreservingProvider
+      def initialize: () -> void
+    end
+
+    def self.merge_provider: () -> Provider
+    def self.register_provider!: (?replace: bool) -> untyped
   end
 end

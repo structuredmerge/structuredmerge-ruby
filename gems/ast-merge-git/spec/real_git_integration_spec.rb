@@ -10,6 +10,10 @@ require 'rbs/merge'
 require 'rust/merge'
 require 'go/merge'
 require 'html/merge'
+require 'commonmarker/merge'
+require 'kramdown/merge'
+require 'markdown/merge'
+require 'markly/merge'
 require 'typescript/merge'
 require 'shellwords'
 require 'zip/merge'
@@ -297,6 +301,56 @@ RSpec.describe 'ast-merge-git executable' do
     expect(repository.join(path).binread).to eq(
       "class Shared\nend\nclass Ours\nend\nclass Theirs\nend\n"
     )
+  end
+
+  [
+    {
+      label: 'Markdown workflow',
+      require_path: 'markdown/merge',
+      provider_id: 'ruby.markdown',
+      backend: 'kreuzberg-language-pack'
+    },
+    {
+      label: 'Commonmarker Markdown backend',
+      require_path: 'commonmarker/merge',
+      provider_id: 'ruby.markdown.commonmarker',
+      backend: 'commonmarker'
+    },
+    {
+      label: 'Kramdown Markdown backend',
+      require_path: 'kramdown/merge',
+      provider_id: 'ruby.markdown.kramdown',
+      backend: 'kramdown'
+    },
+    {
+      label: 'Markly Markdown backend',
+      require_path: 'markly/merge',
+      provider_id: 'ruby.markdown.markly',
+      backend: 'markly'
+    }
+  ].each do |provider|
+    it "runs the exact #{provider.fetch(:label)} selector through the installed Git-driver path" do
+      base = "# Alpha\n\nalpha\n\n# Beta\n\nbeta\n"
+      ours = base.sub('alpha', 'ours')
+      theirs = base.sub('beta', 'theirs')
+      path = configure_opaque_repository(
+        extension: 'md',
+        base: base,
+        ours: ours,
+        theirs: theirs,
+        require_path: provider.fetch(:require_path),
+        provider_id: provider.fetch(:provider_id),
+        family: 'markdown',
+        dialect: 'markdown',
+        backend: provider.fetch(:backend),
+        profile: 'source_preserving'
+      )
+
+      _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+      expect(status.exitstatus).to eq(0), stderr
+      expect(repository.join(path).binread).to eq("# Alpha\n\nours\n\n# Beta\n\ntheirs\n")
+    end
   end
 
   it 'runs the exact Go selector where baseline text merge conflicts' do

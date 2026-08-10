@@ -3,6 +3,7 @@
 require 'markdown-merge'
 require 'kramdown'
 require_relative 'merge/version'
+require_relative 'merge/backend'
 
 module Kramdown
   module Merge
@@ -198,4 +199,5 @@ module Kramdown
   end
 end
 
-require_relative 'merge/backend'
+require_relative 'merge/provider'
+Kramdown::Merge.register_provider!

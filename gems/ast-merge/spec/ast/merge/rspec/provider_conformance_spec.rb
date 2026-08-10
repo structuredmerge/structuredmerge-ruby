@@ -42,14 +42,15 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
     )
   end
 
-  it 'covers all 22 providers while advertising only tested rows' do
+  it 'covers and advertises all 22 tested providers' do
     matrix = described_class.new(fixture).validate!
 
     expect(matrix.advertised_provider_ids).to eq(
-      %w[ruby.bash ruby.binary ruby.dotenv ruby.go ruby.html ruby.json ruby.rbs ruby.ruby ruby.ruby.prism ruby.rust ruby.text
-         ruby.toml ruby.toml.citrus ruby.toml.parslet ruby.typescript ruby.yaml ruby.yaml.psych ruby.zip]
+      %w[ruby.bash ruby.binary ruby.dotenv ruby.go ruby.html ruby.json ruby.markdown ruby.markdown.commonmarker
+         ruby.markdown.kramdown ruby.markdown.markly ruby.rbs ruby.ruby ruby.ruby.prism ruby.rust ruby.text ruby.toml
+         ruby.toml.citrus ruby.toml.parslet ruby.typescript ruby.yaml ruby.yaml.psych ruby.zip]
     )
-    expect(matrix.blocked_provider_ids.length).to eq(4)
+    expect(matrix.blocked_provider_ids).to be_empty
     expect(
       matrix.tested?(
         provider_id: 'ruby.bash',
@@ -58,6 +59,23 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
         profile_id: :source_preserving
       )
     ).to be(true)
+    {
+      'ruby.markdown' => [:'kreuzberg-language-pack', %i[markdown]],
+      'ruby.markdown.commonmarker' => [:commonmarker, %i[markdown commonmark]],
+      'ruby.markdown.kramdown' => [:kramdown, %i[markdown kramdown]],
+      'ruby.markdown.markly' => [:markly, %i[markdown commonmark]]
+    }.each do |provider_id, (backend, dialects)|
+      dialects.each do |dialect|
+        expect(
+          matrix.tested?(
+            provider_id: provider_id,
+            dialect: dialect,
+            backend: backend,
+            profile_id: :source_preserving
+          )
+        ).to be(true)
+      end
+    end
     expect(
       matrix.tested?(
         provider_id: 'ruby.html',

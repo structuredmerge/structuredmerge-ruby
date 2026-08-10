@@ -13,7 +13,7 @@ require 'json'
 require 'json-merge'
 require 'kettle/jem'
 require 'kettle/jem/tasks/install_task'
-require 'markly/merge'
+require 'markdown/merge'
 require 'plain-merge'
 require 'rbs/merge'
 require 'ruby/merge'
@@ -749,7 +749,21 @@ module Smorg
           )
         )
       when 'markdown'
-        merge_markdown(ancestor_source, current_source, other_source)
+        merge3_result(
+          Ast::Merge::Git.merge3(
+            base_source: ancestor_source,
+            ours_source: current_source,
+            theirs_source: other_source,
+            path_name: path_name,
+            provider_id: 'ruby.markdown',
+            family: 'markdown',
+            dialect: 'markdown',
+            backend: 'kreuzberg-language-pack',
+            profile_id: 'source_preserving',
+            fallback_policy: fallback_policy,
+            conflict_marker_size: conflict_marker_size
+          )
+        )
       when 'ruby'
         merge3_result(
           Ast::Merge::Git.merge3(
@@ -863,121 +877,6 @@ module Smorg
         )
       else
         unsupported_language_result(normalize_language(language, path_name), path_name)
-      end
-    end
-
-    def merge_markdown(ancestor_source, current_source, other_source)
-      return { ok: true, diagnostics: [], output: current_source, policies: [] } if other_source == ancestor_source
-      return { ok: true, diagnostics: [], output: other_source, policies: [] } if current_source == ancestor_source
-      if markdown_theirs_changes_already_present?(ancestor_source, current_source, other_source)
-        return { ok: true, diagnostics: [], output: current_source, policies: [] }
-      end
-
-      result = Markly::Merge::SmartMerger.new(
-        other_source,
-        current_source,
-        add_template_only_nodes: true,
-        inner_merge_code_blocks: true,
-        inner_merge_lists: true,
-        normalize_whitespace: :basic
-      ).merge_result
-      {
-        ok: result.success?,
-        diagnostics: result.conflicts.map do |conflict|
-          {
-            severity: 'error',
-            category: 'merge_conflict',
-            message: conflict[:message] || conflict[:reason] || 'unresolved Markdown conflict'
-          }
-        end,
-        output: result.content,
-        policies: []
-      }
-    rescue Markdown::Merge::ParseError => e
-      {
-        ok: false,
-        diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }],
-        policies: []
-      }
-    rescue StandardError => e
-      {
-        ok: false,
-        diagnostics: [{ severity: 'error', category: 'merge_error', message: e.message }],
-        policies: []
-      }
-    end
-
-    def markdown_theirs_changes_already_present?(ancestor_source, current_source, other_source)
-      ancestor_sections = markdown_sections(ancestor_source)
-      current_sections = markdown_sections(current_source)
-      other_sections = markdown_sections(other_source)
-      return false unless ancestor_sections && current_sections && other_sections
-
-      ancestor_by_path = sections_by_path(ancestor_sections)
-      ancestor_by_heading = sections_by_heading(ancestor_sections)
-      current_by_path = sections_by_path(current_sections)
-      current_by_heading = sections_by_heading(current_sections)
-
-      changed_sections = other_sections.filter do |section|
-        ancestor_text = ancestor_by_path[section[:path]] || ancestor_by_heading[markdown_heading_key(section[:text])]
-        ancestor_text != section[:text]
-      end
-      return false if changed_sections.empty?
-
-      changed_sections.all? do |section|
-        other_text = section[:text]
-        heading_key = markdown_heading_key(other_text)
-        ancestor_text = ancestor_by_heading[heading_key] || ancestor_by_path.fetch(section[:path], '')
-        current_text = current_by_heading[heading_key] || current_by_path[section[:path]]
-        next false unless current_text
-
-        introduced_tokens = markdown_significant_tokens(other_text) - markdown_significant_tokens(ancestor_text)
-        !introduced_tokens.empty? && introduced_tokens.subset?(markdown_significant_tokens(current_text))
-      end
-    end
-
-    def markdown_sections(source)
-      parsed = Markly::Merge.parse_markdown(source, 'markdown')
-      return nil unless parsed[:ok]
-
-      Markdown::Merge.collect_markdown_sections(
-        parsed.dig(:analysis, :normalized_source),
-        parsed.dig(:analysis, :owners)
-      )
-    end
-
-    def sections_by_path(sections)
-      sections.to_h { |section| [section[:path], section[:text]] }
-    end
-
-    def sections_by_heading(sections)
-      sections.each_with_object({}) do |section, map|
-        key = markdown_heading_key(section[:text])
-        map[key] ||= section[:text] unless key.empty?
-      end
-    end
-
-    def markdown_heading_key(section_text)
-      heading = section_text.each_line.find { |line| line.start_with?('#') }.to_s.strip
-      heading = heading.delete_prefix('#').strip while heading.start_with?('#')
-      heading.downcase
-    end
-
-    def markdown_significant_tokens(source)
-      source.split.each_with_object(Set.new) do |raw_token, tokens|
-        token = normalize_markdown_token(raw_token)
-        tokens << token if token.length >= 8
-      end
-    end
-
-    def normalize_markdown_token(raw_token)
-      token = raw_token.downcase
-      loop do
-        previous = token
-        token = token.delete_prefix('(').delete_prefix('[').delete_prefix('{').delete_prefix('<')
-        token = token.delete_suffix(')').delete_suffix(']').delete_suffix('}').delete_suffix('>')
-        token = token.delete_suffix('.').delete_suffix(',').delete_suffix(';').delete_suffix(':')
-        return token if token == previous
       end
     end
 
