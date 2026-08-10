@@ -3,4 +3,62 @@
 
 require 'ast/merge/git'
 
+if ARGV.first == 'corpus'
+  require 'json'
+  require 'optparse'
+
+  command = ARGV.fetch(1, 'help')
+  options = { tmp_root: File.expand_path('../tmp/corpus', __dir__), timeout: 30 }
+  parser = OptionParser.new do |opts|
+    opts.banner = 'usage: ast-merge-git corpus validate|run|acquire [options]'
+    opts.on('--manifest PATH') { |value| options[:manifest] = value }
+    opts.on('--repository PATH') { |value| options[:repository] = value }
+    opts.on('--driver PATH') { |value| options[:driver] = value }
+    opts.on('--tmp-root PATH') { |value| options[:tmp_root] = value }
+    opts.on('--case ID') { |value| options[:case_id] = value }
+    opts.on('--destination PATH') { |value| options[:destination] = value }
+    opts.on('--timeout SECONDS', Integer) { |value| options[:timeout] = value }
+  end
+
+  begin
+    parser.parse!(ARGV.drop(2))
+    raise Ast::Merge::Git::Corpus::Error, '--manifest is required' unless options[:manifest]
+
+    corpus = Ast::Merge::Git::Corpus.load(options[:manifest])
+    case command
+    when 'validate'
+      corpus.validate!
+      puts JSON.generate(schema_version: 1, valid: true, cases: corpus.manifest.fetch('cases').length)
+    when 'acquire'
+      raise Ast::Merge::Git::Corpus::Error, '--destination is required' unless options[:destination]
+
+      path = Ast::Merge::Git::CorpusAcquirer.acquire(
+        corpus: corpus,
+        destination: options[:destination],
+        tmp_root: options[:tmp_root]
+      )
+      puts JSON.generate(schema_version: 1, repository: path.to_s, revision: corpus.manifest.dig('source', 'revision'))
+    when 'run'
+      raise Ast::Merge::Git::Corpus::Error, '--repository is required' unless options[:repository]
+
+      driver = options[:driver] || Gem.bin_path('ast-merge-git', 'ast-merge-git')
+      runner = Ast::Merge::Git::CorpusRunner.new(
+        corpus: corpus,
+        repository: options[:repository],
+        driver_path: driver,
+        tmp_root: options[:tmp_root],
+        timeout: options[:timeout]
+      )
+      puts JSON.generate(schema_version: 1, results: runner.run(case_id: options[:case_id]))
+    else
+      warn parser
+      exit 2
+    end
+  rescue Ast::Merge::Git::Corpus::Error, OptionParser::ParseError => e
+    warn "ast-merge-git corpus: #{e.message}"
+    exit 2
+  end
+  exit 0
+end
+
 exit Ast::Merge::Git.run(ARGV)

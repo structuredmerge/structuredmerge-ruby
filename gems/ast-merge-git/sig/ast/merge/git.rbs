@@ -6,9 +6,12 @@ module Ast
       end
       VERSION: String
 
+      PACKAGE_NAME: String
       EXIT_SUCCESS: Integer
       EXIT_CONFLICT: Integer
       EXIT_ERROR: Integer
+      CONFLICT_POLICIES: Array[Symbol]
+      ADAPTER_ERROR_CATEGORIES: Array[Symbol]
 
       def self.merge3: (Hash[Symbol | String, untyped] request) -> Hash[Symbol, untyped]
       def self.merge_files: (
@@ -20,6 +23,43 @@ module Ast
       ) -> Hash[Symbol, untyped]
       def self.run: (Array[String] argv, ?env: Hash[String, String], ?stderr: IO) -> Integer
       def self.git_exit_code: (Hash[Symbol, untyped] result) -> Integer
+
+      class Corpus
+        class Error < StandardError
+        end
+
+        CLASSIFICATIONS: Array[String]
+        SHA_PATTERN: Regexp
+        REQUIRED_CASE_KEYS: Array[String]
+
+        attr_reader manifest: Hash[String, untyped]
+
+        def self.load: (String path) -> Corpus
+        def initialize: (Hash[String, untyped] manifest) -> void
+        def validate!: () -> true
+        def cases: (?String? case_id) -> Array[Hash[String, untyped]]
+      end
+
+      class CorpusRunner
+        DEFAULT_TIMEOUT: Integer
+
+        def initialize: (
+          corpus: Corpus,
+          repository: String | Pathname,
+          driver_path: String | Pathname,
+          tmp_root: String | Pathname,
+          ?timeout: Integer
+        ) -> void
+        def run: (?case_id: String?) -> Array[Hash[Symbol, untyped]]
+      end
+
+      class CorpusAcquirer
+        def self.acquire: (
+          corpus: Corpus,
+          destination: String | Pathname,
+          tmp_root: String | Pathname
+        ) -> Pathname
+      end
     end
   end
 end

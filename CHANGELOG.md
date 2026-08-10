@@ -66,6 +66,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add source-preserving Markdown workflow and Commonmarker, Kramdown, and Markly backend providers with base-aware three-way merge and Git-driver dispatch.
 
+- Add a review-first, pinned Git-history corpus runner for installed ast-merge-git versus Git text-merge baselines, with deterministic raw evidence and claim-eligibility guards.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.
