@@ -92,6 +92,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Route smorg-rb Ruby merge-driver operations through the base-aware Prism provider and advertise the tested Ruby selector in generated attributes.
 
+- Allow smorg-rb to use independent kettle-jem patch releases within the 7.1 series.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
