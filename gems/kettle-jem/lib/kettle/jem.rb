@@ -1403,6 +1403,7 @@ module Kettle
       "🖇osc-sponsors-bottom-img"
     ].freeze
     README_INTEGRATIONS = %w[codecov coveralls qlty codeql skywalking-eyes].freeze
+    README_STAR_HISTORY_MIN_STARS = 150
     README_DISCOVERED_INTEGRATIONS = (README_INTEGRATIONS - [SKYWALKING_EYES_INTEGRATION]).freeze
     COVERAGE_INTEGRATIONS = %w[codecov coveralls qlty].freeze
     MANAGED_INTEGRATIONS = (COVERAGE_INTEGRATIONS + [SKYWALKING_EYES_INTEGRATION]).freeze
@@ -7353,7 +7354,17 @@ module Kettle
     def apply_readme_conditional_blocks(content, facts)
       open_collective_enabled = !facts.dig(:funding, :open_collective_disabled)
       processed = apply_markdown_conditional_block(content, "OPEN_COLLECTIVE", keep: open_collective_enabled)
-      apply_markdown_conditional_block(processed, "NO_OPEN_COLLECTIVE", keep: !open_collective_enabled)
+      processed = apply_markdown_conditional_block(processed, "NO_OPEN_COLLECTIVE", keep: !open_collective_enabled)
+      star_history_enabled = facts.dig(:repository, :star_history, :enabled) == true
+      return processed if star_history_enabled
+
+      delete_markdown_with_ast_crispr(
+        processed,
+        Ast::Crispr::Markdown::Markly::Selectors.html_details(
+          summary_text: "⭐️ Star History",
+          limit: {at_least: 0}
+        )
+      )
     end
 
     def apply_readme_badge_policy(content, facts)
@@ -15969,8 +15980,10 @@ module Kettle
       topology = normalize_repository_topology(repository_topology)
       monorepo_subproject = topology == REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT
       local_root = monorepo_subproject ? git_worktree_root(project_root) : nil
+      repository_root = local_root || project_root
+      git_source_url = git_remote_source_url(repository_root)
       repo_url = if monorepo_subproject
-        repository_root_url(git_remote_source_url(local_root || project_root) || source_url)
+        repository_root_url(git_source_url || source_url)
       else
         repository_root_url(source_url)
       end
@@ -15982,7 +15995,8 @@ module Kettle
         topology: topology,
         url: repo_url,
         name: repo_name,
-        slug: slug
+        slug: slug,
+        star_history: readme_star_history_facts(repository_root, git_source_url)
       )
       return facts unless monorepo_subproject
 
@@ -16129,6 +16143,54 @@ module Kettle
       nil
     end
 
+    def readme_star_history_facts(project_root, git_source_url)
+      repository_slug = github_repository_slug(git_source_url)
+      return {enabled: false, reason: "no_github_remote"} if repository_slug.to_s.empty?
+
+      stars = github_repository_star_count(project_root, repository_slug)
+      unless stars
+        return {
+          enabled: false,
+          repository: repository_slug,
+          reason: "star_count_unavailable"
+        }
+      end
+
+      {
+        enabled: stars >= README_STAR_HISTORY_MIN_STARS,
+        repository: repository_slug,
+        stars: stars,
+        minimum_stars: README_STAR_HISTORY_MIN_STARS
+      }
+    end
+
+    def github_repository_slug(url)
+      normalized = normalize_git_source_url(url)
+      match = normalized.to_s.match(%r{\Ahttps?://github\.com/([^/]+)/([^/?#]+)})
+      return unless match
+
+      repository = match[2].delete_suffix(".git")
+      return if match[1].empty? || repository.empty?
+
+      "#{match[1]}/#{repository}"
+    end
+
+    def github_repository_star_count(project_root, repository_slug)
+      stdout, _stderr, status = Open3.capture3(
+        "gh",
+        "api",
+        "repos/#{repository_slug}",
+        "--jq",
+        ".stargazers_count",
+        chdir: project_root.to_s
+      )
+      return unless status.success?
+
+      Integer(stdout.to_s.strip)
+    rescue ArgumentError, IOError, SystemCallError
+      nil
+    end
+
     def normalize_git_source_url(url)
       value = url.to_s.strip
       return if value.empty?
@@ -16139,6 +16201,11 @@ module Kettle
       end
 
       uri = URI.parse(value)
+      if uri.scheme == "ssh" && uri.host == "github.com"
+        slug = uri.path.to_s.delete_prefix("/").delete_suffix(".git")
+        return "https://github.com/#{slug}" if slug.split("/").length >= 2
+      end
+
       if %w[http https].include?(uri.scheme) && uri.host == "github.com"
         slug = uri.path.to_s.delete_prefix("/").delete_suffix(".git")
         return "https://github.com/#{slug}" if slug.split("/").length >= 2

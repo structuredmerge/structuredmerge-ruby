@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generate README star-history embeds with the revived star-history.dera.page service.
 
+- Generate the README Star History section only for GitHub repositories with at least 150 stars.
+
 ### Deprecated
 
 ### Removed
