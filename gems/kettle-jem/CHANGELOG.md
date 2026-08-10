@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generate README star-history embeds with the revived star-history.dera.page service.
+
 ### Deprecated
 
 ### Removed

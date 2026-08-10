@@ -31,6 +31,23 @@ RSpec.describe Kettle::Jem do
     expect(readme_template).not_to include("bestgems.org")
   end
 
+  it "uses the revived Star History service in the packaged README" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    readme_template = File.read(File.join(template_root, "README.md.example"))
+
+    expect(readme_template).to include(
+      "<a href=\"https://star-history.dera.page/\#{KJ|README:STAR_HISTORY_REPO}&type=date&legend=top-left\">"
+    )
+    expect(readme_template).to include(
+      "https://star-history.dera.page/svg?repos={KJ|README:STAR_HISTORY_REPO}&type=date&theme=dark&legend=top-left"
+    )
+    expect(readme_template).to include(
+      "https://star-history.dera.page/svg?repos={KJ|README:STAR_HISTORY_REPO}&type=date&legend=top-left"
+    )
+    expect(readme_template).not_to include("https://star-history.com/")
+    expect(readme_template).not_to include("https://api.star-history.com/")
+  end
+
   it "excludes the generated README from RuboCop source parsing" do
     template_root = described_class::PACKAGED_TEMPLATE_ROOT
     rubocop_template = File.read(File.join(template_root, ".rubocop.yml.example"))
