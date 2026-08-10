@@ -178,6 +178,30 @@ RSpec.describe Ast::Crispr::Markdown::Markly do
       expect(block_target.locate_matches(context).first.slice_from(content)).not_to include('Tail.')
     end
 
+    it 'finds an HTML details block by its summary heading' do
+      content = <<~MARKDOWN
+        Before.
+
+        <details markdown="1">
+        <summary>⭐️ Star History</summary>
+
+        Chart.
+        </details>
+
+        After.
+      MARKDOWN
+
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: 'README.md')
+      target = described_class.html_details(summary_text: '⭐️ Star History')
+      match = target.locate_matches(context).first
+
+      expect(match.slice_from(content)).to include('<summary>⭐️ Star History</summary>')
+      expect(match.slice_from(content)).to include('Chart.')
+      expect(match.slice_from(content)).not_to include('After.')
+      expect(match.start_line).to eq(3)
+      expect(match.end_line).to eq(7)
+    end
+
     it 'finds the outer marker-bounded HTML comment block when duplicate blocks exist' do
       content = <<~MARKDOWN
         <!-- KJ:START -->

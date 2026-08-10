@@ -28,6 +28,8 @@ module Ast
               analysis.link_definition_owners
             when :html_comments
               analysis.html_comment_owners
+            when :html_details
+              Ast::Crispr::Markdown::Markly.html_details_owners(analysis)
             when :list_items
               analysis.list_item_owners
             when :inline_references
@@ -72,6 +74,13 @@ module Ast
                 owner_selector: :line_bound_statements,
                 supported_comment_regions: [],
                 metadata: { adapter: :markly, markdown_owner: :html_comment }
+              )
+            when :html_details
+              Ast::Crispr::StructureProfile.new(
+                owner_scope: owner_scope,
+                owner_selector: :html_details,
+                supported_comment_regions: [],
+                metadata: { adapter: :markly, markdown_owner: :html_details }
               )
             when :list_items
               Ast::Crispr::StructureProfile.new(
@@ -194,6 +203,37 @@ module Ast
                       end_boundary: :owner_end,
                       payload_kind: :structural_owner_body,
                       text: owner.text
+                    }
+                  )
+                end
+              end
+            )
+          end
+
+          def html_details(summary_text: nil, id: nil, limit: nil, metadata: {}, **options)
+            Ast::Crispr::OwnerSelector.new(
+              id: id || ['html_details', summary_text].compact.join(':'),
+              limit: limit,
+              metadata: metadata.merge(
+                adapter: Ast::Crispr::Markdown::Markly.adapter,
+                owner_scope: :html_details,
+                selector_kind: :html_details,
+                selection_intent: :predicate_filter,
+                include_trailing_gap: false
+              ).merge(options),
+              locate: lambda do |context|
+                context.structural_owners(owner_scope: :html_details).filter_map do |owner|
+                  next if summary_text && owner.summary_text.to_s.strip != summary_text.to_s.strip
+
+                  Ast::Crispr::Match.new(
+                    node: owner,
+                    start_line: owner.location.start_line,
+                    end_line: owner.location.end_line,
+                    metadata: {
+                      start_boundary: :owner_start,
+                      end_boundary: :owner_end,
+                      payload_kind: :structural_owner_body,
+                      summary_text: owner.summary_text
                     }
                   )
                 end
@@ -333,6 +373,65 @@ module Ast
               end
             )
           end
+        end
+
+        HtmlDetailsOwner = Struct.new(:location, :summary_text, :source, keyword_init: true)
+
+        # Markly exposes raw HTML as separate AST blocks rather than a nested HTML
+        # tree, so group the parser-owned blocks into selectable details owners.
+        def self.html_details_owners(analysis)
+          statements = Array(analysis.statements)
+          html_blocks = statements.filter_map do |statement|
+            next unless statement.respond_to?(:merge_type) && statement.merge_type == :html_block
+
+            position = statement.source_position
+            next unless position
+
+            {
+              start_line: position[:start_line],
+              end_line: position[:end_line]
+            }
+          end
+
+          html_blocks.filter_map do |opening|
+            opening_source = analysis.source_range(opening[:start_line], opening[:end_line])
+            next unless opening_source.lines.any? do |line|
+              stripped = line.lstrip
+              stripped.start_with?("<details>") || stripped.start_with?("<details ")
+            end
+
+            closing = html_blocks.drop_while { |candidate| candidate != opening }.drop(1).find do |candidate|
+              source = analysis.source_range(candidate[:start_line], candidate[:end_line])
+              source.lines.any? { |line| line.lstrip.start_with?("</details>") }
+            end
+            next unless closing
+
+            source = analysis.source_range(opening[:start_line], closing[:end_line])
+            summary_text = html_summary_text(source)
+            next if summary_text.empty?
+
+            HtmlDetailsOwner.new(
+              location: ::Markdown::Merge::FileAnalysis::Location.new(
+                start_line: opening[:start_line],
+                end_line: closing[:end_line]
+              ),
+              summary_text: summary_text,
+              source: source
+            )
+          end
+        end
+
+        def self.html_summary_text(source)
+          open_tag_start = source.index("<summary")
+          return "" unless open_tag_start
+
+          open_tag_end = source.index(">", open_tag_start)
+          return "" unless open_tag_end
+
+          close_tag_start = source.index("</summary>", open_tag_end)
+          return "" unless close_tag_start
+
+          source[(open_tag_end + 1)...close_tag_start].to_s.strip
         end
 
         Targets = Selectors
