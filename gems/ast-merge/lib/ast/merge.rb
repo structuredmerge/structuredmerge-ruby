@@ -83,6 +83,7 @@ module Ast
     autoload :OwnerSelection, 'ast/merge/owner_selection'
     autoload :KeyPathPartialTemplateMergerBase, 'ast/merge/key_path_partial_template_merger_base'
     autoload :PartialTemplateMergerBase, 'ast/merge/partial_template_merger_base'
+    autoload :PortableBenchmarkContract, 'ast/merge/portable_benchmark_contract'
     autoload :ProviderContract, 'ast/merge/provider_contract'
     autoload :ProviderRegistry, 'ast/merge/provider_registry'
     autoload :ProviderResult, 'ast/merge/provider_result'

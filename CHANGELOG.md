@@ -68,6 +68,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add a review-first, pinned Git-history corpus runner for installed ast-merge-git versus Git text-merge baselines, with deterministic raw evidence and claim-eligibility guards.
 
+- Add an offline portable benchmark contract consumer and conformance gate with deterministic safety-focused summaries.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

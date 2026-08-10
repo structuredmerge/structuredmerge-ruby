@@ -18,6 +18,35 @@ module Ast
     class Error < StandardError
     end
 
+    module PortableBenchmarkContract
+      SCHEMA_MAJOR: Integer
+      SCHEMA_PATTERN: Regexp
+      ENUM_KEYS: Array[String]
+      QUALITY_EXCLUDED_OUTCOMES: Array[String]
+      ADAPTER_DIGEST_FIELDS: Array[String]
+      HISTORY_FIELDS: Array[String]
+      SHA256_PATTERN: Regexp
+
+      class ValidationError < Ast::Merge::Error
+      end
+
+      class Consumer
+        attr_reader document: Hash[String, untyped]
+        attr_reader contract_digest: String
+
+        def self.parse: (String source) -> Consumer
+        def self.load_file: (String | _ToPath path) -> Consumer
+
+        def initialize: (Hash[String, untyped] document, ?contract_digest: String?) -> void
+        def validate!: () -> Consumer
+        def canonical_summary: () -> Hash[String, untyped]
+        alias summary canonical_summary
+      end
+
+      def self.parse: (String source) -> Consumer
+      def self.load_file: (String | _ToPath path) -> Consumer
+    end
+
     module ProviderContract
       OPERATIONS: Array[provider_operation]
       REQUIRED_METHODS: Array[Symbol]
