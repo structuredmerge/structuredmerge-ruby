@@ -72,6 +72,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an offline micro/dev paired benchmark runner and reviewed CC0 curated corpus contract with non-compensable false-auto-merge gating.
 
+- Add reviewed real-history corpus execution with provider-backed equivalence, seven-outcome classification, and safely reaped timeouts.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

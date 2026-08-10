@@ -18052,7 +18052,7 @@ module Kettle
       aggregate_paths.any? do |path|
         gemfile_eval_paths(File.read(path)).include?(relative_path)
       end
-    rescue StandardError
+    rescue
       false
     end
 

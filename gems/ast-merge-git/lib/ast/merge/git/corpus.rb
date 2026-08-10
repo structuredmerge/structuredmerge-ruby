@@ -5,12 +5,11 @@ require 'fileutils'
 require 'json'
 require 'open3'
 require 'shellwords'
-require 'timeout'
 
 module Ast
   module Merge
     module Git
-      # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/MethodLength -- evidence validation and raw-result assembly remain explicit and auditable
+      # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity -- evidence validation and raw-result assembly remain explicit and auditable
       # Validates and executes pinned Git-history corpus cases.
       class Corpus
         Error = Class.new(StandardError)
@@ -21,6 +20,7 @@ module Ast
           ambiguous_manual_review
           excluded
         ].freeze
+        BACKLOG_STATUSES = %w[blocked admitted resolved].freeze
         SHA_PATTERN = /\A[0-9a-f]{40}\z/
         CASE_ID_PATTERN = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
         REQUIRED_CASE_KEYS = %w[
@@ -53,6 +53,8 @@ module Ast
           ids = manifest['cases'].map { |item| validate_case!(item) }
           raise Error, 'case_id values must be unique' unless ids.uniq.length == ids.length
 
+          validate_admitted_backlog!(ids)
+
           true
         end
 
@@ -81,7 +83,26 @@ module Ast
 
           backlog.each do |item|
             require_keys(item, %w[candidate_id status reason score_eligible], 'admission_backlog item')
-            raise Error, "#{item['candidate_id']}: blocked candidate cannot be score eligible" if item['score_eligible']
+            unless BACKLOG_STATUSES.include?(item['status'])
+              raise Error, "#{item['candidate_id']}: unsupported backlog status"
+            end
+            if item['status'] == 'blocked' && item['score_eligible']
+              raise Error, "#{item['candidate_id']}: blocked candidate cannot be score eligible"
+            end
+            next unless item['status'] == 'admitted'
+
+            require_keys(item, %w[case_id], 'admitted backlog item')
+          end
+        end
+
+        def validate_admitted_backlog!(case_ids)
+          manifest['admission_backlog'].select { |item| item['status'] == 'admitted' }.each do |item|
+            raise Error, "#{item['candidate_id']}: admitted case is missing" unless case_ids.include?(item['case_id'])
+
+            admitted = manifest['cases'].find { |candidate| candidate['case_id'] == item['case_id'] }
+            next if item['score_eligible'] == admitted.dig('oracle', 'score_eligible')
+
+            raise Error, "#{item['candidate_id']}: backlog and case score eligibility differ"
           end
         end
 
@@ -140,6 +161,25 @@ module Ast
           reviewed = oracle['false_auto_merge_review'] == 'complete'
           unscorable = %w[ambiguous_manual_review excluded].include?(oracle['classification'])
           raise Error, "#{item['case_id']}: case cannot be score eligible" if eligible && (!reviewed || unscorable)
+          return unless oracle['classification'] == 'structurally_equivalent_resolution'
+
+          require_keys(item, %w[conflict_evidence review], item['case_id'])
+          require_keys(
+            item['conflict_evidence'],
+            %w[method result review_status],
+            "#{item['case_id']}.conflict_evidence"
+          )
+          require_keys(item['review'], %w[provenance status], "#{item['case_id']}.review")
+          require_keys(oracle, %w[provider_coverage], "#{item['case_id']}.oracle")
+          coverage = oracle['provider_coverage']
+          require_keys(coverage, %w[status reason], "#{item['case_id']}.oracle.provider_coverage")
+          complete = item.dig('conflict_evidence', 'result') == 'content_conflict' &&
+                     item.dig('conflict_evidence', 'review_status') == 'complete' &&
+                     item.dig('review', 'status') == 'complete'
+          raise Error, "#{item['case_id']}: reviewed conflict evidence is incomplete" unless complete
+          return unless eligible && coverage['status'] != 'supported'
+
+          raise Error, "#{item['case_id']}: unsupported provider coverage cannot be score eligible"
         end
 
         def require_keys(hash, keys, context)
@@ -157,6 +197,9 @@ module Ast
       # Executes validated corpus cases without changing the source checkout.
       class CorpusRunner
         DEFAULT_TIMEOUT = 30
+        OUTCOMES = %w[
+          correct_clean false_conflict true_conflict false_auto_merge error unsupported excluded_ambiguous
+        ].freeze
 
         def initialize(corpus:, repository:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT)
           @corpus = corpus
@@ -256,7 +299,7 @@ module Ast
         def execute_candidate(workspace, roles, item)
           write_roles(workspace, roles)
           capture = timed_capture(
-            selector_env(item['selector']),
+            candidate_env(item['selector']),
             @driver_path.to_s,
             'base',
             'ours',
@@ -283,14 +326,19 @@ module Ast
           }
         end
 
+        def candidate_env(selector)
+          forbidden = ENV.keys.grep(/ORACLE|HUMAN|EXPECTED/i).to_h { |key| [key, nil] }
+          forbidden.merge(selector_env(selector))
+        end
+
         def build_result(item, roles, baseline, candidate, rerun)
           {
             schema_version: 1,
             case_id: item['case_id'],
             source: item.slice('merge_commit', 'base_commit', 'parent_commits', 'path', 'blob_oids'),
             oracle: item['oracle'],
-            baseline: outcome(baseline, roles['human'], item),
-            candidate: outcome(candidate, roles['human'], item),
+            baseline: outcome(baseline, roles['human'], item, adapter: :git_merge_file),
+            candidate: outcome(candidate, roles['human'], item, adapter: :structured_merge),
             human_result: { sha256: digest(roles['human']), bytes: roles['human'].bytesize },
             deterministic_rerun: deterministic?(candidate, rerun),
             claim_eligibility: claim_eligibility(item),
@@ -298,20 +346,25 @@ module Ast
           }
         end
 
-        def outcome(capture, human, item)
+        def outcome(capture, human, item, adapter:)
           output = capture.fetch(:output)
           markers = conflict_markers(output)
           exact = output == human
+          provider = provider_equivalence(output, human, item, exact)
+          exit_class = exit_classification(capture[:status], adapter)
+          classified = classify(item, exit_class, exact || provider[:equivalent])
           {
             exit_status: capture[:status],
-            exit_classification: exit_classification(capture[:status]),
+            exit_classification: exit_class,
             stdout: capture[:stdout],
             stderr: capture[:stderr],
             output: output,
             output_sha256: digest(output),
             exact_human_result: exact,
-            structurally_equivalent_human_result: structural_equivalence(output, human, item, exact),
-            parse_valid: parse_validity(output, item),
+            structurally_equivalent_human_result: provider[:equivalent],
+            provider_check: provider,
+            parse_valid: provider[:available] ? provider[:valid] : nil,
+            outcome: classified,
             conflict_markers: markers,
             duration_ns: capture[:duration_ns],
             runtime_comparable: false
@@ -320,17 +373,33 @@ module Ast
 
         def timed_capture(env, *command, chdir:)
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
-          stdout = stderr = status = nil
-          Timeout.timeout(@timeout) do
-            stdout, stderr, process_status = Open3.capture3(env, *command, chdir: chdir.to_s, binmode: true)
-            status = process_status.exitstatus
-          end
+          stdin, stdout_io, stderr_io, process = Open3.popen3(env, *command, chdir: chdir.to_s)
+          [stdin, stdout_io, stderr_io].each(&:binmode)
+          stdin.close
+          stdout_reader = Thread.new { stdout_io.read }
+          stderr_reader = Thread.new { stderr_io.read }
+          timed_out = process.join(@timeout).nil?
+          terminate_process(process) if timed_out
+          stdout = stdout_reader.value
+          stderr = stderr_reader.value
+          stderr = [stderr, "timeout after #{@timeout}s"].reject(&:empty?).join("\n") if timed_out
+          status = timed_out ? 2 : process.value.exitstatus
           { stdout: stdout, stderr: stderr, status: status,
             duration_ns: Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - started }
-        rescue Timeout::Error
-          raise Corpus::Error, "command timed out after #{@timeout}s: #{command.first}"
         rescue Errno::ENOENT => e
-          raise Corpus::Error, "command missing: #{e.message}"
+          { stdout: '', stderr: e.message, status: 2, output: '', duration_ns: 0 }
+        ensure
+          [stdin, stdout_io, stderr_io].compact.each { |io| io.close unless io.closed? }
+        end
+
+        def terminate_process(process)
+          Process.kill('TERM', process.pid)
+          return if process.join(1)
+
+          Process.kill('KILL', process.pid)
+          process.join
+        rescue Errno::ESRCH, Errno::ECHILD
+          process.join
         end
 
         def git_source(*args)
@@ -357,8 +426,22 @@ module Ast
           Digest::SHA256.hexdigest(content)
         end
 
-        def exit_classification(status)
+        def exit_classification(status, adapter)
+          return 'error' unless status
+          return status.zero? ? 'clean' : (status == 255 ? 'error' : 'conflict') if adapter == :git_merge_file
+
           { 0 => 'clean', 1 => 'conflict', 2 => 'error' }.fetch(status, 'error')
+        end
+
+        def classify(item, exit_class, equivalent)
+          classification = item.dig('oracle', 'classification')
+          return 'excluded_ambiguous' if %w[ambiguous_manual_review excluded].include?(classification)
+          return 'error' if exit_class == 'error'
+          return exit_class == 'conflict' ? 'true_conflict' : 'false_auto_merge' if classification == 'conflict_expected'
+          return 'false_conflict' if exit_class == 'conflict'
+          return 'correct_clean' if equivalent
+
+          'false_auto_merge'
         end
 
         def deterministic?(first, second)
@@ -375,27 +458,36 @@ module Ast
             quality_claim_allowed: eligible && @corpus.manifest.dig('claim_policy', 'quality_claims_allowed') }
         end
 
-        def parse_validity(output, item)
-          return nil unless item.dig('selector', 'dialect') == 'ruby'
+        def provider_equivalence(output, human, item, exact)
+          selector = item.fetch('selector')
+          method = 'selected_provider.diff2(expected_human, candidate_output).changes.empty?'
+          if exact
+            return { equivalent: true, available: true, valid: true,
+                     provider_id: selector['provider_id'], method: 'exact_bytes' }
+          end
 
-          require 'prism'
-          Prism.parse(output).success?
-        rescue LoadError
-          nil
-        end
-
-        def structural_equivalence(output, human, item, exact)
-          return true if exact
-          return nil unless item.dig('selector', 'dialect') == 'ruby'
-
-          require 'prism'
-          left = Prism.parse(output)
-          right = Prism.parse(human)
-          return false unless left.success? && right.success?
-
-          Prism.dump(output) == Prism.dump(human)
-        rescue LoadError
-          nil
+          require selector.fetch('require')
+          result = Ast::Merge.dispatch_provider(
+            :diff2,
+            {
+              provider_id: selector.fetch('provider_id'),
+              family: selector.fetch('family'),
+              dialect: selector.fetch('dialect'),
+              backend: selector.fetch('backend'),
+              profile_id: selector.fetch('profile'),
+              before_source: human,
+              after_source: output,
+              path_name: item.fetch('path')
+            }
+          )
+          valid = result[:ok] == true
+          { equivalent: valid && result.fetch(:changes).empty?, available: true, valid: valid,
+            provider_id: selector['provider_id'], method: method,
+            diagnostic_codes: Array(result[:diagnostics]).filter_map { |entry| entry[:code] || entry['code'] } }
+        rescue Ast::Merge::Error, KeyError, LoadError => e
+          { equivalent: false, available: false, valid: false,
+            provider_id: selector['provider_id'], method: method,
+            error: "#{e.class}: #{e.message}" }
         end
 
         # Conflict markers are Git's line protocol, not syntax nodes; byte scans
@@ -460,7 +552,7 @@ module Ast
           end
         end
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/ClassLength, Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     end
   end
 end

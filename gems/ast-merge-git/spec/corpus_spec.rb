@@ -105,16 +105,25 @@ RSpec.describe Ast::Merge::Git::Corpus do
     FileUtils.rm_rf(workspace)
   end
 
-  it 'validates the canonical real-history manifest' do
-    path = Pathname(__dir__).join(
+  it 'validates every canonical real-history manifest and its admission state' do
+    directory = Pathname(__dir__).join(
       '..', '..', '..', '..', 'fixtures', 'diagnostics',
-      'slice-1021-reviewed-git-history-corpus', 'manifest.json'
+      'slice-1021-reviewed-git-history-corpus'
     ).expand_path
+    paths = directory.glob('manifest*.json').sort
+    corpora = paths.map { |path| described_class.load(path) }
 
-    corpus = described_class.load(path)
-    expect(corpus.validate!).to be(true)
-    expect(corpus.manifest.fetch('cases').length).to eq(3)
-    expect(corpus.manifest.dig('claim_policy', 'quality_claims_allowed')).to be(false)
+    expect(paths.map(&:basename).map(&:to_s)).to eq(
+      %w[manifest.git-bash.json manifest.json manifest.typescript.json]
+    )
+    expect(corpora).to all(satisfy(&:validate!))
+    expect(corpora.sum { |corpus| corpus.manifest.fetch('cases').length }).to eq(6)
+    expect(corpora.sum do |corpus|
+      corpus.manifest.fetch('cases').count { |item| item.dig('oracle', 'score_eligible') }
+    end).to eq(1)
+    expect(corpora).to all(satisfy do |corpus|
+      corpus.manifest.dig('claim_policy', 'quality_claims_allowed') == false
+    end)
   end
 
   it 'runs synthetic history through baseline and the installed driver deterministically' do
@@ -131,6 +140,10 @@ RSpec.describe Ast::Merge::Git::Corpus do
 
     expect(result[:baseline]).to include(exit_classification: 'clean', exact_human_result: true)
     expect(result[:candidate]).to include(exit_classification: 'clean', exact_human_result: true, parse_valid: true)
+    expect(result.dig(:candidate, :outcome)).to eq('correct_clean')
+    expect(result.dig(:candidate, :provider_check)).to include(
+      provider_id: 'ruby.ruby', method: 'exact_bytes', equivalent: true
+    )
     expect(result[:deterministic_rerun]).to be(true)
     expect(result.dig(:claim_eligibility, :score_eligible)).to be(false)
     expect(result.dig(:candidate, :runtime_comparable)).to be(false)
@@ -157,6 +170,21 @@ RSpec.describe Ast::Merge::Git::Corpus do
     end.to raise_error(described_class::Error, /case_id must be lowercase kebab-case/)
   end
 
+  it 'classifies git merge-file conflict counts as conflicts rather than process errors' do
+    corpus = described_class.new(synthetic_manifest)
+    runner = Ast::Merge::Git::CorpusRunner.new(
+      corpus: corpus,
+      repository: workspace,
+      driver_path: Gem.bin_path('ast-merge-git', 'ast-merge-git'),
+      tmp_root: Pathname(__dir__).join('..', 'tmp', 'corpus').expand_path
+    )
+
+    expect(runner.send(:exit_classification, 5, :git_merge_file)).to eq('conflict')
+    expect(runner.send(:exit_classification, 7, :git_merge_file)).to eq('conflict')
+    expect(runner.send(:exit_classification, 255, :git_merge_file)).to eq('error')
+    expect(runner.send(:exit_classification, 2, :structured_merge)).to eq('error')
+  end
+
   it 'rejects dirty source history instead of mutating it' do
     corpus = described_class.new(synthetic_manifest)
     workspace.join('untracked.rb').binwrite("DIRTY = true\n")
@@ -168,6 +196,98 @@ RSpec.describe Ast::Merge::Git::Corpus do
     )
 
     expect { runner.run }.to raise_error(described_class::Error, /source repository is dirty/)
+  end
+
+  it 'classifies all seven Slice 1022 outcomes without scalar compensation' do
+    runner = Ast::Merge::Git::CorpusRunner.allocate
+    clean = { 'oracle' => { 'classification' => 'structurally_equivalent_resolution' } }
+    conflict = { 'oracle' => { 'classification' => 'conflict_expected' } }
+    excluded = { 'oracle' => { 'classification' => 'excluded' } }
+
+    expect(runner.send(:classify, clean, 0, true)).to eq('correct_clean')
+    expect(runner.send(:classify, clean, 1, false)).to eq('false_conflict')
+    expect(runner.send(:classify, conflict, 1, false)).to eq('true_conflict')
+    expect(runner.send(:classify, conflict, 0, true)).to eq('false_auto_merge')
+    expect(runner.send(:classify, clean, 0, false)).to eq('false_auto_merge')
+    expect(runner.send(:classify, clean, 2, false)).to eq('error')
+    expect(runner.send(:classify, excluded, 0, true)).to eq('excluded_ambiguous')
+    expect(Ast::Merge::Git::CorpusRunner::OUTCOMES).to eq(
+      %w[correct_clean false_conflict true_conflict false_auto_merge error unsupported excluded_ambiguous]
+    )
+  end
+
+  it 'uses selected-provider diff2 rather than parse validity for structural equivalence' do
+    runner = Ast::Merge::Git::CorpusRunner.allocate
+    item = synthetic_manifest.fetch('cases').first
+    expected = "class Example\n  def value = 1\nend\n"
+    output = "\nclass Example\n  def value = 1\nend\n"
+
+    evidence = runner.send(:provider_equivalence, output, expected, item, false)
+
+    expect(evidence).to include(
+      equivalent: true,
+      available: true,
+      valid: true,
+      provider_id: 'ruby.ruby',
+      method: 'selected_provider.diff2(expected_human, candidate_output).changes.empty?'
+    )
+  end
+
+  it 'does not expose human oracle bytes to the candidate process' do
+    manifest = synthetic_manifest
+    corpus = described_class.new(manifest)
+    root = Pathname(__dir__).join('..', 'tmp', "corpus-oracle-spec-#{Process.pid}").expand_path
+    log = root.join('candidate.json')
+    driver = root.join('recording-driver')
+    FileUtils.mkdir_p(root)
+    driver.binwrite(<<~RUBY)
+      #!/usr/bin/env ruby
+      require 'json'
+      File.binwrite(#{log.to_s.inspect}, JSON.generate(
+        'argv' => ARGV,
+        'forbidden_env' => ENV.select { |key, _| key.match?(/ORACLE|HUMAN|EXPECTED/i) }
+      ))
+      File.binwrite(ARGV.fetch(1), File.binread(ARGV.fetch(0)))
+    RUBY
+    FileUtils.chmod(0o755, driver)
+    previous = ENV['CORPUS_HUMAN_ORACLE_BYTES']
+    ENV['CORPUS_HUMAN_ORACLE_BYTES'] = git('show', "#{manifest['cases'][0]['merge_commit']}:sample.rb")
+    runner = Ast::Merge::Git::CorpusRunner.new(
+      corpus: corpus, repository: workspace, driver_path: driver, tmp_root: root
+    )
+
+    runner.run
+    invocation = JSON.parse(log.binread)
+    expect(invocation.fetch('argv').length).to eq(5)
+    expect(invocation.fetch('argv').first(3)).to eq(%w[base ours theirs])
+    expect(invocation.fetch('forbidden_env')).to be_empty
+  ensure
+    ENV['CORPUS_HUMAN_ORACLE_BYTES'] = previous
+    FileUtils.rm_rf(root) if root
+  end
+
+  it 'terminates and reaps a timed-out child process' do
+    root = Pathname(__dir__).join('..', 'tmp', "corpus-timeout-spec-#{Process.pid}").expand_path
+    pid_path = root.join('child.pid')
+    sleeper = root.join('sleeper')
+    FileUtils.mkdir_p(root)
+    sleeper.binwrite(<<~RUBY)
+      #!/usr/bin/env ruby
+      File.write(#{pid_path.to_s.inspect}, Process.pid)
+      sleep 30
+    RUBY
+    FileUtils.chmod(0o755, sleeper)
+    runner = Ast::Merge::Git::CorpusRunner.allocate
+    runner.instance_variable_set(:@timeout, 1)
+
+    capture = runner.send(:timed_capture, {}, sleeper.to_s, chdir: root)
+    pid = Integer(pid_path.read)
+
+    expect(capture).to include(status: 2)
+    expect(capture[:stderr]).to include('timeout after 1s')
+    expect { Process.kill(0, pid) }.to raise_error(Errno::ESRCH)
+  ensure
+    FileUtils.rm_rf(root) if root
   end
 end
 # rubocop:enable Metrics/BlockLength, Metrics/MethodLength

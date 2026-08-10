@@ -29,6 +29,7 @@ module Ast
         end
 
         CLASSIFICATIONS: Array[String]
+        BACKLOG_STATUSES: Array[String]
         SHA_PATTERN: Regexp
         REQUIRED_CASE_KEYS: Array[String]
 
@@ -42,6 +43,7 @@ module Ast
 
       class CorpusRunner
         DEFAULT_TIMEOUT: Integer
+        OUTCOMES: Array[String]
 
         def initialize: (
           corpus: Corpus,
