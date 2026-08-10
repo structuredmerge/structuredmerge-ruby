@@ -210,7 +210,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(readme).to match(/## 🌻 Synopsis(?: <a [^\n]+)?\n\nDestination synopsis from the scaffolded project\./)
     expect(readme).to include("## 🔧 Basic Usage\n\nDestination usage from the scaffolded project.")
     expect(readme).not_to include("Old scaffold installation notes.")
-    expect(readme).to include("Compatible with MRI Ruby 3.2.0+")
+    expect(readme).to include("CI workflows and Appraisals are generated for MRI Ruby 3.2.0+.")
     expect(readme).to include("https://github.com/acme/dummy-gem")
 
     dependabot = YAML.safe_load_file(File.join(gem_root, ".github/dependabot.yml"))
