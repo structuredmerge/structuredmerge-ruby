@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep the standalone kettle-changelog tool in a Ruby-compatible modular Gemfile with explicit local-path wiring, rather than adding it to every generated gemspec.
 
+- Allow kettle-jem to resolve kettle-dev 3.x while retaining compatibility with supported kettle-dev 2.x releases.
+
 ### Deprecated
 
 ### Removed
