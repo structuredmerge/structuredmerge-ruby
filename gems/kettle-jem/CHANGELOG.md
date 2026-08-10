@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Handle comment-only YAML documents while pruning disabled engine workflow jobs.
 
+- Remove disabled engine workflow badge references from generated README files.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10

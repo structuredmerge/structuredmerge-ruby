@@ -849,6 +849,9 @@ module Kettle
             label = owner.label.to_s
             label if patterns.fetch(:ref_prefixes).any? { |pattern| pattern.match?(label) }
           end
+          ref_labels.each do |label|
+            processed = remove_markdown_inline_references(processed, label)
+          end
           processed = delete_markdown_link_definitions(processed, ref_labels)
         end
 

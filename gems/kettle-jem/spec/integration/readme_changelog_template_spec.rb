@@ -1741,6 +1741,31 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(processed).not_to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
   end
 
+  it "removes disabled engine workflow badges from top-level README references" do
+    readme = <<~MARKDOWN
+      # Example
+
+      [![CI Truffle Ruby][🚎9-t-wfi]][🚎9-t-wf]
+
+      | Works with Truffle Ruby | [![Truffle Ruby current Compat][💎truby-c-i]][🚎9-t-wf] |
+
+      [🚎9-t-wf]: https://github.com/acme/example/actions/workflows/truffle.yml
+      [🚎9-t-wfi]: https://github.com/acme/example/actions/workflows/truffle.yml/badge.svg
+      [💎truby-c-i]: https://img.shields.io/badge/Truffle_Ruby-current-34BCB1
+    MARKDOWN
+
+    processed = described_class::ReadmePostProcessor.process(
+      content: readme,
+      min_ruby: "4.0",
+      engines: ["ruby"]
+    )
+
+    expect(processed).not_to include("CI Truffle Ruby")
+    expect(processed).not_to include("🚎9-t-wf")
+    expect(processed).not_to include("🚎9-t-wfi")
+    expect(processed).not_to include("💎truby-c-i")
+  end
+
   it "keeps same-minor Ruby compatibility badges for patch-level runtime floors" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
