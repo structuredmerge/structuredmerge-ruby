@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Allow kettle-jem to resolve kettle-dev 3.x while retaining compatibility with supported kettle-dev 2.x releases.
 
+- Allow kettle-jem to update independently within the StructuredMerge 7.1 dependency series instead of requiring every sibling gem to share its patch version.
+
 ### Deprecated
 
 ### Removed

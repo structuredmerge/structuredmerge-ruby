@@ -95,32 +95,32 @@ Gem::Specification.new do |spec|
 
   # Utilities
   spec.add_dependency("addressable", ">= 2.8", "< 3")                     # ruby >= 2.2.0
-  spec.add_dependency("ast-crispr-markdown-markly", "= #{spec.version}")  # ruby >= 4.0.0
-  spec.add_dependency("ast-crispr-ruby-prism", "= #{spec.version}")        # ruby >= 4.0.0
-  spec.add_dependency("ast-merge", "= #{spec.version}")                  # ruby >= 4.0.0
-  spec.add_dependency("bash-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("citrus-toml-merge", "= #{spec.version}")          # ruby >= 4.0.0
-  spec.add_dependency("commonmarker-merge", "= #{spec.version}")         # ruby >= 4.0.0
-  spec.add_dependency("dotenv-merge", "= #{spec.version}")              # ruby >= 4.0.0
-  spec.add_dependency("json-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("ast-crispr-markdown-markly", "~> 7.1", ">= 7.1.1")  # ruby >= 4.0.0
+  spec.add_dependency("ast-crispr-ruby-prism", "~> 7.1", ">= 7.1.1")        # ruby >= 4.0.0
+  spec.add_dependency("ast-merge", "~> 7.1", ">= 7.1.1")                  # ruby >= 4.0.0
+  spec.add_dependency("bash-merge", "~> 7.1", ">= 7.1.1")                 # ruby >= 4.0.0
+  spec.add_dependency("citrus-toml-merge", "~> 7.1", ">= 7.1.1")          # ruby >= 4.0.0
+  spec.add_dependency("commonmarker-merge", "~> 7.1", ">= 7.1.1")         # ruby >= 4.0.0
+  spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.1")              # ruby >= 4.0.0
+  spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.1")                 # ruby >= 4.0.0
   spec.add_dependency("kettle-dev", ">= 2.3.5", "< 4.0.0")                # ruby >= 2.3.0
   spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.3")           # ruby >= 2.4.0
   spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.3")             # ruby >= 2.4.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.7")                  # ruby >= 1.8.7
-  spec.add_dependency("kramdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
-  spec.add_dependency("markdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
-  spec.add_dependency("markly-merge", "= #{spec.version}")               # ruby >= 4.0.0
+  spec.add_dependency("kramdown-merge", "~> 7.1", ">= 7.1.1")             # ruby >= 4.0.0
+  spec.add_dependency("markdown-merge", "~> 7.1", ">= 7.1.1")             # ruby >= 4.0.0
+  spec.add_dependency("markly-merge", "~> 7.1", ">= 7.1.1")               # ruby >= 4.0.0
   spec.add_dependency("parslet", "~> 2.0")                               # ruby >= 2.6.0
-  spec.add_dependency("prism-merge", "= #{spec.version}")                # ruby >= 4.0.0
-  spec.add_dependency("psych-merge", "= #{spec.version}")                # ruby >= 4.0.0
+  spec.add_dependency("prism-merge", "~> 7.1", ">= 7.1.1")                # ruby >= 4.0.0
+  spec.add_dependency("psych-merge", "~> 7.1", ">= 7.1.1")                # ruby >= 4.0.0
   spec.add_dependency("rbs", ">= 3.10")                                  # ruby >= 3.1.0
-  spec.add_dependency("rbs-merge", "= #{spec.version}")                  # ruby >= 4.0.0
-  spec.add_dependency("ruby-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("rbs-merge", "~> 7.1", ">= 7.1.1")                  # ruby >= 4.0.0
+  spec.add_dependency("ruby-merge", "~> 7.1", ">= 7.1.1")                 # ruby >= 4.0.0
   spec.add_dependency("token-resolver", "~> 2.0", ">= 2.0.4")            # ruby >= 3.2.0
-  spec.add_dependency("toml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("toml-merge", "~> 7.1", ">= 7.1.1")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
-  spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("yaml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("tree_haver", "~> 7.1", ">= 7.1.1")                 # ruby >= 4.0.0
+  spec.add_dependency("yaml-merge", "~> 7.1", ">= 7.1.1")                 # ruby >= 4.0.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
