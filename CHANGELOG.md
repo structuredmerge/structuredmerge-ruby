@@ -74,6 +74,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add reviewed real-history corpus execution with provider-backed equivalence, seven-outcome classification, and safely reaped timeouts.
 
+- Support conservative TypeScript top-level named call ownership with literal string identities, including real test-suite conflict histories.
+
 ### Changed
 
 - Release kettle-jem independently from the StructuredMerge lock-step family.

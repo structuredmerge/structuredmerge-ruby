@@ -40,12 +40,7 @@ module TypeScript
       end
 
       def signature
-        if node.type == 'expression_statement'
-          declaration = node.children.find { |child| NAMED_DECLARATIONS.key?(child.type) }
-          raise ArgumentError, 'expression statement is not a supported declaration wrapper' unless declaration
-
-          return named_signature(declaration)
-        end
+        return expression_statement_signature if node.type == 'expression_statement'
         return import_signature if node.type == 'import_statement'
         return export_signature if node.type == 'export_statement'
         return variable_signature(node) if variable_declaration?(node)
@@ -69,6 +64,27 @@ module TypeScript
       def semantic_tree = semantic_node(node)
 
       private
+
+      def expression_statement_signature
+        declaration = node.children.find { |child| NAMED_DECLARATIONS.key?(child.type) }
+        return named_signature(declaration) if declaration
+
+        call = direct_child(node, 'call_expression')
+        raise ArgumentError, 'expression statement is not a supported top-level call' unless call
+
+        callee = call.children.find(&:named?)
+        unless callee && callee.type == 'identifier'
+          raise ArgumentError, 'top-level call has no safely attributable named callee'
+        end
+
+        arguments = direct_child(call, 'arguments')
+        identity = arguments&.children&.find(&:named?)
+        unless identity && identity.type == 'string'
+          raise ArgumentError, 'top-level call has no literal string identity'
+        end
+
+        [:call, text(callee), text(identity)]
+      end
 
       def import_signature
         source_node = direct_child(node, 'string') || find_descendant(node, %w[string])

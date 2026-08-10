@@ -73,6 +73,54 @@ RSpec.describe TypeScript::Merge::Provider do
     expect(signatures).to include(satisfy { |value| value.first == :export_from })
   end
 
+  it 'owns top-level named test-suite calls by literal string identity' do
+    source = <<~TS
+      import { describe, expect, it } from "vitest";
+
+      describe("provider contract", () => {
+        it("keeps assertions", () => {
+          expect(true).toBe(true);
+        });
+      });
+    TS
+
+    expect(provider.analyze(source: source)).to include(ok: true)
+    expect(provider.analyze(source: source).dig(:analysis, :declarations)).to include(
+      hash_including(signature: [:call, 'describe', '"provider contract"'])
+    )
+  end
+
+  it 'rejects arbitrary top-level expression statements without a literal call identity' do
+    unsupported = [
+      "runSuite(options);\n",
+      "factory().register(\"suite\");\n",
+      "describe(suiteName, () => {});\n"
+    ]
+
+    unsupported.each do |source|
+      expect(provider.analyze(source: source)).to include(
+        ok: false,
+        diagnostics: include(hash_including(category: :parse_error, blocking: true))
+      )
+    end
+  end
+
+  it 'treats repeated top-level calls with the same literal identity as ambiguous' do
+    source = <<~TS
+      describe("same title", () => {
+        it("first", () => {});
+      });
+      describe("same title", () => {
+        it("second", () => {});
+      });
+    TS
+
+    expect(provider.analyze(source: source)).to include(
+      ok: false,
+      diagnostics: include(hash_including(category: :ambiguous_owner))
+    )
+  end
+
   it 'diffs additions, edits, and deletions in a JSON-ready envelope' do
     after = base.sub('function alpha', 'function gamma').sub('return 2', 'return 3')
     result = provider.diff2(before_source: base, after_source: after)
