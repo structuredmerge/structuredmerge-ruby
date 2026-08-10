@@ -7175,7 +7175,9 @@ module Kettle
 
     def delete_yaml_top_level_mapping_entries(content, parent_key:, child_keys:)
       document = Psych.parse(content.to_s)
-      root = document&.root
+      # Psych returns `false` for a comment-only document under some versions.
+      # Such content has no mapping to prune and must pass through unchanged.
+      root = document.root if document.respond_to?(:root)
       return content unless root.is_a?(Psych::Nodes::Mapping)
 
       parent = yaml_mapping_value(root, parent_key)

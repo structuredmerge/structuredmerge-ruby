@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Handle comment-only YAML documents while pruning disabled engine workflow jobs.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10

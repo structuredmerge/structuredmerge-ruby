@@ -1012,6 +1012,19 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
+  it "leaves comment-only workflow content unchanged while pruning disabled jobs" do
+    content = "# This workflow is intentionally empty.\n"
+
+    expect(
+      described_class.send(
+        :delete_yaml_top_level_mapping_entries,
+        content,
+        parent_key: "jobs",
+        child_keys: ["jruby", "truffleruby"]
+      )
+    ).to eq(content)
+  end
+
   it "prunes versioned engine workflows below minimum Ruby compatibility" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
