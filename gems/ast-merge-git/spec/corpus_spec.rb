@@ -203,14 +203,17 @@ RSpec.describe Ast::Merge::Git::Corpus do
     clean = { 'oracle' => { 'classification' => 'structurally_equivalent_resolution' } }
     conflict = { 'oracle' => { 'classification' => 'conflict_expected' } }
     excluded = { 'oracle' => { 'classification' => 'excluded' } }
+    unsupported = Marshal.load(Marshal.dump(clean))
+    unsupported['oracle']['provider_coverage'] = { 'status' => 'unsupported' }
 
-    expect(runner.send(:classify, clean, 0, true)).to eq('correct_clean')
-    expect(runner.send(:classify, clean, 1, false)).to eq('false_conflict')
-    expect(runner.send(:classify, conflict, 1, false)).to eq('true_conflict')
-    expect(runner.send(:classify, conflict, 0, true)).to eq('false_auto_merge')
-    expect(runner.send(:classify, clean, 0, false)).to eq('false_auto_merge')
-    expect(runner.send(:classify, clean, 2, false)).to eq('error')
-    expect(runner.send(:classify, excluded, 0, true)).to eq('excluded_ambiguous')
+    expect(runner.send(:classify, clean, 'clean', true, adapter: :structured_merge)).to eq('correct_clean')
+    expect(runner.send(:classify, clean, 'conflict', false, adapter: :git_merge_file)).to eq('false_conflict')
+    expect(runner.send(:classify, conflict, 'conflict', false, adapter: :structured_merge)).to eq('true_conflict')
+    expect(runner.send(:classify, conflict, 'clean', true, adapter: :structured_merge)).to eq('false_auto_merge')
+    expect(runner.send(:classify, clean, 'clean', false, adapter: :structured_merge)).to eq('false_auto_merge')
+    expect(runner.send(:classify, clean, 'error', false, adapter: :structured_merge)).to eq('error')
+    expect(runner.send(:classify, unsupported, 'error', false, adapter: :structured_merge)).to eq('unsupported')
+    expect(runner.send(:classify, excluded, 'clean', true, adapter: :structured_merge)).to eq('excluded_ambiguous')
     expect(Ast::Merge::Git::CorpusRunner::OUTCOMES).to eq(
       %w[correct_clean false_conflict true_conflict false_auto_merge error unsupported excluded_ambiguous]
     )
@@ -231,6 +234,17 @@ RSpec.describe Ast::Merge::Git::Corpus do
       provider_id: 'ruby.ruby',
       method: 'selected_provider.diff2(expected_human, candidate_output).changes.empty?'
     )
+  end
+
+  it 'rejects clone destinations that lexically escape the configured tmp root' do
+    tmp_root = Pathname(__dir__).join('..', 'tmp', "corpus-acquire-spec-#{Process.pid}").expand_path
+    escaped = tmp_root.join('..', 'escaped', 'repository')
+
+    expect do
+      Ast::Merge::Git::CorpusAcquirer.send(:validate_destination!, escaped, tmp_root)
+    end.to raise_error(described_class::Error, /destination must be inside/)
+  ensure
+    FileUtils.rm_rf(tmp_root)
   end
 
   it 'does not expose human oracle bytes to the candidate process' do

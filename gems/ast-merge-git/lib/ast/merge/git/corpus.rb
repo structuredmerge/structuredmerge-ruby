@@ -352,7 +352,7 @@ module Ast
           exact = output == human
           provider = provider_equivalence(output, human, item, exact)
           exit_class = exit_classification(capture[:status], adapter)
-          classified = classify(item, exit_class, exact || provider[:equivalent])
+          classified = classify(item, exit_class, exact || provider[:equivalent], adapter: adapter)
           {
             exit_status: capture[:status],
             exit_classification: exit_class,
@@ -428,16 +428,26 @@ module Ast
 
         def exit_classification(status, adapter)
           return 'error' unless status
-          return status.zero? ? 'clean' : (status == 255 ? 'error' : 'conflict') if adapter == :git_merge_file
+
+          if adapter == :git_merge_file
+            return 'clean' if status.zero?
+
+            return status == 255 ? 'error' : 'conflict'
+          end
 
           { 0 => 'clean', 1 => 'conflict', 2 => 'error' }.fetch(status, 'error')
         end
 
-        def classify(item, exit_class, equivalent)
+        def classify(item, exit_class, equivalent, adapter:)
           classification = item.dig('oracle', 'classification')
           return 'excluded_ambiguous' if %w[ambiguous_manual_review excluded].include?(classification)
+          if adapter == :structured_merge && item.dig('oracle', 'provider_coverage', 'status') == 'unsupported'
+            return 'unsupported'
+          end
           return 'error' if exit_class == 'error'
-          return exit_class == 'conflict' ? 'true_conflict' : 'false_auto_merge' if classification == 'conflict_expected'
+          if classification == 'conflict_expected'
+            return exit_class == 'conflict' ? 'true_conflict' : 'false_auto_merge'
+          end
           return 'false_conflict' if exit_class == 'conflict'
           return 'correct_clean' if equivalent
 
@@ -536,10 +546,22 @@ module Ast
             unless resolved_tmp.to_s.start_with?("#{gem_root}/")
               raise Corpus::Error, 'clone tmp root must be inside the ast-merge-git repository'
             end
-            unless destination.to_s.start_with?("#{tmp_root}/")
+
+            FileUtils.mkdir_p(tmp_root)
+            resolved_tmp = tmp_root.realpath
+            resolved_destination = resolve_destination(destination)
+            unless resolved_destination.to_s.start_with?("#{resolved_tmp}/")
               raise Corpus::Error, 'clone destination must be inside the configured repo-local tmp root'
             end
             raise Corpus::Error, "clone destination already exists: #{destination}" if destination.exist?
+          end
+
+          def resolve_destination(destination)
+            return destination.realpath if destination.exist?
+
+            ancestor = destination.cleanpath.dirname
+            ancestor = ancestor.dirname until ancestor.exist?
+            ancestor.realpath.join(destination.cleanpath.relative_path_from(ancestor)).cleanpath
           end
 
           def clone!(remote, destination)
