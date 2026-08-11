@@ -9,13 +9,13 @@ module Kettle
     module CLI
       USAGE = <<~USAGE
         Usage:
-          kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-          kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-          kettle-jem prepare [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force] [--quiet|--verbose]
+          kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--changelog|--no-changelog] [--quiet|--verbose]
+          kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--changelog|--no-changelog] [--quiet|--verbose]
+          kettle-jem prepare [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force] [--changelog|--no-changelog] [--quiet|--verbose]
           kettle-jem plan [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem apply [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem template [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem install [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem apply [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION] [--changelog|--no-changelog]
+          kettle-jem template [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION] [--changelog|--no-changelog]
+          kettle-jem install [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION] [--changelog|--no-changelog]
           kettle-jem manifest [PROJECT_ROOT] [--json]
           kettle-jem selftest [PROJECT_ROOT] [--json] [--report PATH] [--destination PATH] [--template-root PATH] [--selftest-output PATH]
           kettle-jem version
@@ -146,6 +146,9 @@ module Kettle
           opts.on("--skip-rubocop-gradual", "Skip post-template RuboCop Gradual autocorrect.") do
             options[:run_options][:skip_rubocop_gradual] = true
           end
+          opts.on("--[no-]changelog", "Add a Changed entry summarizing actual template changes (default).") do |value|
+            options[:run_options][:skip_changelog] = !value
+          end
           opts.on("--skip-binstubs", "Skip post-template curated Bundler binstub generation.") do
             options[:run_options][:skip_binstubs] = true
           end
@@ -199,7 +202,7 @@ module Kettle
             types: options[:event_types]
           )
         end
-        case command
+        result = case command
         when "setup"
           Kettle::Jem.setup_project(project_root, env: env, run_options: run_options)
         when "prepare"
@@ -229,6 +232,14 @@ module Kettle
         else
           raise ArgumentError, "Unsupported kettle-jem command #{command.inspect}"
         end
+        return result unless %w[setup prepare apply template install].include?(command)
+
+        Kettle::Jem::MaintenanceChangelog.record_template_run(
+          project_root: project_root,
+          report: result,
+          run_options: run_options,
+          label: (command == "prepare") ? "Prepare project for kettle-jem templates" : "Apply kettle-jem templates"
+        )
       end
 
       def scoped_template_run?(run_options)

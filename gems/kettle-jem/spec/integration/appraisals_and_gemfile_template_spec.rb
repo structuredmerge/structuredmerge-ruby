@@ -1268,7 +1268,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
-    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-family kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-family kettle-test kettle-soup-cover kettle-changelog kettle-drift")
     expect(tokens.fetch("KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM")).to include('gem "kettle-family"')
     expect(tokens.fetch("KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP")).to include('gem "nomono"')
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")

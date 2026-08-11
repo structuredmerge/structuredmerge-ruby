@@ -16,6 +16,9 @@ RSpec.describe Kettle::Jem::CLI do
     out = StringIO.new
     err = StringIO.new
     allow(Dir).to receive(:pwd).and_return(tmp_root)
+    allow(Kettle::Jem::MaintenanceChangelog).to receive(:record_template_run) do |project_root:, report:, **|
+      report
+    end
     status = described_class.run(argv, env: env, out: out, err: err)
     [status, out.string, err.string]
   end
@@ -425,6 +428,27 @@ RSpec.describe Kettle::Jem::CLI do
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
         run_options: include(force: true)
+      )
+    end
+  end
+
+  it "records a changelog summary after a mutating template command" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run).and_return(
+        mode: "template",
+        changed_files: ["README.md"],
+        template_steps: []
+      )
+
+      status, _out, err = run_cli(["template", root, "--only", "README.md"], env: {"K_JEM_TEMPLATING" => "true"})
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      expect(Kettle::Jem::MaintenanceChangelog).to have_received(:record_template_run).with(
+        project_root: root,
+        report: include(mode: "template", changed_files: ["README.md"]),
+        run_options: include(only: ["README.md"]),
+        label: "Apply kettle-jem templates"
       )
     end
   end

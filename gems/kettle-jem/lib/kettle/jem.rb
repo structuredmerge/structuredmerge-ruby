@@ -20,9 +20,11 @@ require "ast/crispr/markdown/markly"
 require "kettle/ndjson"
 require "rbs"
 require "kettle/dev"
+require "kettle/changelog"
 require "kettle/rb/compat_matrix"
 require_relative "jem/version"
 require_relative "jem/license_txt_migrator"
+require_relative "jem/maintenance_changelog"
 
 begin
   require "kettle/drift"
@@ -6390,37 +6392,11 @@ module Kettle
     end
 
     def apply_changelog_transfer_entries(content, entries, excluded_keys: [])
-      transfer_entries = Array(entries).select do |entry|
-        entry.is_a?(Hash) && entry[:key].to_s != "" && Array(entry[:lines]).any?
-      end
-
-      normalized = normalize_changelog(content, {})
-      normalized = remove_excluded_changelog_transfer_entries(normalized, excluded_keys)
-      existing_keys = changelog_transfer_keys(normalized)
-      missing = transfer_entries.reject { |entry| existing_keys.include?(entry.fetch(:key)) }
-      return ensure_trailing_newline(normalized) if missing.empty?
-
-      lines = markdown_source_lines(normalized)
-      unreleased = changelog_unreleased_line_index(lines)
-      return ensure_trailing_newline(normalized) unless unreleased
-
-      destination_end = changelog_unreleased_end_index(lines, unreleased)
-      destination_body = lines[(unreleased + 1)...destination_end] || []
-      items = changelog_unreleased_items(destination_body)
-      missing.group_by { |entry| entry.fetch(:section, "### Changed") }.each do |section, section_entries|
-        section = CHANGELOG_STANDARD_HEADINGS.include?(section) ? section : "### Changed"
-        items[section] ||= []
-        items[section].pop while items[section].any? && items[section].last.to_s.strip.empty?
-        items[section] << "" if items[section].any?
-        section_entries.each do |entry|
-          items[section].concat(Array(entry.fetch(:lines)).map(&:rstrip))
-        end
-      end
-
-      merged_lines = lines[0...unreleased] +
-        build_changelog_unreleased_section(lines.fetch(unreleased), items) +
-        lines[destination_end..].to_a
-      ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+      Kettle::Changelog::TransferMerger.apply(
+        content: normalize_changelog(content, {}),
+        entries: entries,
+        excluded_keys: excluded_keys
+      )
     end
 
     def remove_excluded_changelog_transfer_entries(content, excluded_keys)
@@ -13960,7 +13936,7 @@ module Kettle
               root: ["src", "my", "kettle-dev"]
             )
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 1.0", ">= 1.0.0"
+            gem "kettle-changelog", "~> 1.0", ">= 1.0.1"
           end
         end
       RUBY
@@ -14911,7 +14887,7 @@ module Kettle
     end
 
     def kettle_dev_local_gems(config)
-      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover]
+      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover kettle-changelog]
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
       gems.uniq.join(" ")

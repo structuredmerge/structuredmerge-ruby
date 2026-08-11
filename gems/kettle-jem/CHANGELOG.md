@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Declare kettle-changelog as a runtime dependency for packaged maintenance commands.
 
+- Main templating commands now record an aggregate Changed entry through kettle-changelog only when template files change, while transfer replay uses kettle-changelog's structural merger.
+
 ### Deprecated
 
 ### Removed

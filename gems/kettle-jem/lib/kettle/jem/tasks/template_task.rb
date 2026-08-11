@@ -68,6 +68,7 @@ module Kettle
             skip_binstubs: truthy?(env["KETTLE_JEM_SKIP_BINSTUBS"]),
             skip_appraisal_generate: truthy?(env["KETTLE_JEM_SKIP_APPRAISAL_GENERATE"]),
             skip_lock_normalization: truthy?(env["KETTLE_JEM_SKIP_LOCK_NORMALIZATION"]),
+            skip_changelog: truthy?(env["KETTLE_JEM_SKIP_CHANGELOG"]),
             checksums: env["KETTLE_JEM_CHECKSUMS"],
             accept_config: truthy?(env["KETTLE_JEM_ACCEPT_CONFIG"]),
             bootstrap_mode: truthy?(env["KETTLE_JEM_BOOTSTRAP_MODE"]),
