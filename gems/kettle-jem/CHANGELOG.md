@@ -46,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve local Gemfile indentation when removing destination package entries from multiline word arrays.
 
+- Add the generated frozen-string-literal comment to Ruby 3.1 extracted stdlib Gemfiles.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10
