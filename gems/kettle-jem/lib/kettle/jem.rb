@@ -9727,7 +9727,7 @@ module Kettle
         replacement = if record.fetch(:source).lines.one?
           "%w[#{kept.join(" ")}]"
         else
-          ruby_multiline_word_array_source(kept, indent: record.fetch(:start_column))
+          ruby_multiline_word_array_source(kept, indent: record.fetch(:line_indent))
         end
         {start_offset: record.fetch(:start_offset), end_offset: record.fetch(:end_offset), replacement: replacement}
       end
@@ -9738,13 +9738,15 @@ module Kettle
     end
 
     def ruby_word_array_records(content)
+      lines = content.to_s.lines
       ruby_word_array_nodes(content).map do |node|
+        source_line = lines.fetch(node.location.start_line - 1)
         {
           names: ruby_word_array_names(node),
           source: node.location.slice,
           start_line: node.location.start_line,
           end_line: node.location.end_line,
-          start_column: node.location.start_column,
+          line_indent: source_line.length - source_line.lstrip.length,
           start_offset: node.location.start_offset,
           end_offset: node.location.end_offset
         }
@@ -9771,9 +9773,9 @@ module Kettle
     end
 
     def ruby_multiline_word_array_source(names, indent:)
-      prefix = " " * indent.to_i
-      element_prefix = "#{prefix}  "
-      (["#{prefix}%w["] + names.map { |name| "#{element_prefix}#{name}" } + ["#{prefix}]"]).join("\n")
+      element_prefix = " " * (indent.to_i + 2)
+      closing_prefix = " " * indent.to_i
+      (["%w["] + names.map { |name| "#{element_prefix}#{name}" } + ["#{closing_prefix}]"]).join("\n")
     end
 
     def replace_source_offsets(content, replacements)

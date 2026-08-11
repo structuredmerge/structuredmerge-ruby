@@ -1240,6 +1240,20 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "preserves local Gemfile array indentation when removing the destination package" do
+    source = <<~RUBY
+      structuredmerge_local_gems = %w[
+        tree_haver
+        kettle-jem
+      ]
+    RUBY
+
+    content = described_class.send(:remove_gemfile_percent_w_entries, source, ["kettle-jem"])
+
+    expect(content).to include("structuredmerge_local_gems = %w[\n  tree_haver\n]")
+    expect(content).not_to include("structuredmerge_local_gems =                              %w[")
+  end
+
   it "adds configured kettle plugins to the kettle-rb local Gemfile overrides" do
     runtime = described_class.send(
       :project_runtime_facts,

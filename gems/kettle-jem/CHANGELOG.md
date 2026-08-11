@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Synchronize monorepo subgem profiles with a template-owned Rakefile so legacy generated task blocks are replaced instead of duplicated.
 
+- Preserve local Gemfile indentation when removing destination package entries from multiline word arrays.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10
