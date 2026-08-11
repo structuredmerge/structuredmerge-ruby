@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/toml/merge.rb<span class="defines">,<br>
-  lib/toml/merge/emitter.rb,<br> lib/toml/merge/version.rb,<br> lib/toml/merge/key_sorter.rb,<br> lib/toml/merge/debug_logger.rb,<br> lib/toml/merge/merge_result.rb,<br> lib/toml/merge/node_wrapper.rb,<br> lib/toml/merge/smart_merger.rb,<br> lib/toml/merge/file_analysis.rb,<br> lib/toml/merge/comment_tracker.rb,<br> lib/toml/merge/conflict_resolver.rb,<br> lib/toml/merge/table_match_refiner.rb,<br> lib/toml/merge/node_type_normalizer.rb</span>
+  lib/toml/merge/emitter.rb,<br> lib/toml/merge/version.rb,<br> lib/toml/merge/provider.rb,<br> lib/toml/merge/key_sorter.rb,<br> lib/toml/merge/debug_logger.rb,<br> lib/toml/merge/merge_result.rb,<br> lib/toml/merge/node_wrapper.rb,<br> lib/toml/merge/smart_merger.rb,<br> lib/toml/merge/file_analysis.rb,<br> lib/toml/merge/comment_tracker.rb,<br> lib/toml/merge/conflict_resolver.rb,<br> lib/toml/merge/table_match_refiner.rb,<br> lib/toml/merge/node_type_normalizer.rb,<br> lib/toml/merge/source_preserving_provider.rb</span>
 
 </dd>
   </dl>
@@ -90,26 +90,13 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Smart merge system for TOML files using tree-sitter AST analysis.<br />
-Provides intelligent merging by understanding TOML structure<br />
-rather than treating files as plain text.</p>
+    <p>Portable TOML workflow integration.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="Merge/SmartMerger.html" title="Toml::Merge::SmartMerger (class)">Main entry point for merge operations</a></span></li>
-    
-      <li><span class='object_link'><a href="Merge/FileAnalysis.html" title="Toml::Merge::FileAnalysis (class)">Analyzes TOML structure</a></span></li>
-    
-      <li><span class='object_link'><a href="Merge/ConflictResolver.html" title="Toml::Merge::ConflictResolver (class)">Resolves content conflicts</a></span></li>
-    
-  </ul>
 
 </div><h2>Defined Under Namespace</h2>
 <p class="children">
@@ -119,7 +106,7 @@ rather than treating files as plain text.</p>
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Toml::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/ConflictResolver.html" title="Toml::Merge::ConflictResolver (class)">ConflictResolver</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Toml::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Toml::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Toml::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Toml::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Toml::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/KeySorter.html" title="Toml::Merge::KeySorter (class)">KeySorter</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Toml::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Toml::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Toml::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Toml::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TableMatchRefiner.html" title="Toml::Merge::TableMatchRefiner (class)">TableMatchRefiner</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Toml::Merge::TemplateParseError (class)">TemplateParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Toml::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/ConflictResolver.html" title="Toml::Merge::ConflictResolver (class)">ConflictResolver</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Toml::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Toml::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Toml::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Toml::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Toml::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/KeySorter.html" title="Toml::Merge::KeySorter (class)">KeySorter</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Toml::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Toml::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Toml::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Toml::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Toml::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/SourcePreservingProvider.html" title="Toml::Merge::SourcePreservingProvider (class)">SourcePreservingProvider</a></span>, <span class='object_link'><a href="Merge/TableMatchRefiner.html" title="Toml::Merge::TableMatchRefiner (class)">TableMatchRefiner</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Toml::Merge::TemplateParseError (class)">TemplateParseError</a></span>
     
   
 </p>
@@ -275,6 +262,29 @@ rather than treating files as plain text.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#merge_toml-class_method" title="merge_toml (class method)">.<strong>merge_toml</strong>(template_source, destination_source, dialect, backend: nil)  &#x21d2; Object </a>
     
 
@@ -345,6 +355,29 @@ rather than treating files as plain text.</p>
   <span class="summary_signature">
     
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
     
 
     
@@ -458,7 +491,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-164
 165
 166
 167
@@ -478,10 +510,11 @@ rather than treating files as plain text.</p>
 181
 182
 183
-184</pre>
+184
+185</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 164</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_analyze_toml_source'>analyze_toml_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
@@ -524,12 +557,12 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-122
 123
-124</pre>
+124
+125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 122</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 123</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_toml_backends'>available_toml_backends</span>
   <span class='id identifier rubyid_toml_backend_available_for_analysis?'>toml_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND_REFERENCE-constant" title="Toml::Merge::TREE_SITTER_BACKEND_REFERENCE (constant)">TREE_SITTER_BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND_REFERENCE-constant" title="Toml::Merge::TREE_SITTER_BACKEND_REFERENCE (constant)">TREE_SITTER_BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -554,15 +587,45 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-186
 187
-188</pre>
+188
+189</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 186</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 187</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_toml_owners'>match_toml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
   <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>OwnerSelection</span><span class='period'>.</span><span class='id identifier rubyid_match_by_path'>match_by_path</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+16
+17
+18</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/provider.rb', line 16</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Toml::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -584,7 +647,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-190
 191
 192
 193
@@ -613,10 +675,11 @@ rather than treating files as plain text.</p>
 216
 217
 218
-219</pre>
+219
+220</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 190</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 191</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_toml'>merge_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_merge_result'>unsupported_feature_merge_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
@@ -668,7 +731,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-221
 222
 223
 224
@@ -697,10 +759,11 @@ rather than treating files as plain text.</p>
 247
 248
 249
-250</pre>
+250
+251</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 221</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 222</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_toml_with_parser'>merge_toml_with_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_merge_result'>unsupported_feature_merge_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
@@ -752,7 +815,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-151
 152
 153
 154
@@ -763,10 +825,11 @@ rather than treating files as plain text.</p>
 159
 160
 161
-162</pre>
+162
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 151</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_toml'>parse_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported TOML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
@@ -800,7 +863,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-252
 253
 254
 255
@@ -810,10 +872,11 @@ rather than treating files as plain text.</p>
 259
 260
 261
-262</pre>
+262
+263</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 253</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
   <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Toml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -825,6 +888,36 @@ rather than treating files as plain text.</p>
 
     <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Toml::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'>registered</span> <span class='op'>=</span> <span class='kw'>true</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+20
+21
+22</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/provider.rb', line 20</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -846,7 +939,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-126
 127
 128
 129
@@ -855,10 +947,11 @@ rather than treating files as plain text.</p>
 132
 133
 134
-135</pre>
+135
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 126</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 127</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_toml_backend_feature_profile'>toml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_requested_toml_backend_id'>requested_toml_backend_id</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -890,16 +983,16 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-114
 115
 116
 117
 118
 119
-120</pre>
+120
+121</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 114</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 115</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_toml_feature_profile'>toml_feature_profile</span>
   <span class='lbrace'>{</span>
@@ -928,7 +1021,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-137
 138
 139
 140
@@ -940,10 +1032,11 @@ rather than treating files as plain text.</p>
 146
 147
 148
-149</pre>
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 137</span>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_toml_plan_context'>toml_plan_context</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_toml_backend_feature_profile'>toml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -968,7 +1061,7 @@ rather than treating files as plain text.</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:46:08 2026 by
+  Generated on Tue Aug 11 05:51:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
