@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ruby::Merge::GemspecSupport
+  
+    &mdash; Documentation by YARD 0.9.45
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ruby::Merge::GemspecSupport";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (G)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ruby.html" title="Ruby (module)">Ruby</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Ruby::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">GemspecSupport</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ruby::Merge::GemspecSupport
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ruby/merge/gemspec_support.rb
+</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="GEMSPEC_VAR_PLACEHOLDER-constant" class="">GEMSPEC_VAR_PLACEHOLDER =
+          
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:__gemspec_var__</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#effective_receiver-class_method" title="effective_receiver (class method)">.<strong>effective_receiver</strong>(receiver, gemspec_block_var)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merged_block_var-class_method" title="merged_block_var (class method)">.<strong>merged_block_var</strong>(var, preferred_var)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#opening_line_with_preferred_block_var-class_method" title="opening_line_with_preferred_block_var (class method)">.<strong>opening_line_with_preferred_block_var</strong>(opening_line, dest_var:, preferred_var:, node_preference:)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#preferred_block_var-class_method" title="preferred_block_var (class method)">.<strong>preferred_block_var</strong>(template_var, dest_var)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="effective_receiver-class_method">
+  
+    .<strong>effective_receiver</strong>(receiver, gemspec_block_var)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_effective_receiver'>effective_receiver</span><span class='lparen'>(</span><span class='id identifier rubyid_receiver'>receiver</span><span class='comma'>,</span> <span class='id identifier rubyid_gemspec_block_var'>gemspec_block_var</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="BlockBindingSupport.html" title="Ruby::Merge::BlockBindingSupport (module)">BlockBindingSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_effective_receiver'><span class='object_link'><a href="BlockBindingSupport.html#effective_receiver-class_method" title="Ruby::Merge::BlockBindingSupport.effective_receiver (method)">effective_receiver</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_receiver'>receiver</span><span class='comma'>,</span> <span class='id identifier rubyid_gemspec_block_var'>gemspec_block_var</span><span class='comma'>,</span> <span class='label'>placeholder:</span> <span class='const'><span class='object_link'><a href="#GEMSPEC_VAR_PLACEHOLDER-constant" title="Ruby::Merge::GemspecSupport::GEMSPEC_VAR_PLACEHOLDER (constant)">GEMSPEC_VAR_PLACEHOLDER</a></span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merged_block_var-class_method">
+  
+    .<strong>merged_block_var</strong>(var, preferred_var)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+20
+21
+22</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 20</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merged_block_var'>merged_block_var</span><span class='lparen'>(</span><span class='id identifier rubyid_var'>var</span><span class='comma'>,</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="BlockBindingSupport.html" title="Ruby::Merge::BlockBindingSupport (module)">BlockBindingSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_merged_block_var'><span class='object_link'><a href="BlockBindingSupport.html#merged_block_var-class_method" title="Ruby::Merge::BlockBindingSupport.merged_block_var (method)">merged_block_var</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_var'>var</span><span class='comma'>,</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="opening_line_with_preferred_block_var-class_method">
+  
+    .<strong>opening_line_with_preferred_block_var</strong>(opening_line, dest_var:, preferred_var:, node_preference:)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+24
+25
+26
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 24</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_opening_line_with_preferred_block_var'>opening_line_with_preferred_block_var</span><span class='lparen'>(</span><span class='id identifier rubyid_opening_line'>opening_line</span><span class='comma'>,</span> <span class='label'>dest_var:</span><span class='comma'>,</span> <span class='label'>preferred_var:</span><span class='comma'>,</span> <span class='label'>node_preference:</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_opening_line'>opening_line</span> <span class='kw'>unless</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_var'>dest_var</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_var'>dest_var</span> <span class='op'>!=</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_opening_line'>opening_line</span> <span class='kw'>unless</span> <span class='id identifier rubyid_node_preference'>node_preference</span> <span class='op'>==</span> <span class='symbol'>:destination</span>
+
+  <span class='id identifier rubyid_opening_line'>opening_line</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dest_var'>dest_var</span><span class='embexpr_end'>}</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_preferred_var'>preferred_var</span><span class='embexpr_end'>}</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="preferred_block_var-class_method">
+  
+    .<strong>preferred_block_var</strong>(template_var, dest_var)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+16
+17
+18</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 16</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_preferred_block_var'>preferred_block_var</span><span class='lparen'>(</span><span class='id identifier rubyid_template_var'>template_var</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_var'>dest_var</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="BlockBindingSupport.html" title="Ruby::Merge::BlockBindingSupport (module)">BlockBindingSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_preferred_block_var'><span class='object_link'><a href="BlockBindingSupport.html#preferred_block_var-class_method" title="Ruby::Merge::BlockBindingSupport.preferred_block_var (method)">preferred_block_var</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_var'>template_var</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_var'>dest_var</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Tue Aug 11 04:19:56 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.45 (ruby-4.0.6).
+</div>
+
+    </div>
+  </body>
+</html>
