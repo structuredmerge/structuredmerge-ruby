@@ -12,8 +12,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Peter H. Boling']
   spec.email = ['floss@galtzo.com']
 
-  spec.summary = '💎 Prism adapter for AST CRISPR structural edits'
-  spec.description = '💎 Ruby/Prism structural owner selectors and edit helpers for ast-crispr.'
+  spec.summary = '🧬 Prism adapter for AST CRISPR structural edits'
+  spec.description = '🧬 Ruby/Prism structural owner selectors and edit helpers for ast-crispr.'
   spec.homepage = 'https://github.com/structuredmerge/structuredmerge-ruby'
   spec.licenses = ['AGPL-3.0-only', 'PolyForm-Small-Business-1.0.0']
   spec.required_ruby_version = '>= 4.0.0'
