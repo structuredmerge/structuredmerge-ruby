@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/html/merge.rb<span class="defines">,<br>
-  lib/html/merge/version.rb,<br> lib/html/merge/crispr_adapter.rb</span>
+  lib/html/merge/version.rb,<br> lib/html/merge/provider.rb,<br> lib/html/merge/node_wrapper.rb,<br> lib/html/merge/file_analysis.rb,<br> lib/html/merge/crispr_adapter.rb</span>
 
 </dd>
   </dl>
@@ -96,7 +96,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CrisprAdapter.html" title="Html::Merge::CrisprAdapter (class)">CrisprAdapter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Html::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Html::Merge::ParseError (class)">ParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CrisprAdapter.html" title="Html::Merge::CrisprAdapter (class)">CrisprAdapter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Html::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Html::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Html::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Html::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Html::Merge::Provider (class)">Provider</a></span>
     
   
 </p>
@@ -504,6 +504,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#parse_html-class_method" title="parse_html (class method)">.<strong>parse_html</strong>(source, dialect = &quot;html&quot;, backend: nil)  &#x21d2; Object </a>
     
 
@@ -528,6 +551,29 @@
   <span class="summary_signature">
     
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
     
 
     
@@ -641,12 +687,12 @@
       <pre class="lines">
 
 
-43
-44
-45</pre>
+46
+47
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_html_backends'>available_html_backends</span>
   <span class='id identifier rubyid_html_backend_available_for_analysis?'>html_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Html::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Html::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -671,18 +717,18 @@
       <pre class="lines">
 
 
-207
-208
-209
 210
 211
 212
 213
 214
-215</pre>
+215
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 210</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_document_context'>document_context</span><span class='lparen'>(</span><span class='label'>content:</span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>source</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ast/crispr</span><span class='tstring_end'>&quot;</span></span>
@@ -713,9 +759,6 @@
       <pre class="lines">
 
 
-217
-218
-219
 220
 221
 222
@@ -725,10 +768,13 @@
 226
 227
 228
-229</pre>
+229
+230
+231
+232</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 220</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_element_text_selector'>element_text_selector</span><span class='lparen'>(</span><span class='label'>text:</span><span class='comma'>,</span> <span class='label'>id:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ast/crispr</span><span class='tstring_end'>&quot;</span></span>
@@ -763,9 +809,6 @@
       <pre class="lines">
 
 
-240
-241
-242
 243
 244
 245
@@ -774,10 +817,13 @@
 248
 249
 250
-251</pre>
+251
+252
+253
+254</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 243</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_yard_content_wrapper'>ensure_yard_content_wrapper</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ast/crispr</span><span class='tstring_end'>&quot;</span></span>
@@ -834,16 +880,16 @@
       <pre class="lines">
 
 
-183
-184
-185
 186
 187
 188
-189</pre>
+189
+190
+191
+192</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 186</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_backend_available_for_analysis?'>html_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_id'>backend_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_requested_html_backend_id'>requested_html_backend_id</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_id'>backend_id</span><span class='rparen'>)</span>
@@ -872,9 +918,6 @@
       <pre class="lines">
 
 
-47
-48
-49
 50
 51
 52
@@ -882,10 +925,13 @@
 54
 55
 56
-57</pre>
+57
+58
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_backend_feature_profile'>html_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_requested_html_backend_id'>requested_html_backend_id</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -941,17 +987,17 @@
       <pre class="lines">
 
 
-231
-232
-233
 234
 235
 236
 237
-238</pre>
+238
+239
+240
+241</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 234</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_descendant_element_text?'>html_descendant_element_text?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_child_count'>child_count</span><span class='period'>.</span><span class='id identifier rubyid_times'>times</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
@@ -981,16 +1027,16 @@
       <pre class="lines">
 
 
-35
-36
-37
 38
 39
 40
-41</pre>
+41
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 38</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_feature_profile'>html_feature_profile</span>
   <span class='lbrace'>{</span>
@@ -1019,9 +1065,6 @@
       <pre class="lines">
 
 
-152
-153
-154
 155
 156
 157
@@ -1030,10 +1073,13 @@
 160
 161
 162
-163</pre>
+163
+164
+165
+166</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 152</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_node_span'>html_node_span</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_start_point'>start_point</span> <span class='op'>=</span> <span class='id identifier rubyid_html_point'>html_point</span><span class='lparen'>(</span><span class='id identifier rubyid_html_raw_point'>html_raw_point</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='symbol'>:start</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -1067,9 +1113,6 @@
       <pre class="lines">
 
 
-122
-123
-124
 125
 126
 127
@@ -1079,10 +1122,13 @@
 131
 132
 133
-134</pre>
+134
+135
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 122</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 125</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_node_summaries'>html_node_summaries</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_nodes'>nodes</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1117,16 +1163,16 @@
       <pre class="lines">
 
 
-136
-137
-138
 139
 140
 141
-142</pre>
+142
+143
+144
+145</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 136</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_parse_error_nodes'>html_parse_error_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_errors'>errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1155,9 +1201,6 @@
       <pre class="lines">
 
 
-59
-60
-61
 62
 63
 64
@@ -1167,10 +1210,13 @@
 68
 69
 70
-71</pre>
+71
+72
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_plan_context'>html_plan_context</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_html_backend_feature_profile'>html_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -1228,16 +1274,16 @@
       <pre class="lines">
 
 
-175
-176
-177
 178
 179
 180
-181</pre>
+181
+182
+183
+184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_point'>html_point</span><span class='lparen'>(</span><span class='id identifier rubyid_point'>point</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_row'>row</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_column'>column</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:row</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_point'>point</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:column</span><span class='rparen'>)</span>
@@ -1266,18 +1312,18 @@
       <pre class="lines">
 
 
-165
-166
-167
 168
 169
 170
 171
 172
-173</pre>
+173
+174
+175
+176</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 165</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_raw_point'>html_raw_point</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raw_node'>raw_node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:inner_node</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_inner_node'>inner_node</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span>
@@ -1308,19 +1354,49 @@
       <pre class="lines">
 
 
-116
-117
-118
 119
-120</pre>
+120
+121
+122
+123</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_html_root_node'>html_root_node</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_requested_html_backend_id'>requested_html_backend_id</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_register_backend!'>register_backend!</span>
   <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_requested'>requested</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:html</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+256
+257
+258</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 256</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Html::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1342,9 +1418,6 @@
       <pre class="lines">
 
 
-73
-74
-75
 76
 77
 78
@@ -1383,10 +1456,13 @@
 111
 112
 113
-114</pre>
+114
+115
+116
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 76</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_html'>parse_html</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>html</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported HTML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>html</span><span class='tstring_end'>&quot;</span></span>
@@ -1450,9 +1526,6 @@
       <pre class="lines">
 
 
-22
-23
-24
 25
 26
 27
@@ -1461,10 +1534,13 @@
 30
 31
 32
-33</pre>
+33
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
   <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Html::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -1477,6 +1553,40 @@
 
     <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Html::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'>registered</span> <span class='op'>=</span> <span class='kw'>true</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+260
+261
+262
+263
+264</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 260</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:register_provider</span><span class='rparen'>)</span>
+
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1498,12 +1608,12 @@
       <pre class="lines">
 
 
-191
-192
-193</pre>
+194
+195
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 191</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 194</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_requested_html_backend_id'>requested_html_backend_id</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Html::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -1528,9 +1638,6 @@
       <pre class="lines">
 
 
-195
-196
-197
 198
 199
 200
@@ -1538,10 +1645,13 @@
 202
 203
 204
-205</pre>
+205
+206
+207
+208</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 195</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -1597,16 +1707,16 @@
       <pre class="lines">
 
 
-144
-145
-146
 147
 148
 149
-150</pre>
+150
+151
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/html/merge.rb', line 147</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_visit_html_node'>visit_html_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>yield</span> <span class='id identifier rubyid_node'>node</span>
@@ -1625,7 +1735,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 03:42:21 2026 by
+  Generated on Tue Aug 11 06:19:56 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

@@ -83,6 +83,10 @@
 <h2 id="-synopsis--">🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"></a>
 </h2>
 
+<p>Html::Merge provides TreeHaver-backed HTML parsing and structural analysis for<br>
+the StructuredMerge Ruby family, including feature profiles and YARD content<br>
+wrapper repair helpers.</p>
+
 <h2 id="-info-you-can-shake-a-stick-at">💡 Info you can shake a stick at</h2>
 
 <table>
@@ -147,7 +151,7 @@
 
 <h3 id="compatibility">Compatibility</h3>
 
-<p>Compatible with MRI Ruby 3.2.0+, and concordant releases of JRuby, and TruffleRuby.<br>
+<p>Compatible with MRI Ruby 3.2.0+, JRuby, and TruffleRuby.<br>
 CI workflows and Appraisals are generated for MRI Ruby 3.2.0+.<br>
 This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle-jem.yml</code> and<br>
 may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
@@ -237,9 +241,25 @@ not practical for the current toolchain.</p>
 
 <h2 id="️-configuration">⚙️ Configuration</h2>
 
+<p>HTML parsing is registered through TreeHaver. The gem currently supports the<br>
+HTML dialect and its configured Kreuzberg language-pack backend; inspect<br>
+<code>Html::Merge.html_plan_context</code> before selecting a backend in a host merge<br>
+pipeline. No global initializer is required.</p>
+
 <h2 id="-basic-usage">🔧 Basic Usage</h2>
 
-<p>TODO: Write usage instructions here</p>
+<p>Parse and inspect HTML through the module API:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;html/merge&quot;
+
+result = Html::Merge.parse_html(&quot;&lt;main&gt;&lt;h1&gt;Hello&lt;/h1&gt;&lt;/main&gt;&quot;)
+raise result[:diagnostics].inspect unless result[:ok]
+
+puts result.dig(:analysis, :nodes)
+</code></pre>
+
+<p>Use <code>Html::Merge.html_plan_context</code> to advertise the available backend and<br>
+<code>Html::Merge.ensure_yard_content_wrapper</code> when repairing YARD-generated HTML.</p>
 
 <h2 id="-security">🔐 Security</h2>
 
@@ -248,19 +268,11 @@ not practical for the current toolchain.</p>
 <h2 id="-contributing">🤝 Contributing</h2>
 
 <p>If you need some ideas of where to help, you could work on adding more code coverage,<br>
-or if it is already 💯 (see <a href="#code-coverage">below</a>) check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>,<br>
-or use the gem and think about how it could be better.</p>
+check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>, or use the gem and think about how it could be better.</p>
 
 <p>We <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep A Changelog"></a> so if you make changes, remember to update it.</p>
 
 <p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more detailed instructions.</p>
-
-<h3 id="code-coverage">Code Coverage</h3>
-
-<details>
-  <summary>Coverage service badges</summary>
-
-</details>
 
 <h2 id="-versioning">📌 Versioning</h2>
 
@@ -297,7 +309,7 @@ the <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/M
 </div></div>
 
       <div id="footer">
-  Generated on Sat Aug  8 03:42:21 2026 by
+  Generated on Tue Aug 11 06:19:56 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
