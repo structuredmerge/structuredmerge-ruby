@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Write-mode dependency-floor and workflow-pin maintenance tools now document their updates in CHANGELOG.md by default.
 
+- Update kettle-jem template dependency floors: kettle-dev (>= 3.0.6), kettle-family (>= 1.2.50), kettle-jem (>= 7.1.3), and yard-lint (>= 1.11.0).
+
 ### Deprecated
 
 ### Removed
