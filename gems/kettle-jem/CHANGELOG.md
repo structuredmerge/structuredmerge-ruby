@@ -26,6 +26,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Update kettle-jem template dependency floors: kettle-dev (>= 3.0.6), kettle-family (>= 1.2.50), kettle-jem (>= 7.1.3), and yard-lint (>= 1.11.0).
 
+- Update pinned GitHub Actions in kettle-jem templates: github/codeql-action/analyze v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3), github/codeql-action/autobuild v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3), and github/codeql-action/init v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3).
+
 ### Deprecated
 
 ### Removed
