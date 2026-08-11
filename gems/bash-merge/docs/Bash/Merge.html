@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/bash/merge.rb<span class="defines">,<br>
-  lib/bash/merge/emitter.rb,<br> lib/bash/merge/version.rb,<br> lib/bash/merge/freeze_node.rb,<br> lib/bash/merge/debug_logger.rb,<br> lib/bash/merge/merge_result.rb,<br> lib/bash/merge/node_wrapper.rb,<br> lib/bash/merge/smart_merger.rb,<br> lib/bash/merge/file_analysis.rb,<br> lib/bash/merge/comment_tracker.rb</span>
+  lib/bash/merge/emitter.rb,<br> lib/bash/merge/version.rb,<br> lib/bash/merge/provider.rb,<br> lib/bash/merge/freeze_node.rb,<br> lib/bash/merge/debug_logger.rb,<br> lib/bash/merge/merge_result.rb,<br> lib/bash/merge/node_wrapper.rb,<br> lib/bash/merge/smart_merger.rb,<br> lib/bash/merge/file_analysis.rb,<br> lib/bash/merge/comment_tracker.rb</span>
 
 </dd>
   </dl>
@@ -90,24 +90,13 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Smart merge system for Bash scripts using tree-sitter AST analysis.<br />
-Provides intelligent merging by understanding Bash structure<br />
-rather than treating files as plain text.</p>
+    <p>Registration and source-preserving workflow implementation for Bash.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">Main entry point for merge operations</a></span></li>
-    
-      <li><span class='object_link'><a href="Merge/FileAnalysis.html" title="Bash::Merge::FileAnalysis (class)">Analyzes Bash structure</a></span></li>
-    
-  </ul>
 
 </div><h2>Defined Under Namespace</h2>
 <p class="children">
@@ -117,7 +106,7 @@ rather than treating files as plain text.</p>
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/Availability.html" title="Bash::Merge::Availability (class)">Availability</a></span>, <span class='object_link'><a href="Merge/CommentTracker.html" title="Bash::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Bash::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Bash::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Bash::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Bash::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Bash::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Bash::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Bash::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Bash::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Bash::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Bash::Merge::TemplateParseError (class)">TemplateParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/Availability.html" title="Bash::Merge::Availability (class)">Availability</a></span>, <span class='object_link'><a href="Merge/CommentTracker.html" title="Bash::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Bash::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Bash::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Bash::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Bash::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Bash::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Bash::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Bash::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Bash::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Bash::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Bash::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Bash::Merge::TemplateParseError (class)">TemplateParseError</a></span>
     
   
 </p>
@@ -244,7 +233,53 @@ rather than treating files as plain text.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
     
 
     
@@ -289,7 +324,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-146
 147
 148
 149
@@ -297,10 +331,11 @@ rather than treating files as plain text.</p>
 151
 152
 153
-154</pre>
+154
+155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 146</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 147</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_availability'>availability</span><span class='lparen'>(</span><span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#!/usr/bin/env bash\necho hello\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_diagnostics'>diagnostics</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -354,12 +389,12 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-142
 143
-144</pre>
+144
+145</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 142</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 143</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available?'>available?</span><span class='lparen'>(</span><span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#!/usr/bin/env bash\necho hello\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_availability'>availability</span><span class='lparen'>(</span><span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_available?'>available?</span>
@@ -384,15 +419,45 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-138
 139
-140</pre>
+140
+141</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 138</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_bash_backends'>available_bash_backends</span>
   <span class='id identifier rubyid_bash_backend_available_for_analysis?'>bash_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND-constant" title="Bash::Merge::TREE_SITTER_BACKEND (constant)">TREE_SITTER_BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND-constant" title="Bash::Merge::TREE_SITTER_BACKEND (constant)">TREE_SITTER_BACKEND</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+13
+14
+15</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 13</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Bash::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -414,7 +479,6 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
-125
 126
 127
 128
@@ -425,10 +489,11 @@ rather than treating files as plain text.</p>
 133
 134
 135
-136</pre>
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 125</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
   <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Bash::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -447,12 +512,46 @@ rather than treating files as plain text.</p>
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19
+20
+21</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:register_provider</span><span class='rparen'>)</span>
+
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:23:05 2026 by
+  Generated on Tue Aug 11 05:10:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

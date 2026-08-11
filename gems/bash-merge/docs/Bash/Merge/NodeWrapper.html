@@ -148,6 +148,39 @@ This provides a unified interface for working with Bash AST nodes during merging
 
 
 
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#node-instance_method" title="#node (instance method)">#<strong>node</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute node.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
 
 
 
@@ -246,6 +279,29 @@ This provides a unified interface for working with Bash AST nodes during merging
 
   
     <span class="summary_desc"><div class='inline'><p>Check if this is a comment.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#end_byte-instance_method" title="#end_byte (instance method)">#<strong>end_byte</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
 </div></span>
   
 </li>
@@ -369,6 +425,29 @@ This provides a unified interface for working with Bash AST nodes during merging
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#heredoc%3F-instance_method" title="#heredoc? (instance method)">#<strong>heredoc?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#if_statement%3F-instance_method" title="#if_statement? (instance method)">#<strong>if_statement?</strong>  &#x21d2; Boolean </a>
     
 
@@ -407,6 +486,75 @@ This provides a unified interface for working with Bash AST nodes during merging
 
   
     <span class="summary_desc"><div class='inline'><p>Check if this is a pipeline.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#semantic_tree-instance_method" title="#semantic_tree (instance method)">#<strong>semantic_tree</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#source_text-instance_method" title="#source_text (instance method)">#<strong>source_text</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#start_byte-instance_method" title="#start_byte (instance method)">#<strong>start_byte</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
 </div></span>
   
 </li>
@@ -487,6 +635,53 @@ This provides a unified interface for working with Bash AST nodes during merging
 
 
   
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="node-instance_method">
+  
+    #<strong>node</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute node.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_node'>node</span>
+  <span class='ivar'>@node</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
@@ -530,12 +725,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-54
-55
-56</pre>
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_case_statement?'>case_statement?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>case_statement</span><span class='tstring_end'>&#39;</span></span>
@@ -583,12 +778,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-60
-61
-62</pre>
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_command?'>command?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>command</span><span class='tstring_end'>&#39;</span></span>
@@ -636,8 +831,6 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-98
-99
 100
 101
 102
@@ -646,10 +839,12 @@ This provides a unified interface for working with Bash AST nodes during merging
 105
 106
 107
-108</pre>
+108
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 98</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_command_name'>command_name</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_command?'>command?</span>
@@ -705,16 +900,42 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-72
-73
-74</pre>
+74
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment?'>comment?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>comment</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="end_byte-instance_method">
+  
+    #<strong>end_byte</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+113</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 113</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_end_byte'>end_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_end_byte'>end_byte</span></pre>
     </td>
   </tr>
 </table>
@@ -777,14 +998,14 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-113
-114
-115
-116
-117</pre>
+127
+128
+129
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 127</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_child_by_field'>find_child_by_field</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:child_by_field_name</span><span class='rparen'>)</span>
@@ -853,17 +1074,17 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-122
-123
-124
-125
-126
-127
-128
-129</pre>
+136
+137
+138
+139
+140
+141
+142
+143</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 122</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 136</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_child_by_type'>find_child_by_type</span><span class='lparen'>(</span><span class='id identifier rubyid_type_name'>type_name</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:each</span><span class='rparen'>)</span>
@@ -916,12 +1137,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-42
-43
-44</pre>
+44
+45
+46</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_for_statement?'>for_statement?</span>
   <span class='qwords_beg'>%w[</span><span class='tstring_content'>for_statement</span><span class='words_sep'> </span><span class='tstring_content'>c_style_for_statement</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -969,12 +1190,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-24
-25
-26</pre>
+26
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_function_definition?'>function_definition?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>function_definition</span><span class='tstring_end'>&#39;</span></span>
@@ -1022,16 +1243,16 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-78
-79
 80
 81
 82
 83
-84</pre>
+84
+85
+86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 78</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_function_name'>function_name</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_function_definition?'>function_definition?</span>
@@ -1039,6 +1260,59 @@ This provides a unified interface for working with Bash AST nodes during merging
   <span class='comment'># In bash tree-sitter, function name is in a &#39;name&#39; or &#39;word&#39; child
 </span>  <span class='id identifier rubyid_name_node'>name_node</span> <span class='op'>=</span> <span class='id identifier rubyid_find_child_by_type'>find_child_by_type</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>word</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_find_child_by_field'>find_child_by_field</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>name</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node_text'>node_text</span><span class='lparen'>(</span><span class='id identifier rubyid_name_node'>name_node</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_name_node'>name_node</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="heredoc?-instance_method">
+  
+    #<strong>heredoc?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+120
+121
+122</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 120</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_heredoc?'>heredoc?</span>
+  <span class='id identifier rubyid_descendant_type?'>descendant_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>heredoc_redirect</span><span class='words_sep'> </span><span class='tstring_content'>heredoc_body</span><span class='tstring_end'>]</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1083,12 +1357,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-36
-37
-38</pre>
+38
+39
+40</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 38</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_if_statement?'>if_statement?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>if_statement</span><span class='tstring_end'>&#39;</span></span>
@@ -1136,16 +1410,98 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-66
-67
-68</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pipeline?'>pipeline?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>pipeline</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="semantic_tree-instance_method">
+  
+    #<strong>semantic_tree</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+116
+117
+118</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 116</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_semantic_tree'>semantic_tree</span>
+  <span class='id identifier rubyid_semantic_node'>semantic_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="source_text-instance_method">
+  
+    #<strong>source_text</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+114</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 114</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_source_text'>source_text</span> <span class='op'>=</span> <span class='ivar'>@source</span><span class='period'>.</span><span class='id identifier rubyid_byteslice'>byteslice</span><span class='lparen'>(</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="start_byte-instance_method">
+  
+    #<strong>start_byte</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 112</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_start_byte'>start_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_start_byte'>start_byte</span></pre>
     </td>
   </tr>
 </table>
@@ -1189,12 +1545,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-30
-31
-32</pre>
+32
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_variable_assignment?'>variable_assignment?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>variable_assignment</span><span class='tstring_end'>&#39;</span></span>
@@ -1242,16 +1598,16 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-88
-89
 90
 91
 92
 93
-94</pre>
+94
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_variable_name'>variable_name</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_variable_assignment?'>variable_assignment?</span>
@@ -1303,12 +1659,12 @@ This provides a unified interface for working with Bash AST nodes during merging
       <pre class="lines">
 
 
-48
-49
-50</pre>
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/node_wrapper.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_while_statement?'>while_statement?</span>
   <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>while_statement</span><span class='tstring_end'>&#39;</span></span>
@@ -1323,7 +1679,7 @@ This provides a unified interface for working with Bash AST nodes during merging
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:23:06 2026 by
+  Generated on Tue Aug 11 05:10:29 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
