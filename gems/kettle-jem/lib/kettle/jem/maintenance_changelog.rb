@@ -8,11 +8,35 @@ require "rubygems"
 module Kettle
   module Jem
     module MaintenanceChangelog
+      BUNDLER_ENVIRONMENT = %w[
+        BUNDLE_BIN_PATH
+        BUNDLE_FROZEN
+        BUNDLE_GEMFILE
+        BUNDLE_LOCKFILE
+        BUNDLER_SETUP
+        BUNDLER_VERSION
+        RUBYLIB
+        RUBYOPT
+      ].freeze
+
       module_function
 
       def add_unreleased_entry(project_root:, section:, entry:)
-        command = [RbConfig.ruby, Gem.bin_path("kettle-changelog", "kettle-changelog"), "--add-unreleased-entry", "--json", "--section", section.to_s, "--entry", entry.to_s]
-        stdout, stderr, status = Open3.capture3(*command, chdir: project_root)
+        command = [
+          RbConfig.ruby,
+          "-rrubygems",
+          "-e",
+          'exec Gem.ruby, Gem.bin_path("kettle-changelog", "kettle-changelog"), *ARGV',
+          "--",
+          "--add-unreleased-entry",
+          "--json",
+          "--section",
+          section.to_s,
+          "--entry",
+          entry.to_s
+        ]
+        environment = BUNDLER_ENVIRONMENT.to_h { |key| [key, nil] }
+        stdout, stderr, status = Open3.capture3(environment, *command, chdir: project_root)
         unless status.success?
           detail = [stdout, stderr].reject(&:empty?).join("\n")
           raise "kettle-changelog failed (exit #{status.exitstatus}): #{detail}"
