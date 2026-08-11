@@ -7281,7 +7281,11 @@ module Kettle
         )
       end
       processed = with_readme_timing("postprocess.compatibility_summary") do
-        normalize_readme_compatibility_summary(processed, facts.dig(:rubygems, :engines))
+        normalize_readme_compatibility_summary(
+          processed,
+          facts.dig(:rubygems, :engines),
+          minimum_ruby_token(facts.dig(:rubygems, :min_ruby))
+        )
       end
       processed = with_readme_timing("postprocess.project_heading") { normalize_readme_project_heading(processed, facts) }
       processed = with_readme_timing("postprocess.synopsis_heading") { normalize_readme_synopsis_heading(processed, facts) }
@@ -7434,11 +7438,13 @@ module Kettle
       processed
     end
 
-    def normalize_readme_compatibility_summary(content, engines)
+    def normalize_readme_compatibility_summary(content, engines, min_ruby = "")
       enabled = Array(engines).map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).uniq
       return content if enabled.empty?
 
-      runtime_engines = ["MRI Ruby"]
+      runtime_floor = min_ruby.to_s.strip
+      runtime_floor = " #{runtime_floor}+" unless runtime_floor.empty?
+      runtime_engines = ["MRI Ruby#{runtime_floor}"]
       runtime_engines << "JRuby" if enabled.include?("jruby")
       runtime_engines << "TruffleRuby" if enabled.include?("truffleruby") || enabled.include?("truby")
       description = runtime_engines.one? ? runtime_engines.first : runtime_engines[0...-1].join(", ") + ", and #{runtime_engines.last}"

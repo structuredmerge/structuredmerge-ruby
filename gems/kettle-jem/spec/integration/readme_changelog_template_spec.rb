@@ -1672,6 +1672,50 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
+  it "retains the MRI runtime floor when normalizing multi-engine compatibility text" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-compatibility-floor-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 4.0.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          engines:
+            - ruby
+            - jruby
+            - truffleruby
+          files:
+            README.md:
+              strategy: accept_template
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN
+          # Example
+
+          Compatible with MRI Ruby {KJ|MIN_RUBY}+, and concordant releases of JRuby, and TruffleRuby.
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+
+      expect(report.fetch(:final_content)).to include(
+        "Compatible with MRI Ruby 4.0.0+, JRuby, and TruffleRuby."
+      )
+    end
+  end
+
   it "keeps Ruby 2.3 in the untested README support badge set" do
     template = File.read(project_root.join("lib/kettle/jem/templates/README.md.example"))
     ruby_2_line = template.lines.find { |line| line.start_with?("| Works with MRI Ruby 2") }

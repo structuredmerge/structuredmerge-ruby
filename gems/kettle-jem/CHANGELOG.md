@@ -48,6 +48,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add the generated frozen-string-literal comment to Ruby 3.1 extracted stdlib Gemfiles.
 
+- Retain the MRI runtime floor when normalizing multi-engine README compatibility text.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10
