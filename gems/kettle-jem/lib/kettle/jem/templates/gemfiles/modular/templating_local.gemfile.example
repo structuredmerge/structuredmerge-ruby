@@ -44,7 +44,7 @@ kettle_dev_local_gems = %w[
   {KJ|KETTLE_DEV_LOCAL_GEMS}
 ]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
-structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems
+structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[{KJ|PACKAGE_NAME}]
 kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])
 
 platform :mri do

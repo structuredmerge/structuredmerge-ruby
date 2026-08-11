@@ -1279,6 +1279,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
     expect(template).to include("  html-merge\n")
     expect(template).to include(
+      "structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[{KJ|PACKAGE_NAME}]"
+    )
+    expect(template).not_to include(
+      "structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
+    )
+    expect(template).to include(
       "kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])"
     )
   end

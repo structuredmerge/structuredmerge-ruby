@@ -31,9 +31,11 @@ direct_sibling_gems = %w[
 # The default adapter registry is exercised by the release suite with local
 # sibling wiring disabled, so its released adapter dependencies must be present
 # in the ordinary development bundle as well as in the templating bundle.
-gem 'markly-merge', '~> 7.1', '>= 7.1.0', require: false
-gem 'prism-merge', '~> 7.1', '>= 7.1.0', require: false
-gem 'toml-merge', '~> 7.1', '>= 7.1.0', require: false
+unless ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+  gem 'markly-merge', '~> 7.1', '>= 7.1.0', require: false
+  gem 'prism-merge', '~> 7.1', '>= 7.1.0', require: false
+  gem 'toml-merge', '~> 7.1', '>= 7.1.0', require: false
+end
 
 direct_sibling_dev = ENV.fetch('STRUCTUREDMERGE_DEV', '')
 direct_sibling_local =
