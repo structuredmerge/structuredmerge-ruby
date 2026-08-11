@@ -280,12 +280,12 @@
       <pre class="lines">
 
 
-49
-50
-51</pre>
+51
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region_text'>comment_region_text</span><span class='lparen'>(</span><span class='id identifier rubyid__document'>_document</span><span class='comma'>,</span> <span class='id identifier rubyid__comment_region'>_comment_region</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Markdown CRISPR adapter does not expose comment regions</span><span class='tstring_end'>&#39;</span></span>
@@ -333,15 +333,15 @@
       <pre class="lines">
 
 
-42
-43
 44
 45
 46
-47</pre>
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_regions_for'>comment_regions_for</span><span class='lparen'>(</span><span class='id identifier rubyid__document'>_document</span><span class='comma'>,</span> <span class='id identifier rubyid__owner'>_owner</span><span class='comma'>,</span> <span class='label'>region:</span> <span class='symbol'>:leading</span><span class='comma'>,</span> <span class='label'>owner_scope:</span> <span class='symbol'>:shared_default</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>Error</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
@@ -448,7 +448,9 @@
 37
 38
 39
-40</pre>
+40
+41
+42</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 22</span>
@@ -462,6 +464,8 @@
     <span class='id identifier rubyid_analysis'>analysis</span><span class='period'>.</span><span class='id identifier rubyid_link_definition_owners'>link_definition_owners</span>
   <span class='kw'>when</span> <span class='symbol'>:html_comments</span>
     <span class='id identifier rubyid_analysis'>analysis</span><span class='period'>.</span><span class='id identifier rubyid_html_comment_owners'>html_comment_owners</span>
+  <span class='kw'>when</span> <span class='symbol'>:html_details</span>
+    <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Markdown.html" title="Ast::Crispr::Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Markly.html" title="Ast::Crispr::Markdown::Markly (module)">Markly</a></span></span><span class='period'>.</span><span class='id identifier rubyid_html_details_owners'><span class='object_link'><a href="../Markly.html#html_details_owners-class_method" title="Ast::Crispr::Markdown::Markly.html_details_owners (method)">html_details_owners</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:list_items</span>
     <span class='id identifier rubyid_analysis'>analysis</span><span class='period'>.</span><span class='id identifier rubyid_list_item_owners'>list_item_owners</span>
   <span class='kw'>when</span> <span class='symbol'>:inline_references</span>
@@ -492,8 +496,6 @@
       <pre class="lines">
 
 
-53
-54
 55
 56
 57
@@ -539,10 +541,19 @@
 97
 98
 99
-100</pre>
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr/markdown/markly.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='lparen'>(</span><span class='label'>owner_scope:</span> <span class='symbol'>:shared_default</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span>
@@ -566,6 +577,13 @@
       <span class='label'>owner_selector:</span> <span class='symbol'>:line_bound_statements</span><span class='comma'>,</span>
       <span class='label'>supported_comment_regions:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>adapter:</span> <span class='symbol'>:markly</span><span class='comma'>,</span> <span class='label'>markdown_owner:</span> <span class='symbol'>:html_comment</span> <span class='rbrace'>}</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>when</span> <span class='symbol'>:html_details</span>
+    <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>StructureProfile</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>owner_scope:</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span><span class='comma'>,</span>
+      <span class='label'>owner_selector:</span> <span class='symbol'>:html_details</span><span class='comma'>,</span>
+      <span class='label'>supported_comment_regions:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span> <span class='label'>adapter:</span> <span class='symbol'>:markly</span><span class='comma'>,</span> <span class='label'>markdown_owner:</span> <span class='symbol'>:html_details</span> <span class='rbrace'>}</span>
     <span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='symbol'>:list_items</span>
     <span class='const'><span class='object_link'><a href="../../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span><span class='op'>::</span><span class='const'>StructureProfile</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
@@ -602,7 +620,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:15:50 2026 by
+  Generated on Tue Aug 11 04:40:33 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
