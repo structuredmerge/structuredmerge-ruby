@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/zip/merge/backend.rb<span class="defines">,<br>
-  lib/zip/merge.rb,<br> lib/zip/merge/version.rb</span>
+  lib/zip/merge.rb,<br> lib/zip/merge/version.rb,<br> lib/zip/merge/provider.rb,<br> lib/zip/merge/provider.rb</span>
 
 </dd>
   </dl>
@@ -90,7 +90,7 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>StructuredMerge ZIP archive merge planning and rendering helpers.</p>
+    <p>ZIP provider registration.</p>
 
 
   </div>
@@ -105,6 +105,8 @@
       <strong class="modules">Modules:</strong> <span class='object_link'><a href="Merge/Backend.html" title="Zip::Merge::Backend (module)">Backend</a></span>, <span class='object_link'><a href="Merge/Version.html" title="Zip::Merge::Version (module)">Version</a></span>
     
   
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/Provider.html" title="Zip::Merge::Provider (class)">Provider</a></span>
     
   
 </p>
@@ -396,6 +398,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#nested_family-class_method" title="nested_family (class method)">.<strong>nested_family</strong>(path)  &#x21d2; Object </a>
     
 
@@ -558,6 +583,29 @@
   <span class="summary_signature">
     
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>  &#x21d2; Object </a>
     
 
     
@@ -1143,6 +1191,36 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/zip/merge/provider.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Zip::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="nested_family-class_method">
   
     .<strong>nested_family</strong>(path)  &#x21d2; <tt>Object</tt> 
@@ -1590,6 +1668,36 @@
     <span class='label'>contract:</span> <span class='symbol'>:kaitai</span>
   <span class='rparen'>)</span>
   <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/zip/merge/provider.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2233,7 +2341,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 02:18:26 2026 by
+  Generated on Tue Aug 11 06:01:19 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
