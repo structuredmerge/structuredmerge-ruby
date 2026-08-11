@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Markly::Merge::Provider
+  
+    &mdash; Documentation by YARD 0.9.45
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Markly::Merge::Provider";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Markly.html" title="Markly (module)">Markly</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Markly::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">Provider</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Markly::Merge::Provider
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Markdown::Merge::SourcePreservingProvider</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Markdown::Merge::SourcePreservingProvider</li>
+          
+            <li class="next">Markly::Merge::Provider</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/markly/merge/provider.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Native Markly backend configuration for the shared provider engine.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  &#x21d2; Provider </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>rubocop:disable Metrics/MethodLength – constructor declares the complete backend boundary.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="Markly::Merge::Provider (class)">Provider</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>rubocop:disable Metrics/MethodLength – constructor declares the complete backend boundary</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markly/merge/provider.rb', line 9</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
+  <span class='kw'>super</span><span class='lparen'>(</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.markdown.markly</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>role:</span> <span class='symbol'>:backend</span><span class='comma'>,</span>
+    <span class='label'>backend:</span> <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ProviderBackend</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>id:</span> <span class='symbol'>:markly</span><span class='comma'>,</span>
+      <span class='label'>package:</span> <span class='const'><span class='object_link'><a href="../Merge.html#PACKAGE_NAME-constant" title="Markly::Merge::PACKAGE_NAME (constant)">PACKAGE_NAME</a></span></span><span class='comma'>,</span>
+      <span class='label'>dialects:</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>markdown</span><span class='words_sep'> </span><span class='tstring_content'>commonmark</span><span class='tstring_end'>]</span></span><span class='comma'>,</span>
+      <span class='label'>parser:</span> <span class='id identifier rubyid_lambda'>lambda</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_source'>source</span><span class='op'>|</span>
+        <span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Backend.html" title="Markly::Merge::Backend (module)">Backend</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backend/Parser.html" title="Markly::Merge::Backend::Parser (class)">Parser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Backend/Parser.html#initialize-instance_method" title="Markly::Merge::Backend::Parser#initialize (method)">new</a></span></span>
+        <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_language'>language</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Backend.html" title="Markly::Merge::Backend (module)">Backend</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Backend/Language.html" title="Markly::Merge::Backend::Language (class)">Language</a></span></span><span class='period'>.</span><span class='id identifier rubyid_markdown'><span class='object_link'><a href="Backend/Language.html#markdown-class_method" title="Markly::Merge::Backend::Language.markdown (method)">markdown</a></span></span>
+        <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+      <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>headings:</span> <span class='const'>Markdown</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>ProviderBackend</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:native_headings</span><span class='rparen'>)</span>
+    <span class='rparen'>)</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+</div>
+
+      <div id="footer">
+  Generated on Tue Aug 11 04:34:58 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.45 (ruby-4.0.6).
+</div>
+
+    </div>
+  </body>
+</html>
