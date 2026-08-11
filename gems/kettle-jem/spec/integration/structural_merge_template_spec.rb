@@ -681,7 +681,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(tokens.fetch("KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY")).to include(
         'ENV.fetch("KETTLE_DEV_DEV", "false")',
         'Gem::Version.new("4.0.0")',
-        'gem "kettle-changelog"'
+        'gem "kettle-changelog", "~> 1.0", ">= 1.0.0"'
       )
 
       facts[:package][:name] = "kettle-changelog"

@@ -13920,7 +13920,7 @@ module Kettle
           )
         else
           if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 0.1", ">= 0.1.0"
+            gem "kettle-changelog", "~> 1.0", ">= 1.0.0"
           end
         end
       RUBY

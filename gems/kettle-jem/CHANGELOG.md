@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prepare profile synchronization now materializes newly added modular Gemfiles before Bundler bootstrapping.
 
+- Generate modular changelog Gemfiles with the released kettle-changelog 1.x dependency floor.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10
