@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Fix a stale README link in the contributing guidance.
+
 ### Security
 
 ## [7.1.2] - 2026-08-11
