@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/dotenv/merge/backend.rb<span class="defines">,<br>
-  lib/dotenv/merge.rb,<br> lib/dotenv/merge/version.rb,<br> lib/dotenv/merge/env_line.rb,<br> lib/dotenv/merge/freeze_node.rb,<br> lib/dotenv/merge/debug_logger.rb,<br> lib/dotenv/merge/merge_result.rb,<br> lib/dotenv/merge/smart_merger.rb,<br> lib/dotenv/merge/file_analysis.rb,<br> lib/dotenv/merge/comment_tracker.rb</span>
+  lib/dotenv/merge.rb,<br> lib/dotenv/merge/version.rb,<br> lib/dotenv/merge/env_line.rb,<br> lib/dotenv/merge/provider.rb,<br> lib/dotenv/merge/freeze_node.rb,<br> lib/dotenv/merge/debug_logger.rb,<br> lib/dotenv/merge/merge_result.rb,<br> lib/dotenv/merge/smart_merger.rb,<br> lib/dotenv/merge/file_analysis.rb,<br> lib/dotenv/merge/comment_tracker.rb</span>
 
 </dd>
   </dl>
@@ -106,7 +106,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Dotenv::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Dotenv::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Dotenv::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/EnvLine.html" title="Dotenv::Merge::EnvLine (class)">EnvLine</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Dotenv::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Dotenv::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Dotenv::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Dotenv::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Dotenv::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Dotenv::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Dotenv::Merge::TemplateParseError (class)">TemplateParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Dotenv::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Dotenv::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Dotenv::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/EnvLine.html" title="Dotenv::Merge::EnvLine (class)">EnvLine</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Dotenv::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Dotenv::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Dotenv::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Dotenv::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Dotenv::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Dotenv::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Dotenv::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Dotenv::Merge::TemplateParseError (class)">TemplateParseError</a></span>
     
   
 </p>
@@ -159,6 +159,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
     
 
@@ -202,6 +225,29 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
     </ul>
     
   
@@ -213,7 +259,37 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="register_backend!-class_method">
+  <h3 class="signature first" id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Dotenv::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_backend!-class_method">
   
     .<strong>register_backend!</strong>  &#x21d2; <tt>Object</tt> 
   
@@ -292,12 +368,42 @@
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge.rb', line 81</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:24:43 2026 by
+  Generated on Tue Aug 11 06:14:09 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

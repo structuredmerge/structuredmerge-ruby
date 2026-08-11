@@ -222,6 +222,34 @@ comments, and freeze blocks.</p>
 </li>
 
     
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#structural_diagnostics-instance_method" title="#structural_diagnostics (instance method)">#<strong>structural_diagnostics</strong>  &#x21d2; CommentTracker </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Comment tracker for this file.</p>
+</div></span>
+  
+</li>
+
+    
   </ul>
 
 
@@ -820,7 +848,8 @@ comments, and freeze blocks.</p>
 59
 60
 61
-62</pre>
+62
+63</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 40</span>
@@ -829,6 +858,7 @@ comments, and freeze blocks.</p>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
   <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
   <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+  <span class='ivar'>@structural_diagnostics</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='comment'># **options captures any additional parameters (e.g., node_typing) for forward compatibility
 </span>
   <span class='comment'># Parse all lines
@@ -917,6 +947,65 @@ comments, and freeze blocks.</p>
 </table>
 </div>
     
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="structural_diagnostics-instance_method">
+  
+    #<strong>structural_diagnostics</strong>  &#x21d2; <tt><span class='object_link'><a href="CommentTracker.html" title="Dotenv::Merge::CommentTracker (class)">CommentTracker</a></span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Comment tracker for this file.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="CommentTracker.html" title="Dotenv::Merge::CommentTracker (class)">CommentTracker</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Comment tracker for this file</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_structural_diagnostics'>structural_diagnostics</span>
+  <span class='ivar'>@structural_diagnostics</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 
@@ -962,12 +1051,12 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-181
 182
-183</pre>
+183
+184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 181</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 182</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_all_assignments'>all_assignments</span>
   <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:assignment?</span><span class='rparen'>)</span>
@@ -1015,12 +1104,12 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-164
 165
-166</pre>
+166
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 164</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_assignment_lines'>assignment_lines</span>
   <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='op'>|</span> <span class='id identifier rubyid_stmt'>stmt</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="EnvLine.html" title="Dotenv::Merge::EnvLine (class)">EnvLine</a></span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_stmt'>stmt</span><span class='period'>.</span><span class='id identifier rubyid_assignment?'>assignment?</span> <span class='rbrace'>}</span>
@@ -1102,16 +1191,16 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-137
 138
 139
 140
 141
 142
-143</pre>
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 137</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span>
@@ -1163,12 +1252,12 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-146
 147
-148</pre>
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 146</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 147</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span>
   <span class='symbol'>:tracker_layout_merge</span>
@@ -1252,15 +1341,15 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-125
 126
 127
 128
 129
-130</pre>
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 125</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span>
@@ -1311,12 +1400,12 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-73
 74
-75</pre>
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
   <span class='ivar'>@comment_capability</span> <span class='op'>||=</span> <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_augment'>augment</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_capability'>capability</span>
@@ -1383,12 +1472,12 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-102
 103
-104</pre>
+104
+105</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 103</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
@@ -1436,12 +1525,12 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-94
 95
-96</pre>
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 94</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
@@ -1540,16 +1629,16 @@ comments, and freeze blocks.</p>
       <pre class="lines">
 
 
-112
 113
 114
 115
 116
 117
-118</pre>
+118
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>kind:</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_comment_tracker'>comment_tracker</span><span class='period'>.</span><span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span>
@@ -1604,16 +1693,16 @@ synthetic merge layer.</p>
       <pre class="lines">
 
 
-83
 84
 85
 86
 87
 88
-89</pre>
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
   <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
@@ -1688,17 +1777,17 @@ synthetic merge layer.</p>
       <pre class="lines">
 
 
-198
 199
 200
 201
 202
 203
 204
-205</pre>
+205
+206</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 198</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 199</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_node'>node</span>
@@ -1774,12 +1863,12 @@ synthetic merge layer.</p>
       <pre class="lines">
 
 
-214
 215
-216</pre>
+216
+217</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 214</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 215</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_env_var'>env_var</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_assignment?'>assignment?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='id identifier rubyid_key'>key</span> <span class='rbrace'>}</span>
@@ -1831,12 +1920,12 @@ synthetic merge layer.</p>
       <pre class="lines">
 
 
-220
 221
-222</pre>
+222
+223</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 220</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 221</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_keys'>keys</span>
   <span class='id identifier rubyid_all_assignments'>all_assignments</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:key</span><span class='rparen'>)</span>
@@ -1908,14 +1997,14 @@ Override base to return EnvLine objects instead of raw strings</p>
       <pre class="lines">
 
 
-189
 190
 191
 192
-193</pre>
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 190</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_at'>line_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_line_number'>line_number</span> <span class='op'>&lt;</span> <span class='int'>1</span>
@@ -1942,12 +2031,12 @@ Override base to return EnvLine objects instead of raw strings</p>
       <pre class="lines">
 
 
-154
 155
-156</pre>
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 154</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_match_key'>ruleset_match_key</span>
   <span class='symbol'>:env_key</span>
@@ -1972,12 +2061,12 @@ Override base to return EnvLine objects instead of raw strings</p>
       <pre class="lines">
 
 
-150
 151
-152</pre>
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 150</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 151</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_owner_selector'>ruleset_owner_selector</span>
   <span class='symbol'>:assignment_lines_plus_freeze_blocks</span>
@@ -2002,12 +2091,12 @@ Override base to return EnvLine objects instead of raw strings</p>
       <pre class="lines">
 
 
-158
 159
-160</pre>
+160
+161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 158</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 159</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruleset_render_family'>ruleset_render_family</span>
   <span class='symbol'>:dotenv_assignments</span>
@@ -2057,14 +2146,14 @@ excluding standalone comments, blanks, and invalid lines.</p>
       <pre class="lines">
 
 
-173
 174
 175
 176
-177</pre>
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 173</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 174</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_structural_owners'>structural_owners</span>
   <span class='ivar'>@structural_owners</span> <span class='op'>||=</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='op'>|</span>
@@ -2114,12 +2203,12 @@ excluding standalone comments, blanks, and invalid lines.</p>
       <pre class="lines">
 
 
-66
 67
-68</pre>
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/dotenv/merge/file_analysis.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
   <span class='kw'>true</span>
@@ -2134,7 +2223,7 @@ excluding standalone comments, blanks, and invalid lines.</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:24:43 2026 by
+  Generated on Tue Aug 11 06:14:10 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
