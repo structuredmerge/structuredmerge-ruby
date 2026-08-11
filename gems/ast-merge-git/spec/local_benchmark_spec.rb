@@ -220,9 +220,9 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     pid_path = tmp_root.join('timed-out.pid')
     sleeper = tmp_root.join('sleeper')
     sleeper.binwrite(<<~RUBY)
-      #!/usr/bin/env ruby
-      File.write(#{pid_path.to_s.inspect}, Process.pid)
-      sleep 30
+      #!/bin/sh
+      printf '%s' "$$" > #{pid_path}
+      exec sleep 30
     RUBY
     FileUtils.chmod(0o755, sleeper)
     short_runner = described_class_runner(sleeper)
