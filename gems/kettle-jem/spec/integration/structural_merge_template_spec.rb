@@ -680,6 +680,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(tokens.fetch("KJ|NAMESPACE_SHIELD")).to eq("Warden::OAuth")
       expect(tokens.fetch("KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY")).to include(
         'ENV.fetch("KETTLE_DEV_DEV", "false")',
+        'ENV.fetch("KETTLE_DEV_SKIP_CHANGELOG", "false")',
         'Gem::Version.new("4.0.0")',
         'gem "kettle-changelog", "~> 1.0", ">= 1.0.0"'
       )
