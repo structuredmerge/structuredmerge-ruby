@@ -81,20 +81,32 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/go/merge.rb<span class="defines">,<br>
-  lib/go/merge/version.rb</span>
+  lib/go/merge/version.rb,<br> lib/go/merge/provider.rb,<br> lib/go/merge/node_wrapper.rb,<br> lib/go/merge/file_analysis.rb</span>
 
 </dd>
   </dl>
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Native Go parsing and source-preserving merge APIs.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
       <strong class="modules">Modules:</strong> <span class='object_link'><a href="Merge/Version.html" title="Go::Merge::Version (module)">Version</a></span>
     
   
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/FileAnalysis.html" title="Go::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Go::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Go::Merge::Provider (class)">Provider</a></span>
     
   
 </p>
@@ -314,6 +326,29 @@
   
 
   
+    <span class="summary_desc"><div class='inline'><p>rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity – legacy merge result assembly remains one compatibility boundary.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
     <span class="summary_desc"><div class='inline'>
 </div></span>
   
@@ -366,6 +401,29 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
     </ul>
     
   
@@ -391,12 +449,12 @@
       <pre class="lines">
 
 
-33
-34
-35</pre>
+39
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_go_backends'>available_go_backends</span>
   <span class='id identifier rubyid_go_backend_available_for_analysis?'>go_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND-constant" title="Go::Merge::TREE_SITTER_BACKEND (constant)">TREE_SITTER_BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND-constant" title="Go::Merge::TREE_SITTER_BACKEND (constant)">TREE_SITTER_BACKEND</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -444,21 +502,21 @@
       <pre class="lines">
 
 
-75
-76
-77
-78
-79
 80
 81
 82
 83
 84
 85
-86</pre>
+86
+87
+88
+89
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_go_backend_available_for_analysis?'>go_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_id'>backend_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_register_backend!'>register_backend!</span>
@@ -492,21 +550,21 @@
       <pre class="lines">
 
 
-37
-38
-39
-40
-41
-42
 43
 44
 45
 46
 47
-48</pre>
+48
+49
+50
+51
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_go_backend_feature_profile'>go_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_requested_tree_sitter_backend_id'>requested_tree_sitter_backend_id</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -540,12 +598,12 @@
       <pre class="lines">
 
 
-29
-30
-31</pre>
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 35</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_go_feature_profile'>go_feature_profile</span>
   <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>supported_dialects:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>supported_policies:</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#DESTINATION_WINS_ARRAY_POLICY-constant" title="Go::Merge::DESTINATION_WINS_ARRAY_POLICY (constant)">DESTINATION_WINS_ARRAY_POLICY</a></span></span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
@@ -570,22 +628,22 @@
       <pre class="lines">
 
 
-50
-51
-52
-53
-54
-55
 56
 57
 58
 59
 60
 61
-62</pre>
+62
+63
+64
+65
+66
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_go_plan_context'>go_plan_context</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_go_backend_feature_profile'>go_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -620,12 +678,12 @@
       <pre class="lines">
 
 
-96
-97
-98</pre>
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_go_owners'>match_go_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
   <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>OwnerSelection</span><span class='period'>.</span><span class='id identifier rubyid_match_by_path'>match_by_path</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
@@ -644,26 +702,22 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity – legacy merge result assembly remains one compatibility boundary</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
 114
 115
 116
@@ -675,10 +729,25 @@
 122
 123
 124
-125</pre>
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 100</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_go'>merge_go</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_destination_source'>destination_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_template'>template</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_go'>parse_go</span><span class='lparen'>(</span><span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
@@ -696,15 +765,46 @@
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_destination_declarations'>destination_declarations</span> <span class='op'>=</span> <span class='id identifier rubyid_destination'>destination</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:declarations</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_item'>item</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_template_additions'>template_additions</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:declarations</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span>
+    <span class='id identifier rubyid_destination_declarations'>destination_declarations</span><span class='lbracket'>[</span><span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
   <span class='id identifier rubyid_merged_declaration_texts'>merged_declaration_texts</span> <span class='op'>=</span> <span class='id identifier rubyid_destination'>destination</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:declarations</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='op'>+</span>
-                             <span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:declarations</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span>
-                               <span class='id identifier rubyid_destination_declarations'>destination_declarations</span><span class='lbracket'>[</span><span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
-                             <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+                             <span class='id identifier rubyid_template_additions'>template_additions</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_import_block'>import_block</span> <span class='op'>=</span> <span class='id identifier rubyid_destination'>destination</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:analysis</span><span class='comma'>,</span> <span class='symbol'>:imports</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
   <span class='id identifier rubyid_declaration_block'>declaration_block</span> <span class='op'>=</span> <span class='id identifier rubyid_merged_declaration_texts'>merged_declaration_texts</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span>
   <span class='id identifier rubyid_sections'>sections</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_import_block'>import_block</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span><span class='comma'>,</span> <span class='id identifier rubyid_declaration_block'>declaration_block</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>output:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_sections'>sections</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#DESTINATION_WINS_ARRAY_POLICY-constant" title="Go::Merge::DESTINATION_WINS_ARRAY_POLICY (constant)">DESTINATION_WINS_ARRAY_POLICY</a></span></span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Go::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -726,19 +826,18 @@
       <pre class="lines">
 
 
-64
-65
-66
-67
-68
-69
 70
 71
 72
-73</pre>
+73
+74
+75
+76
+77
+78</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_go'>parse_go</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
   <span class='kw'>unless</span> <span class='id identifier rubyid_go_backend_available_for_analysis?'>go_backend_available_for_analysis?</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='rparen'>)</span>
@@ -747,8 +846,7 @@
   <span class='kw'>end</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_analyze_go_module'>analyze_go_module</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span>
 
-  <span class='lbrace'>{</span> <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-    <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported_feature</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>message:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Go dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_unsupported_feature_result'>unsupported_feature_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported Go dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -770,21 +868,21 @@
       <pre class="lines">
 
 
-16
-17
-18
-19
-20
-21
 22
 23
 24
 25
 26
-27</pre>
+27
+28
+29
+30
+31
+32
+33</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
   <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Go::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -803,12 +901,42 @@
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/go/merge.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:48:02 2026 by
+  Generated on Tue Aug 11 05:12:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
