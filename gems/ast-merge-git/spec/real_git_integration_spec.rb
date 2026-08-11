@@ -72,9 +72,7 @@ RSpec.describe 'ast-merge-git executable' do
   end
 
   def configure_driver
-    command = [
-      'env',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}",
+    command = (bundle_driver_prefix + [
       'AST_MERGE_REQUIRE=json/merge',
       'AST_MERGE_FAMILY=json',
       'AST_MERGE_DIALECT=json',
@@ -86,7 +84,7 @@ RSpec.describe 'ast-merge-git executable' do
       '%B',
       '%P',
       '%L'
-    ].join(' ')
+    ]).join(' ')
     git('config', 'merge.structuredmerge.name', 'StructuredMerge JSON provider')
     git('config', 'merge.structuredmerge.driver', command)
   end
@@ -113,9 +111,7 @@ RSpec.describe 'ast-merge-git executable' do
   end
 
   def configure_text_driver
-    command = [
-      'env',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}",
+    command = (bundle_driver_prefix + [
       'AST_MERGE_REQUIRE=plain/merge',
       'AST_MERGE_FAMILY=text',
       'AST_MERGE_DIALECT=text',
@@ -128,7 +124,7 @@ RSpec.describe 'ast-merge-git executable' do
       '%B',
       '%P',
       '%L'
-    ].join(' ')
+    ]).join(' ')
     git('config', 'merge.structuredmerge.name', 'StructuredMerge text provider')
     git('config', 'merge.structuredmerge.driver', command)
   end
@@ -158,9 +154,7 @@ RSpec.describe 'ast-merge-git executable' do
   end
 
   def configure_opaque_driver(provider_id: nil, **driver)
-    command = [
-      'env',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}",
+    command = (bundle_driver_prefix + [
       "AST_MERGE_REQUIRE=#{driver.fetch(:require_path)}",
       ("AST_MERGE_PROVIDER=#{provider_id}" if provider_id),
       "AST_MERGE_FAMILY=#{driver.fetch(:family)}",
@@ -175,9 +169,27 @@ RSpec.describe 'ast-merge-git executable' do
       '%B',
       '%P',
       '%L'
-    ].compact.join(' ')
+    ].compact).join(' ')
     git('config', 'merge.structuredmerge.name', "StructuredMerge #{driver.fetch(:family)} provider")
     git('config', 'merge.structuredmerge.driver', command)
+  end
+
+  # The driver runs from Git's temporary checkout while the specs already run
+  # under the family bundle. Remove that parent Bundler bootstrap before
+  # selecting the driver's own Gemfile.
+  def bundle_driver_prefix
+    [
+      'env',
+      '-u', 'BUNDLE_BIN_PATH',
+      '-u', 'BUNDLE_FROZEN',
+      '-u', 'BUNDLE_GEMFILE',
+      '-u', 'BUNDLE_LOCKFILE',
+      '-u', 'BUNDLER_SETUP',
+      '-u', 'BUNDLER_VERSION',
+      '-u', 'RUBYLIB',
+      '-u', 'RUBYOPT',
+      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}"
+    ]
   end
 
   def text_git_baseline(base:, ours:, theirs:)

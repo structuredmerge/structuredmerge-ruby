@@ -98,6 +98,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Allow smorg-rb to use independent kettle-jem patch releases within the 7.1 series.
 
+- Isolate nested Git-driver Bundler commands from the family test bundle.
+
 ### Security
 
 ## [7.1.1] - 2026-08-08
