@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/rbs/merge.rb<span class="defines">,<br>
-  lib/rbs/merge/version.rb,<br> lib/rbs/merge/freeze_node.rb,<br> lib/rbs/merge/debug_logger.rb,<br> lib/rbs/merge/file_aligner.rb,<br> lib/rbs/merge/merge_result.rb,<br> lib/rbs/merge/node_wrapper.rb,<br> lib/rbs/merge/smart_merger.rb,<br> lib/rbs/merge/file_analysis.rb,<br> lib/rbs/merge/comment_tracker.rb,<br> lib/rbs/merge/conflict_resolver.rb,<br> lib/rbs/merge/backends/rbs_backend.rb,<br> lib/rbs/merge/node_type_normalizer.rb</span>
+  lib/rbs/merge/version.rb,<br> lib/rbs/merge/provider.rb,<br> lib/rbs/merge/freeze_node.rb,<br> lib/rbs/merge/debug_logger.rb,<br> lib/rbs/merge/file_aligner.rb,<br> lib/rbs/merge/merge_result.rb,<br> lib/rbs/merge/node_wrapper.rb,<br> lib/rbs/merge/smart_merger.rb,<br> lib/rbs/merge/file_analysis.rb,<br> lib/rbs/merge/comment_tracker.rb,<br> lib/rbs/merge/conflict_resolver.rb,<br> lib/rbs/merge/backends/rbs_backend.rb,<br> lib/rbs/merge/node_type_normalizer.rb</span>
 
 </dd>
   </dl>
@@ -96,7 +96,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Rbs::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/ConflictResolver.html" title="Rbs::Merge::ConflictResolver (class)">ConflictResolver</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Rbs::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Rbs::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Rbs::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAligner.html" title="Rbs::Merge::FileAligner (class)">FileAligner</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Rbs::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Rbs::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Rbs::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Rbs::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Rbs::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Rbs::Merge::TemplateParseError (class)">TemplateParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Rbs::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/ConflictResolver.html" title="Rbs::Merge::ConflictResolver (class)">ConflictResolver</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Rbs::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Rbs::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Rbs::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAligner.html" title="Rbs::Merge::FileAligner (class)">FileAligner</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Rbs::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Rbs::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Rbs::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Rbs::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Rbs::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Rbs::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Rbs::Merge::TemplateParseError (class)">TemplateParseError</a></span>
     
   
 </p>
@@ -207,6 +207,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
     
 
@@ -222,6 +245,29 @@
 
   
     <span class="summary_desc"><div class='inline'><p>Register the current RBS parsing entrypoints with TreeHaver.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
 </div></span>
   
 </li>
@@ -267,6 +313,36 @@
   <span class='id identifier rubyid_registrations'>registrations</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_registered_languages'>registered_languages</span><span class='lparen'>(</span><span class='symbol'>:rbs</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backends'>backends</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="#TREE_SITTER_BACKEND_REFERENCE-constant" title="Rbs::Merge::TREE_SITTER_BACKEND_REFERENCE (constant)">TREE_SITTER_BACKEND_REFERENCE</a></span></span> <span class='kw'>if</span> <span class='id identifier rubyid_registrations'>registrations</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:tree_sitter</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_registrations'>registrations</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:tslp</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backends'>backends</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+141
+142
+143</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge.rb', line 141</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Rbs::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -377,12 +453,42 @@
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+145
+146
+147</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge.rb', line 145</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:26:21 2026 by
+  Generated on Tue Aug 11 05:25:31 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
