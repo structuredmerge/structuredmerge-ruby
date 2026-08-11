@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Update pinned GitHub Actions in kettle-jem templates: github/codeql-action/analyze v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3), github/codeql-action/autobuild v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3), and github/codeql-action/init v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3).
 
+- Declare kettle-changelog as a runtime dependency for packaged maintenance commands.
+
 ### Deprecated
 
 ### Removed

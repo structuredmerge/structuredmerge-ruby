@@ -40,8 +40,8 @@ class KettleJemWorkflowPins
       out.puts("workflow-pins: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
       result.fetch(:changes, []).each do |change|
         out.puts(
-          "  #{change.fetch(:action)} #{self.pin_label(change.fetch(:old_version), change.fetch(:old_ref))} -> " \
-            "#{self.pin_label(change.fetch(:new_version), change.fetch(:new_ref))}"
+          "  #{change.fetch(:action)} #{pin_label(change.fetch(:old_version), change.fetch(:old_ref))} -> " \
+            "#{pin_label(change.fetch(:new_version), change.fetch(:new_ref))}"
         )
       end
       if result[:commit]
