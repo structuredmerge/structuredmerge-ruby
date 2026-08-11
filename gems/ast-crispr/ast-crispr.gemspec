@@ -12,8 +12,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Peter H. Boling']
   spec.email = ['floss@galtzo.com']
 
-  spec.summary = '💎 Structured edit tooling over Structured Merge AST contracts'
-  spec.description = '💎 A thin structural edit tool layer over ast-merge structured-edit contracts.'
+  spec.summary = '🧬 Structured edit tooling over Structured Merge AST contracts'
+  spec.description = '🧬 A thin structural edit tool layer over ast-merge structured-edit contracts.'
   spec.homepage = 'https://github.com/structuredmerge/structuredmerge-ruby'
   spec.licenses = ['AGPL-3.0-only', 'PolyForm-Small-Business-1.0.0']
   spec.required_ruby_version = '>= 4.0.0'
