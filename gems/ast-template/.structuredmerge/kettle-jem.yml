@@ -237,12 +237,14 @@ templates:
     - README.md
     - source: gem.gemspec
       target: ast-template.gemspec
+    - Rakefile
     - LICENSE.md
     - MIT.md
     - AGPL-3.0-only.md
     - PolyForm-Noncommercial-1.0.0.md
     - PolyForm-Small-Business-1.0.0.md
     - Big-Time-Public-License.md
+    - mise.toml
     - Gemfile
     - certs/pboling.pem
     - tmp/.gitignore
@@ -250,6 +252,7 @@ templates:
     - gemfiles/modular/benchmark/vHEAD.gemfile
     - gemfiles/modular/cgi/r4/v0.5.gemfile
     - gemfiles/modular/cgi/vHEAD.gemfile
+    - gemfiles/modular/changelog.gemfile
     - gemfiles/modular/coverage.gemfile
     - gemfiles/modular/coverage_local.gemfile
     - gemfiles/modular/debug.gemfile
@@ -392,6 +395,8 @@ patterns:
 files:
   README.md:
     strategy: merge
+  Rakefile:
+    strategy: accept_template
   ast-template.gemspec:
     strategy: merge
   AGENTS.md:

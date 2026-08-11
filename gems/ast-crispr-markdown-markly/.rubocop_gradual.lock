@@ -2,13 +2,13 @@
   ".simplecov:3645595653": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:4085821453": [
+  "Rakefile:3762892929": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
-    [79, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [163, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [166, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "ast-crispr-markdown-markly.gemspec:2290321083": [
+  "ast-crispr-markdown-markly.gemspec:1151378606": [
     [138, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [149, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [150, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
@@ -30,10 +30,10 @@
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -69,7 +69,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/templating.gemfile:1411170554": [
+  "gemfiles/modular/templating.gemfile:637207389": [
     [15, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 11 of the Gemfile.", 2310012541]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -98,40 +98,48 @@
   "lib/ast-crispr-markdown-markly.rb:3517773299": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`ast-crispr-markdown-markly.rb`) should use snake_case.", 5381]
   ],
-  "lib/ast/crispr/markdown/markly.rb:3502891392": [
+  "lib/ast/crispr/markdown/markly.rb:3857092279": [
     [10, 7, 13, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Markdown::Markly`.", 95841343],
     [13, 9, 13, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Markdown::Markly::Adapter`.", 2579377404],
-    [22, 11, 764, "Metrics/MethodLength: Method has too many lines. [17/10]", 1473258177],
-    [53, 11, 2084, "Metrics/MethodLength: Method has too many lines. [46/10]", 116781866],
-    [103, 9, 16, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Markdown::Markly::Selectors`.", 2133324825],
-    [103, 9, 10193, "Metrics/ModuleLength: Module has too many lines. [217/100]", 289669313],
-    [106, 11, 1452, "Metrics/AbcSize: Assignment Branch Condition size for `heading_section` is too high. [<2, 21, 7> 22.23/17]", 1578141243],
-    [106, 11, 1452, "Metrics/MethodLength: Method has too many lines. [30/10]", 1578141243],
-    [106, 30, 73, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 515735878],
-    [140, 11, 1397, "Metrics/AbcSize: Assignment Branch Condition size for `link_definition` is too high. [<2, 22, 8> 23.49/17]", 2035221200],
-    [140, 11, 1397, "Metrics/MethodLength: Method has too many lines. [29/10]", 2035221200],
-    [140, 30, 68, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 2927391196],
-    [173, 11, 1236, "Metrics/MethodLength: Method has too many lines. [27/10]", 2705412671],
-    [204, 11, 1341, "Metrics/AbcSize: Assignment Branch Condition size for `list_item` is too high. [<2, 22, 4> 22.45/17]", 9692259],
-    [204, 11, 1341, "Metrics/MethodLength: Method has too many lines. [29/10]", 9692259],
-    [237, 11, 1632, "Metrics/AbcSize: Assignment Branch Condition size for `inline_reference` is too high. [<2, 25, 7> 26.04/17]", 2822954343],
-    [237, 11, 1632, "Metrics/MethodLength: Method has too many lines. [32/10]", 2822954343],
-    [237, 31, 79, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 871966347],
-    [273, 11, 3009, "Metrics/AbcSize: Assignment Branch Condition size for `html_comment_block` is too high. [<14, 43, 23> 50.73/17]", 1757586727],
-    [273, 11, 3009, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `html_comment_block` is too high. [18/7]", 1757586727],
-    [273, 11, 3009, "Metrics/MethodLength: Method has too many lines. [56/10]", 1757586727],
-    [273, 11, 3009, "Metrics/PerceivedComplexity: Perceived complexity for `html_comment_block` is too high. [18/8]", 1757586727],
-    [273, 33, 148, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 4247948333],
-    [285, 23, 2311, "Metrics/BlockLength: Block has too many lines. [43/25]", 3166751632],
-    [290, 121, 5, "Layout/LineLength: Line is too long. [125/120]", 236074548]
+    [22, 11, 869, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `structural_owners` is too high. [8/7]", 1473258177],
+    [22, 11, 869, "Metrics/MethodLength: Method has too many lines. [19/10]", 1473258177],
+    [55, 11, 2394, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `structure_profile` is too high. [8/7]", 116781866],
+    [55, 11, 2394, "Metrics/MethodLength: Method has too many lines. [53/10]", 116781866],
+    [112, 9, 16, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Markdown::Markly::Selectors`.", 2133324825],
+    [112, 9, 11533, "Metrics/ModuleLength: Module has too many lines. [246/100]", 1557502497],
+    [115, 11, 1452, "Metrics/AbcSize: Assignment Branch Condition size for `heading_section` is too high. [<2, 21, 7> 22.23/17]", 1578141243],
+    [115, 11, 1452, "Metrics/MethodLength: Method has too many lines. [30/10]", 1578141243],
+    [115, 30, 73, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 515735878],
+    [149, 11, 1397, "Metrics/AbcSize: Assignment Branch Condition size for `link_definition` is too high. [<2, 22, 8> 23.49/17]", 2035221200],
+    [149, 11, 1397, "Metrics/MethodLength: Method has too many lines. [29/10]", 2035221200],
+    [149, 30, 68, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 2927391196],
+    [182, 11, 1236, "Metrics/MethodLength: Method has too many lines. [27/10]", 2705412671],
+    [213, 11, 1328, "Metrics/AbcSize: Assignment Branch Condition size for `html_details` is too high. [<2, 20, 5> 20.71/17]", 2078933880],
+    [213, 11, 1328, "Metrics/MethodLength: Method has too many lines. [27/10]", 2078933880],
+    [244, 11, 1341, "Metrics/AbcSize: Assignment Branch Condition size for `list_item` is too high. [<2, 22, 4> 22.45/17]", 9692259],
+    [244, 11, 1341, "Metrics/MethodLength: Method has too many lines. [29/10]", 9692259],
+    [277, 11, 1632, "Metrics/AbcSize: Assignment Branch Condition size for `inline_reference` is too high. [<2, 25, 7> 26.04/17]", 2822954343],
+    [277, 11, 1632, "Metrics/MethodLength: Method has too many lines. [32/10]", 2822954343],
+    [277, 31, 79, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 871966347],
+    [313, 11, 3009, "Metrics/AbcSize: Assignment Branch Condition size for `html_comment_block` is too high. [<14, 43, 23> 50.73/17]", 1757586727],
+    [313, 11, 3009, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `html_comment_block` is too high. [18/7]", 1757586727],
+    [313, 11, 3009, "Metrics/MethodLength: Method has too many lines. [56/10]", 1757586727],
+    [313, 11, 3009, "Metrics/PerceivedComplexity: Perceived complexity for `html_comment_block` is too high. [18/8]", 1757586727],
+    [313, 33, 148, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 4247948333],
+    [325, 23, 2311, "Metrics/BlockLength: Block has too many lines. [43/25]", 3166751632],
+    [330, 121, 5, "Layout/LineLength: Line is too long. [125/120]", 236074548],
+    [382, 9, 1643, "Metrics/AbcSize: Assignment Branch Condition size for `html_details_owners` is too high. [<15, 36, 15> 41.79/17]", 4079582090],
+    [382, 9, 1643, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `html_details_owners` is too high. [14/7]", 4079582090],
+    [382, 9, 1643, "Metrics/MethodLength: Method has too many lines. [33/10]", 4079582090],
+    [382, 9, 1643, "Metrics/PerceivedComplexity: Perceived complexity for `html_details_owners` is too high. [14/8]", 4079582090]
   ],
-  "spec/ast/crispr/markdown/markly_spec.rb:479377118": [
-    [3, 1, 13025, "Metrics/BlockLength: Block has too many lines. [238/25]", 467937705],
-    [28, 3, 10314, "Metrics/BlockLength: Block has too many lines. [182/25]", 3591393606],
+  "spec/ast/crispr/markdown/markly_spec.rb:718851051": [
+    [3, 1, 13813, "Metrics/BlockLength: Block has too many lines. [256/25]", 2914089467],
+    [28, 3, 11102, "Metrics/BlockLength: Block has too many lines. [200/25]", 1686212284],
     [132, 121, 35, "Layout/LineLength: Line is too long. [155/120]", 2413317061],
     [134, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 3021964175],
     [152, 121, 37, "Layout/LineLength: Line is too long. [157/120]", 3082451518],
     [154, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 3021964175],
-    [267, 3, 1687, "Metrics/BlockLength: Block has too many lines. [33/25]", 4221412326]
+    [291, 3, 1687, "Metrics/BlockLength: Block has too many lines. [33/25]", 4221412326]
   ]
 }

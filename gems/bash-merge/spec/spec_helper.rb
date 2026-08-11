@@ -26,6 +26,7 @@ require 'kettle/test/rspec'
 # This library
 require 'ast/merge'
 require 'bash/merge'
+
 require 'tree_haver/rspec'
 require 'ast/merge/rspec'
 

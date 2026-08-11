@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 # kettle-jem:freeze
-# To retain chunks of comments & code during yaml-merge templating:
+# To retain chunks of comments & code during kettle-jem templating:
 # Wrap custom sections with freeze markers (e.g., as above and below this comment chunk).
-# yaml-merge will then preserve content between those markers across template runs.
+# kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-# yaml-merge Rakefile v7.0.0 - 2026-05-31
+# yaml-merge Rakefile v7.1.2 - 2026-08-10
 # Ruby 2.3 (Safe Navigation) or higher required
 #
 # See LICENSE.md for license information.
@@ -19,7 +19,8 @@
 #
 # rake appraisal:install                      # Install Appraisal gemfiles (initial setup...
 # rake appraisal:reset                        # Delete Appraisal lockfiles (gemfiles/*.gemfile.lock)
-# rake appraisal:update                       # Update Appraisal gemfiles and run RuboCop...
+# rake appraisal:generate                     # Generate Appraisal gemfiles without resolving...
+# rake appraisal:update                       # Generate and update Appraisal gemfiles
 # rake bench                                  # Run all benchmarks (alias for bench:run)
 # rake bench:list                             # List available benchmark scripts
 # rake bench:run                              # Run all benchmark scripts (skips on CI)
@@ -50,6 +51,7 @@
 # rake spec                                   # Run RSpec code examples
 # rake test                                   # Run tests
 # rake yard                                   # Generate YARD Documentation
+# rake yard:lint                              # Lint YARD Documentation
 #
 
 # simplecov:disable
@@ -130,23 +132,23 @@ end
 
 ### DUPLICATE DRIFT TASKS
 begin
-  require 'kettle/drift'
+  require "kettle/drift"
   Kettle::Drift.install_tasks
 rescue LoadError
-  desc('(stub) kettle:drift:check is unavailable')
-  task('kettle:drift:check') do
+  desc("(stub) kettle:drift:check is unavailable")
+  task("kettle:drift:check") do
     warn("NOTE: kettle-drift isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
   end
-  desc('(stub) kettle:drift:update is unavailable')
-  task('kettle:drift:update') do
+  desc("(stub) kettle:drift:update is unavailable")
+  task("kettle:drift:update") do
     warn("NOTE: kettle-drift isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
   end
-  desc('(stub) kettle:drift:force_update is unavailable')
-  task('kettle:drift:force_update') do
+  desc("(stub) kettle:drift:force_update is unavailable")
+  task("kettle:drift:force_update") do
     warn("NOTE: kettle-drift isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
   end
-  desc('(stub) kettle:drift is unavailable')
-  task('kettle:drift' => 'kettle:drift:update')
+  desc("(stub) kettle:drift is unavailable")
+  task("kettle:drift" => "kettle:drift:update")
 end
 
 ### TEMPLATING TASKS

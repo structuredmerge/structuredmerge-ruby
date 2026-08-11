@@ -339,20 +339,11 @@ templates:
     - Gemfile
     - certs/pboling.pem
     - tmp/.gitignore
-    - Gemfile
-    - Rakefile
-    - .rspec
-    - .simplecov
-    - .yard-lint.yml
-    - .yardignore
-    - .yardopts
-    - bin/setup
-    - spec/README.md
-    - spec/spec_helper.rb
     - gemfiles/modular/benchmark/r4/v0.5.gemfile
     - gemfiles/modular/benchmark/vHEAD.gemfile
     - gemfiles/modular/cgi/r4/v0.5.gemfile
     - gemfiles/modular/cgi/vHEAD.gemfile
+    - gemfiles/modular/changelog.gemfile
     - gemfiles/modular/coverage.gemfile
     - gemfiles/modular/coverage_local.gemfile
     - gemfiles/modular/debug.gemfile
@@ -415,7 +406,7 @@ templates:
   #   monorepo-root   - repository-root support template
   #
   # ENV override: KETTLE_JEM_TEMPLATE_PROFILE
-  profile: monorepo-subgem-release
+  profile: monorepo-subgem-package
 
 # StructuredMerge Git diff driver setup.
 # Default: semantic-diff installs local .gitattributes entries for semantic

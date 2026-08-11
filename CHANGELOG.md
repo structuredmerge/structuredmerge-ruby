@@ -82,6 +82,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Refactor ast-merge-git into a format-neutral provider adapter with explicit conflict-write policy, stable Git exit codes, and no runtime dependency on json-merge.
 
+- Include kettle-jem in the structuredmerge-ruby family release graph after its structured merge dependencies and before smorg-rb.
+
 ### Deprecated
 
 ### Removed

@@ -90,7 +90,7 @@ puts result.content if result.success?
 
 ### Compatibility
 
-Compatible with MRI Ruby 4.0.0+, and concordant releases of JRuby, and TruffleRuby.
+Compatible with MRI Ruby 4.0.0+, JRuby, and TruffleRuby.
 CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.
 This test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml` and
 may be higher than the gem's runtime compatibility floor when legacy Rubies are
@@ -184,13 +184,6 @@ or use the gem and think about how it could be better.
 We [![Keep A Changelog][📗keep-changelog-img]][📗keep-changelog] so if you make changes, remember to update it.
 
 See [CONTRIBUTING.md][🤝contributing] for more detailed instructions.
-
-### Code Coverage
-
-<details markdown="1">
-<summary>Coverage service badges</summary>
-
-</details>
 
 ## 📌 Versioning
 

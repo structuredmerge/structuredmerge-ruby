@@ -1,6 +1,6 @@
 <a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by GitHub" src="https://github.com/structuredmerge.png?size=192" width="14%" align="right"/></a>
 
-# 🧬 Ast::Crispr
+# 💎 Ast::Crispr
 
 [![Version][👽versioni]][👽version] [![Ruby Users Forum][✉️ruby-forum-top-img]][✉️ruby-forum] [![GitHub tag (latest SemVer)][⛳️tag-img]][⛳️tag] [![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0][📄license-img]][📄license] [![Total downloads][👽dl-ranki]][👽dl-rank] [![CI Current][🚎11-c-wfi]][🚎11-c-wf]
 
@@ -46,7 +46,7 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ### Compatibility
 
-Compatible with MRI Ruby 4.0.0+, and concordant releases of JRuby, and TruffleRuby.
+Compatible with MRI Ruby 4.0.0+, JRuby, and TruffleRuby.
 CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.
 This test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml` and
 may be higher than the gem's runtime compatibility floor when legacy Rubies are
@@ -141,13 +141,6 @@ or use the gem and think about how it could be better.
 We [![Keep A Changelog][📗keep-changelog-img]][📗keep-changelog] so if you make changes, remember to update it.
 
 See [CONTRIBUTING.md][🤝contributing] for more detailed instructions.
-
-### Code Coverage
-
-<details markdown="1">
-<summary>Coverage service badges</summary>
-
-</details>
 
 ## 📌 Versioning
 

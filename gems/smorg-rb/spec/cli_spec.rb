@@ -282,7 +282,8 @@ RSpec.describe Smorg::RB do
 
   it 'routes TypeScript and TSX paths only through the exact base-aware provider' do
     %w[ts tsx].each do |extension|
-      ancestor = write_file(@dir, "ancestor.#{extension}", "export function obsolete() {}\nexport function stable() {}\n")
+      ancestor = write_file(@dir, "ancestor.#{extension}",
+                            "export function obsolete() {}\nexport function stable() {}\n")
       current = write_file(
         @dir,
         "current-#{extension}.tmp",

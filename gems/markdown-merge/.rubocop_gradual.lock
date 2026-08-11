@@ -2,11 +2,11 @@
   ".simplecov:3364541157": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:1018150957": [
+  "Rakefile:1292287521": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
-    [79, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [163, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [166, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -25,10 +25,10 @@
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -64,7 +64,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/templating.gemfile:1411170554": [
+  "gemfiles/modular/templating.gemfile:637207389": [
     [15, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 11 of the Gemfile.", 2310012541]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -93,52 +93,52 @@
   "lib/markdown-merge.rb:2827716783": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`markdown-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/markdown/merge.rb:3246516816": [
+  "lib/markdown/merge.rb:2631994489": [
     [8, 3, 12, "Style/Documentation: Missing top-level documentation comment for `module Markdown::Merge`.", 2866359175],
-    [8, 3, 24257, "Metrics/ModuleLength: Module has too many lines. [579/100]", 4268495043],
+    [8, 3, 25562, "Metrics/ModuleLength: Module has too many lines. [591/100]", 2772054550],
     [20, 5, 16, "Style/Documentation: Missing top-level documentation comment for `class Markdown::Merge::ParseError`.", 362242086],
-    [117, 5, 1014, "Metrics/MethodLength: Method has too many lines. [24/10]", 650805533],
-    [147, 5, 678, "Metrics/AbcSize: Assignment Branch Condition size for `match_markdown_owners` is too high. [<10, 23, 8> 26.32/17]", 2124140148],
-    [147, 5, 678, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `match_markdown_owners` is too high. [9/7]", 2124140148],
-    [147, 5, 678, "Metrics/PerceivedComplexity: Perceived complexity for `match_markdown_owners` is too high. [9/8]", 2124140148],
-    [160, 5, 1188, "Metrics/AbcSize: Assignment Branch Condition size for `merge_markdown` is too high. [<10, 25, 8> 28.09/17]", 3592129796],
-    [160, 5, 1188, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_markdown` is too high. [9/7]", 3592129796],
-    [160, 5, 1188, "Metrics/MethodLength: Method has too many lines. [23/10]", 3592129796],
-    [160, 5, 1188, "Metrics/PerceivedComplexity: Perceived complexity for `merge_markdown` is too high. [9/8]", 3592129796],
-    [189, 5, 513, "Metrics/MethodLength: Method has too many lines. [13/10]", 912081106],
-    [207, 5, 747, "Metrics/MethodLength: Method has too many lines. [16/10]", 3172863125],
-    [238, 5, 1513, "Metrics/AbcSize: Assignment Branch Condition size for `apply_markdown_delegated_child_outputs` is too high. [<16, 37, 9> 41.3/17]", 3320736661],
-    [238, 5, 1513, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_markdown_delegated_child_outputs` is too high. [10/7]", 3320736661],
-    [238, 5, 1513, "Metrics/MethodLength: Method has too many lines. [30/10]", 3320736661],
-    [238, 5, 1513, "Metrics/PerceivedComplexity: Perceived complexity for `apply_markdown_delegated_child_outputs` is too high. [10/8]", 3320736661],
-    [276, 5, 1058, "Metrics/MethodLength: Method has too many lines. [23/10]", 2000305522],
-    [303, 5, 1103, "Metrics/MethodLength: Method has too many lines. [23/10]", 2615729942],
-    [303, 52, 144, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3050457682],
-    [331, 5, 817, "Metrics/MethodLength: Method has too many lines. [13/10]", 322304706],
-    [336, 121, 74, "Layout/LineLength: Line is too long. [194/120]", 2378183959],
-    [349, 5, 805, "Metrics/MethodLength: Method has too many lines. [13/10]", 935244360],
-    [354, 121, 66, "Layout/LineLength: Line is too long. [186/120]", 2974266470],
-    [367, 5, 722, "Metrics/MethodLength: Method has too many lines. [12/10]", 1758487766],
-    [372, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 3013228499],
-    [384, 5, 730, "Metrics/MethodLength: Method has too many lines. [12/10]", 3297037131],
-    [389, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 3013228499],
-    [415, 5, 1584, "Metrics/AbcSize: Assignment Branch Condition size for `collect_markdown_owners` is too high. [<21, 32, 13> 40.42/17]", 572024212],
-    [415, 5, 1584, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collect_markdown_owners` is too high. [11/7]", 572024212],
-    [415, 5, 1584, "Metrics/MethodLength: Method has too many lines. [45/10]", 572024212],
-    [415, 5, 1584, "Metrics/PerceivedComplexity: Perceived complexity for `collect_markdown_owners` is too high. [11/8]", 572024212],
-    [469, 5, 1147, "Metrics/AbcSize: Assignment Branch Condition size for `markdown_owner_start_indices` is too high. [<21, 22, 11> 32.34/17]", 12516264],
-    [469, 5, 1147, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `markdown_owner_start_indices` is too high. [9/7]", 12516264],
-    [469, 5, 1147, "Metrics/MethodLength: Method has too many lines. [33/10]", 12516264],
-    [469, 5, 1147, "Metrics/PerceivedComplexity: Perceived complexity for `markdown_owner_start_indices` is too high. [9/8]", 12516264],
-    [510, 5, 602, "Metrics/AbcSize: Assignment Branch Condition size for `collect_markdown_sections` is too high. [<9, 20, 6> 22.74/17]", 1946206422],
-    [510, 5, 602, "Metrics/MethodLength: Method has too many lines. [14/10]", 1946206422],
-    [518, 7, 11, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 848344986],
-    [529, 5, 1097, "Metrics/AbcSize: Assignment Branch Condition size for `markdown_fence_ranges` is too high. [<19, 21, 11> 30.38/17]", 2035260313],
-    [529, 5, 1097, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `markdown_fence_ranges` is too high. [8/7]", 2035260313],
-    [529, 5, 1097, "Metrics/MethodLength: Method has too many lines. [31/10]", 2035260313],
-    [545, 13, 227, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 1054958538],
-    [567, 5, 332, "Metrics/MethodLength: Method has too many lines. [14/10]", 2041170985],
-    [603, 5, 549, "Metrics/MethodLength: Method has too many lines. [12/10]", 2513777426]
+    [153, 5, 1014, "Metrics/MethodLength: Method has too many lines. [24/10]", 650805533],
+    [183, 5, 678, "Metrics/AbcSize: Assignment Branch Condition size for `match_markdown_owners` is too high. [<10, 23, 8> 26.32/17]", 2124140148],
+    [183, 5, 678, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `match_markdown_owners` is too high. [9/7]", 2124140148],
+    [183, 5, 678, "Metrics/PerceivedComplexity: Perceived complexity for `match_markdown_owners` is too high. [9/8]", 2124140148],
+    [196, 5, 1188, "Metrics/AbcSize: Assignment Branch Condition size for `merge_markdown` is too high. [<10, 25, 8> 28.09/17]", 3592129796],
+    [196, 5, 1188, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_markdown` is too high. [9/7]", 3592129796],
+    [196, 5, 1188, "Metrics/MethodLength: Method has too many lines. [23/10]", 3592129796],
+    [196, 5, 1188, "Metrics/PerceivedComplexity: Perceived complexity for `merge_markdown` is too high. [9/8]", 3592129796],
+    [225, 5, 513, "Metrics/MethodLength: Method has too many lines. [13/10]", 912081106],
+    [243, 5, 747, "Metrics/MethodLength: Method has too many lines. [16/10]", 3172863125],
+    [274, 5, 1513, "Metrics/AbcSize: Assignment Branch Condition size for `apply_markdown_delegated_child_outputs` is too high. [<16, 37, 9> 41.3/17]", 3320736661],
+    [274, 5, 1513, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_markdown_delegated_child_outputs` is too high. [10/7]", 3320736661],
+    [274, 5, 1513, "Metrics/MethodLength: Method has too many lines. [30/10]", 3320736661],
+    [274, 5, 1513, "Metrics/PerceivedComplexity: Perceived complexity for `apply_markdown_delegated_child_outputs` is too high. [10/8]", 3320736661],
+    [312, 5, 1058, "Metrics/MethodLength: Method has too many lines. [23/10]", 2000305522],
+    [339, 5, 1103, "Metrics/MethodLength: Method has too many lines. [23/10]", 2615729942],
+    [339, 52, 144, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3050457682],
+    [367, 5, 817, "Metrics/MethodLength: Method has too many lines. [13/10]", 322304706],
+    [372, 121, 74, "Layout/LineLength: Line is too long. [194/120]", 2378183959],
+    [385, 5, 805, "Metrics/MethodLength: Method has too many lines. [13/10]", 935244360],
+    [390, 121, 66, "Layout/LineLength: Line is too long. [186/120]", 2974266470],
+    [403, 5, 722, "Metrics/MethodLength: Method has too many lines. [12/10]", 1758487766],
+    [408, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 3013228499],
+    [420, 5, 730, "Metrics/MethodLength: Method has too many lines. [12/10]", 3297037131],
+    [425, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 3013228499],
+    [451, 5, 1584, "Metrics/AbcSize: Assignment Branch Condition size for `collect_markdown_owners` is too high. [<21, 32, 13> 40.42/17]", 572024212],
+    [451, 5, 1584, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collect_markdown_owners` is too high. [11/7]", 572024212],
+    [451, 5, 1584, "Metrics/MethodLength: Method has too many lines. [45/10]", 572024212],
+    [451, 5, 1584, "Metrics/PerceivedComplexity: Perceived complexity for `collect_markdown_owners` is too high. [11/8]", 572024212],
+    [505, 5, 1147, "Metrics/AbcSize: Assignment Branch Condition size for `markdown_owner_start_indices` is too high. [<21, 22, 11> 32.34/17]", 12516264],
+    [505, 5, 1147, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `markdown_owner_start_indices` is too high. [9/7]", 12516264],
+    [505, 5, 1147, "Metrics/MethodLength: Method has too many lines. [33/10]", 12516264],
+    [505, 5, 1147, "Metrics/PerceivedComplexity: Perceived complexity for `markdown_owner_start_indices` is too high. [9/8]", 12516264],
+    [546, 5, 602, "Metrics/AbcSize: Assignment Branch Condition size for `collect_markdown_sections` is too high. [<9, 20, 6> 22.74/17]", 1946206422],
+    [546, 5, 602, "Metrics/MethodLength: Method has too many lines. [14/10]", 1946206422],
+    [554, 7, 11, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 848344986],
+    [565, 5, 1097, "Metrics/AbcSize: Assignment Branch Condition size for `markdown_fence_ranges` is too high. [<19, 21, 11> 30.38/17]", 2035260313],
+    [565, 5, 1097, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `markdown_fence_ranges` is too high. [8/7]", 2035260313],
+    [565, 5, 1097, "Metrics/MethodLength: Method has too many lines. [31/10]", 2035260313],
+    [581, 13, 227, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 1054958538],
+    [603, 5, 332, "Metrics/MethodLength: Method has too many lines. [14/10]", 2041170985],
+    [639, 5, 549, "Metrics/MethodLength: Method has too many lines. [12/10]", 2513777426]
   ],
   "lib/markdown/merge/backend_support.rb:1910609966": [
     [6, 5, 7153, "Metrics/ModuleLength: Module has too many lines. [161/100]", 606467501],
@@ -626,7 +626,7 @@
     [78, 43, 286, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 3809385913],
     [127, 7, 592, "Metrics/MethodLength: Method has too many lines. [12/10]", 3827282628]
   ],
-  "markdown-merge.gemspec:247992110": [
+  "markdown-merge.gemspec:169353851": [
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [149, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]

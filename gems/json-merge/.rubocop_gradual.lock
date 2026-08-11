@@ -2,11 +2,11 @@
   ".simplecov:3227426949": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:2931360525": [
+  "Rakefile:98041473": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
-    [79, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [163, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [166, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -25,10 +25,10 @@
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -64,7 +64,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/templating.gemfile:1411170554": [
+  "gemfiles/modular/templating.gemfile:637207389": [
     [15, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 11 of the Gemfile.", 2310012541]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -90,7 +90,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "json-merge.gemspec:1337877133": [
+  "json-merge.gemspec:202271160": [
     [16, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 1168797721],
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
@@ -99,36 +99,36 @@
   "lib/json-merge.rb:2566998416": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`json-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/json/merge.rb:3472674946": [
+  "lib/json/merge.rb:179760894": [
     [9, 3, 12, "Style/Documentation: Missing top-level documentation comment for `module Json::Merge`.", 2866359175],
-    [9, 3, 16173, "Metrics/ModuleLength: Module has too many lines. [419/100]", 1440743816],
+    [9, 3, 16532, "Metrics/ModuleLength: Module has too many lines. [428/100]", 1440743816],
     [20, 5, 16, "Style/Documentation: Missing top-level documentation comment for `class Json::Merge::ParseError`.", 362242086],
-    [100, 5, 1337, "Metrics/AbcSize: Assignment Branch Condition size for `parse_json` is too high. [<5, 25, 11> 27.77/17]", 2581608668],
-    [100, 5, 1337, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parse_json` is too high. [10/7]", 2581608668],
-    [100, 5, 1337, "Metrics/MethodLength: Method has too many lines. [31/10]", 2581608668],
-    [100, 5, 1337, "Metrics/PerceivedComplexity: Perceived complexity for `parse_json` is too high. [10/8]", 2581608668],
-    [141, 5, 1190, "Metrics/MethodLength: Method has too many lines. [24/10]", 1390480966],
-    [183, 5, 994, "Metrics/AbcSize: Assignment Branch Condition size for `json_value_for_source` is too high. [<5, 21, 10> 23.79/17]", 299250882],
-    [183, 5, 994, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `json_value_for_source` is too high. [9/7]", 299250882],
-    [183, 5, 994, "Metrics/MethodLength: Method has too many lines. [17/10]", 299250882],
-    [183, 5, 994, "Metrics/PerceivedComplexity: Perceived complexity for `json_value_for_source` is too high. [9/8]", 299250882],
-    [206, 5, 928, "Metrics/AbcSize: Assignment Branch Condition size for `json_value_for_node` is too high. [<6, 21, 12> 24.92/17]", 3784972554],
-    [206, 5, 928, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `json_value_for_node` is too high. [13/7]", 3784972554],
-    [206, 5, 928, "Metrics/MethodLength: Method has too many lines. [26/10]", 3784972554],
-    [249, 5, 555, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `decode_json_string_literal` is too high. [11/7]", 4144578840],
-    [249, 5, 555, "Metrics/MethodLength: Method has too many lines. [16/10]", 4144578840],
-    [269, 5, 1325, "Metrics/AbcSize: Assignment Branch Condition size for `decode_json5_string_literal` is too high. [<14, 34, 27> 45.62/17]", 3994115595],
-    [269, 5, 1325, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `decode_json5_string_literal` is too high. [23/7]", 3994115595],
-    [269, 5, 1325, "Metrics/MethodLength: Method has too many lines. [40/10]", 3994115595],
-    [269, 5, 1325, "Metrics/PerceivedComplexity: Perceived complexity for `decode_json5_string_literal` is too high. [15/8]", 3994115595],
-    [358, 5, 457, "Metrics/MethodLength: Method has too many lines. [11/10]", 906734662],
-    [414, 5, 691, "Metrics/MethodLength: Method has too many lines. [18/10]", 4010630320],
-    [437, 5, 528, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `detect_trailing_comma` is too high. [8/7]", 4057979016],
-    [437, 5, 528, "Metrics/MethodLength: Method has too many lines. [13/10]", 4057979016],
-    [478, 5, 787, "Metrics/AbcSize: Assignment Branch Condition size for `advance_scanner_state` is too high. [<8, 12, 24> 28/17]", 2437181548],
-    [478, 5, 787, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `advance_scanner_state` is too high. [15/7]", 2437181548],
-    [478, 5, 787, "Metrics/MethodLength: Method has too many lines. [25/10]", 2437181548],
-    [478, 5, 787, "Metrics/PerceivedComplexity: Perceived complexity for `advance_scanner_state` is too high. [17/8]", 2437181548]
+    [111, 5, 1337, "Metrics/AbcSize: Assignment Branch Condition size for `parse_json` is too high. [<5, 25, 11> 27.77/17]", 2581608668],
+    [111, 5, 1337, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parse_json` is too high. [10/7]", 2581608668],
+    [111, 5, 1337, "Metrics/MethodLength: Method has too many lines. [31/10]", 2581608668],
+    [111, 5, 1337, "Metrics/PerceivedComplexity: Perceived complexity for `parse_json` is too high. [10/8]", 2581608668],
+    [152, 5, 1190, "Metrics/MethodLength: Method has too many lines. [24/10]", 1390480966],
+    [194, 5, 994, "Metrics/AbcSize: Assignment Branch Condition size for `json_value_for_source` is too high. [<5, 21, 10> 23.79/17]", 299250882],
+    [194, 5, 994, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `json_value_for_source` is too high. [9/7]", 299250882],
+    [194, 5, 994, "Metrics/MethodLength: Method has too many lines. [17/10]", 299250882],
+    [194, 5, 994, "Metrics/PerceivedComplexity: Perceived complexity for `json_value_for_source` is too high. [9/8]", 299250882],
+    [217, 5, 928, "Metrics/AbcSize: Assignment Branch Condition size for `json_value_for_node` is too high. [<6, 21, 12> 24.92/17]", 3784972554],
+    [217, 5, 928, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `json_value_for_node` is too high. [13/7]", 3784972554],
+    [217, 5, 928, "Metrics/MethodLength: Method has too many lines. [26/10]", 3784972554],
+    [260, 5, 555, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `decode_json_string_literal` is too high. [11/7]", 4144578840],
+    [260, 5, 555, "Metrics/MethodLength: Method has too many lines. [16/10]", 4144578840],
+    [280, 5, 1325, "Metrics/AbcSize: Assignment Branch Condition size for `decode_json5_string_literal` is too high. [<14, 34, 27> 45.62/17]", 3994115595],
+    [280, 5, 1325, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `decode_json5_string_literal` is too high. [23/7]", 3994115595],
+    [280, 5, 1325, "Metrics/MethodLength: Method has too many lines. [40/10]", 3994115595],
+    [280, 5, 1325, "Metrics/PerceivedComplexity: Perceived complexity for `decode_json5_string_literal` is too high. [15/8]", 3994115595],
+    [369, 5, 457, "Metrics/MethodLength: Method has too many lines. [11/10]", 906734662],
+    [425, 5, 691, "Metrics/MethodLength: Method has too many lines. [18/10]", 4010630320],
+    [448, 5, 528, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `detect_trailing_comma` is too high. [8/7]", 4057979016],
+    [448, 5, 528, "Metrics/MethodLength: Method has too many lines. [13/10]", 4057979016],
+    [489, 5, 787, "Metrics/AbcSize: Assignment Branch Condition size for `advance_scanner_state` is too high. [<8, 12, 24> 28/17]", 2437181548],
+    [489, 5, 787, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `advance_scanner_state` is too high. [15/7]", 2437181548],
+    [489, 5, 787, "Metrics/MethodLength: Method has too many lines. [25/10]", 2437181548],
+    [489, 5, 787, "Metrics/PerceivedComplexity: Perceived complexity for `advance_scanner_state` is too high. [17/8]", 2437181548]
   ],
   "lib/json/merge/conflict_resolver.rb:4183268983": [
     [11, 5, 56074, "Metrics/ClassLength: Class has too many lines. [1067/100]", 2246754139],

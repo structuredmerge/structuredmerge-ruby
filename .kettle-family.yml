@@ -36,6 +36,7 @@ members:
     - gems/kramdown-merge
     - gems/markly-merge
     - gems/prism-merge
+    - gems/kettle-jem
     - gems/smorg-rb
   exclude:
     - "**/benchmarks/**"
@@ -71,6 +72,7 @@ members:
       - kramdown-merge
       - markly-merge
       - prism-merge
+      - kettle-jem
       - smorg-rb
 
 commands:
@@ -156,6 +158,7 @@ release:
     - [ast-crispr, ast-template, bash-merge, go-merge, json-merge, markdown-merge, plain-merge, rbs-merge, ruby-merge, rust-merge, toml-merge, typescript-merge, yaml-merge, zip-merge]
     - [ast-merge-git, citrus-toml-merge, commonmarker-merge, dotenv-merge, html-merge, kramdown-merge, markly-merge, parslet-toml-merge, prism-merge, psych-merge]
     - [ast-crispr-markdown-markly, ast-crispr-ruby-prism]
+    - [kettle-jem]
     - [smorg-rb]
   disable_local_path_env:
     - K_JEM_TEMPLATING

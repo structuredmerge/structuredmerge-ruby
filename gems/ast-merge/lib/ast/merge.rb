@@ -129,10 +129,10 @@ module Ast
       ProviderRegistry.default.dispatch(operation, request)
     end
     module_function :normalize_merge_engine,
-      :merge_engine_from_environment,
-      :register_provider,
-      :resolve_provider,
-      :dispatch_provider
+                    :merge_engine_from_environment,
+                    :register_provider,
+                    :resolve_provider,
+                    :dispatch_provider
 
     COMPACT_RULESET_REPEATABLE_KEYED_DIRECTIVES = %w[
       backend node_role atomic child_group capability logical_owner repair surface delegate

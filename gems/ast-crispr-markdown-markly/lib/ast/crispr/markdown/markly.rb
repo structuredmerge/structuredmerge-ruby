@@ -397,12 +397,12 @@ module Ast
             opening_source = analysis.source_range(opening[:start_line], opening[:end_line])
             next unless opening_source.lines.any? do |line|
               stripped = line.lstrip
-              stripped.start_with?("<details>") || stripped.start_with?("<details ")
+              stripped.start_with?('<details>') || stripped.start_with?('<details ')
             end
 
             closing = html_blocks.drop_while { |candidate| candidate != opening }.drop(1).find do |candidate|
               source = analysis.source_range(candidate[:start_line], candidate[:end_line])
-              source.lines.any? { |line| line.lstrip.start_with?("</details>") }
+              source.lines.any? { |line| line.lstrip.start_with?('</details>') }
             end
             next unless closing
 
@@ -422,14 +422,14 @@ module Ast
         end
 
         def self.html_summary_text(source)
-          open_tag_start = source.index("<summary")
-          return "" unless open_tag_start
+          open_tag_start = source.index('<summary')
+          return '' unless open_tag_start
 
-          open_tag_end = source.index(">", open_tag_start)
-          return "" unless open_tag_end
+          open_tag_end = source.index('>', open_tag_start)
+          return '' unless open_tag_end
 
-          close_tag_start = source.index("</summary>", open_tag_end)
-          return "" unless close_tag_start
+          close_tag_start = source.index('</summary>', open_tag_end)
+          return '' unless close_tag_start
 
           source[(open_tag_end + 1)...close_tag_start].to_s.strip
         end

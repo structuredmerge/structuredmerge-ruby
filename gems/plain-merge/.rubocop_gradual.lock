@@ -2,11 +2,11 @@
   ".simplecov:1228210085": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:4149951629": [
+  "Rakefile:2935468609": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
-    [79, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [163, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [166, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -25,10 +25,10 @@
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -64,7 +64,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/templating.gemfile:1411170554": [
+  "gemfiles/modular/templating.gemfile:637207389": [
     [15, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 11 of the Gemfile.", 2310012541]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -93,30 +93,30 @@
   "lib/plain-merge.rb:3407233138": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`plain-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/plain/merge.rb:3674161568": [
-    [7, 3, 12, "Style/Documentation: Missing top-level documentation comment for `module Plain::Merge`.", 2866359175],
-    [7, 3, 7814, "Metrics/ModuleLength: Module has too many lines. [210/100]", 719656966],
-    [40, 5, 645, "Metrics/MethodLength: Method has too many lines. [21/10]", 3773389417],
-    [67, 5, 513, "Metrics/AbcSize: Assignment Branch Condition size for `similarity_score` is too high. [<9, 17, 3> 19.47/17]", 594433443],
-    [67, 5, 513, "Metrics/MethodLength: Method has too many lines. [12/10]", 594433443],
-    [85, 9, 10, "Naming/PredicatePrefix: Rename `is_similar` to `similar?`.", 1730577729],
-    [94, 5, 2045, "Metrics/AbcSize: Assignment Branch Condition size for `match_text_blocks` is too high. [<23, 33, 14> 42.59/17]", 2803919775],
-    [94, 5, 2045, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `match_text_blocks` is too high. [12/7]", 2803919775],
-    [94, 5, 2045, "Metrics/MethodLength: Method has too many lines. [49/10]", 2803919775],
-    [94, 5, 2045, "Metrics/PerceivedComplexity: Perceived complexity for `match_text_blocks` is too high. [12/8]", 2803919775],
-    [101, 7, 1540, "Metrics/BlockLength: Block has too many lines. [37/25]", 4289796872],
-    [153, 5, 683, "Metrics/AbcSize: Assignment Branch Condition size for `merge_text` is too high. [<11, 16, 4> 19.82/17]", 3448903566],
-    [153, 5, 683, "Metrics/MethodLength: Method has too many lines. [14/10]", 3448903566],
-    [173, 5, 633, "Metrics/AbcSize: Assignment Branch Condition size for `refined_text_similarity` is too high. [<3, 17, 0> 17.26/17]", 2185070085],
-    [203, 5, 700, "Metrics/AbcSize: Assignment Branch Condition size for `levenshtein_distance` is too high. [<8, 31, 8> 33/17]", 1827550752],
-    [203, 5, 700, "Metrics/MethodLength: Method has too many lines. [18/10]", 1827550752]
+  "lib/plain/merge.rb:3924658879": [
+    [8, 3, 12, "Style/Documentation: Missing top-level documentation comment for `module Plain::Merge`.", 2866359175],
+    [8, 3, 8054, "Metrics/ModuleLength: Module has too many lines. [217/100]", 262907591],
+    [51, 5, 645, "Metrics/MethodLength: Method has too many lines. [21/10]", 3773389417],
+    [78, 5, 513, "Metrics/AbcSize: Assignment Branch Condition size for `similarity_score` is too high. [<9, 17, 3> 19.47/17]", 594433443],
+    [78, 5, 513, "Metrics/MethodLength: Method has too many lines. [12/10]", 594433443],
+    [96, 9, 10, "Naming/PredicatePrefix: Rename `is_similar` to `similar?`.", 1730577729],
+    [105, 5, 2045, "Metrics/AbcSize: Assignment Branch Condition size for `match_text_blocks` is too high. [<23, 33, 14> 42.59/17]", 2803919775],
+    [105, 5, 2045, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `match_text_blocks` is too high. [12/7]", 2803919775],
+    [105, 5, 2045, "Metrics/MethodLength: Method has too many lines. [49/10]", 2803919775],
+    [105, 5, 2045, "Metrics/PerceivedComplexity: Perceived complexity for `match_text_blocks` is too high. [12/8]", 2803919775],
+    [112, 7, 1540, "Metrics/BlockLength: Block has too many lines. [37/25]", 4289796872],
+    [164, 5, 683, "Metrics/AbcSize: Assignment Branch Condition size for `merge_text` is too high. [<11, 16, 4> 19.82/17]", 3448903566],
+    [164, 5, 683, "Metrics/MethodLength: Method has too many lines. [14/10]", 3448903566],
+    [184, 5, 633, "Metrics/AbcSize: Assignment Branch Condition size for `refined_text_similarity` is too high. [<3, 17, 0> 17.26/17]", 2185070085],
+    [214, 5, 700, "Metrics/AbcSize: Assignment Branch Condition size for `levenshtein_distance` is too high. [<8, 31, 8> 33/17]", 1827550752],
+    [214, 5, 700, "Metrics/MethodLength: Method has too many lines. [18/10]", 1827550752]
   ],
-  "plain-merge.gemspec:143221792": [
+  "plain-merge.gemspec:937782709": [
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [149, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
   ],
-  "spec/fixtures_integration_spec.rb:465637347": [
+  "spec/fixtures_integration_spec.rb:813881472": [
     [3, 1, 3550, "Metrics/BlockLength: Block has too many lines. [77/25]", 4225834063]
   ]
 }

@@ -2,11 +2,11 @@
   ".simplecov:2333130821": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:133885645": [
+  "Rakefile:2062160577": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
-    [79, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [163, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [166, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -25,10 +25,10 @@
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -64,7 +64,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/templating.gemfile:1411170554": [
+  "gemfiles/modular/templating.gemfile:637207389": [
     [15, 3, 47, "Bundler/DuplicatedGem: Gem `tree_sitter_language_pack` requirements already given on line 11 of the Gemfile.", 2310012541]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -93,17 +93,17 @@
   "lib/toml-merge.rb:1401275262": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`toml-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/toml/merge.rb:3771296722": [
-    [38, 3, 12343, "Metrics/ModuleLength: Module has too many lines. [232/100]", 1029844733],
-    [113, 5, 9391, "Metrics/ClassLength: Class has too many lines. [206/100]", 282717333],
-    [155, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 1773216188],
-    [164, 7, 709, "Metrics/MethodLength: Method has too many lines. [17/10]", 2355964538],
-    [190, 7, 1280, "Metrics/AbcSize: Assignment Branch Condition size for `merge_toml` is too high. [<6, 16, 6> 18.11/17]", 2322240506],
-    [190, 7, 1280, "Metrics/MethodLength: Method has too many lines. [25/10]", 2322240506],
-    [194, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 1773216188],
-    [221, 7, 1401, "Metrics/AbcSize: Assignment Branch Condition size for `merge_toml_with_parser` is too high. [<6, 18, 6> 19.9/17]", 3118052892],
-    [221, 7, 1401, "Metrics/MethodLength: Method has too many lines. [24/10]", 3118052892],
-    [321, 9, 11, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 848344986]
+  "lib/toml/merge.rb:587867471": [
+    [38, 3, 12423, "Metrics/ModuleLength: Module has too many lines. [233/100]", 2965158616],
+    [114, 5, 9391, "Metrics/ClassLength: Class has too many lines. [206/100]", 282717333],
+    [156, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 1773216188],
+    [165, 7, 709, "Metrics/MethodLength: Method has too many lines. [17/10]", 2355964538],
+    [191, 7, 1280, "Metrics/AbcSize: Assignment Branch Condition size for `merge_toml` is too high. [<6, 16, 6> 18.11/17]", 2322240506],
+    [191, 7, 1280, "Metrics/MethodLength: Method has too many lines. [25/10]", 2322240506],
+    [195, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 1773216188],
+    [222, 7, 1401, "Metrics/AbcSize: Assignment Branch Condition size for `merge_toml_with_parser` is too high. [<6, 18, 6> 19.9/17]", 3118052892],
+    [222, 7, 1401, "Metrics/MethodLength: Method has too many lines. [24/10]", 3118052892],
+    [322, 9, 11, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 848344986]
   ],
   "lib/toml/merge/comment_tracker.rb:743656609": [
     [16, 5, 5242, "Metrics/ClassLength: Class has too many lines. [112/100]", 3014190138],
@@ -266,7 +266,7 @@
   "spec/toml/merge/retained_blank_gap_compliance_spec.rb:1717387616": [
     [8, 1, 1046, "Metrics/BlockLength: Block has too many lines. [31/25]", 305562394]
   ],
-  "toml-merge.gemspec:3987493193": [
+  "toml-merge.gemspec:2355003388": [
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [149, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]

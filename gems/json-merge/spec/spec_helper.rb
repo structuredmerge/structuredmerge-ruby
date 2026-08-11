@@ -26,6 +26,7 @@ require 'kettle/test/rspec'
 # This library
 require 'ast/merge'
 require 'json/merge'
+
 require 'ast/merge/rspec'
 
 RSpec.configure do |config|
