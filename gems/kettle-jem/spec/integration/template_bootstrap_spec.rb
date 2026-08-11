@@ -669,6 +669,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         files:
           README.md:
             strategy: merge
+          Rakefile:
+            strategy: accept_template
           tree_haver.gemspec:
             strategy: merge
       YAML
@@ -1288,6 +1290,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     config_yaml = YAML.safe_load(updated)
 
     expect(config_yaml.dig("files", "bash-merge.gemspec", "strategy")).to eq("merge")
+    expect(config_yaml.dig("files", "Rakefile", "strategy")).to eq("accept_template")
     expect(config_yaml.fetch("files")).not_to have_key("plain-merge.gemspec")
     expect(config_yaml.dig("files", "gemfiles", "strategy")).to eq("keep_destination")
   end

@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generate modular changelog Gemfiles with the released kettle-changelog 1.x dependency floor.
 
+- Synchronize monorepo subgem profiles with a template-owned Rakefile so legacy generated task blocks are replaced instead of duplicated.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10

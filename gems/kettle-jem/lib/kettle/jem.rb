@@ -5176,6 +5176,7 @@ module Kettle
         updated.insert(profile_index + 1, *entries_lines)
       end
       sync_kettle_config_gemspec_strategy_lines!(updated, gemspec_path)
+      sync_kettle_config_rakefile_strategy_lines!(updated)
       ensure_trailing_newline(updated.join("\n"))
     end
 
@@ -5203,6 +5204,33 @@ module Kettle
         lines[strategy_index] = "    strategy: merge"
       else
         lines.insert(gemspec_index + 1, "    strategy: merge")
+      end
+    end
+
+    def sync_kettle_config_rakefile_strategy_lines!(lines)
+      files_index = lines.index("files:")
+      return unless files_index
+
+      rakefile_index = ((files_index + 1)...lines.length).find do |index|
+        line = lines.fetch(index)
+        break nil if top_level_yaml_key_line?(line)
+
+        line == "  Rakefile:"
+      end
+      unless rakefile_index
+        insertion_index = kettle_config_gemspec_override_insertion_index(lines, files_index)
+        lines.insert(insertion_index, "  Rakefile:", "    strategy: accept_template")
+        return
+      end
+
+      block_end = kettle_config_file_override_block_end(lines, rakefile_index)
+      strategy_index = ((rakefile_index + 1)...block_end).find do |index|
+        lines.fetch(index).start_with?("    strategy:")
+      end
+      if strategy_index
+        lines[strategy_index] = "    strategy: accept_template"
+      else
+        lines.insert(rakefile_index + 1, "    strategy: accept_template")
       end
     end
 
@@ -12671,7 +12699,9 @@ module Kettle
     def add_monorepo_subgem_file_overrides(content, gemspec_path, profile = MONOREPO_SUBGEM_TEMPLATE_PROFILE)
       override_lines = [
         "  README.md:",
-        "    strategy: merge"
+        "    strategy: merge",
+        "  Rakefile:",
+        "    strategy: accept_template"
       ]
       gemspec = gemspec_path.to_s.strip
       unless gemspec.empty?
