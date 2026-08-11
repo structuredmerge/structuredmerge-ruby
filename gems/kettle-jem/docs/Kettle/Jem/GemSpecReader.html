@@ -204,12 +204,12 @@
       <pre class="lines">
 
 
-1269
-1270
-1271</pre>
+1275
+1276
+1277</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1269</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1275</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear_cache!'>clear_cache!</span>
   <span class='const'>CACHE</span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='lbrace'>{</span> <span class='const'>CACHE</span><span class='period'>.</span><span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span> <span class='rbrace'>}</span>
@@ -234,12 +234,6 @@
       <pre class="lines">
 
 
-1253
-1254
-1255
-1256
-1257
-1258
 1259
 1260
 1261
@@ -248,10 +242,16 @@
 1264
 1265
 1266
-1267</pre>
+1267
+1268
+1269
+1270
+1271
+1272
+1273</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1253</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1259</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cache_key'>cache_key</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -278,7 +278,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Aug 10 01:13:01 2026 by
+  Generated on Tue Aug 11 03:53:44 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

@@ -276,6 +276,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_supplemental_prepare_report-class_method" title="merge_supplemental_prepare_report (class method)">.<strong>merge_supplemental_prepare_report</strong>(report, supplemental_report)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#normalize_existing_local_gemfile_bootstraps_step-class_method" title="normalize_existing_local_gemfile_bootstraps_step (class method)">.<strong>normalize_existing_local_gemfile_bootstraps_step</strong>(project_root, events:)  &#x21d2; Object </a>
     
 
@@ -346,6 +369,29 @@
   <span class="summary_signature">
     
       <a href="#snapshot_files-class_method" title="snapshot_files (class method)">.<strong>snapshot_files</strong>(paths)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#synchronize_monorepo_subgem_profile_step-class_method" title="synchronize_monorepo_subgem_profile_step (class method)">.<strong>synchronize_monorepo_subgem_profile_step</strong>(project_root, report)  &#x21d2; Object </a>
     
 
     
@@ -459,34 +505,34 @@
       <pre class="lines">
 
 
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
 220
-221</pre>
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 197</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 220</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bundle_install_after_bootstrap_step'>bundle_install_after_bootstrap_step</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>setup_env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='comma'>,</span> <span class='label'>events:</span><span class='comma'>,</span> <span class='label'>bootstrap_command:</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_bootstrap_command'>bootstrap_command</span> <span class='op'>==</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>bundle</span><span class='words_sep'> </span><span class='tstring_content'>install</span><span class='tstring_end'>]</span></span>
@@ -533,12 +579,12 @@
       <pre class="lines">
 
 
-170
-171
-172</pre>
+193
+194
+195</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 170</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bundle_update_templating_bootstrap_command'>bundle_update_templating_bootstrap_command</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span> <span class='op'>=</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span>
   <span class='qwords_beg'>%w[</span><span class='tstring_content'>bundle</span><span class='words_sep'> </span><span class='tstring_content'>update</span><span class='tstring_end'>]</span></span> <span class='op'>+</span> <span class='const'><span class='object_link'><a href="#CRITICAL_TEMPLATING_GEMS-constant" title="Kettle::Jem::Tasks::PrepareTask::CRITICAL_TEMPLATING_GEMS (constant)">CRITICAL_TEMPLATING_GEMS</a></span></span> <span class='op'>+</span> <span class='id identifier rubyid_locked_templating_gems'>locked_templating_gems</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
@@ -563,17 +609,17 @@
       <pre class="lines">
 
 
-240
-241
-242
-243
-244
-245
-246
-247</pre>
+263
+264
+265
+266
+267
+268
+269
+270</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_changed_files_since'>changed_files_since</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_snapshot'>snapshot</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_snapshot'>snapshot</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_before'>before</span><span class='op'>|</span>
@@ -626,17 +672,17 @@
       <pre class="lines">
 
 
-161
-162
-163
-164
-165
-166
-167
-168</pre>
+184
+185
+186
+187
+188
+189
+190
+191</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 161</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 184</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_local_path_development_env?'>local_path_development_env?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_raw_value'>raw_value</span><span class='op'>|</span>
@@ -666,15 +712,15 @@
       <pre class="lines">
 
 
-227
-228
-229
-230
-231
-232</pre>
+250
+251
+252
+253
+254
+255</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 227</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 250</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_locked_gem_names'>locked_gem_names</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_path'>lock_path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Gemfile.lock</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -702,15 +748,59 @@
       <pre class="lines">
 
 
-223
-224
-225</pre>
+246
+247
+248</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 223</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 246</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_locked_templating_gems'>locked_templating_gems</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="#LOCKED_TEMPLATING_GEMS-constant" title="Kettle::Jem::Tasks::PrepareTask::LOCKED_TEMPLATING_GEMS (constant)">LOCKED_TEMPLATING_GEMS</a></span></span> <span class='op'>&amp;</span> <span class='id identifier rubyid_locked_gem_names'>locked_gem_names</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_supplemental_prepare_report-class_method">
+  
+    .<strong>merge_supplemental_prepare_report</strong>(report, supplemental_report)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_supplemental_prepare_report'>merge_supplemental_prepare_report</span><span class='lparen'>(</span><span class='id identifier rubyid_report'>report</span><span class='comma'>,</span> <span class='id identifier rubyid_supplemental_report'>supplemental_report</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_report'>report</span> <span class='kw'>unless</span> <span class='id identifier rubyid_supplemental_report'>supplemental_report</span>
+
+  <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+    <span class='label'>changed_files:</span> <span class='lparen'>(</span>
+      <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed_files</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_supplemental_report'>supplemental_report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed_files</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_supplemental_report'>supplemental_report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -732,27 +822,27 @@
       <pre class="lines">
 
 
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114</pre>
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_existing_local_gemfile_bootstraps_step'>normalize_existing_local_gemfile_bootstraps_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>events:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_paths'>paths</span> <span class='op'>=</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_glob'>glob</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>gemfiles/modular/**/*_local.gemfile</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span>
@@ -792,29 +882,6 @@
       <pre class="lines">
 
 
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
 139
 140
 141
@@ -835,10 +902,33 @@
 156
 157
 158
-159</pre>
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_release_lockfiles_step'>reset_release_lockfiles_step</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>setup_env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='comma'>,</span> <span class='label'>events:</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_local_path_development_env?'>local_path_development_env?</span><span class='lparen'>(</span><span class='id identifier rubyid_setup_env'>setup_env</span><span class='rparen'>)</span>
@@ -973,7 +1063,12 @@
 92
 93
 94
-95</pre>
+95
+96
+97
+98
+99
+100</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 26</span>
@@ -986,6 +1081,11 @@
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_events'>events</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_event_stream_from_options'><span class='object_link'><a href="../../Jem.html#event_stream_from_options-class_method" title="Kettle::Jem.event_stream_from_options (method)">event_stream_from_options</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_effective_run_options'>effective_run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_report'>report</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_apply_project'><span class='object_link'><a href="../../Jem.html#apply_project-class_method" title="Kettle::Jem.apply_project (method)">apply_project</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_prepare_run_options'>prepare_run_options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_profile_sync_step'>profile_sync_step</span> <span class='op'>=</span> <span class='id identifier rubyid_synchronize_monorepo_subgem_profile_step'>synchronize_monorepo_subgem_profile_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_supplemental_report'>supplemental_report</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_profile_sync_step'>profile_sync_step</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_profile_sync_step'>profile_sync_step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>applied</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_apply_project'><span class='object_link'><a href="../../Jem.html#apply_project-class_method" title="Kettle::Jem.apply_project (method)">apply_project</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_prepare_run_options'>prepare_run_options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_report'>report</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_supplemental_prepare_report'>merge_supplemental_prepare_report</span><span class='lparen'>(</span><span class='id identifier rubyid_report'>report</span><span class='comma'>,</span> <span class='id identifier rubyid_supplemental_report'>supplemental_report</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_nomono_bootstrap_step'>nomono_bootstrap_step</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_existing_local_gemfile_bootstraps_step'>normalize_existing_local_gemfile_bootstraps_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>events:</span> <span class='id identifier rubyid_events'>events</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_setup_env'>setup_env</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="InstallTask.html" title="Kettle::Jem::Tasks::InstallTask (module)">InstallTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setup_command_env'><span class='object_link'><a href="InstallTask.html#setup_command_env-class_method" title="Kettle::Jem::Tasks::InstallTask.setup_command_env (method)">setup_command_env</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_setup_env'>setup_env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BUNDLE_DISABLE_CHECKSUM_VALIDATION</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>true</span><span class='tstring_end'>&quot;</span></span>
@@ -1031,7 +1131,7 @@
       <span class='qwords_beg'>%w[</span><span class='tstring_content'>skipped</span><span class='words_sep'> </span><span class='tstring_content'>succeeded</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_reset_step'>reset_step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
       <span class='qwords_beg'>%w[</span><span class='tstring_content'>skipped</span><span class='words_sep'> </span><span class='tstring_content'>succeeded</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_bundle_step'>bundle_step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>prepare_only:</span> <span class='const'><span class='object_link'><a href="#PREPARE_ONLY_PATHS-constant" title="Kettle::Jem::Tasks::PrepareTask::PREPARE_ONLY_PATHS (constant)">PREPARE_ONLY_PATHS</a></span></span><span class='comma'>,</span>
-    <span class='label'>prepare_steps:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_nomono_bootstrap_step'>nomono_bootstrap_step</span><span class='comma'>,</span> <span class='id identifier rubyid_reset_step'>reset_step</span><span class='comma'>,</span> <span class='id identifier rubyid_bootstrap_step'>bootstrap_step</span><span class='comma'>,</span> <span class='id identifier rubyid_bundle_step'>bundle_step</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>prepare_steps:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_profile_sync_step'>profile_sync_step</span><span class='comma'>,</span> <span class='id identifier rubyid_nomono_bootstrap_step'>nomono_bootstrap_step</span><span class='comma'>,</span> <span class='id identifier rubyid_reset_step'>reset_step</span><span class='comma'>,</span> <span class='id identifier rubyid_bootstrap_step'>bootstrap_step</span><span class='comma'>,</span> <span class='id identifier rubyid_bundle_step'>bundle_step</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='comma'>,</span>
     <span class='label'>changed_files:</span> <span class='lparen'>(</span>
       <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed_files</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span>
         <span class='id identifier rubyid_nomono_bootstrap_step'>nomono_bootstrap_step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed_files</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span>
@@ -1068,19 +1168,55 @@
       <pre class="lines">
 
 
-234
-235
-236
-237
-238</pre>
+257
+258
+259
+260
+261</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 234</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 257</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_snapshot_files'>snapshot_files</span><span class='lparen'>(</span><span class='id identifier rubyid_paths'>paths</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_paths'>paths</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_snapshot'>snapshot</span><span class='op'>|</span>
     <span class='id identifier rubyid_snapshot'>snapshot</span><span class='lbracket'>[</span><span class='id identifier rubyid_path'>path</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_binread'>binread</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>nil</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="synchronize_monorepo_subgem_profile_step-class_method">
+  
+    .<strong>synchronize_monorepo_subgem_profile_step</strong>(project_root, report)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104
+105
+106
+107</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_synchronize_monorepo_subgem_profile_step'>synchronize_monorepo_subgem_profile_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_facts'>facts</span> <span class='op'>=</span> <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:facts</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:monorepo_subgem_template_profile?</span><span class='comma'>,</span> <span class='id identifier rubyid_facts'>facts</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:monorepo_subgem_kettle_config_profile_sync_step</span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1102,14 +1238,14 @@
       <pre class="lines">
 
 
-174
-175
-176
-177
-178</pre>
+197
+198
+199
+200
+201</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 174</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 197</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_templating_bootstrap_command'>templating_bootstrap_command</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span> <span class='op'>=</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>bundle</span><span class='words_sep'> </span><span class='tstring_content'>install</span><span class='tstring_end'>]</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_templating_bootstrap_lockfile_ready?'>templating_bootstrap_lockfile_ready?</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
@@ -1159,19 +1295,19 @@
       <pre class="lines">
 
 
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195</pre>
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 186</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_templating_bootstrap_lockfile_ready?'>templating_bootstrap_lockfile_ready?</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_path'>lock_path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Gemfile.lock</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1203,14 +1339,14 @@
       <pre class="lines">
 
 
-180
-181
-182
-183
-184</pre>
+203
+204
+205
+206
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 180</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/prepare_task.rb', line 203</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_templating_bootstrap_step_name'>templating_bootstrap_step_name</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span> <span class='op'>=</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bundle_install_templating_bootstrap</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_templating_bootstrap_lockfile_ready?'>templating_bootstrap_lockfile_ready?</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
@@ -1227,7 +1363,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Aug 10 01:13:01 2026 by
+  Generated on Tue Aug 11 03:53:44 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

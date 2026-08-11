@@ -22,13 +22,26 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Generate README star-history embeds with the revived star-history.dera.page service.
-
-- Generate the README Star History section only for GitHub repositories with at least 150 stars.
-
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.3] - 2026-08-11
+
+- TAG: [v7.1.3][7.1.3t]
+- COVERAGE: 93.99% -- 10757/11445 lines in 15 files
+- BRANCH COVERAGE: 77.39% -- 4605/5950 branches in 15 files
+- 18.01% documented
+
+### Changed
+
+- Generate README star-history embeds with the revived star-history.dera.page service.
+
+- Generate the README Star History section only for GitHub repositories with at least 150 stars.
 
 ### Fixed
 
@@ -51,8 +64,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Retain the MRI runtime floor when normalizing multi-engine README compatibility text.
 
 - Include html-merge in generated StructuredMerge local dependency wiring.
-
-### Security
 
 ## [7.1.2] - 2026-08-10
 
@@ -1483,7 +1494,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.2...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.3...HEAD
+[7.1.3]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.2...v7.1.3
+[7.1.3t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.3
 [7.1.2]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.1...v7.1.2
 [7.1.2t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.2
 [7.1.1]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...v7.1.1

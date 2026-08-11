@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.45
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><p><a href="https://discord.gg/3qme4XHNKN"><img src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-192px.svg" alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" /></a> <a href="https://www.ruby-lang.org/"><img src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-192px.svg" alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" /></a> <a href="https://github.com/structuredmerge"><img src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-192px.svg" alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0" /></a></p>
+<h1 id="StructuredMerge_Ruby">StructuredMerge Ruby</h1>
+<p>StructuredMerge Ruby provides Ruby gems for building merge-aware tools that need
+portable structured-merge contracts, fixture-backed behavior, and Ruby-native
+integration points.</p>
+<p>The monorepo includes the core AST/review contracts, parser substrate support,
+format-specific merge gems, binary/ZIP planning helpers, provider adapters, and
+a Ruby packaging recipe gem.</p>
+<p>Project links:</p>
+<ul>
+<li>Website: <a href="https://structuredmerge.org">https://structuredmerge.org</a></li>
+<li>Implementations: <a href="https://structuredmerge.org/implementations.html">https://structuredmerge.org/implementations.html</a></li>
+<li>Specification: <a href="https://github.com/structuredmerge/structuredmerge-spec">https://github.com/structuredmerge/structuredmerge-spec</a></li>
+<li>Shared fixtures: <a href="https://github.com/structuredmerge/structuredmerge-fixtures">https://github.com/structuredmerge/structuredmerge-fixtures</a></li>
+</ul>
+<h2 id="Package_Family">Package Family</h2>
+<p>StructuredMerge Ruby is a layered gem family. The lower layers provide parser,
+range, AST, merge, and template contracts; format gems apply those contracts to
+specific languages and data formats; provider gems bind a format family to a
+parser or serializer; workflow gems package the behavior for Git drivers,
+release automation, and monorepo maintenance.</p>
+<p>Package README files keep this section short and link here. This root guide is
+the implementation inventory for Ruby users who need to choose gems, understand
+backend coverage, or wire a focused backend into a test suite.</p>
+<p>The family is intentionally layered:</p>
+<ul>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver"><code>tree_haver</code></a> provides parser portability, backend discovery, byte ranges, and runtime capability reporting.</li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge"><code>ast-merge</code></a> provides the cross-format merge substrate: shared base classes, layout/comment ownership, diagnostics, review state, and execution reports.</li>
+<li>Family gems such as <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markdown-merge"><code>markdown-merge</code></a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/yaml-merge"><code>yaml-merge</code></a>, and <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/toml-merge"><code>toml-merge</code></a> own parser-neutral behavior for one format family.</li>
+<li>Provider gems such as <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markly-merge"><code>markly-merge</code></a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/psych-merge"><code>psych-merge</code></a>, and <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/citrus-toml-merge"><code>citrus-toml-merge</code></a> register backend-specific parser/emitter behavior.</li>
+<li>Workflow gems such as <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge-git"><code>ast-merge-git</code></a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/smorg-rb"><code>smorg-rb</code></a>, and <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><code>kettle-jem</code></a> package the family for Git, release, and templating workflows.</li>
+</ul>
+<h3 id="Core_and_Workflow_Gems">Core and Workflow Gems</h3>
+<table>
+<thead>
+<tr>
+<th>Gem</th>
+<th>Layer</th>
+<th>What it provides</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver"><code>tree_haver</code></a></td>
+<td>Parser substrate</td>
+<td>Parser backend registry, byte ranges, node wrappers, source locations, binary tree contracts, and backend selection helpers.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge"><code>ast-merge</code></a></td>
+<td>Merge substrate</td>
+<td>AST merge contracts, diagnostics, structural edit plans, review/replay vocabulary, nested merge orchestration, backend provider registration, and shared spec helpers.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-template"><code>ast-template</code></a></td>
+<td>Template substrate</td>
+<td>Template/session transport objects used by recipe tooling and language-specific templating layers.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge-git"><code>ast-merge-git</code></a></td>
+<td>Git integration</td>
+<td>Merge-driver, diff-driver, conflict inspection, language registry, and command plumbing for <code>smorg-rb</code>.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/smorg-rb"><code>smorg-rb</code></a></td>
+<td>Command package</td>
+<td>Ruby implementation command packaging and executable entry points.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><code>kettle-jem</code></a></td>
+<td>Recipe tooling</td>
+<td>Template recipes, monorepo root materialization, gem maintenance helpers, and StructuredMerge Ruby release support.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Transformation_Gems">Transformation Gems</h3>
+<table>
+<thead>
+<tr>
+<th>Gem</th>
+<th>Layer</th>
+<th>What it provides</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr"><code>ast-crispr</code></a></td>
+<td>Generic AST edits</td>
+<td>Structured document surgery recipes for generated blocks and template-owned regions.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr-ruby-prism"><code>ast-crispr-ruby-prism</code></a></td>
+<td>Ruby AST edits</td>
+<td><a href="https://github.com/ruby/prism">Prism</a>-backed Ruby source edits, including require insertion and template-managed Ruby regions.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr-markdown-markly"><code>ast-crispr-markdown-markly</code></a></td>
+<td>Markdown AST edits</td>
+<td><a href="https://github.com/ioquatix/markly">Markly</a>-backed Markdown block replacement and README recipe support.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Format_Gems">Format Gems</h3>
+<table>
+<thead>
+<tr>
+<th>Gem</th>
+<th>Family</th>
+<th>What it provides</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/plain-merge"><code>plain-merge</code></a></td>
+<td>Text</td>
+<td>Line-backed TreeHaver parser registration, plain-text fallback contracts, and conflict-preserving merge behavior.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/json-merge"><code>json-merge</code></a></td>
+<td>JSON and JSONC</td>
+<td>Object/array-aware JSON merge behavior using the shared StructuredMerge merge substrate and <a href="https://github.com/tree-sitter/tree-sitter-json">tree-sitter JSON</a> grammar coverage where the selected backend supplies it.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/yaml-merge"><code>yaml-merge</code></a></td>
+<td>YAML</td>
+<td>YAML-family merge contracts, shared provider tags, and provider-neutral behavior.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/toml-merge"><code>toml-merge</code></a></td>
+<td>TOML</td>
+<td>TOML-family merge contracts and provider-neutral behavior.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/dotenv-merge"><code>dotenv-merge</code></a></td>
+<td>dotenv</td>
+<td>Dotenv line parser registration and key/value configuration merge behavior built on the plain text substrate.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markdown-merge"><code>markdown-merge</code></a></td>
+<td>Markdown</td>
+<td>Markdown-family merge contracts, heading/table/list matching, link-reference handling, fenced-code flow, and provider-neutral behavior.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ruby-merge"><code>ruby-merge</code></a></td>
+<td>Ruby source</td>
+<td>Ruby source merge contracts and parser-backed source-language behavior.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/rbs-merge"><code>rbs-merge</code></a></td>
+<td>RBS</td>
+<td>Ruby signature merge behavior, declaration matching, and template-owned signature updates using <a href="https://github.com/ruby/rbs">RBS</a> and tree-sitter RBS grammar coverage where available.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/bash-merge"><code>bash-merge</code></a></td>
+<td>Bash source</td>
+<td>Shell source merge contracts and parser-backed shell-language behavior using <a href="https://github.com/tree-sitter/tree-sitter-bash">tree-sitter Bash</a> where available.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/go-merge"><code>go-merge</code></a></td>
+<td>Go source</td>
+<td>Go source merge contracts for the cross-language StructuredMerge family.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/rust-merge"><code>rust-merge</code></a></td>
+<td>Rust source</td>
+<td>Rust source merge contracts for the cross-language StructuredMerge family.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/typescript-merge"><code>typescript-merge</code></a></td>
+<td>TypeScript source</td>
+<td>TypeScript source merge contracts for the cross-language StructuredMerge family.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/binary-merge"><code>binary-merge</code></a></td>
+<td>Binary</td>
+<td>Kaitai/binary-family substrate for byte-range ownership, preservation reports, unsafe diagnostics, and renderer planning.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/zip-merge"><code>zip-merge</code></a></td>
+<td>Archives</td>
+<td>ZIP parser registration and archive-aware merge contracts built on the binary-family substrate.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Provider_Gems">Provider Gems</h3>
+<p>Provider gems register themselves with the backend tag system used by
+<code>ast-merge</code> and <code>tree_haver</code>. That registry lets a spec suite run against a
+single selected backend, lets a format gem ask for a capability instead of a
+hard dependency, and keeps parser-specific behavior out of provider-neutral
+merge gems.</p>
+<table>
+<thead>
+<tr>
+<th>Gem</th>
+<th>Provides</th>
+<th>Runtime notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/psych-merge"><code>psych-merge</code></a></td>
+<td>YAML provider</td>
+<td>Uses Ruby's <a href="https://github.com/ruby/psych">Psych</a> parser and emitter.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/citrus-toml-merge"><code>citrus-toml-merge</code></a></td>
+<td>TOML provider</td>
+<td>Registers a TreeHaver TOML backend backed by a <a href="https://github.com/mjackson/citrus">Citrus</a> grammar, commonly paired with <a href="https://github.com/emancu/toml-rb"><code>toml-rb</code></a> style TOML data handling.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/parslet-toml-merge"><code>parslet-toml-merge</code></a></td>
+<td>TOML provider</td>
+<td>Registers a TreeHaver TOML backend backed by <a href="https://github.com/kschiess/parslet">Parslet</a>, commonly paired with <a href="https://github.com/jm/toml"><code>toml</code></a> style TOML data handling.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/commonmarker-merge"><code>commonmarker-merge</code></a></td>
+<td>Markdown provider</td>
+<td>Uses <a href="https://github.com/gjtorikian/commonmarker">CommonMarker</a> for CommonMark-oriented Markdown parsing.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kramdown-merge"><code>kramdown-merge</code></a></td>
+<td>Markdown provider</td>
+<td>Uses <a href="https://github.com/gettalong/kramdown">Kramdown</a> for Ruby-native Markdown parsing.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markly-merge"><code>markly-merge</code></a></td>
+<td>Markdown provider</td>
+<td>Uses <a href="https://github.com/ioquatix/markly">Markly</a> for cmark-gfm-backed Markdown parsing and README templating support.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/prism-merge"><code>prism-merge</code></a></td>
+<td>Ruby provider</td>
+<td>Uses <a href="https://github.com/ruby/prism">Prism</a> for Ruby source parsing and Ruby-specific merge refiners.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Ruby_Backend_Notes">Ruby Backend Notes</h3>
+<p>Ruby has the broadest backend surface in the StructuredMerge implementation set.
+<code>tree_haver</code> owns the parser backend registry and byte-range contracts;
+<code>ast-merge</code> owns provider registration and merge orchestration. The backend
+tags are capability names, not package preferences.</p>
+<table>
+<thead>
+<tr>
+<th>Backend or provider path</th>
+<th>Used by</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:TSLP</code></td>
+<td>source-family gems</td>
+<td>Uses <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack">tree-sitter-language-pack</a> parser aggregation where available. This is the preferred tree-sitter provider path for broad language coverage.</td>
+</tr>
+<tr>
+<td><code>:MRI</code></td>
+<td>source-family gems</td>
+<td>Uses <a href="https://github.com/Faveod/ruby-tree-sitter"><code>ruby_tree_sitter</code></a>; retained as the MRI-native tree-sitter backend name.</td>
+</tr>
+<tr>
+<td><code>:rust</code></td>
+<td>source-family gems</td>
+<td>Uses <a href="https://github.com/joker1007/tree_stump"><code>tree_stump</code></a> where that native Rust-backed parser path is selected.</td>
+</tr>
+<tr>
+<td><code>:ffi</code></td>
+<td>source-family gems</td>
+<td>Uses <a href="https://github.com/ffi/ffi">FFI</a> bindings to <a href="https://tree-sitter.github.io/tree-sitter/">libtree-sitter</a>; suitable where the runtime and native library support the needed ABI.</td>
+</tr>
+<tr>
+<td><code>:java</code></td>
+<td>source-family gems</td>
+<td>Uses JVM tree-sitter bindings through <a href="https://github.com/tree-sitter/java-tree-sitter">java-tree-sitter</a> / <a href="https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter">jtreesitter</a> for JRuby-oriented parser runs.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ruby/prism">Prism</a></td>
+<td><code>ruby-merge</code>, <code>prism-merge</code>, <code>ast-crispr-ruby-prism</code></td>
+<td>Ruby-native parser path for Ruby source and structured Ruby source edits.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ruby/psych">Psych</a></td>
+<td><code>yaml-merge</code>, <code>psych-merge</code></td>
+<td>Ruby standard YAML parser/emitter path.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ruby/rbs">RBS</a></td>
+<td><code>rbs-merge</code></td>
+<td>Ruby signature parser path.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gjtorikian/commonmarker">CommonMarker</a>, <a href="https://github.com/ioquatix/markly">Markly</a>, <a href="https://github.com/gettalong/kramdown">Kramdown</a></td>
+<td><code>markdown-merge</code> providers</td>
+<td>Markdown parser families with different CommonMark/GFM/Ruby-native tradeoffs.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/mjackson/citrus">Citrus</a>, <a href="https://github.com/kschiess/parslet">Parslet</a></td>
+<td><code>toml-merge</code> providers</td>
+<td>Pure-Ruby TOML parser families exposed as provider-specific TreeHaver backend paths.</td>
+</tr>
+<tr>
+<td><a href="https://kaitai.io/">Kaitai Struct</a></td>
+<td><code>binary-merge</code>, <code>zip-merge</code></td>
+<td>Schema-oriented binary parsing support and shared binary-family merge behavior.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="Backend_Platform_Compatibility">Backend Platform Compatibility</h4>
+<p><code>tree_haver</code> supports multiple Ruby parser backends, but not every backend works
+on every Ruby runtime:</p>
+<table>
+<thead>
+<tr>
+<th>TreeHaver backend</th>
+<th align="center">MRI</th>
+<th align="center">JRuby</th>
+<th align="center">TruffleRuby</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:TSLP</code> (<a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack">tree-sitter-language-pack</a>)</td>
+<td align="center">✅</td>
+<td align="center">❓</td>
+<td align="center">❓</td>
+<td>Aggregated tree-sitter provider used by StructuredMerge language-family gems where available.</td>
+</tr>
+<tr>
+<td><code>:MRI</code> (<a href="https://github.com/Faveod/ruby-tree-sitter"><code>ruby_tree_sitter</code></a>)</td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td>C extension, MRI only.</td>
+</tr>
+<tr>
+<td><code>:rust</code> (<a href="https://github.com/joker1007/tree_stump"><code>tree_stump</code></a>)</td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td>Rust extension through Ruby native-extension tooling, MRI only.</td>
+</tr>
+<tr>
+<td><code>:ffi</code> (<a href="https://github.com/ffi/ffi">FFI</a> + <a href="https://tree-sitter.github.io/tree-sitter/">libtree-sitter</a>)</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td>TruffleRuby FFI does not support the tree-sitter struct-by-value ABI.</td>
+</tr>
+<tr>
+<td><code>:java</code> (<a href="https://github.com/tree-sitter/java-tree-sitter">java-tree-sitter</a> / <a href="https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter">jtreesitter</a>)</td>
+<td align="center">❌</td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td>JRuby-oriented path that requires matching grammar JARs.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ruby/prism">Prism</a></td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td>Ruby parser, standard library in Ruby 3.4+.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ruby/psych">Psych</a></td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td>YAML parser/emitter, standard library.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/mjackson/citrus">Citrus</a></td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td>Pure Ruby PEG parser.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kschiess/parslet">Parslet</a></td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td>Pure Ruby PEG parser.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gjtorikian/commonmarker">CommonMarker</a></td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td align="center">❓</td>
+<td>Native Markdown parser used through <code>commonmarker-merge</code>.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ioquatix/markly">Markly</a></td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td align="center">❓</td>
+<td>Native cmark-gfm parser used through <code>markly-merge</code>.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gettalong/kramdown">Kramdown</a></td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td>Pure Ruby Markdown parser.</td>
+</tr>
+</tbody>
+</table>
+<p>Legend: ✅ = works, ❌ = does not work, ❓ = not part of the supported runtime claim.</p>
+<h2 id="Install">Install</h2>
+<p>Install the gems your tool needs:</p>
+<pre class="code sh"><code class="sh">bundle add ast-merge json-merge
+</code></pre>
+<h2 id="Command">Command</h2>
+<p>The Ruby implementation ships the implementation-specific <code>smorg-rb</code> command.
+Use that name in git configuration unless a package manager or local install has
+provided a <code>smorg</code> symlink.</p>
+<p>Package-manager formulas may expose the selected implementation as <code>smorg</code>.
+For a local user-created symlink:</p>
+<pre class="code sh"><code class="sh">ln -s &quot;$(command -v smorg-rb)&quot; ~/.local/bin/smorg
+</code></pre>
+<pre class="code sh"><code class="sh">git config merge.smorg-rb.driver &#39;smorg-rb merge-driver %O %A %B %P&#39;
+git config diff.smorg-rb.command &#39;smorg-rb diff-driver&#39;
+smorg-rb conflicts diff path/to/file-with-conflicts.go
+smorg-rb languages --gitattributes
+</code></pre>
+<p><code>merge-driver</code> updates Git's <code>%A</code> file by default, or writes to <code>--output</code> when
+used outside git. <code>diff-driver</code> accepts both the two-argument local form and the
+seven- or nine-argument forms Git passes to external diff commands.
+<code>conflicts diff</code> reports conflict-marker regions in a file that already contains
+Git conflict markers.</p>
+<p>Semantic merge-driver coverage is fixture-backed for JSON. Other language and
+format paths are git-compatible command surfaces without semantic driver
+coverage.</p>
+<h2 id="Gems">Gems</h2>
+<p>Core and transformation gems:</p>
+<ul>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver"><code>tree_haver</code></a> - parser substrate, byte ranges, backend adapters, and binary tree contracts.</li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge"><code>ast-merge</code></a> - AST merge contracts, diagnostics, planning, review, replay, and nested-merge vocabulary.</li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-template"><code>ast-template</code></a> - template/session transport contracts.</li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr"><code>ast-crispr</code></a> - generic AST edit recipes for generated blocks and template-owned regions.</li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr-ruby-prism"><code>ast-crispr-ruby-prism</code></a> - Prism-backed Ruby source edits.</li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr-markdown-markly"><code>ast-crispr-markdown-markly</code></a> - Markly-backed Markdown source edits.</li>
+</ul>
+<p>Format libraries:</p>
+<ul>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/plain-merge"><code>plain-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/bash-merge"><code>bash-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/dotenv-merge"><code>dotenv-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/json-merge"><code>json-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/rbs-merge"><code>rbs-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/yaml-merge"><code>yaml-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/toml-merge"><code>toml-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markdown-merge"><code>markdown-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ruby-merge"><code>ruby-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/go-merge"><code>go-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/rust-merge"><code>rust-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/typescript-merge"><code>typescript-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/binary-merge"><code>binary-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/zip-merge"><code>zip-merge</code></a></li>
+</ul>
+<p>Provider and recipe gems:</p>
+<ul>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge-git"><code>ast-merge-git</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/psych-merge"><code>psych-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/citrus-toml-merge"><code>citrus-toml-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/parslet-toml-merge"><code>parslet-toml-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/commonmarker-merge"><code>commonmarker-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kramdown-merge"><code>kramdown-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markly-merge"><code>markly-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/prism-merge"><code>prism-merge</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><code>kettle-jem</code></a></li>
+<li><a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/smorg-rb"><code>smorg-rb</code></a></li>
+</ul>
+<h2 id="Portability">Portability</h2>
+<p>The Ruby gems are developed against the [shared StructuredMerge fixtures][structuredmerge-fixtures].
+Those fixtures define the cross-language behavior expected from the Go,
+TypeScript, Rust, and Ruby implementations. Conformance checks live in gem specs
+and in the shared spec/fixture tooling rather than in a static status document.</p>
+<h2 id="Development">Development</h2>
+<p>Use the family tooling from the monorepo root for broad checks:</p>
+<pre class="code sh"><code class="sh">bundle exec kettle-family install --execute
+bundle exec kettle-family lint --execute
+bundle exec kettle-family test --execute
+</code></pre>
+<p>For a single gem, run commands from that gem directory:</p>
+<pre class="code sh"><code class="sh">bundle exec kettle-test
+bin/rake rubocop_gradual:autocorrect
+</code></pre>
+<p>Prefer <code>kettle-test</code> over direct <code>rspec</code> so local verification exercises the
+same parallel runner, worker isolation, filtering, and formatter behavior used
+by CI. Use direct <code>rspec</code> only for narrow debugging when <code>kettle-test</code> cannot
+express the probe, then rerun <code>kettle-test</code> before treating the suite as
+verified.</p>
+<p>Bundler path gems are the default isolation mechanism inside this monorepo. When
+this repository needs to consume sibling workspace projects outside the monorepo
+itself, prefer <code>nomono</code>-driven Bundler wiring rather than manual Ruby load-path
+changes.</p></div></div>
+
+      <div id="footer">
+  Generated on Tue Aug 11 03:58:12 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.45 (ruby-4.0.6).
+</div>
+
+    </div>
+  </body>
+</html>
