@@ -39,6 +39,7 @@ RSpec.describe KettleJemWorkflowPins do
     allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => old_pin})
     allow(Kettle::Gha::Pins::GitHubClient).to receive(:new).and_return(client)
     allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(resolver_plan)
+    allow(Kettle::Jem::MaintenanceChangelog).to receive(:add_unreleased_entry).and_return(status: "updated")
   end
 
   after do
@@ -79,9 +80,13 @@ RSpec.describe KettleJemWorkflowPins do
   end
 
   it "allows workflow pin writes to opt out of default commits" do
-    options = described_class.parse_options(%w[--write --no-commit])
+    options = described_class.parse_options(%w[--write --no-commit --no-changelog])
 
-    expect(options).to include(write: true, commit: false)
+    expect(options).to include(write: true, commit: false, changelog: false)
+  end
+
+  it "enables changelog entries by default" do
+    expect(described_class.parse_options([])).to include(changelog: true)
   end
 
   it "updates the pin index and workflow examples by action key" do
@@ -90,6 +95,11 @@ RSpec.describe KettleJemWorkflowPins do
     expect(result[:updated_actions]).to eq(["actions/checkout"])
     expect(File.read(pin_index_path)).to include(new_pin)
     expect(File.read(workflow_path)).to include("uses: #{new_pin}")
+    expect(Kettle::Jem::MaintenanceChangelog).to have_received(:add_unreleased_entry).with(
+      project_root: project_root,
+      section: "Changed",
+      entry: include("actions/checkout v1.0.0 (#{old_sha}) -> v1.0.1 (#{new_sha})")
+    )
     expect(Kettle::Gha::Pins).to have_received(:resolve_action_plan).with(
       cache: {},
       client: client,
@@ -110,6 +120,7 @@ RSpec.describe KettleJemWorkflowPins do
     expect(status).to eq(0)
     expect(out.string).to include("workflow-pins: mode=dry-run upgrade=patch")
     expect(out.string).to include("workflow-pins: 1 update")
+    expect(out.string).to include("actions/checkout v1.0.0 (#{old_sha}) -> v1.0.1 (#{new_sha})")
     expect(out.string).to include("hint: rerun with --write --upgrade patch")
     expect(err.string).to eq("")
   end

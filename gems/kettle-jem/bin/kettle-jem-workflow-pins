@@ -8,6 +8,7 @@ require "pathname"
 
 require "kettle/gha/pins"
 require "kettle/jem"
+require "kettle/jem/maintenance_changelog"
 
 # Repository-local maintenance tool for updating kettle-jem workflow template pins.
 class KettleJemWorkflowPins
@@ -23,6 +24,7 @@ class KettleJemWorkflowPins
       write: false,
       check: false,
       commit: true,
+      changelog: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }.merge(options.transform_keys(&:to_sym))
@@ -36,9 +38,16 @@ class KettleJemWorkflowPins
     else
       out.puts("workflow-pins: mode=#{result.fetch(:mode)} upgrade=#{result.fetch(:upgrade)}")
       out.puts("workflow-pins: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
-      result.fetch(:updated_actions, []).each { |action| out.puts("  #{action}") }
+      result.fetch(:changes, []).each do |change|
+        out.puts(
+          "  #{change.fetch(:action)} #{self.pin_label(change.fetch(:old_version), change.fetch(:old_ref))} -> " \
+            "#{self.pin_label(change.fetch(:new_version), change.fetch(:new_ref))}"
+        )
+      end
       if result[:commit]
         out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
+      elsif result[:changelog]
+        out.puts("changelog: #{result.fetch(:changelog).fetch(:status)}")
       end
       if !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
         out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
@@ -60,6 +69,7 @@ class KettleJemWorkflowPins
       write: false,
       check: false,
       commit: true,
+      changelog: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }
@@ -72,13 +82,19 @@ class KettleJemWorkflowPins
 
   def self.parser
     OptionParser.new do |opts|
-      opts.banner = "Usage: bin/kettle-jem-workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--upgrade LEVEL]"
+      opts.banner = "Usage: bin/kettle-jem-workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--changelog|--no-changelog] [--upgrade LEVEL]"
       opts.on("-w", "--write", "Write updates to kettle-jem template sources.") { |value| value }
       opts.on("--check", "Fail when template workflow pins are stale.") { |value| value }
       opts.on("--[no-]commit", "Commit written updates (default with --write).") { |value| value }
+      opts.on("--[no-]changelog", "Add a Changed entry with kettle-changelog (default with --write).") { |value| value }
       opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
       opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
     end
+  end
+
+  def self.pin_label(version, ref)
+    version = version.to_s.delete_prefix("v")
+    version.empty? ? ref.to_s : "v#{version} (#{ref})"
   end
 
   def run
@@ -97,9 +113,12 @@ class KettleJemWorkflowPins
     source_pin_replacements(pins, desired_pins_by_action(pins, replacements)).each do |old_pin, replacement|
       replacements[old_pin] = replacement
     end
+    changes = replacement_changes(replacements, planned_changes)
     if @options[:write] && replacements.any?
       target_paths = replacement_target_paths(replacements.values)
+      target_paths << changelog_path if changelog_needed?(replacements)
       preexisting_dirty_paths = preexisting_dirty_target_paths(target_paths)
+      changelog_result = add_changelog_entry(changes) if changelog_needed?(replacements)
       apply_replacements(replacements.values)
       commit_result = commit_changes(target_paths, preexisting_dirty_paths) if @options[:commit]
     end
@@ -115,7 +134,9 @@ class KettleJemWorkflowPins
       pin_count: pins.length,
       updates: replacements.length,
       updated_actions: replacements.values.map { |replacement| replacement.fetch(:action) }.uniq.sort,
+      changes: changes,
       commit: commit_result,
+      changelog: changelog_result,
       planned_changes: planned_changes.select { |change| planned_change_replacement(change, pins) },
       outdated_pins: report.fetch("outdated_pins", [])
     }
@@ -360,6 +381,56 @@ class KettleJemWorkflowPins
       original = File.read(path)
       replacements.any? { |replacement| original.include?(replacement.fetch(:old_pin)) }
     end.map { |path| project_relative_path(path) }.uniq.sort
+  end
+
+  def replacement_changes(replacements, planned_changes)
+    planned_by_action = planned_changes.each_with_object({}) do |change, result|
+      result[pin_action_key(change, Kettle::Jem.github_actions_step_pins)] = change
+    end
+    replacements.values.sort_by { |replacement| replacement.fetch(:action) }.map do |replacement|
+      old_pin = parse_pin(replacement.fetch(:old_pin)) || {}
+      new_pin = parse_pin(replacement.fetch(:new_pin)) || {}
+      planned = planned_by_action[replacement.fetch(:action)] || {}
+      {
+        action: replacement.fetch(:action),
+        old_ref: old_pin[:ref].to_s,
+        old_version: old_pin[:version].to_s,
+        new_ref: new_pin[:ref].to_s,
+        new_version: new_pin[:version].to_s,
+        reason: planned.fetch("reason", "synchronize_template_pin")
+      }
+    end
+  end
+
+  def changelog_path
+    "CHANGELOG.md"
+  end
+
+  def changelog_needed?(replacements)
+    @options[:write] && @options[:changelog] && replacements.any?
+  end
+
+  def add_changelog_entry(changes)
+    Kettle::Jem::MaintenanceChangelog.add_unreleased_entry(
+      project_root: @project_root,
+      section: "Changed",
+      entry: workflow_changelog_entry(changes)
+    )
+  end
+
+  def workflow_changelog_entry(changes)
+    details = changes.map do |change|
+      "#{change.fetch(:action)} #{self.class.pin_label(change.fetch(:old_version), change.fetch(:old_ref))} -> " \
+        "#{self.class.pin_label(change.fetch(:new_version), change.fetch(:new_ref))}"
+    end
+    "Update pinned GitHub Actions in kettle-jem templates: #{human_join(details)}."
+  end
+
+  def human_join(values)
+    return values.fetch(0) if values.length == 1
+    return values.join(" and ") if values.length == 2
+
+    "#{values[0...-1].join(", ")}, and #{values[-1]}"
   end
 
   def preexisting_dirty_target_paths(relative_paths)

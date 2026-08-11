@@ -53,6 +53,7 @@ RSpec.describe KettleJemDepsFloor do
       "#{described_class}::EXTRA_SOURCE_FILES",
       []
     )
+    allow(Kettle::Jem::MaintenanceChangelog).to receive(:add_unreleased_entry).and_return(status: "updated")
     write_file("template/valid.gemfile.example", <<~RUBY)
       # frozen_string_literal: true
 
@@ -135,9 +136,13 @@ RSpec.describe KettleJemDepsFloor do
   end
 
   it "allows dependency floor writes to opt out of default commits" do
-    options = described_class.parse_options(%w[--write --no-commit])
+    options = described_class.parse_options(%w[--write --no-commit --no-changelog])
 
-    expect(options).to include(write: true, commit: false)
+    expect(options).to include(write: true, commit: false, changelog: false)
+  end
+
+  it "enables changelog entries by default" do
+    expect(described_class.parse_options([])).to include(changelog: true)
   end
 
   it "uses a thirty-day persistent RubyGems version cache when live lookups fail", freeze: Time.utc(2026, 7, 30, 12, 0, 0) do
@@ -260,6 +265,16 @@ RSpec.describe KettleJemDepsFloor do
     expect(read_file("template/tokenized.gemspec.example")).to include('spec.add_development_dependency("{KJ|TOKENIZED_GEM}", "~> 9.0", ">= 9.0.0")')
     expect(read_file("template/local.gemfile.example")).to include('require "nomono/bundler"')
     expect(read_file("template/documentation.gemfile.example")).to include('gem "yard-timekeeper", "~> 0.2", ">= 0.2.4", require: false')
+  end
+
+  it "adds one Changed entry describing written dependency floor updates" do
+    described_class.new(project_root: project_root, resolver: resolver, options: {write: true, commit: false, upgrade: "minor"}).run
+
+    expect(Kettle::Jem::MaintenanceChangelog).to have_received(:add_unreleased_entry).with(
+      project_root: project_root,
+      section: "Changed",
+      entry: include("Update kettle-jem template dependency floors:", "kettle-dev (>= 2.5.8)")
+    )
   end
 
   it "commits written updates by default inside git repositories" do

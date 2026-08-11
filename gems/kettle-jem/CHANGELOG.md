@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Write-mode dependency-floor and workflow-pin maintenance tools now document their updates in CHANGELOG.md by default.
+
 ### Deprecated
 
 ### Removed

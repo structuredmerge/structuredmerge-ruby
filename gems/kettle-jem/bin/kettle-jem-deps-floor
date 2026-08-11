@@ -9,6 +9,7 @@ require "pathname"
 require "time"
 
 require "kettle/jem"
+require "kettle/jem/maintenance_changelog"
 
 # Repository-local maintenance tool for updating dependency floors owned by
 # kettle-jem templates.
@@ -149,6 +150,7 @@ class KettleJemDepsFloor
       write: false,
       check: false,
       commit: true,
+      changelog: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }.merge(options.transform_keys(&:to_sym))
@@ -171,6 +173,8 @@ class KettleJemDepsFloor
       end
       if result[:commit]
         out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
+      elsif result[:changelog]
+        out.puts("changelog: #{result.fetch(:changelog).fetch(:status)}")
       elsif !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
         out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
       end
@@ -191,6 +195,7 @@ class KettleJemDepsFloor
       write: false,
       check: false,
       commit: true,
+      changelog: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }
@@ -203,10 +208,11 @@ class KettleJemDepsFloor
 
   def self.parser
     OptionParser.new do |opts|
-      opts.banner = "Usage: bin/kettle-jem-deps-floor [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--upgrade LEVEL]"
+      opts.banner = "Usage: bin/kettle-jem-deps-floor [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--changelog|--no-changelog] [--upgrade LEVEL]"
       opts.on("-w", "--write", "Write updates to kettle-jem template sources.") { |value| value }
       opts.on("--check", "Fail when managed dependency floors are stale.") { |value| value }
       opts.on("--[no-]commit", "Commit written updates (default with --write).") { |value| value }
+      opts.on("--[no-]changelog", "Add a Changed entry with kettle-changelog (default with --write).") { |value| value }
       opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
       opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
     end
@@ -243,9 +249,12 @@ class KettleJemDepsFloor
 
     records = dependency_records
     planned_changes = planned_dependency_changes(records, upgrade)
-    preexisting_dirty_paths = preexisting_dirty_target_paths(planned_changes)
+    target_paths = changed_relative_paths(planned_changes)
+    target_paths << changelog_path if changelog_needed?(planned_changes)
+    preexisting_dirty_paths = preexisting_dirty_target_paths(target_paths)
+    changelog_result = add_changelog_entry(planned_changes) if changelog_needed?(planned_changes)
     apply_changes(planned_changes) if @options[:write] && planned_changes.any?
-    commit_result = commit_changes(planned_changes, preexisting_dirty_paths) if @options[:write] && @options[:commit] && planned_changes.any?
+    commit_result = commit_changes(target_paths, preexisting_dirty_paths) if @options[:write] && @options[:commit] && planned_changes.any?
 
     if @options[:check] && planned_changes.any?
       raise "Managed dependency floors are stale; run bin/kettle-jem-deps-floor --write --upgrade #{upgrade}"
@@ -259,6 +268,7 @@ class KettleJemDepsFloor
       updates: planned_changes.length,
       updated_dependencies: planned_changes.map { |change| change.fetch(:name) }.uniq.sort,
       commit: commit_result,
+      changelog: changelog_result,
       planned_changes: planned_changes.map { |change| serializable_change(change) }
     }
   end
@@ -484,15 +494,13 @@ class KettleJemDepsFloor
     end
   end
 
-  def preexisting_dirty_target_paths(changes)
-    relative_paths = changed_relative_paths(changes)
+  def preexisting_dirty_target_paths(relative_paths)
     return [] if relative_paths.empty? || !git_repository?
 
     dirty_paths(relative_paths)
   end
 
-  def commit_changes(changes, preexisting_dirty_paths)
-    relative_paths = changed_relative_paths(changes)
+  def commit_changes(relative_paths, preexisting_dirty_paths)
     return {status: "skipped", reason: "no_updates"} if relative_paths.empty?
     return {status: "unavailable", reason: "not_git_repository"} unless git_repository?
     unless preexisting_dirty_paths.empty?
@@ -509,6 +517,37 @@ class KettleJemDepsFloor
 
   def changed_relative_paths(changes)
     changes.map { |change| change.fetch(:relative_path) }.uniq.sort
+  end
+
+  def changelog_path
+    "CHANGELOG.md"
+  end
+
+  def changelog_needed?(changes)
+    @options[:write] && @options[:changelog] && changes.any?
+  end
+
+  def add_changelog_entry(changes)
+    Kettle::Jem::MaintenanceChangelog.add_unreleased_entry(
+      project_root: project_root,
+      section: "Changed",
+      entry: dependency_changelog_entry(changes)
+    )
+  end
+
+  def dependency_changelog_entry(changes)
+    details = changes.group_by { |change| change.fetch(:name) }.sort.map do |name, grouped|
+      floors = grouped.map { |change| change.fetch(:new_floor_version).to_s }.uniq.sort_by { |version| Gem::Version.new(version) }
+      "#{name} (>= #{floors.join(", >= ")})"
+    end
+    "Update kettle-jem template dependency floors: #{human_join(details)}."
+  end
+
+  def human_join(values)
+    return values.fetch(0) if values.length == 1
+    return values.join(" and ") if values.length == 2
+
+    "#{values[0...-1].join(", ")}, and #{values[-1]}"
   end
 
   def git_repository?
