@@ -89,7 +89,7 @@
 
 <ul>
   <li>Git-oriented request and response shaping for three-way merge driver integrations.</li>
-  <li>Family detection from path, extension, and configured merge behavior.</li>
+  <li>Provider selection from explicit family/provider, dialect, backend, and profile selectors.</li>
   <li>JSON-compatible reports that can be logged, inspected, or replayed by higher-level tooling.</li>
   <li>Fallback-friendly behavior for unsupported families or unsafe parser results.</li>
 </ul>
@@ -158,7 +158,7 @@
 
 <h3 id="compatibility">Compatibility</h3>
 
-<p>Compatible with MRI Ruby 4.0.0+, and concordant releases of JRuby, and TruffleRuby.<br>
+<p>Compatible with MRI Ruby 4.0.0+, JRuby, and TruffleRuby.<br>
 CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.<br>
 This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle-jem.yml</code> and<br>
 may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
@@ -248,16 +248,27 @@ not practical for the current toolchain.</p>
 
 <h2 id="️-configuration">⚙️ Configuration</h2>
 
-<p>Configure <code>ast-merge-git</code> through the repository’s Git attributes and StructuredMerge family settings. The gem expects callers to provide the ancestor, current, and incoming file contents that Git passes to a custom merge driver.</p>
+<p>Configure <code>ast-merge-git</code> through the repository’s Git attributes and StructuredMerge provider settings. The gem expects callers to provide the ancestor, current, and incoming file contents that Git passes to a custom merge driver.</p>
 
 <p>Keep family-specific parser configuration in the corresponding merge gem. For example, Markdown backend choices belong to <code>markdown-merge</code> or its provider gems, while Ruby source backend choices belong to <code>ruby-merge</code> or <code>prism-merge</code>.</p>
+
+<p>The executable does not infer or require family implementations. Configure<br>
+<code>AST_MERGE_REQUIRE</code> with comma-separated provider require paths and select a<br>
+provider with <code>AST_MERGE_FAMILY</code> or <code>AST_MERGE_PROVIDER</code>. Optional selectors are<br>
+<code>AST_MERGE_DIALECT</code>, <code>AST_MERGE_BACKEND</code>, and <code>AST_MERGE_PROFILE</code>.</p>
+
+<pre class="code language-ini"><code class="language-ini">[merge &quot;structured-json&quot;]
+  name = StructuredMerge JSON-family driver
+  driver = AST_MERGE_REQUIRE=json/merge AST_MERGE_FAMILY=json AST_MERGE_DIALECT=json ast-merge-git %O %A %B %P %L
+</code></pre>
 
 <h2 id="-basic-usage">🔧 Basic Usage</h2>
 
 <pre class="code language-ruby"><code class="language-ruby">require &quot;ast/merge/git&quot;
+require &quot;json/merge&quot;
 
 result = Ast::Merge::Git.merge3(
-  language: &quot;json&quot;,
+  family: &quot;json&quot;,
   dialect: &quot;json&quot;,
   base_source: File.binread(&quot;%O&quot;),
   ours_source: File.binread(&quot;%A&quot;),
@@ -272,6 +283,12 @@ else
 end
 </code></pre>
 
+<p>For direct Git-driver execution, <code>ast-merge-git</code> writes clean provider output to<br>
+<code>%A</code> and exits <code>0</code>. Unresolved conflicts exit <code>1</code>; unsupported capabilities,<br>
+invalid provider output, configuration failures, and file errors exit <code>2</code>.<br>
+<code>AST_MERGE_CONFLICT_POLICY=leave_ours</code> prevents conflicted output from replacing<br>
+<code>%A</code>; the default <code>write</code> policy writes provider conflict output when available.</p>
+
 <h2 id="-security">🔐 Security</h2>
 
 <p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md">SECURITY.md</a>.</p>
@@ -279,19 +296,11 @@ end
 <h2 id="-contributing">🤝 Contributing</h2>
 
 <p>If you need some ideas of where to help, you could work on adding more code coverage,<br>
-or if it is already 💯 (see <a href="#code-coverage">below</a>) check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>,<br>
-or use the gem and think about how it could be better.</p>
+check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>, or use the gem and think about how it could be better.</p>
 
 <p>We <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep A Changelog"></a> so if you make changes, remember to update it.</p>
 
 <p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more detailed instructions.</p>
-
-<h3 id="code-coverage">Code Coverage</h3>
-
-<details>
-  <summary>Coverage service badges</summary>
-
-</details>
 
 <h2 id="-versioning">📌 Versioning</h2>
 
@@ -330,7 +339,7 @@ See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:19:43 2026 by
+  Generated on Tue Aug 11 06:46:22 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
