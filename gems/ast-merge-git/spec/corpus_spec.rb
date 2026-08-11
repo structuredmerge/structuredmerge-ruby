@@ -285,11 +285,11 @@ RSpec.describe Ast::Merge::Git::Corpus do
     pid_path = root.join('child.pid')
     sleeper = root.join('sleeper')
     FileUtils.mkdir_p(root)
-    sleeper.binwrite(<<~RUBY)
-      #!/usr/bin/env ruby
-      File.write(#{pid_path.to_s.inspect}, Process.pid)
-      sleep 30
-    RUBY
+    sleeper.binwrite(<<~SH)
+      #!/bin/sh
+      printf '%s' "$$" > #{pid_path}
+      exec sleep 30
+    SH
     FileUtils.chmod(0o755, sleeper)
     runner = Ast::Merge::Git::CorpusRunner.allocate
     runner.instance_variable_set(:@timeout, 1)
