@@ -10,6 +10,38 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     expect(described_class::PREPARE_ONLY_PATHS).not_to include("gemfiles/modular/templating.gemfile")
   end
 
+  it "resynchronizes monorepo subgem entries before bootstrapping new modular Gemfiles" do
+    report = {
+      facts: {template_profile: "monorepo-subgem-package"}
+    }
+    sync_step = {name: "monorepo_subgem_kettle_config_profile_sync", status: "applied"}
+
+    allow(Kettle::Jem).to receive(:monorepo_subgem_template_profile?)
+      .with(report.fetch(:facts))
+      .and_return(true)
+    allow(Kettle::Jem).to receive(:monorepo_subgem_kettle_config_profile_sync_step)
+      .with("/workspace/project", report)
+      .and_return(sync_step)
+
+    expect(described_class.synchronize_monorepo_subgem_profile_step("/workspace/project", report)).to eq(sync_step)
+  end
+
+  it "merges the supplemental scoped apply after a profile sync" do
+    report = {
+      changed_files: ["Gemfile"],
+      diagnostics: [{message: "initial"}]
+    }
+    supplemental = {
+      changed_files: ["Gemfile", "gemfiles/modular/changelog.gemfile"],
+      diagnostics: [{message: "supplemental"}]
+    }
+
+    expect(described_class.merge_supplemental_prepare_report(report, supplemental)).to include(
+      changed_files: ["Gemfile", "gemfiles/modular/changelog.gemfile"],
+      diagnostics: [{message: "initial"}, {message: "supplemental"}]
+    )
+  end
+
   it "repairs legacy local Gemfile nomono bootstraps before Bundler starts" do
     Dir.mktmpdir("kettle-jem-prepare-nomono-repair", tmp_root) do |root|
       path = File.join(root, "gemfiles/modular/coverage_local.gemfile")

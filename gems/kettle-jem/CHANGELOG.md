@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Gemspec templating now discards untouched Bundler allowed-push-host placeholders while preserving destination-specific metadata.
 
+- Prepare profile synchronization now materializes newly added modular Gemfiles before Bundler bootstrapping.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10

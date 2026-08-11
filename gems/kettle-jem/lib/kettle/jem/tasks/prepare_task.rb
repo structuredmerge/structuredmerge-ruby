@@ -31,6 +31,11 @@ module Kettle
           )
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
+          profile_sync_step = synchronize_monorepo_subgem_profile_step(project_root, report)
+          supplemental_report = if profile_sync_step && profile_sync_step.fetch(:status) == "applied"
+            Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
+          end
+          report = merge_supplemental_prepare_report(report, supplemental_report)
           nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
@@ -76,7 +81,7 @@ module Kettle
               %w[skipped succeeded].include?(reset_step.fetch(:status)) &&
               %w[skipped succeeded].include?(bundle_step.fetch(:status)),
             prepare_only: PREPARE_ONLY_PATHS,
-            prepare_steps: [nomono_bootstrap_step, reset_step, bootstrap_step, bundle_step],
+            prepare_steps: [profile_sync_step, nomono_bootstrap_step, reset_step, bootstrap_step, bundle_step].compact,
             changed_files: (
               report.fetch(:changed_files, []) +
                 nomono_bootstrap_step.fetch(:changed_files, []) +
@@ -92,6 +97,24 @@ module Kettle
           )
           Kettle::Jem.emit_summary_event(events, final_report)
           final_report
+        end
+
+        def synchronize_monorepo_subgem_profile_step(project_root, report)
+          facts = report.fetch(:facts, {})
+          return unless Kettle::Jem.send(:monorepo_subgem_template_profile?, facts)
+
+          Kettle::Jem.send(:monorepo_subgem_kettle_config_profile_sync_step, project_root, report)
+        end
+
+        def merge_supplemental_prepare_report(report, supplemental_report)
+          return report unless supplemental_report
+
+          report.merge(
+            changed_files: (
+              report.fetch(:changed_files, []) + supplemental_report.fetch(:changed_files, [])
+            ).uniq.sort,
+            diagnostics: report.fetch(:diagnostics, []) + supplemental_report.fetch(:diagnostics, [])
+          )
         end
 
         def normalize_existing_local_gemfile_bootstraps_step(project_root, events:)
