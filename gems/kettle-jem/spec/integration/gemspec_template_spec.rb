@@ -1041,6 +1041,33 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(remerged).to eq(merged)
   end
 
+  it "drops untouched Bundler gemspec metadata defaults without dropping real metadata" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.homepage = "https://example.test/demo"
+        spec.metadata["rubygems_mfa_required"] = "true"
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.homepage = "https://example.test/demo"
+        spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
+        spec.metadata["rubygems_mfa_required"] = "false"
+        spec.metadata["default_lint_roller_plugin"] = "RuboCop::Lts::Ruby::Plugin"
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+    remerged = described_class.merge_gemspec_template_source(template, merged, facts: {package: {name: "demo"}})
+
+    expect(merged).not_to include("TODO: Set to your gem server")
+    expect(merged).to include('spec.metadata["rubygems_mfa_required"] = "true"')
+    expect(merged).to include('spec.metadata["default_lint_roller_plugin"] = "RuboCop::Lts::Ruby::Plugin"')
+    expect(remerged).to eq(merged)
+  end
+
   it "replaces executable destination gemspec files assignments with template package collections" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

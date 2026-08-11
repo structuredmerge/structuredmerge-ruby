@@ -38,7 +38,7 @@ module Kettle
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     TEMPLATE_SOURCE_APPLICATION_FINGERPRINT_VERSION = 1
     APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
-    GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
+    GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
     SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION = 1
     VERSION_NAMESPACE_TEMPLATE_POLICY_FINGERPRINT_VERSION = 2
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
@@ -49,6 +49,9 @@ module Kettle
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
       "rspec-stubbed_env" => ">= 1.0.6"
+    }.freeze
+    DEFAULT_GEMSPEC_METADATA_VALUES = {
+      "allowed_push_host" => "TODO: Set to your gem server 'https://example.com'"
     }.freeze
     OBSOLETE_GITHUB_WORKFLOWS = %w[
       ancient.yml
@@ -10598,7 +10601,9 @@ module Kettle
         record.fetch(:key)
       end
       destination_records = gemspec_metadata_assignment_records(destination_content, receiver: destination_receiver).select do |record|
-        !template_keys.include?(record.fetch(:key)) && !merged_keys.include?(record.fetch(:key))
+        !template_keys.include?(record.fetch(:key)) &&
+          !merged_keys.include?(record.fetch(:key)) &&
+          !default_gemspec_metadata_assignment?(record)
       end
       return content if destination_records.empty?
 
@@ -10625,6 +10630,7 @@ module Kettle
         end_line = ruby_node_source_end_line(call)
         {
           key: key,
+          value: ruby_static_string_value(args[1]),
           start_line: start_line,
           end_line: end_line,
           source: lines[(start_line - 1)..(end_line - 1)].to_a.join
@@ -10632,6 +10638,10 @@ module Kettle
       end
     rescue Ast::Crispr::Error
       []
+    end
+
+    def default_gemspec_metadata_assignment?(record)
+      DEFAULT_GEMSPEC_METADATA_VALUES[record.fetch(:key)] == record[:value]
     end
 
     def remove_gemspec_version_gem_dependency_when_disabled(content, facts, receiver:, template_declares_version_gem: false)

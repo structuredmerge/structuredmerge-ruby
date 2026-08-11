@@ -36,6 +36,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove disabled engine workflow badge references from generated README files.
 
+- Gemspec templating now discards untouched Bundler allowed-push-host placeholders while preserving destination-specific metadata.
+
 ### Security
 
 ## [7.1.2] - 2026-08-10
