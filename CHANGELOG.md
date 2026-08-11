@@ -28,15 +28,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Decouple member release bundles from the unpublished kettle-changelog during shared-family bootstrap releases.
-
 ### Security
 
 ## [7.1.2] - 2026-08-11
 
 - TAG: [v7.1.2][7.1.2t]
-- COVERAGE: 47.29% -- 1581/3343 lines in 37 files
-- BRANCH COVERAGE: 13.67% -- 188/1375 branches in 37 files
+- COVERAGE: 47.32% -- 1582/3343 lines in 37 files
+- BRANCH COVERAGE: 13.75% -- 189/1375 branches in 37 files
 - 73.88% documented
 
 ### Added
@@ -120,6 +118,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Make corpus timeout regression coverage deterministic under parallel execution.
 
 - Remove the stale code coverage fragment link from tree_haver's README.
+
+- Decouple member release bundles from the unpublished kettle-changelog during shared-family bootstrap releases.
 
 ## [7.1.1] - 2026-08-08
 

@@ -16,14 +16,6 @@ PATH
       version_gem (~> 1.1, >= 1.1.15)
 
 PATH
-  remote: /var/home/pboling/src/my/kettle-dev/kettle-changelog
-  specs:
-    kettle-changelog (1.0.0)
-      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
-      kettle-dev (>= 3.0.3, < 4.0.0)
-      version_gem (~> 1.1, >= 1.1.15)
-
-PATH
   remote: /var/home/pboling/src/my/kettle-dev/kettle-dev
   specs:
     kettle-dev (3.0.5)
@@ -361,12 +353,9 @@ GEM
     command_kit-completion (0.3.0)
       command_kit (~> 0.1)
       completely (~> 0.6)
-    commonmarker (2.9.0-aarch64-linux)
-    commonmarker (2.9.0-aarch64-linux-musl)
-    commonmarker (2.9.0-arm64-darwin)
-    commonmarker (2.9.0-x86_64-darwin)
+    commonmarker (2.9.0)
+      rb_sys (~> 0.9)
     commonmarker (2.9.0-x86_64-linux)
-    commonmarker (2.9.0-x86_64-linux-musl)
     completely (0.8.0)
       colsole (~> 1.0.0)
       erb
@@ -508,6 +497,9 @@ GEM
     racc (1.8.1)
     rainbow (3.1.1)
     rake (13.4.2)
+    rake-compiler-dock (1.12.0)
+    rb_sys (0.9.127)
+      rake-compiler-dock (= 1.12.0)
     rbs (4.1.2)
       logger
       prism (>= 1.6.0)
@@ -782,7 +774,6 @@ DEPENDENCIES
   go-merge!
   irb (~> 1.17)
   json-merge!
-  kettle-changelog!
   kettle-dev (~> 3.0, >= 3.0.0, >= 0)!
   kettle-drift!
   kettle-family (~> 1.2, >= 1.2.44)
@@ -862,12 +853,8 @@ CHECKSUMS
   colsole (1.0.1) sha256=7632a300ace2db877c024ffe413c684954cf37e41264b75ace9f456c9d657b02
   command_kit (0.6.0) sha256=e57f29cf5aee4f571c210041d910ff87f85749e42dfe75139c57cc93d84afa90
   command_kit-completion (0.3.0) sha256=d9c498555125bcdd0c9d869f2a64a25a2f0205102a7f28c81c7937ae633ea737
-  commonmarker (2.9.0-aarch64-linux)
-  commonmarker (2.9.0-aarch64-linux-musl)
-  commonmarker (2.9.0-arm64-darwin)
-  commonmarker (2.9.0-x86_64-darwin)
+  commonmarker (2.9.0)
   commonmarker (2.9.0-x86_64-linux)
-  commonmarker (2.9.0-x86_64-linux-musl)
   commonmarker-merge (7.1.2)
   completely (0.8.0) sha256=e493cd5d84805f47917a41f277ecbfe5f35363bed670be5a957d3acaed8c6c5e
   concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
@@ -897,7 +884,6 @@ CHECKSUMS
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   json-merge (7.1.2)
-  kettle-changelog (1.0.0)
   kettle-dev (3.0.5)
   kettle-drift (1.0.12)
   kettle-family (1.2.45) sha256=1ed7e7b69feb0fd505fae3fb20607f91bc97180a5145e850ab22ea0a8dbee3e2
@@ -944,6 +930,8 @@ CHECKSUMS
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+  rake-compiler-dock (1.12.0)
+  rb_sys (0.9.127)
   rbs (4.1.2) sha256=050eb1d8b508f1233bed929c0f2c7052302f7adf295230d9cb314e9024078f48
   rbs-merge (7.1.2)
   rdoc (7.2.0) sha256=8650f76cd4009c3b54955eb5d7e3a075c60a57276766ebf36f9085e8c9f23192
