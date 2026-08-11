@@ -28,15 +28,15 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Remove the stale code coverage fragment link from tree_haver's README.
+- Decouple member release bundles from the unpublished kettle-changelog during shared-family bootstrap releases.
 
 ### Security
 
 ## [7.1.2] - 2026-08-11
 
 - TAG: [v7.1.2][7.1.2t]
-- COVERAGE: 0.00% -- 0/0 lines in 0 files
-- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- COVERAGE: 47.29% -- 1581/3343 lines in 37 files
+- BRANCH COVERAGE: 13.67% -- 188/1375 branches in 37 files
 - 73.88% documented
 
 ### Added
@@ -118,6 +118,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Isolate nested Git-driver Bundler commands from the family test bundle.
 
 - Make corpus timeout regression coverage deterministic under parallel execution.
+
+- Remove the stale code coverage fragment link from tree_haver's README.
 
 ## [7.1.1] - 2026-08-08
 

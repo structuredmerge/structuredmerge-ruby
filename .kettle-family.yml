@@ -151,7 +151,7 @@ release:
   # off for each member once its selected sibling dependencies are released.
   local_path_strategy: waves
   build_command: bundle exec rake build
-  publish_command: bundle exec kettle-release
+  publish_command: bundle exec kettle-release skip_steps=1
   waves:
     - [tree_haver]
     - [ast-merge, binary-merge]
@@ -170,7 +170,7 @@ release:
     TSLP_DEV: ""
   family_changelog:
     enabled: true
-    command: bundle exec kettle-changelog
+    command: kettle-changelog
 
 pre_release:
   image_url_skip_patterns:
