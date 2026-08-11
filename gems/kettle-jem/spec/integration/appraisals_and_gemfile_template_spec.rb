@@ -1277,6 +1277,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   it "keeps kettle-dev local overrides available for kettle-jem transitive runtime dependencies" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
 
+    expect(template).to include("  html-merge\n")
     expect(template).to include(
       "kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])"
     )
