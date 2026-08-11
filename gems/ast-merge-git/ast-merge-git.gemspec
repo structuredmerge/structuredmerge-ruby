@@ -137,6 +137,34 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('kettle-test', '~> 2.0', '>= 2.0.19') # ruby >= 4.0.0
   spec.add_development_dependency('turbo_tests2', '~> 3.2', '>= 3.2.5') # ruby >= 2.4.0, default kettle-test runner
 
+  # The Git-driver integration suite executes each provider through the installed
+  # driver boundary. Keep those providers as development dependencies so the
+  # release bundle and family dependency graph contain the complete test surface.
+  %w[
+    bash-merge
+    citrus-toml-merge
+    commonmarker-merge
+    dotenv-merge
+    go-merge
+    html-merge
+    json-merge
+    kramdown-merge
+    markdown-merge
+    markly-merge
+    parslet-toml-merge
+    plain-merge
+    psych-merge
+    rbs-merge
+    ruby-merge
+    rust-merge
+    toml-merge
+    typescript-merge
+    yaml-merge
+    zip-merge
+  ].each do |provider_gem|
+    spec.add_development_dependency(provider_gem, "= #{spec.version}")
+  end
+
   # Releasing
   spec.add_development_dependency('ruby-progressbar', '~> 1.13')                    # ruby >= 0
   spec.add_development_dependency('stone_checksums', '~> 1.0', '>= 1.0.8')          # ruby >= 2.2.0
