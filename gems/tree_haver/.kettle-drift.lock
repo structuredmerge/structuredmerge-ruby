@@ -1,13 +1,4 @@
 {
-  "# simplecov:disable\n### MONOREPO FAMILY TASKS": [
-    {
-      "file": "Rakefile",
-      "lines": [
-        66,
-        132
-      ]
-    }
-  ],
   "- No incremental parsing support\n- No query API": [
     {
       "file": "README.md",
@@ -35,39 +26,12 @@
       ]
     }
   ],
-  "if Kettle::Jem.respond_to?(:install_tasks)\nKettle::Jem.install_tasks": [
+  "vendored_gems_env: 'VENDORED_GEMS',\nvendor_gem_dir_env: 'VENDOR_GEM_DIR',": [
     {
-      "file": "Rakefile",
+      "file": "gemfiles/modular/templating_local.gemfile",
       "lines": [
-        226,
-        237
-      ]
-    }
-  ],
-  "rescue LoadError\nkettle_jem_selftest_unavailable_note = \"NOTE: kettle-jem isn't installed, or is disabled for #{RUBY_VERSION} in the current environment\"": [
-    {
-      "file": "Rakefile",
-      "lines": [
-        231,
-        242
-      ]
-    }
-  ],
-  "rescue LoadError\nwarn(\"NOTE: kettle-dev isn't installed, or is disabled for #{RUBY_VERSION} in the current environment\")": [
-    {
-      "file": "Rakefile",
-      "lines": [
-        128,
-        193
-      ]
-    }
-  ],
-  "task :list do\nfamily_gem_dirs.each { |path| puts File.basename(path) }": [
-    {
-      "file": "Rakefile",
-      "lines": [
-        82,
-        148
+        77,
+        88
       ]
     }
   ]
