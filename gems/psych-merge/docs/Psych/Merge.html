@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/psych/merge.rb<span class="defines">,<br>
-  lib/psych/merge/emitter.rb,<br> lib/psych/merge/version.rb,<br> lib/psych/merge/diff_mapper.rb,<br> lib/psych/merge/freeze_node.rb,<br> lib/psych/merge/debug_logger.rb,<br> lib/psych/merge/merge_result.rb,<br> lib/psych/merge/node_wrapper.rb,<br> lib/psych/merge/smart_merger.rb,<br> lib/psych/merge/file_analysis.rb,<br> lib/psych/merge/comment_tracker.rb,<br> lib/psych/merge/conflict_resolver.rb,<br> lib/psych/merge/node_type_normalizer.rb,<br> lib/psych/merge/mapping_match_refiner.rb,<br> lib/psych/merge/partial_template_merger.rb</span>
+  lib/psych/merge/emitter.rb,<br> lib/psych/merge/version.rb,<br> lib/psych/merge/provider.rb,<br> lib/psych/merge/diff_mapper.rb,<br> lib/psych/merge/freeze_node.rb,<br> lib/psych/merge/debug_logger.rb,<br> lib/psych/merge/merge_result.rb,<br> lib/psych/merge/node_wrapper.rb,<br> lib/psych/merge/smart_merger.rb,<br> lib/psych/merge/file_analysis.rb,<br> lib/psych/merge/comment_tracker.rb,<br> lib/psych/merge/conflict_resolver.rb,<br> lib/psych/merge/node_type_normalizer.rb,<br> lib/psych/merge/mapping_match_refiner.rb,<br> lib/psych/merge/partial_template_merger.rb</span>
 
 </dd>
   </dl>
@@ -90,26 +90,13 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Smart merge system for YAML files using Psych AST analysis.<br />
-Provides intelligent merging by understanding YAML structure<br />
-rather than treating files as plain text.</p>
+    <p>Psych-backed YAML structural merge provider integration.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-
-  <p class="tag_title">See Also:</p>
-  <ul class="see">
-    
-      <li><span class='object_link'><a href="Merge/SmartMerger.html" title="Psych::Merge::SmartMerger (class)">Main entry point for merge operations</a></span></li>
-    
-      <li><span class='object_link'><a href="Merge/FileAnalysis.html" title="Psych::Merge::FileAnalysis (class)">Analyzes YAML structure</a></span></li>
-    
-      <li><span class='object_link'><a href="Merge/ConflictResolver.html" title="Psych::Merge::ConflictResolver (class)">Resolves content conflicts</a></span></li>
-    
-  </ul>
 
 </div><h2>Defined Under Namespace</h2>
 <p class="children">
@@ -119,7 +106,7 @@ rather than treating files as plain text.</p>
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Psych::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/ConflictResolver.html" title="Psych::Merge::ConflictResolver (class)">ConflictResolver</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Psych::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Psych::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/DiffMapper.html" title="Psych::Merge::DiffMapper (class)">DiffMapper</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Psych::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Psych::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Psych::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Psych::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MappingEntry.html" title="Psych::Merge::MappingEntry (class)">MappingEntry</a></span>, <span class='object_link'><a href="Merge/MappingMatchRefiner.html" title="Psych::Merge::MappingMatchRefiner (class)">MappingMatchRefiner</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Psych::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Psych::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Psych::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/PartialTemplateMerger.html" title="Psych::Merge::PartialTemplateMerger (class)">PartialTemplateMerger</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Psych::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Psych::Merge::TemplateParseError (class)">TemplateParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/CommentTracker.html" title="Psych::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/ConflictResolver.html" title="Psych::Merge::ConflictResolver (class)">ConflictResolver</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Psych::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Psych::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/DiffMapper.html" title="Psych::Merge::DiffMapper (class)">DiffMapper</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Psych::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Psych::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Psych::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Psych::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MappingEntry.html" title="Psych::Merge::MappingEntry (class)">MappingEntry</a></span>, <span class='object_link'><a href="Merge/MappingMatchRefiner.html" title="Psych::Merge::MappingMatchRefiner (class)">MappingMatchRefiner</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Psych::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Psych::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Psych::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/PartialTemplateMerger.html" title="Psych::Merge::PartialTemplateMerger (class)">PartialTemplateMerger</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Psych::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Psych::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Psych::Merge::TemplateParseError (class)">TemplateParseError</a></span>
     
   
 </p>
@@ -251,6 +238,29 @@ rather than treating files as plain text.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_provider-class_method" title="merge_provider (class method)">.<strong>merge_provider</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#merge_yaml-class_method" title="merge_yaml (class method)">.<strong>merge_yaml</strong>(template_source, destination_source, dialect, backend: nil, comment_merge_policy: :preserve_destination, preference: :destination, add_template_only_nodes: true, add_template_only_sequence_items: false, **_options)  &#x21d2; Object </a>
     
 
@@ -298,6 +308,29 @@ rather than treating files as plain text.</p>
   <span class="summary_signature">
     
       <a href="#register_backend!-class_method" title="register_backend! (class method)">.<strong>register_backend!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_provider!-class_method" title="register_provider! (class method)">.<strong>register_provider!</strong>(replace: false)  &#x21d2; Object </a>
     
 
     
@@ -434,12 +467,12 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+122
 123
-124
-125</pre>
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 123</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_yaml_backends'>available_yaml_backends</span>
   <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Psych::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='rbracket'>]</span>
@@ -464,15 +497,45 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+165
 166
-167
-168</pre>
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_match_yaml_owners'>match_yaml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
-  <span class='const'>Yaml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_match_yaml_owners'>match_yaml_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>YamlDocument</span><span class='period'>.</span><span class='id identifier rubyid_match_owners'>match_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_provider-class_method">
+  
+    .<strong>merge_provider</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+890
+891
+892</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/provider.rb', line 890</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
+  <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Psych::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -494,6 +557,7 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+169
 170
 171
 172
@@ -532,11 +596,10 @@ rather than treating files as plain text.</p>
 205
 206
 207
-208
-209</pre>
+208</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 170</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 169</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_yaml'>merge_yaml</span><span class='lparen'>(</span>
   <span class='id identifier rubyid_template_source'>template_source</span><span class='comma'>,</span>
@@ -598,6 +661,7 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+152
 153
 154
 155
@@ -608,11 +672,10 @@ rather than treating files as plain text.</p>
 160
 161
 162
-163
-164</pre>
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 153</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_yaml'>parse_yaml</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Psych::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -622,7 +685,7 @@ rather than treating files as plain text.</p>
   <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_feature_parse_result'>unsupported_feature_parse_result</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported YAML dialect </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dialect'>dialect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span>
 
   <span class='id identifier rubyid_parsed'>parsed</span> <span class='op'>=</span> <span class='id identifier rubyid_yaml_value_for_source'>yaml_value_for_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
-  <span class='const'>Yaml</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_analyze_yaml_document'>analyze_yaml_document</span><span class='lparen'>(</span><span class='id identifier rubyid_parsed'>parsed</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>YamlDocument</span><span class='period'>.</span><span class='id identifier rubyid_analyze'>analyze</span><span class='lparen'>(</span><span class='id identifier rubyid_parsed'>parsed</span><span class='comma'>,</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='rparen'>)</span>
 <span class='kw'>rescue</span> <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='id identifier rubyid_parse_error_result'>parse_error_result</span><span class='lparen'>(</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -646,6 +709,7 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+210
 211
 212
 213
@@ -660,11 +724,10 @@ rather than treating files as plain text.</p>
 222
 223
 224
-225
-226</pre>
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 210</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_backend!'>register_backend!</span>
   <span class='const'><span class='object_link'><a href="#BACKEND_REGISTRY-constant" title="Psych::Merge::BACKEND_REGISTRY (constant)">BACKEND_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
@@ -688,6 +751,36 @@ rather than treating files as plain text.</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="register_provider!-class_method">
+  
+    .<strong>register_provider!</strong>(replace: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+894
+895
+896</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge/provider.rb', line 894</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_register_provider'>register_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_merge_provider'>merge_provider</span><span class='comma'>,</span> <span class='label'>replace:</span> <span class='id identifier rubyid_replace'>replace</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="yaml_backend_feature_profile-class_method">
   
     .<strong>yaml_backend_feature_profile</strong>(backend: nil)  &#x21d2; <tt>Object</tt> 
@@ -702,6 +795,7 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+126
 127
 128
 129
@@ -711,11 +805,10 @@ rather than treating files as plain text.</p>
 133
 134
 135
-136
-137</pre>
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_backend_feature_profile'>yaml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Psych::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -748,16 +841,16 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+114
 115
 116
 117
 118
 119
-120
-121</pre>
+120</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 115</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_feature_profile'>yaml_feature_profile</span>
   <span class='lbrace'>{</span>
@@ -786,6 +879,7 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+138
 139
 140
 141
@@ -797,11 +891,10 @@ rather than treating files as plain text.</p>
 147
 148
 149
-150
-151</pre>
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_plan_context'>yaml_plan_context</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_yaml_backend_feature_profile'>yaml_backend_feature_profile</span><span class='lparen'>(</span><span class='label'>backend:</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
@@ -836,15 +929,15 @@ rather than treating files as plain text.</p>
       <pre class="lines">
 
 
+227
 228
 229
 230
 231
-232
-233</pre>
+232</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 228</span>
+      <pre class="code"><span class="info file"># File 'lib/psych/merge.rb', line 227</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yaml_value_for_source'>yaml_value_for_source</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_with_backend'>with_backend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#BACKEND_REFERENCE-constant" title="Psych::Merge::BACKEND_REFERENCE (constant)">BACKEND_REFERENCE</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='kw'>do</span>
@@ -862,7 +955,7 @@ rather than treating files as plain text.</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 02:20:15 2026 by
+  Generated on Tue Aug 11 06:32:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
