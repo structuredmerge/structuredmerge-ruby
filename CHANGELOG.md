@@ -28,7 +28,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Make corpus timeout regression coverage deterministic under parallel execution.
+- Remove the stale code coverage fragment link from tree_haver's README.
 
 ### Security
 
@@ -116,6 +116,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Allow smorg-rb to use independent kettle-jem patch releases within the 7.1 series.
 
 - Isolate nested Git-driver Bundler commands from the family test bundle.
+
+- Make corpus timeout regression coverage deterministic under parallel execution.
 
 ## [7.1.1] - 2026-08-08
 
