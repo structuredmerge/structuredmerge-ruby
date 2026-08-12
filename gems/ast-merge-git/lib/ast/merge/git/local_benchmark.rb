@@ -16,6 +16,7 @@ module Ast
         SCHEMA = 'structuredmerge.benchmark.corpus/v1'
         CASE_SCHEMA = 'structuredmerge.benchmark/v1'
         OPERATIONS = %w[merge3 metamorphic diff].freeze
+        EXECUTABLE_OPERATIONS = %w[merge3 metamorphic].freeze
         PARTITIONS = %w[sentinel gold metamorphic].freeze
         EXPECTATIONS = %w[clean conflict error excluded_ambiguous].freeze
         SEVERITIES = %w[none low high critical].freeze
@@ -23,6 +24,9 @@ module Ast
         TRANSFORMATIONS = %w[
           rename move reorder formatting comment independent_edit delete_modify duplicate_key_identity
           schema_aware_mutation
+        ].freeze
+        METAMORPHIC_INVARIANTS = %w[
+          comment-retained no-semantic-edit same-json-value same-jsonc-value
         ].freeze
         ID_PATTERN = /\A[a-z0-9]+(?:[.-][a-z0-9]+)*\z/
         PROVENANCE_FIELDS = %w[
@@ -109,7 +113,9 @@ module Ast
               'seed' => document.dig('selection', 'seed'),
               'selected_case_ids' => neighbors
             },
-            'unsupported_selected_cases' => selected.reject { |id| case_by_id(id)['operation'] == 'merge3' },
+            'unsupported_selected_cases' => selected.reject do |id|
+              EXECUTABLE_OPERATIONS.include?(case_by_id(id)['operation'])
+            end,
             'budgets' => definition.fetch('budgets'),
             'explanation' => explanation(
               profile,
@@ -260,6 +266,8 @@ module Ast
           digest = item.dig('generator', 'sha256')
           error!("#{id}: generator SHA-256 is malformed") unless /\A[0-9a-f]{64}\z/.match?(digest)
           error!("#{id}: expected invariants must not be empty") if item['expected_invariants'].empty?
+          unknown_invariants = item['expected_invariants'] - METAMORPHIC_INVARIANTS
+          error!("#{id}: unsupported expected invariants: #{unknown_invariants.join(', ')}") if unknown_invariants.any?
           item['transformations'].each do |transformation|
             require_keys(transformation, %w[id type parameters], "#{id} transformation")
             error!("#{id}: unknown transformation") unless TRANSFORMATIONS.include?(transformation['type'])
@@ -388,8 +396,13 @@ module Ast
         end
 
         def execute_case(item)
-          return unsupported_pair(item) unless item['operation'] == 'merge3'
+          return execute_merge3_case(item) if item['operation'] == 'merge3'
+          return execute_metamorphic_case(item) if item['operation'] == 'metamorphic'
 
+          unsupported_pair(item)
+        end
+
+        def execute_merge3_case(item)
           workspace = @tmp_root.join("#{safe_id(item['id'])}-#{Process.pid}")
           FileUtils.rm_rf(workspace)
           FileUtils.mkdir_p(workspace)
@@ -402,8 +415,22 @@ module Ast
           FileUtils.rm_rf(workspace) if workspace
         end
 
+        def execute_metamorphic_case(item)
+          workspace = @tmp_root.join("#{safe_id(item['id'])}-#{Process.pid}")
+          FileUtils.rm_rf(workspace)
+          FileUtils.mkdir_p(workspace)
+          write_metamorphic_roles(item, workspace)
+          baseline = execute_metamorphic_baseline(item, workspace)
+          candidate = execute_metamorphic_candidate(item, workspace)
+          rerun = execute_metamorphic_candidate(item, workspace)
+          candidate['deterministic_correctness_rerun'] = correctness_record(candidate) == correctness_record(rerun)
+          [baseline, candidate]
+        ensure
+          FileUtils.rm_rf(workspace) if workspace
+        end
+
         def unsupported_pair(item)
-          %w[git.merge-file ast-merge-git].map do |adapter|
+          %w[git.unsupported structuredmerge.unsupported].map do |adapter|
             raw_result(item, adapter, nil, outcome: 'unsupported',
                                            unsupported_reason: "no installed #{item['operation']} adapter")
           end
@@ -432,6 +459,62 @@ module Ast
           %w[base ours theirs].each do |role|
             workspace.join(role).binwrite(item.dig('inputs', role, 'bytes'))
           end
+        end
+
+        def write_metamorphic_roles(item, workspace)
+          %w[source transformed].each do |role|
+            workspace.join(role).binwrite(item.dig('inputs', role, 'bytes'))
+          end
+        end
+
+        def execute_metamorphic_baseline(item, workspace)
+          capture = timed_capture(
+            {},
+            'git', 'diff', '--no-index', '--no-color', '--no-ext-diff', '--', 'source', 'transformed',
+            chdir: workspace
+          )
+          capture[:output] = capture[:stdout]
+          metamorphic_result(
+            item,
+            'git.diff',
+            'baseline',
+            capture,
+            edit_signal: capture[:status] == 1
+          )
+        end
+
+        def execute_metamorphic_candidate(item, workspace)
+          capture, changes = capture_provider_diff(item, workspace)
+          metamorphic_result(
+            item,
+            'ast-merge-provider.diff2',
+            'candidate',
+            capture,
+            edit_signal: changes.any?
+          )
+        end
+
+        def capture_provider_diff(item, workspace)
+          selector = item.fetch('selector')
+          capture = timed_capture(
+            candidate_env(selector),
+            @driver_path.to_s,
+            'benchmark-provider-diff',
+            'source',
+            'transformed',
+            "#{item['id']}.#{item['dialect']}",
+            chdir: workspace
+          )
+          result = capture[:stdout].empty? ? {} : JSON.parse(capture[:stdout])
+          changes = capture[:status].zero? ? result.fetch('changes') : []
+          capture[:output] = JSON.generate(changes)
+          [capture, changes]
+        rescue JSON::ParserError, KeyError => e
+          capture ||= { stdout: '', stderr: '', status: 2, duration_ns: 0 }
+          capture[:stderr] = [capture[:stderr], e.message].reject(&:empty?).join("\n")
+          capture[:status] = 2
+          capture[:output] = ''
+          [capture, []]
         end
 
         def timed_capture(env, *command, chdir:)
@@ -475,6 +558,7 @@ module Ast
             'id' => "result.#{safe_id(item['id'])}.#{safe_id(adapter)}",
             'case_id' => item['id'],
             'adapter_id' => adapter,
+            'adapter_role' => adapter.start_with?('git.') ? 'baseline' : 'candidate',
             'case_tags' => item.slice(
               'operation', 'partition', 'family', 'provider', 'dialect',
               'capabilities', 'false_auto_merge_severity'
@@ -496,6 +580,128 @@ module Ast
             'dimensions' => dimensions(item, classified, checks),
             'runtime' => capture && { 'duration_ns' => capture[:duration_ns], 'comparable' => true }
           }
+        end
+
+        def metamorphic_result(item, adapter, adapter_role, capture, edit_signal:)
+          checks = metamorphic_checks(item, edit_signal)
+          classified = if capture[:status].nil? || capture[:status] >= 2
+                         'error'
+                       elsif checks['acceptable']
+                         'correct_clean'
+                       else
+                         'false_conflict'
+                       end
+          eligible = item.dig('oracle', 'score_eligible') && classified != 'error'
+          {
+            'schema_version' => 'structuredmerge.benchmark.result/v1',
+            'id' => "result.#{safe_id(item['id'])}.#{safe_id(adapter)}",
+            'case_id' => item['id'],
+            'adapter_id' => adapter,
+            'adapter_role' => adapter_role,
+            'case_tags' => item.slice(
+              'operation', 'partition', 'family', 'provider', 'dialect',
+              'capabilities', 'false_auto_merge_severity'
+            ),
+            'outcome' => classified,
+            'score_eligible' => eligible,
+            'provenance' => item['provenance'],
+            'process' => {
+              'status' => capture[:status],
+              'exit_classification' => metamorphic_exit_class(adapter_role, capture[:status])
+            },
+            'raw' => {
+              'stdout' => raw_record(capture[:stdout]),
+              'stderr' => raw_record(capture[:stderr]),
+              'output' => raw_record(capture[:output])
+            },
+            'diagnostics' => diagnostics(capture[:stderr], nil),
+            'conflict_regions' => region_evidence(item, []),
+            'checks' => checks,
+            'independent_edit_evidence' => {},
+            'dimensions' => dimensions(item, classified, checks),
+            'runtime' => { 'duration_ns' => capture[:duration_ns], 'comparable' => true }
+          }
+        end
+
+        def metamorphic_checks(item, edit_signal)
+          evaluations = item.fetch('expected_invariants').map do |invariant|
+            matched, evidence = evaluate_metamorphic_invariant(item, invariant, edit_signal)
+            { 'id' => invariant, 'matched' => matched, 'evidence' => evidence }
+          end
+          accepted = evaluations.all? { |evaluation| evaluation['matched'] }
+          {
+            'declared_invariants' => evaluations,
+            'accepted_equivalence' => accepted ? 'declared_invariants' : nil,
+            'acceptable_equivalence_evaluations' => [{
+              'class' => 'declared_invariants',
+              'matched' => accepted
+            }],
+            'parse_validity_only_accepted' => false,
+            'generator_replay' => {
+              'generator_id' => item.dig('generator', 'id'),
+              'generator_version' => item.dig('generator', 'version'),
+              'seed' => item.dig('generator', 'seed'),
+              'transformation_ids' => item.fetch('transformations').map { |transformation| transformation['id'] },
+              'authored_bytes_digest_verified' => true
+            },
+            'preservation_violations' => [],
+            'acceptable' => accepted
+          }
+        end
+
+        def evaluate_metamorphic_invariant(item, invariant, edit_signal)
+          case invariant
+          when 'same-json-value', 'same-jsonc-value'
+            [json_values_equal?(item), 'JSON-family values parsed from source and transformed bytes']
+          when 'no-semantic-edit'
+            [!edit_signal, 'adapter emitted no edit units']
+          when 'comment-retained'
+            [json_comments_retained?(item), 'JSONC AST comment content retained']
+          else
+            [false, 'unsupported invariant']
+          end
+        end
+
+        def json_values_equal?(item)
+          require 'json/merge'
+          selector = item.fetch('selector')
+          source = Json::Merge.json_value_for_source(
+            item.dig('inputs', 'source', 'bytes'),
+            dialect: selector.fetch('dialect').to_sym,
+            backend: selector.fetch('backend')
+          )
+          transformed = Json::Merge.json_value_for_source(
+            item.dig('inputs', 'transformed', 'bytes'),
+            dialect: selector.fetch('dialect').to_sym,
+            backend: selector.fetch('backend')
+          )
+          source == transformed
+        rescue Json::Merge::ParseError, LoadError
+          false
+        end
+
+        def json_comments_retained?(item)
+          require 'json/merge'
+          selector = item.fetch('selector')
+          source = Json::Merge::FileAnalysis.new(
+            item.dig('inputs', 'source', 'bytes'),
+            dialect: selector.fetch('dialect').to_sym
+          )
+          transformed = Json::Merge::FileAnalysis.new(
+            item.dig('inputs', 'transformed', 'bytes'),
+            dialect: selector.fetch('dialect').to_sym
+          )
+          source.valid? && transformed.valid? &&
+            source.comment_nodes.map(&:normalized_content) == transformed.comment_nodes.map(&:normalized_content)
+        rescue TreeHaver::Error, LoadError
+          false
+        end
+
+        def metamorphic_exit_class(adapter_role, status)
+          return 'error' if status.nil? || status >= 2
+          return status == 1 ? 'differences' : 'no_differences' if adapter_role == 'baseline'
+
+          'analyzed'
         end
 
         def classify(item, status, checks)
@@ -802,8 +1008,8 @@ module Ast
         end
 
         def transition(items)
-          baseline = items.find { |item| item['adapter_id'] == 'git.merge-file' }
-          candidate = items.find { |item| item['adapter_id'] == 'ast-merge-git' }
+          baseline = items.find { |item| item['adapter_role'] == 'baseline' }
+          candidate = items.find { |item| item['adapter_role'] == 'candidate' }
           {
             'case_id' => items.first['case_id'],
             'baseline_result_id' => baseline['id'],
@@ -831,7 +1037,7 @@ module Ast
         def coverage
           selected = @run.dig('selection', 'selected_case_ids').length
           unsupported = @results.select do |item|
-            item['adapter_id'] == 'ast-merge-git' && item['outcome'] == 'unsupported'
+            item['adapter_role'] == 'candidate' && item['outcome'] == 'unsupported'
           end
           { 'selected_cases' => selected, 'executed_candidate_cases' => selected - unsupported.length,
             'unsupported_case_ids' => unsupported.map { |item| item['case_id'] },
@@ -839,7 +1045,7 @@ module Ast
         end
 
         def strata
-          case_results = @results.select { |item| item['adapter_id'] == 'ast-merge-git' }
+          case_results = @results.select { |item| item['adapter_role'] == 'candidate' }
           tag_fields = %w[operation partition family provider dialect false_auto_merge_severity]
           tag_strata = tag_fields.to_h do |field|
             [field, case_results.group_by { |item| item.dig('case_tags', field) }.transform_values(&:length)]

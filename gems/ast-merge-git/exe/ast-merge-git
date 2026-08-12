@@ -3,6 +3,35 @@
 
 require 'ast/merge/git'
 
+if ARGV.first == 'benchmark-provider-diff'
+  require 'json'
+
+  begin
+    before_path, after_path, path_name = ARGV.drop(1)
+    raise ArgumentError, 'before, after, and path name are required' unless before_path && after_path && path_name
+
+    require ENV.fetch('AST_MERGE_REQUIRE')
+    result = Ast::Merge.dispatch_provider(
+      :diff2,
+      {
+        provider_id: ENV.fetch('AST_MERGE_PROVIDER'),
+        family: ENV.fetch('AST_MERGE_FAMILY'),
+        dialect: ENV.fetch('AST_MERGE_DIALECT'),
+        backend: ENV.fetch('AST_MERGE_BACKEND'),
+        profile_id: ENV.fetch('AST_MERGE_PROFILE'),
+        before_source: File.binread(before_path),
+        after_source: File.binread(after_path),
+        path_name: path_name
+      }
+    )
+    puts JSON.generate(Ast::Merge.json_ready(result))
+    exit(result[:ok] == true ? 0 : 2)
+  rescue ArgumentError, Ast::Merge::Error, KeyError, LoadError, SystemCallError => e
+    warn "ast-merge-git benchmark-provider-diff: #{e.message}"
+    exit 2
+  end
+end
+
 if ARGV.first == 'benchmark'
   require 'json'
   require 'optparse'

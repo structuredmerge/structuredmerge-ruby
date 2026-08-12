@@ -238,7 +238,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
   it 'runs the corrected JSON5 and conservative TOML cases cleanly with exact native source' do
     run = runner.run(profile: 'dev', changed_paths: ['gems/json-merge/lib/provider.rb'])
-    candidates = run.fetch('results').select { |result| result['adapter_id'] == 'ast-merge-git' }
+    candidates = run.fetch('results').select { |result| result['adapter_role'] == 'candidate' }
     json5 = candidates.find { |result| result['case_id'] == 'case.merge3.json5.order-format.v1' }
     toml = candidates.find { |result| result['case_id'] == 'case.merge3.toml.independent-tables.v1' }
 
@@ -248,6 +248,36 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(toml).to include('outcome' => 'correct_clean')
     expect(toml.dig('checks', 'exact')).to be(true)
     expect(toml.dig('raw', 'output', 'inline')).to eq("left = 2\nright = 2\n")
+  end
+
+  it 'executes provider diff2 through the installed driver boundary' do
+    FileUtils.mkdir_p(tmp_root)
+    source = tmp_root.join('source.json')
+    transformed = tmp_root.join('transformed.json')
+    source.binwrite("{\"a\":1,\"b\":2}\n")
+    transformed.binwrite("{\n  \"b\": 2,\n  \"a\": 1\n}\n")
+    env = {
+      'AST_MERGE_PROVIDER' => 'ruby.json',
+      'AST_MERGE_FAMILY' => 'json',
+      'AST_MERGE_DIALECT' => 'json',
+      'AST_MERGE_BACKEND' => 'kreuzberg-language-pack',
+      'AST_MERGE_PROFILE' => 'source_preserving',
+      'AST_MERGE_REQUIRE' => 'json/merge'
+    }
+
+    stdout, stderr, status = Open3.capture3(
+      env,
+      driver,
+      'benchmark-provider-diff',
+      source.to_s,
+      transformed.to_s,
+      'metamorphic.json'
+    )
+    result = JSON.parse(stdout)
+
+    expect(status).to be_success
+    expect(stderr).to be_empty
+    expect(result).to include('ok' => true, 'operation' => 'diff2', 'changes' => [])
   end
 
   context 'with the installed paired drivers' do
@@ -327,18 +357,28 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     )
   end
 
-  it 'reports selection-only metamorphic cases as unsupported coverage, not quality failures' do
+  it 'executes metamorphic cases as paired textual-versus-structural no-edit probes' do
     run = Ast::Merge::Git::LocalBenchmarkRunner.new(
       benchmark: benchmark,
       driver_path: driver,
       tmp_root: tmp_root
     ).run(profile: 'dev', changed_paths: ['gems/json-merge/lib/provider.rb'])
     report = Ast::Merge::Git::LocalBenchmarkReport.build(run)
+    metamorphic = run.fetch('results').select { |result| result.dig('case_tags', 'operation') == 'metamorphic' }
+    baseline = metamorphic.select { |result| result['adapter_role'] == 'baseline' }
+    candidate = metamorphic.select { |result| result['adapter_role'] == 'candidate' }
 
-    expect(report.dig('dimensions', 'coverage', 'unsupported_case_ids')).to contain_exactly(
+    expect(baseline.map { |result| result['outcome'] }).to eq(%w[false_conflict false_conflict])
+    expect(candidate.map { |result| result['outcome'] }).to eq(%w[correct_clean correct_clean])
+    expect(candidate).to all(satisfy do |result|
+      result.dig('checks', 'declared_invariants').all? { |invariant| invariant['matched'] } &&
+        result['deterministic_correctness_rerun'] == true
+    end)
+    expect(report.fetch('newly_passing_case_ids')).to include(
       'case.metamorphic.json.reorder-format.v1',
       'case.metamorphic.jsonc.comment-format.v1'
     )
+    expect(report.dig('dimensions', 'coverage', 'unsupported_case_ids')).to be_empty
     expect(report.dig('dimensions', 'coverage', 'unsupported_is_quality_failure')).to be(false)
     expect(report['scalar_score']).to be_nil
     expect { JSON.generate(report) }.not_to raise_error
