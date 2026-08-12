@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Main templating commands now record an aggregate Changed entry through kettle-changelog only when template files change, while transfer replay uses kettle-changelog's structural merger.
 
+- Update kettle-jem template dependency floors: kettle-family (>= 1.2.51).
+
 ### Deprecated
 
 ### Removed
