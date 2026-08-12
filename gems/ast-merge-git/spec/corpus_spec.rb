@@ -120,7 +120,7 @@ RSpec.describe Ast::Merge::Git::Corpus do
     expect(corpora.sum { |corpus| corpus.manifest.fetch('cases').length }).to eq(6)
     expect(corpora.sum do |corpus|
       corpus.manifest.fetch('cases').count { |item| item.dig('oracle', 'score_eligible') }
-    end).to eq(2)
+    end).to eq(3)
     expect(corpora).to all(satisfy do |corpus|
       corpus.manifest.dig('claim_policy', 'quality_claims_allowed') == false
     end)

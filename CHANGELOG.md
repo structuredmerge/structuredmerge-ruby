@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Bash merge providers now recognize AST-proven literal-title test_expect_success owners while retaining full-file conflicts for test membership changes until insertion order can be preserved safely.
+
 ### Deprecated
 
 ### Removed

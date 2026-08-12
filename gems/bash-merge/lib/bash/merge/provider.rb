@@ -5,6 +5,7 @@ require 'json'
 require 'ast/merge/source_render'
 require_relative 'node_wrapper'
 require_relative 'file_analysis'
+require_relative 'test_harness_identity'
 
 module Bash
   # Registration and source-preserving workflow implementation for Bash.
@@ -22,8 +23,9 @@ module Bash
     end
 
     # Base-aware, source-preserving provider for native top-level Bash owners.
-    # Functions and assignments have stable AST identities. Every other
-    # top-level form must remain identical across all revisions in a composite.
+    # Functions, assignments, and literal-title test_expect_success calls have
+    # stable AST identities. Every other top-level form must remain identical
+    # across all revisions in a composite.
     # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists, Metrics/PerceivedComplexity -- provider decisions, source plans, and verification form one boundary
     class Provider
       DEFAULT_PROFILE = :source_preserving
@@ -42,7 +44,7 @@ module Bash
           backends: [TREE_SITTER_BACKEND.id.to_sym],
           profiles: [DEFAULT_PROFILE],
           role: :workflow,
-          ast_ownership: :stable_functions_and_assignments,
+          ast_ownership: :stable_functions_assignments_and_literal_test_titles,
           source_preservation: %i[exact_source declaration_fragments line_provenance reparse semantic_verification]
         }.freeze
       end
@@ -101,6 +103,9 @@ module Bash
         return documents if provider_failure?(documents)
 
         ownership_failure = unstable_ownership_failure(request, documents)
+        return ownership_failure if ownership_failure
+
+        ownership_failure = test_harness_ownership_failure(request, documents)
         return ownership_failure if ownership_failure
 
         decision = decide(documents, include_unmanaged_conflict: true)
@@ -212,6 +217,8 @@ module Bash
         elsif wrapper.variable_assignment?
           name = wrapper.variable_name
           name && [:variable_assignment, name]
+        elsif (identity = TestHarnessIdentity.for(wrapper))
+          [:test_harness_call, *identity]
         else
           wrapper.signature
         end
@@ -396,7 +403,57 @@ module Bash
       end
 
       def stable_signature?(signature)
-        %i[function variable_assignment].include?(signature.first)
+        %i[function variable_assignment test_harness_call].include?(signature.first)
+      end
+
+      def test_harness_ownership_failure(request, documents)
+        sequences = documents.transform_values do |document|
+          document.owners.filter_map do |owner|
+            owner.id if owner.signature.first == :test_harness_call
+          end
+        end
+        base = sequences.fetch(:base)
+        invalid_role = %i[ours theirs].find do |role|
+          sequence = sequences.fetch(role)
+          sequence.length < base.length || sequence.first(base.length) != base
+        end
+        changed_role = %i[ours theirs].find { |role| sequences.fetch(role) != base }
+        return unless invalid_role || changed_role
+
+        reason = if invalid_role
+                   :non_append_only_test_harness_change
+                 else
+                   :test_harness_addition_requires_ordered_rendering
+                 end
+        source_role = invalid_role || changed_role
+
+        signature_digest = Digest::SHA256.hexdigest(JSON.generate(Ast::Merge.json_ready(sequences)))
+        conflict = {
+          conflict_id: "bash-test-ownership-#{signature_digest[0, 16]}",
+          category: :unproven_ast_ownership,
+          path: '<test_expect_success-sequence>',
+          owner_id: nil,
+          source_role: source_role,
+          identities: sequences,
+          reason: reason
+        }.freeze
+        decision = Decision.new(changes: [], conflicts: [conflict], choices: {})
+        rendered = render_plan(request, [whole_document_conflict(request, decision)])
+        failure(
+          :merge3,
+          request,
+          category: :unproven_ast_ownership,
+          message: 'Literal-title test_expect_success membership changes require ordered insertion rendering.',
+          conflicts: [conflict],
+          conflicted_output: rendered.content,
+          render_report: render_report(rendered, :full_file_conflict),
+          verification: { base_participated: true },
+          fallbacks: [{
+            from: :test_harness_ast_ownership,
+            to: :full_file_conflict,
+            reason: reason
+          }]
+        )
       end
 
       def side_change(base, side)

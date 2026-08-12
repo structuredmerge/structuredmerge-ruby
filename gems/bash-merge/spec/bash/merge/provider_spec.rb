@@ -38,13 +38,22 @@ RSpec.describe Bash::Merge::Provider do
     ).to equal(Bash::Merge.merge_provider)
   end
 
-  it 'analyzes stable function and assignment identities and emits JSON-ready diffs' do
-    source = "VALUE=one\nalpha() { echo alpha; }\n"
+  it 'analyzes stable function, assignment, and literal test identities and emits JSON-ready diffs' do
+    source = "VALUE=one\nalpha() { echo alpha; }\ntest_expect_success 'works' 'echo one'\n"
     signatures = provider.analyze(source: source).dig(:analysis, :declarations).map { |item| item.fetch(:signature) }
-    result = provider.diff2(before_source: source, after_source: source.sub('one', 'two'))
+    result = provider.diff2(before_source: source, after_source: source.gsub('one', 'two'))
 
-    expect(signatures).to eq([[:variable_assignment, 'VALUE'], [:function, 'alpha']])
-    expect(result.fetch(:changes)).to contain_exactly(hash_including(change: :edited))
+    expect(signatures).to eq(
+      [
+        [:variable_assignment, 'VALUE'],
+        [:function, 'alpha'],
+        [:test_harness_call, :test_expect_success, "'works'"]
+      ]
+    )
+    expect(result.fetch(:changes)).to contain_exactly(
+      hash_including(path: include('variable_assignment'), change: :edited),
+      hash_including(path: include('test_harness_call'), change: :edited)
+    )
     expect { JSON.generate(Ast::Merge.json_ready(result)) }.not_to raise_error
   end
 
@@ -253,6 +262,99 @@ RSpec.describe Bash::Merge::Provider do
       theirs_source: reordered_base.sub('echo base', 'echo theirs')
     )
     expect(reordered.fetch(:conflicts)).to include(hash_including(category: :unproven_ast_ownership))
+  end
+
+  it 'recognizes append-only literal-title tests but conflicts until ordered insertion rendering exists' do
+    test_base = "test_expect_success 'base test' 'echo base'\ntest_done\n"
+    ours = test_base.sub("test_done\n", "test_expect_success 'ours test' 'echo ours'\ntest_done\n")
+    theirs = test_base.sub("test_done\n", "test_expect_success 'theirs test' 'echo theirs'\ntest_done\n")
+    result = provider.merge3(base_source: test_base, ours_source: ours, theirs_source: theirs)
+
+    expect(result).to include(ok: false)
+    expect(result.fetch(:conflicts)).to include(
+      hash_including(
+        category: :unproven_ast_ownership,
+        reason: :test_harness_addition_requires_ordered_rendering
+      )
+    )
+    expect(result.dig(:render_report, :strategy)).to eq(:full_file_conflict)
+  end
+
+  it 'fails closed for ambiguous, dynamic, reordered, deleted, and inserted test ownership' do
+    test_base = <<~BASH
+      test_expect_success 'first test' 'echo first'
+      test_expect_success 'second test' 'echo second'
+      test_done
+    BASH
+    stable_edit = test_base.sub('echo first', 'echo theirs')
+
+    duplicate = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.sub(
+        "test_done\n",
+        "test_expect_success 'second test' 'echo duplicate'\ntest_done\n"
+      ),
+      theirs_source: stable_edit
+    )
+    expect(duplicate.fetch(:conflicts)).to include(hash_including(category: :ambiguous_owner))
+
+    dynamic = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.sub(
+        "test_done\n",
+        "test_expect_success \"dynamic $title\" 'echo dynamic'\ntest_done\n"
+      ),
+      theirs_source: stable_edit
+    )
+    expect(dynamic.fetch(:conflicts)).to include(hash_including(category: :unproven_ast_ownership))
+
+    redirected = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.sub(
+        "test_done\n",
+        "test_expect_success 'redirected test' 'echo redirected' >result\ntest_done\n"
+      ),
+      theirs_source: stable_edit
+    )
+    expect(redirected.fetch(:conflicts)).to include(hash_including(category: :unproven_ast_ownership))
+
+    reordered = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.lines.values_at(1, 0, 2).join,
+      theirs_source: stable_edit
+    )
+    deleted = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.lines.values_at(0, 2).join,
+      theirs_source: stable_edit
+    )
+    inserted = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.sub(
+        "test_expect_success 'second test'",
+        "test_expect_success 'inserted test' 'echo inserted'\ntest_expect_success 'second test'"
+      ),
+      theirs_source: stable_edit
+    )
+
+    [reordered, deleted, inserted].each do |unsafe|
+      expect(unsafe.fetch(:conflicts)).to include(
+        hash_including(category: :unproven_ast_ownership, reason: :non_append_only_test_harness_change)
+      )
+      expect(unsafe.dig(:render_report, :strategy)).to eq(:full_file_conflict)
+    end
+  end
+
+  it 'localizes divergent edits to the same literal-title test owner' do
+    test_base = "test_expect_success 'same test' 'echo base'\n"
+    result = provider.merge3(
+      base_source: test_base,
+      ours_source: test_base.sub('echo base', 'echo ours'),
+      theirs_source: test_base.sub('echo base', 'echo theirs')
+    )
+
+    expect(result.fetch(:conflicts)).to contain_exactly(hash_including(category: :edit_edit))
+    expect(result.dig(:render_report, :strategy)).to eq(:declaration_localized_conflict)
   end
 
   it 'allows identical unstable owners beside independent stable-owner edits' do
