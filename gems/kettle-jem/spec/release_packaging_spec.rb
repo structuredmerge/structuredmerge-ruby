@@ -57,6 +57,20 @@ RSpec.describe Kettle::Jem do
     expect(spec.extra_rdoc_files).to be_empty
   end
 
+  it "runs repository maintenance tools from the source checkout" do
+    %w[kettle-jem-deps-floor kettle-jem-workflow-pins].each do |executable|
+      stdout, stderr, status = Open3.capture3(
+        clean_subprocess_env("BUNDLE_GEMFILE" => nil),
+        Gem.ruby,
+        gem_root.join("bin", executable).to_s,
+        "--help",
+        chdir: gem_root.to_s
+      )
+
+      expect(status.success?).to be(true), "#{executable} failed\nstdout=#{stdout}\nstderr=#{stderr}"
+    end
+  end
+
   it "builds an artifact that can run kettle-jem from unpacked package files" do
     tmp_root = gem_root.join("spec/tmp/release-packaging")
     FileUtils.rm_rf(tmp_root)

@@ -8,8 +8,7 @@ require "optparse"
 require "pathname"
 require "time"
 
-require "kettle/jem"
-require "kettle/jem/maintenance_changelog"
+require_relative "../lib/kettle/jem"
 
 # Repository-local maintenance tool for updating dependency floors owned by
 # kettle-jem templates.

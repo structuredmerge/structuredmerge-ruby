@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Restore source-checkout loading for the repository-local dependency-floor and workflow-pin maintenance tools.
+
 ### Security
 
 ## [7.1.3] - 2026-08-11
