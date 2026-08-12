@@ -280,12 +280,12 @@
       <pre class="lines">
 
 
-1639
-1640
-1641</pre>
+1641
+1642
+1643</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1639</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1641</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_camelize'>camelize</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:capitalize</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -310,15 +310,15 @@
       <pre class="lines">
 
 
-1601
-1602
 1603
 1604
 1605
-1606</pre>
+1606
+1607
+1608</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1601</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1603</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load!'>load!</span><span class='lparen'>(</span><span class='label'>plugin_names:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_names'>names</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_plugin_names'>normalize_plugin_names</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_names'>plugin_names</span><span class='rparen'>)</span>
@@ -346,8 +346,6 @@
       <pre class="lines">
 
 
-1608
-1609
 1610
 1611
 1612
@@ -360,10 +358,12 @@
 1619
 1620
 1621
-1622</pre>
+1622
+1623
+1624</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1608</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1610</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load_plugin!'>load_plugin!</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='comma'>,</span> <span class='label'>registry:</span><span class='rparen'>)</span>
   <span class='comment'># Plugins are apply-time main-Ractor extensions; workers receive reports, not plugin callbacks.
@@ -400,12 +400,12 @@
       <pre class="lines">
 
 
-1624
-1625
-1626</pre>
+1626
+1627
+1628</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1624</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1626</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_plugin_names'>normalize_plugin_names</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_names'>plugin_names</span><span class='rparen'>)</span>
   <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_names'>plugin_names</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
@@ -430,15 +430,15 @@
       <pre class="lines">
 
 
-1632
-1633
 1634
 1635
 1636
-1637</pre>
+1637
+1638
+1639</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1632</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1634</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plugin_handle'>plugin_handle</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_constant_name'>constant_name</span> <span class='op'>=</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_part'>part</span><span class='op'>|</span> <span class='id identifier rubyid_camelize'>camelize</span><span class='lparen'>(</span><span class='id identifier rubyid_part'>part</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>::</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -466,12 +466,12 @@
       <pre class="lines">
 
 
-1628
-1629
-1630</pre>
+1630
+1631
+1632</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1628</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1630</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plugin_require_path'>plugin_require_path</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_tr'>tr</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -486,7 +486,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 06:59:52 2026 by
+  Generated on Wed Aug 12 01:44:00 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

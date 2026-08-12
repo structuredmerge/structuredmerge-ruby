@@ -310,12 +310,12 @@
       <pre class="lines">
 
 
-79
 80
-81</pre>
+81
+82</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_default_thread_worker_count'>default_thread_worker_count</span>
   <span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span> <span class='const'>Etc</span><span class='period'>.</span><span class='id identifier rubyid_nprocessors'>nprocessors</span> <span class='op'>/</span> <span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
@@ -365,7 +365,8 @@
 74
 75
 76
-77</pre>
+77
+78</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 52</span>
@@ -389,6 +390,7 @@
     <span class='label'>skip_binstubs:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_SKIP_BINSTUBS</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>skip_appraisal_generate:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_SKIP_APPRAISAL_GENERATE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>skip_lock_normalization:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_SKIP_LOCK_NORMALIZATION</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>skip_changelog:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_SKIP_CHANGELOG</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>checksums:</span> <span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_CHECKSUMS</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>accept_config:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_ACCEPT_CONFIG</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>bootstrap_mode:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_BOOTSTRAP_MODE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
@@ -439,12 +441,12 @@
       <pre class="lines">
 
 
-112
 113
-114</pre>
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_falsey?'>falsey?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_falsey?'><span class='object_link'><a href="../DecisionPolicy.html#falsey%3F-class_method" title="Kettle::Jem::DecisionPolicy.falsey? (method)">falsey?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
@@ -492,14 +494,14 @@
       <pre class="lines">
 
 
-116
 117
 118
 119
-120</pre>
+120
+121</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 117</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_monorepo_root_profile?'>monorepo_root_profile?</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:template_profile</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>template_profile</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_TEMPLATE_PROFILE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
@@ -675,12 +677,12 @@
       <pre class="lines">
 
 
-108
 109
-110</pre>
+110
+111</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 109</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_truthy?'><span class='object_link'><a href="../DecisionPolicy.html#truthy%3F-class_method" title="Kettle::Jem::DecisionPolicy.truthy? (method)">truthy?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
@@ -728,7 +730,6 @@
       <pre class="lines">
 
 
-83
 84
 85
 86
@@ -751,10 +752,11 @@
 103
 104
 105
-106</pre>
+106
+107</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_worker_or_strategy_option_provided?'>worker_or_strategy_option_provided?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_option_keys'>option_keys</span> <span class='op'>=</span> <span class='qsymbols_beg'>%i[</span><span class='words_sep'>
@@ -790,7 +792,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 06:59:52 2026 by
+  Generated on Wed Aug 12 01:44:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

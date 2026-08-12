@@ -389,15 +389,15 @@
       <pre class="lines">
 
 
-1123
-1124
 1125
 1126
 1127
-1128</pre>
+1128
+1129
+1130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1123</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1125</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>cache:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>http_get:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>v1_api_base:</span> <span class='const'><span class='object_link'><a href="#RUBYGEMS_V1_API_BASE-constant" title="Kettle::Jem::RubyGemsResolver::RUBYGEMS_V1_API_BASE (constant)">RUBYGEMS_V1_API_BASE</a></span></span><span class='comma'>,</span> <span class='label'>v2_api_base:</span> <span class='const'><span class='object_link'><a href="#RUBYGEMS_V2_API_BASE-constant" title="Kettle::Jem::RubyGemsResolver::RUBYGEMS_V2_API_BASE (constant)">RUBYGEMS_V2_API_BASE</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@cache</span> <span class='op'>=</span> <span class='id identifier rubyid_cache'>cache</span>
@@ -442,12 +442,12 @@
       <pre class="lines">
 
 
-1121
-1122
-1123</pre>
+1123
+1124
+1125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1121</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1123</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cache'>cache</span>
   <span class='ivar'>@cache</span>
@@ -479,8 +479,6 @@
       <pre class="lines">
 
 
-1199
-1200
 1201
 1202
 1203
@@ -488,10 +486,12 @@
 1205
 1206
 1207
-1208</pre>
+1208
+1209
+1210</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1199</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1201</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch_gem_info'>fetch_gem_info</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cache_key'>cache_key</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>info:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_version'>version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -546,8 +546,6 @@
       <pre class="lines">
 
 
-1188
-1189
 1190
 1191
 1192
@@ -555,10 +553,12 @@
 1194
 1195
 1196
-1197</pre>
+1197
+1198
+1199</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1188</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1190</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch_versions'>fetch_versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cache_key'>cache_key</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>versions:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -590,13 +590,13 @@
       <pre class="lines">
 
 
-1165
-1166
 1167
-1168</pre>
+1168
+1169
+1170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1165</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_min_ruby_version'>min_ruby_version</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_fetch_versions'>fetch_versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>number</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='id identifier rubyid_version'>version</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span>
@@ -622,8 +622,6 @@
       <pre class="lines">
 
 
-1170
-1171
 1172
 1173
 1174
@@ -638,10 +636,12 @@
 1183
 1184
 1185
-1186</pre>
+1186
+1187
+1188</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1170</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1172</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_minor_versions_by_major'>minor_versions_by_major</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='label'>requirements:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_versions'>versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='label'>requirements:</span> <span class='id identifier rubyid_requirements'>requirements</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='comma'>,</span> <span class='id identifier rubyid_grouped'>grouped</span><span class='op'>|</span>
@@ -680,8 +680,6 @@
       <pre class="lines">
 
 
-1210
-1211
 1212
 1213
 1214
@@ -693,10 +691,12 @@
 1220
 1221
 1222
-1223</pre>
+1223
+1224
+1225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1210</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1212</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_min_ruby'>parse_min_ruby</span><span class='lparen'>(</span><span class='id identifier rubyid_requirement'>requirement</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_requirement'>requirement</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -732,8 +732,6 @@
       <pre class="lines">
 
 
-1147
-1148
 1149
 1150
 1151
@@ -748,10 +746,12 @@
 1160
 1161
 1162
-1163</pre>
+1163
+1164
+1165</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1147</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1149</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_version_info'>version_info</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_fetch_gem_info'>fetch_gem_info</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
@@ -790,8 +790,6 @@
       <pre class="lines">
 
 
-1130
-1131
 1132
 1133
 1134
@@ -805,10 +803,12 @@
 1142
 1143
 1144
-1145</pre>
+1145
+1146
+1147</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1130</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1132</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_versions'>versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='label'>include_prerelease:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>requirements:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requirement'>requirement</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_requirements'>normalize_requirements</span><span class='lparen'>(</span><span class='id identifier rubyid_requirements'>requirements</span><span class='rparen'>)</span>
@@ -836,7 +836,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 06:59:53 2026 by
+  Generated on Wed Aug 12 01:44:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

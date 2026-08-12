@@ -100,13 +100,13 @@
         </dt>
         <dd><pre class="code"><span class='heredoc_beg'>&lt;&lt;~USAGE</span>
 <span class='tstring_content'>  Usage:
-</span><span class='tstring_content'>    kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-</span><span class='tstring_content'>    kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-</span><span class='tstring_content'>    kettle-jem prepare [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force] [--quiet|--verbose]
+</span><span class='tstring_content'>    kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--changelog|--no-changelog] [--quiet|--verbose]
+</span><span class='tstring_content'>    kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--changelog|--no-changelog] [--quiet|--verbose]
+</span><span class='tstring_content'>    kettle-jem prepare [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force] [--changelog|--no-changelog] [--quiet|--verbose]
 </span><span class='tstring_content'>    kettle-jem plan [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-</span><span class='tstring_content'>    kettle-jem apply [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-</span><span class='tstring_content'>    kettle-jem template [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-</span><span class='tstring_content'>    kettle-jem install [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+</span><span class='tstring_content'>    kettle-jem apply [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION] [--changelog|--no-changelog]
+</span><span class='tstring_content'>    kettle-jem template [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION] [--changelog|--no-changelog]
+</span><span class='tstring_content'>    kettle-jem install [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION] [--changelog|--no-changelog]
 </span><span class='tstring_content'>    kettle-jem manifest [PROJECT_ROOT] [--json]
 </span><span class='tstring_content'>    kettle-jem selftest [PROJECT_ROOT] [--json] [--report PATH] [--destination PATH] [--template-root PATH] [--selftest-output PATH]
 </span><span class='tstring_content'>    kettle-jem version
@@ -522,14 +522,14 @@
       <pre class="lines">
 
 
-252
-253
-254
-255
-256</pre>
+263
+264
+265
+266
+267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_canonical_path'>canonical_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_realpath'>realpath</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
@@ -632,12 +632,12 @@
       <pre class="lines">
 
 
-309
-310
-311</pre>
+320
+321
+322</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 309</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 320</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_debug_enabled?'>debug_enabled?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='qwords_beg'>%w[</span><span class='tstring_content'>DEBUG</span><span class='words_sep'> </span><span class='tstring_content'>KETTLE_JEM_DEBUG</span><span class='words_sep'> </span><span class='tstring_content'>KETTLE_DEV_DEBUG</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span> <span class='id identifier rubyid_env_true?'>env_true?</span><span class='lparen'>(</span><span class='id identifier rubyid_env_value'>env_value</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -685,21 +685,21 @@
       <pre class="lines">
 
 
-239
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249
-250</pre>
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 239</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 250</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_not_running_from_own_context!'>ensure_not_running_from_own_context!</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>help</span><span class='words_sep'> </span><span class='tstring_content'>version</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
@@ -756,12 +756,12 @@
       <pre class="lines">
 
 
-313
-314
-315</pre>
+324
+325
+326</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 313</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 324</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_env_true?'>env_true?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A(?:true|t|yes|y|on|1)\z</span><span class='regexp_end'>/i</span></span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='rparen'>)</span>
@@ -786,14 +786,14 @@
       <pre class="lines">
 
 
-317
-318
-319
-320
-321</pre>
+328
+329
+330
+331
+332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 317</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 328</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_env_value'>env_value</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_env'>env</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -820,9 +820,6 @@
       <pre class="lines">
 
 
-194
-195
-196
 197
 198
 199
@@ -858,10 +855,21 @@
 229
 230
 231
-232</pre>
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 194</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 197</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute'>execute</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>options:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:run_options</span><span class='rparen'>)</span>
@@ -871,7 +879,7 @@
       <span class='label'>types:</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:event_types</span><span class='rbracket'>]</span>
     <span class='rparen'>)</span>
   <span class='kw'>end</span>
-  <span class='kw'>case</span> <span class='id identifier rubyid_command'>command</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_command'>command</span>
   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setup</span><span class='tstring_end'>&quot;</span></span>
     <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setup_project'><span class='object_link'><a href="../Jem.html#setup_project-class_method" title="Kettle::Jem.setup_project (method)">setup_project</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prepare</span><span class='tstring_end'>&quot;</span></span>
@@ -901,6 +909,14 @@
   <span class='kw'>else</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported kettle-jem command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_result'>result</span> <span class='kw'>unless</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>setup</span><span class='words_sep'> </span><span class='tstring_content'>prepare</span><span class='words_sep'> </span><span class='tstring_content'>apply</span><span class='words_sep'> </span><span class='tstring_content'>template</span><span class='words_sep'> </span><span class='tstring_content'>install</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="MaintenanceChangelog.html" title="Kettle::Jem::MaintenanceChangelog (module)">MaintenanceChangelog</a></span></span><span class='period'>.</span><span class='id identifier rubyid_record_template_run'><span class='object_link'><a href="MaintenanceChangelog.html#record_template_run-class_method" title="Kettle::Jem::MaintenanceChangelog.record_template_run (method)">record_template_run</a></span></span><span class='lparen'>(</span>
+    <span class='label'>project_root:</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span>
+    <span class='label'>report:</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span>
+    <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='comma'>,</span>
+    <span class='label'>label:</span> <span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prepare</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Prepare project for kettle-jem templates</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Apply kettle-jem templates</span><span class='tstring_end'>&quot;</span></span>
+  <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1144,7 +1160,10 @@
 189
 190
 191
-192</pre>
+192
+193
+194
+195</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 70</span>
@@ -1228,6 +1247,9 @@
     <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--skip-rubocop-gradual</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Skip post-template RuboCop Gradual autocorrect.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:run_options</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:skip_rubocop_gradual</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
     <span class='kw'>end</span>
+    <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--[no-]changelog</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Add a Changed entry summarizing actual template changes (default).</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+      <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:run_options</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:skip_changelog</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='op'>!</span><span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>end</span>
     <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--skip-binstubs</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Skip post-template curated Bundler binstub generation.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
       <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:run_options</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:skip_binstubs</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
     <span class='kw'>end</span>
@@ -1292,17 +1314,17 @@
       <pre class="lines">
 
 
-300
-301
-302
-303
-304
-305
-306
-307</pre>
+311
+312
+313
+314
+315
+316
+317
+318</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 300</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 311</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_debug_snapshot'>print_debug_snapshot</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>err:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_err'>err</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[kettle-jem] DEBUG: early environment snapshot</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1332,13 +1354,13 @@
       <pre class="lines">
 
 
-323
-324
-325
-326</pre>
+334
+335
+336
+337</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 323</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 334</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_help'>print_help</span><span class='lparen'>(</span><span class='id identifier rubyid_out'>out</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#USAGE-constant" title="Kettle::Jem::CLI::USAGE (constant)">USAGE</a></span></span><span class='rparen'>)</span>
@@ -1364,17 +1386,6 @@
       <pre class="lines">
 
 
-258
-259
-260
-261
-262
-263
-264
-265
-266
-267
-268
 269
 270
 271
@@ -1399,10 +1410,21 @@
 290
 291
 292
-293</pre>
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 258</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 269</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_result'>print_result</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='label'>options:</span><span class='comma'>,</span> <span class='label'>out:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:events</span><span class='rbracket'>]</span>
@@ -1460,13 +1482,13 @@
       <pre class="lines">
 
 
-328
-329
-330
-331</pre>
+339
+340
+341
+342</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 328</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 339</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_version'>print_version</span><span class='lparen'>(</span><span class='id identifier rubyid_out'>out</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_out'>out</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Version.html" title="Kettle::Jem::Version (module)">Version</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Version.html#VERSION-constant" title="Kettle::Jem::Version::VERSION (constant)">VERSION</a></span></span><span class='rparen'>)</span>
@@ -1585,13 +1607,13 @@
       <pre class="lines">
 
 
-234
-235
-236
-237</pre>
+245
+246
+247
+248</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 234</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 245</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scoped_template_run?'>scoped_template_run?</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>=</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span>
@@ -1617,13 +1639,13 @@
       <pre class="lines">
 
 
-295
-296
-297
-298</pre>
+306
+307
+308
+309</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 295</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/cli.rb', line 306</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_write_report'>write_report</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
   <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_mkdir_p'>mkdir_p</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_dirname'>dirname</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -1639,7 +1661,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 06:59:52 2026 by
+  Generated on Wed Aug 12 01:44:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
