@@ -36,6 +36,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Run every Ruby gem suite when the pinned StructuredMerge fixture release changes.
+
 ### Security
 
 ## [7.1.4] - 2026-08-12

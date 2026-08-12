@@ -71,8 +71,11 @@ jobs:
           )
           gems = [gem for gem in gems if gem in all_gems]
 
-          root_bundle_changed = any(path in {"Gemfile", "Gemfile.lock"} for path in changed)
-          if root_bundle_changed:
+          family_input_changed = any(
+              path in {"Gemfile", "Gemfile.lock", ".structuredmerge/fixtures.lock"}
+              for path in changed
+          )
+          if family_input_changed:
               gems = all_gems
 
           matrix = {"gem": gems}
