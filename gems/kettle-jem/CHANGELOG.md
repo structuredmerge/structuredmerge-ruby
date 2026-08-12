@@ -24,17 +24,20 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Write-mode dependency-floor and workflow-pin maintenance tools now document their updates in CHANGELOG.md by default.
 
-- Update kettle-jem template dependency floors: kettle-dev (>= 3.0.6), kettle-family (>= 1.2.50), kettle-jem (>= 7.1.3), and yard-lint (>= 1.11.0).
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-dev (~> 3.0, >= 3.0.0 -> ~> 3.0, >= 3.0.6)
+  - kettle-family (~> 1.2, >= 1.2.44 -> ~> 1.2, >= 1.2.51)
+  - kettle-jem (~> 7.1, >= 7.1.1 -> ~> 7.1, >= 7.1.3)
+  - yard-lint (~> 1.10, >= 1.10.3 -> ~> 1.11, >= 1.11.0)
 
-- Update pinned GitHub Actions in kettle-jem templates: github/codeql-action/analyze v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3), github/codeql-action/autobuild v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3), and github/codeql-action/init v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3).
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - github/codeql-action/analyze v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
+  - github/codeql-action/autobuild v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
+  - github/codeql-action/init v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
 
 - Declare kettle-changelog as a runtime dependency for packaged maintenance commands.
 
 - Main templating commands now record an aggregate Changed entry through kettle-changelog only when template files change, while transfer replay uses kettle-changelog's structural merger.
-
-- Update kettle-jem template dependency floors: kettle-family (>= 1.2.51).
-
-- Maintenance dependency-floor and workflow-pin tools now use keyed kettle-changelog entries with nested upgrade details and preserve original baselines across reruns.
 
 ### Deprecated
 
