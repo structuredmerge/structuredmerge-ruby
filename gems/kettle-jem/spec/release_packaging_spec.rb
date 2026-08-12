@@ -38,7 +38,7 @@ RSpec.describe Kettle::Jem do
     expect(spec.metadata["homepage_uri"]).to eq("https://structuredmerge.org")
     expect(spec.executables).to eq(["kettle-jem"])
     changelog_dependency = spec.runtime_dependencies.find { |dependency| dependency.name == "kettle-changelog" }
-    expect(changelog_dependency.requirement).to eq(Gem::Requirement.new(["~> 1.0", ">= 1.0.1"]))
+    expect(changelog_dependency.requirement).to eq(Gem::Requirement.new(["~> 1.0", ">= 1.0.2"]))
     expect(File.executable?(gem_root.join("exe/kettle-jem"))).to be(true)
     expect(File.executable?(gem_root.join("bin/kettle-jem-deps-floor"))).to be(true)
     expect(File.executable?(gem_root.join("bin/kettle-jem-workflow-pins"))).to be(true)

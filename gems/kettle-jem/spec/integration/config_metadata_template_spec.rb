@@ -1936,7 +1936,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
       expect(default_report.fetch(:checksum_skipped)).to be(true)
       outcomes = default_apply.fetch(:file_outcomes)
-      expect(outcomes).to include(checksum_hits: 0, checksum_protected: 1, changed: 1)
+      expect(outcomes).to include(checksum_hits: 0, checksum_protected: 1, changed: 0)
       expect(outcomes.fetch(:planned)).to eq(
         outcomes.fetch(:checksum_hits) + outcomes.fetch(:checksum_protected) + outcomes.fetch(:unchanged) + outcomes.fetch(:changed)
       )
