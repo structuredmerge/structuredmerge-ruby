@@ -62,6 +62,7 @@ RSpec.describe Kettle::Jem do
       stdout, stderr, status = Open3.capture3(
         clean_subprocess_env("BUNDLE_GEMFILE" => nil),
         Gem.ruby,
+        "-rbundler/setup",
         gem_root.join("bin", executable).to_s,
         "--help",
         chdir: gem_root.to_s
