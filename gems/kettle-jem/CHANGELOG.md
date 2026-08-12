@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Update kettle-jem template dependency floors: kettle-family (>= 1.2.51).
 
+- Maintenance dependency-floor and workflow-pin tools now use keyed kettle-changelog entries with nested upgrade details and preserve original baselines across reruns.
+
 ### Deprecated
 
 ### Removed

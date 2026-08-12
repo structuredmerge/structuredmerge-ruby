@@ -53,7 +53,7 @@ RSpec.describe KettleJemDepsFloor do
       "#{described_class}::EXTRA_SOURCE_FILES",
       []
     )
-    allow(Kettle::Jem::MaintenanceChangelog).to receive(:add_unreleased_entry).and_return(status: "updated")
+    allow(Kettle::Jem::MaintenanceChangelog).to receive(:upsert_unreleased_entry).and_return(status: "updated")
     write_file("template/valid.gemfile.example", <<~RUBY)
       # frozen_string_literal: true
 
@@ -270,11 +270,24 @@ RSpec.describe KettleJemDepsFloor do
   it "adds one Changed entry describing written dependency floor updates" do
     described_class.new(project_root: project_root, resolver: resolver, options: {write: true, commit: false, upgrade: "minor"}).run
 
-    expect(Kettle::Jem::MaintenanceChangelog).to have_received(:add_unreleased_entry).with(
+    expect(Kettle::Jem::MaintenanceChangelog).to have_received(:upsert_unreleased_entry).with(
       project_root: project_root,
       section: "Changed",
-      entry: include("Update kettle-jem template dependency floors:", "kettle-dev (>= 2.5.8)")
+      key: "kettle-jem-deps-floor",
+      legacy_prefixes: ["Update kettle-jem template dependency floors:"],
+      entry: kind_of(Proc)
     )
+  end
+
+  it "renders one nested dependency detail while preserving its earliest baseline" do
+    tool = described_class.new(project_root: project_root, resolver: resolver)
+    entry = tool.send(
+      :dependency_changelog_entry,
+      [{name: "kettle-family", current_floor_version: Gem::Version.new("1.2.51"), new_floor_version: Gem::Version.new("1.2.52")}],
+      existing_entries: [{source: "- [kc] kettle-jem-deps-floor: Previous.\n  - kettle-family (>= 1.2.50 -> >= 1.2.51)\n"}]
+    )
+
+    expect(entry).to eq("Update kettle-jem template dependency floors:\n  - kettle-family (>= 1.2.50 -> >= 1.2.52)")
   end
 
   it "commits written updates by default inside git repositories" do

@@ -7,13 +7,18 @@ require "optparse"
 require "pathname"
 
 require "kettle/gha/pins"
+# Repository-local executable must boot from the unreleased source checkout.
+# rubocop:disable Packaging/RequireRelativeHardcodingLib -- Installed execution is not available while maintaining templates.
 require_relative "../lib/kettle/jem"
+# rubocop:enable Packaging/RequireRelativeHardcodingLib
 
 # Repository-local maintenance tool for updating kettle-jem workflow template pins.
 class KettleJemWorkflowPins
   VALID_UPGRADE_LEVELS = %w[major minor patch].freeze
   DEFAULT_UPGRADE_LEVEL = "major"
   DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
+  CHANGELOG_KEY = "kettle-jem-workflow-pins"
+  LEGACY_CHANGELOG_PREFIX = "Update pinned GitHub Actions in kettle-jem templates:"
   PIN_PATTERN = %r{(([-\w.]+/[-\w.]+(?:/[-\w.]+)*)@[0-9a-f]{40}[ \t]*#[ \t]*[^\s"',]+)}
 
   def initialize(project_root:, env: ENV, options: {})
@@ -43,11 +48,10 @@ class KettleJemWorkflowPins
             "#{pin_label(change.fetch(:new_version), change.fetch(:new_ref))}"
         )
       end
-      if result[:commit]
-        out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
-      elsif result[:changelog]
+      if result[:changelog]
         out.puts("changelog: #{result.fetch(:changelog).fetch(:status)}")
       end
+      out.puts("commit: #{result.fetch(:commit).fetch(:status)}") if result[:commit]
       if !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
         out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
       end
@@ -410,19 +414,36 @@ class KettleJemWorkflowPins
   end
 
   def add_changelog_entry(changes)
-    Kettle::Jem::MaintenanceChangelog.add_unreleased_entry(
+    Kettle::Jem::MaintenanceChangelog.upsert_unreleased_entry(
       project_root: @project_root,
       section: "Changed",
-      entry: workflow_changelog_entry(changes)
+      key: CHANGELOG_KEY,
+      legacy_prefixes: [LEGACY_CHANGELOG_PREFIX],
+      entry: ->(existing_entries) { workflow_changelog_entry(changes, existing_entries: existing_entries) }
     )
   end
 
-  def workflow_changelog_entry(changes)
-    details = changes.map do |change|
-      "#{change.fetch(:action)} #{self.class.pin_label(change.fetch(:old_version), change.fetch(:old_ref))} -> " \
-        "#{self.class.pin_label(change.fetch(:new_version), change.fetch(:new_ref))}"
+  def workflow_changelog_entry(changes, existing_entries: [])
+    existing_baselines = workflow_changelog_baselines(existing_entries)
+    details = changes.group_by { |change| change.fetch(:action) }.sort.map do |action, grouped|
+      latest = grouped.max_by { |change| Gem::Version.new(change.fetch(:new_version).to_s) }
+      baseline = existing_baselines.fetch(action, {
+        old_version: latest.fetch(:old_version),
+        old_ref: latest.fetch(:old_ref)
+      })
+      "#{action} #{self.class.pin_label(baseline.fetch(:old_version), baseline.fetch(:old_ref))} -> " \
+        "#{self.class.pin_label(latest.fetch(:new_version), latest.fetch(:new_ref))}"
     end
-    "Update pinned GitHub Actions in kettle-jem templates: #{human_join(details)}."
+    "Update pinned GitHub Actions in kettle-jem templates:\n#{details.map { |detail| "  - #{detail}" }.join("\n")}"
+  end
+
+  def workflow_changelog_baselines(existing_entries)
+    pattern = /([\w.-]+\/[\w.-]+(?:\/[\w.-]+)*)\s+(v?[\d.]+)\s+\(([0-9a-f]{40})\)\s+->\s+(v?[\d.]+)\s+\(([0-9a-f]{40})\)/
+    Array(existing_entries).flat_map { |entry| entry.fetch(:source).to_s.lines }.each_with_object({}) do |line, baselines|
+      line.scan(pattern).each do |action, old_version, old_ref, _new_version, _new_ref|
+        baselines[action] ||= {old_version: old_version, old_ref: old_ref}
+      end
+    end
   end
 
   def human_join(values)

@@ -69,6 +69,17 @@ module Kettle
         raise "kettle-changelog executable is not installed: #{error.message}"
       end
 
+      def upsert_unreleased_entry(project_root:, section:, key:, entry:, legacy_prefixes: [])
+        result = Kettle::Changelog::KeyedEntryUpserter.new(
+          root: project_root,
+          section: section,
+          key: key,
+          entry: entry,
+          legacy_prefixes: legacy_prefixes
+        ).run
+        result.merge(status: result.fetch(:changed) ? "updated" : "unchanged")
+      end
+
       def record_template_run(project_root:, report:, run_options: {}, label: "Apply kettle-jem templates")
         report = report.to_h
         if template_changelog_disabled?(run_options) || bootstrap_only_report?(report)

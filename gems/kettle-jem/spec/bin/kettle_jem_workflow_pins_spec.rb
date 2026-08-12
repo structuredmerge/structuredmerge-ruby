@@ -39,7 +39,7 @@ RSpec.describe KettleJemWorkflowPins do
     allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => old_pin})
     allow(Kettle::Gha::Pins::GitHubClient).to receive(:new).and_return(client)
     allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(resolver_plan)
-    allow(Kettle::Jem::MaintenanceChangelog).to receive(:add_unreleased_entry).and_return(status: "updated")
+    allow(Kettle::Jem::MaintenanceChangelog).to receive(:upsert_unreleased_entry).and_return(status: "updated")
   end
 
   after do
@@ -95,10 +95,12 @@ RSpec.describe KettleJemWorkflowPins do
     expect(result[:updated_actions]).to eq(["actions/checkout"])
     expect(File.read(pin_index_path)).to include(new_pin)
     expect(File.read(workflow_path)).to include("uses: #{new_pin}")
-    expect(Kettle::Jem::MaintenanceChangelog).to have_received(:add_unreleased_entry).with(
+    expect(Kettle::Jem::MaintenanceChangelog).to have_received(:upsert_unreleased_entry).with(
       project_root: project_root,
       section: "Changed",
-      entry: include("actions/checkout v1.0.0 (#{old_sha}) -> v1.0.1 (#{new_sha})")
+      key: "kettle-jem-workflow-pins",
+      legacy_prefixes: ["Update pinned GitHub Actions in kettle-jem templates:"],
+      entry: kind_of(Proc)
     )
     expect(Kettle::Gha::Pins).to have_received(:resolve_action_plan).with(
       cache: {},
@@ -106,6 +108,26 @@ RSpec.describe KettleJemWorkflowPins do
       repo_ref: "actions/checkout",
       old_ref: old_sha,
       upgrade_level: "major"
+    )
+  end
+
+  it "renders one nested action detail while preserving its earliest baseline" do
+    tool = described_class.new(project_root: project_root, env: env)
+    entry = tool.send(
+      :workflow_changelog_entry,
+      [{
+        action: "actions/checkout",
+        old_version: "1.0.1",
+        old_ref: new_sha,
+        new_version: "1.0.2",
+        new_ref: "c" * 40
+      }],
+      existing_entries: [{source: "- [kc] kettle-jem-workflow-pins: Previous.\n  - actions/checkout v1.0.0 (#{old_sha}) -> v1.0.1 (#{new_sha})\n"}]
+    )
+
+    expect(entry).to eq(
+      "Update pinned GitHub Actions in kettle-jem templates:\n" \
+        "  - actions/checkout v1.0.0 (#{old_sha}) -> v1.0.2 (#{"c" * 40})"
     )
   end
 

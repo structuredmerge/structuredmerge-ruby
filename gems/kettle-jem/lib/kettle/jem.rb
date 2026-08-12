@@ -13936,7 +13936,7 @@ module Kettle
               root: ["src", "my", "kettle-dev"]
             )
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 1.0", ">= 1.0.1"
+            gem "kettle-changelog", "~> 1.0", ">= 1.0.2"
           end
         end
       RUBY

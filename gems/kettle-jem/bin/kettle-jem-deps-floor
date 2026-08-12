@@ -8,7 +8,10 @@ require "optparse"
 require "pathname"
 require "time"
 
+# Repository-local executable must boot from the unreleased source checkout.
+# rubocop:disable Packaging/RequireRelativeHardcodingLib -- Installed execution is not available while maintaining templates.
 require_relative "../lib/kettle/jem"
+# rubocop:enable Packaging/RequireRelativeHardcodingLib
 
 # Repository-local maintenance tool for updating dependency floors owned by
 # kettle-jem templates.
@@ -16,6 +19,8 @@ class KettleJemDepsFloor
   VALID_UPGRADE_LEVELS = %w[major minor patch].freeze
   DEFAULT_UPGRADE_LEVEL = "major"
   DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
+  CHANGELOG_KEY = "kettle-jem-deps-floor"
+  LEGACY_CHANGELOG_PREFIX = "Update kettle-jem template dependency floors:"
   CACHE_TTL_SECONDS = 30 * 24 * 60 * 60
   CACHE_ENV_KEY = "KETTLE_JEM_DEPS_FLOOR_CACHE"
   CACHE_REFRESH_ENV_KEY = "KETTLE_JEM_DEPS_FLOOR_CACHE_REFRESH"
@@ -170,10 +175,11 @@ class KettleJemDepsFloor
             "#{change.fetch(:new_pessimistic)}, >= #{change.fetch(:new_floor)}"
         )
       end
+      if result[:changelog]
+        out.puts("changelog: #{result.fetch(:changelog).fetch(:status)}")
+      end
       if result[:commit]
         out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
-      elsif result[:changelog]
-        out.puts("changelog: #{result.fetch(:changelog).fetch(:status)}")
       elsif !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
         out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
       end
@@ -527,19 +533,33 @@ class KettleJemDepsFloor
   end
 
   def add_changelog_entry(changes)
-    Kettle::Jem::MaintenanceChangelog.add_unreleased_entry(
+    Kettle::Jem::MaintenanceChangelog.upsert_unreleased_entry(
       project_root: project_root,
       section: "Changed",
-      entry: dependency_changelog_entry(changes)
+      key: CHANGELOG_KEY,
+      legacy_prefixes: [LEGACY_CHANGELOG_PREFIX],
+      entry: ->(existing_entries) { dependency_changelog_entry(changes, existing_entries: existing_entries) }
     )
   end
 
-  def dependency_changelog_entry(changes)
+  def dependency_changelog_entry(changes, existing_entries: [])
+    existing_baselines = dependency_changelog_baselines(existing_entries)
     details = changes.group_by { |change| change.fetch(:name) }.sort.map do |name, grouped|
-      floors = grouped.map { |change| change.fetch(:new_floor_version).to_s }.uniq.sort_by { |version| Gem::Version.new(version) }
-      "#{name} (>= #{floors.join(", >= ")})"
+      current_versions = grouped.map { |change| change.fetch(:current_floor_version) }
+      new_versions = grouped.map { |change| change.fetch(:new_floor_version) }
+      initial = [*existing_baselines[name], *current_versions].map { |version| Gem::Version.new(version.to_s) }.min
+      latest = new_versions.map { |version| Gem::Version.new(version.to_s) }.max
+      "#{name} (>= #{initial} -> >= #{latest})"
     end
-    "Update kettle-jem template dependency floors: #{human_join(details)}."
+    "Update kettle-jem template dependency floors:\n#{details.map { |detail| "  - #{detail}" }.join("\n")}"
+  end
+
+  def dependency_changelog_baselines(existing_entries)
+    Array(existing_entries).flat_map { |entry| entry.fetch(:source).to_s.lines }.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |line, baselines|
+      line.scan(/\b([A-Za-z0-9_.-]+)\s+\(>=\s*([0-9A-Za-z.+-]+)/).each do |name, version|
+        baselines[name] << Gem::Version.new(version)
+      end
+    end
   end
 
   def human_join(values)

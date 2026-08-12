@@ -3,6 +3,33 @@
 require "kettle/jem/maintenance_changelog"
 
 RSpec.describe Kettle::Jem::MaintenanceChangelog do
+  it "delegates keyed maintenance updates to kettle-changelog" do
+    Dir.mktmpdir("kettle-jem-maintenance-changelog") do |root|
+      stub_env("K_CHANGELOG_PATH" => nil)
+      File.write(File.join(root, "CHANGELOG.md"), <<~MARKDOWN)
+        # Changelog
+
+        ## [Unreleased]
+
+        ### Changed
+
+        ### Fixed
+      MARKDOWN
+
+      result = described_class.upsert_unreleased_entry(
+        project_root: root,
+        section: "Changed",
+        key: "kettle-jem-deps-floor",
+        entry: "Update dependency floors:\n  - kettle-family (>= 1.2.50 -> >= 1.2.51)"
+      )
+
+      expect(result).to include(status: "updated", key: "kettle-jem-deps-floor")
+      expect(File.read(File.join(root, "CHANGELOG.md"))).to include(
+        "- [kc] kettle-jem-deps-floor: Update dependency floors:\n  - kettle-family (>= 1.2.50 -> >= 1.2.51)"
+      )
+    end
+  end
+
   describe ".record_template_run" do
     let(:report) do
       {
