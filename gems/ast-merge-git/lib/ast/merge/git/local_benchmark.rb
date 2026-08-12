@@ -58,7 +58,7 @@ module Ast
 
         def validate!
           require_keys(document, %w[schema_version kind id version extends provenance profiles capability_map
-                                    selection cases expected_summary], 'corpus')
+                                    selection competitors cases expected_summary], 'corpus')
           error!('unsupported corpus schema') unless document['schema_version'] == SCHEMA
           error!('corpus must extend Slice 1022 v1') unless document['extends'] == CASE_SCHEMA
           error!('network must be denied') unless document['network_policy'] == 'denied'
@@ -66,6 +66,7 @@ module Ast
           validate_provenance!(document['provenance'], 'corpus')
           validate_profiles!
           validate_capability_map!
+          validate_competitors!
           validate_cases!
           validate_summary!
           true
@@ -151,6 +152,25 @@ module Ast
             unless entry['capabilities'] == entry['capabilities'].sort
               error!('capability map capabilities must be sorted')
             end
+          end
+        end
+
+        def validate_competitors!
+          document.fetch('competitors').each do |id, competitor|
+            require_keys(
+              competitor,
+              %w[adapter_id source_url source_revision version spdx_license reuse_posture toolchain
+                 build_command operations dialects],
+              "competitor #{id}"
+            )
+            error!("competitor #{id}: adapter ID differs") unless competitor['adapter_id'] == id
+            unless /\A[0-9a-f]{40}\z/.match?(competitor['source_revision'])
+              error!("competitor #{id}: source revision must be a full SHA")
+            end
+            error!("competitor #{id}: only merge3 is admitted") unless competitor['operations'] == ['merge3']
+            next if competitor['dialects'] == competitor['dialects'].sort
+
+            error!("competitor #{id}: dialects must be sorted")
           end
         end
 
@@ -356,12 +376,23 @@ module Ast
       # Executes the same authored merge bytes through Git and the installed driver.
       class LocalBenchmarkRunner
         DEFAULT_TIMEOUT = 30
+        MERGIRAF_EXTENSIONS = {
+          'bash' => 'sh',
+          'html' => 'html',
+          'json' => 'json',
+          'markdown' => 'md',
+          'ruby' => 'rb',
+          'toml' => 'toml',
+          'typescript' => 'ts',
+          'yaml' => 'yaml'
+        }.freeze
 
-        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT)
+        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT, competitor_paths: {})
           @benchmark = benchmark
           @driver_path = Pathname(driver_path).expand_path
           @tmp_root = Pathname(tmp_root).expand_path
           @timeout = Integer(timeout)
+          @competitor_paths = competitor_paths.transform_values { |path| Pathname(path).expand_path }
         end
 
         def run(profile:, changed_paths: [])
@@ -369,7 +400,8 @@ module Ast
           selection = @benchmark.select(profile: profile, changed_paths: changed_paths)
           original_cwd = Dir.pwd
           results = selection['selected_case_ids'].flat_map do |id|
-            execute_case(@benchmark.case_by_id(id))
+            item = @benchmark.case_by_id(id)
+            execute_case(item) + execute_competitors(item)
           end
           raise LocalBenchmark::Error, 'runner changed its working directory' unless Dir.pwd == original_cwd
 
@@ -380,6 +412,7 @@ module Ast
             'corpus_digest' => @benchmark.corpus_digest,
             'selection' => selection,
             'cache_identity' => cache_identity(selection),
+            'competitors' => competitor_provenance,
             'results' => results
           }
         ensure
@@ -390,6 +423,10 @@ module Ast
 
         def verify_environment!
           error!("missing installed driver: #{@driver_path}") unless @driver_path.file? && @driver_path.executable?
+          @competitor_paths.each do |id, path|
+            error!("unknown competitor: #{id}") unless @benchmark.document.fetch('competitors').key?(id)
+            error!("missing competitor executable: #{path}") unless path.file? && path.executable?
+          end
           root = Pathname(__dir__).join('..', '..', '..', '..').realpath
           resolved = @tmp_root.exist? ? @tmp_root.realpath : @tmp_root.dirname.realpath.join(@tmp_root.basename)
           error!('tmp_root must be inside the ast-merge-git repository') unless resolved.to_s.start_with?("#{root}/")
@@ -400,6 +437,50 @@ module Ast
           return execute_metamorphic_case(item) if item['operation'] == 'metamorphic'
 
           unsupported_pair(item)
+        end
+
+        def execute_competitors(item)
+          @competitor_paths.map do |id, path|
+            metadata = @benchmark.document.dig('competitors', id)
+            unless metadata['operations'].include?(item['operation']) && metadata['dialects'].include?(item['dialect'])
+              next raw_result(
+                item,
+                id,
+                nil,
+                outcome: 'unsupported',
+                unsupported_reason: "#{id} does not support #{item['operation']}/#{item['dialect']}"
+              )
+            end
+
+            execute_mergiraf(item, path)
+          end
+        end
+
+        def execute_mergiraf(item, path)
+          workspace = @tmp_root.join("#{safe_id(item['id'])}-mergiraf-#{Process.pid}")
+          FileUtils.rm_rf(workspace)
+          FileUtils.mkdir_p(workspace)
+          write_roles(item, workspace)
+          output = workspace.join('output')
+          capture = timed_capture(
+            oracle_free_env,
+            path.to_s,
+            'merge',
+            'base',
+            'ours',
+            'theirs',
+            '--output',
+            output.to_s,
+            '--path-name',
+            "#{item['id']}.#{MERGIRAF_EXTENSIONS.fetch(item['dialect'])}",
+            '--conflict-marker-size',
+            '7',
+            chdir: workspace
+          )
+          capture[:output] = output.file? ? output.binread : ''
+          raw_result(item, 'mergiraf', capture)
+        ensure
+          FileUtils.rm_rf(workspace) if workspace
         end
 
         def execute_merge3_case(item)
@@ -558,7 +639,7 @@ module Ast
             'id' => "result.#{safe_id(item['id'])}.#{safe_id(adapter)}",
             'case_id' => item['id'],
             'adapter_id' => adapter,
-            'adapter_role' => adapter.start_with?('git.') ? 'baseline' : 'candidate',
+            'adapter_role' => adapter_role(adapter),
             'case_tags' => item.slice(
               'operation', 'partition', 'family', 'provider', 'dialect',
               'capabilities', 'false_auto_merge_severity'
@@ -580,6 +661,13 @@ module Ast
             'dimensions' => dimensions(item, classified, checks),
             'runtime' => capture && { 'duration_ns' => capture[:duration_ns], 'comparable' => true }
           }
+        end
+
+        def adapter_role(adapter)
+          return 'baseline' if adapter.start_with?('git.')
+          return 'candidate' if %w[ast-merge-git ast-merge-provider.diff2 structuredmerge.unsupported].include?(adapter)
+
+          'competitor'
         end
 
         def metamorphic_result(item, adapter, adapter_role, capture, edit_signal:)
@@ -883,8 +971,11 @@ module Ast
         end
 
         def candidate_env(selector)
-          forbidden = ENV.keys.grep(/(?:ORACLE|EXPECTED)/i).to_h { |name| [name, nil] }
-          forbidden.merge(selector_env(selector))
+          oracle_free_env.merge(selector_env(selector))
+        end
+
+        def oracle_free_env
+          ENV.keys.grep(/(?:ORACLE|EXPECTED)/i).to_h { |name| [name, nil] }
         end
 
         def cache_identity(selection)
@@ -899,10 +990,12 @@ module Ast
           configuration = selection['selected_case_ids'].map do |id|
             @benchmark.case_by_id(id).slice('id', 'selector')
           end
+          competitors = competitor_provenance
           identity = {
             'adapter_source_sha' => source_sha.strip,
             'adapter_artifact_sha256' => Digest::SHA256.file(@driver_path).hexdigest,
             'configuration_sha256' => Digest::SHA256.hexdigest(JSON.generate(configuration)),
+            'competitors' => competitors,
             'corpus_sha256' => @benchmark.corpus_digest,
             'environment' => environment,
             'profile' => selection['profile'],
@@ -914,6 +1007,22 @@ module Ast
             'selected_case_ids' => selection['selected_case_ids']
           }
           identity.merge('sha256' => Digest::SHA256.hexdigest(JSON.generate(identity)))
+        end
+
+        def competitor_provenance
+          @competitor_provenance ||= @competitor_paths.to_h do |id, path|
+            metadata = @benchmark.document.fetch('competitors').fetch(id)
+            capture = timed_capture(oracle_free_env, path.to_s, '--version', chdir: path.dirname)
+            error!("#{id} version probe failed: #{capture[:stderr].strip}") unless capture[:status].zero?
+            expected = "#{metadata.fetch('adapter_id')} #{metadata.fetch('version')}"
+            error!("#{id} version differs: #{capture[:stdout].strip}") unless capture[:stdout].strip == expected
+
+            [id, metadata.merge(
+              'binary_path' => path.to_s,
+              'binary_sha256' => Digest::SHA256.file(path).hexdigest,
+              'reported_version' => capture[:stdout].strip
+            )]
+          end
         end
 
         def deep_sort(value)
@@ -956,7 +1065,7 @@ module Ast
 
         def build
           pairs = @results.group_by { |result| result['case_id'] }.values.map { |items| transition(items) }
-          false_auto_merges = eligible.select { |item| item['outcome'] == 'false_auto_merge' }
+          false_auto_merges = candidate_eligible.select { |item| item['outcome'] == 'false_auto_merge' }
           {
             'schema_version' => 'structuredmerge.benchmark.report/v1',
             'kind' => 'paired_aggregate_report',
@@ -966,7 +1075,7 @@ module Ast
             'cache_identity' => @run['cache_identity'],
             'dimensions' => {
               'safety' => {
-                'eligible' => eligible.length,
+                'eligible' => candidate_eligible.length,
                 'false_auto_merge_result_ids' => false_auto_merges.map { |item| item['id'] },
                 'gate' => false_auto_merges.empty? ? 'pass' : 'fail',
                 'non_compensable' => true
@@ -982,7 +1091,8 @@ module Ast
               'reliability' => { 'error_result_ids' => @results.filter_map do |item|
                 item['id'] if item['outcome'] == 'error'
               end },
-              'coverage' => coverage
+              'coverage' => coverage,
+              'competitive' => competitive
             },
             'strata' => strata,
             'transitions' => pairs,
@@ -998,6 +1108,10 @@ module Ast
 
         def eligible
           @eligible ||= @results.select { |item| item['score_eligible'] }
+        end
+
+        def candidate_eligible
+          eligible.select { |item| item['adapter_role'] == 'candidate' }
         end
 
         def outcome_counts
@@ -1042,6 +1156,21 @@ module Ast
           { 'selected_cases' => selected, 'executed_candidate_cases' => selected - unsupported.length,
             'unsupported_case_ids' => unsupported.map { |item| item['case_id'] },
             'unsupported_is_quality_failure' => false }
+        end
+
+        def competitive
+          results = @results.select { |item| item['adapter_role'] == 'competitor' }
+          {
+            'configured' => @run.fetch('competitors'),
+            'outcomes' => results.group_by { |item| item['outcome'] }.transform_values(&:length),
+            'unsupported_case_ids' => results.filter_map do |item|
+              item['case_id'] if item['outcome'] == 'unsupported'
+            end,
+            'false_auto_merge_result_ids' => results.filter_map do |item|
+              item['id'] if item['outcome'] == 'false_auto_merge'
+            end,
+            'affects_candidate_safety_gate' => false
+          }
         end
 
         def strata

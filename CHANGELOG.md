@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Local paired benchmarks now execute deterministic JSON and JSONC metamorphic no-semantic-edit probes against Git textual diff and selected StructuredMerge provider diff2 adapters.
 
+- Local paired benchmarks can execute an explicitly pinned Mergiraf binary, record source and binary provenance, report unsupported coverage separately, and isolate competitor safety findings from the StructuredMerge candidate gate.
+
 ### Changed
 
 - Bash merge providers now recognize AST-proven literal-title test_expect_success owners while retaining full-file conflicts for test membership changes until insertion order can be preserved safely.

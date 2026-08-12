@@ -49,6 +49,7 @@ if ARGV.first == 'benchmark'
     opts.on('--profile PROFILE') { |value| options[:profile] = value }
     opts.on('--changed-path PATH') { |value| options[:changed_paths] << value }
     opts.on('--driver PATH') { |value| options[:driver] = value }
+    opts.on('--mergiraf PATH') { |value| options[:mergiraf] = value }
     opts.on('--tmp-root PATH') { |value| options[:tmp_root] = value }
     opts.on('--timeout SECONDS', Integer) { |value| options[:timeout] = value }
   end
@@ -70,7 +71,8 @@ if ARGV.first == 'benchmark'
                  benchmark: benchmark,
                  driver_path: driver,
                  tmp_root: options[:tmp_root],
-                 timeout: options[:timeout]
+                 timeout: options[:timeout],
+                 competitor_paths: options[:mergiraf] ? { 'mergiraf' => options[:mergiraf] } : {}
                ).run(profile: options[:profile], changed_paths: options[:changed_paths])
                command == 'report' ? Ast::Merge::Git::LocalBenchmarkReport.build(run) : run
              else

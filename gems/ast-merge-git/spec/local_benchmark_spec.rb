@@ -280,6 +280,45 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(result).to include('ok' => true, 'operation' => 'diff2', 'changes' => [])
   end
 
+  it 'executes a pinned merge competitor without letting its results alter the candidate safety gate' do
+    FileUtils.mkdir_p(tmp_root)
+    competitor = tmp_root.join('mergiraf')
+    competitor.binwrite(<<~SH)
+      #!/bin/sh
+      if [ "$1" = "--version" ]; then
+        printf '%s\n' 'mergiraf 0.18.0'
+        exit 0
+      fi
+      if [ -n "$BENCHMARK_EXPECTED_ORACLE_BYTES" ]; then
+        exit 9
+      fi
+      git merge-file -p "$3" "$2" "$4" >"$6"
+    SH
+    FileUtils.chmod(0o755, competitor)
+    competitive_runner = Ast::Merge::Git::LocalBenchmarkRunner.new(
+      benchmark: benchmark,
+      driver_path: driver,
+      tmp_root: tmp_root.join('competitive-runs'),
+      competitor_paths: { 'mergiraf' => competitor }
+    )
+    previous = ENV['BENCHMARK_EXPECTED_ORACLE_BYTES']
+    ENV['BENCHMARK_EXPECTED_ORACLE_BYTES'] = 'must-not-reach-competitor'
+    report = Ast::Merge::Git::LocalBenchmarkReport.build(competitive_runner.run(profile: 'micro'))
+
+    expect(report.dig('dimensions', 'competitive', 'configured', 'mergiraf')).to include(
+      'source_revision' => '13b813c02da9511c7433131aed142473ffe62d52',
+      'reported_version' => 'mergiraf 0.18.0'
+    )
+    expect(report.dig('dimensions', 'competitive')).to include(
+      'outcomes' => { 'false_conflict' => 2, 'true_conflict' => 1 },
+      'unsupported_case_ids' => [],
+      'affects_candidate_safety_gate' => false
+    )
+    expect(report.dig('dimensions', 'safety', 'gate')).to eq('pass')
+  ensure
+    ENV['BENCHMARK_EXPECTED_ORACLE_BYTES'] = previous
+  end
+
   context 'with the installed paired drivers' do
     subject(:run) do
       Ast::Merge::Git::LocalBenchmarkRunner.new(
