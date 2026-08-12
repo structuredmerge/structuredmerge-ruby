@@ -72,7 +72,12 @@ jobs:
           gems = [gem for gem in gems if gem in all_gems]
 
           family_input_changed = any(
-              path in {"Gemfile", "Gemfile.lock", ".structuredmerge/fixtures.lock"}
+              path in {
+                  "Gemfile",
+                  "Gemfile.lock",
+                  ".structuredmerge/fixtures.lock",
+                  ".github/workflows/current.yml",
+              }
               for path in changed
           )
           if family_input_changed:
