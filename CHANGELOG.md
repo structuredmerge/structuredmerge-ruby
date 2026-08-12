@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Local paired benchmarks can execute an explicitly pinned Mergiraf binary, record source and binary provenance, report unsupported coverage separately, and isolate competitor safety findings from the StructuredMerge candidate gate.
 
+- Run the affected-capability StructuredMerge dev benchmark in Ruby family CI, retain its non-scalar report artifact, and gate only deterministic candidate safety.
+
 ### Changed
 
 - Bash merge providers now recognize AST-proven literal-title test_expect_success owners while retaining full-file conflicts for test membership changes until insertion order can be preserved safely.

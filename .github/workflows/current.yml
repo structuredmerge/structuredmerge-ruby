@@ -134,6 +134,108 @@ jobs:
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test
 
+  benchmark-dev:
+    name: StructuredMerge dev benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+      - name: Clone benchmark corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          lock=".structuredmerge/benchmark-fixtures.lock"
+          repository="$(ruby -ryaml -e 'puts YAML.safe_load_file(ARGV.fetch(0)).fetch("repository")' "${lock}")"
+          revision="$(ruby -ryaml -e 'puts YAML.safe_load_file(ARGV.fetch(0)).fetch("revision")' "${lock}")"
+          git clone --filter=blob:none --no-checkout "${repository}" ../benchmark-fixtures
+          git -C ../benchmark-fixtures fetch --depth 1 origin "${revision}"
+          git -C ../benchmark-fixtures checkout --detach "${revision}"
+          test "$(git -C ../benchmark-fixtures rev-parse HEAD)" = "${revision}"
+      - name: Setup Ruby
+        uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
+        with:
+          ruby-version: ruby
+          bundler-cache: false
+          working-directory: gems/ast-merge-git
+          pre-bundle-gems: |
+            nomono --source https://gem.coop --source https://rubygems.org
+      - name: Install dependencies
+        working-directory: gems/ast-merge-git
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          bundle config set frozen false
+          bundle install --jobs 4
+      - name: Run affected-capability benchmark
+        working-directory: gems/ast-merge-git
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          set -euo pipefail
+
+          base_sha="${BASE_SHA:-}"
+          if [[ -z "${base_sha}" || "${base_sha}" =~ ^0+$ ]]; then
+            base_sha="$(git -C "${GITHUB_WORKSPACE}" rev-parse HEAD^ 2>/dev/null || git -C "${GITHUB_WORKSPACE}" rev-list --max-parents=0 HEAD)"
+          fi
+
+          mapfile -t changed_paths < <(git -C "${GITHUB_WORKSPACE}" diff --name-only "${base_sha}...HEAD")
+          changed_path_args=()
+          for path in "${changed_paths[@]}"; do
+            changed_path_args+=(--changed-path "${path}")
+          done
+
+          lock="${GITHUB_WORKSPACE}/.structuredmerge/benchmark-fixtures.lock"
+          corpus_relative="$(ruby -ryaml -e 'puts YAML.safe_load_file(ARGV.fetch(0)).fetch("corpus")' "${lock}")"
+          corpus="${GITHUB_WORKSPACE}/../benchmark-fixtures/${corpus_relative}"
+          report="${PWD}/tmp/ci-benchmark/report.json"
+          mkdir -p "$(dirname "${report}")"
+
+          set +e
+          timeout 5m bundle exec ast-merge-git benchmark report \
+            --corpus "${corpus}" \
+            --profile dev \
+            --tmp-root "${PWD}/tmp/ci-benchmark/run" \
+            "${changed_path_args[@]}" > "${report}"
+          benchmark_status=$?
+          set -e
+
+          test -s "${report}"
+          # shellcheck disable=SC2016
+          ruby -rjson -e '
+            report = JSON.parse(File.read(ARGV.fetch(0)))
+            selected = report.dig("selection", "selected_case_ids")
+            effectiveness = report.dig("dimensions", "effectiveness")
+            coverage = report.dig("dimensions", "coverage")
+            File.open(ENV.fetch("GITHUB_STEP_SUMMARY"), "a") do |summary|
+              summary.puts "## StructuredMerge dev benchmark"
+              summary.puts
+              summary.puts "- Selected cases: #{selected.length}"
+              summary.puts "- Executed candidate cases: #{coverage.fetch("executed_candidate_cases")}"
+              summary.puts "- Candidate safety gate: #{report.dig("dimensions", "safety", "gate")}"
+              summary.puts "- Hard gate failed: #{report.fetch("hard_gate_failed")}"
+              summary.puts "- Scalar score: none"
+              summary.puts
+              summary.puts "| Outcome | Results |"
+              summary.puts "| --- | ---: |"
+              effectiveness.each { |outcome, count| summary.puts "| `#{outcome}` | #{count} |" }
+            end
+          ' "${report}"
+
+          exit "${benchmark_status}"
+      - name: Upload benchmark report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: structuredmerge-dev-benchmark-${{ github.sha }}
+          path: gems/ast-merge-git/tmp/ci-benchmark/report.json
+          if-no-files-found: warn
+          retention-days: 30
+
   rbs:
     name: RBS
     runs-on: ubuntu-latest
@@ -208,6 +310,7 @@ jobs:
     needs:
       - detect
       - gem-suite
+      - benchmark-dev
       - rbs
       - tslp-cold-cache
     if: ${{ always() }}
@@ -219,6 +322,7 @@ jobs:
           SELECTED_GEMS: ${{ needs.detect.outputs.summary }}
           DETECT_RESULT: ${{ needs.detect.result }}
           GEM_SUITE_RESULT: ${{ needs.gem-suite.result }}
+          BENCHMARK_DEV_RESULT: ${{ needs.benchmark-dev.result }}
           RBS_RESULT: ${{ needs.rbs.result }}
           TSLP_COLD_CACHE_RESULT: ${{ needs.tslp-cold-cache.result }}
         run: |
@@ -226,6 +330,7 @@ jobs:
           echo "Selected gem suites: ${SELECTED_GEMS}"
           echo "Detect result: ${DETECT_RESULT}"
           echo "Gem suite result: ${GEM_SUITE_RESULT}"
+          echo "Dev benchmark result: ${BENCHMARK_DEV_RESULT}"
           echo "RBS result: ${RBS_RESULT}"
           echo "TSLP cold cache result: ${TSLP_COLD_CACHE_RESULT}"
 
@@ -233,6 +338,9 @@ jobs:
             exit 1
           fi
           if [[ "${RBS_RESULT}" != "success" ]]; then
+            exit 1
+          fi
+          if [[ "${BENCHMARK_DEV_RESULT}" != "success" ]]; then
             exit 1
           fi
           if [[ "${TSLP_COLD_CACHE_RESULT}" != "success" ]]; then
