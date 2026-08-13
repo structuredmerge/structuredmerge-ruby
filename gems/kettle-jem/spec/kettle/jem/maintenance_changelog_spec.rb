@@ -30,6 +30,33 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
     end
   end
 
+  it "supports compound keys without extending kettle-changelog's keyed entry format" do
+    Dir.mktmpdir("kettle-jem-maintenance-changelog-compound-key") do |root|
+      stub_env("K_CHANGELOG_PATH" => nil)
+      File.write(File.join(root, "CHANGELOG.md"), <<~MARKDOWN)
+        # Changelog
+
+        ## [Unreleased]
+
+        ### Changed
+
+        ### Fixed
+      MARKDOWN
+
+      result = described_class.upsert_unreleased_entry(
+        project_root: root,
+        section: "Changed",
+        key: "[kettle-jem][template]",
+        entry: "updated 1 project file:\n  - documentation (1)"
+      )
+
+      expect(result).to include(status: "updated", key: "[kettle-jem][template]")
+      expect(File.read(File.join(root, "CHANGELOG.md"))).to include(
+        "- [kc] [kettle-jem][template]: updated 1 project file:\n  - documentation (1)"
+      )
+    end
+  end
+
   describe ".record_template_run" do
     let(:report) do
       {
@@ -44,8 +71,12 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       }
     end
 
-    it "records one aggregate entry for actual template changes" do
-      allow(described_class).to receive(:add_unreleased_entry).and_return(status: "updated")
+    it "records one keyed aggregate entry for actual template changes" do
+      options = nil
+      allow(described_class).to receive(:upsert_unreleased_entry) do |**received_options|
+        options = received_options
+        {status: "updated", entry: "rendered entry"}
+      end
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
@@ -54,15 +85,23 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
       expect(result.fetch(:changelog)).to include(status: "updated")
       expect(result.fetch(:changed_files)).to include("CHANGELOG.md")
-      expect(described_class).to have_received(:add_unreleased_entry).with(
+      expect(described_class).to have_received(:upsert_unreleased_entry).with(
         project_root: "/workspace/example",
         section: "Changed",
-        entry: "Apply kettle-jem templates: updated 4 project files across code and tests (1), dependencies (1), documentation (1), workflows (1)."
+        key: "[kettle-jem][template]",
+        entry: an_instance_of(Proc)
       )
+      expect(options.fetch(:entry).call([])).to eq(<<~ENTRY.chomp)
+        updated 4 project files:
+          - code and tests (1)
+          - dependencies (1)
+          - documentation (1)
+          - workflows (1)
+      ENTRY
     end
 
     it "does not invoke kettle-changelog when only bookkeeping changed" do
-      allow(described_class).to receive(:add_unreleased_entry)
+      allow(described_class).to receive(:upsert_unreleased_entry)
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
@@ -70,11 +109,11 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       )
 
       expect(result.fetch(:changelog)).to include(status: "skipped", reason: "no_template_changes")
-      expect(described_class).not_to have_received(:add_unreleased_entry)
+      expect(described_class).not_to have_received(:upsert_unreleased_entry)
     end
 
     it "does not record the first-run config bootstrap" do
-      allow(described_class).to receive(:add_unreleased_entry)
+      allow(described_class).to receive(:upsert_unreleased_entry)
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
@@ -82,11 +121,11 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       )
 
       expect(result.fetch(:changelog)).to include(status: "skipped", reason: "bootstrap_only")
-      expect(described_class).not_to have_received(:add_unreleased_entry)
+      expect(described_class).not_to have_received(:upsert_unreleased_entry)
     end
 
     it "supports an explicit changelog opt-out" do
-      allow(described_class).to receive(:add_unreleased_entry)
+      allow(described_class).to receive(:upsert_unreleased_entry)
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
@@ -95,7 +134,29 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       )
 
       expect(result.fetch(:changelog)).to include(status: "skipped", reason: "disabled")
-      expect(described_class).not_to have_received(:add_unreleased_entry)
+      expect(described_class).not_to have_received(:upsert_unreleased_entry)
+    end
+
+    it "adds later template changes to the existing keyed category totals" do
+      allow(described_class).to receive(:upsert_unreleased_entry) do |**options|
+        body = options.fetch(:entry).call([{source: <<~MARKDOWN}])
+          - [kc] [kettle-jem][template]: updated 4 project files:
+            - dependencies (2)
+            - documentation (2)
+        MARKDOWN
+        {status: "updated", entry: body}
+      end
+
+      result = described_class.record_template_run(
+        project_root: "/workspace/example",
+        report: {changed_files: ["Gemfile", "README.md"]}
+      )
+
+      expect(result.fetch(:changelog).fetch(:entry)).to include(
+        "updated 6 project files:",
+        "- dependencies (3)",
+        "- documentation (3)"
+      )
     end
   end
 end

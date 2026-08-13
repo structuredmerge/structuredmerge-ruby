@@ -23,6 +23,10 @@ module Kettle
         configuration: ->(path) { path.start_with?(".structuredmerge/") || path == "mise.toml" || path == ".gitignore" },
         code_and_tests: ->(path) { path.start_with?("lib/", "spec/", "test/", "bin/") || path == "Rakefile" }
       }.freeze
+      TEMPLATE_CHANGELOG_KEYS = {
+        "Apply kettle-jem templates" => "[kettle-jem][template]",
+        "Prepare project for kettle-jem templates" => "[kettle-jem][prepare]"
+      }.freeze
       BUNDLER_ENVIRONMENT = %w[
         BUNDLE_BIN_PATH
         BUNDLE_FROZEN
@@ -91,9 +95,10 @@ module Kettle
           return report.merge(changelog: {status: "skipped", reason: "no_template_changes", changed_files: []})
         end
 
-        entry = template_run_entry(label, changed_files)
-        result = add_unreleased_entry(project_root: project_root, section: "Changed", entry: entry)
-        changelog = result.merge(changed_files: changed_files, entry: entry)
+        key = TEMPLATE_CHANGELOG_KEYS.fetch(label, "[kettle-jem][template]")
+        entry = ->(matches) { template_run_entry(changed_files, matches) }
+        result = upsert_unreleased_entry(project_root: project_root, section: "Changed", key: key, entry: entry)
+        changelog = result.merge(changed_files: changed_files, entry: result.fetch(:entry))
         changed_files_with_changelog = if result.fetch(:status) == "updated"
           (Array(report.fetch(:changed_files, [])) + ["CHANGELOG.md"]).uniq.sort
         else
@@ -108,12 +113,29 @@ module Kettle
         end
       end
 
-      def template_run_entry(label, changed_files)
-        counts = changed_files.group_by { |path| template_change_category(path) }
-          .sort_by { |category, _paths| category.to_s }
-          .map { |category, paths| "#{category.to_s.tr("_", " ")} (#{paths.length})" }
-        areas = counts.empty? ? "project files" : counts.join(", ")
-        "#{label}: updated #{changed_files.length} project file#{"s" unless changed_files.length == 1} across #{areas}."
+      def template_run_entry(changed_files, matches)
+        counts = template_entry_counts(matches)
+        changed_files.group_by { |path| template_change_category(path) }.each do |category, paths|
+          counts[category] = counts.fetch(category, 0) + paths.length
+        end
+        total = counts.values.sum
+        details = counts.sort_by { |category, _count| category.to_s }.map do |category, count|
+          "  - #{category.to_s.tr("_", " ")} (#{count})"
+        end
+        ["updated #{total} project file#{"s" unless total == 1}:", *details].join("\n")
+      end
+
+      def template_entry_counts(matches)
+        source = Array(matches).first.to_h.fetch(:source, "")
+        source.lines.filter_map do |line|
+          match = line.match(/\A\s{2,}- (.+?) \((\d+)\)\s*\z/)
+          next unless match
+
+          category = match[1].tr(" ", "_").to_sym
+          next unless TEMPLATE_CHANGE_CATEGORIES.key?(category) || category == :other
+
+          [category, match[2].to_i]
+        end.to_h
       end
 
       def template_change_category(path)

@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Template maintenance summaries now use keyed, cumulative [kc] entries with nested file-type counts, so repeated template runs update one changelog entry.
+
 ### Deprecated
 
 ### Removed
