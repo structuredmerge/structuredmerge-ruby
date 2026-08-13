@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Use Markdown-safe compound keys for automated kettle-jem template changelog entries so release reference validation does not treat their labels as undefined links.
+
 ### Security
 
 ## [7.1.4] - 2026-08-12

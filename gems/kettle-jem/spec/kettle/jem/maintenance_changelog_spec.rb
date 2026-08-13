@@ -46,13 +46,13 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       result = described_class.upsert_unreleased_entry(
         project_root: root,
         section: "Changed",
-        key: "[kettle-jem][template]",
+        key: "kettle-jem/template",
         entry: "updated 1 project file:\n  - documentation (1)"
       )
 
-      expect(result).to include(status: "updated", key: "[kettle-jem][template]")
+      expect(result).to include(status: "updated", key: "kettle-jem/template")
       expect(File.read(File.join(root, "CHANGELOG.md"))).to include(
-        "- [kc] [kettle-jem][template]: updated 1 project file:\n  - documentation (1)"
+        "- [kc] kettle-jem/template: updated 1 project file:\n  - documentation (1)"
       )
     end
   end
@@ -88,7 +88,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       expect(described_class).to have_received(:upsert_unreleased_entry).with(
         project_root: "/workspace/example",
         section: "Changed",
-        key: "[kettle-jem][template]",
+        key: "kettle-jem/template",
         entry: an_instance_of(Proc)
       )
       expect(options.fetch(:entry).call([])).to eq(<<~ENTRY.chomp)
@@ -140,7 +140,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
     it "adds later template changes to the existing keyed category totals" do
       allow(described_class).to receive(:upsert_unreleased_entry) do |**options|
         body = options.fetch(:entry).call([{source: <<~MARKDOWN}])
-          - [kc] [kettle-jem][template]: updated 4 project files:
+          - [kc] kettle-jem/template: updated 4 project files:
             - dependencies (2)
             - documentation (2)
         MARKDOWN

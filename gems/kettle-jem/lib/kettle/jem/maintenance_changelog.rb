@@ -24,8 +24,8 @@ module Kettle
         code_and_tests: ->(path) { path.start_with?("lib/", "spec/", "test/", "bin/") || path == "Rakefile" }
       }.freeze
       TEMPLATE_CHANGELOG_KEYS = {
-        "Apply kettle-jem templates" => "[kettle-jem][template]",
-        "Prepare project for kettle-jem templates" => "[kettle-jem][prepare]"
+        "Apply kettle-jem templates" => "kettle-jem/template",
+        "Prepare project for kettle-jem templates" => "kettle-jem/prepare"
       }.freeze
       BUNDLER_ENVIRONMENT = %w[
         BUNDLE_BIN_PATH
@@ -95,7 +95,7 @@ module Kettle
           return report.merge(changelog: {status: "skipped", reason: "no_template_changes", changed_files: []})
         end
 
-        key = TEMPLATE_CHANGELOG_KEYS.fetch(label, "[kettle-jem][template]")
+        key = TEMPLATE_CHANGELOG_KEYS.fetch(label, "kettle-jem/template")
         entry = ->(matches) { template_run_entry(changed_files, matches) }
         result = upsert_unreleased_entry(project_root: project_root, section: "Changed", key: key, entry: entry)
         changelog = result.merge(changed_files: changed_files, entry: result.fetch(:entry))
