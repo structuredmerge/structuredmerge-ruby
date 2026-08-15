@@ -30,22 +30,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Bash merge providers now recognize AST-proven literal-title test_expect_success owners while retaining full-file conflicts for test membership changes until insertion order can be preserved safely.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Run every Ruby gem suite when the pinned StructuredMerge fixture release changes.
-
-### Security
-
-## [7.1.4] - 2026-08-12
-
-- TAG: [v7.1.4][7.1.4t]
-- COVERAGE: 0.00% -- 0/0 lines in 0 files
-- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
-- 18.00% documented
 
 ## [7.1.3] - 2026-08-11
 
@@ -524,9 +511,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...HEAD
-[7.1.4]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.3...v7.1.4
-[7.1.4t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.4
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.3...HEAD
 [7.1.3]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.2...v7.1.3
 [7.1.3t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.3
 [7.1.2]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.1...v7.1.2
