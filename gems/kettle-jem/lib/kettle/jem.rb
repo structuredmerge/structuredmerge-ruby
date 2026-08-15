@@ -1407,6 +1407,63 @@ module Kettle
       "🖇osc-sponsors-img",
       "🖇osc-sponsors-bottom-img"
     ].freeze
+    FUNDING_YML_PLATFORMS = %w[
+      buy_me_a_coffee
+      community_bridge
+      github
+      issuehunt
+      ko_fi
+      liberapay
+      open_collective
+      patreon
+      polar
+      thanks_dev
+      tidelift
+    ].freeze
+    FUNDING_README_PLATFORMS = (FUNDING_YML_PLATFORMS + ["paypal"]).freeze
+    FUNDING_DEFAULT_DISABLED_PLATFORMS = %w[issuehunt patreon polar].freeze
+    README_FUNDING_BADGE_POLICIES = {
+      "github" => {
+        badges: [
+          "[![Sponsor Me on Github][🖇sponsor-img]][🖇sponsor]",
+          "[![Sponsor me on GitHub Sponsors][🖇sponsor-bottom-img]][🖇sponsor]"
+        ],
+        labels: ["🖇sponsor", "🖇sponsor-img", "🖇sponsor-bottom-img"]
+      },
+      "liberapay" => {
+        badges: [
+          "[![Liberapay Goal Progress][⛳liberapay-img]][⛳liberapay]",
+          "[![Sponsor me on Liberapay][⛳liberapay-bottom-img]][⛳liberapay]"
+        ],
+        labels: ["⛳liberapay", "⛳liberapay-img", "⛳liberapay-bottom-img"]
+      },
+      "paypal" => {
+        badges: [
+          "[![Donate on PayPal][🖇paypal-img]][🖇paypal]",
+          "[![Donate on PayPal][🖇paypal-bottom-img]][🖇paypal]"
+        ],
+        labels: ["🖇paypal", "🖇paypal-img", "🖇paypal-bottom-img"]
+      },
+      "buy_me_a_coffee" => {
+        badges: [
+          "[![Buy me a coffee][🖇buyme-small-img]][🖇buyme]"
+        ],
+        labels: ["🖇buyme", "🖇buyme-small-img", "🖇buyme-img"]
+      },
+      "ko_fi" => {
+        badges: [
+          "[![Donate at ko-fi.com][🖇kofi-img]][🖇kofi]",
+          "[![Donate to my FLOSS efforts at ko-fi.com][🖇kofi-img]][🖇kofi]"
+        ],
+        labels: ["🖇kofi", "🖇kofi-img"]
+      },
+      "tidelift" => {
+        badges: [
+          "[![Get help from me on Tidelift][🏙️entsup-tidelift-img]][🏙️entsup-tidelift]"
+        ],
+        labels: ["🏙️entsup-tidelift", "🏙️entsup-tidelift-img"]
+      }
+    }.freeze
     README_INTEGRATIONS = %w[codecov coveralls qlty codeql skywalking-eyes].freeze
     README_STAR_HISTORY_MIN_STARS = 150
     README_DISCOVERED_INTEGRATIONS = (README_INTEGRATIONS - [SKYWALKING_EYES_INTEGRATION]).freeze
@@ -3161,6 +3218,7 @@ module Kettle
       facts[:ruby_style] = ruby_style_facts(project_root)
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
+      funding_platforms = funding_platform_policies(kettle_config, env)
       detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
       detected_open_collective_org ||= fallback_opencollective_org unless opencollective_disabled
       funding = compact_hash(
@@ -3168,9 +3226,11 @@ module Kettle
           project_root,
           package_name,
           opencollective_disabled: opencollective_disabled,
-          open_collective_org: detected_open_collective_org && detected_open_collective_org.fetch(:org)
+          open_collective_org: detected_open_collective_org && detected_open_collective_org.fetch(:org),
+          enabled_platforms: funding_platforms
         ),
-        platform_tokens: funding_platform_token_facts(kettle_config, env)
+        platform_tokens: funding_platform_token_facts(kettle_config, env),
+        platforms: funding_platforms
       )
       funding[:open_collective_disabled] = true if opencollective_disabled
       funding[:open_collective_disabled_source] = opencollective_policy[:source] if opencollective_disabled
@@ -3410,6 +3470,7 @@ module Kettle
       facts[:social] = social unless social.empty?
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
+      funding_platforms = funding_platform_policies(kettle_config, env)
       open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
       open_collective_org ||= fallback_opencollective_org unless opencollective_disabled
       funding = compact_hash(
@@ -3418,8 +3479,10 @@ module Kettle
           name,
           funding_uri: metadata_value(gemspec_metadata, :funding_uri),
           opencollective_disabled: opencollective_disabled,
-          open_collective_org: open_collective_org && open_collective_org.fetch(:org)
-        )
+          open_collective_org: open_collective_org && open_collective_org.fetch(:org),
+          enabled_platforms: funding_platforms
+        ),
+        platforms: funding_platforms
       )
       funding_tokens = funding_platform_token_facts(kettle_config, env)
       funding[:platform_tokens] = funding_tokens unless funding_tokens.empty?
@@ -7018,6 +7081,8 @@ module Kettle
         merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root, facts: facts) if template_file_type(recipe) == :toml
         return finalize_template_source_content(recipe, sync_kettle_config_env_overrides(merged, env)) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
+        merged = postprocess_funding_markdown_content(merged, facts) if recipe.fetch(:target_path) == "FUNDING.md"
+
         if github_workflow_template_recipe?(recipe)
           merged = preserve_github_workflow_project_settings(recipe, merged, original, project_root: project_root)
           merged = finalize_github_workflow_template(merged, facts)
@@ -7030,6 +7095,7 @@ module Kettle
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts, project_root: project_root)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original, project_root: project_root) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
+        accepted = postprocess_funding_markdown_content(accepted, facts) if recipe.fetch(:target_path) == "FUNDING.md"
         if github_workflow_template_recipe?(recipe)
           accepted = finalize_github_workflow_template(accepted, facts)
           accepted = preserve_newer_github_workflow_action_pins(accepted, original)
@@ -7047,6 +7113,7 @@ module Kettle
       end
 
       resolved = finalize_github_workflow_template(resolved, facts) if github_workflow_template_recipe?(recipe)
+      resolved = postprocess_funding_markdown_content(resolved, facts) if recipe.fetch(:target_path) == "FUNDING.md"
       if recipe.fetch(:target_path) == "README.md"
         return postprocess_readme_content(
           resolved,
@@ -7366,6 +7433,11 @@ module Kettle
       open_collective_enabled = !facts.dig(:funding, :open_collective_disabled)
       processed = apply_markdown_conditional_block(content, "OPEN_COLLECTIVE", keep: open_collective_enabled)
       processed = apply_markdown_conditional_block(processed, "NO_OPEN_COLLECTIVE", keep: !open_collective_enabled)
+      processed = apply_markdown_conditional_block(
+        processed,
+        "FUNDING_TIDELIFT",
+        keep: funding_platform_enabled?(facts.dig(:funding, :platforms), "tidelift")
+      )
       star_history_enabled = facts.dig(:repository, :star_history, :enabled) == true
       return processed if star_history_enabled
 
@@ -7376,6 +7448,28 @@ module Kettle
           limit: {at_least: 0}
         )
       )
+    end
+
+    def postprocess_funding_markdown_content(content, facts)
+      open_collective_enabled = !facts.dig(:funding, :open_collective_disabled)
+      processed = apply_markdown_conditional_block(content, "OPEN_COLLECTIVE", keep: open_collective_enabled)
+      processed = apply_markdown_conditional_block(processed, "NO_OPEN_COLLECTIVE", keep: !open_collective_enabled)
+      funding_platforms = facts.dig(:funding, :platforms)
+      if facts.dig(:funding, :open_collective_disabled)
+        processed = remove_readme_badge_and_refs(
+          processed,
+          README_OPEN_COLLECTIVE_FUNDING_BADGES,
+          README_OPEN_COLLECTIVE_LINK_LABELS
+        )
+      end
+      README_FUNDING_BADGE_POLICIES.each do |platform, policy|
+        next if funding_platform_enabled?(funding_platforms, platform)
+
+        processed = policy.fetch(:badges).reduce(processed) do |badge_content, badge|
+          remove_readme_badge_and_refs(badge_content, badge, policy.fetch(:labels))
+        end
+      end
+      processed
     end
 
     def apply_readme_badge_policy(content, facts)
@@ -7403,6 +7497,16 @@ module Kettle
             README_OPEN_COLLECTIVE_FUNDING_BADGES,
             README_OPEN_COLLECTIVE_LINK_LABELS
           )
+        end
+      end
+      funding_platforms = facts.dig(:funding, :platforms)
+      README_FUNDING_BADGE_POLICIES.each do |platform, policy|
+        next if funding_platform_enabled?(funding_platforms, platform)
+
+        processed = with_readme_timing("badge_policy.#{platform}") do
+          policy.fetch(:badges).reduce(processed) do |badge_content, badge|
+            remove_readme_badge_and_refs(badge_content, badge, policy.fetch(:labels))
+          end
         end
       end
       Array(facts.dig(:readme_style, :disabled_integrations)).each do |integration|
@@ -13101,24 +13205,38 @@ module Kettle
       engines.map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).uniq
     end
 
-    def funding_urls(project_root, package_name, funding_uri: nil, opencollective_disabled: false, open_collective_org: nil)
+    def funding_urls(project_root, package_name, funding_uri: nil, opencollective_disabled: false, open_collective_org: nil, enabled_platforms: nil)
       urls = [funding_uri]
       path = File.join(project_root, ".github", "FUNDING.yml")
-      urls.concat(github_funding_urls(path, opencollective_disabled: opencollective_disabled)) if File.exist?(path)
-      urls << github_funding_platform_urls("open_collective", [open_collective_org]).first unless opencollective_disabled
-      urls << github_funding_platform_urls("tidelift", ["rubygems/#{package_name}"]).first
+      if File.exist?(path)
+        urls.concat(
+          github_funding_urls(
+            path,
+            opencollective_disabled: opencollective_disabled,
+            enabled_platforms: enabled_platforms
+          )
+        )
+      end
+      if !opencollective_disabled && funding_platform_enabled?(enabled_platforms, "open_collective")
+        urls << github_funding_platform_urls("open_collective", [open_collective_org]).first
+      end
+      if funding_platform_enabled?(enabled_platforms, "tidelift")
+        urls << github_funding_platform_urls("tidelift", ["rubygems/#{package_name}"]).first
+      end
 
       urls.compact.uniq.sort
     end
 
-    def github_funding_urls(path, opencollective_disabled: false)
+    def github_funding_urls(path, opencollective_disabled: false, enabled_platforms: nil)
       funding = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
       return [] unless funding.is_a?(Hash)
 
       funding.flat_map do |platform, value|
-        next [] if opencollective_disabled && platform.to_s == "open_collective"
+        normalized_platform = platform.to_s
+        next [] if opencollective_disabled && normalized_platform == "open_collective"
+        next [] unless funding_platform_enabled?(enabled_platforms, normalized_platform)
 
-        github_funding_platform_urls(platform.to_s, Array(value).compact)
+        github_funding_platform_urls(normalized_platform, Array(value).compact)
       end
     end
 
@@ -13741,6 +13859,27 @@ module Kettle
 
     def opencollective_disabled?(config, env: ENV)
       opencollective_policy(config, env).fetch(:disabled)
+    end
+
+    def funding_platform_policies(config, env)
+      funding = config["funding"]
+      configured = funding.is_a?(Hash) ? funding : {}
+      FUNDING_README_PLATFORMS.to_h do |platform|
+        value = if platform == "open_collective"
+          !opencollective_policy(config, env).fetch(:disabled)
+        elsif configured.key?(platform)
+          !falsey_config?(configured.fetch(platform))
+        else
+          !FUNDING_DEFAULT_DISABLED_PLATFORMS.include?(platform)
+        end
+        [platform, value]
+      end
+    end
+
+    def funding_platform_enabled?(enabled_platforms, platform)
+      return true unless enabled_platforms.is_a?(Hash)
+
+      enabled_platforms.fetch(platform.to_s, true) == true
     end
 
     def opencollective_policy(config, env)
@@ -18523,9 +18662,15 @@ module Kettle
 
     def synchronize_github_funding_yml(content, facts)
       output = content.to_s
-      output = remove_top_level_yaml_key_lines(output, "open_collective") if facts.fetch(:funding, {})[:open_collective_disabled]
+      enabled_platforms = facts.fetch(:funding, {}).fetch(:platforms, {})
+      enabled_platforms = enabled_platforms.merge("open_collective" => false) if facts.fetch(:funding, {})[:open_collective_disabled]
+      FUNDING_YML_PLATFORMS.each do |platform|
+        next if funding_platform_enabled?(enabled_platforms, platform)
+
+        output = remove_top_level_yaml_key_lines(output, platform)
+      end
       tidelift_value = "rubygems/#{facts.fetch(:package).fetch(:name)}"
-      unless yaml_top_level_key_lines(output).key?("tidelift")
+      if funding_platform_enabled?(enabled_platforms, "tidelift") && !yaml_top_level_key_lines(output).key?("tidelift")
         lines = output.lines
         lines << "\n" unless lines.empty? || lines.last.to_s.strip.empty?
         lines << "tidelift: #{tidelift_value}\n"

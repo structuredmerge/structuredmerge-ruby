@@ -1012,6 +1012,101 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
+  it "applies funding platform policy to destination FUNDING.yml entries" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-funding-platform-policy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          funding:
+            github: false
+            issuehunt: false
+            patreon: false
+            polar: false
+            tidelift: false
+        YAML
+        ".github/FUNDING.yml" => <<~YAML
+          github: [example]
+          issuehunt: example
+          ko_fi: example
+          patreon: example
+          polar: example
+          tidelift: rubygems/example
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      funding_report = plan[:recipe_reports].find { |report| report.fetch(:recipe_name) == "github_funding_yml" }
+      final_content = funding_report.fetch(:final_content)
+
+      expect(plan.dig(:facts, :funding, :platforms)).to include(
+        "github" => false,
+        "issuehunt" => false,
+        "patreon" => false,
+        "polar" => false,
+        "tidelift" => false,
+        "ko_fi" => true
+      )
+      expect(final_content).not_to match(/^github:/)
+      expect(final_content).not_to match(/^issuehunt:/)
+      expect(final_content).not_to match(/^patreon:/)
+      expect(final_content).not_to match(/^polar:/)
+      expect(final_content).not_to match(/^tidelift:/)
+      expect(final_content).to match(/^ko_fi:/)
+    end
+  end
+
+  it "keeps funding badges aligned with disabled platform policy" do
+    config = {
+      "funding" => {
+        "github" => false,
+        "ko_fi" => false,
+        "paypal" => false,
+        "buy_me_a_coffee" => false,
+        "liberapay" => false,
+        "tidelift" => false
+      }
+    }
+    platforms = described_class.send(:funding_platform_policies, config, {})
+    content = <<~MARKDOWN
+      [![Sponsor Me on Github][🖇sponsor-img]][🖇sponsor]
+      [![Liberapay Goal Progress][⛳liberapay-img]][⛳liberapay]
+      [![Donate on PayPal][🖇paypal-img]][🖇paypal]
+      [![Buy me a coffee][🖇buyme-small-img]][🖇buyme]
+      [![Donate at ko-fi.com][🖇kofi-img]][🖇kofi]
+      [![Get help from me on Tidelift][🏙️entsup-tidelift-img]][🏙️entsup-tidelift]
+
+      [🖇sponsor-img]: https://example.test/sponsor.png
+      [🖇sponsor]: https://example.test/sponsor
+      [⛳liberapay-img]: https://example.test/liberapay.png
+      [⛳liberapay]: https://example.test/liberapay
+      [🖇paypal-img]: https://example.test/paypal.png
+      [🖇paypal]: https://example.test/paypal
+      [🖇buyme-small-img]: https://example.test/buyme.png
+      [🖇buyme]: https://example.test/buyme
+      [🖇kofi-img]: https://example.test/kofi.png
+      [🖇kofi]: https://example.test/kofi
+      [🏙️entsup-tidelift-img]: https://example.test/tidelift.png
+      [🏙️entsup-tidelift]: https://example.test/tidelift
+    MARKDOWN
+
+    result = described_class.send(
+      :postprocess_funding_markdown_content,
+      content,
+      {funding: {platforms: platforms}}
+    )
+
+    expect(result).not_to include("Sponsor Me on Github", "Liberapay Goal Progress", "Donate on PayPal", "Buy me a coffee", "Donate at ko-fi.com", "Get help from me on Tidelift")
+    expect(result).not_to include("🖇sponsor", "⛳liberapay", "🖇paypal", "🖇buyme", "🖇kofi", "🏙️entsup-tidelift")
+  end
+
   it "updates the README KLOC badge from the current changelog release coverage" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

@@ -7,6 +7,7 @@
 #
 # High-level structure:
 #   defaults  - default merge behavior for files that use strategy: merge
+#   funding   - per-platform emission policy for FUNDING.yml and funding badges
 #   tokens    - values for {KJ|...} placeholders used across template files
 #   patterns  - glob-based overrides for files/directories
 #   files     - exact per-file overrides using a nested directory tree
@@ -448,6 +449,22 @@ defaults:
 # Tip:
 #   The author fields in a newly created destination config are normally seeded
 #   from the gemspec via safe derivation. After that, destination values win.
+funding:
+  # Set a platform to false to remove it from .github/FUNDING.yml and its
+  # managed README/FUNDING.md badges. Retired platforms stay explicit opt-outs
+  # so existing destination files are cleaned without making removal permanent.
+  buy_me_a_coffee: true
+  community_bridge: true
+  github: true
+  issuehunt: false
+  ko_fi: true
+  liberapay: true
+  open_collective: "kettle-dev" # Slug, true to enable with ENV/.opencollective.yml, false to disable.
+  patreon: false
+  paypal: true                 # README/FUNDING.md badge only; not a FUNDING.yml key.
+  polar: false
+  thanks_dev: true
+  tidelift: true
 tokens:
   forge:
     gh_user: "pboling"          # GitHub username only, no @, no URL. Used for GitHub Sponsors and profile links. ENV: KJ_GH_USER
