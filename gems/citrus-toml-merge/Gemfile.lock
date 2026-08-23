@@ -16,6 +16,23 @@ PATH
       toml-rb (~> 4.1)
       version_gem (~> 1.1, >= 1.1.15)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-merge
+  specs:
+    ast-merge (7.1.4)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.4)
+      tree_haver (= 7.1.4)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/toml-merge
+  specs:
+    toml-merge (7.1.4)
+      ast-merge (= 7.1.4)
+      tree_haver (= 7.1.4)
+      version_gem (~> 1.1, >= 1.1.15)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -41,11 +58,6 @@ GEM
       ast-crispr (= 7.1.4)
       markdown-merge (= 7.1.4)
       markly-merge (= 7.1.4)
-      version_gem (~> 1.1, >= 1.1.15)
-    ast-merge (7.1.4)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.4)
-      tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
     backports (3.25.3)
     benchmark (0.5.0)
@@ -407,10 +419,6 @@ GEM
     token-resolver (2.0.9)
       parslet (~> 2.0)
       version_gem (~> 1.1, >= 1.1.15)
-    toml-merge (7.1.4)
-      ast-merge (= 7.1.4)
-      tree_haver (= 7.1.4)
-      version_gem (~> 1.1, >= 1.1.15)
     toml-rb (4.2.1)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
@@ -484,6 +492,7 @@ DEPENDENCIES
   anonymous_loader (~> 0.1, >= 0.1.3)
   appraisal2 (~> 3.2, >= 3.2.2)
   appraisal2-rubocop (~> 1.0, >= 1.0.1)
+  ast-merge!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
   cgi (~> 0.5)
@@ -517,6 +526,7 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8)
   stringio (>= 3.0)
+  toml-merge!
   turbo_tests2 (~> 3.2, >= 3.2.6)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.5)

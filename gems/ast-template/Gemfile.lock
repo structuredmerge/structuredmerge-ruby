@@ -14,6 +14,15 @@ PATH
       ast-merge (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-merge
+  specs:
+    ast-merge (7.1.4)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.4)
+      tree_haver (= 7.1.4)
+      version_gem (~> 1.1, >= 1.1.15)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -39,11 +48,6 @@ GEM
       ast-crispr (= 7.1.4)
       markdown-merge (= 7.1.4)
       markly-merge (= 7.1.4)
-      version_gem (~> 1.1, >= 1.1.15)
-    ast-merge (7.1.4)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.4)
-      tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
     backports (3.25.3)
     benchmark (0.5.0)
@@ -484,6 +488,7 @@ DEPENDENCIES
   anonymous_loader (~> 0.1, >= 0.1.3)
   appraisal2 (~> 3.2, >= 3.2.2)
   appraisal2-rubocop (~> 1.0, >= 1.0.1)
+  ast-merge!
   ast-template!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)

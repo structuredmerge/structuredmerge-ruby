@@ -15,6 +15,14 @@ PATH
       markdown-merge (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/markdown-merge
+  specs:
+    markdown-merge (7.1.4)
+      ast-merge (= 7.1.4)
+      tree_haver (= 7.1.4)
+      version_gem (~> 1.1, >= 1.1.15)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -176,10 +184,6 @@ GEM
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     logger (1.7.0)
-    markdown-merge (7.1.4)
-      ast-merge (= 7.1.4)
-      tree_haver (= 7.1.4)
-      version_gem (~> 1.1, >= 1.1.15)
     markly (0.17.0)
     markly-merge (7.1.4)
       markdown-merge (= 7.1.4)
@@ -491,6 +495,7 @@ DEPENDENCIES
   kettle-test (~> 2.0, >= 2.0.20)
   kramdown-merge!
   kramdown-parser-gfm (~> 1.1)
+  markdown-merge!
   mutex_m (~> 0.2)
   nomono (~> 1.1, >= 1.1.4)
   rake (~> 13.0)

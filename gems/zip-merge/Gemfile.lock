@@ -15,6 +15,23 @@ PATH
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/binary-merge
+  specs:
+    binary-merge (7.1.4)
+      ast-merge (= 7.1.4)
+      tree_haver (= 7.1.4)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/tree_haver
+  specs:
+    tree_haver (7.1.4)
+      citrus (~> 3.0)
+      parslet (~> 2.0)
+      tree_sitter_language_pack (>= 1.13.2, < 2.0)
+      version_gem (~> 1.1, >= 1.1.15)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -49,10 +66,6 @@ GEM
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
-    binary-merge (7.1.4)
-      ast-merge (= 7.1.4)
-      tree_haver (= 7.1.4)
-      version_gem (~> 1.1, >= 1.1.15)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
       thor (~> 1.0)
@@ -410,11 +423,6 @@ GEM
     token-resolver (2.0.9)
       parslet (~> 2.0)
       version_gem (~> 1.1, >= 1.1.15)
-    tree_haver (7.1.4)
-      citrus (~> 3.0)
-      parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.13.2, < 2.0)
-      version_gem (~> 1.1, >= 1.1.15)
     tree_sitter_language_pack (1.15.7-aarch64-linux)
       sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.15.7-arm64-darwin)
@@ -481,6 +489,7 @@ DEPENDENCIES
   appraisal2 (~> 3.2, >= 3.2.2)
   appraisal2-rubocop (~> 1.0, >= 1.0.1)
   benchmark (~> 0.5, >= 0.5.0)
+  binary-merge!
   bundler-audit (~> 0.9.3)
   cgi (~> 0.5)
   debug (>= 1.1)
@@ -512,6 +521,7 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8)
   stringio (>= 3.0)
+  tree_haver!
   turbo_tests2 (~> 3.2, >= 3.2.6)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.5)
