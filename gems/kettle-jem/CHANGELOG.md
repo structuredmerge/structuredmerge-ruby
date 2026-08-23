@@ -26,6 +26,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] kettle-jem/funding-platforms: Configure GitHub funding platforms independently, remove disabled destination-only FUNDING.yml entries, and keep README/FUNDING.md badges aligned with the configured policy.
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - gitmoji-regex (>= 2.0.11 -> >= 2.0.12)
+  - kettle-dev (>= 3.0.6 -> >= 3.0.7)
+  - kettle-family (>= 1.2.51 -> >= 1.2.56)
+  - kettle-jem (>= 7.1.3 -> >= 7.1.4)
+  - kettle-test (>= 2.0.19 -> >= 2.0.20)
+  - turbo_tests2 (>= 3.2.5 -> >= 3.2.6)
+
 ### Deprecated
 
 ### Removed
