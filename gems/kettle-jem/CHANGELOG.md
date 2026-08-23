@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Use Markdown-safe compound keys for automated kettle-jem template changelog entries so release reference validation does not treat their labels as undefined links.
 
+- Use a dependency-specific switch when omitting kettle-changelog from release Bundler resolution.
+
 ### Security
 
 ## [7.1.4] - 2026-08-12

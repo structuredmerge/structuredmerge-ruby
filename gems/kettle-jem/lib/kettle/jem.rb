@@ -14061,7 +14061,9 @@ module Kettle
       return "" if package_name == "kettle-changelog"
 
       <<~RUBY.chomp
-        kettle_changelog_skip = ENV.fetch("KETTLE_DEV_SKIP_CHANGELOG", "false").downcase
+        # Release lockfile/build commands set this dependency-specific switch so
+        # the development tool cannot pull unpublished family gems into resolution.
+        kettle_changelog_skip = ENV.fetch("KETTLE_DEV_SKIP_CHANGELOG_DEPENDENCY", "false").downcase
         kettle_changelog_skip = %w[true 1 yes on].include?(kettle_changelog_skip)
         kettle_changelog_local = ENV.fetch("KETTLE_DEV_DEV", "false").downcase
         kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)
