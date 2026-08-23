@@ -30,6 +30,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Bash merge providers now recognize AST-proven literal-title test_expect_success owners while retaining full-file conflicts for test membership changes until insertion order can be preserved safely.
 
+- [kc] kettle-jem/prepare: updated 1231 project files:
+  - code and tests (29)
+  - dependencies (1202)
+
+- [kc] kettle-jem/template: updated 293 project files:
+  - code and tests (232)
+  - dependencies (30)
+  - documentation (2)
+  - other (29)
+
 ### Fixed
 
 - Run every Ruby gem suite when the pinned StructuredMerge fixture release changes.
