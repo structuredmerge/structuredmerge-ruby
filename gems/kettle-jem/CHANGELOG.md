@@ -39,6 +39,16 @@ Please file a bug if you notice a violation of semantic versioning.
   - github/codeql-action/autobuild v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3) -> v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28)
   - github/codeql-action/init v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3) -> v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28)
 
+- [kc] kettle-jem/prepare: updated 9 project files:
+  - code and tests (1)
+  - dependencies (8)
+
+- [kc] kettle-jem/template: updated 4 project files:
+  - code and tests (1)
+  - dependencies (1)
+  - documentation (1)
+  - other (1)
+
 ### Deprecated
 
 ### Removed
