@@ -5385,7 +5385,7 @@ module Kettle
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.8"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.12"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.57"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.58"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.4"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.20"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
@@ -15035,7 +15035,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.57"\n)
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.58"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
