@@ -116,7 +116,7 @@ PATH
 PATH
   remote: gems/kettle-jem
   specs:
-    kettle-jem (7.1.4)
+    kettle-jem (7.1.5)
       addressable (>= 2.8, < 3)
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.3)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.3)
@@ -392,7 +392,7 @@ GEM
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
       kettle-dev (>= 3.0.6, < 4.0.0)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-dev (3.0.7)
+    kettle-dev (3.0.8)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.13)
       kettle-ndjson (~> 0.1, >= 0.1.12)
@@ -402,10 +402,10 @@ GEM
       tty-progressbar (~> 0.18)
     kettle-drift (1.0.12)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-family (1.2.56)
+    kettle-family (1.2.58)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
-      kettle-dev (>= 3.0.7, < 4.0.0)
+      kettle-dev (>= 3.0.8, < 4.0.0)
       kettle-test (~> 2.0, >= 2.0.20)
       tsort (~> 0.2)
       tty-screen (~> 0.8)
@@ -722,41 +722,41 @@ DEPENDENCIES
   ast-merge!
   ast-merge-git!
   ast-template!
-  bash-merge (>= 0, = 7.1.4)!
+  bash-merge!
   benchmark (~> 0.5, >= 0.5.0)
   binary-merge!
   bundler-audit (~> 0.9.3)
   cgi (~> 0.5)
-  citrus-toml-merge (>= 0, = 7.1.4)!
-  commonmarker-merge (>= 0, = 7.1.4)!
+  citrus-toml-merge!
+  commonmarker-merge!
   debug (>= 1.1)
-  dotenv-merge (>= 0, = 7.1.4)!
+  dotenv-merge!
   erb (~> 6.0, >= 6.0.6)
   gem_bench (~> 2.0, >= 2.0.5)
-  gitmoji-regex (~> 2.0, >= 2.0.11, >= 2.0.1)
-  go-merge (>= 0, = 7.1.4)!
-  html-merge (>= 0, = 7.1.4)!
+  gitmoji-regex (~> 2.0, >= 2.0.12, >= 2.0.1)
+  go-merge!
+  html-merge!
   irb (~> 1.17)
-  json-merge (>= 0, = 7.1.4)!
-  kettle-dev (~> 3.0, >= 3.0.0)
+  json-merge!
+  kettle-dev (~> 3.0, >= 3.0.7, >= 3.0.0)
   kettle-drift (~> 1.0, >= 1.0.8)
-  kettle-family (~> 1.2, >= 1.2.55)
+  kettle-family (~> 1.2, >= 1.2.58)
   kettle-jem!
   kettle-soup-cover (~> 3.0, >= 3.0.6)
-  kettle-test (~> 2.0, >= 2.0.19, >= 2.0.11)
+  kettle-test (~> 2.0, >= 2.0.20, >= 2.0.11)
   kramdown (~> 2.5, >= 2.5.2)
-  kramdown-merge (>= 0, = 7.1.4)!
+  kramdown-merge!
   kramdown-parser-gfm (~> 1.1)
-  markdown-merge (>= 0, = 7.1.4)!
-  markly-merge (>= 0, = 7.1.4)!
+  markdown-merge!
+  markly-merge!
   mutex_m (~> 0.2)
-  parslet-toml-merge (>= 0, = 7.1.4)!
-  plain-merge (>= 0, = 7.1.4)!
+  parslet-toml-merge!
+  plain-merge!
   prism-merge!
-  psych-merge (>= 0, = 7.1.4)!
+  psych-merge!
   rake (~> 13.0, >= 0)
   rbs (>= 3.0)
-  rbs-merge (>= 0, = 7.1.4)!
+  rbs-merge!
   rdoc (~> 6.11)
   reek (~> 6.5, >= 6.5.0)
   require_bench (~> 1.0, >= 1.0.4)
@@ -768,24 +768,24 @@ DEPENDENCIES
   rubocop-on-rbs (~> 2.0, >= 2.0.0)
   rubocop-packaging (~> 0.6, >= 0.6.0)
   rubocop-ruby3_2 (~> 3.0, >= 3.0.6)
-  ruby-merge (>= 0, = 7.1.4)!
+  ruby-merge!
   ruby-progressbar (~> 1.13)
-  rust-merge (>= 0, = 7.1.4)!
+  rust-merge!
   smorg-rb!
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8, >= 1.0.3)
   stringio (>= 3.0)
   token-resolver (~> 2.0, >= 2.0.4)
   toml (~> 0.3)
-  toml-merge (>= 0, = 7.1.4)!
+  toml-merge!
   toml-rb (~> 4.1)
   tree_haver!
   tree_sitter_language_pack (~> 1.13, >= 1.13.7)
-  turbo_tests2 (~> 3.2, ~> 3.1, >= 3.2.5, >= 3.1.14)
-  typescript-merge (>= 0, = 7.1.4)!
+  turbo_tests2 (~> 3.2, ~> 3.1, >= 3.2.6, >= 3.1.14)
+  typescript-merge!
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.3)
-  yaml-merge (>= 0, = 7.1.4)!
+  yaml-merge!
   yard (~> 0.9, >= 0.9.45)
   yard-fence (~> 0.9, >= 0.9.6)
   yard-junk (~> 0.1, >= 0.1.0)
@@ -793,7 +793,7 @@ DEPENDENCIES
   yard-relative_markdown_links (~> 0.6)
   yard-timekeeper (~> 0.2, >= 0.2.4)
   yard-yaml (~> 0.2, >= 0.2.3)
-  zip-merge (>= 0, = 7.1.4)!
+  zip-merge!
 
 CHECKSUMS
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
@@ -853,11 +853,11 @@ CHECKSUMS
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   json-merge (7.1.4)
   kettle-changelog (1.0.2) sha256=8292d0ca01c0cc6a2cf3cfd5b50ba7b82f798203eca12dfd6d9312aab8e03cc6
-  kettle-dev (3.0.7) sha256=cf085b1e34dcca366cfabc70b01fe78e483f3175d78c37c7645376df826f3b09
+  kettle-dev (3.0.8) sha256=1b6b846b92aa3c60cd888bc13a5dd0e973b90c08966b47a6e5ed1262e2cbcdb8
   kettle-drift (1.0.12) sha256=ae4ae5f5c329d5986684e9fa472c931785cf31c20d209c1a9c62df4641e6e876
-  kettle-family (1.2.56) sha256=ac3ba1d8c102fb7b58795770e579979e4878d7f83a8679578ef2f839c48a190c
+  kettle-family (1.2.58) sha256=495304700d3da669ca383eadf5203b10416c6c898aa12eb5235e2b684bfc0369
   kettle-gha-pins (0.3.13) sha256=c393aa90a7c78248d42fd63b2f4abfb0ca39df94a7b0d8f53082fa3ffdaa3f80
-  kettle-jem (7.1.4)
+  kettle-jem (7.1.5)
   kettle-ndjson (0.1.12) sha256=9c506b197c1b95904227876890a5b1a55a5f435f1c425857036e7fab83d152e5
   kettle-rb (0.1.10) sha256=98fadfb0baf6a655132e651079bd4e499135b9db10e2c751212739b06b9acb01
   kettle-soup-cover (3.0.9) sha256=32e3dbb6b15ad46d1ff7ef141597061b686bbfbfa2af71e7fe2e50d47c35f4e7
