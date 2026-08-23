@@ -27,7 +27,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem/funding-platforms: Configure GitHub funding platforms independently, remove disabled destination-only FUNDING.yml entries, and keep README/FUNDING.md badges aligned with the configured policy.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-family (>= 1.2.51 -> >= 1.2.58)
+  - kettle-dev (>= 3.0.8 -> >= 3.0.9)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - github/codeql-action/analyze v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3) -> v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28)
