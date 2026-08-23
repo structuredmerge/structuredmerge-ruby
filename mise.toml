@@ -27,6 +27,6 @@ description = "Refresh member bundles against released dependencies and commit l
 run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute"
 
 [tasks.release]
-description = "Publish the family in dependency waves with shrinking local sibling paths"
+description = "Publish dependency waves with local paths available to the aggregate changelog suite"
 raw = true
-run = "KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --execute --publish --secrets-provider op --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
+run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --execute --publish --secrets-provider op --env STRUCTUREDMERGE_DEV={{config_root}}/gems"

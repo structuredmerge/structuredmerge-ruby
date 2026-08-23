@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Keep local StructuredMerge dependencies available to aggregate release coverage.
+
 ### Security
 
 ## [7.1.4] - 2026-08-23
