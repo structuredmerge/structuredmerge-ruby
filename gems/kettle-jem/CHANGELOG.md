@@ -34,6 +34,11 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-test (>= 2.0.19 -> >= 2.0.20)
   - turbo_tests2 (>= 3.2.5 -> >= 3.2.6)
 
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - github/codeql-action/analyze v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3) -> v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28)
+  - github/codeql-action/autobuild v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3) -> v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28)
+  - github/codeql-action/init v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3) -> v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28)
+
 ### Deprecated
 
 ### Removed
