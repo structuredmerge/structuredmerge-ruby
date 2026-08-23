@@ -28,10 +28,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Keep local StructuredMerge dependencies available to aggregate release coverage.
-
-- Enable the complete local templating graph during aggregate release coverage.
-
 ### Security
 
 ## [7.1.4] - 2026-08-23
@@ -68,6 +64,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Run every Ruby gem suite when the pinned StructuredMerge fixture release changes.
 
 - Fix ast-merge-git integration test bundles so isolated Git-driver subprocesses resolve every StructuredMerge provider.
+
+- Keep local StructuredMerge dependencies available to aggregate release coverage.
+
+- Enable the complete local templating graph during aggregate release coverage.
 
 ## [7.1.3] - 2026-08-11
 
