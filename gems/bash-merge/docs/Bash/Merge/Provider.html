@@ -105,8 +105,9 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     <p>Base-aware, source-preserving provider for native top-level Bash owners.<br />
-Functions and assignments have stable AST identities. Every other<br />
-top-level form must remain identical across all revisions in a composite.<br />
+Functions, assignments, and literal-title test_expect_success calls have<br />
+stable AST identities. Every other top-level form must remain identical<br />
+across all revisions in a composite.<br />
 rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists, Metrics/PerceivedComplexity – provider decisions, source plans, and verification form one boundary</p>
 
 
@@ -342,8 +343,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-50
-51
 52
 53
 54
@@ -356,10 +355,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 61
 62
 63
-64</pre>
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_analyze'>analyze</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_document'>document</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_document'>parse_document</span><span class='lparen'>(</span><span class='symbol'>:analyze</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='comma'>,</span> <span class='symbol'>:source</span><span class='rparen'>)</span>
@@ -396,8 +397,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-38
-39
 40
 41
 42
@@ -406,10 +405,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 45
 46
 47
-48</pre>
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
   <span class='lbrace'>{</span>
@@ -418,7 +419,7 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
     <span class='label'>backends:</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../Merge.html#TREE_SITTER_BACKEND-constant" title="Bash::Merge::TREE_SITTER_BACKEND (constant)">TREE_SITTER_BACKEND</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>profiles:</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#DEFAULT_PROFILE-constant" title="Bash::Merge::Provider::DEFAULT_PROFILE (constant)">DEFAULT_PROFILE</a></span></span><span class='rbracket'>]</span><span class='comma'>,</span>
     <span class='label'>role:</span> <span class='symbol'>:workflow</span><span class='comma'>,</span>
-    <span class='label'>ast_ownership:</span> <span class='symbol'>:stable_functions_and_assignments</span><span class='comma'>,</span>
+    <span class='label'>ast_ownership:</span> <span class='symbol'>:stable_functions_assignments_and_literal_test_titles</span><span class='comma'>,</span>
     <span class='label'>source_preservation:</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>exact_source</span><span class='words_sep'> </span><span class='tstring_content'>declaration_fragments</span><span class='words_sep'> </span><span class='tstring_content'>line_provenance</span><span class='words_sep'> </span><span class='tstring_content'>reparse</span><span class='words_sep'> </span><span class='tstring_content'>semantic_verification</span><span class='tstring_end'>]</span></span>
   <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
 <span class='kw'>end</span></pre>
@@ -442,8 +443,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-66
-67
 68
 69
 70
@@ -457,10 +456,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 78
 79
 80
-81</pre>
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_diff2'>diff2</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_before'>before</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_document'>parse_document</span><span class='lparen'>(</span><span class='symbol'>:diff2</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='comma'>,</span> <span class='symbol'>:before</span><span class='rparen'>)</span>
@@ -498,10 +499,10 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-36</pre>
+38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 38</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_family'>family</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span></pre>
     </td>
@@ -524,8 +525,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-83
-84
 85
 86
 87
@@ -535,10 +534,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 91
 92
 93
-94</pre>
+94
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge2'>merge2</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_merge3_request'>merge3_request</span> <span class='op'>=</span> <span class='id identifier rubyid_request'>request</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
@@ -572,8 +573,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-96
-97
 98
 99
 100
@@ -586,10 +585,15 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 107
 108
 109
-110</pre>
+110
+111
+112
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_exact_role'>exact_role</span> <span class='op'>=</span> <span class='id identifier rubyid_exact_revision_role'>exact_revision_role</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span>
@@ -599,6 +603,9 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
   <span class='kw'>return</span> <span class='id identifier rubyid_documents'>documents</span> <span class='kw'>if</span> <span class='id identifier rubyid_provider_failure?'>provider_failure?</span><span class='lparen'>(</span><span class='id identifier rubyid_documents'>documents</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_ownership_failure'>ownership_failure</span> <span class='op'>=</span> <span class='id identifier rubyid_unstable_ownership_failure'>unstable_ownership_failure</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='comma'>,</span> <span class='id identifier rubyid_documents'>documents</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_ownership_failure'>ownership_failure</span> <span class='kw'>if</span> <span class='id identifier rubyid_ownership_failure'>ownership_failure</span>
+
+  <span class='id identifier rubyid_ownership_failure'>ownership_failure</span> <span class='op'>=</span> <span class='id identifier rubyid_test_harness_ownership_failure'>test_harness_ownership_failure</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='comma'>,</span> <span class='id identifier rubyid_documents'>documents</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_ownership_failure'>ownership_failure</span> <span class='kw'>if</span> <span class='id identifier rubyid_ownership_failure'>ownership_failure</span>
 
   <span class='id identifier rubyid_decision'>decision</span> <span class='op'>=</span> <span class='id identifier rubyid_decide'>decide</span><span class='lparen'>(</span><span class='id identifier rubyid_documents'>documents</span><span class='comma'>,</span> <span class='label'>include_unmanaged_conflict:</span> <span class='kw'>true</span><span class='rparen'>)</span>
@@ -626,10 +633,10 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-35</pre>
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_provider_id'>provider_id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.bash</span><span class='tstring_end'>&#39;</span></span></pre>
     </td>
@@ -642,7 +649,7 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 05:10:29 2026 by
+  Generated on Sun Aug 23 19:31:43 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/bash/merge.rb<span class="defines">,<br>
-  lib/bash/merge/emitter.rb,<br> lib/bash/merge/version.rb,<br> lib/bash/merge/provider.rb,<br> lib/bash/merge/freeze_node.rb,<br> lib/bash/merge/debug_logger.rb,<br> lib/bash/merge/merge_result.rb,<br> lib/bash/merge/node_wrapper.rb,<br> lib/bash/merge/smart_merger.rb,<br> lib/bash/merge/file_analysis.rb,<br> lib/bash/merge/comment_tracker.rb</span>
+  lib/bash/merge/emitter.rb,<br> lib/bash/merge/version.rb,<br> lib/bash/merge/provider.rb,<br> lib/bash/merge/freeze_node.rb,<br> lib/bash/merge/debug_logger.rb,<br> lib/bash/merge/merge_result.rb,<br> lib/bash/merge/node_wrapper.rb,<br> lib/bash/merge/smart_merger.rb,<br> lib/bash/merge/file_analysis.rb,<br> lib/bash/merge/comment_tracker.rb,<br> lib/bash/merge/test_harness_identity.rb</span>
 
 </dd>
   </dl>
@@ -106,7 +106,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/Availability.html" title="Bash::Merge::Availability (class)">Availability</a></span>, <span class='object_link'><a href="Merge/CommentTracker.html" title="Bash::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Bash::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Bash::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Bash::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Bash::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Bash::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Bash::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Bash::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Bash::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Bash::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Bash::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Bash::Merge::TemplateParseError (class)">TemplateParseError</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Merge/Availability.html" title="Bash::Merge::Availability (class)">Availability</a></span>, <span class='object_link'><a href="Merge/CommentTracker.html" title="Bash::Merge::CommentTracker (class)">CommentTracker</a></span>, <span class='object_link'><a href="Merge/CorruptionDetectedError.html" title="Bash::Merge::CorruptionDetectedError (class)">CorruptionDetectedError</a></span>, <span class='object_link'><a href="Merge/DestinationParseError.html" title="Bash::Merge::DestinationParseError (class)">DestinationParseError</a></span>, <span class='object_link'><a href="Merge/Emitter.html" title="Bash::Merge::Emitter (class)">Emitter</a></span>, <span class='object_link'><a href="Merge/Error.html" title="Bash::Merge::Error (class)">Error</a></span>, <span class='object_link'><a href="Merge/FileAnalysis.html" title="Bash::Merge::FileAnalysis (class)">FileAnalysis</a></span>, <span class='object_link'><a href="Merge/FreezeNode.html" title="Bash::Merge::FreezeNode (class)">FreezeNode</a></span>, <span class='object_link'><a href="Merge/MergeResult.html" title="Bash::Merge::MergeResult (class)">MergeResult</a></span>, <span class='object_link'><a href="Merge/NodeWrapper.html" title="Bash::Merge::NodeWrapper (class)">NodeWrapper</a></span>, <span class='object_link'><a href="Merge/ParseError.html" title="Bash::Merge::ParseError (class)">ParseError</a></span>, <span class='object_link'><a href="Merge/Provider.html" title="Bash::Merge::Provider (class)">Provider</a></span>, <span class='object_link'><a href="Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span>, <span class='object_link'><a href="Merge/TemplateParseError.html" title="Bash::Merge::TemplateParseError (class)">TemplateParseError</a></span>, <span class='object_link'><a href="Merge/TestHarnessIdentity.html" title="Bash::Merge::TestHarnessIdentity (class)">TestHarnessIdentity</a></span>
     
   
 </p>
@@ -449,12 +449,12 @@
       <pre class="lines">
 
 
-13
 14
-15</pre>
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 13</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_provider'>merge_provider</span>
   <span class='ivar'>@merge_provider</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Merge/Provider.html" title="Bash::Merge::Provider (class)">Provider</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -527,14 +527,14 @@
       <pre class="lines">
 
 
-17
 18
 19
 20
-21</pre>
+21
+22</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/provider.rb', line 18</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_provider!'>register_provider!</span><span class='lparen'>(</span><span class='label'>replace:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:register_provider</span><span class='rparen'>)</span>
@@ -551,7 +551,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 05:10:28 2026 by
+  Generated on Sun Aug 23 19:31:43 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
