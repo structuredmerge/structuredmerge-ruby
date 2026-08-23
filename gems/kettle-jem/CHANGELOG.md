@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - documentation (1)
   - other (1)
 
+- Document the disposable BUNDLE_LOCKFILE workaround in generated CONTRIBUTING.md release guidance.
+
 ### Deprecated
 
 ### Removed
