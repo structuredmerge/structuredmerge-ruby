@@ -8,6 +8,23 @@ require "optparse"
 require "pathname"
 require "time"
 
+# The source checkout is a StructuredMerge monorepo subproject during local
+# development. Enable its sibling paths before Bundler reads the Gemfile so a
+# bare invocation cannot mix unreleased 7.1.x gems with older global installs.
+structuredmerge_gems = File.expand_path("../..", __dir__)
+if File.directory?(File.join(structuredmerge_gems, "ast-merge"))
+  ENV["K_JEM_TEMPLATING"] ||= "true"
+  ENV["STRUCTUREDMERGE_DEV"] ||= structuredmerge_gems
+  structuredmerge_root = File.expand_path("../..", structuredmerge_gems)
+  kettle_dev_root = File.expand_path("../kettle-dev", structuredmerge_root)
+  ENV["KETTLE_DEV_DEV"] ||= kettle_dev_root if File.directory?(kettle_dev_root)
+end
+
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+
+require "rubygems"
+require "bundler/setup"
+
 # Repository-local executable must boot from the unreleased source checkout.
 # rubocop:disable Packaging/RequireRelativeHardcodingLib -- Installed execution is not available while maintaining templates.
 require_relative "../lib/kettle/jem"

@@ -46,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Document the disposable BUNDLE_LOCKFILE workaround in generated CONTRIBUTING.md release guidance.
 
+- Make the repository-local kettle-jem-deps-floor executable bootstrap the consistent StructuredMerge development bundle before loading parser dependencies.
+
 ### Deprecated
 
 ### Removed

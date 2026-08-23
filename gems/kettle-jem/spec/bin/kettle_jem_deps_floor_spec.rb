@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "open3"
+require "rbconfig"
 require "stringio"
 
 load File.expand_path("../../bin/kettle-jem-deps-floor", __dir__)
@@ -133,6 +134,18 @@ RSpec.describe KettleJemDepsFloor do
     options = described_class.parse_options([])
 
     expect(options.fetch(:project_root)).to eq(File.expand_path("../..", __dir__))
+  end
+
+  it "keeps the repository-local executable inside its bundle" do
+    _stdout, stderr, status = Open3.capture3(
+      {},
+      RbConfig.ruby,
+      File.expand_path("../../bin/kettle-jem-deps-floor", __dir__),
+      "--help",
+      chdir: File.expand_path("../..", __dir__)
+    )
+
+    expect(status).to be_success, stderr
   end
 
   it "allows dependency floor writes to opt out of default commits" do
