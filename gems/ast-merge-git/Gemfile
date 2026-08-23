@@ -18,7 +18,7 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from ast-merge-git.gemspec
 gemspec
 
-gem 'kettle-family', '~> 1.2', '>= 1.2.56'
+gem 'kettle-family', '~> 1.2', '>= 1.2.57'
 
 # Local workspace dependency wiring for *_local.gemfile overrides
 gem 'nomono', '~> 1.1', '>= 1.1.4', require: false # ruby >= 3.2.0
@@ -27,34 +27,48 @@ gem 'nomono', '~> 1.1', '>= 1.1.4', require: false # ruby >= 3.2.0
 direct_sibling_gems = %w[
   ast-merge
 ]
+provider_gems = %w[
+  bash-merge
+  binary-merge
+  citrus-toml-merge
+  commonmarker-merge
+  dotenv-merge
+  go-merge
+  html-merge
+  json-merge
+  kramdown-merge
+  markdown-merge
+  markly-merge
+  parslet-toml-merge
+  plain-merge
+  prism-merge
+  psych-merge
+  rbs-merge
+  ruby-merge
+  rust-merge
+  toml-merge
+  typescript-merge
+  yaml-merge
+  zip-merge
+]
 direct_sibling_dev = ENV.fetch('STRUCTUREDMERGE_DEV', '')
 direct_sibling_local =
   !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
 direct_sibling_templating = ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
 
-if direct_sibling_gems.any? &&
-   (direct_sibling_local ||
-     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
-  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
-  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+if direct_sibling_gems.any? && direct_sibling_local && !direct_sibling_templating
   require 'nomono/bundler'
-  begin
-    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+  eval_nomono_gems(
+    gems: direct_sibling_gems + provider_gems,
+    prefix: 'STRUCTUREDMERGE',
+    path_env: 'STRUCTUREDMERGE_DEV',
+    root: %w[src my structuredmerge ruby gems]
+  )
+end
 
-    eval_nomono_gems(
-      gems: direct_sibling_gems,
-      prefix: 'STRUCTUREDMERGE',
-      path_env: 'STRUCTUREDMERGE_DEV',
-      root: %w[src my structuredmerge ruby gems]
-    )
-  ensure
-    if direct_sibling_templating && !direct_sibling_local
-      if direct_sibling_dev_was_set
-        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
-      else
-        ENV.delete('STRUCTUREDMERGE_DEV')
-      end
-    end
+unless direct_sibling_local || direct_sibling_templating
+  provider_gems.each do |gem_name|
+    gem gem_name, '~> 7.1', '>= 7.1.4', require: false
   end
 end
 
