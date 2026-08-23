@@ -5383,7 +5383,7 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.2"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.9"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.10"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.12"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.58"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.4"\n)},
