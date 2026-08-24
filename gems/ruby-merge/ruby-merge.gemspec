@@ -103,7 +103,6 @@ Gem::Specification.new do |spec|
 
   # Utilities
   spec.add_dependency 'ast-merge', "= #{spec.version}"
-  spec.add_dependency 'prism-merge', "= #{spec.version}"
   spec.add_dependency 'tree_haver', "= #{spec.version}"
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.15') # ruby >= 2.2.0
 

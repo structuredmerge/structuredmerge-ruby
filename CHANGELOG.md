@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep runtime dependency release waves ordered so dependents resolve just-published sibling gems.
 
+- Restore Ruby parser layering: ruby-merge remains the Tree-sitter-backed language layer, while prism-merge alone provides the native Prism provider and depends on ruby-merge; Tree-sitter capability gaps remain explicitly pending or unsupported.
+
 ### Security
 
 ## [7.1.4] - 2026-08-23

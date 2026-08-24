@@ -16,9 +16,9 @@ require 'kettle/jem/tasks/install_task'
 require 'markdown/merge'
 require 'plain-merge'
 require 'rbs/merge'
-require 'ruby/merge'
 require 'toml/merge'
 require 'typescript/merge'
+require 'prism/merge'
 require 'yaml/merge'
 require_relative 'rb/version'
 
@@ -771,7 +771,6 @@ module Smorg
             ours_source: current_source,
             theirs_source: other_source,
             path_name: path_name,
-            provider_id: 'ruby.ruby',
             family: 'ruby',
             dialect: 'ruby',
             backend: 'prism',

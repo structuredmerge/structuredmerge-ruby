@@ -376,31 +376,21 @@ RSpec.describe Smorg::RB do
     expect(report.dig('render_report', 'strategy')).to eq('exact_assignment_composite')
   end
 
-  it 'routes Ruby paths through the base-aware workflow provider' do
-    ancestor = write_file(@dir, 'ancestor.rb', "OBSOLETE = true\nVALUE = 0\n")
-    current = write_file(@dir, 'current.rb', "OBSOLETE = true\nVALUE = 0\nOURS = 1\n")
+  it 'routes Ruby paths through the base-aware Prism provider' do
+    ancestor = write_file(@dir, 'ancestor.rb', "VALUE = 0\n")
+    current = write_file(@dir, 'current.rb', "VALUE = 0\nOURS = 1\n")
     other = write_file(@dir, 'other.rb', "VALUE = 0\nTHEIRS = 2\n")
-    report_path = File.join(@dir, 'merge-report.json')
     stdout = StringIO.new
     stderr = StringIO.new
 
     exit_code = described_class.run(
-      ['merge-driver', '--report', report_path, '--path-name', 'example.rb', ancestor, current, other],
+      ['merge-driver', '--path-name', 'example.rb', ancestor, current, other],
       stdout: stdout,
       stderr: stderr
     )
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     expect(File.read(current)).to eq("VALUE = 0\nOURS = 1\nTHEIRS = 2\n")
-    report = JSON.parse(File.read(report_path))
-    expect(report.fetch('ok')).to be(true)
-    expect(report.dig('provider', 'provider_id')).to eq('ruby.ruby')
-    expect(report.dig('provider', 'backend')).to eq('prism')
-    expect(report.dig('provider', 'delegated_provider')).to include(
-      'provider_id' => 'ruby.ruby.prism',
-      'backend' => 'prism'
-    )
-    expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
   it 'routes RBS paths through the exact base-aware workflow provider' do

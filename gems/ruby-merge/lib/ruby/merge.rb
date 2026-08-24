@@ -1,10 +1,20 @@
 # frozen_string_literal: true
 
 require 'digest'
-require 'prism/merge'
 require 'tree_haver'
 require 'ast/merge'
 require_relative 'merge/version'
+require_relative 'merge/block_directive_detector'
+require_relative 'merge/block_binding_support'
+require_relative 'merge/doc_comment_support'
+require_relative 'merge/gemspec_support'
+require_relative 'merge/magic_comment_support'
+require_relative 'merge/method_similarity'
+require_relative 'merge/nocov_node_base'
+require_relative 'merge/nocov_wrapper_base'
+require_relative 'merge/rescue_semantics'
+require_relative 'merge/scaffold_chunk_support'
+require_relative 'merge/signature_support'
 
 module Ruby
   module Merge
@@ -236,8 +246,8 @@ module Ruby
         conflicts = namespace_conflicts.join(', ')
         return unsupported_feature_result(
           'ruby-merge cannot reconcile equivalent Ruby namespace declaration forms with the active TSLP records: ' \
-          "#{conflicts}. Use prism-merge for native Ruby merging, or report missing Ruby namespace ownership " \
-          'records to tree-sitter-language-pack.'
+          "#{conflicts}. Use a native Ruby provider for native Ruby merging, or report missing Ruby namespace " \
+          'ownership records to tree-sitter-language-pack.'
         )
       end
       if !namespace_conflicts.empty? && TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_namespace_form_equivalence)
@@ -1505,7 +1515,9 @@ module Ruby
       unsupported_lines = ruby_tslp_unsupported_top_level_lines(source, process_analysis)
       unless unsupported_lines.empty?
         return unsupported_feature_result(
-          "ruby-merge can only merge TSLP-record-backed top-level Ruby declarations and imports; #{role} has unsupported top-level content on line(s) #{unsupported_lines.join(', ')}. Use prism-merge for native Ruby merging, or report missing Ruby process records to tree-sitter-language-pack."
+          "ruby-merge can only merge TSLP-record-backed top-level Ruby declarations and imports; #{role} has " \
+          "unsupported top-level content on line(s) #{unsupported_lines.join(', ')}. Use a native Ruby provider " \
+          'for native Ruby merging, or report missing Ruby process records to tree-sitter-language-pack.'
         )
       end
 
@@ -3133,8 +3145,6 @@ module Ruby
 end
 
 Ruby::Merge.register_backend!
-require_relative 'merge/provider'
-Ruby::Merge.register_provider!
 
 TreeHaver::BackendRegistry.register_tag(
   :tslp_ruby_import_records,

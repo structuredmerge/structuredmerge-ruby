@@ -72,7 +72,11 @@ module Ast
         private
 
         def tested_provider_ids
-          tested_rows.map { |row| fetch(row, :provider_id) }.uniq
+          tested_rows.filter_map do |row|
+            next unless fetch(row, :status) == 'tested'
+
+            fetch(row, :provider_id)
+          end.uniq
         end
 
         def fetch(hash, key)

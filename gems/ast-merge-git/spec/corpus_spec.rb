@@ -69,16 +69,16 @@ RSpec.describe Ast::Merge::Git::Corpus do
           'human' => blob(merge)
         },
         'selector' => {
-          'provider_id' => 'ruby.ruby',
+          'provider_id' => 'ruby.ruby.prism',
           'family' => 'ruby',
           'dialect' => 'ruby',
           'backend' => 'prism',
           'profile' => 'source_preserving',
-          'require' => 'ruby/merge'
+          'require' => 'prism/merge'
         },
         'capability_tags' => %w[merge3 ruby prism clean_history],
         'stratum' => {
-          'provider' => 'ruby.ruby',
+          'provider' => 'ruby.ruby.prism',
           'dialect' => 'ruby',
           'conflict_type' => 'clean_history_preservation'
         },
@@ -142,7 +142,7 @@ RSpec.describe Ast::Merge::Git::Corpus do
     expect(result[:candidate]).to include(exit_classification: 'clean', exact_human_result: true, parse_valid: true)
     expect(result.dig(:candidate, :outcome)).to eq('correct_clean')
     expect(result.dig(:candidate, :provider_check)).to include(
-      provider_id: 'ruby.ruby', method: 'exact_bytes', equivalent: true
+      provider_id: 'ruby.ruby.prism', method: 'exact_bytes', equivalent: true
     )
     expect(result[:deterministic_rerun]).to be(true)
     expect(result.dig(:claim_eligibility, :score_eligible)).to be(false)
@@ -231,7 +231,7 @@ RSpec.describe Ast::Merge::Git::Corpus do
       equivalent: true,
       available: true,
       valid: true,
-      provider_id: 'ruby.ruby',
+      provider_id: 'ruby.ruby.prism',
       method: 'selected_provider.diff2(expected_human, candidate_output).changes.empty?'
     )
   end

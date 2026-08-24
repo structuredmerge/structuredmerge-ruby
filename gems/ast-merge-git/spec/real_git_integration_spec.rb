@@ -253,7 +253,7 @@ RSpec.describe 'ast-merge-git executable' do
     expect(repository.join('notes.txt').binread).to eq("theirs\n")
   end
 
-  it 'runs the Ruby workflow provider through the installed Git-driver path' do
+  it 'runs the Prism Ruby provider through the installed Git-driver path' do
     base = "VALUE = 0\n"
     ours = "VALUE = 0\nOURS = 1\n"
     theirs = "VALUE = 0\nTHEIRS = 2\n"
@@ -262,8 +262,7 @@ RSpec.describe 'ast-merge-git executable' do
       base: base,
       ours: ours,
       theirs: theirs,
-      require_path: 'ruby/merge',
-      provider_id: 'ruby.ruby',
+      require_path: 'prism/merge',
       family: 'ruby',
       dialect: 'ruby',
       backend: 'prism',

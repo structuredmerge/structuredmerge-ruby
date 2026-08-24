@@ -1,19 +1,9 @@
 # frozen_string_literal: true
 
 require 'prism'
+require 'ruby-merge'
 require 'ast/merge'
 require 'tree_haver'
-require_relative '../ruby/merge/block_directive_detector'
-require_relative '../ruby/merge/block_binding_support'
-require_relative '../ruby/merge/doc_comment_support'
-require_relative '../ruby/merge/gemspec_support'
-require_relative '../ruby/merge/magic_comment_support'
-require_relative '../ruby/merge/method_similarity'
-require_relative '../ruby/merge/nocov_node_base'
-require_relative '../ruby/merge/nocov_wrapper_base'
-require_relative '../ruby/merge/rescue_semantics'
-require_relative '../ruby/merge/scaffold_chunk_support'
-require_relative '../ruby/merge/signature_support'
 require_relative 'merge/version'
 
 module Prism
@@ -21,7 +11,6 @@ module Prism
     module_function
 
     PACKAGE_NAME = 'prism-merge'
-    DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
     BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'prism', family: 'native').freeze
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
     TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
@@ -99,11 +88,7 @@ module Prism
     end
 
     def ruby_feature_profile
-      {
-        family: 'ruby',
-        supported_dialects: ['ruby'],
-        supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
-      }
+      Ruby::Merge.ruby_feature_profile
     end
 
     def merge_provider
@@ -664,7 +649,7 @@ module Prism
     end
 
     def match_ruby_owners(template, destination)
-      Ast::Merge::OwnerSelection.match_by_path(template, destination)
+      Ruby::Merge.match_ruby_owners(template, destination)
     end
 
     def merge_ruby(
@@ -699,7 +684,7 @@ module Prism
         ok: true,
         diagnostics: [],
         output: merger.merge.to_s,
-        policies: ruby_feature_profile.fetch(:supported_policies)
+        policies: Ruby::Merge.ruby_feature_profile.fetch(:supported_policies)
       }
     rescue Prism::Merge::ParseError => e
       {
@@ -812,7 +797,7 @@ module Prism
           }
         },
         apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, resolved_children|
-          apply_ruby_delegated_child_outputs(
+          Ruby::Merge.apply_ruby_delegated_child_outputs(
             merged_output,
             operations,
             apply_plan,
@@ -913,83 +898,15 @@ module Prism
     end
 
     def ruby_discovered_surfaces(analysis)
-      analysis[:discovered_surfaces] || []
+      Ruby::Merge.ruby_discovered_surfaces(analysis)
     end
 
     def ruby_delegated_child_operations(analysis, parent_operation_id: 'ruby-document-0')
-      surfaces = ruby_discovered_surfaces(analysis)
-      doc_operation_ids = {}
-      operations = []
-
-      surfaces.each_with_index do |surface, index|
-        next unless surface[:surface_kind] == 'ruby_doc_comment'
-
-        operation_id = "ruby-doc-comment-#{index}"
-        doc_operation_ids[surface[:address]] = operation_id
-        operations << Ast::Merge.delegated_child_operation(
-          operation_id: operation_id,
-          parent_operation_id: parent_operation_id,
-          requested_strategy: 'delegate_child_surface',
-          language_chain: ['ruby', surface[:effective_language]],
-          surface: surface
-        )
-      end
-
-      example_index = 0
-      surfaces.each do |surface|
-        next unless surface[:surface_kind] == 'yard_example_block'
-
-        operations << Ast::Merge.delegated_child_operation(
-          operation_id: "yard-example-#{example_index}",
-          parent_operation_id: doc_operation_ids.fetch(surface[:parent_address], parent_operation_id),
-          requested_strategy: 'delegate_child_surface',
-          language_chain: ['ruby', 'yard', surface[:effective_language]],
-          surface: surface
-        )
-        example_index += 1
-      end
-
-      operations
-    end
-
-    def apply_ruby_delegated_child_outputs(source, delegated_operations, apply_plan, applied_children)
-      lines = prism_ruby_normalize_source(source).split("\n")
-      operations_by_id = delegated_operations.to_h { |operation| [operation[:operation_id], operation] }
-      outputs_by_id = applied_children.to_h { |entry| [entry[:operation_id], entry[:output]] }
-
-      replacements = apply_plan[:entries].filter_map do |entry|
-        operation = operations_by_id[entry.dig(:delegated_group, :child_operation_id)]
-        output = outputs_by_id[entry.dig(:delegated_group, :child_operation_id)]
-        span = operation&.dig(:surface, :span)
-        next if operation.nil? || output.nil? || span.nil?
-
-        { start: span[:start_line] - 1, finish: span[:end_line] - 1, output: output }
-      end
-
-      replacements.sort_by { |entry| -entry[:start] }.each do |entry|
-        prefix = Ruby::Merge::DocCommentSupport.comment_prefix_for(lines[entry[:start]])
-        replacement_lines = if entry[:output].empty?
-                              []
-                            else
-                              entry[:output].sub(/\n\z/, '').split("\n").map { |line| "#{prefix}#{line}" }
-                            end
-        lines[entry[:start]..entry[:finish]] = replacement_lines
-      end
-
-      {
-        ok: true,
-        diagnostics: [],
-        output: "#{lines.join("\n").sub(/\n+\z/, '')}\n",
-        policies: [DESTINATION_WINS_ARRAY_POLICY]
-      }
+      Ruby::Merge.ruby_delegated_child_operations(analysis, parent_operation_id: parent_operation_id)
     end
 
     def unsupported_feature_result(message)
-      {
-        ok: false,
-        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
-        policies: []
-      }
+      Ruby::Merge.unsupported_feature_result(message)
     end
 
     def prism_ruby_analysis_owners(body)
