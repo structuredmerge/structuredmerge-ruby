@@ -2,8 +2,16 @@
 
 require_relative '../spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 RSpec.describe TreeHaver::Backends::Tslp do
   before do
+    described_class.reset!
+  end
+
+  after do
+    # Several examples replace TreeSitterLanguagePack to exercise fail-closed
+    # behavior. Reset the backend memoization at the end of each example so a
+    # failed smoke probe cannot poison unrelated parser-backed specs.
     described_class.reset!
   end
 
@@ -52,7 +60,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     )
     parser = instance_double('TreeSitterLanguagePack::Parser', parse: raw_tree)
     stub_const('TreeSitterLanguagePack', Module.new)
-    TreeSitterLanguagePack.const_set(:Parser, Class.new { def parse(_source) = :tree })
+    parser_class = Class.new
+    parser_class.define_method(:parse) { |_source| :tree }
+    TreeSitterLanguagePack.const_set(:Parser, parser_class)
     allow(TreeSitterLanguagePack).to receive(:has_language).with('toml').and_return(true)
     allow(TreeSitterLanguagePack).to receive(:get_parser).with('toml').and_return(parser)
     allow(described_class).to receive(:available?).and_return(true)
@@ -68,7 +78,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     )
     parser = instance_double('TreeSitterLanguagePack::Parser', parse: raw_tree)
     stub_const('TreeSitterLanguagePack', Module.new)
-    TreeSitterLanguagePack.const_set(:Parser, Class.new { def parse(_source) = :tree })
+    parser_class = Class.new
+    parser_class.define_method(:parse) { |_source| :tree }
+    TreeSitterLanguagePack.const_set(:Parser, parser_class)
     allow(TreeSitterLanguagePack).to receive(:has_language).with('json').and_return(true)
     allow(TreeSitterLanguagePack).to receive(:get_parser).with('json').and_return(parser)
     allow(described_class).to receive(:available?).and_return(true)
@@ -231,3 +243,4 @@ RSpec.describe TreeHaver::Backends::Tslp do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
