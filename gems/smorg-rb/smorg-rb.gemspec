@@ -113,12 +113,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'kettle-jem', '~> 7.1', '>= 7.1.5'
   spec.add_dependency 'markdown-merge', "= #{spec.version}"
   spec.add_dependency 'plain-merge', "= #{spec.version}"
+  spec.add_dependency 'prism-merge', "= #{spec.version}"
+  spec.add_dependency 'psych-merge', "= #{spec.version}"
   spec.add_dependency 'rbs-merge', "= #{spec.version}"
   spec.add_dependency 'rust-merge', "= #{spec.version}"
   spec.add_dependency 'toml-merge', "= #{spec.version}"
   spec.add_dependency 'typescript-merge', "= #{spec.version}"
-  spec.add_dependency 'prism-merge', "= #{spec.version}"
-  spec.add_dependency 'psych-merge', "= #{spec.version}"
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.15') # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased

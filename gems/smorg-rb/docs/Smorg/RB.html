@@ -88,7 +88,17 @@
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>rubocop:disable Metrics/ModuleLength</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
@@ -132,6 +142,80 @@
         </dt>
         <dd><pre class="code"><span class='int'>3</span></pre></dd>
       
+        <dt id="MERGE_PROVIDER_OPTIONS-constant" class="">MERGE_PROVIDER_OPTIONS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv-line</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>prism</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.yaml.psych</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>psych</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>coarse_document</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="LANGUAGE_BY_EXTENSION-constant" class="">LANGUAGE_BY_EXTENSION =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.bash</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.sh</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.go</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.htm</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.html</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.rs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.ts</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.tsx</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="LANGUAGE_ALIASES-constant" class="">LANGUAGE_ALIASES =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>sh</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/x-sh</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/x-shellscript</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>golang</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>htm</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/html</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html5</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>env</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config-env</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json with comments</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>md</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>gfm</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/markdown</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rb</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/x-ruby</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/rust</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/rust</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/toml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ts</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/typescript</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/typescript</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescriptreact</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/yaml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/yaml</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plain</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plaintext</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/plain</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="ATTRIBUTE_KEYS-constant" class="">ATTRIBUTE_KEYS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smorg.language</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:language</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>linguist-language</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:language</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smorg.profile</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:profile_id</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smorg.requireProfileStatus</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:require_profile_status</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
         <dt id="VERSION-constant" class="">VERSION =
           <div class="docstring">
   <div class="discussion">
@@ -163,6 +247,29 @@
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#apply_attribute_field-class_method" title="apply_attribute_field (class method)">.<strong>apply_attribute_field</strong>(settings, field)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -213,6 +320,52 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#attribute_directory_paths-class_method" title="attribute_directory_paths (class method)">.<strong>attribute_directory_paths</strong>(dir)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attribute_fields-class_method" title="attribute_fields (class method)">.<strong>attribute_fields</strong>(raw_line, path_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#attribute_files_for_path-class_method" title="attribute_files_for_path (class method)">.<strong>attribute_files_for_path</strong>(path_name)  &#x21d2; Object </a>
     
 
@@ -237,6 +390,52 @@
   <span class="summary_signature">
     
       <a href="#attribute_pattern_matches%3F-class_method" title="attribute_pattern_matches? (class method)">.<strong>attribute_pattern_matches?</strong>(pattern, path_name)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#conflict_marker_prefixes-class_method" title="conflict_marker_prefixes (class method)">.<strong>conflict_marker_prefixes</strong>(marker_size)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#conflict_region_state-class_method" title="conflict_region_state (class method)">.<strong>conflict_region_state</strong>(current, line, line_number, prefixes)  &#x21d2; Object </a>
     
 
     
@@ -397,6 +596,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#language_from_path-class_method" title="language_from_path (class method)">.<strong>language_from_path</strong>(path_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#line_count-class_method" title="line_count (class method)">.<strong>line_count</strong>(source)  &#x21d2; Object </a>
     
 
@@ -443,7 +665,53 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge3_report_fields-class_method" title="merge3_report_fields (class method)">.<strong>merge3_report_fields</strong>(result)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#merge3_result-class_method" title="merge3_result (class method)">.<strong>merge3_result</strong>(result)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge3_result_payload-class_method" title="merge3_result_payload (class method)">.<strong>merge3_result_payload</strong>(result, success, output)  &#x21d2; Object </a>
     
 
     
@@ -558,6 +826,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_options_for-class_method" title="merge_options_for (class method)">.<strong>merge_options_for</strong>(ancestor_source, current_source, other_source, fallback_policy, conflict_marker_size)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#merge_plain_fallback-class_method" title="merge_plain_fallback (class method)">.<strong>merge_plain_fallback</strong>(other_source, current_source)  &#x21d2; Object </a>
     
 
@@ -581,7 +872,53 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#merge_with_provider-class_method" title="merge_with_provider (class method)">.<strong>merge_with_provider</strong>(path_name, provider_options, merge_options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#normalize_language-class_method" title="normalize_language (class method)">.<strong>normalize_language</strong>(language, path_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalized_attribute_path-class_method" title="normalized_attribute_path (class method)">.<strong>normalized_attribute_path</strong>(path_name)  &#x21d2; Object </a>
     
 
     
@@ -812,6 +1149,29 @@
   <span class="summary_signature">
     
       <a href="#report_and_enforce_profile-class_method" title="report_and_enforce_profile (class method)">.<strong>report_and_enforce_profile</strong>(options, stdout, stderr)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#root_attribute_path%3F-class_method" title="root_attribute_path? (class method)">.<strong>root_attribute_path?</strong>(clean_path)  &#x21d2; Boolean </a>
     
 
     
@@ -1072,7 +1432,47 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="apply_attributes-class_method">
+  <h3 class="signature first" id="apply_attribute_field-class_method">
+  
+    .<strong>apply_attribute_field</strong>(settings, field)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+881
+882
+883
+884
+885
+886
+887
+888</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 881</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_apply_attribute_field'>apply_attribute_field</span><span class='lparen'>(</span><span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_field'>field</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_field'>field</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>=</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_value'>value</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_settings'>settings</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#ATTRIBUTE_KEYS-constant" title="Smorg::RB::ATTRIBUTE_KEYS (constant)">ATTRIBUTE_KEYS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#ATTRIBUTE_KEYS-constant" title="Smorg::RB::ATTRIBUTE_KEYS (constant)">ATTRIBUTE_KEYS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_marker_size'>marker_size</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+  <span class='id identifier rubyid_settings'>settings</span><span class='lbracket'>[</span><span class='symbol'>:conflict_marker_size</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_marker_size'>marker_size</span> <span class='kw'>if</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>conflict-marker-size</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_marker_size'>marker_size</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="apply_attributes-class_method">
   
     .<strong>apply_attributes</strong>(settings, path_name, source)  &#x21d2; <tt>Object</tt> 
   
@@ -1086,60 +1486,18 @@
       <pre class="lines">
 
 
-1014
-1015
-1016
-1017
-1018
-1019
-1020
-1021
-1022
-1023
-1024
-1025
-1026
-1027
-1028
-1029
-1030
-1031
-1032
-1033
-1034
-1035
-1036
-1037
-1038
-1039</pre>
+858
+859
+860
+861
+862</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 1014</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 858</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply_attributes'>apply_attributes</span><span class='lparen'>(</span><span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_each_line'>each_line</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_raw_line'>raw_line</span><span class='op'>|</span>
-    <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_raw_line'>raw_line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
-    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>#</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_fields'>fields</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
-    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_fields'>fields</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='op'>!</span><span class='id identifier rubyid_attribute_pattern_matches?'>attribute_pattern_matches?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_fields'>fields</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_field'>field</span><span class='op'>|</span>
-      <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_field'>field</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>=</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span>
-      <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_value'>value</span>
-
-      <span class='kw'>case</span> <span class='id identifier rubyid_key'>key</span>
-      <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smorg.language</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>linguist-language</span><span class='tstring_end'>&#39;</span></span>
-        <span class='id identifier rubyid_settings'>settings</span><span class='lbracket'>[</span><span class='symbol'>:language</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
-      <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smorg.profile</span><span class='tstring_end'>&#39;</span></span>
-        <span class='id identifier rubyid_settings'>settings</span><span class='lbracket'>[</span><span class='symbol'>:profile_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
-      <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>smorg.requireProfileStatus</span><span class='tstring_end'>&#39;</span></span>
-        <span class='id identifier rubyid_settings'>settings</span><span class='lbracket'>[</span><span class='symbol'>:require_profile_status</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
-      <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>conflict-marker-size</span><span class='tstring_end'>&#39;</span></span>
-        <span class='id identifier rubyid_marker_size'>marker_size</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
-        <span class='id identifier rubyid_settings'>settings</span><span class='lbracket'>[</span><span class='symbol'>:conflict_marker_size</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_marker_size'>marker_size</span> <span class='kw'>if</span> <span class='id identifier rubyid_marker_size'>marker_size</span><span class='period'>.</span><span class='id identifier rubyid_positive?'>positive?</span>
-      <span class='kw'>end</span>
-    <span class='kw'>end</span>
+    <span class='id identifier rubyid_attribute_fields'>attribute_fields</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_line'>raw_line</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_field'>field</span><span class='op'>|</span> <span class='id identifier rubyid_apply_attribute_field'>apply_attribute_field</span><span class='lparen'>(</span><span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_field'>field</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1252,6 +1610,84 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="attribute_directory_paths-class_method">
+  
+    .<strong>attribute_directory_paths</strong>(dir)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+851
+852
+853
+854
+855
+856</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 851</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attribute_directory_paths'>attribute_directory_paths</span><span class='lparen'>(</span><span class='id identifier rubyid_dir'>dir</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>=</span> <span class='id identifier rubyid_dir'>dir</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='const'>File</span><span class='op'>::</span><span class='const'>SEPARATOR</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_parts'>parts</span><span class='period'>.</span><span class='id identifier rubyid_each_index'>each_index</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_parts'>parts</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="attribute_fields-class_method">
+  
+    .<strong>attribute_fields</strong>(raw_line, path_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+864
+865
+866
+867
+868
+869
+870
+871
+872</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 864</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attribute_fields'>attribute_fields</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_line'>raw_line</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_raw_line'>raw_line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>#</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_fields'>fields</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_fields'>fields</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='op'>!</span><span class='id identifier rubyid_attribute_pattern_matches?'>attribute_pattern_matches?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_fields'>fields</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="attribute_files_for_path-class_method">
   
     .<strong>attribute_files_for_path</strong>(path_name)  &#x21d2; <tt>Object</tt> 
@@ -1266,43 +1702,21 @@
       <pre class="lines">
 
 
-996
-997
-998
-999
-1000
-1001
-1002
-1003
-1004
-1005
-1006
-1007
-1008
-1009
-1010
-1011
-1012</pre>
+832
+833
+834
+835
+836
+837</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 996</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 832</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attribute_files_for_path'>attribute_files_for_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_clean_path'>clean_path</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-                                   <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span>
-                 <span class='const'>Pathname</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_cleanpath'>cleanpath</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
-               <span class='kw'>else</span>
-                 <span class='id identifier rubyid_path_name'>path_name</span>
-               <span class='kw'>end</span>
-  <span class='id identifier rubyid_dir'>dir</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_dirname'>dirname</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_dir'>dir</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span> <span class='op'>||</span> <span class='id identifier rubyid_clean_path'>clean_path</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>..</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='const'>Pathname</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_absolute?'>absolute?</span>
+  <span class='id identifier rubyid_clean_path'>clean_path</span> <span class='op'>=</span> <span class='id identifier rubyid_normalized_attribute_path'>normalized_attribute_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_root_attribute_path?'>root_attribute_path?</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_files'>files</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>=</span> <span class='id identifier rubyid_dir'>dir</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='const'>File</span><span class='op'>::</span><span class='const'>SEPARATOR</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_parts'>parts</span><span class='period'>.</span><span class='id identifier rubyid_each_index'>each_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
-    <span class='id identifier rubyid_files'>files</span> <span class='op'>&lt;&lt;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_parts'>parts</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  <span class='id identifier rubyid_files'>files</span>
+  <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_attribute_directory_paths'>attribute_directory_paths</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_dirname'>dirname</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1347,18 +1761,18 @@
       <pre class="lines">
 
 
-1041
-1042
-1043
-1044
-1045
-1046
-1047
-1048
-1049</pre>
+890
+891
+892
+893
+894
+895
+896
+897
+898</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 1041</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 890</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attribute_pattern_matches?'>attribute_pattern_matches?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>==</span> <span class='id identifier rubyid_path_name'>path_name</span>
@@ -1367,6 +1781,84 @@
     <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_fnmatch?'>fnmatch?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_basename'>basename</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>else</span>
     <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_fnmatch?'>fnmatch?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="conflict_marker_prefixes-class_method">
+  
+    .<strong>conflict_marker_prefixes</strong>(marker_size)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+911
+912
+913
+914</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 911</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_conflict_marker_prefixes'>conflict_marker_prefixes</span><span class='lparen'>(</span><span class='id identifier rubyid_marker_size'>marker_size</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_size'>size</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_marker_size'>marker_size</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
+  <span class='lbrace'>{</span> <span class='label'>start:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='label'>separator:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>=</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='label'>end:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_size'>size</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="conflict_region_state-class_method">
+  
+    .<strong>conflict_region_state</strong>(current, line, line_number, prefixes)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+916
+917
+918
+919
+920
+921
+922
+923
+924
+925
+926</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 916</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_conflict_region_state'>conflict_region_state</span><span class='lparen'>(</span><span class='id identifier rubyid_current'>current</span><span class='comma'>,</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span> <span class='id identifier rubyid_prefixes'>prefixes</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='id identifier rubyid_prefixes'>prefixes</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span> <span class='label'>separator_line:</span> <span class='int'>0</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rbracket'>]</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_current'>current</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:separator_line</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='id identifier rubyid_prefixes'>prefixes</span><span class='lbracket'>[</span><span class='symbol'>:separator</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='lbracket'>[</span><span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>separator_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rbracket'>]</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_current'>current</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='id identifier rubyid_prefixes'>prefixes</span><span class='lbracket'>[</span><span class='symbol'>:end</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='lbracket'>[</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>end_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span><span class='rbracket'>]</span>
+  <span class='kw'>else</span>
+    <span class='lbracket'>[</span><span class='id identifier rubyid_current'>current</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1455,47 +1947,27 @@
       <pre class="lines">
 
 
-1051
-1052
-1053
-1054
-1055
-1056
-1057
-1058
-1059
-1060
-1061
-1062
-1063
-1064
-1065
-1066
-1067
-1068
-1069
-1070</pre>
+900
+901
+902
+903
+904
+905
+906
+907
+908
+909</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 1051</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 900</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_conflict_regions'>find_conflict_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_marker_size'>marker_size</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_marker_size'>marker_size</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_marker_size'>marker_size</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
-  <span class='id identifier rubyid_start_prefix'>start_prefix</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_marker_size'>marker_size</span>
-  <span class='id identifier rubyid_separator_prefix'>separator_prefix</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>=</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_marker_size'>marker_size</span>
-  <span class='id identifier rubyid_end_prefix'>end_prefix</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_marker_size'>marker_size</span>
+  <span class='id identifier rubyid_prefixes'>prefixes</span> <span class='op'>=</span> <span class='id identifier rubyid_conflict_marker_prefixes'>conflict_marker_prefixes</span><span class='lparen'>(</span><span class='id identifier rubyid_marker_size'>marker_size</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_regions'>regions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
-    <span class='id identifier rubyid_line_number'>line_number</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='id identifier rubyid_start_prefix'>start_prefix</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>start_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span> <span class='label'>separator_line:</span> <span class='int'>0</span> <span class='rbrace'>}</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_current'>current</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:separator_line</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='id identifier rubyid_separator_prefix'>separator_prefix</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:separator_line</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_line_number'>line_number</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_current'>current</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='id identifier rubyid_end_prefix'>end_prefix</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_regions'>regions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>end_line:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_current'>current</span> <span class='op'>=</span> <span class='kw'>nil</span>
-    <span class='kw'>end</span>
+    <span class='id identifier rubyid_current'>current</span><span class='comma'>,</span> <span class='id identifier rubyid_completed'>completed</span> <span class='op'>=</span> <span class='id identifier rubyid_conflict_region_state'>conflict_region_state</span><span class='lparen'>(</span><span class='id identifier rubyid_current'>current</span><span class='comma'>,</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span><span class='comma'>,</span> <span class='id identifier rubyid_prefixes'>prefixes</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_regions'>regions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_completed'>completed</span> <span class='kw'>if</span> <span class='id identifier rubyid_completed'>completed</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_regions'>regions</span>
 <span class='kw'>end</span></pre>
@@ -1645,6 +2117,42 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="language_from_path-class_method">
+  
+    .<strong>language_from_path</strong>(path_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+815
+816
+817
+818
+819
+820</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 815</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_language_from_path'>language_from_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_extension'>extension</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
+  <span class='const'><span class='object_link'><a href="#LANGUAGE_BY_EXTENSION-constant" title="Smorg::RB::LANGUAGE_BY_EXTENSION (constant)">LANGUAGE_BY_EXTENSION</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_extension'>extension</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_classify_template_target_path'>classify_template_target_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:family</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="line_count-class_method">
   
     .<strong>line_count</strong>(source)  &#x21d2; <tt>Object</tt> 
@@ -1659,14 +2167,14 @@
       <pre class="lines">
 
 
-1080
-1081
-1082
-1083
-1084</pre>
+936
+937
+938
+939
+940</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 1080</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 936</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_line_count'>line_count</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='int'>0</span> <span class='kw'>if</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -1693,18 +2201,18 @@
       <pre class="lines">
 
 
-986
-987
-988
-989
-990
-991
-992
-993
-994</pre>
+822
+823
+824
+825
+826
+827
+828
+829
+830</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 986</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 822</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load_path_settings'>load_path_settings</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_settings'>settings</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>conflict_marker_size:</span> <span class='int'>7</span> <span class='rbrace'>}</span>
@@ -1714,6 +2222,48 @@
     <span class='id identifier rubyid_apply_attributes'>apply_attributes</span><span class='lparen'>(</span><span class='id identifier rubyid_settings'>settings</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes_path'>attributes_path</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_settings'>settings</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge3_report_fields-class_method">
+  
+    .<strong>merge3_report_fields</strong>(result)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+777
+778
+779
+780
+781
+782
+783
+784
+785</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 777</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge3_report_fields'>merge3_report_fields</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>change_classifications:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:change_classifications</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>conflicts:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:conflicts</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>fallbacks:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:fallbacks</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>provider:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:provider</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>verification:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:verification</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1735,93 +2285,75 @@
       <pre class="lines">
 
 
-897
-898
-899
-900
-901
-902
-903
-904
-905
-906
-907
-908
-909
-910
-911
-912
-913
-914
-915
-916
-917
-918
-919
-920
-921
-922
-923
-924
-925
-926
-927
-928
-929
-930
-931
-932
-933
-934
-935
-936
-937
-938</pre>
+754
+755
+756
+757
+758
+759
+760
+761
+762</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 897</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 754</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_merge3_report_fields'>merge3_report_fields</span> <span class='op'>=</span> <span class='lbrace'>{</span>
-    <span class='label'>change_classifications:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:change_classifications</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>conflicts:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:conflicts</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>fallbacks:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:fallbacks</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>provider:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:provider</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>verification:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:verification</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='rbrace'>}</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:merged_source</span><span class='rbracket'>]</span>
-    <span class='lbrace'>{</span>
-      <span class='label'>ok:</span> <span class='kw'>true</span><span class='comma'>,</span>
-      <span class='label'>diagnostics:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>output:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:merged_source</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>owned_regions:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:owned_regions</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>render_report:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:render_report</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>profile:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:profile</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='op'>**</span><span class='id identifier rubyid_merge3_report_fields'>merge3_report_fields</span>
-    <span class='rbrace'>}</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_merge3_result_payload'>merge3_result_payload</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:merged_source</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>elsif</span> <span class='op'>!</span><span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:ok</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:conflicted_source</span><span class='rbracket'>]</span>
-    <span class='lbrace'>{</span>
-      <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-      <span class='label'>diagnostics:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>output:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:conflicted_source</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>owned_regions:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:owned_regions</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>render_report:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:render_report</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>profile:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:profile</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='op'>**</span><span class='id identifier rubyid_merge3_report_fields'>merge3_report_fields</span>
-    <span class='rbrace'>}</span>
-  <span class='kw'>else</span>
-    <span class='lbrace'>{</span>
-      <span class='label'>ok:</span> <span class='kw'>false</span><span class='comma'>,</span>
-      <span class='label'>diagnostics:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>owned_regions:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:owned_regions</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>render_report:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:render_report</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>profile:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:profile</span><span class='rparen'>)</span><span class='comma'>,</span>
-      <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='op'>**</span><span class='id identifier rubyid_merge3_report_fields'>merge3_report_fields</span>
-    <span class='rbrace'>}</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_merge3_result_payload'>merge3_result_payload</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:conflicted_source</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_merge3_result_payload'>merge3_result_payload</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge3_result_payload-class_method">
+  
+    .<strong>merge3_result_payload</strong>(result, success, output)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+764
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774
+775</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 764</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge3_result_payload'>merge3_result_payload</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='id identifier rubyid_success'>success</span><span class='comma'>,</span> <span class='id identifier rubyid_output'>output</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_payload'>payload</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>ok:</span> <span class='id identifier rubyid_success'>success</span><span class='comma'>,</span>
+    <span class='label'>diagnostics:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>owned_regions:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:owned_regions</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>render_report:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:render_report</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>profile:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:profile</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>policies:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_merge3_report_fields'>merge3_report_fields</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>?</span> <span class='id identifier rubyid_payload'>payload</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>output:</span> <span class='id identifier rubyid_output'>output</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_payload'>payload</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1843,42 +2375,6 @@
       <pre class="lines">
 
 
-671
-672
-673
-674
-675
-676
-677
-678
-679
-680
-681
-682
-683
-684
-685
-686
-687
-688
-689
-690
-691
-692
-693
-694
-695
-696
-697
-698
-699
-700
-701
-702
-703
-704
-705
-706
 707
 708
 709
@@ -1889,385 +2385,21 @@
 714
 715
 716
-717
-718
-719
-720
-721
-722
-723
-724
-725
-726
-727
-728
-729
-730
-731
-732
-733
-734
-735
-736
-737
-738
-739
-740
-741
-742
-743
-744
-745
-746
-747
-748
-749
-750
-751
-752
-753
-754
-755
-756
-757
-758
-759
-760
-761
-762
-763
-764
-765
-766
-767
-768
-769
-770
-771
-772
-773
-774
-775
-776
-777
-778
-779
-780
-781
-782
-783
-784
-785
-786
-787
-788
-789
-790
-791
-792
-793
-794
-795
-796
-797
-798
-799
-800
-801
-802
-803
-804
-805
-806
-807
-808
-809
-810
-811
-812
-813
-814
-815
-816
-817
-818
-819
-820
-821
-822
-823
-824
-825
-826
-827
-828
-829
-830
-831
-832
-833
-834
-835
-836
-837
-838
-839
-840
-841
-842
-843
-844
-845
-846
-847
-848
-849
-850
-851
-852
-853
-854
-855
-856
-857
-858
-859
-860
-861
-862
-863
-864
-865
-866
-867
-868
-869
-870
-871
-872
-873
-874
-875
-876
-877
-878
-879
-880
-881</pre>
+717</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 671</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 707</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_by_path'>merge_by_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
                   <span class='id identifier rubyid_other_source'>other_source</span><span class='rparen'>)</span>
-  <span class='kw'>case</span> <span class='id identifier rubyid_normalize_language'>normalize_language</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv-line</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='id identifier rubyid_normalize_language'>normalize_language</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>prism</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_dialect'>dialect</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_language'>normalize_language</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='id identifier rubyid_dialect'>dialect</span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>provider_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby.yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>backend:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span>
-    <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
-      <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
-        <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
-        <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
-        <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
-        <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
-        <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>dialect:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>profile_id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>coarse_document</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
-        <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
-        <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
-      <span class='rparen'>)</span>
-    <span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_unsupported_language_result'>unsupported_language_result</span><span class='lparen'>(</span><span class='id identifier rubyid_normalize_language'>normalize_language</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+  <span class='id identifier rubyid_normalized_language'>normalized_language</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_language'>normalize_language</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_provider_options'>provider_options</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#MERGE_PROVIDER_OPTIONS-constant" title="Smorg::RB::MERGE_PROVIDER_OPTIONS (constant)">MERGE_PROVIDER_OPTIONS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_normalized_language'>normalized_language</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_unsupported_language_result'>unsupported_language_result</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized_language'>normalized_language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_provider_options'>provider_options</span>
+
+  <span class='id identifier rubyid_merge_with_provider'>merge_with_provider</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='id identifier rubyid_provider_options'>provider_options</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_merge_options_for'>merge_options_for</span><span class='lparen'>(</span><span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span><span class='rparen'>)</span>
+  <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2506,6 +2638,48 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="merge_options_for-class_method">
+  
+    .<strong>merge_options_for</strong>(ancestor_source, current_source, other_source, fallback_policy, conflict_marker_size)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+719
+720
+721
+722
+723
+724
+725
+726
+727</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 719</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_options_for'>merge_options_for</span><span class='lparen'>(</span><span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span><span class='rparen'>)</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>base_source:</span> <span class='id identifier rubyid_ancestor_source'>ancestor_source</span><span class='comma'>,</span>
+    <span class='label'>ours_source:</span> <span class='id identifier rubyid_current_source'>current_source</span><span class='comma'>,</span>
+    <span class='label'>theirs_source:</span> <span class='id identifier rubyid_other_source'>other_source</span><span class='comma'>,</span>
+    <span class='label'>fallback_policy:</span> <span class='id identifier rubyid_fallback_policy'>fallback_policy</span><span class='comma'>,</span>
+    <span class='label'>conflict_marker_size:</span> <span class='id identifier rubyid_conflict_marker_size'>conflict_marker_size</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="merge_plain_fallback-class_method">
   
     .<strong>merge_plain_fallback</strong>(other_source, current_source)  &#x21d2; <tt>Object</tt> 
@@ -2548,6 +2722,50 @@
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="merge_with_provider-class_method">
+  
+    .<strong>merge_with_provider</strong>(path_name, provider_options, merge_options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+729
+730
+731
+732
+733
+734
+735
+736
+737
+738</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 729</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_provider'>merge_with_provider</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='id identifier rubyid_provider_options'>provider_options</span><span class='comma'>,</span> <span class='id identifier rubyid_merge_options'>merge_options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge3_result'>merge3_result</span><span class='lparen'>(</span>
+    <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Git</span><span class='period'>.</span><span class='id identifier rubyid_merge3'>merge3</span><span class='lparen'>(</span>
+      <span class='op'>**</span><span class='id identifier rubyid_merge_options'>merge_options</span><span class='comma'>,</span>
+      <span class='label'>path_name:</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span>
+      <span class='label'>profile_id:</span> <span class='id identifier rubyid_provider_options'>provider_options</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:profile_id</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source_preserving</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='op'>**</span><span class='id identifier rubyid_provider_options'>provider_options</span><span class='period'>.</span><span class='id identifier rubyid_except'>except</span><span class='lparen'>(</span><span class='symbol'>:profile_id</span><span class='rparen'>)</span>
+    <span class='rparen'>)</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="normalize_language-class_method">
   
     .<strong>normalize_language</strong>(language, path_name)  &#x21d2; <tt>Object</tt> 
@@ -2562,99 +2780,61 @@
       <pre class="lines">
 
 
-940
-941
-942
-943
-944
-945
-946
-947
-948
-949
-950
-951
-952
-953
-954
-955
-956
-957
-958
-959
-960
-961
-962
-963
-964
-965
-966
-967
-968
-969
-970
-971
-972
-973
-974
-975
-976
-977
-978
-979
-980
-981
-982
-983
-984</pre>
+787
+788
+789
+790
+791
+792
+793
+794</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 940</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 787</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_language'>normalize_language</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>.bash</span><span class='words_sep'> </span><span class='tstring_content'>.sh</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.go</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>.htm</span><span class='words_sep'> </span><span class='tstring_content'>.html</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.rs</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.ts</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_extname'>extname</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.tsx</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_normalized_language'>normalized_language</span> <span class='op'>=</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_language_from_path'>language_from_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_normalized_language'>normalized_language</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
 
-  <span class='kw'>case</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>sh</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/x-sh</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/x-shellscript</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bash</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>golang</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>go</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>htm</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/html</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html5</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>html</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>env</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config-env</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dotenv</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json with comments</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jsonc</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json5</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>md</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>gfm</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/markdown</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/x-ruby</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rbs</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/rust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/rust</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/toml</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ts</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/typescript</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/typescript</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescript</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>typescriptreact</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tsx</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/yaml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/yaml</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plain</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>plaintext</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/plain</span><span class='tstring_end'>&#39;</span></span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>else</span>
+  <span class='const'><span class='object_link'><a href="#LANGUAGE_ALIASES-constant" title="Smorg::RB::LANGUAGE_ALIASES (constant)">LANGUAGE_ALIASES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized_language'>normalized_language</span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_classify_template_target_path'>classify_template_target_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:family</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalized_attribute_path-class_method">
+  
+    .<strong>normalized_attribute_path</strong>(path_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+839
+840
+841
+842
+843
+844</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 839</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalized_attribute_path'>normalized_attribute_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_expanded_path'>expanded_path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='const'>Pathname</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_cleanpath'>cleanpath</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_expanded_path'>expanded_path</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_path_name'>path_name</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -3072,16 +3252,16 @@
       <pre class="lines">
 
 
-1072
-1073
-1074
-1075
-1076
-1077
-1078</pre>
+928
+929
+930
+931
+932
+933
+934</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 1072</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 928</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_conflict_diff'>print_conflict_diff</span><span class='lparen'>(</span><span class='id identifier rubyid_stdout'>stdout</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='comma'>,</span> <span class='id identifier rubyid_regions'>regions</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stdout'>stdout</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>conflicts </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path_name'>path_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -3110,14 +3290,14 @@
       <pre class="lines">
 
 
-1086
-1087
-1088
-1089
-1090</pre>
+942
+943
+944
+945
+946</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 1086</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 942</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_diagnostics'>print_diagnostics</span><span class='lparen'>(</span><span class='id identifier rubyid_stderr'>stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:diagnostics</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='op'>|</span>
@@ -3341,6 +3521,61 @@
     <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="#EXIT_USER_ERROR-constant" title="Smorg::RB::EXIT_USER_ERROR (constant)">EXIT_USER_ERROR</a></span></span>
   <span class='kw'>end</span>
   <span class='const'><span class='object_link'><a href="#EXIT_SUCCESS-constant" title="Smorg::RB::EXIT_SUCCESS (constant)">EXIT_SUCCESS</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="root_attribute_path?-class_method">
+  
+    .<strong>root_attribute_path?</strong>(clean_path)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+846
+847
+848
+849</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 846</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_root_attribute_path?'>root_attribute_path?</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dir'>dir</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_dirname'>dirname</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dir'>dir</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span> <span class='op'>||</span> <span class='id identifier rubyid_clean_path'>clean_path</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>..</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='const'>Pathname</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_clean_path'>clean_path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_absolute?'>absolute?</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -3938,22 +4173,22 @@
       <pre class="lines">
 
 
-883
-884
-885
-886
-887
-888
-889
-890
-891
-892
-893
-894
-895</pre>
+740
+741
+742
+743
+744
+745
+746
+747
+748
+749
+750
+751
+752</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 883</span>
+      <pre class="code"><span class="info file"># File 'lib/smorg/rb.rb', line 740</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unsupported_language_result'>unsupported_language_result</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='id identifier rubyid_path_name'>path_name</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -4094,7 +4329,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 07:06:20 2026 by
+  Generated on Mon Aug 24 19:38:09 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
