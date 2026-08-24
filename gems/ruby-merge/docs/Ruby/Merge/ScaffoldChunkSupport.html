@@ -86,7 +86,17 @@
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Shared chunk anchors used when preserving project-specific Rake sections.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
@@ -269,15 +279,15 @@
       <pre class="lines">
 
 
-60
 61
 62
 63
 64
-65</pre>
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/scaffold_chunk_support.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/scaffold_chunk_support.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jaccard'>jaccard</span><span class='lparen'>(</span><span class='id identifier rubyid_a_set'>a_set</span><span class='comma'>,</span> <span class='id identifier rubyid_b_set'>b_set</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_union'>union</span> <span class='op'>=</span> <span class='id identifier rubyid_a_set'>a_set</span> <span class='op'>|</span> <span class='id identifier rubyid_b_set'>b_set</span>
@@ -305,12 +315,12 @@
       <pre class="lines">
 
 
-56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/scaffold_chunk_support.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/scaffold_chunk_support.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jaccard_tokens'>jaccard_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[A-Za-z0-9_]+</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
@@ -358,14 +368,14 @@
       <pre class="lines">
 
 
-67
 68
 69
 70
-71</pre>
+71
+72</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/scaffold_chunk_support.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/scaffold_chunk_support.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_task_anchor_match?'>task_anchor_match?</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='id identifier rubyid_anchor_value'>anchor_value</span><span class='comma'>,</span> <span class='id identifier rubyid_threshold'>threshold</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_node_tokens'>node_tokens</span> <span class='op'>=</span> <span class='id identifier rubyid_jaccard_tokens'>jaccard_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -382,7 +392,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:03:28 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

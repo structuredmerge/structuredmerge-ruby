@@ -113,7 +113,10 @@
 
 <p>Parser-specific merge gems subclass this when they need native AST location<br />
 or comment attachment behavior. The structural Ruby semantics live here:<br />
-nocov blocks follow file preference and match by their inner content.</p>
+nocov blocks follow file preference and match by their inner content.<br />
+Nocov nodes preserve source locations and marker text as one structural<br />
+unit; the initializer mirrors the node’s complete serialized shape.<br />
+rubocop:disable Metrics/CyclomaticComplexity, Metrics/ParameterLists, Metrics/PerceivedComplexity</p>
 
 
   </div>
@@ -604,17 +607,17 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-23
-24
-25
 26
 27
 28
 29
-30</pre>
+30
+31
+32
+33</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>start_line:</span><span class='comma'>,</span> <span class='label'>end_line:</span><span class='comma'>,</span> <span class='label'>analysis:</span><span class='comma'>,</span> <span class='label'>nodes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>start_marker:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>close_marker:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_start_line'>start_line</span>
@@ -661,12 +664,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-21
-22
-23</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_analysis'>analysis</span>
   <span class='ivar'>@analysis</span>
@@ -703,12 +706,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-21
-22
-23</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_close_marker'>close_marker</span>
   <span class='ivar'>@close_marker</span>
@@ -745,12 +748,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-21
-22
-23</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
   <span class='ivar'>@end_line</span>
@@ -787,12 +790,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-21
-22
-23</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_nodes'>nodes</span>
   <span class='ivar'>@nodes</span>
@@ -829,12 +832,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-21
-22
-23</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
   <span class='ivar'>@start_line</span>
@@ -871,12 +874,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-21
-22
-23</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_marker'>start_marker</span>
   <span class='ivar'>@start_marker</span>
@@ -908,10 +911,10 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-34</pre>
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_children'>children</span> <span class='op'>=</span> <span class='ivar'>@nodes</span></pre>
     </td>
@@ -938,12 +941,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-68
-69
-70</pre>
+71
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 71</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='ivar'>@end_line</span><span class='embexpr_end'>}</span><span class='tstring_content'> nodes=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -968,10 +971,10 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-32</pre>
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 35</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_kind'>kind</span> <span class='op'>=</span> <span class='symbol'>:nocov</span></pre>
     </td>
@@ -994,12 +997,12 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-38
-39
-40</pre>
+41
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 41</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_location'>location</span>
   <span class='ivar'>@location</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="NocovNodeBase/Location.html" title="Ruby::Merge::NocovNodeBase::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ruby::Merge::NocovNodeBase#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@start_line</span><span class='comma'>,</span> <span class='ivar'>@end_line</span><span class='rparen'>)</span>
@@ -1024,10 +1027,10 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-36</pre>
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_policy'>merge_policy</span> <span class='op'>=</span> <span class='kw'>nil</span></pre>
     </td>
@@ -1054,10 +1057,10 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-62</pre>
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 62</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_type'>merge_type</span> <span class='op'>=</span> <span class='symbol'>:nocov_block</span></pre>
     </td>
@@ -1103,10 +1106,10 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-66</pre>
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_nocov_node?'>nocov_node?</span> <span class='op'>=</span> <span class='kw'>true</span></pre>
     </td>
@@ -1129,19 +1132,19 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-51
-52
-53
 54
 55
 56
 57
 58
 59
-60</pre>
+60
+61
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='symbol'>:NocovNode</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='ivar'>@analysis</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -1173,17 +1176,17 @@ nocov blocks follow file preference and match by their inner content.</p>
       <pre class="lines">
 
 
-42
-43
-44
 45
 46
 47
 48
-49</pre>
+49
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/nocov_node_base.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_slice'>slice</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@analysis</span>
@@ -1203,7 +1206,7 @@ nocov blocks follow file preference and match by their inner content.</p>
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:03:29 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

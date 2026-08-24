@@ -102,7 +102,17 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Projects Ruby hash literals into source-preserving merge nodes.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -197,12 +207,12 @@
       <pre class="lines">
 
 
-2383
-2384
-2385</pre>
+2464
+2465
+2466</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge.rb', line 2383</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge.rb', line 2464</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
   <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -257,21 +267,21 @@
       <pre class="lines">
 
 
-2387
-2388
-2389
-2390
-2391
-2392
-2393
-2394
-2395
-2396
-2397
-2398</pre>
+2468
+2469
+2470
+2471
+2472
+2473
+2474
+2475
+2476
+2477
+2478
+2479</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge.rb', line 2387</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge.rb', line 2468</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span>
   <span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:ruby</span><span class='comma'>,</span> <span class='label'>backend_type:</span> <span class='symbol'>:tree_sitter</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
@@ -295,7 +305,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 05:42:00 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

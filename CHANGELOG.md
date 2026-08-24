@@ -28,18 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Keep runtime dependency release waves ordered so dependents resolve just-published sibling gems.
-
-- Restore Ruby parser layering: ruby-merge remains the Tree-sitter-backed language layer, while prism-merge alone provides the native Prism provider and depends on ruby-merge; Tree-sitter capability gaps remain explicitly pending or unsupported.
-
 ### Security
 
 ## [7.1.4] - 2026-08-23
 
 - TAG: [v7.1.4][7.1.4t]
-- COVERAGE: 93.20% -- 1371/1471 lines in 4 files
-- BRANCH COVERAGE: 76.27% -- 466/611 branches in 4 files
-- 14.81% documented
+- COVERAGE: 91.03% -- 1826/2006 lines in 14 files
+- BRANCH COVERAGE: 72.27% -- 589/815 branches in 14 files
+- 25.41% documented
 
 ### Added
 
@@ -72,6 +68,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Keep local StructuredMerge dependencies available to aggregate release coverage.
 
 - Enable the complete local templating graph during aggregate release coverage.
+
+- Keep runtime dependency release waves ordered so dependents resolve just-published sibling gems.
+
+- Restore Ruby parser layering: ruby-merge remains the Tree-sitter-backed language layer, while prism-merge alone provides the native Prism provider and depends on ruby-merge; Tree-sitter capability gaps remain explicitly pending or unsupported.
 
 ## [7.1.3] - 2026-08-11
 

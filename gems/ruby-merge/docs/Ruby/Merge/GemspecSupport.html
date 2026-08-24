@@ -86,7 +86,17 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Shared gemspec block-variable normalization for Ruby templating.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
   
     <h2>
       Constant Summary
@@ -234,12 +244,12 @@
       <pre class="lines">
 
 
-12
 13
-14</pre>
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 12</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_effective_receiver'>effective_receiver</span><span class='lparen'>(</span><span class='id identifier rubyid_receiver'>receiver</span><span class='comma'>,</span> <span class='id identifier rubyid_gemspec_block_var'>gemspec_block_var</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="BlockBindingSupport.html" title="Ruby::Merge::BlockBindingSupport (module)">BlockBindingSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_effective_receiver'><span class='object_link'><a href="BlockBindingSupport.html#effective_receiver-class_method" title="Ruby::Merge::BlockBindingSupport.effective_receiver (method)">effective_receiver</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_receiver'>receiver</span><span class='comma'>,</span> <span class='id identifier rubyid_gemspec_block_var'>gemspec_block_var</span><span class='comma'>,</span> <span class='label'>placeholder:</span> <span class='const'><span class='object_link'><a href="#GEMSPEC_VAR_PLACEHOLDER-constant" title="Ruby::Merge::GemspecSupport::GEMSPEC_VAR_PLACEHOLDER (constant)">GEMSPEC_VAR_PLACEHOLDER</a></span></span><span class='rparen'>)</span>
@@ -264,12 +274,12 @@
       <pre class="lines">
 
 
-20
 21
-22</pre>
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merged_block_var'>merged_block_var</span><span class='lparen'>(</span><span class='id identifier rubyid_var'>var</span><span class='comma'>,</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="BlockBindingSupport.html" title="Ruby::Merge::BlockBindingSupport (module)">BlockBindingSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_merged_block_var'><span class='object_link'><a href="BlockBindingSupport.html#merged_block_var-class_method" title="Ruby::Merge::BlockBindingSupport.merged_block_var (method)">merged_block_var</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_var'>var</span><span class='comma'>,</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span><span class='rparen'>)</span>
@@ -294,15 +304,15 @@
       <pre class="lines">
 
 
-24
 25
 26
 27
 28
-29</pre>
+29
+30</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_opening_line_with_preferred_block_var'>opening_line_with_preferred_block_var</span><span class='lparen'>(</span><span class='id identifier rubyid_opening_line'>opening_line</span><span class='comma'>,</span> <span class='label'>dest_var:</span><span class='comma'>,</span> <span class='label'>preferred_var:</span><span class='comma'>,</span> <span class='label'>node_preference:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_opening_line'>opening_line</span> <span class='kw'>unless</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_var'>dest_var</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_var'>dest_var</span> <span class='op'>!=</span> <span class='id identifier rubyid_preferred_var'>preferred_var</span>
@@ -330,12 +340,12 @@
       <pre class="lines">
 
 
-16
 17
-18</pre>
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/gemspec_support.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_preferred_block_var'>preferred_block_var</span><span class='lparen'>(</span><span class='id identifier rubyid_template_var'>template_var</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_var'>dest_var</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="BlockBindingSupport.html" title="Ruby::Merge::BlockBindingSupport (module)">BlockBindingSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_preferred_block_var'><span class='object_link'><a href="BlockBindingSupport.html#preferred_block_var-class_method" title="Ruby::Merge::BlockBindingSupport.preferred_block_var (method)">preferred_block_var</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_var'>template_var</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_var'>dest_var</span><span class='rparen'>)</span>
@@ -350,7 +360,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:03:28 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

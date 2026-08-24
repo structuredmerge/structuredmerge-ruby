@@ -1,4 +1,60 @@
 PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-dev
+  specs:
+    kettle-dev (3.0.10)
+      emoji_regex (>= 15.0)
+      kettle-gha-pins (~> 0.3, >= 0.3.13)
+      kettle-ndjson (~> 0.1, >= 0.1.12)
+      kettle-rb (~> 0.1, >= 0.1.10)
+      kettle-test (~> 2.0, >= 2.0.20)
+      ruby-progressbar (~> 1.13)
+      tty-progressbar (~> 0.18)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-drift
+  specs:
+    kettle-drift (1.0.12)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-family
+  specs:
+    kettle-family (1.2.58)
+      command_kit (~> 0.6)
+      command_kit-completion (~> 0.1)
+      kettle-dev (>= 3.0.8, < 4.0.0)
+      kettle-test (~> 2.0, >= 2.0.20)
+      tsort (~> 0.2)
+      tty-screen (~> 0.8)
+      unicode-display_width (~> 2.6)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-soup-cover
+  specs:
+    kettle-soup-cover (3.0.9)
+      kettle-wash (~> 0.1, >= 0.1.3)
+      simplecov (>= 1.0)
+      simplecov-cobertura (>= 4.0)
+      simplecov-console (~> 0.9, >= 0.9.5)
+      simplecov-rcov (~> 0.3, >= 0.3.7)
+      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-test
+  specs:
+    kettle-test (2.0.20)
+      appraisal2 (~> 3.0, >= 3.0.6)
+      backports (~> 3.0)
+      rspec (~> 3.0)
+      rspec-block_is_expected (~> 1.0, >= 1.0.6)
+      rspec-pending_for (~> 0.1, >= 0.1.20)
+      rspec-stubbed_env (~> 1.0, >= 1.0.6)
+      rspec_junit_formatter (~> 0.6)
+      silent_stream (~> 1.0, >= 1.0.12)
+      timecop-rspec (~> 1.0, >= 1.0.3)
+      turbo_tests2 (~> 3.1, >= 3.1.12)
+
+PATH
   remote: gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.4)
@@ -121,24 +177,24 @@ PATH
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.3)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.3)
       ast-merge (~> 7.1, >= 7.1.4)
-      bash-merge (~> 7.1, >= 7.1.3)
+      bash-merge (~> 7.1, >= 7.1.4)
       citrus-toml-merge (~> 7.1, >= 7.1.3)
       commonmarker-merge (~> 7.1, >= 7.1.3)
       dotenv-merge (~> 7.1, >= 7.1.3)
-      json-merge (~> 7.1, >= 7.1.3)
+      json-merge (~> 7.1, >= 7.1.4)
       kettle-changelog (~> 1.0, >= 1.0.2)
       kettle-dev (>= 2.3.5, < 4.0.0)
       kettle-gha-pins (~> 0.3, >= 0.3.3)
       kettle-ndjson (~> 0.1, >= 0.1.3)
       kettle-rb (~> 0.1, >= 0.1.7)
       kramdown-merge (~> 7.1, >= 7.1.3)
-      markdown-merge (~> 7.1, >= 7.1.3)
+      markdown-merge (~> 7.1, >= 7.1.4)
       markly-merge (~> 7.1, >= 7.1.3)
       parslet (~> 2.0)
       prism-merge (~> 7.1, >= 7.1.3)
       psych-merge (~> 7.1, >= 7.1.3)
       rbs (>= 3.10)
-      rbs-merge (~> 7.1, >= 7.1.3)
+      rbs-merge (~> 7.1, >= 7.1.4)
       ruby-merge (~> 7.1, >= 7.1.3)
       token-resolver (~> 2.0, >= 2.0.4)
       toml-merge (~> 7.1, >= 7.1.3)
@@ -192,6 +248,7 @@ PATH
     prism-merge (7.1.4)
       ast-merge (= 7.1.4)
       prism (~> 1.6)
+      ruby-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
@@ -202,6 +259,7 @@ PATH
       ast-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
+      yaml-merge (= 7.1.4)
 
 PATH
   remote: gems/rbs-merge
@@ -217,7 +275,6 @@ PATH
   specs:
     ruby-merge (7.1.4)
       ast-merge (= 7.1.4)
-      prism-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
@@ -244,13 +301,13 @@ PATH
       kettle-jem (~> 7.1, >= 7.1.3)
       markdown-merge (= 7.1.4)
       plain-merge (= 7.1.4)
+      prism-merge (= 7.1.4)
+      psych-merge (= 7.1.4)
       rbs-merge (= 7.1.4)
-      ruby-merge (= 7.1.4)
       rust-merge (= 7.1.4)
       toml-merge (= 7.1.4)
       typescript-merge (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
-      yaml-merge (= 7.1.4)
 
 PATH
   remote: gems/toml-merge
@@ -282,7 +339,6 @@ PATH
   specs:
     yaml-merge (7.1.4)
       ast-merge (= 7.1.4)
-      psych-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
@@ -392,24 +448,6 @@ GEM
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
       kettle-dev (>= 3.0.6, < 4.0.0)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-dev (3.0.10)
-      emoji_regex (>= 15.0)
-      kettle-gha-pins (~> 0.3, >= 0.3.13)
-      kettle-ndjson (~> 0.1, >= 0.1.12)
-      kettle-rb (~> 0.1, >= 0.1.10)
-      kettle-test (~> 2.0, >= 2.0.20)
-      ruby-progressbar (~> 1.13)
-      tty-progressbar (~> 0.18)
-    kettle-drift (1.0.12)
-      version_gem (~> 1.1, >= 1.1.15)
-    kettle-family (1.2.58)
-      command_kit (~> 0.6)
-      command_kit-completion (~> 0.1)
-      kettle-dev (>= 3.0.8, < 4.0.0)
-      kettle-test (~> 2.0, >= 2.0.20)
-      tsort (~> 0.2)
-      tty-screen (~> 0.8)
-      unicode-display_width (~> 2.6)
     kettle-gha-pins (0.3.13)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
@@ -417,24 +455,6 @@ GEM
     kettle-ndjson (0.1.12)
       version_gem (~> 1.1, >= 1.1.15)
     kettle-rb (0.1.10)
-    kettle-soup-cover (3.0.9)
-      kettle-wash (~> 0.1, >= 0.1.3)
-      simplecov (>= 1.0)
-      simplecov-cobertura (>= 4.0)
-      simplecov-console (~> 0.9, >= 0.9.5)
-      simplecov-rcov (~> 0.3, >= 0.3.7)
-      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
-    kettle-test (2.0.20)
-      appraisal2 (~> 3.0, >= 3.0.6)
-      backports (~> 3.0)
-      rspec (~> 3.0)
-      rspec-block_is_expected (~> 1.0, >= 1.0.6)
-      rspec-pending_for (~> 0.1, >= 0.1.20)
-      rspec-stubbed_env (~> 1.0, >= 1.0.6)
-      rspec_junit_formatter (~> 0.6)
-      silent_stream (~> 1.0, >= 1.0.12)
-      timecop-rspec (~> 1.0, >= 1.0.3)
-      turbo_tests2 (~> 3.1, >= 3.1.12)
     kettle-wash (0.1.5)
       version_gem (~> 1.1, >= 1.1.15)
     kramdown (2.5.2)
@@ -738,12 +758,12 @@ DEPENDENCIES
   html-merge!
   irb (~> 1.17)
   json-merge!
-  kettle-dev (~> 3.0, >= 3.0.7, >= 3.0.0)
-  kettle-drift (~> 1.0, >= 1.0.8)
-  kettle-family (~> 1.2, >= 1.2.58)
+  kettle-dev!
+  kettle-drift!
+  kettle-family!
   kettle-jem!
-  kettle-soup-cover (~> 3.0, >= 3.0.6)
-  kettle-test (~> 2.0, >= 2.0.20, >= 2.0.11)
+  kettle-soup-cover!
+  kettle-test!
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-merge!
   kramdown-parser-gfm (~> 1.1)

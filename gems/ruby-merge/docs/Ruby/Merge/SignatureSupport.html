@@ -86,7 +86,17 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Stable structural signatures used by Ruby owner and method matching.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -632,12 +642,12 @@
       <pre class="lines">
 
 
-52
 53
-54</pre>
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_begin_block'>begin_block</span><span class='lparen'>(</span><span class='id identifier rubyid_first_statement_preview'>first_statement_preview</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:begin</span><span class='comma'>,</span> <span class='id identifier rubyid_first_statement_preview'>first_statement_preview</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -662,12 +672,12 @@
       <pre class="lines">
 
 
-56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_identifier'>identifier</span><span class='comma'>,</span> <span class='label'>block:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_block'>block</span> <span class='op'>?</span> <span class='symbol'>:call_with_block</span> <span class='op'>:</span> <span class='symbol'>:call</span><span class='comma'>,</span> <span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_identifier'>identifier</span><span class='rbracket'>]</span>
@@ -692,12 +702,12 @@
       <pre class="lines">
 
 
-68
 69
-70</pre>
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call_operator_write'>call_operator_write</span><span class='lparen'>(</span><span class='id identifier rubyid_write_name'>write_name</span><span class='comma'>,</span> <span class='id identifier rubyid_receiver'>receiver</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:call_op_write</span><span class='comma'>,</span> <span class='id identifier rubyid_write_name'>write_name</span><span class='comma'>,</span> <span class='id identifier rubyid_receiver'>receiver</span><span class='rbracket'>]</span>
@@ -722,12 +732,12 @@
       <pre class="lines">
 
 
-44
 45
-46</pre>
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_case_match_statement'>case_match_statement</span><span class='lparen'>(</span><span class='id identifier rubyid_predicate'>predicate</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:case_match</span><span class='comma'>,</span> <span class='id identifier rubyid_predicate'>predicate</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -752,12 +762,12 @@
       <pre class="lines">
 
 
-40
 41
-42</pre>
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 41</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_case_statement'>case_statement</span><span class='lparen'>(</span><span class='id identifier rubyid_predicate'>predicate</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:case</span><span class='comma'>,</span> <span class='id identifier rubyid_predicate'>predicate</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -782,12 +792,12 @@
       <pre class="lines">
 
 
-12
 13
-14</pre>
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 12</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_class_definition'>class_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_constant_path'>constant_path</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:class</span><span class='comma'>,</span> <span class='id identifier rubyid_constant_path'>constant_path</span><span class='rbracket'>]</span>
@@ -812,12 +822,12 @@
       <pre class="lines">
 
 
-36
 37
-38</pre>
+38
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_conditional'>conditional</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_predicate'>predicate</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_predicate'>predicate</span><span class='rbracket'>]</span>
@@ -842,12 +852,12 @@
       <pre class="lines">
 
 
-24
 25
-26</pre>
+26
+27</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_constant'>constant</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:const</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
@@ -872,12 +882,12 @@
       <pre class="lines">
 
 
-84
 85
-86</pre>
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_embedded'>embedded</span><span class='lparen'>(</span><span class='id identifier rubyid_statements_source'>statements_source</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:embedded</span><span class='comma'>,</span> <span class='id identifier rubyid_statements_source'>statements_source</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -902,12 +912,12 @@
       <pre class="lines">
 
 
-76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 77</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execution_block'>execution_block</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span>
@@ -932,12 +942,12 @@
       <pre class="lines">
 
 
-64
 65
-66</pre>
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_forwarding_super_call'>forwarding_super_call</span><span class='lparen'>(</span><span class='label'>block:</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:forwarding_super</span><span class='comma'>,</span> <span class='id identifier rubyid_block'>block</span> <span class='op'>?</span> <span class='symbol'>:with_block</span> <span class='op'>:</span> <span class='symbol'>:no_block</span><span class='rbracket'>]</span>
@@ -962,12 +972,12 @@
       <pre class="lines">
 
 
-72
 73
-74</pre>
+74
+75</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lambda_literal'>lambda_literal</span><span class='lparen'>(</span><span class='id identifier rubyid_parameters_source'>parameters_source</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:lambda</span><span class='comma'>,</span> <span class='id identifier rubyid_parameters_source'>parameters_source</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -992,12 +1002,12 @@
       <pre class="lines">
 
 
-48
 49
-50</pre>
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_loop_statement'>loop_statement</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_parts'>parts</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_parts'>parts</span><span class='rbracket'>]</span>
@@ -1022,12 +1032,12 @@
       <pre class="lines">
 
 
-8
 9
-10</pre>
+10
+11</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 8</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_definition'>method_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:def</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span><span class='rbracket'>]</span>
@@ -1052,12 +1062,12 @@
       <pre class="lines">
 
 
-16
 17
-18</pre>
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_module_definition'>module_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_constant_path'>constant_path</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:module</span><span class='comma'>,</span> <span class='id identifier rubyid_constant_path'>constant_path</span><span class='rbracket'>]</span>
@@ -1082,12 +1092,12 @@
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_multi_write'>multi_write</span><span class='lparen'>(</span><span class='id identifier rubyid_targets'>targets</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:multi_write</span><span class='comma'>,</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_targets'>targets</span><span class='rparen'>)</span><span class='rbracket'>]</span>
@@ -1112,12 +1122,12 @@
       <pre class="lines">
 
 
-88
 89
-90</pre>
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 89</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_other'>other</span><span class='lparen'>(</span><span class='id identifier rubyid_class_name'>class_name</span><span class='comma'>,</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:other</span><span class='comma'>,</span> <span class='id identifier rubyid_class_name'>class_name</span><span class='comma'>,</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span>
@@ -1142,12 +1152,12 @@
       <pre class="lines">
 
 
-80
 81
-82</pre>
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parenthesized'>parenthesized</span><span class='lparen'>(</span><span class='id identifier rubyid_first_expression_preview'>first_expression_preview</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:parens</span><span class='comma'>,</span> <span class='id identifier rubyid_first_expression_preview'>first_expression_preview</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -1172,12 +1182,12 @@
       <pre class="lines">
 
 
-20
 21
-22</pre>
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_singleton_class'>singleton_class</span><span class='lparen'>(</span><span class='id identifier rubyid_expression'>expression</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:singleton_class</span><span class='comma'>,</span> <span class='id identifier rubyid_expression'>expression</span><span class='rbracket'>]</span>
@@ -1202,12 +1212,12 @@
       <pre class="lines">
 
 
-60
 61
-62</pre>
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_super_call'>super_call</span><span class='lparen'>(</span><span class='label'>block:</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='symbol'>:super</span><span class='comma'>,</span> <span class='id identifier rubyid_block'>block</span> <span class='op'>?</span> <span class='symbol'>:with_block</span> <span class='op'>:</span> <span class='symbol'>:no_block</span><span class='rbracket'>]</span>
@@ -1232,12 +1242,12 @@
       <pre class="lines">
 
 
-92
 93
-94</pre>
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 92</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 93</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_textual_method_signature'>textual_method_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_receiver_prefix'>receiver_prefix</span><span class='comma'>,</span> <span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_receiver_prefix'>receiver_prefix</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -1262,12 +1272,12 @@
       <pre class="lines">
 
 
-28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/signature_support.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_variable_assignment'>variable_assignment</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
@@ -1282,7 +1292,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:03:28 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

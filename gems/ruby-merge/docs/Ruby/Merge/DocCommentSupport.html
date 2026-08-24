@@ -253,7 +253,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
+    <span class="summary_desc"><div class='inline'><p>Example extraction deliberately combines tag scanning and body slicing so the returned indexes remain tied to the original comment entries.</p>
 </div></span>
   
 </li>
@@ -531,15 +531,24 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Example extraction deliberately combines tag scanning and body slicing<br />
+so the returned indexes remain tied to the original comment entries.<br />
+rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-71
-72
-73
 74
 75
 76
@@ -560,10 +569,13 @@
 91
 92
 93
-94</pre>
+94
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/doc_comment_support.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/doc_comment_support.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_example_blocks'>example_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_entries'>entries</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_normalize_comment_content'>normalize_comment_content</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:raw</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -762,7 +774,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:03:28 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

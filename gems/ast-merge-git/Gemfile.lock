@@ -166,25 +166,25 @@ PATH
       addressable (>= 2.8, < 3)
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.3)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.3)
-      ast-merge (~> 7.1, >= 7.1.3)
-      bash-merge (~> 7.1, >= 7.1.3)
+      ast-merge (~> 7.1, >= 7.1.4)
+      bash-merge (~> 7.1, >= 7.1.4)
       citrus-toml-merge (~> 7.1, >= 7.1.3)
       commonmarker-merge (~> 7.1, >= 7.1.3)
       dotenv-merge (~> 7.1, >= 7.1.3)
-      json-merge (~> 7.1, >= 7.1.3)
+      json-merge (~> 7.1, >= 7.1.4)
       kettle-changelog (~> 1.0, >= 1.0.2)
       kettle-dev (>= 2.3.5, < 4.0.0)
       kettle-gha-pins (~> 0.3, >= 0.3.3)
       kettle-ndjson (~> 0.1, >= 0.1.3)
       kettle-rb (~> 0.1, >= 0.1.7)
       kramdown-merge (~> 7.1, >= 7.1.3)
-      markdown-merge (~> 7.1, >= 7.1.3)
+      markdown-merge (~> 7.1, >= 7.1.4)
       markly-merge (~> 7.1, >= 7.1.3)
       parslet (~> 2.0)
       prism-merge (~> 7.1, >= 7.1.3)
       psych-merge (~> 7.1, >= 7.1.3)
       rbs (>= 3.10)
-      rbs-merge (~> 7.1, >= 7.1.3)
+      rbs-merge (~> 7.1, >= 7.1.4)
       ruby-merge (~> 7.1, >= 7.1.3)
       token-resolver (~> 2.0, >= 2.0.4)
       toml-merge (~> 7.1, >= 7.1.3)
@@ -238,6 +238,7 @@ PATH
     prism-merge (7.1.4)
       ast-merge (= 7.1.4)
       prism (~> 1.6)
+      ruby-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
@@ -248,6 +249,7 @@ PATH
       ast-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
+      yaml-merge (= 7.1.4)
 
 PATH
   remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/rbs-merge
@@ -263,7 +265,6 @@ PATH
   specs:
     ruby-merge (7.1.4)
       ast-merge (= 7.1.4)
-      prism-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 
@@ -290,13 +291,13 @@ PATH
       kettle-jem (~> 7.1, >= 7.1.3)
       markdown-merge (= 7.1.4)
       plain-merge (= 7.1.4)
+      prism-merge (= 7.1.4)
+      psych-merge (= 7.1.4)
       rbs-merge (= 7.1.4)
-      ruby-merge (= 7.1.4)
       rust-merge (= 7.1.4)
       toml-merge (= 7.1.4)
       typescript-merge (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
-      yaml-merge (= 7.1.4)
 
 PATH
   remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/toml-merge
@@ -328,7 +329,6 @@ PATH
   specs:
     yaml-merge (7.1.4)
       ast-merge (= 7.1.4)
-      psych-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
 

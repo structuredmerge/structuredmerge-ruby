@@ -102,7 +102,21 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Computes stable name/parameter similarity scores for Ruby methods.</p>
 
+<p>The dynamic-programming distance calculation is intentionally kept local<br />
+to this value object so the matching contract stays easy to audit.<br />
+rubocop:disable Metrics/AbcSize, Metrics/MethodLength</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
   
     <h2>
       Constant Summary
@@ -348,13 +362,13 @@
       <pre class="lines">
 
 
-11
-12
-13
-14</pre>
+16
+17
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>name_weight:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_NAME_WEIGHT-constant" title="Ruby::Merge::MethodSimilarity::DEFAULT_NAME_WEIGHT (constant)">DEFAULT_NAME_WEIGHT</a></span></span><span class='comma'>,</span> <span class='label'>params_weight:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PARAMS_WEIGHT-constant" title="Ruby::Merge::MethodSimilarity::DEFAULT_PARAMS_WEIGHT (constant)">DEFAULT_PARAMS_WEIGHT</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@name_weight</span> <span class='op'>=</span> <span class='id identifier rubyid_name_weight'>name_weight</span>
@@ -397,12 +411,12 @@
       <pre class="lines">
 
 
-9
-10
-11</pre>
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_name_weight'>name_weight</span>
   <span class='ivar'>@name_weight</span>
@@ -439,12 +453,12 @@
       <pre class="lines">
 
 
-9
-10
-11</pre>
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_params_weight'>params_weight</span>
   <span class='ivar'>@params_weight</span>
@@ -476,15 +490,15 @@
       <pre class="lines">
 
 
-16
-17
-18
-19
-20
-21</pre>
+21
+22
+23
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='label'>template_name:</span><span class='comma'>,</span> <span class='label'>template_params:</span><span class='comma'>,</span> <span class='label'>dest_name:</span><span class='comma'>,</span> <span class='label'>dest_params:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_name_score'>name_score</span> <span class='op'>=</span> <span class='id identifier rubyid_string_similarity'>string_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_template_name'>template_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_name'>dest_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -512,11 +526,6 @@
       <pre class="lines">
 
 
-45
-46
-47
-48
-49
 50
 51
 52
@@ -539,10 +548,15 @@
 69
 70
 71
-72</pre>
+72
+73
+74
+75
+76
+77</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_levenshtein_distance'>levenshtein_distance</span><span class='lparen'>(</span><span class='id identifier rubyid_str1'>str1</span><span class='comma'>,</span> <span class='id identifier rubyid_str2'>str2</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_str2'>str2</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='kw'>if</span> <span class='id identifier rubyid_str1'>str1</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -592,20 +606,20 @@
       <pre class="lines">
 
 
-23
-24
-25
-26
-27
 28
 29
 30
 31
 32
-33</pre>
+33
+34
+35
+36
+37
+38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_param_similarity'>param_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_template_params'>template_params</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_params'>dest_params</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='float'>1.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_template_params'>template_params</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_params'>dest_params</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -638,18 +652,18 @@
       <pre class="lines">
 
 
-35
-36
-37
-38
-39
 40
 41
 42
-43</pre>
+43
+44
+45
+46
+47
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/ruby/merge/method_similarity.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_string_similarity'>string_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_str1'>str1</span><span class='comma'>,</span> <span class='id identifier rubyid_str2'>str2</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='float'>1.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_str1'>str1</span> <span class='op'>==</span> <span class='id identifier rubyid_str2'>str2</span>
@@ -670,7 +684,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Aug  8 01:03:29 2026 by
+  Generated on Sun Aug 23 23:21:18 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
