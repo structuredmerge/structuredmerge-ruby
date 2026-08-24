@@ -30,14 +30,31 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Security
 
-## [7.1.5] - 2026-08-24
+## [7.1.4] - 2026-08-12
 
-- TAG: [v7.1.5][7.1.5t]
-- COVERAGE: 93.60% -- 10815/11554 lines in 16 files
-- BRANCH COVERAGE: 77.21% -- 4627/5993 branches in 16 files
-- 17.97% documented
+- TAG: [v7.1.4][7.1.4t]
+- COVERAGE: 93.57% -- 10753/11492 lines in 16 files
+- BRANCH COVERAGE: 77.10% -- 4599/5965 branches in 16 files
+- 18.00% documented
 
 ### Changed
+
+- Write-mode dependency-floor and workflow-pin maintenance tools now document their updates in CHANGELOG.md by default.
+
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-dev (~> 3.0, >= 3.0.0 -> ~> 3.0, >= 3.0.6)
+  - kettle-family (~> 1.2, >= 1.2.44 -> ~> 1.2, >= 1.2.51)
+  - kettle-jem (~> 7.1, >= 7.1.1 -> ~> 7.1, >= 7.1.3)
+  - yard-lint (~> 1.10, >= 1.10.3 -> ~> 1.11, >= 1.11.0)
+
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - github/codeql-action/analyze v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
+  - github/codeql-action/autobuild v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
+  - github/codeql-action/init v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
+
+- Declare kettle-changelog as a runtime dependency for packaged maintenance commands.
+
+- Main templating commands now record an aggregate Changed entry through kettle-changelog only when template files change, while transfer replay uses kettle-changelog's structural merger.
 
 - Template maintenance summaries now use keyed, cumulative [kc] entries with nested file-type counts, so repeated template runs update one changelog entry.
 
@@ -67,41 +84,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Restore source-checkout loading for the repository-local dependency-floor and workflow-pin maintenance tools.
+
 - Use Markdown-safe compound keys for automated kettle-jem template changelog entries so release reference validation does not treat their labels as undefined links.
 
 - Use a dependency-specific switch when omitting kettle-changelog from release Bundler resolution.
 
 - Avoid duplicate tree_sitter_language_pack declarations when templating with a local TSLP override.
-
-## [7.1.4] - 2026-08-12
-
-- TAG: [v7.1.4][7.1.4t]
-- COVERAGE: 93.57% -- 10753/11492 lines in 16 files
-- BRANCH COVERAGE: 77.10% -- 4599/5965 branches in 16 files
-- 18.00% documented
-
-### Changed
-
-- Write-mode dependency-floor and workflow-pin maintenance tools now document their updates in CHANGELOG.md by default.
-
-- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-dev (~> 3.0, >= 3.0.0 -> ~> 3.0, >= 3.0.6)
-  - kettle-family (~> 1.2, >= 1.2.44 -> ~> 1.2, >= 1.2.51)
-  - kettle-jem (~> 7.1, >= 7.1.1 -> ~> 7.1, >= 7.1.3)
-  - yard-lint (~> 1.10, >= 1.10.3 -> ~> 1.11, >= 1.11.0)
-
-- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - github/codeql-action/analyze v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
-  - github/codeql-action/autobuild v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
-  - github/codeql-action/init v4.37.4 (f205ea1c3313d32999d8d6a48b4f6530d4437b38) -> v4.37.6 (5595ccaf912efad79be6eef63a5619ff05969be3)
-
-- Declare kettle-changelog as a runtime dependency for packaged maintenance commands.
-
-- Main templating commands now record an aggregate Changed entry through kettle-changelog only when template files change, while transfer replay uses kettle-changelog's structural merger.
-
-### Fixed
-
-- Restore source-checkout loading for the repository-local dependency-floor and workflow-pin maintenance tools.
 
 ## [7.1.3] - 2026-08-11
 
@@ -1567,9 +1556,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.5...HEAD
-[7.1.5]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...v7.1.5
-[7.1.5t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.5
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...HEAD
 [7.1.4]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.3...v7.1.4
 [7.1.4t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.4
 [7.1.3]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.2...v7.1.3
