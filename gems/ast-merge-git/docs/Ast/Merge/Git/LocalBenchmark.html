@@ -142,6 +142,11 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
         </dt>
         <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>merge3</span><span class='words_sep'> </span><span class='tstring_content'>metamorphic</span><span class='words_sep'> </span><span class='tstring_content'>diff</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
+        <dt id="EXECUTABLE_OPERATIONS-constant" class="">EXECUTABLE_OPERATIONS =
+          
+        </dt>
+        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>merge3</span><span class='words_sep'> </span><span class='tstring_content'>metamorphic</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
         <dt id="PARTITIONS-constant" class="">PARTITIONS =
           
         </dt>
@@ -168,6 +173,13 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
         <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='words_sep'>
 </span><span class='words_sep'>  </span><span class='tstring_content'>rename</span><span class='words_sep'> </span><span class='tstring_content'>move</span><span class='words_sep'> </span><span class='tstring_content'>reorder</span><span class='words_sep'> </span><span class='tstring_content'>formatting</span><span class='words_sep'> </span><span class='tstring_content'>comment</span><span class='words_sep'> </span><span class='tstring_content'>independent_edit</span><span class='words_sep'> </span><span class='tstring_content'>delete_modify</span><span class='words_sep'> </span><span class='tstring_content'>duplicate_key_identity</span><span class='words_sep'>
 </span><span class='words_sep'>  </span><span class='tstring_content'>schema_aware_mutation</span><span class='words_sep'>
+</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="METAMORPHIC_INVARIANTS-constant" class="">METAMORPHIC_INVARIANTS =
+          
+        </dt>
+        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>comment-retained</span><span class='words_sep'> </span><span class='tstring_content'>no-semantic-edit</span><span class='words_sep'> </span><span class='tstring_content'>same-json-value</span><span class='words_sep'> </span><span class='tstring_content'>same-jsonc-value</span><span class='words_sep'>
 </span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="ID_PATTERN-constant" class="">ID_PATTERN =
@@ -484,14 +496,14 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-49
-50
-51
-52
-53</pre>
+53
+54
+55
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_document'>document</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>corpus_digest:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@document</span> <span class='op'>=</span> <span class='id identifier rubyid_document'>document</span>
@@ -535,12 +547,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-38
-39
-40</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corpus_digest'>corpus_digest</span>
   <span class='ivar'>@corpus_digest</span>
@@ -577,12 +589,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-38
-39
-40</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_document'>document</span>
   <span class='ivar'>@document</span>
@@ -619,12 +631,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-38
-39
-40</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_path'>path</span>
   <span class='ivar'>@path</span>
@@ -656,17 +668,17 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-40
-41
-42
-43
 44
 45
 46
-47</pre>
+47
+48
+49
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_source'>source</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_binread'>binread</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
@@ -702,12 +714,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-125
-126
-127</pre>
+132
+133
+134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 125</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 132</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_case_by_id'>case_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_document'>document</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cases</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_id'>id</span> <span class='rbrace'>}</span> <span class='op'>||</span> <span class='id identifier rubyid_error!'>error!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unknown case: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -732,13 +744,13 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-70
-71
-72
-73</pre>
+75
+76
+77
+78</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cases'>cases</span>
   <span class='id identifier rubyid_validate!'>validate!</span>
@@ -764,11 +776,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-75
-76
-77
-78
-79
 80
 81
 82
@@ -812,10 +819,17 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 120
 121
 122
-123</pre>
+123
+124
+125
+126
+127
+128
+129
+130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='label'>profile:</span><span class='comma'>,</span> <span class='label'>changed_paths:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_validate!'>validate!</span>
@@ -854,7 +868,9 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>seed</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_document'>document</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>selection</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>seed</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
       <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>selected_case_ids</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_neighbors'>neighbors</span>
     <span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported_selected_cases</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_selected'>selected</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_id'>id</span><span class='op'>|</span> <span class='id identifier rubyid_case_by_id'>case_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>operation</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>merge3</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported_selected_cases</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_selected'>selected</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_id'>id</span><span class='op'>|</span>
+      <span class='const'><span class='object_link'><a href="#EXECUTABLE_OPERATIONS-constant" title="Ast::Merge::Git::LocalBenchmark::EXECUTABLE_OPERATIONS (constant)">EXECUTABLE_OPERATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_case_by_id'>case_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>operation</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='kw'>end</span><span class='comma'>,</span>
     <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>budgets</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_definition'>definition</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>budgets</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>explanation</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_explanation'>explanation</span><span class='lparen'>(</span>
       <span class='id identifier rubyid_profile'>profile</span><span class='comma'>,</span>
@@ -886,10 +902,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-55
-56
-57
-58
 59
 60
 61
@@ -899,14 +911,19 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 65
 66
 67
-68</pre>
+68
+69
+70
+71
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 55</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate!'>validate!</span>
   <span class='id identifier rubyid_require_keys'>require_keys</span><span class='lparen'>(</span><span class='id identifier rubyid_document'>document</span><span class='comma'>,</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>schema_version</span><span class='words_sep'> </span><span class='tstring_content'>kind</span><span class='words_sep'> </span><span class='tstring_content'>id</span><span class='words_sep'> </span><span class='tstring_content'>version</span><span class='words_sep'> </span><span class='tstring_content'>extends</span><span class='words_sep'> </span><span class='tstring_content'>provenance</span><span class='words_sep'> </span><span class='tstring_content'>profiles</span><span class='words_sep'> </span><span class='tstring_content'>capability_map</span><span class='words_sep'>
-</span><span class='words_sep'>                            </span><span class='tstring_content'>selection</span><span class='words_sep'> </span><span class='tstring_content'>cases</span><span class='words_sep'> </span><span class='tstring_content'>expected_summary</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>corpus</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+</span><span class='words_sep'>                            </span><span class='tstring_content'>selection</span><span class='words_sep'> </span><span class='tstring_content'>competitors</span><span class='words_sep'> </span><span class='tstring_content'>cases</span><span class='words_sep'> </span><span class='tstring_content'>expected_summary</span><span class='tstring_end'>]</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>corpus</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_error!'>error!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported corpus schema</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_document'>document</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>schema_version</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#SCHEMA-constant" title="Ast::Merge::Git::LocalBenchmark::SCHEMA (constant)">SCHEMA</a></span></span>
   <span class='id identifier rubyid_error!'>error!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>corpus must extend Slice 1022 v1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_document'>document</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>extends</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#CASE_SCHEMA-constant" title="Ast::Merge::Git::LocalBenchmark::CASE_SCHEMA (constant)">CASE_SCHEMA</a></span></span>
   <span class='id identifier rubyid_error!'>error!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>network must be denied</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_document'>document</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>network_policy</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>denied</span><span class='tstring_end'>&#39;</span></span>
@@ -914,6 +931,7 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
   <span class='id identifier rubyid_validate_provenance!'>validate_provenance!</span><span class='lparen'>(</span><span class='id identifier rubyid_document'>document</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>provenance</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>corpus</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_validate_profiles!'>validate_profiles!</span>
   <span class='id identifier rubyid_validate_capability_map!'>validate_capability_map!</span>
+  <span class='id identifier rubyid_validate_competitors!'>validate_competitors!</span>
   <span class='id identifier rubyid_validate_cases!'>validate_cases!</span>
   <span class='id identifier rubyid_validate_summary!'>validate_summary!</span>
   <span class='kw'>true</span>
@@ -928,7 +946,7 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 06:46:22 2026 by
+  Generated on Mon Aug 24 04:13:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
