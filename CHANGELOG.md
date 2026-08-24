@@ -28,14 +28,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Keep runtime dependency release waves ordered so dependents resolve just-published sibling gems.
+
 ### Security
 
 ## [7.1.4] - 2026-08-23
 
 - TAG: [v7.1.4][7.1.4t]
-- COVERAGE: 78.50% -- 1479/1884 lines in 15 files
-- BRANCH COVERAGE: 52.27% -- 541/1035 branches in 15 files
-- 88.89% documented
+- COVERAGE: 93.20% -- 1371/1471 lines in 4 files
+- BRANCH COVERAGE: 76.27% -- 466/611 branches in 4 files
+- 14.81% documented
 
 ### Added
 
