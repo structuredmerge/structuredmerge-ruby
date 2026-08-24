@@ -101,7 +101,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("bash-merge", "~> 7.1", ">= 7.1.4")                 # ruby >= 4.0.0
   spec.add_dependency("citrus-toml-merge", "~> 7.1", ">= 7.1.4")          # ruby >= 4.0.0
   spec.add_dependency("commonmarker-merge", "~> 7.1", ">= 7.1.4")         # ruby >= 4.0.0
-  spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.3")              # ruby >= 4.0.0
+  spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.4")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.4")                 # ruby >= 4.0.0
   spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.2")          # ruby >= 4.0.0
   spec.add_dependency("kettle-dev", ">= 2.3.5", "< 4.0.0")                # ruby >= 2.3.0
