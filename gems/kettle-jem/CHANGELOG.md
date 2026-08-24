@@ -22,6 +22,23 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.5] - 2026-08-24
+
+- TAG: [v7.1.5][7.1.5t]
+- COVERAGE: 93.60% -- 10814/11554 lines in 16 files
+- BRANCH COVERAGE: 77.21% -- 4627/5993 branches in 16 files
+- 17.97% documented
+
+### Changed
+
 - Template maintenance summaries now use keyed, cumulative [kc] entries with nested file-type counts, so repeated template runs update one changelog entry.
 
 - [kc] kettle-jem/funding-platforms: Configure GitHub funding platforms independently, remove disabled destination-only FUNDING.yml entries, and keep README/FUNDING.md badges aligned with the configured policy.
@@ -48,10 +65,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Make the repository-local kettle-jem-deps-floor executable bootstrap the consistent StructuredMerge development bundle before loading parser dependencies.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Use Markdown-safe compound keys for automated kettle-jem template changelog entries so release reference validation does not treat their labels as undefined links.
@@ -59,8 +72,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Use a dependency-specific switch when omitting kettle-changelog from release Bundler resolution.
 
 - Avoid duplicate tree_sitter_language_pack declarations when templating with a local TSLP override.
-
-### Security
 
 ## [7.1.4] - 2026-08-12
 
@@ -1556,7 +1567,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.5...HEAD
+[7.1.5]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...v7.1.5
+[7.1.5t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.5
 [7.1.4]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.3...v7.1.4
 [7.1.4t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.4
 [7.1.3]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.2...v7.1.3
