@@ -110,7 +110,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'go-merge', "= #{spec.version}"
   spec.add_dependency 'html-merge', "= #{spec.version}"
   spec.add_dependency 'json-merge', "= #{spec.version}"
-  spec.add_dependency 'kettle-jem', '~> 7.1', '>= 7.1.3'
+  spec.add_dependency 'kettle-jem', '~> 7.1', '>= 7.1.5'
   spec.add_dependency 'markdown-merge', "= #{spec.version}"
   spec.add_dependency 'plain-merge', "= #{spec.version}"
   spec.add_dependency 'rbs-merge', "= #{spec.version}"
