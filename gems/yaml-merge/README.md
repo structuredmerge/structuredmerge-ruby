@@ -23,22 +23,22 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 `Yaml::Merge` is the canonical YAML family package. It is the YAML substrate for
 StructuredMerge Ruby: it registers the tree-sitter YAML path and should own the
-shared YAML merge behavior used by all YAML backends, including `psych-merge`.
-YAML parsing and backend selection enter through `tree_haver`; source-preserving
+shared YAML merge behavior used by provider implementations. YAML parsing and
+backend selection enter through `tree_haver`; source-preserving
 partial document insertion, replacement, and removal should enter through
 `ast-crispr`; merge orchestration should use `ast-merge`.
 
-Direct parser calls in YAML merge behavior are a smell. Tree-sitter YAML details
-belong behind the TreeHaver backend path, and Psych details belong behind the
-Psych TreeHaver backend. YAML-family code should operate on normalized owners,
-ranges, comments, and edit plans rather than native Ruby Hash/Array round-trips.
+Direct parser calls in YAML merge behavior are a smell. Parser-specific details
+belong behind the provider boundary. YAML-family code should operate on
+normalized owners, ranges, comments, and edit plans rather than native Ruby
+Hash/Array round-trips.
 
 ### Key Features
 
 - YAML mapping-root validation.
 - Backend feature profiles for the shared language-pack parser.
 - Path-based owner matching for mapping entries.
-- Shared YAML-family merge semantics for provider gems such as `psych-merge`.
+- Shared YAML-family merge semantics for provider gems.
 - Destination-wins array policy.
 - Hash result API for fixture runners and higher-level tools.
 

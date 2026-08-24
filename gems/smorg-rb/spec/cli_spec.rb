@@ -467,7 +467,7 @@ RSpec.describe Smorg::RB do
     expect(report.dig('verification', 'base_participated')).to be(true)
   end
 
-  it 'routes YAML paths through the base-aware workflow provider' do
+  it 'routes YAML paths through the Psych provider' do
     ancestor = write_file(@dir, 'ancestor.yml', "obsolete: true\nstable: true\n")
     current = write_file(@dir, 'current.yml', "obsolete: true\nstable: true\nours: left\n")
     other = write_file(@dir, 'other.yml', "stable: true\ntheirs: right\n")
@@ -482,12 +482,8 @@ RSpec.describe Smorg::RB do
     expect(File.read(current)).to eq("stable: true\nours: left\ntheirs: right\n")
     report = JSON.parse(File.read(report_path))
     expect(report.fetch('ok')).to be(true)
-    expect(report.dig('provider', 'provider_id')).to eq('ruby.yaml')
-    expect(report.dig('provider', 'backend')).to eq('kreuzberg-language-pack')
-    expect(report.dig('provider', 'delegated_provider')).to include(
-      'provider_id' => 'ruby.yaml.psych',
-      'backend' => 'psych'
-    )
+    expect(report.dig('provider', 'provider_id')).to eq('ruby.yaml.psych')
+    expect(report.dig('provider', 'backend')).to eq('psych')
     expect(report.dig('verification', 'base_participated')).to be(true)
   end
 

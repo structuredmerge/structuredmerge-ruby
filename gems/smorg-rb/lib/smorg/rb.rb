@@ -19,7 +19,7 @@ require 'rbs/merge'
 require 'toml/merge'
 require 'typescript/merge'
 require 'prism/merge'
-require 'yaml/merge'
+require 'psych/merge'
 require_relative 'rb/version'
 
 module Smorg
@@ -851,10 +851,10 @@ module Smorg
             ours_source: current_source,
             theirs_source: other_source,
             path_name: path_name,
-            provider_id: 'ruby.yaml',
+            provider_id: 'ruby.yaml.psych',
             family: 'yaml',
             dialect: 'yaml',
-            backend: 'kreuzberg-language-pack',
+            backend: 'psych',
             profile_id: 'source_preserving',
             fallback_policy: fallback_policy,
             conflict_marker_size: conflict_marker_size

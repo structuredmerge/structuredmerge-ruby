@@ -674,35 +674,6 @@ RSpec.describe 'ast-merge-git executable' do
     )
   end
 
-  it 'runs the YAML workflow provider through the installed Git-driver path' do
-    base = "shared: true\n"
-    ours = "shared: true\nours: left\n"
-    theirs = "shared: true\ntheirs: right\n"
-    path = configure_opaque_repository(
-      extension: 'yaml',
-      base: base,
-      ours: ours,
-      theirs: theirs,
-      require_path: 'yaml/merge',
-      family: 'yaml',
-      dialect: 'yaml',
-      backend: 'kreuzberg-language-pack',
-      profile: 'source_preserving'
-    )
-    baseline_output, _baseline_error, baseline_status = text_git_baseline(
-      base: base,
-      ours: ours,
-      theirs: theirs
-    )
-
-    _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
-
-    expect(baseline_status.exitstatus).to eq(1)
-    expect(baseline_output).to include('<<<<<<< baseline-ours.json')
-    expect(status.exitstatus).to eq(0), stderr
-    expect(repository.join(path).binread).to eq("shared: true\nours: left\ntheirs: right\n")
-  end
-
   it 'reports an opaque binary conflict without changing ours bytes' do
     ours = "\x00ours\xFF".b
     path = configure_opaque_repository(

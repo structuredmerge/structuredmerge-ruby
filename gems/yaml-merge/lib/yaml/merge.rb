@@ -3,7 +3,6 @@
 require 'json'
 require 'tree_haver'
 require 'ast/merge'
-require 'psych/merge'
 require_relative 'merge/version'
 
 module Yaml
@@ -99,11 +98,38 @@ module Yaml
     end
 
     def analyze_yaml_document(parsed, dialect)
-      Ast::Merge::YamlDocument.analyze(parsed, dialect)
+      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
+      return parse_error_result('YAML documents must parse to a mapping root.') unless parsed.is_a?(Hash)
+
+      validated = validate_yaml_node(parsed, '')
+      return { ok: false, diagnostics: [validated[:diagnostic]], policies: [] } unless validated[:ok]
+
+      {
+        ok: true,
+        diagnostics: [],
+        analysis: {
+          kind: 'yaml',
+          dialect: 'yaml',
+          normalized_source: canonical_yaml(validated[:value]),
+          document: validated[:value],
+          root_kind: 'mapping',
+          owners: collect_yaml_owners(validated[:value])
+        },
+        policies: []
+      }
     end
 
     def match_yaml_owners(template, destination)
-      Ast::Merge::YamlDocument.match_owners(template, destination)
+      destination_paths = destination[:owners].to_h { |owner| [owner[:path], true] }
+      template_paths = template[:owners].to_h { |owner| [owner[:path], true] }
+
+      {
+        matched: template[:owners]
+                 .filter { |owner| destination_paths[owner[:path]] }
+                 .map { |owner| { template_path: owner[:path], destination_path: owner[:path] } },
+        unmatched_template: template[:owners].map { |owner| owner[:path] }.reject { |path| destination_paths[path] },
+        unmatched_destination: destination[:owners].map { |owner| owner[:path] }.reject { |path| template_paths[path] }
+      }
     end
 
     def merge_yaml(template_source, destination_source, dialect, backend: nil)
@@ -456,5 +482,3 @@ module Yaml
 end
 
 Yaml::Merge.register_backend!
-require_relative 'merge/provider'
-Yaml::Merge.register_provider!
