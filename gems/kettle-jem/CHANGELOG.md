@@ -33,7 +33,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ## [7.1.5] - 2026-08-24
 
 - TAG: [v7.1.5][7.1.5t]
-- COVERAGE: 93.60% -- 10814/11554 lines in 16 files
+- COVERAGE: 93.60% -- 10815/11554 lines in 16 files
 - BRANCH COVERAGE: 77.21% -- 4627/5993 branches in 16 files
 - 17.97% documented
 
