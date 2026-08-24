@@ -7,6 +7,9 @@ require 'tree_haver'
 require_relative 'merge/version'
 
 module Prism
+  # This public facade keeps provider protocol and backend registration
+  # entrypoints together; implementation details live in autoloaded files.
+  # rubocop:disable Metrics/ModuleLength
   module Merge
     module_function
 
@@ -309,6 +312,8 @@ module Prism
       }
     end
 
+    # This projection mirrors the nested public schema intentionally.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def ruby_structured_edit_batch_report_projection
       content = "class App\n  # managed snippet\n  old_call\n\n  anchor_call\n\n  # obsolete snippet\n  obsolete_call\nend\n"
       {
@@ -450,7 +455,10 @@ module Prism
         )
       }
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
+    # Keep parser validation and diagnostics in one boundary method.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
@@ -478,6 +486,7 @@ module Prism
         policies: []
       }
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     def analyze_ruby_document(source, parse_result)
       normalized_source = prism_ruby_normalize_source(source)
@@ -494,6 +503,8 @@ module Prism
       }
     end
 
+    # Normalization builds the complete TreeHaver contract in one pass.
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def parse_ruby_normalized(source, dialect = 'ruby', backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
@@ -575,7 +586,10 @@ module Prism
         metadata: prism_normalized_metadata
       ).to_h
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
+    # This adapter validates, edits, reparses, and reports one projection atomically.
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def apply_edit_projection(request)
       source = request.fetch(:source)
       provider_id = request.fetch(:provider_id)
@@ -647,6 +661,7 @@ module Prism
         []
       ).to_h
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
     def match_ruby_owners(template, destination)
       Ruby::Merge.match_ruby_owners(template, destination)
@@ -730,6 +745,8 @@ module Prism
       end
     end
 
+    # Alias normalization intentionally handles the supported input shapes inline.
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
     def normalize_ruby_require_aliases(require_aliases)
       Array(require_aliases).each_with_object({}) do |entry, aliases|
         case entry
@@ -750,6 +767,7 @@ module Prism
         aliases[to] = canonical
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
 
     def ruby_dsl_call_node(node)
       return node if node.is_a?(::Prism::CallNode)
@@ -774,6 +792,8 @@ module Prism
       end
     end
 
+    # The reviewed merge boundary must retain all protocol roles for replay.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ParameterLists
     def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
                                                 applied_children, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
@@ -806,6 +826,7 @@ module Prism
         }
       )
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ParameterLists
 
     def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect,
                                                                    replay_bundle, backend: nil)
@@ -933,6 +954,8 @@ module Prism
       end.sort_by { |owner| owner[:path] }
     end
 
+    # Surface discovery intentionally keeps line ownership and comment state together.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def prism_ruby_discovered_surfaces(source, body)
       owners_by_line = body.filter_map do |node|
         name = prism_ruby_declaration_name(node)
@@ -963,7 +986,10 @@ module Prism
 
       surfaces
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
+    # A surface record is assembled as one schema-shaped value.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def prism_ruby_surfaces_for_owner(owner_name, comment_entries)
       filtered_entries = comment_entries.filter { |entry| prism_ruby_doc_comment_content?(entry.fetch(:raw)) }
       return [] if filtered_entries.empty?
@@ -988,7 +1014,10 @@ module Prism
 
       [doc_surface] + prism_ruby_example_surfaces(doc_surface)
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
+    # Example surfaces preserve the complete delegated-child metadata contract.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def prism_ruby_example_surfaces(surface)
       entries = Array(surface.dig(:metadata, :entries))
       Ruby::Merge::DocCommentSupport.example_blocks(entries).map do |block|
@@ -1013,6 +1042,7 @@ module Prism
         )
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     def prism_ruby_declaration_name(node)
       case node
@@ -1171,6 +1201,8 @@ module Prism
       end
     end
 
+    # Comment nodes retain backend metadata in a single normalized schema value.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def prism_comment_node(source, comment, index, magic_comment, parent_id:)
       directive = prism_comment_directive(
         source.byteslice(comment.location.start_offset...comment.location.end_offset), magic_comment
@@ -1201,6 +1233,7 @@ module Prism
         }
       )
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     def prism_comment_directive(comment_text, magic_comment)
       if comment_text.strip.match?(/\A#\s*smorg:freeze\b/)
@@ -1339,6 +1372,7 @@ module Prism
       :source_span_for_location
     )
   end
+  # rubocop:enable Metrics/ModuleLength
 end
 
 Prism::Merge.register_backend!
