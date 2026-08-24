@@ -85,15 +85,15 @@
 
 <p><code>Yaml::Merge</code> is the canonical YAML family package. It is the YAML substrate for<br>
 StructuredMerge Ruby: it registers the tree-sitter YAML path and should own the<br>
-shared YAML merge behavior used by all YAML backends, including <code>psych-merge</code>.<br>
-YAML parsing and backend selection enter through <code>tree_haver</code>; source-preserving<br>
+shared YAML merge behavior used by provider implementations. YAML parsing and<br>
+backend selection enter through <code>tree_haver</code>; source-preserving<br>
 partial document insertion, replacement, and removal should enter through<br>
 <code>ast-crispr</code>; merge orchestration should use <code>ast-merge</code>.</p>
 
-<p>Direct parser calls in YAML merge behavior are a smell. Tree-sitter YAML details<br>
-belong behind the TreeHaver backend path, and Psych details belong behind the<br>
-Psych TreeHaver backend. YAML-family code should operate on normalized owners,<br>
-ranges, comments, and edit plans rather than native Ruby Hash/Array round-trips.</p>
+<p>Direct parser calls in YAML merge behavior are a smell. Parser-specific details<br>
+belong behind the provider boundary. YAML-family code should operate on<br>
+normalized owners, ranges, comments, and edit plans rather than native Ruby<br>
+Hash/Array round-trips.</p>
 
 <h3 id="key-features">Key Features</h3>
 
@@ -101,7 +101,7 @@ ranges, comments, and edit plans rather than native Ruby Hash/Array round-trips.
   <li>YAML mapping-root validation.</li>
   <li>Backend feature profiles for the shared language-pack parser.</li>
   <li>Path-based owner matching for mapping entries.</li>
-  <li>Shared YAML-family merge semantics for provider gems such as <code>psych-merge</code>.</li>
+  <li>Shared YAML-family merge semantics for provider gems.</li>
   <li>Destination-wins array policy.</li>
   <li>Hash result API for fixture runners and higher-level tools.</li>
 </ul>
@@ -131,7 +131,7 @@ ranges, comments, and edit plans rather than native Ruby Hash/Array round-trips.
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/yaml-merge"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/yaml-merge"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/yaml-merge"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-0.606-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/yaml-merge"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/yaml-merge"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/yaml-merge"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-0.667-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -334,7 +334,7 @@ See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Tue Aug 11 06:34:55 2026 by
+  Generated on Mon Aug 24 00:54:57 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

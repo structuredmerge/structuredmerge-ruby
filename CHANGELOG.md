@@ -30,12 +30,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Security
 
-## [7.1.4] - 2026-08-23
+## [7.1.4] - 2026-08-24
 
 - TAG: [v7.1.4][7.1.4t]
-- COVERAGE: 90.96% -- 634/697 lines in 6 files
-- BRANCH COVERAGE: 66.67% -- 220/330 branches in 6 files
-- 45.83% documented
+- COVERAGE: 88.01% -- 587/667 lines in 9 files
+- BRANCH COVERAGE: 61.72% -- 158/256 branches in 9 files
+- 25.64% documented
 
 ### Added
 

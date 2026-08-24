@@ -499,7 +499,7 @@
   <span class='id identifier rubyid_exceptions'>exceptions</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_rescue_node'>rescue_node</span><span class='period'>.</span><span class='id identifier rubyid_exceptions'>exceptions</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_exception_node'>exception_node</span><span class='op'>|</span>
     <span class='id identifier rubyid_exception_node'>exception_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:slice</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_exception_node'>exception_node</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span> <span class='op'>:</span> <span class='id identifier rubyid_exception_node'>exception_node</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
   <span class='kw'>end</span>
-  <span class='const'><span class='object_link'><a href="../../Ruby.html" title="Ruby (module)">Ruby</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Ruby/Merge.html" title="Ruby::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Ruby/Merge/RescueSemantics.html" title="Ruby::Merge::RescueSemantics (class)">RescueSemantics</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../../Ruby/Merge/RescueSemantics.html#initialize-instance_method" title="Ruby::Merge::RescueSemantics#initialize (method)">new</a></span></span><span class='period'>.</span><span class='id identifier rubyid_rescue_clause_signature'><span class='object_link'><a href="../../Ruby/Merge/RescueSemantics.html#rescue_clause_signature-instance_method" title="Ruby::Merge::RescueSemantics#rescue_clause_signature (method)">rescue_clause_signature</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_exceptions'>exceptions</span><span class='rparen'>)</span>
+  <span class='const'>Ruby</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>RescueSemantics</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_rescue_clause_signature'>rescue_clause_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_exceptions'>exceptions</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -896,7 +896,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Aug 11 04:19:57 2026 by
+  Generated on Mon Aug 24 00:54:30 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
