@@ -15,7 +15,8 @@
 #
 # Expected to work in any project that uses Bundler.
 #
-# Sets up tasks for appraisal2, floss_funding, kettle-jem, kettle-dev, rspec, minitest, rubocop_gradual, reek, yard, and stone_checksums.
+# Sets up tasks for appraisal2, floss_funding, kettle-jem, kettle-dev, rspec,
+# minitest, rubocop_gradual, reek, yard, and stone_checksums.
 #
 # rake appraisal:install                      # Install Appraisal gemfiles (initial setup...
 # rake appraisal:reset                        # Delete Appraisal lockfiles (gemfiles/*.gemfile.lock)
@@ -78,6 +79,8 @@ if Dir.exist?(File.join(__dir__, 'gems'))
     sh('bundle', 'exec', 'kettle-family', *args)
   end
 
+  # The family namespace intentionally keeps the monorepo task surface together.
+  # rubocop:disable Metrics/BlockLength
   namespace :family do
     desc 'List released Ruby subgems'
     task :list do
@@ -119,6 +122,7 @@ if Dir.exist?(File.join(__dir__, 'gems'))
       run_kettle_family('release', '--execute')
     end
   end
+  # rubocop:enable Metrics/BlockLength
 end
 # simplecov:enable
 
@@ -162,10 +166,12 @@ begin
   if Kettle::Jem.respond_to?(:install_tasks)
     Kettle::Jem.install_tasks
   else
-    kettle_jem_selftest_unavailable_note = "NOTE: kettle-jem #{Kettle::Jem::Version::VERSION} does not provide rake tasks in this environment"
+    kettle_jem_selftest_unavailable_note = \
+      "NOTE: kettle-jem #{Kettle::Jem::Version::VERSION} does not provide rake tasks in this environment"
   end
 rescue LoadError
-  kettle_jem_selftest_unavailable_note = "NOTE: kettle-jem isn't installed, or is disabled for #{RUBY_VERSION} in the current environment"
+  kettle_jem_selftest_unavailable_note = \
+    "NOTE: kettle-jem isn't installed, or is disabled for #{RUBY_VERSION} in the current environment"
 end
 
 if kettle_jem_selftest_unavailable_note

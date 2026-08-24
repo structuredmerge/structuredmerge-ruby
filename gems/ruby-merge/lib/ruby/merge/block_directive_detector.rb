@@ -7,6 +7,10 @@ module Ruby
     # This is Ruby-specific substrate behavior shared by Ruby parser providers.
     # Parser-specific gems may consume the spans and project them into their own
     # node types, but directive token semantics should live here.
+    # Directive scanning intentionally keeps the paired-stack validation in one
+    # class so every caller receives identical malformed-input diagnostics.
+    # rubocop:disable Metrics/AbcSize, Metrics/BlockLength, Metrics/ClassLength
+    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     class BlockDirectiveDetector
       Span = Struct.new(:kind, :start_line, :end_line, :open_marker, :close_marker, keyword_init: true)
 
@@ -174,9 +178,10 @@ module Ruby
             next if first_index == second_index || invalid_indices.include?(second_index)
             next unless crossing_spans?(first, second)
 
-            report_unbalanced("offset-overlapping #{first.kind} block " \
-              "(lines #{first.start_line}..#{first.end_line}) and #{second.kind} block " \
-              "(lines #{second.start_line}..#{second.end_line}) - both treated as plain comments")
+            report_unbalanced(
+              "offset-overlapping #{first.kind} block (lines #{first.start_line}..#{first.end_line}) and " \
+              "#{second.kind} block (lines #{second.start_line}..#{second.end_line}) - both treated as plain comments"
+            )
             invalid_indices.add(first_index)
             invalid_indices.add(second_index)
             crossing = true
@@ -190,8 +195,13 @@ module Ruby
       end
 
       def crossing_spans?(first, second)
-        (first.start_line < second.start_line && first.end_line > second.start_line && first.end_line < second.end_line) ||
-          (second.start_line < first.start_line && second.end_line > first.start_line && second.end_line < first.end_line)
+        first_crosses_second = first.start_line < second.start_line &&
+                               first.end_line > second.start_line &&
+                               first.end_line < second.end_line
+        second_crosses_first = second.start_line < first.start_line &&
+                               second.end_line > first.start_line &&
+                               second.end_line < first.end_line
+        first_crosses_second || second_crosses_first
       end
 
       def top_level_spans_only(spans)
@@ -204,5 +214,7 @@ module Ruby
         end
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/AbcSize, Metrics/BlockLength, Metrics/ClassLength
   end
 end

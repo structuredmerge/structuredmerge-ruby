@@ -2,6 +2,11 @@
 
 module Ruby
   module Merge
+    # Computes stable name/parameter similarity scores for Ruby methods.
+    #
+    # The dynamic-programming distance calculation is intentionally kept local
+    # to this value object so the matching contract stays easy to audit.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     class MethodSimilarity
       DEFAULT_NAME_WEIGHT = 0.7
       DEFAULT_PARAMS_WEIGHT = 0.3
@@ -71,5 +76,6 @@ module Ruby
         previous_row[m]
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
   end
 end

@@ -4,12 +4,17 @@ require_relative 'spec_helper'
 
 RUBY_MERGE = ::Ruby::Merge
 
-RSpec.describe 'Ruby::Merge' do
-  RubyMergeSpecSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
-  RubyMergeSpecStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
-  RubyMergeSpecImportItem = Struct.new(:source, :span, keyword_init: true)
-  RubyMergeSpecProcessAnalysis = Struct.new(:structure, :imports, keyword_init: true)
+# These structural value objects are shared by the examples below and must be
+# defined outside the RSpec example-group block.
+RubyMergeSpecSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
+RubyMergeSpecStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
+RubyMergeSpecImportItem = Struct.new(:source, :span, keyword_init: true)
+RubyMergeSpecProcessAnalysis = Struct.new(:structure, :imports, keyword_init: true)
 
+# This file is a single fixture-conformance contract by design. Keeping the
+# examples together makes the fixture paths and backend expectations auditable.
+# rubocop:disable Metrics/BlockLength
+RSpec.describe 'Ruby::Merge' do
   def fixtures_root
     Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   end
@@ -724,8 +729,9 @@ RSpec.describe 'Ruby::Merge' do
     merge_move_count = merge_matching_report.fetch(:matches).count { |entry| entry.fetch(:moved) }
     expect(merge_move_result[:ok]).to eq(merge_move_report_fixture.dig(:expected, :ok))
     expect(merge_move_result[:output]).to eq(merge_move_report_fixture.dig(:expected, :output))
-    expect(merge_move_result.fetch(:matching_reports).length).to eq(merge_move_report_fixture.dig(:expected,
-                                                                                                  :matching_report_count))
+    expect(merge_move_result.fetch(:matching_reports).length).to eq(
+      merge_move_report_fixture.dig(:expected, :matching_report_count)
+    )
     expect(merge_matching_report[:matching_id]).to eq(merge_move_report_fixture.dig(:expected, :matching_id))
     expect(merge_matching_report[:strategy]).to eq(merge_move_report_fixture.dig(:expected, :strategy))
     expect(merge_move_count).to eq(merge_move_report_fixture.dig(:expected, :move_count))
@@ -1809,13 +1815,18 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       envelope_rejection_fixture[:replay_bundle_envelope]
     )
-    expect(json_ready(replay_envelope_rejection)).to eq(json_ready(envelope_rejection_fixture[:expected_replay_bundle].merge(policies: [])))
+    expect(json_ready(replay_envelope_rejection)).to eq(
+      json_ready(envelope_rejection_fixture[:expected_replay_bundle].merge(policies: []))
+    )
     state_envelope_rejection = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(
       envelope_rejection_fixture[:template],
       envelope_rejection_fixture[:destination],
       'ruby',
       envelope_rejection_fixture[:review_state_envelope]
     )
-    expect(json_ready(state_envelope_rejection)).to eq(json_ready(envelope_rejection_fixture[:expected_review_state].merge(policies: [])))
+    expect(json_ready(state_envelope_rejection)).to eq(
+      json_ready(envelope_rejection_fixture[:expected_review_state].merge(policies: []))
+    )
   end
 end
+# rubocop:enable Metrics/BlockLength

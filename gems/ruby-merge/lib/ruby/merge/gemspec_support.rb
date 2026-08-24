@@ -4,6 +4,7 @@ require_relative 'block_binding_support'
 
 module Ruby
   module Merge
+    # Shared gemspec block-variable normalization for Ruby templating.
     module GemspecSupport
       GEMSPEC_VAR_PLACEHOLDER = :__gemspec_var__
 

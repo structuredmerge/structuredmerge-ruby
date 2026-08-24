@@ -2,6 +2,7 @@
 
 module Ruby
   module Merge
+    # Stable structural signatures used by Ruby owner and method matching.
     module SignatureSupport
       module_function
 

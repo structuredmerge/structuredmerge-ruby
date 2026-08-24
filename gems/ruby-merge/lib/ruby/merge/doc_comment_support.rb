@@ -68,6 +68,9 @@ module Ruby
         nil
       end
 
+      # Example extraction deliberately combines tag scanning and body slicing
+      # so the returned indexes remain tied to the original comment entries.
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       def example_blocks(entries)
         normalized = entries.map { |entry| normalize_comment_content(entry[:raw]) }
         normalized.each_with_index.filter_map do |content, tag_index|
@@ -92,6 +95,7 @@ module Ruby
           }
         end
       end
+      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
     end
   end
 end

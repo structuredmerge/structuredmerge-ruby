@@ -3,6 +3,9 @@
 module Ruby
   module Merge
     # Ruby magic comment detection and file-header prefix handling.
+    # Header scanning intentionally preserves source order and duplicate entries
+    # because those details affect comment ownership during reconstruction.
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
     module MagicCommentSupport
       MAGIC_COMMENT_PATTERNS = {
         frozen_string_literal: /^frozen_string_literal:\s*(true|false)$/i,
@@ -124,5 +127,6 @@ module Ruby
         comment&.slice&.start_with?('#!')
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
   end
 end

@@ -2,6 +2,10 @@
 
 module Ruby
   module Merge
+    # Normalizes rescue clause ordering while preserving source-defined
+    # exception hierarchies and Ruby's broader-handler semantics.
+    # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/MethodLength, Metrics/PerceivedComplexity
     class RescueSemantics
       def initialize(source_defined_exception_definitions: [])
         @source_defined_exception_definitions = source_defined_exception_definitions
@@ -123,7 +127,11 @@ module Ruby
                               else
                                 candidate_name = qualify_source_constant_name(definition[:superclass],
                                                                               definition[:namespace])
-                                defined_names.include?(candidate_name) ? candidate_name : normalize_exception_name(definition[:superclass])
+                                if defined_names.include?(candidate_name)
+                                  candidate_name
+                                else
+                                  normalize_exception_name(definition[:superclass])
+                                end
                               end
 
             hierarchy[definition[:name]] ||= superclass_name if superclass_name
@@ -205,5 +213,7 @@ module Ruby
           !rescue_clause_covers?(right_clause_type, left_clause_type)
       end
     end
+    # rubocop:enable Metrics/MethodLength, Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity
   end
 end

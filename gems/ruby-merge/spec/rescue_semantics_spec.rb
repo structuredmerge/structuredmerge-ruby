@@ -2,6 +2,8 @@
 
 require_relative 'spec_helper'
 
+# The examples exercise the complete ordering matrix in one context.
+# rubocop:disable Metrics/BlockLength
 RSpec.describe Ruby::Merge::RescueSemantics do
   subject(:semantics) { described_class.new(source_defined_exception_definitions: definitions) }
 
@@ -73,3 +75,4 @@ RSpec.describe Ruby::Merge::RescueSemantics do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

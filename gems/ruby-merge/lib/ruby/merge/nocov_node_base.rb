@@ -7,6 +7,9 @@ module Ruby
     # Parser-specific merge gems subclass this when they need native AST location
     # or comment attachment behavior. The structural Ruby semantics live here:
     # nocov blocks follow file preference and match by their inner content.
+    # Nocov nodes preserve source locations and marker text as one structural
+    # unit; the initializer mirrors the node's complete serialized shape.
+    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/ParameterLists, Metrics/PerceivedComplexity
     class NocovNodeBase
       include Ast::Merge::BlockDirective
 
@@ -71,5 +74,6 @@ module Ruby
 
       alias to_s inspect
     end
+    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/ParameterLists, Metrics/PerceivedComplexity
   end
 end

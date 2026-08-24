@@ -2,6 +2,7 @@
 
 module Ruby
   module Merge
+    # Shared chunk anchors used when preserving project-specific Rake sections.
     module ScaffoldChunkSupport
       ChunkSpec = Struct.new(
         :anchor_type,
