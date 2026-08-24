@@ -58,6 +58,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Use a dependency-specific switch when omitting kettle-changelog from release Bundler resolution.
 
+- Avoid duplicate tree_sitter_language_pack declarations when templating with a local TSLP override.
+
 ### Security
 
 ## [7.1.4] - 2026-08-12

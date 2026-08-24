@@ -1835,7 +1835,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating.gemfile.example", __dir__))
 
     expect(template).to include("tslp_dev = nil if tslp_dev.empty? || %w[false 0 no off].include?(tslp_dev.downcase)")
-    expect(template).to include('gem "tree_sitter_language_pack", path: tslp_dev')
+    expect(template).to include('tslp_requirements = if tslp_dev.to_s.empty?')
+    expect(template).to include('gem "tree_sitter_language_pack", *tslp_requirements')
   end
 
   it "treats packaged CITATION.cff as template-owned metadata by default" do
