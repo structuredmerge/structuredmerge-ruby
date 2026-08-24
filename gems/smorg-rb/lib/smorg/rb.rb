@@ -23,7 +23,7 @@ require 'psych/merge'
 require_relative 'rb/version'
 
 module Smorg
-  module RB
+  module RB # rubocop:disable Metrics/ModuleLength
     EXIT_SUCCESS = 0
     EXIT_UNRESOLVED_CONFLICT = 1
     EXIT_USER_ERROR = 2
@@ -668,215 +668,73 @@ module Smorg
       EXIT_SUCCESS
     end
 
+    MERGE_PROVIDER_OPTIONS = {
+      'bash' => {
+        provider_id: 'ruby.bash', family: 'bash', dialect: 'bash', backend: 'kreuzberg-language-pack'
+      },
+      'go' => {
+        provider_id: 'ruby.go', family: 'go', dialect: 'go', backend: 'kreuzberg-language-pack'
+      },
+      'html' => {
+        provider_id: 'ruby.html', family: 'html', dialect: 'html', backend: 'kreuzberg-language-pack'
+      },
+      'dotenv' => { family: 'dotenv', dialect: 'dotenv', backend: 'dotenv-line' },
+      'json' => { family: 'json', dialect: 'json' },
+      'jsonc' => { family: 'json', dialect: 'jsonc' },
+      'json5' => { family: 'json', dialect: 'json5' },
+      'markdown' => {
+        provider_id: 'ruby.markdown', family: 'markdown', dialect: 'markdown', backend: 'kreuzberg-language-pack'
+      },
+      'ruby' => { family: 'ruby', dialect: 'ruby', backend: 'prism' },
+      'rbs' => { provider_id: 'ruby.rbs', family: 'rbs', dialect: 'rbs', backend: 'rbs' },
+      'rust' => {
+        provider_id: 'ruby.rust', family: 'rust', dialect: 'rust', backend: 'kreuzberg-language-pack'
+      },
+      'toml' => {
+        provider_id: 'ruby.toml', family: 'toml', dialect: 'toml', backend: 'kreuzberg-language-pack'
+      },
+      'typescript' => {
+        provider_id: 'ruby.typescript', family: 'typescript', dialect: 'typescript',
+        backend: 'kreuzberg-language-pack'
+      },
+      'tsx' => {
+        provider_id: 'ruby.typescript', family: 'typescript', dialect: 'tsx', backend: 'kreuzberg-language-pack'
+      },
+      'yaml' => { provider_id: 'ruby.yaml.psych', family: 'yaml', dialect: 'yaml', backend: 'psych' },
+      'text' => { family: 'text', dialect: 'text', profile_id: 'coarse_document' }
+    }.freeze
+
     def merge_by_path(path_name, language, conflict_marker_size, fallback_policy, ancestor_source, current_source,
                       other_source)
-      case normalize_language(language, path_name)
-      when 'bash'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.bash',
-            family: 'bash',
-            dialect: 'bash',
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
+      normalized_language = normalize_language(language, path_name)
+      provider_options = MERGE_PROVIDER_OPTIONS[normalized_language]
+      return unsupported_language_result(normalized_language, path_name) unless provider_options
+
+      merge_with_provider(
+        path_name, provider_options,
+        merge_options_for(ancestor_source, current_source, other_source, fallback_policy, conflict_marker_size)
+      )
+    end
+
+    def merge_options_for(ancestor_source, current_source, other_source, fallback_policy, conflict_marker_size)
+      {
+        base_source: ancestor_source,
+        ours_source: current_source,
+        theirs_source: other_source,
+        fallback_policy: fallback_policy,
+        conflict_marker_size: conflict_marker_size
+      }
+    end
+
+    def merge_with_provider(path_name, provider_options, merge_options)
+      merge3_result(
+        Ast::Merge::Git.merge3(
+          **merge_options,
+          path_name: path_name,
+          profile_id: provider_options.fetch(:profile_id, 'source_preserving'),
+          **provider_options.except(:profile_id)
         )
-      when 'go'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.go',
-            family: 'go',
-            dialect: 'go',
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'html'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.html',
-            family: 'html',
-            dialect: 'html',
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'dotenv'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            family: 'dotenv',
-            dialect: 'dotenv',
-            backend: 'dotenv-line',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'json', 'jsonc', 'json5'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            family: 'json',
-            dialect: normalize_language(language, path_name),
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'markdown'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.markdown',
-            family: 'markdown',
-            dialect: 'markdown',
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'ruby'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            family: 'ruby',
-            dialect: 'ruby',
-            backend: 'prism',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'rbs'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.rbs',
-            family: 'rbs',
-            dialect: 'rbs',
-            backend: 'rbs',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'rust'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.rust',
-            family: 'rust',
-            dialect: 'rust',
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'toml'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.toml',
-            family: 'toml',
-            dialect: 'toml',
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'typescript', 'tsx'
-        dialect = normalize_language(language, path_name)
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.typescript',
-            family: 'typescript',
-            dialect: dialect,
-            backend: 'kreuzberg-language-pack',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'yaml'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            provider_id: 'ruby.yaml.psych',
-            family: 'yaml',
-            dialect: 'yaml',
-            backend: 'psych',
-            profile_id: 'source_preserving',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      when 'text'
-        merge3_result(
-          Ast::Merge::Git.merge3(
-            base_source: ancestor_source,
-            ours_source: current_source,
-            theirs_source: other_source,
-            path_name: path_name,
-            family: 'text',
-            dialect: 'text',
-            profile_id: 'coarse_document',
-            fallback_policy: fallback_policy,
-            conflict_marker_size: conflict_marker_size
-          )
-        )
-      else
-        unsupported_language_result(normalize_language(language, path_name), path_name)
-      end
+      )
     end
 
     def unsupported_language_result(language, path_name)
@@ -894,90 +752,69 @@ module Smorg
     end
 
     def merge3_result(result)
-      merge3_report_fields = {
+      if result[:ok] && result[:merged_source]
+        return merge3_result_payload(result, true, result.fetch(:merged_source))
+      elsif !result[:ok] && result[:conflicted_source]
+        return merge3_result_payload(result, false, result.fetch(:conflicted_source))
+      end
+
+      merge3_result_payload(result, false, nil)
+    end
+
+    def merge3_result_payload(result, success, output)
+      payload = {
+        ok: success,
+        diagnostics: result.fetch(:diagnostics),
+        owned_regions: result.fetch(:owned_regions, []),
+        render_report: result.fetch(:render_report),
+        profile: result.fetch(:profile),
+        policies: [],
+        **merge3_report_fields(result)
+      }
+      output ? payload.merge(output: output) : payload
+    end
+
+    def merge3_report_fields(result)
+      {
         change_classifications: result.fetch(:change_classifications, []),
         conflicts: result.fetch(:conflicts, []),
         fallbacks: result.fetch(:fallbacks, []),
         provider: result.fetch(:provider, {}),
         verification: result.fetch(:verification, {})
       }
-      if result[:ok] && result[:merged_source]
-        {
-          ok: true,
-          diagnostics: result.fetch(:diagnostics),
-          output: result.fetch(:merged_source),
-          owned_regions: result.fetch(:owned_regions, []),
-          render_report: result.fetch(:render_report),
-          profile: result.fetch(:profile),
-          policies: [],
-          **merge3_report_fields
-        }
-      elsif !result[:ok] && result[:conflicted_source]
-        {
-          ok: false,
-          diagnostics: result.fetch(:diagnostics),
-          output: result.fetch(:conflicted_source),
-          owned_regions: result.fetch(:owned_regions, []),
-          render_report: result.fetch(:render_report),
-          profile: result.fetch(:profile),
-          policies: [],
-          **merge3_report_fields
-        }
-      else
-        {
-          ok: false,
-          diagnostics: result.fetch(:diagnostics),
-          owned_regions: result.fetch(:owned_regions, []),
-          render_report: result.fetch(:render_report),
-          profile: result.fetch(:profile),
-          policies: [],
-          **merge3_report_fields
-        }
-      end
     end
 
     def normalize_language(language, path_name)
-      return 'bash' if language.to_s.strip.empty? && %w[.bash .sh].include?(File.extname(path_name.to_s).downcase)
-      return 'go' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.go'
-      return 'html' if language.to_s.strip.empty? && %w[.htm .html].include?(File.extname(path_name.to_s).downcase)
-      return 'rust' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.rs'
-      return 'typescript' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.ts'
-      return 'tsx' if language.to_s.strip.empty? && File.extname(path_name.to_s).downcase == '.tsx'
+      normalized_language = language.to_s.strip.downcase
+      return language_from_path(path_name) if normalized_language.empty?
 
-      case language.to_s.strip.downcase
-      when 'bash', 'sh', 'application/x-sh', 'text/x-shellscript'
-        'bash'
-      when 'go', 'golang'
-        'go'
-      when 'html', 'htm', 'text/html', 'html5'
-        'html'
-      when 'dotenv', 'env', 'config-env'
-        'dotenv'
-      when 'json'
-        'json'
-      when 'jsonc', 'json with comments'
-        'jsonc'
-      when 'json5'
-        'json5'
-      when 'markdown', 'md', 'gfm', 'text/markdown'
-        'markdown'
-      when 'ruby', 'rb', 'application/x-ruby'
-        'ruby'
-      when 'rbs'
-        'rbs'
-      when 'rust', 'rs', 'application/rust', 'text/rust'
-        'rust'
-      when 'toml', 'application/toml'
-        'toml'
-      when 'typescript', 'ts', 'application/typescript', 'text/typescript'
-        'typescript'
-      when 'tsx', 'typescriptreact'
-        'tsx'
-      when 'yaml', 'yml', 'application/yaml', 'text/yaml'
-        'yaml'
-      when 'plain', 'text', 'plaintext', 'text/plain'
-        'text'
-      else
+      LANGUAGE_ALIASES.fetch(normalized_language) do
+        Ast::Merge.classify_template_target_path(path_name)[:family]
+      end
+    end
+
+    LANGUAGE_BY_EXTENSION = {
+      '.bash' => 'bash', '.sh' => 'bash', '.go' => 'go', '.htm' => 'html', '.html' => 'html',
+      '.rs' => 'rust', '.ts' => 'typescript', '.tsx' => 'tsx'
+    }.freeze
+
+    LANGUAGE_ALIASES = {
+      'bash' => 'bash', 'sh' => 'bash', 'application/x-sh' => 'bash', 'text/x-shellscript' => 'bash',
+      'go' => 'go', 'golang' => 'go', 'html' => 'html', 'htm' => 'html', 'text/html' => 'html', 'html5' => 'html',
+      'dotenv' => 'dotenv', 'env' => 'dotenv', 'config-env' => 'dotenv', 'json' => 'json', 'jsonc' => 'jsonc',
+      'json with comments' => 'jsonc', 'json5' => 'json5', 'markdown' => 'markdown', 'md' => 'markdown',
+      'gfm' => 'markdown', 'text/markdown' => 'markdown', 'ruby' => 'ruby', 'rb' => 'ruby',
+      'application/x-ruby' => 'ruby', 'rbs' => 'rbs', 'rust' => 'rust', 'rs' => 'rust',
+      'application/rust' => 'rust', 'text/rust' => 'rust', 'toml' => 'toml', 'application/toml' => 'toml',
+      'typescript' => 'typescript', 'ts' => 'typescript', 'application/typescript' => 'typescript',
+      'text/typescript' => 'typescript', 'tsx' => 'tsx', 'typescriptreact' => 'tsx', 'yaml' => 'yaml',
+      'yml' => 'yaml', 'application/yaml' => 'yaml', 'text/yaml' => 'yaml', 'plain' => 'text', 'text' => 'text',
+      'plaintext' => 'text', 'text/plain' => 'text'
+    }.freeze
+
+    def language_from_path(path_name)
+      extension = File.extname(path_name.to_s).downcase
+      LANGUAGE_BY_EXTENSION.fetch(extension) do
         Ast::Merge.classify_template_target_path(path_name)[:family]
       end
     end
@@ -993,48 +830,61 @@ module Smorg
     end
 
     def attribute_files_for_path(path_name)
-      clean_path = if File.expand_path(path_name,
-                                       Dir.pwd).start_with?(Dir.pwd)
-                     Pathname.new(path_name).cleanpath.to_s
-                   else
-                     path_name
-                   end
-      dir = File.dirname(clean_path)
-      return ['.gitattributes'] if dir == '.' || clean_path.start_with?('..') || Pathname.new(clean_path).absolute?
+      clean_path = normalized_attribute_path(path_name)
+      return ['.gitattributes'] if root_attribute_path?(clean_path)
 
-      files = ['.gitattributes']
+      ['.gitattributes', *attribute_directory_paths(File.dirname(clean_path))]
+    end
+
+    def normalized_attribute_path(path_name)
+      expanded_path = File.expand_path(path_name, Dir.pwd)
+      return Pathname.new(path_name).cleanpath.to_s if expanded_path.start_with?(Dir.pwd)
+
+      path_name
+    end
+
+    def root_attribute_path?(clean_path)
+      dir = File.dirname(clean_path)
+      dir == '.' || clean_path.start_with?('..') || Pathname.new(clean_path).absolute?
+    end
+
+    def attribute_directory_paths(dir)
       parts = dir.split(File::SEPARATOR).reject(&:empty?)
-      parts.each_index do |index|
-        files << File.join(*parts[0..index], '.gitattributes')
+      parts.each_index.map do |index|
+        File.join(*parts[0..index], '.gitattributes')
       end
-      files
     end
 
     def apply_attributes(settings, path_name, source)
       source.each_line do |raw_line|
-        line = raw_line.strip
-        next if line.empty? || line.start_with?('#')
-
-        pattern, *fields = line.split(/\s+/)
-        next if fields.empty? || !attribute_pattern_matches?(pattern, path_name)
-
-        fields.each do |field|
-          key, value = field.split('=', 2)
-          next unless value
-
-          case key
-          when 'smorg.language', 'linguist-language'
-            settings[:language] = value
-          when 'smorg.profile'
-            settings[:profile_id] = value
-          when 'smorg.requireProfileStatus'
-            settings[:require_profile_status] = value
-          when 'conflict-marker-size'
-            marker_size = value.to_i
-            settings[:conflict_marker_size] = marker_size if marker_size.positive?
-          end
-        end
+        attribute_fields(raw_line, path_name).each { |field| apply_attribute_field(settings, field) }
       end
+    end
+
+    def attribute_fields(raw_line, path_name)
+      line = raw_line.strip
+      return [] if line.empty? || line.start_with?('#')
+
+      pattern, *fields = line.split(/\s+/)
+      return [] if fields.empty? || !attribute_pattern_matches?(pattern, path_name)
+
+      fields
+    end
+
+    ATTRIBUTE_KEYS = {
+      'smorg.language' => :language,
+      'linguist-language' => :language,
+      'smorg.profile' => :profile_id,
+      'smorg.requireProfileStatus' => :require_profile_status
+    }.freeze
+
+    def apply_attribute_field(settings, field)
+      key, value = field.split('=', 2)
+      return unless value
+      return settings[ATTRIBUTE_KEYS[key]] = value if ATTRIBUTE_KEYS.key?(key)
+
+      marker_size = value.to_i
+      settings[:conflict_marker_size] = marker_size if key == 'conflict-marker-size' && marker_size.positive?
     end
 
     def attribute_pattern_matches?(pattern, path_name)
@@ -1048,24 +898,31 @@ module Smorg
     end
 
     def find_conflict_regions(source, marker_size)
-      marker_size = [marker_size.to_i, 1].max
-      start_prefix = '<' * marker_size
-      separator_prefix = '=' * marker_size
-      end_prefix = '>' * marker_size
+      prefixes = conflict_marker_prefixes(marker_size)
       regions = []
       current = nil
       source.split("\n").each_with_index do |line, index|
-        line_number = index + 1
-        if line.start_with?(start_prefix)
-          current = { start_line: line_number, separator_line: 0 }
-        elsif current && current[:separator_line].zero? && line.start_with?(separator_prefix)
-          current[:separator_line] = line_number
-        elsif current && line.start_with?(end_prefix)
-          regions << current.merge(end_line: line_number)
-          current = nil
-        end
+        current, completed = conflict_region_state(current, line, index + 1, prefixes)
+        regions << completed if completed
       end
       regions
+    end
+
+    def conflict_marker_prefixes(marker_size)
+      size = [marker_size.to_i, 1].max
+      { start: '<' * size, separator: '=' * size, end: '>' * size }
+    end
+
+    def conflict_region_state(current, line, line_number, prefixes)
+      if line.start_with?(prefixes[:start])
+        [{ start_line: line_number, separator_line: 0 }, nil]
+      elsif current && current[:separator_line].zero? && line.start_with?(prefixes[:separator])
+        [current.merge(separator_line: line_number), nil]
+      elsif current && line.start_with?(prefixes[:end])
+        [nil, current.merge(end_line: line_number)]
+      else
+        [current, nil]
+      end
     end
 
     def print_conflict_diff(stdout, path_name, regions)
@@ -1087,7 +944,7 @@ module Smorg
         stderr.puts("#{diagnostic[:category]}: #{diagnostic[:message]}")
       end
     end
-  end
+  end # rubocop:enable Metrics/ModuleLength
 end
 
 require 'rust/merge'

@@ -94,9 +94,8 @@
   "lib/smorg-rb.rb:2472820900": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`smorg-rb.rb`) should use snake_case.", 5381]
   ],
-  "lib/smorg/rb.rb:3174253675": [
+  "lib/smorg/rb.rb:3440305546": [
     [26, 3, 9, "Style/Documentation: Missing top-level documentation comment for `module Smorg::RB`.", 4021240623],
-    [26, 3, 37928, "Metrics/ModuleLength: Module has too many lines. [990/100]", 1266528340],
     [35, 5, 660, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `run` is too high. [8/7]", 1065401429],
     [35, 5, 660, "Metrics/MethodLength: Method has too many lines. [20/10]", 1065401429],
     [59, 121, 41, "Layout/LineLength: Line is too long. [161/120]", 2633772911],
@@ -138,48 +137,29 @@
     [563, 5, 637, "Metrics/MethodLength: Method has too many lines. [11/10]", 2705694247],
     [611, 5, 776, "Metrics/MethodLength: Method has too many lines. [25/10]", 1858237241],
     [639, 5, 1678, "Metrics/MethodLength: Method has too many lines. [28/10]", 3074688720],
-    [671, 5, 7269, "Metrics/AbcSize: Assignment Branch Condition size for `merge_by_path` is too high. [<1, 31, 13> 33.63/17]", 278330781],
-    [671, 5, 7269, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_by_path` is too high. [14/7]", 278330781],
-    [671, 5, 7269, "Metrics/MethodLength: Method has too many lines. [208/10]", 278330781],
-    [671, 22, 129, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 7400119],
-    [883, 5, 355, "Metrics/MethodLength: Method has too many lines. [11/10]", 39262550],
-    [897, 5, 1486, "Metrics/AbcSize: Assignment Branch Condition size for `merge3_result` is too high. [<1, 24, 5> 24.54/17]", 3217366728],
-    [897, 5, 1486, "Metrics/MethodLength: Method has too many lines. [40/10]", 3217366728],
-    [940, 5, 1758, "Metrics/AbcSize: Assignment Branch Condition size for `normalize_language` is too high. [<0, 43, 32> 53.6/17]", 735674814],
-    [940, 5, 1758, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `normalize_language` is too high. [29/7]", 735674814],
-    [940, 5, 1758, "Metrics/MethodLength: Method has too many lines. [42/10]", 735674814],
-    [940, 5, 1758, "Metrics/PerceivedComplexity: Perceived complexity for `normalize_language` is too high. [17/8]", 735674814],
-    [996, 5, 668, "Metrics/AbcSize: Assignment Branch Condition size for `attribute_files_for_path` is too high. [<5, 17, 8> 19.44/17]", 4267311100],
-    [996, 5, 668, "Metrics/MethodLength: Method has too many lines. [14/10]", 4267311100],
-    [1014, 5, 885, "Metrics/AbcSize: Assignment Branch Condition size for `apply_attributes` is too high. [<12, 16, 11> 22.83/17]", 2340440569],
-    [1014, 5, 885, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_attributes` is too high. [12/7]", 2340440569],
-    [1014, 5, 885, "Metrics/MethodLength: Method has too many lines. [21/10]", 2340440569],
-    [1014, 5, 885, "Metrics/PerceivedComplexity: Perceived complexity for `apply_attributes` is too high. [10/8]", 2340440569],
-    [1051, 5, 772, "Metrics/AbcSize: Assignment Branch Condition size for `find_conflict_regions` is too high. [<12, 16, 7> 21.19/17]", 2134600144],
-    [1051, 5, 772, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `find_conflict_regions` is too high. [8/7]", 2134600144],
-    [1051, 5, 772, "Metrics/MethodLength: Method has too many lines. [18/10]", 2134600144],
-    [1051, 5, 772, "Metrics/PerceivedComplexity: Perceived complexity for `find_conflict_regions` is too high. [9/8]", 2134600144],
-    [1076, 121, 11, "Layout/LineLength: Line is too long. [131/120]", 1186836706]
+    [707, 22, 129, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 7400119],
+    [740, 5, 355, "Metrics/MethodLength: Method has too many lines. [11/10]", 39262550],
+    [932, 121, 11, "Layout/LineLength: Line is too long. [131/120]", 1186836706]
   ],
-  "smorg-rb.gemspec:2766676436": [
+  "smorg-rb.gemspec:2312448275": [
     [152, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [163, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [164, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
   ],
-  "spec/cli_spec.rb:3028663920": [
-    [8, 1, 37807, "Metrics/BlockLength: Block has too many lines. [703/25]", 35868750],
+  "spec/cli_spec.rb:59152524": [
+    [8, 1, 37083, "Metrics/BlockLength: Block has too many lines. [689/25]", 35868750],
     [149, 5, 7, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 4045560504],
     [196, 3, 1095, "Metrics/BlockLength: Block has too many lines. [29/25]", 3257059481],
     [283, 3, 1523, "Metrics/BlockLength: Block has too many lines. [30/25]", 753676956],
     [284, 5, 1430, "Metrics/BlockLength: Block has too many lines. [28/25]", 1174890550],
     [318, 3, 1497, "Metrics/BlockLength: Block has too many lines. [33/25]", 1056060672],
     [321, 5, 1226, "Metrics/BlockLength: Block has too many lines. [29/25]", 4141469029],
-    [538, 3, 2568, "Metrics/BlockLength: Block has too many lines. [42/25]", 534998881],
-    [539, 5, 2506, "Metrics/BlockLength: Block has too many lines. [40/25]", 125340559],
-    [540, 7, 2429, "Metrics/BlockLength: Block has too many lines. [38/25]", 2347531946],
-    [602, 3, 1502, "Metrics/BlockLength: Block has too many lines. [33/25]", 509781518],
-    [640, 3, 1958, "Metrics/BlockLength: Block has too many lines. [34/25]", 955598497],
-    [641, 5, 1872, "Metrics/BlockLength: Block has too many lines. [32/25]", 1095476741],
-    [642, 7, 1799, "Metrics/BlockLength: Block has too many lines. [30/25]", 1248712702]
+    [524, 3, 2568, "Metrics/BlockLength: Block has too many lines. [42/25]", 534998881],
+    [525, 5, 2506, "Metrics/BlockLength: Block has too many lines. [40/25]", 125340559],
+    [526, 7, 2429, "Metrics/BlockLength: Block has too many lines. [38/25]", 2347531946],
+    [588, 3, 1502, "Metrics/BlockLength: Block has too many lines. [33/25]", 509781518],
+    [626, 3, 1958, "Metrics/BlockLength: Block has too many lines. [34/25]", 955598497],
+    [627, 5, 1872, "Metrics/BlockLength: Block has too many lines. [32/25]", 1095476741],
+    [628, 7, 1799, "Metrics/BlockLength: Block has too many lines. [30/25]", 1248712702]
   ]
 }
