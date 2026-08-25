@@ -282,13 +282,32 @@ and in the shared spec/fixture tooling rather than in a static status document.
 
 ## Development
 
-Use the family tooling from the monorepo root for broad checks:
+Use the consistent family task names from the monorepo root. The root
+`mise.toml` files are manually maintained workspace configuration, so the
+invocation adapts to each family's local Bundler and path wiring while the task
+names stay the same:
 
 ```sh
-bundle exec kettle-family install --execute
-bundle exec kettle-family lint --execute
-bundle exec kettle-family test --execute
+mise run install
+mise run readiness
+mise run lint
+mise run test
+mise run check
 ```
+
+`lint` is read-only. Use `mise run lint-fix` when applying RuboCop Gradual
+autocorrections is intentional. `mise run deps` updates against released
+dependencies without committing; `mise run deps-local` uses sibling checkouts
+without committing; and `mise run deps-release` uses released dependencies and
+permits lockfile commits. `mise run state` shows release state, while
+`mise run release-plan` previews a publish and `mise run release -- --only pend`
+executes one with additional release options forwarded after `--`.
+
+The same task names are available from the other Ruby family roots in this
+workspace, including `appraisal-rb`, `galtzo-floss`, `kettle-dev`, `omniauth`,
+`resque`, `rubocop-lts`, `ruby-oauth`, `ruby-openid`, `rubythems`, and
+`ur-brain`. The StructuredMerge Go, Rust, and TypeScript roots retain their
+language-specific native tasks.
 
 For a single gem, run commands from that gem directory:
 

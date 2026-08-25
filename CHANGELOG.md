@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Family lint now runs RuboCop Gradual read-only; use the explicit lint-fix task for intentional autocorrection.
+
 ### Deprecated
 
 ### Removed

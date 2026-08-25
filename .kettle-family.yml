@@ -76,7 +76,7 @@ members:
       - smorg-rb
 
 commands:
-  lint: bundle exec rubocop-gradual --autocorrect --force-update
+  lint: bundle exec rubocop-gradual
   docs: bin/rake yard
 
 check:

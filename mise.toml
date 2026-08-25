@@ -15,16 +15,80 @@ description = "Run each member gem suite with its own bundle"
 run = "bundle exec kettle-family test --execute"
 
 [tasks.lint]
-description = "Run lint across family members"
+description = "Run read-only lint checks across family members"
 run = "bundle exec kettle-family lint --execute"
 
+[tasks.lint-fix]
+description = "Autocorrect lint issues across family members without committing"
+run = "bundle exec kettle-family bex --execute --no-commit -- bin/rake rubocop_gradual:autocorrect"
+
+[tasks.readiness]
+description = "Run family readiness checks without changing files"
+run = "bundle exec kettle-family check"
+
+[tasks.check]
+description = "Run readiness, lint, and tests across the family"
+depends = ["readiness", "lint", "test"]
+run = "true"
+
+[tasks.state]
+description = "Report release state for every family member"
+run = "bundle exec kettle-family state"
+
+[tasks.install]
+description = "Build and install selected family gems locally"
+run = "bundle exec kettle-family install --execute"
+
+[tasks.template]
+description = "Apply kettle-jem templates across family members"
+run = "bundle exec kettle-family template --execute"
+
+[tasks.docs]
+description = "Generate documentation across family members"
+run = "bundle exec kettle-family docs --execute"
+
+[tasks.deps]
+description = "Update dependencies from released sources without committing"
+run = "bundle exec kettle-family bup --execute --no-commit"
+
+[tasks.deps-local]
+description = "Update dependencies against local family and Kettle sources"
+run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --no-commit"
+
+[tasks.deps-release]
+description = "Update dependencies from released sources and commit lockfiles"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
+
 [tasks.bup]
-description = "Refresh member bundles against local family dependencies without committing path locks"
+description = "Compatibility alias for deps-local"
 run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --no-commit"
 
 [tasks.bup-release]
-description = "Refresh member bundles against released dependencies and commit lockfile updates"
-run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute"
+description = "Compatibility alias for deps-release"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
+
+[tasks.bump]
+description = "Bump family versions; pass VERSION or major/minor/patch/pre"
+raw = true
+run = "bundle exec kettle-family bump"
+
+[tasks.changelog]
+description = "Add a structured entry to a member Unreleased changelog"
+raw = true
+run = "bundle exec kettle-family add-changelog --execute"
+
+[tasks.clean]
+description = "Remove locally installed family versions newer than released"
+run = "bundle exec kettle-family clean-unreleased --execute"
+
+[tasks.pins]
+description = "Review and update GitHub Actions pins across the family"
+run = "bundle exec kettle-family gha-sha-pins --execute"
+
+[tasks.release-plan]
+description = "Plan the family publish without changing files"
+raw = true
+run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --publish --secrets-provider op --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
 
 [tasks.release]
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"
