@@ -26,6 +26,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Copyright filtering now excludes bot-marker identities and the packaged template seeds shared author aliases and machine-account defaults.
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-family (>= 1.2.61 -> >= 1.2.62)
+  - kettle-jem (>= 7.1.6 -> >= 7.1.7)
+
 ### Deprecated
 
 ### Removed
