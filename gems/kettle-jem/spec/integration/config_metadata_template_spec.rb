@@ -459,6 +459,37 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(YAML.safe_load(output).dig("readme", "badges", "fossa")).to be(false)
   end
 
+  it "refreshes legacy author names documentation without changing config values" do
+    content = <<~YAML
+      # Safe automatic derivations currently implemented:
+      #   AUTHOR:NAME         <- first author from the gemspec
+      #   AUTHOR:NAMES        <- all authors from the gemspec, or copyright holders if no gemspec authors exist
+      #   AUTHOR:EMAIL        <- first email from the gemspec
+
+      author_aliases:
+        "old@example.test": Canonical Author
+    YAML
+
+    output = described_class.send(:sync_kettle_config_documentation_comments, content)
+
+    expect(output).to include("#   AUTHOR:NAMES        <- existing gemspec authors plus Git-derived copyright holders\n")
+    expect(output).to include("#                           (after author_aliases consolidation)\n")
+    expect(YAML.safe_load(output).fetch("author_aliases")).to eq("old@example.test" => "Canonical Author")
+  end
+
+  it "refreshes legacy author token documentation" do
+    content = <<~YAML
+      tokens:
+        author:
+          name: "Peter H. Boling" # Auto-seeded from gemspec authors.first; generated gemspec authors preserve the full existing authors array via AUTHOR:NAMES.
+    YAML
+
+    output = described_class.send(:sync_kettle_config_documentation_comments, content)
+
+    expect(output).to include("AUTHOR:NAMES preserves existing gemspec authors and appends Git-derived copyright holders.")
+    expect(output).not_to include("generated gemspec authors preserve the full existing authors array via AUTHOR:NAMES.")
+  end
+
   it "preserves explicit kettle config values while refreshing the config template" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

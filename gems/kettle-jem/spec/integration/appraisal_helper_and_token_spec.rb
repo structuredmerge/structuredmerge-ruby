@@ -620,6 +620,48 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     )
   end
 
+  it "expands existing gemspec authors with copyright holders" do
+    author = described_class.send(
+      :author_facts,
+      {},
+      {},
+      gemspec_metadata: {authors: ["Existing Author"]},
+      copyright: {
+        lines: [
+          "Copyright (c) 2020 Ada Lovelace",
+          "Copyright (c) 2021 Grace Hopper"
+        ]
+      }
+    )
+
+    expect(author.fetch(:names)).to eq(["Existing Author", "Ada Lovelace", "Grace Hopper"])
+  end
+
+  it "consolidates configured author aliases across gemspec and copyright metadata" do
+    author = described_class.send(
+      :author_facts,
+      {
+        "author_aliases" => {
+          "A. Lovelace" => "Ada Lovelace",
+          "ada.old@example.test" => "Ada Lovelace",
+          "G. Hopper" => "Grace Hopper"
+        }
+      },
+      {},
+      gemspec_metadata: {authors: ["A. Lovelace", "Grace Hopper"]},
+      copyright: {
+        lines: [
+          "Copyright (c) 2020 A. Lovelace",
+          "Copyright (c) 2021 Ada Lovelace",
+          "Copyright (c) 2022 G. Hopper"
+        ]
+      }
+    )
+
+    expect(author.fetch(:name)).to eq("Ada Lovelace")
+    expect(author.fetch(:names)).to eq(["Ada Lovelace", "Grace Hopper"])
+  end
+
   it "honors forge user template token config and environment overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1627,6 +1669,48 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(readme_report.fetch(:final_content)).to include("Copyright holders")
       expect(readme_report.fetch(:final_content)).to include("- #{expected_line}")
       expect(license_report.dig(:metadata, :template_tokens, "KJ|LICENSE_COPYRIGHT_NOTICE")).to include("- #{expected_line}")
+    end
+  end
+
+  it "filters default machine users and consolidates Git author identities" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-copyright-identity-slice", tmp_root) do |root|
+      expect(system("git", "-C", root, "init", "-q")).to be(true)
+      expect(system("git", "-C", root, "config", "user.name", "Fixture User")).to be(true)
+      expect(system("git", "-C", root, "config", "user.email", "fixture@example.test")).to be(true)
+
+      commit = lambda do |name, email, path|
+        File.write(File.join(root, path), "#{name}\n")
+        expect(system("git", "-C", root, "add", path)).to be(true)
+        commit_env = {
+          "GIT_AUTHOR_NAME" => name,
+          "GIT_AUTHOR_EMAIL" => email,
+          "GIT_AUTHOR_DATE" => "2024-01-02T00:00:00Z",
+          "GIT_COMMITTER_NAME" => name,
+          "GIT_COMMITTER_EMAIL" => email,
+          "GIT_COMMITTER_DATE" => "2024-01-02T00:00:00Z"
+        }
+        expect(system(commit_env, "git", "-C", root, "commit", "-qm", name)).to be(true)
+      end
+
+      commit.call("A. Lovelace", "ada.old@example.test", "first.txt")
+      commit.call("Ada Lovelace", "ada@example.test", "second.txt")
+      commit.call("autobolt", "automation@example.test", "automation.txt")
+
+      facts = described_class.send(
+        :copyright_facts,
+        root,
+        {
+          "author_aliases" => {
+            "A. Lovelace" => "Ada Lovelace",
+            "ada.old@example.test" => "Ada Lovelace"
+          }
+        }
+      )
+
+      expect(described_class.send(:copyright_machine_users, {})).to eq(["autobolt"])
+      expect(facts.fetch(:lines)).to eq(["Copyright (c) 2024 Ada Lovelace"])
     end
   end
 

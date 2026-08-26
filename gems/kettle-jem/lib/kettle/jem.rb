@@ -476,6 +476,7 @@ module Kettle
     COPYRIGHT_NAME_RE = /\ACopyright \(c\) [\d,\s-]+ (.+)\z/
     BOT_EMAIL_PATTERN = /\A\d+\+[^@]+\[bot\]@/i
     BOT_NAME_SUFFIX = /\[bot\]\z/i
+    DEFAULT_MACHINE_USERS = ["autobolt"].freeze
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"
     README_TOP_LOGO_DEFAULTS = %w[org project].freeze
@@ -12322,7 +12323,28 @@ module Kettle
     def sync_kettle_config_documentation_comments(content)
       synced = sync_readme_top_logos_documentation_comment(content)
       synced = remove_duplicate_framework_matrix_documentation(synced)
-      remove_duplicate_readme_preservation_documentation(synced)
+      synced = remove_duplicate_readme_preservation_documentation(synced)
+      sync_author_names_documentation_comment(synced)
+    end
+
+    def sync_author_names_documentation_comment(content)
+      legacy = "#   AUTHOR:NAMES        <- all authors from the gemspec, or copyright holders if no gemspec authors exist"
+      current = [
+        "#   AUTHOR:NAMES        <- existing gemspec authors plus Git-derived copyright holders\n",
+        "#                           (after author_aliases consolidation)\n"
+      ]
+      lines = content.to_s.lines
+      index = lines.index { |line| line.chomp == legacy }
+      updated = if index
+        lines[index, 1] = current
+        lines.join
+      else
+        content
+      end
+
+      legacy_token_comment = "generated gemspec authors preserve the full existing authors array via AUTHOR:NAMES."
+      current_token_comment = "AUTHOR:NAMES preserves existing gemspec authors and appends Git-derived copyright holders."
+      updated.lines.map { |line| line.sub(legacy_token_comment, current_token_comment) }.join
     end
 
     # YAML parsers do not retain comments. These migrations therefore operate
@@ -14391,7 +14413,10 @@ module Kettle
     def author_facts(config, env, gemspec_metadata: {}, copyright: {})
       token_config = token_config_values(config)
       author_config = token_config["author"].is_a?(Hash) ? token_config["author"] : {}
-      derived_name = Array(gemspec_metadata[:authors]).map(&:to_s).find { |value| present_template_token_value?(value) }
+      aliases = author_aliases(config)
+      derived_name = Array(gemspec_metadata[:authors]).map { |value| canonical_author_name(value, aliases) }.find do |value|
+        present_template_token_value?(value)
+      end
       derived_email = Array(gemspec_metadata[:email]).map(&:to_s).find { |value| present_template_token_value?(value) }
       name = preferred_template_token_value(derived_name, author_config["name"], env, "KJ_AUTHOR_NAME").to_s
       email = preferred_template_token_value(derived_email, author_config["email"], env, "KJ_AUTHOR_EMAIL").to_s
@@ -14401,7 +14426,7 @@ module Kettle
       orcid = preferred_template_token_value(nil, author_config["orcid"], env, "KJ_AUTHOR_ORCID")
       compact_hash(
         name: name,
-        names: author_names(gemspec_metadata, copyright, name),
+        names: author_names(gemspec_metadata, copyright, name, author_aliases: aliases),
         given_names: given_names.to_s,
         family_names: family_names.to_s,
         email: email,
@@ -14435,6 +14460,46 @@ module Kettle
       value.to_s.strip.match?(%r{\A\{KJ\|[A-Z][A-Z0-9_:]*\}\z})
     end
 
+    def author_aliases(config)
+      return {} unless config.is_a?(Hash)
+
+      configured = config["author_aliases"]
+      configured = config.dig("copyright", "author_aliases") if configured.nil? && config["copyright"].is_a?(Hash)
+      return {} unless configured.is_a?(Hash)
+
+      configured.each_with_object({}) do |(alias_name, canonical_name), aliases|
+        alias_key = alias_name.to_s.strip.downcase
+        canonical = canonical_name.to_s.strip
+        next if alias_key.empty? || canonical.empty?
+
+        aliases[alias_key] = canonical
+      end
+    end
+
+    def canonical_author_name(value, aliases)
+      current = value.to_s.strip
+      seen = {}
+      loop do
+        key = current.downcase
+        break if current.empty? || seen[key]
+
+        seen[key] = true
+        replacement = aliases[key]
+        break if replacement.nil? || replacement.to_s.strip.empty?
+
+        current = replacement.to_s.strip
+      end
+      current
+    end
+
+    def canonical_author_name_for_entry(entry, aliases)
+      name = entry[:name].to_s.strip
+      email = entry[:email].to_s.strip
+      configured_name = aliases[name.downcase]
+      configured_email = aliases[email.downcase]
+      canonical_author_name(configured_name || configured_email || name, aliases)
+    end
+
     def author_template_tokens(author)
       names = Array(author[:names]).map(&:to_s).reject(&:empty?)
       names = [author[:name].to_s] if names.empty?
@@ -14449,11 +14514,13 @@ module Kettle
       }
     end
 
-    def author_names(gemspec_metadata, copyright, primary_name)
+    def author_names(gemspec_metadata, copyright, primary_name, author_aliases: {})
       names = Array(gemspec_metadata[:authors]).map(&:to_s)
-      names = names.select { |name| present_template_token_value?(name) }
-      names = copyright_author_names(copyright) if names.empty?
-      names = [primary_name.to_s] if names.empty?
+      names += copyright_author_names(copyright)
+      names = names
+        .map { |name| canonical_author_name(name, author_aliases) }
+        .select { |name| present_template_token_value?(name) }
+      names = [canonical_author_name(primary_name, author_aliases)] if names.empty?
       names.map(&:strip).reject(&:empty?).uniq
     end
 
@@ -14481,16 +14548,22 @@ module Kettle
     end
 
     def copyright_facts(project_root, config)
-      lines = git_copyright_lines(project_root, copyright_machine_users(config))
+      lines = git_copyright_lines(
+        project_root,
+        copyright_machine_users(config),
+        author_aliases: author_aliases(config)
+      )
       compact_hash(lines: lines)
     end
 
     def copyright_machine_users(config)
       copyright = config["copyright"].is_a?(Hash) ? config["copyright"] : {}
-      (Array(config["machine_users"]) + Array(copyright["machine_users"])).map { |user| user.to_s.downcase.strip }.reject(&:empty?)
+      configured = Array(config["machine_users"]) + Array(copyright["machine_users"])
+      configured = DEFAULT_MACHINE_USERS if configured.empty?
+      configured.map { |user| user.to_s.downcase.strip }.reject(&:empty?).uniq
     end
 
-    def git_copyright_lines(project_root, machine_users)
+    def git_copyright_lines(project_root, machine_users, author_aliases: {})
       files = git_capture(project_root, "ls-files", "-z")
       return [] if files.to_s.empty?
 
@@ -14503,10 +14576,20 @@ module Kettle
         next
       end
       resolve_uncommitted_author!(project_root, author_map)
-      author_map.values
+      consolidated = author_map.values
         .reject { |entry| copyright_bot_entry?(entry) }
-        .reject { |entry| copyright_machine_user_entry?(entry, machine_users) }
-        .reject { |entry| entry[:name].to_s.strip.empty? || entry[:years].empty? }
+        .reject { |entry| copyright_machine_user_entry?(entry, machine_users, author_aliases: author_aliases) }
+        .each_with_object({}) do |entry, authors|
+          next if entry[:name].to_s.strip.empty? || entry[:years].empty?
+
+          name = canonical_author_name_for_entry(entry, author_aliases)
+          next if name.empty?
+
+          author = authors[name.downcase] ||= {name: name, years: []}
+          author[:years].concat(entry[:years])
+        end
+        .values
+      consolidated
         .sort_by { |entry| [entry[:years].map(&:to_i).min, entry[:name].to_s.downcase] }
         .map { |entry| "Copyright (c) #{format_copyright_years(entry[:years])} #{entry[:name]}" }
     rescue ArgumentError
@@ -14569,11 +14652,15 @@ module Kettle
       entry[:name].to_s.match?(BOT_NAME_SUFFIX) || entry[:email].to_s.match?(BOT_EMAIL_PATTERN)
     end
 
-    def copyright_machine_user_entry?(entry, machine_users)
+    def copyright_machine_user_entry?(entry, machine_users, author_aliases: {})
       return false if machine_users.empty?
 
-      machine_users.include?(entry[:name].to_s.downcase.strip) ||
-        machine_users.include?(entry[:email].to_s.downcase.strip)
+      identities = [
+        entry[:name],
+        entry[:email],
+        canonical_author_name_for_entry(entry, author_aliases)
+      ].map { |identity| identity.to_s.downcase.strip }
+      identities.any? { |identity| machine_users.include?(identity) }
     end
 
     def format_copyright_years(years)

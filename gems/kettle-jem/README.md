@@ -202,6 +202,12 @@ readme:
 machine_users:
   - dependabot
 
+# Map alternate Git author names or email addresses to one canonical name.
+# The canonical names are used in generated LICENSE.md and gemspec metadata.
+author_aliases:
+  "Jane Q. Public": "Jane Q Public"
+  "jane.old@example.com": "Jane Q Public"
+
 # Maximum allowed divergence (%) for selftest CI check
 min_divergence_threshold: 5       # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
 
@@ -290,11 +296,23 @@ Common tokens:
 | `{KJ\|GEM_NAME}`       | Gem name from gemspec             |
 | `{KJ\|NAMESPACE}`      | Ruby module namespace             |
 | `{KJ\|AUTHOR:NAME}`    | Author full name                  |
+| `{KJ\|AUTHOR:NAMES}`   | Existing gemspec authors plus Git-derived copyright holders |
 | `{KJ\|AUTHOR:EMAIL}`   | Author email                      |
 | `{KJ\|GH:USER}`        | GitHub username                   |
 | `{KJ\|PROJECT_EMOJI}`  | Project emoji from config         |
 | `{KJ\|MIN_RUBY}`       | Minimum Ruby version              |
 | `{KJ\|FREEZE_TOKEN}`   | Freeze marker name                |
+
+`machine_users` excludes configured Git author names or email addresses from
+Git-derived copyright output. Known GitHub/GitLab bot identities are filtered
+automatically. When the key is absent or empty, `autobolt` is excluded by
+default.
+
+`author_aliases` consolidates alternate Git author names or email addresses to
+canonical display names. The mapping is case-insensitive and applies to Git
+copyright facts and existing gemspec author names; it does not rewrite Git
+history. `AUTHOR:NAMES` preserves existing gemspec authors and appends any
+copyright holders not already present.
 
 ### Freeze Blocks
 
