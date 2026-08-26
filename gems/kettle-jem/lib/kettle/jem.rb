@@ -474,9 +474,8 @@ module Kettle
       KJ|SOCIAL:MASTODON
     ].freeze
     COPYRIGHT_NAME_RE = /\ACopyright \(c\) [\d,\s-]+ (.+)\z/
-    BOT_EMAIL_PATTERN = /\A\d+\+[^@]+\[bot\]@/i
-    BOT_NAME_SUFFIX = /\[bot\]\z/i
-    DEFAULT_MACHINE_USERS = ["autobolt"].freeze
+    BOT_IDENTITY_PATTERN = /\[bot\]/i
+    DEFAULT_MACHINE_USERS = ["autobolt", "StepSecurity Bot", "dependabot[bot]", "depfu[bot]"].freeze
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"
     README_TOP_LOGO_DEFAULTS = %w[org project].freeze
@@ -14558,8 +14557,7 @@ module Kettle
 
     def copyright_machine_users(config)
       copyright = config["copyright"].is_a?(Hash) ? config["copyright"] : {}
-      configured = Array(config["machine_users"]) + Array(copyright["machine_users"])
-      configured = DEFAULT_MACHINE_USERS if configured.empty?
+      configured = DEFAULT_MACHINE_USERS + Array(config["machine_users"]) + Array(copyright["machine_users"])
       configured.map { |user| user.to_s.downcase.strip }.reject(&:empty?).uniq
     end
 
@@ -14649,7 +14647,7 @@ module Kettle
     end
 
     def copyright_bot_entry?(entry)
-      entry[:name].to_s.match?(BOT_NAME_SUFFIX) || entry[:email].to_s.match?(BOT_EMAIL_PATTERN)
+      entry[:name].to_s.match?(BOT_IDENTITY_PATTERN) || entry[:email].to_s.match?(BOT_IDENTITY_PATTERN)
     end
 
     def copyright_machine_user_entry?(entry, machine_users, author_aliases: {})

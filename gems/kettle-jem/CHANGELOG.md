@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Copyright filtering now excludes bot-marker identities and the packaged template seeds shared author aliases and machine-account defaults.
+
 ### Deprecated
 
 ### Removed

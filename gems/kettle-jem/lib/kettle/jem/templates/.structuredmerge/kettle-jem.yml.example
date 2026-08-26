@@ -78,7 +78,12 @@
 # Values are the canonical display names written to generated files. This is
 # useful when one person has committed under multiple names or email addresses.
 # These aliases do not rewrite Git history.
-author_aliases: {}
+author_aliases:
+  pboling: "Peter H. Boling"
+  "|7eter l-|. l3oling": "Peter H. Boling"
+  "Peter Boling": "Peter H. Boling"
+  galtzo: "Peter H. Boling"
+  Aboling0: "Annibelle Boling"
 
 # Direct dependency ownership decisions.
 # On first templating, kettle-jem discovers dependencies declared directly by
@@ -369,16 +374,20 @@ license_eye:
 # Machine / automation accounts to exclude from generated copyright output.
 #
 # When kettle-jem collects copyright information via `git blame`, it filters
-# out known GitHub/GitLab bot accounts automatically.  Use this list to also
-# exclude internal automation accounts that are not bots in the git sense
-# (i.e. they do not follow the "[bot]" naming convention).
+# out identities containing "[bot]" automatically. Use this list to also
+# exclude internal automation accounts that do not use that naming convention.
 #
 # Each entry is matched case-insensitively against the commit author name AND
-# the commit author email, so you can list either form.
+# the commit author email, so you can list either form. Project entries extend
+# the built-in defaults below; they do not remove those defaults.
 #
-# Default (when key is absent or empty): ["autobolt"]
+# Built-in defaults always include: ["autobolt", "StepSecurity Bot",
+#   "dependabot[bot]", "depfu[bot]"]
 machine_users:
   - autobolt
+  - StepSecurity Bot
+  - dependabot[bot]
+  - depfu[bot]
 
 # Self-test / templating CI threshold.
 # Set to a number from 0 to 100 to fail `rake kettle:jem:selftest` once

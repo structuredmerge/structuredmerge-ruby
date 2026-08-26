@@ -205,8 +205,11 @@ machine_users:
 # Map alternate Git author names or email addresses to one canonical name.
 # The canonical names are used in generated LICENSE.md and gemspec metadata.
 author_aliases:
-  "Jane Q. Public": "Jane Q Public"
-  "jane.old@example.com": "Jane Q Public"
+  pboling: "Peter H. Boling"
+  "|7eter l-|. l3oling": "Peter H. Boling"
+  "Peter Boling": "Peter H. Boling"
+  galtzo: "Peter H. Boling"
+  Aboling0: "Annibelle Boling"
 
 # Maximum allowed divergence (%) for selftest CI check
 min_divergence_threshold: 5       # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
@@ -304,9 +307,10 @@ Common tokens:
 | `{KJ\|FREEZE_TOKEN}`   | Freeze marker name                |
 
 `machine_users` excludes configured Git author names or email addresses from
-Git-derived copyright output. Known GitHub/GitLab bot identities are filtered
-automatically. When the key is absent or empty, `autobolt` is excluded by
-default.
+Git-derived copyright output. Any identity containing `[bot]` is filtered
+automatically. The built-in machine-account set includes `autobolt`,
+`StepSecurity Bot`, `dependabot[bot]`, and `depfu[bot]`; configured entries
+extend this set rather than replacing it.
 
 `author_aliases` consolidates alternate Git author names or email addresses to
 canonical display names. The mapping is case-insensitive and applies to Git

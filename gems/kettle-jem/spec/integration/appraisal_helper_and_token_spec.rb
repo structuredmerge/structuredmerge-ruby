@@ -1709,9 +1709,27 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
         }
       )
 
-      expect(described_class.send(:copyright_machine_users, {})).to eq(["autobolt"])
+      expect(described_class.send(:copyright_machine_users, {})).to eq([
+        "autobolt",
+        "stepsecurity bot",
+        "dependabot[bot]",
+        "depfu[bot]"
+      ])
+      expect(described_class.send(:copyright_machine_users, {"machine_users" => ["Internal Automation"]})).to eq([
+        "autobolt",
+        "stepsecurity bot",
+        "dependabot[bot]",
+        "depfu[bot]",
+        "internal automation"
+      ])
       expect(facts.fetch(:lines)).to eq(["Copyright (c) 2024 Ada Lovelace"])
     end
+  end
+
+  it "filters every bot identity containing the bot marker" do
+    expect(described_class.send(:copyright_bot_entry?, name: "dependabot[bot]", email: "123+depfu[bot]@users.noreply.github.com")).to be(true)
+    expect(described_class.send(:copyright_bot_entry?, name: "automation[bot] account", email: "automation@example.test")).to be(true)
+    expect(described_class.send(:copyright_bot_entry?, name: "Human Contributor", email: "human@example.test")).to be(false)
   end
 
   it "falls back to configured author copyright sections when git blame is unavailable" do
