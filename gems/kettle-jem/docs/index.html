@@ -141,7 +141,7 @@ to build <code>kettle-jem</code> extension gems against the supported plugin sea
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.554-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.606-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -400,6 +400,15 @@ readme:
 machine_users:
   - dependabot
 
+# Map alternate Git author names or email addresses to one canonical name.
+# The canonical names are used in generated LICENSE.md and gemspec metadata.
+author_aliases:
+  pboling: &quot;Peter H. Boling&quot;
+  &quot;|7eter l-|. l3oling&quot;: &quot;Peter H. Boling&quot;
+  &quot;Peter Boling&quot;: &quot;Peter H. Boling&quot;
+  galtzo: &quot;Peter H. Boling&quot;
+  Aboling0: &quot;Annibelle Boling&quot;
+
 # Maximum allowed divergence (%) for selftest CI check
 min_divergence_threshold: 5       # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
 
@@ -530,6 +539,10 @@ StructuredMerge normalization.</p>
       <td>Author full name</td>
     </tr>
     <tr>
+      <td><code>{KJ\|AUTHOR:NAMES}</code></td>
+      <td>Existing gemspec authors plus Git-derived copyright holders</td>
+    </tr>
+    <tr>
       <td><code>{KJ\|AUTHOR:EMAIL}</code></td>
       <td>Author email</td>
     </tr>
@@ -551,6 +564,18 @@ StructuredMerge normalization.</p>
     </tr>
   </tbody>
 </table>
+
+<p><code>machine_users</code> excludes configured Git author names or email addresses from<br>
+Git-derived copyright output. Any identity containing <code>[bot]</code> is filtered<br>
+automatically. The built-in machine-account set includes <code>autobolt</code>,<br>
+<code>StepSecurity Bot</code>, <code>dependabot[bot]</code>, and <code>depfu[bot]</code>; configured entries<br>
+extend this set rather than replacing it.</p>
+
+<p><code>author_aliases</code> consolidates alternate Git author names or email addresses to<br>
+canonical display names. The mapping is case-insensitive and applies to Git<br>
+copyright facts and existing gemspec author names; it does not rewrite Git<br>
+history. <code>AUTHOR:NAMES</code> preserves existing gemspec authors and appends any<br>
+copyright holders not already present.</p>
 
 <h3 id="freeze-blocks">Freeze Blocks</h3>
 
@@ -1247,7 +1272,7 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Wed Aug 26 00:38:57 2026 by
+  Generated on Wed Aug 26 10:39:23 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
