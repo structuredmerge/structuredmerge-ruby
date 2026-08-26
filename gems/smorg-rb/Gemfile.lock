@@ -181,11 +181,11 @@ GEM
       ast-merge (= 7.1.4)
       tree_haver (= 7.1.4)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-changelog (1.0.2)
+    kettle-changelog (1.0.3)
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
-      kettle-dev (>= 3.0.6, < 4.0.0)
+      kettle-dev (>= 3.0.11, < 4.0.0)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-dev (3.0.12)
+    kettle-dev (3.0.13)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.13)
       kettle-ndjson (~> 0.1, >= 0.1.12)
@@ -193,14 +193,18 @@ GEM
       kettle-test (~> 2.0, >= 2.0.20)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
-    kettle-family (1.2.60)
+    kettle-family (1.2.61)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
-      kettle-dev (>= 3.0.12, < 4.0.0)
+      kettle-changelog (~> 1.0, >= 1.0.3)
+      kettle-dev (>= 3.0.13, < 4.0.0)
+      kettle-gha-pins (~> 0.3, >= 0.3.13)
+      kettle-jem (~> 7.0, >= 7.0.0)
       kettle-test (~> 2.0, >= 2.0.20)
       tsort (~> 0.2)
       tty-screen (~> 0.8)
       unicode-display_width (~> 2.6)
+      version_gem (~> 1.1, >= 1.1.15)
     kettle-gha-pins (0.3.13)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
@@ -621,7 +625,7 @@ DEPENDENCIES
   irb (~> 1.17)
   kettle-changelog (~> 1.0, >= 1.0.2)
   kettle-dev (~> 3.0, >= 3.0.7)
-  kettle-family (~> 1.2, >= 1.2.60)
+  kettle-family (~> 1.2, >= 1.2.61)
   kettle-soup-cover (~> 3.0, >= 3.0.9)
   kettle-test (~> 2.0, >= 2.0.20)
   kramdown (~> 2.5, >= 2.5.2)
@@ -715,9 +719,9 @@ CHECKSUMS
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   json-merge (7.1.4) sha256=70e78f84a1db0ab1145996a79be5f9951fe928aa76288f540c704e48dd431601
-  kettle-changelog (1.0.2) sha256=8292d0ca01c0cc6a2cf3cfd5b50ba7b82f798203eca12dfd6d9312aab8e03cc6
-  kettle-dev (3.0.12) sha256=f6ef8b2f09af6aafab04c12c1e465d845676556dae89671b3e7631f607a18026
-  kettle-family (1.2.60) sha256=65767e6a13a18a293341c9d92070799d32980a08a4271c36efa2f1f5b04d463a
+  kettle-changelog (1.0.3) sha256=72d977f269134b2b2fe3776ab4daffa1fac7fd5676379fb26d844fb9086acd8e
+  kettle-dev (3.0.13) sha256=131f23898ff9dc1aa7066c1a4f6c2ecf5b56c67e0cbda503e90d42103a8891c6
+  kettle-family (1.2.61) sha256=62fe4fe607951a3f3920330613e59a9d97896b7fc4f2fe970f5f3ab3167cd1b7
   kettle-gha-pins (0.3.13) sha256=c393aa90a7c78248d42fd63b2f4abfb0ca39df94a7b0d8f53082fa3ffdaa3f80
   kettle-jem (7.1.5) sha256=a086e0c89c6a04d997c35c8a93a0786e2af88e68d1e341bd97891c335ea01df4
   kettle-ndjson (0.1.12) sha256=9c506b197c1b95904227876890a5b1a55a5f435f1c425857036e7fab83d152e5
