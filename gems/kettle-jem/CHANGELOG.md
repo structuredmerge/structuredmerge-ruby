@@ -22,9 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-dev (>= 3.0.12 -> >= 3.0.13)
-
 ### Deprecated
 
 ### Removed
@@ -36,7 +33,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ## [7.1.6] - 2026-08-25
 
 - TAG: [v7.1.6][7.1.6t]
-- COVERAGE: 93.65% -- 10820/11554 lines in 16 files
+- COVERAGE: 93.64% -- 10819/11554 lines in 16 files
 - BRANCH COVERAGE: 77.24% -- 4629/5993 branches in 16 files
 - 17.97% documented
 
@@ -51,6 +48,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-dev (>= 3.0.11 -> >= 3.0.12)
   - kettle-family (>= 1.2.59 -> >= 1.2.60)
+
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-dev (>= 3.0.12 -> >= 3.0.13)
 
 ## [7.1.5] - 2026-08-24
 
