@@ -339,7 +339,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       expect(install.fetch(:mode)).to eq("install")
       expect(install.fetch(:installed)).to be(true)
-      expect(install.fetch(:changed_files)).to eq(["bin/setup"])
+      expect(install.fetch(:changed_files)).to eq(["CHANGELOG.md", "bin/setup"])
       expect(install.fetch(:install_steps)).to include(
         name: "bin_setup_executable",
         path: "bin/setup",
@@ -641,6 +641,57 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
           env: include("BUNDLE_GEMFILE" => File.join(gem_root, "Gemfile"))
         )
       end
+    end
+  end
+
+  it "records the template changelog before the bootstrap commit" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-changelog-order", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => [
+          "templates:",
+          "  root: packaged",
+          "  apply: true",
+          "  entries:",
+          "    - bin/setup",
+          ""
+        ].join("\n"),
+        "bin/setup" => "#!/usr/bin/env ruby\n"
+      })
+      expect(system("git", "init", root, out: File::NULL, err: File::NULL)).to be(true)
+
+      order = []
+      allow(Kettle::Jem::MaintenanceChangelog).to receive(:record_template_run) do |project_root:, report:, **|
+        order << :changelog
+        File.write(File.join(project_root, "CHANGELOG.md"), "## [Unreleased]\n")
+        report.merge(changelog: {status: "updated"})
+      end
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:bundle_includes_gem?).and_return(true)
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        order << command
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {},
+        run_options: {only: "bin/setup"},
+        command_runner: command_runner
+      )
+
+      git_add_index = order.index(%w[git add -A -- .])
+      expect(git_add_index).to be_a(Integer)
+      expect(order.index(:changelog)).to be < git_add_index
+      expect(install.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }).to include(
+        dirty_entries: include("?? CHANGELOG.md")
+      )
     end
   end
 

@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Record template-run changelog updates before the bootstrap commit so generated changes and their maintenance summary are committed together.
+
 ### Deprecated
 
 ### Removed

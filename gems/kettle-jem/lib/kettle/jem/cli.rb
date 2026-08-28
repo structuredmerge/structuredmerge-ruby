@@ -234,6 +234,8 @@ module Kettle
         end
         return result unless %w[setup prepare apply template install].include?(command)
 
+        return result if result.is_a?(Hash) && result.key?(:changelog)
+
         Kettle::Jem::MaintenanceChangelog.record_template_run(
           project_root: project_root,
           report: result,

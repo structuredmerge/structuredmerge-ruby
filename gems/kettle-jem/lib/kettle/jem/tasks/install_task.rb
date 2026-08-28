@@ -8,6 +8,7 @@ require "toml-rb"
 require "uri"
 require "yaml"
 require "kettle/rb/compat_matrix"
+require "kettle/jem/maintenance_changelog"
 
 module Kettle
   module Jem
@@ -48,7 +49,6 @@ module Kettle
           install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
-          install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
 
           final_report = report.merge(
@@ -61,6 +61,26 @@ module Kettle
               severity: "advisory",
               message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps."
             }]
+          )
+          final_report = Kettle::Jem::MaintenanceChangelog.record_template_run(
+            project_root: project_root,
+            report: final_report,
+            run_options: effective_run_options
+          )
+          bootstrap_commit = bootstrap_commit_step(project_root, run_options: effective_run_options)
+          install_steps.concat(
+            execute_orchestration_steps(
+              [bootstrap_commit],
+              project_root: project_root,
+              env: setup_env,
+              run_options: effective_run_options,
+              command_runner: command_runner
+            )
+          )
+          final_report = final_report.merge(
+            install_steps: install_steps,
+            install_phase_reports: install_phase_reports(install_steps),
+            install_summary: install_step_summary(install_steps)
           )
           Kettle::Jem.emit_summary_event(Kettle::Jem.event_stream_from_options(effective_run_options), final_report)
           final_report
