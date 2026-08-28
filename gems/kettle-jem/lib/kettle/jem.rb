@@ -525,6 +525,7 @@ module Kettle
     APPRAISAL_VERSION_SELECTION_MODES = %w[major minor patch minor-minmax semver].freeze
     DEFAULT_TEST_MINIMUM_RUBY = Gem::Version.new("2.4")
     REQUIRE_RELATIVE_MIN_RUBY = Gem::Version.new("2.2").freeze
+    ANONYMOUS_VERSION_LOADER_MIN_RUBY = Gem::Version.new("2.2").freeze
     MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY = Gem::Version.new("3.1").freeze
     APPRAISAL_DEFAULT_FRESHNESS_TTL = 604_800
     DECISION_ACTIONS = %w[create merge replace keep delete skip].freeze
@@ -3326,7 +3327,6 @@ module Kettle
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       configured_namespace = rubygems_config["namespace"].to_s.strip
-      entrypoint_namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path)
       version_namespace = existing_version_namespace(project_root, version_path)
       version_namespace = reconcile_existing_version_namespace(
         project_root,
@@ -3334,20 +3334,14 @@ module Kettle
         version_path,
         version_namespace
       )
-      version_namespace_kinds = existing_version_namespace_kinds(
-        project_root,
-        version_path,
-        version_namespace,
-        entrypoint_path: entrypoint_path
-      )
-      version_namespace_superclasses = existing_version_namespace_superclasses(
-        project_root,
-        version_path,
-        version_namespace,
-        entrypoint_path: entrypoint_path
-      )
       metadata_namespace = metadata_value(gemspec_metadata, :namespace)
       default_namespace = classify_namespace(name)
+      namespace_hint = configured_namespace.empty? ? default_namespace : configured_namespace
+      entrypoint_namespace = existing_entrypoint_version_namespace(
+        project_root,
+        entrypoint_path,
+        expected_depth: namespace_hint.split("::").count { |segment| !segment.empty? }
+      )
       namespace = configured_namespace.empty? ? nil : configured_namespace
       namespace ||= project_namespace(
         entrypoint_namespace: entrypoint_namespace,
@@ -3355,6 +3349,23 @@ module Kettle
         metadata_namespace: metadata_namespace,
         default_namespace: default_namespace
       )
+      version_namespace_kinds = existing_version_namespace_kinds(
+        project_root,
+        version_path,
+        namespace,
+        entrypoint_path: entrypoint_path
+      )
+      version_namespace_superclasses = existing_version_namespace_superclasses(
+        project_root,
+        version_path,
+        namespace
+      )
+      namespace_superclass_details = existing_namespace_superclass_details(
+        project_root,
+        namespace,
+        preferred_path: entrypoint_path
+      )
+      entrypoint_namespace_superclasses = namespace_superclass_details.fetch(:superclasses)
       project_version = metadata_value(gemspec_metadata, :version)
       project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
       project_version = git_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
@@ -3428,6 +3439,8 @@ module Kettle
           min_ruby: min_ruby,
           version_namespace_kinds: version_namespace_kinds,
           version_namespace_superclasses: version_namespace_superclasses,
+          entrypoint_namespace_superclasses: entrypoint_namespace_superclasses,
+          entrypoint_namespace_superclass_path: namespace_superclass_details[:path],
           version_gem_default_enabled: version_gem_default_enabled_for_project?(rubygems_config, gemspec_metadata),
           engines: ruby_engines_config(kettle_config)
         )
@@ -5469,8 +5482,15 @@ module Kettle
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       version_path = File.join("lib", entrypoint_require, "version.rb")
       signature_path = File.join("sig", "#{entrypoint_require}.rbs")
-      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       namespace = facts.dig(:rubygems, :namespace).to_s
+      entrypoint_path = facts.dig(:rubygems, :entrypoint_namespace_superclass_path).to_s
+      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb") unless File.file?(File.join(project_root, entrypoint_path))
+      namespace_superclass_details = existing_namespace_superclass_details(
+        project_root,
+        namespace,
+        preferred_path: entrypoint_path
+      )
+      entrypoint_path = namespace_superclass_details[:path] if namespace_superclass_details[:path]
       version_gem_bootstrap_step_for_paths(
         project_root,
         facts,
@@ -5511,17 +5531,36 @@ module Kettle
 
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.to_s.empty?
       namespace = facts.dig(:rubygems, :namespace).to_s
-      namespace = classify_namespace(package_name) if namespace.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
-      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path).to_s if namespace.empty?
+      if namespace.empty?
+        namespace = existing_entrypoint_version_namespace(
+          project_root,
+          entrypoint_path,
+          expected_depth: classify_namespace(package_name).split("::").count { |segment| !segment.empty? }
+        ).to_s
+      end
       namespace = existing_version_namespace(project_root, version_path).to_s if namespace.empty?
+      namespace = classify_namespace(package_name) if namespace.empty?
       return {name: "version_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
 
+      namespace_superclass_details = existing_namespace_superclass_details(
+        project_root,
+        namespace,
+        preferred_path: entrypoint_path
+      )
+      entrypoint_namespace_superclasses = namespace_superclass_details.fetch(:superclasses)
+      entrypoint_namespace_superclasses = entrypoint_namespace_superclasses.merge(
+        entrypoint_namespace_superclasses_from_facts(facts)
+      )
+      fact_superclass_path = facts.dig(:rubygems, :entrypoint_namespace_superclass_path).to_s
+      if entrypoint_namespace_superclasses.any? && File.file?(File.join(project_root, fact_superclass_path))
+        entrypoint_path = fact_superclass_path
+      elsif namespace_superclass_details[:path]
+        entrypoint_path = namespace_superclass_details[:path]
+      end
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       changes = []
-      cleanup = version_gem_cleanup_step(project_root, facts)
-      changes.concat(Array(cleanup[:changed_files]))
       outer_namespace_kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
       namespace_kinds = existing_version_namespace_kinds(
         project_root,
@@ -5529,12 +5568,13 @@ module Kettle
         namespace,
         entrypoint_path: entrypoint_path
       )
-      namespace_superclasses = existing_version_namespace_superclasses(
+      cleanup = version_gem_cleanup_step(
         project_root,
-        version_path,
-        namespace,
-        entrypoint_path: entrypoint_path
+        facts,
+        entrypoint_path: entrypoint_path,
+        after_declarations: !entrypoint_namespace_superclasses.empty?
       )
+      changes.concat(Array(cleanup[:changed_files]))
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path) if preserve_version_module_include.nil?
       unless templated_paths.include?(version_path) && outer_namespace_kind != :class
         version = facts.dig(:project_runtime, :version).to_s
@@ -5549,7 +5589,6 @@ module Kettle
             version: version,
             outer_namespace_kind: outer_namespace_kind,
             namespace_kinds: namespace_kinds,
-            namespace_superclasses: namespace_superclasses,
             preserve_version_module_include: preserve_version_module_include
           )
         )
@@ -5593,13 +5632,13 @@ module Kettle
       }
     end
 
-    def version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: true)
+    def version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: true, after_declarations: false, entrypoint_path: nil)
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_gem_cleanup", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
 
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
-      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      entrypoint_path ||= File.join("lib", "#{entrypoint_require}.rb")
       dedicated_entrypoint_path = File.join("lib", entrypoint_require, "version_gem.rb")
       version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
       changed_files = []
@@ -5609,7 +5648,8 @@ module Kettle
         cleaned = version_gem_free_entrypoint_content(
           current,
           entrypoint_require: entrypoint_require,
-          ensure_version_require: File.file?(version_path)
+          ensure_version_require: File.file?(version_path),
+          after_declarations: after_declarations
         )
         changed_files << write_if_changed(project_root, entrypoint_path, cleaned)
       end
@@ -6894,10 +6934,12 @@ module Kettle
       modern = Gem::Version.new(min_ruby) >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
       before_legacy = !gemspec_top_level_gem_version_node(original).nil?
       after_legacy = !gemspec_top_level_gem_version_node(final).nil?
+      superclass_sensitive = gemspec_version_loader_superclass_sensitive?(request[:runtime_context] || request["runtime_context"] || {})
       {
         operation: "rewrite_version_loader",
         min_ruby: min_ruby,
         mode: modern ? "modern" : "legacy",
+        superclass_sensitive: superclass_sensitive,
         legacy_preamble_removed: before_legacy && !after_legacy,
         legacy_preamble_present: after_legacy
       }
@@ -10526,7 +10568,18 @@ module Kettle
       modern = min_ruby_version >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
       rhs = modern ? gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace) : "gem_version"
       rewritten = replace_gemspec_version_assignment(content, receiver: receiver, rhs: rhs)
-      modern ? remove_gemspec_legacy_version_loader_preamble(rewritten) : ensure_gemspec_legacy_version_loader_preamble(rewritten, entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby_version)
+      if modern
+        remove_gemspec_legacy_version_loader_preamble(rewritten)
+      else
+        ensure_gemspec_legacy_version_loader_preamble(
+          rewritten,
+          entrypoint_require: entrypoint_require,
+          namespace: namespace,
+          min_ruby: min_ruby_version,
+          superclass_sensitive: gemspec_version_loader_superclass_sensitive?(facts),
+          fallback_version: facts.to_h.dig(:project_runtime, :version)
+        )
+      end
     rescue ArgumentError, Ast::Crispr::Error
       content
     end
@@ -10546,7 +10599,48 @@ module Kettle
       %(Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/#{entrypoint_require}/version.rb", mod) }::#{namespace}::Version::VERSION)
     end
 
-    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:)
+    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:, superclass_sensitive: false, fallback_version: nil)
+      unless superclass_sensitive
+        return gemspec_standard_legacy_version_loader_block(
+          entrypoint_require: entrypoint_require,
+          namespace: namespace,
+          min_ruby: min_ruby
+        )
+      end
+
+      anonymous_loader = <<~RUBY.chomp
+        require "anonymous_loader"
+        path = File.expand_path("lib/#{entrypoint_require}/version.rb", __dir__)
+        anonymous_namespace = AnonymousLoader.load(files: path)
+        anonymous_namespace::#{namespace}::Version::VERSION
+      RUBY
+      anonymous_loader_lines = anonymous_loader.lines.map { |line| "    #{line.chomp}" }
+      fallback = fallback_version.to_s
+      fallback = "0.0.0" if fallback.empty?
+      lines = [
+        "gem_version =",
+        "  if Gem.ruby_version >= Gem::Version.new(\"3.1\")",
+        "    # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!",
+        "    # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358",
+        "    # See: https://github.com/panorama-ed/memo_wise/pull/397",
+        "    #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace)}"
+      ]
+      lines << "  # The namesake namespace has a superclass. Directly requiring version.rb"
+      lines << "  # on legacy Ruby could define that namespace with the wrong superclass."
+      if min_ruby < ANONYMOUS_VERSION_LOADER_MIN_RUBY
+        lines << "  elsif Gem.ruby_version >= Gem::Version.new(\"2.2\")"
+        lines.concat(anonymous_loader_lines)
+        lines << "  else"
+        lines << "    #{fallback.dump}"
+      else
+        lines << "  else"
+        lines.concat(anonymous_loader_lines)
+      end
+      lines << "  end"
+      "#{lines.join("\n")}\n"
+    end
+
+    def gemspec_standard_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:)
       legacy_require =
         if min_ruby >= REQUIRE_RELATIVE_MIN_RUBY
           %(require_relative "lib/#{entrypoint_require}/version")
@@ -10572,6 +10666,14 @@ module Kettle
             #{namespace}::Version::VERSION
           end
       RUBY
+    end
+
+    def gemspec_version_loader_superclass_sensitive?(facts)
+      rubygems = facts.to_h[:rubygems]
+      return false unless rubygems.is_a?(Hash)
+
+      value = rubygems[:entrypoint_namespace_superclasses]
+      value.is_a?(Hash) && !value.empty?
     end
 
     def remove_gemspec_legacy_version_loader_preamble(content)
@@ -10606,8 +10708,8 @@ module Kettle
       {start_line: start_index + 1, end_line: end_line}
     end
 
-    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:, min_ruby:)
-      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby)}\n"
+    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:, min_ruby:, superclass_sensitive: false, fallback_version: nil)
+      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby, superclass_sensitive: superclass_sensitive, fallback_version: fallback_version)}\n"
       node = gemspec_top_level_gem_version_node(content)
       return replace_source_range_lines(content, node.location.start_line, expand_line_range_through_following_blanks(content, node.location.end_line), block) if node
 
@@ -15221,6 +15323,36 @@ module Kettle
       )
       default_entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       default_entrypoint = read_project_file(project_root, default_entrypoint_path)
+      version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
+      signature_path = File.join("sig", "#{entrypoint_require}.rbs")
+      legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
+      namespace = facts.dig(:rubygems, :namespace).to_s
+      if namespace.empty?
+        namespace = existing_entrypoint_version_namespace(
+          project_root,
+          entrypoint_path,
+          expected_depth: classify_namespace(package_name).split("::").count { |segment| !segment.empty? }
+        ).to_s
+      end
+      namespace = existing_version_namespace(project_root, version_path).to_s if namespace.empty?
+      namespace = classify_namespace(package_name) if namespace.empty?
+      return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
+
+      namespace_superclass_details = existing_namespace_superclass_details(
+        project_root,
+        namespace,
+        preferred_path: entrypoint_path
+      )
+      entrypoint_namespace_superclasses = namespace_superclass_details.fetch(:superclasses)
+      entrypoint_namespace_superclasses = entrypoint_namespace_superclasses.merge(
+        entrypoint_namespace_superclasses_from_facts(facts)
+      )
+      fact_superclass_path = facts.dig(:rubygems, :entrypoint_namespace_superclass_path).to_s
+      if entrypoint_namespace_superclasses.any? && File.file?(File.join(project_root, fact_superclass_path))
+        entrypoint_path = fact_superclass_path
+      elsif namespace_superclass_details[:path]
+        entrypoint_path = namespace_superclass_details[:path]
+      end
       default_entrypoint_loads_version = entrypoint_path != default_entrypoint_path &&
         entrypoint_loads_version_file?(
           default_entrypoint,
@@ -15228,25 +15360,20 @@ module Kettle
           entrypoint_path: default_entrypoint_path,
           version_path: version_path
         )
-      version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
-      signature_path = File.join("sig", "#{entrypoint_require}.rbs")
-      legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
-      namespace = existing_version_namespace(project_root, version_path).to_s
-      namespace = facts.dig(:rubygems, :namespace).to_s if namespace.empty?
-      namespace = classify_namespace(package_name) if namespace.empty?
-      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path).to_s if namespace.empty?
-      return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
-
       version = facts.dig(:project_runtime, :version).to_s
       version = project_gemspec_version(project_root) if version.empty?
       version = "0.0.1.pre" if version.empty?
       changes = []
       current_entrypoint = read_project_file(project_root, entrypoint_path)
       outer_namespace_kind = ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
-      namespace_kinds = existing_version_namespace_kinds(project_root, version_path, namespace)
-      namespace_kinds = namespace_kinds.merge(version_namespace_kinds_from_facts(facts))
-      namespace_superclasses = existing_version_namespace_superclasses(project_root, version_path, namespace)
-      namespace_superclasses = namespace_superclasses.merge(version_namespace_superclasses_from_facts(facts))
+      namespace_kinds = version_namespace_kinds_from_facts(facts).merge(
+        existing_version_namespace_kinds(
+          project_root,
+          version_path,
+          namespace,
+          entrypoint_path: entrypoint_path
+        )
+      )
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path) if preserve_version_module_include.nil?
 
       if manage_version_file
@@ -15259,7 +15386,6 @@ module Kettle
             version: version,
             outer_namespace_kind: outer_namespace_kind,
             namespace_kinds: namespace_kinds,
-            namespace_superclasses: namespace_superclasses,
             preserve_version_module_include: preserve_version_module_include
           )
         )
@@ -15271,6 +15397,7 @@ module Kettle
           current_entrypoint,
           entrypoint_require: entrypoint_require,
           ensure_version_require: !default_entrypoint_loads_version,
+          after_declarations: !entrypoint_namespace_superclasses.empty?,
           version_require_path: version_require_path_for_entrypoint(entrypoint_path, version_path)
         )
       elsif current_entrypoint.empty?
@@ -15280,6 +15407,7 @@ module Kettle
           current_entrypoint,
           namespace: namespace,
           entrypoint_require: entrypoint_require,
+          namespace_superclasses: entrypoint_namespace_superclasses,
           version_require_path: version_require_path_for_entrypoint(entrypoint_path, version_path)
         )
       end
@@ -15662,7 +15790,7 @@ module Kettle
       version_gem_require_insertion_index(content)
     end
 
-    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module, namespace_kinds: {}, namespace_superclasses: {}, preserve_version_module_include: false)
+    def version_gem_version_file_content(existing_version:, namespace:, version:, outer_namespace_kind: :module, namespace_kinds: {}, preserve_version_module_include: false)
       resolved_version = existing_version.to_s.empty? ? version.to_s : existing_version.to_s
       body = [
         "# Version namespace for this gem.",
@@ -15678,7 +15806,7 @@ module Kettle
       <<~RUBY
         # frozen_string_literal: true
 
-        #{wrap_ruby_namespace(namespace, body, outer_namespace_kind: outer_namespace_kind, namespace_kinds: namespace_kinds, namespace_superclasses: namespace_superclasses).join("\n")}
+        #{wrap_ruby_namespace(namespace, body, outer_namespace_kind: outer_namespace_kind, namespace_kinds: namespace_kinds).join("\n")}
       RUBY
     end
 
@@ -15705,11 +15833,12 @@ module Kettle
       "#{wrap_ruby_namespace(namespace, body).join("\n")}\n"
     end
 
-    def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, version_require_path: nil)
+    def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, namespace_superclasses: {}, version_require_path: nil)
       current = normalize_entrypoint_version_require(
         content,
         entrypoint_require: entrypoint_require,
-        version_require_path: version_require_path
+        version_require_path: version_require_path,
+        after_declarations: !namespace_superclasses.empty?
       )
       current = remove_version_gem_class_eval_references(current) unless ruby_version_class_eval_namespaces(current).include?(namespace.to_s)
       lines = current.lines
@@ -15730,7 +15859,7 @@ module Kettle
       collapse_excess_blank_lines(updated)
     end
 
-    def version_gem_free_entrypoint_content(content, entrypoint_require:, ensure_version_require: true, version_require_path: nil)
+    def version_gem_free_entrypoint_content(content, entrypoint_require:, ensure_version_require: true, after_declarations: false, version_require_path: nil)
       current = remove_version_gem_entrypoint_references(content)
       unless ensure_version_require
         relative_path = version_require_path.to_s.empty? ? File.join(File.basename(entrypoint_require), "version") : version_require_path.to_s
@@ -15745,17 +15874,23 @@ module Kettle
       normalize_entrypoint_version_require(
         current,
         entrypoint_require: entrypoint_require,
-        version_require_path: version_require_path
+        version_require_path: version_require_path,
+        after_declarations: after_declarations
       )
     end
 
-    def normalize_entrypoint_version_require(content, entrypoint_require:, version_require_path: nil)
+    def normalize_entrypoint_version_require(content, entrypoint_require:, version_require_path: nil, after_declarations: false)
       relative_path = version_require_path.to_s.empty? ? File.join(File.basename(entrypoint_require), "version") : version_require_path.to_s
       absolute_path = File.join(entrypoint_require, "version")
       legacy_relative_path = File.join(File.basename(entrypoint_require), "version")
       current = [relative_path, legacy_relative_path].uniq.reduce(content) do |value, path|
         remove_entrypoint_version_requires(value, relative_path: path, absolute_path: absolute_path)
       end
+      if after_declarations
+        current = trim_trailing_blank_lines(collapse_excess_blank_lines(current))
+        return "#{current}\n\nrequire_relative \"#{relative_path}\"\n" unless current.empty?
+      end
+
       lines = current.lines
       lines.insert(version_gem_require_insertion_index(current), %(require_relative "#{relative_path}"\n), "\n")
       trim_trailing_blank_lines(collapse_excess_blank_lines(lines.join))
@@ -15923,6 +16058,9 @@ module Kettle
       kind = version_namespace_outer_kind(project_root, entrypoint_path, namespace)
       return kind if kind == :class
 
+      entrypoint_kind = ruby_namespace_declaration_kind(read_project_file(project_root, entrypoint_path), namespace)
+      return entrypoint_kind if entrypoint_kind == :class
+
       configured_kinds = version_namespace_kinds_from_facts(facts)
       target_index = namespace.to_s.split("::").count { |element| !element.empty? } - 1
       configured_kind = configured_kinds[target_index]
@@ -15943,6 +16081,16 @@ module Kettle
 
     def version_namespace_superclasses_from_facts(facts)
       raw = facts.dig(:rubygems, :version_namespace_superclasses)
+      return {} unless raw.is_a?(Hash)
+
+      raw.each_with_object({}) do |(index, superclass), superclasses|
+        value = superclass.to_s.strip
+        superclasses[index.to_i] = value unless value.empty?
+      end
+    end
+
+    def entrypoint_namespace_superclasses_from_facts(facts)
+      raw = facts.dig(:rubygems, :entrypoint_namespace_superclasses)
       return {} unless raw.is_a?(Hash)
 
       raw.each_with_object({}) do |(index, superclass), superclasses|
@@ -16064,6 +16212,27 @@ module Kettle
       end
     end
 
+    def existing_namespace_superclass_details(project_root, namespace, preferred_path: nil)
+      library_paths = [preferred_path, *ruby_library_source_paths(project_root)].compact.uniq
+      library_paths.each do |relative_path|
+        superclasses = existing_version_namespace_superclasses(project_root, relative_path, namespace)
+        next if superclasses.empty?
+
+        return {path: relative_path, superclasses: superclasses}
+      end
+
+      {path: nil, superclasses: {}}
+    end
+
+    def ruby_library_source_paths(project_root)
+      Dir.glob(File.join(project_root, "lib", "**", "*.rb")).sort.filter_map do |path|
+        relative_path = Pathname(path).relative_path_from(Pathname(project_root)).to_s
+        next if relative_path.end_with?("/version.rb", "/version_gem.rb")
+
+        relative_path
+      end
+    end
+
     def ruby_namespace_declaration_kind(content, namespace)
       target = namespace.to_s.split("::").reject(&:empty?)
       body = prism_parse_success(content)&.value&.statements&.body || []
@@ -16154,8 +16323,13 @@ module Kettle
       node&.slice.to_s.split("::").reject(&:empty?)
     end
 
-    def existing_entrypoint_version_namespace(project_root, relative_path)
+    def existing_entrypoint_version_namespace(project_root, relative_path, expected_depth: nil)
       content = read_project_file(project_root, relative_path)
+      if expected_depth
+        return ruby_entrypoint_module_namespace(content, expected_depth: expected_depth) ||
+            ruby_version_class_eval_namespaces(content).first
+      end
+
       ruby_version_class_eval_namespaces(content).first || ruby_entrypoint_module_namespace(content)
     end
 
@@ -16169,24 +16343,27 @@ module Kettle
       end
     end
 
-    def ruby_entrypoint_module_namespace(content)
+    def ruby_entrypoint_module_namespace(content, expected_depth: nil)
       body = prism_parse_success(content)&.value&.statements&.body || []
       body.each do |node|
-        namespace = ruby_entrypoint_module_namespace_for(node, [])
+        namespace = ruby_entrypoint_module_namespace_for(node, [], expected_depth: expected_depth)
         return namespace if namespace
       end
       nil
     end
 
-    def ruby_entrypoint_module_namespace_for(node, namespace)
+    def ruby_entrypoint_module_namespace_for(node, namespace, expected_depth: nil)
       return unless node.is_a?(::Prism::ModuleNode) || node.is_a?(::Prism::ClassNode)
 
       current = namespace + ruby_constant_path_segments(node.constant_path)
+      return current.join("::") if expected_depth && current.length == expected_depth
+      return if expected_depth && current.length > expected_depth
+
       node.body&.body&.each do |child|
-        child_namespace = ruby_entrypoint_module_namespace_for(child, current)
+        child_namespace = ruby_entrypoint_module_namespace_for(child, current, expected_depth: expected_depth)
         return child_namespace if child_namespace
       end
-      current.join("::") unless current.empty?
+      current.join("::") unless expected_depth || current.empty?
     end
 
     def read_project_file(project_root, relative_path)

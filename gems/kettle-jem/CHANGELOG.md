@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Keep external superclass expressions out of generated standalone version files.
+
 ### Security
 
 ## [7.1.8] - 2026-08-26

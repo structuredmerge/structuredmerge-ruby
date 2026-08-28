@@ -992,7 +992,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-  it "preserves a class namespace superclass when bootstrapping version_gem" do
+  it "does not copy a stale version-file superclass into generated version_gem files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-version-namespace-superclass", tmp_root) do |root|
@@ -1029,7 +1029,107 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       described_class.send(:template_version_gem_bootstrap_step, root, report)
 
       version_file = File.read(File.join(root, "lib/simple_column/scopes/version.rb"))
-      expect(version_file).to include("class Scopes < Module")
+      expect(version_file).to include("class Scopes\n")
+      expect(version_file).not_to include("class Scopes < Module")
+    end
+  end
+
+  it "does not copy an entrypoint superclass into the standalone version file" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-namespace-entrypoint-superclass", tmp_root) do |root|
+      write_tree(root, {
+        "activesupport-logger.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "activesupport-logger"
+            spec.version = "3.0.1"
+            spec.required_ruby_version = ">= 3.1.0"
+          end
+        RUBY
+        "lib/activesupport/logger.rb" => <<~RUBY,
+          module ActiveSupport
+            class Logger < ::Logger
+              class SimpleFormatter < ::Logger::Formatter
+              end
+            end
+          end
+        RUBY
+        "lib/activesupport/logger/version.rb" => <<~RUBY
+          module ActiveSupport
+            module Logger
+              module SimpleFormatter
+                VERSION = "3.0.1"
+              end
+            end
+          end
+        RUBY
+      })
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+      expect(facts.dig(:rubygems, :version_namespace_superclasses)).to be_nil
+      expect(facts.dig(:rubygems, :namespace)).to eq("ActiveSupport::Logger")
+      expect(facts.dig(:rubygems, :entrypoint_namespace_superclasses)).to include(1 => "::Logger")
+      report = {
+        facts: facts,
+        recipe_reports: [{relative_path: "lib/activesupport/logger/version.rb"}],
+        template_selection: {only: []}
+      }
+
+      described_class.send(:template_version_gem_bootstrap_step, root, report)
+
+      version_file = File.read(File.join(root, "lib/activesupport/logger/version.rb"))
+      expect(version_file).to include("class Logger\n    # Version namespace for this gem.")
+      expect(version_file).not_to include("SimpleFormatter")
+      expect(version_file).not_to include("< ::Logger")
+      expect(version_file).not_to include("< ::Logger::Formatter")
+      entrypoint_file = File.read(File.join(root, "lib/activesupport/logger.rb"))
+      expect(entrypoint_file.index("class Logger < ::Logger")).to be < entrypoint_file.index('require_relative "logger/version"')
+    end
+  end
+
+  it "puts the version require in a secondary namesake superclass declaration file" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-secondary-version-entrypoint", tmp_root) do |root|
+      write_tree(root, {
+        "nested-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "nested-gem"
+            spec.version = "0.1.0"
+            spec.required_ruby_version = ">= 2.4"
+          end
+        RUBY
+        "lib/nested/gem.rb" => <<~RUBY,
+          module Nested
+            autoload :Gem, "nested/gem/core"
+          end
+        RUBY
+        "lib/nested/gem/core.rb" => <<~RUBY,
+          module Nested
+            class Gem < ::Base
+            end
+          end
+        RUBY
+        "lib/nested/gem/version.rb" => <<~RUBY
+          module Nested
+            module Gem
+              module Version
+                VERSION = "0.1.0"
+              end
+            end
+          end
+        RUBY
+      })
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+
+      result = described_class.send(:version_gem_bootstrap_step_for_paths, root, facts)
+
+      expect(result).to include(entrypoint_path: "lib/nested/gem/core.rb")
+      version_file = File.read(File.join(root, "lib/nested/gem/version.rb"))
+      expect(version_file).to include("class Gem\n")
+      expect(version_file).not_to include("< ::Base")
+      entrypoint_file = File.read(File.join(root, "lib/nested/gem/core.rb"))
+      expect(entrypoint_file.index("class Gem < ::Base")).to be < entrypoint_file.index('require_relative "version"')
+      expect(File.read(File.join(root, "lib/nested/gem.rb"))).not_to include('require_relative "gem/version"')
     end
   end
 

@@ -387,6 +387,94 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
+  it "uses anonymous legacy version loading only for low-floor namesake superclasses" do
+    content = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "my-gem"
+        spec.version = "0.1.0"
+        spec.required_ruby_version = ">= 2.4"
+      end
+    RUBY
+    facts = {
+      package: {name: "my-gem"},
+      project_runtime: {version: "0.1.0"},
+      rubygems: {
+        entrypoint_require: "my/gem",
+        namespace: "My::Gem",
+        min_ruby: "2.4",
+        entrypoint_namespace_superclasses: {1 => "Module"}
+      }
+    }
+
+    gemspec = described_class.send(:rewrite_gemspec_version_loader, content, facts: facts)
+
+    expect(gemspec).to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
+    expect(gemspec).to include('require "anonymous_loader"')
+    expect(gemspec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+    expect(gemspec).not_to include('elsif Gem.ruby_version >= Gem::Version.new("2.2")')
+    expect(gemspec).to include("anonymous_namespace::My::Gem::Version::VERSION")
+    expect(gemspec).to include("spec.version = gem_version")
+  end
+
+  it "uses a literal gemspec version below the anonymous-loader Ruby floor" do
+    content = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "my-gem"
+        spec.version = "0.1.0"
+        spec.required_ruby_version = ">= 2.1"
+      end
+    RUBY
+    facts = {
+      package: {name: "my-gem"},
+      project_runtime: {version: "0.1.0"},
+      rubygems: {
+        entrypoint_require: "my/gem",
+        namespace: "My::Gem",
+        min_ruby: "2.1",
+        entrypoint_namespace_superclasses: {1 => "Module"}
+      }
+    }
+
+    gemspec = described_class.send(:rewrite_gemspec_version_loader, content, facts: facts)
+
+    expect(gemspec).to include('elsif Gem.ruby_version >= Gem::Version.new("2.2")')
+    expect(gemspec).to include("else\n    \"0.1.0\"")
+  end
+
+  it "does not add a runtime Ruby check for high-floor namesake superclasses" do
+    content = <<~RUBY
+      gem_version =
+        if Gem.ruby_version >= Gem::Version.new("3.1")
+          Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION
+        else
+          require_relative "lib/my/gem/version"
+          My::Gem::Version::VERSION
+        end
+
+      Gem::Specification.new do |spec|
+        spec.name = "my-gem"
+        spec.version = gem_version
+        spec.required_ruby_version = ">= 3.2"
+      end
+    RUBY
+    facts = {
+      package: {name: "my-gem"},
+      project_runtime: {version: "0.1.0"},
+      rubygems: {
+        entrypoint_require: "my/gem",
+        namespace: "My::Gem",
+        min_ruby: "3.2",
+        entrypoint_namespace_superclasses: {1 => "Module"}
+      }
+    }
+
+    gemspec = described_class.send(:rewrite_gemspec_version_loader, content, facts: facts)
+
+    expect(gemspec).to include("spec.version = Module.new.tap")
+    expect(gemspec).not_to include("gem_version =")
+    expect(gemspec).not_to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
+  end
+
   it "keeps load-path gemspec legacy version loading only when minimum Ruby is below 2.2" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
