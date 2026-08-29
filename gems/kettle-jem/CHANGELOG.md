@@ -35,6 +35,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-jem (>= 7.1.8 -> >= 7.1.10)
   - turbo_tests2 (>= 3.2.6 -> >= 3.2.7)
 
+- Raise first-party dependency minimums to their latest released versions.
+
 ### Deprecated
 
 ### Removed

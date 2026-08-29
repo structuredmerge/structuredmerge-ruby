@@ -103,11 +103,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency("commonmarker-merge", "~> 7.1", ">= 7.1.4")         # ruby >= 4.0.0
   spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.4")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.4")                 # ruby >= 4.0.0
-  spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.2")          # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", ">= 2.3.5", "< 4.0.0")                # ruby >= 2.3.0
-  spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.3")           # ruby >= 2.4.0
-  spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.3")             # ruby >= 2.4.0
-  spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.7")                  # ruby >= 1.8.7
+  spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.6")          # ruby >= 4.0.0
+  spec.add_dependency("kettle-dev", ">= 3.0.17", "< 4.0.0")               # ruby >= 2.3.0
+  spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.14")          # ruby >= 2.4.0
+  spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.13")            # ruby >= 2.4.0
+  spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.11")                 # ruby >= 1.8.7
   spec.add_dependency("kramdown-merge", "~> 7.1", ">= 7.1.4")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "~> 7.1", ">= 7.1.4")             # ruby >= 4.0.0
   spec.add_dependency("markly-merge", "~> 7.1", ">= 7.1.4")               # ruby >= 4.0.0
@@ -117,7 +117,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("rbs", ">= 3.10")                                  # ruby >= 3.1.0
   spec.add_dependency("rbs-merge", "~> 7.1", ">= 7.1.4")                  # ruby >= 4.0.0
   spec.add_dependency("ruby-merge", "~> 7.1", ">= 7.1.4")                 # ruby >= 4.0.0
-  spec.add_dependency("token-resolver", "~> 2.0", ">= 2.0.4")            # ruby >= 3.2.0
+  spec.add_dependency("token-resolver", "~> 2.0", ">= 2.0.10")           # ruby >= 3.2.0
   spec.add_dependency("toml-merge", "~> 7.1", ">= 7.1.4")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "~> 7.1", ">= 7.1.4")                 # ruby >= 4.0.0
@@ -150,7 +150,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("anonymous_loader", "~> 0.1", ">= 0.1.3")         # ruby >= 2.2.0
   spec.add_development_dependency("appraisal2", "~> 3.2", ">= 3.2.2")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
   spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.21")            # ruby >= 4.0.0
-  spec.add_development_dependency("turbo_tests2", "~> 3.2", ">= 3.2.6")           # ruby >= 2.4.0, default kettle-test runner
+  spec.add_development_dependency("turbo_tests2", "~> 3.2", ">= 3.2.7")           # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0
