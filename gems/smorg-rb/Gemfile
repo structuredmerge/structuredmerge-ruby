@@ -21,7 +21,7 @@ gemspec
 gem 'kettle-family', '~> 1.2', '>= 1.2.64'
 
 # Local workspace dependency wiring for *_local.gemfile overrides
-gem 'nomono', '~> 1.1', '>= 1.1.4', require: false # ruby >= 3.2.0
+gem 'nomono', '~> 1.1', '>= 1.1.5', require: false # ruby >= 3.2.0
 
 # Direct sibling dependencies (env-switched via STRUCTUREDMERGE_DEV)
 direct_sibling_gems = %w[
@@ -35,12 +35,12 @@ direct_sibling_gems = %w[
   kettle-jem
   markdown-merge
   plain-merge
+  prism-merge
+  psych-merge
   rbs-merge
   rust-merge
   toml-merge
   typescript-merge
-  prism-merge
-  psych-merge
 ]
 direct_sibling_dev = ENV.fetch('STRUCTUREDMERGE_DEV', '')
 direct_sibling_local =
