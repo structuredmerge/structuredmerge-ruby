@@ -76,11 +76,56 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h3 id="changed">Changed</h3>
 
+<ul>
+  <li>
+    <p>Record template-run changelog updates before the bootstrap commit so generated changes and their maintenance summary are committed together.</p>
+  </li>
+  <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+    <ul>
+      <li>kettle-changelog (&gt;= 1.0.3 -&gt; &gt;= 1.0.5)</li>
+      <li>kettle-dev (&gt;= 3.0.13 -&gt; &gt;= 3.0.16)</li>
+      <li>kettle-drift (&gt;= 1.0.12 -&gt; &gt;= 1.0.13)</li>
+      <li>kettle-family (&gt;= 1.2.62 -&gt; &gt;= 1.2.63)</li>
+      <li>kettle-jem (&gt;= 7.1.7 -&gt; &gt;= 7.1.8)</li>
+      <li>kettle-soup-cover (&gt;= 3.0.9 -&gt; &gt;= 3.0.10)</li>
+      <li>kettle-test (&gt;= 2.0.20 -&gt; &gt;= 2.0.21)</li>
+      <li>nomono (&gt;= 1.1.4 -&gt; &gt;= 1.1.5)</li>
+    </ul>
+  </li>
+  <li>[kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+    <ul>
+      <li>apache/skywalking-eyes/dependency v0.8.0 (61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1) -&gt; v0.9.0 (a196742f472feaffafea537ce5a2a4c3c53a8de4)</li>
+      <li>github/codeql-action/analyze v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) -&gt; v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938)</li>
+      <li>github/codeql-action/autobuild v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) -&gt; v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938)</li>
+      <li>github/codeql-action/init v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) -&gt; v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938)</li>
+    </ul>
+  </li>
+  <li>[kc] kettle-jem/template: updated 1194 project files:
+    <ul>
+      <li>code and tests (60)</li>
+      <li>configuration (36)</li>
+      <li>dependencies (441)</li>
+      <li>documentation (27)</li>
+      <li>other (369)</li>
+      <li>workflows (261)</li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="deprecated">Deprecated</h3>
 
 <h3 id="removed">Removed</h3>
 
 <h3 id="fixed">Fixed</h3>
+
+<ul>
+  <li>
+    <p>Keep external superclass expressions out of generated standalone version files.</p>
+  </li>
+  <li>
+    <p>Skip template changelog recording for partial destination projects that do not contain a changelog.</p>
+  </li>
+</ul>
 
 <h3 id="security">Security</h3>
 
@@ -1963,7 +2008,7 @@ preserving comments and trailing commas during template updates.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Wed Aug 26 10:39:23 2026 by
+  Generated on Fri Aug 28 22:31:15 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

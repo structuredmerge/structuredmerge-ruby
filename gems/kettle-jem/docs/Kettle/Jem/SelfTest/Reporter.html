@@ -218,7 +218,6 @@
       <pre class="lines">
 
 
-2488
 2489
 2490
 2491
@@ -233,10 +232,11 @@
 2500
 2501
 2502
-2503</pre>
+2503
+2504</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2488</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2489</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_append_self_test_table'>append_self_test_table</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_title'>title</span><span class='comma'>,</span> <span class='id identifier rubyid_paths'>paths</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_paths'>paths</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -274,7 +274,6 @@
       <pre class="lines">
 
 
-2505
 2506
 2507
 2508
@@ -288,10 +287,11 @@
 2516
 2517
 2518
-2519</pre>
+2519
+2520</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2505</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2506</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_append_skipped_files'>append_skipped_files</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_skipped'>skipped</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_skipped'>skipped</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -328,7 +328,6 @@
       <pre class="lines">
 
 
-2427
 2428
 2429
 2430
@@ -339,10 +338,11 @@
 2435
 2436
 2437
-2438</pre>
+2438
+2439</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2427</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2428</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_diff'>diff</span><span class='lparen'>(</span><span class='id identifier rubyid_file_a'>file_a</span><span class='comma'>,</span> <span class='id identifier rubyid_file_b'>file_b</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_a'>a</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_file_a'>file_a</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_file_a'>file_a</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>:</span> <span class='const'>File</span><span class='op'>::</span><span class='const'>NULL</span>
@@ -376,7 +376,6 @@
       <pre class="lines">
 
 
-2440
 2441
 2442
 2443
@@ -422,10 +421,11 @@
 2483
 2484
 2485
-2486</pre>
+2486
+2487</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2440</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2441</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_summary'>summary</span><span class='lparen'>(</span><span class='id identifier rubyid_comparison'>comparison</span><span class='comma'>,</span> <span class='label'>output_dir:</span><span class='comma'>,</span> <span class='label'>templating_environment:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>diff_count:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>now:</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_matched'>matched</span> <span class='op'>=</span> <span class='id identifier rubyid_comparison'>comparison</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:matched</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -484,7 +484,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Aug 26 10:39:25 2026 by
+  Generated on Fri Aug 28 22:31:17 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
