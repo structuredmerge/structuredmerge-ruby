@@ -34,6 +34,12 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-test (>= 2.0.20 -> >= 2.0.21)
   - nomono (>= 1.1.4 -> >= 1.1.5)
 
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - apache/skywalking-eyes/dependency v0.8.0 (61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1) -> v0.9.0 (a196742f472feaffafea537ce5a2a4c3c53a8de4)
+  - github/codeql-action/analyze v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) -> v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938)
+  - github/codeql-action/autobuild v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) -> v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938)
+  - github/codeql-action/init v4.37.8 (db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) -> v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938)
+
 ### Deprecated
 
 ### Removed
