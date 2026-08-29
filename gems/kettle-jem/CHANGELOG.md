@@ -22,14 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- [kc] kettle-jem/prepare: updated 13 project files:
-  - dependencies (13)
-
-- [kc] kettle-jem/template: updated 3 project files:
-  - code and tests (1)
-  - dependencies (1)
-  - other (1)
-
 ### Deprecated
 
 ### Removed
@@ -41,8 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ## [7.1.10] - 2026-08-29
 
 - TAG: [v7.1.10][7.1.10t]
-- COVERAGE: 93.55% -- 10937/11691 lines in 16 files
-- BRANCH COVERAGE: 76.94% -- 4659/6055 branches in 16 files
+- COVERAGE: 93.56% -- 10937/11690 lines in 16 files
+- BRANCH COVERAGE: 76.95% -- 4658/6053 branches in 16 files
 - 17.92% documented
 
 ### Changed
@@ -76,6 +68,14 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-dev (>= 3.0.16 -> >= 3.0.17)
   - kettle-family (>= 1.2.63 -> >= 1.2.64)
+
+- [kc] kettle-jem/prepare: updated 13 project files:
+  - dependencies (13)
+
+- [kc] kettle-jem/template: updated 3 project files:
+  - code and tests (1)
+  - dependencies (1)
+  - other (1)
 
 ### Fixed
 
