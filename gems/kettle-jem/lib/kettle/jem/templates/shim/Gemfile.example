@@ -6,7 +6,7 @@ shimmed_gem_path = ENV["KETTLE_JEM_SHIMMED_GEM_PATH"].to_s
 gem "{KJ|SHIMMED_GEM_NAME}", path: shimmed_gem_path unless shimmed_gem_path.empty?
 
 # Local workspace dependency wiring for templating_local.gemfile overrides.
-gem "nomono", "~> 1.1", ">= 1.1.4", require: false # ruby >= 3.2.0
+gem "nomono", "~> 1.1", ">= 1.1.5", require: false # ruby >= 3.2.0
 
 # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
 eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?

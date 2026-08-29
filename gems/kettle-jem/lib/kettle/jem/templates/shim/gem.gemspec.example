@@ -30,13 +30,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency "{KJ|SHIMMED_GEM_NAME}"
 
   # Dev, Test, & Release Tasks
-  spec.add_development_dependency("kettle-dev", "~> 3.0", ">= 3.0.13")             # ruby >= {KJ|MIN_TEST_RUBY}
+  spec.add_development_dependency("kettle-dev", "~> 3.0", ">= 3.0.16")             # ruby >= {KJ|MIN_TEST_RUBY}
 
   # Tasks
   spec.add_development_dependency "rake", "~> 13.0"
 
   # Testing
-  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.20")            # ruby >= {KJ|MIN_TEST_RUBY}
+  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.21")            # ruby >= {KJ|MIN_TEST_RUBY}
   spec.add_development_dependency "rspec", "~> 3.12"
 
   # Releasing

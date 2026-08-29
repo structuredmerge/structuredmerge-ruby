@@ -24,6 +24,16 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Record template-run changelog updates before the bootstrap commit so generated changes and their maintenance summary are committed together.
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-changelog (>= 1.0.3 -> >= 1.0.5)
+  - kettle-dev (>= 3.0.13 -> >= 3.0.16)
+  - kettle-drift (>= 1.0.12 -> >= 1.0.13)
+  - kettle-family (>= 1.2.62 -> >= 1.2.63)
+  - kettle-jem (>= 7.1.7 -> >= 7.1.8)
+  - kettle-soup-cover (>= 3.0.9 -> >= 3.0.10)
+  - kettle-test (>= 2.0.20 -> >= 2.0.21)
+  - nomono (>= 1.1.4 -> >= 1.1.5)
+
 ### Deprecated
 
 ### Removed

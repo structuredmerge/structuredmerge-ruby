@@ -5396,11 +5396,11 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.2"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.13"\n)},
-        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.12"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.62"\n)},
-        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.7"\n)},
-        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.20"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.16"\n)},
+        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.63"\n)},
+        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.8"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.8"\n)},
@@ -14200,7 +14200,7 @@ module Kettle
               root: ["src", "my", "kettle-dev"]
             )
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 1.0", ">= 1.0.3"
+            gem "kettle-changelog", "~> 1.0", ">= 1.0.5"
           end
         end
       RUBY
@@ -15224,7 +15224,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.62"\n)
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.63"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -15237,7 +15237,7 @@ module Kettle
     end
 
     def nomono_gemfile_declaration
-      %(gem "nomono", "~> 1.1", ">= 1.1.4", require: false # ruby >= 3.2.0)
+      %(gem "nomono", "~> 1.1", ">= 1.1.5", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
@@ -15245,7 +15245,7 @@ module Kettle
         # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
         # Bundler records that dependency during Gemfile evaluation, but it does not
         # activate that exact version before the immediate `require "nomono/bundler"`.
-        nomono_activation_requirements = ["~> 1.1", ">= 1.1.4"]
+        nomono_activation_requirements = ["~> 1.1", ">= 1.1.5"]
         nomono_requirement = Gem::Requirement.new(nomono_activation_requirements)
         nomono_already_activated = Gem.loaded_specs["nomono"]
         nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
