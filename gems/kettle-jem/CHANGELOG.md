@@ -45,6 +45,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve inherited version namespaces by declaring their superclass before loading version.rb.
 
+- Template-manage default local test bundles independently from appraisal and framework CI matrices.
+
 ### Security
 
 ## [7.1.10] - 2026-08-29

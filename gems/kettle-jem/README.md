@@ -268,7 +268,77 @@ good fit when you want kettle-jem to generate framework-version modular gemfiles
 
 If you need a deeper or more complex matrix, prefer
 **`kettle-jem-appraisals`**, which generates `Appraisals` entries and is the
-better fit for Appraisals-style combinations.
+better fit for Appraisals-style combinations. Its `appraisal_matrix` config is
+the source of truth for the generated matrix: use `mode` (or per-gem `mode`),
+`freshness_ttl`, `exec_cmd`, `appraisal_gemfiles`, `standard_appraisal_role`,
+and `gems.tier1` / `gems.tier2` as documented in the
+[`kettle-jem-appraisals` configuration reference](https://github.com/appraisal-rb/kettle-jem-appraisals#%EF%B8%8F-configuration).
+
+Neither `appraisal_matrix` nor `framework_matrix` implicitly changes the root
+local development bundle. Pair either policy with `test_bundle` when the
+default local test command needs a specific framework or harness.
+
+### Default Local Test Bundle
+
+The root `Gemfile` is the default bundle for local commands such as
+`bundle exec kettle-test`. It is intentionally separate from Appraisals and
+CI, which run with their own generated Gemfiles. Declare its project-specific
+test dependencies with `test_bundle`; kettle-jem will add them to the root
+`Gemfile` on every template run.
+
+Use `test_bundle.gemfiles` for a modular fragment. A mapping may name direct
+dependencies that the fragment replaces, so kettle-jem removes stale root
+declarations before adding the `eval_gemfile` call:
+
+```yaml
+test_bundle:
+  gemfiles:
+    - path: gemfiles/rails_7_2.gemfile
+      replaces:
+        - combustion
+        - actionmailer
+        - railties
+```
+
+Use `test_bundle.gems` for a small, explicit local test dependency that does
+not warrant a modular fragment. Use either `requirement` or `requirements`; set
+`require: false` only when the dependency must be available to Bundler but
+should not be automatically required:
+
+```yaml
+test_bundle:
+  gems:
+    - name: activerecord
+      requirement: "~> 7.2"
+    - name: debug
+      requirement: "~> 1.11"
+      require: false
+```
+
+For a simple `workflows.framework_matrix`, mark exactly one version as
+`default: true` to load that generated framework gemfile into the root
+`Gemfile` as the local default. The matrix still controls Appraisals and CI;
+the flag only selects the root local bundle. `appraisal_matrix` deliberately
+has no implicit default selector: use `test_bundle` to name the stable local
+Gemfile fragment or direct dependencies while the plugin continues to generate
+the full appraisal matrix.
+
+```yaml
+workflows:
+  preset: framework
+  framework_matrix:
+    dimension: rails
+    gem: rails
+    gemfile_pattern: "rails_{version}.gemfile"
+    versions:
+      - label: "7.2"
+        slug: "7_2"
+        requirement: "~> 7.2.2"
+        default: true
+```
+
+Do not use freeze markers for any of these declarations. The configuration is
+the source of truth, and templating keeps the root bundle synchronized with it.
 
 ### Strategies
 

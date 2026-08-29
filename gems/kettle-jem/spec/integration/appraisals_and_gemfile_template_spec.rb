@@ -481,6 +481,91 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "manages the default local test bundle separately from Appraisals" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-default-test-bundle", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          test_bundle:
+            gemfiles:
+              - path: gemfiles/rails_7_2.gemfile
+                replaces:
+                  - combustion
+                  - actionmailer
+                  - railties
+            gems:
+              - name: activerecord
+                requirement: "~> 7.2"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec
+
+          gem "combustion", "~> 1.5"
+          gem "actionmailer", "~> 7.2.2"
+          gem "railties", "~> 7.2.2"
+          gem "activerecord", "~> 7.1"
+
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec
+
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      content = apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "Gemfile" }.fetch(:final_content)
+
+      expect(content).to include("# Default local test bundle")
+      expect(content).to include('eval_gemfile "gemfiles/rails_7_2.gemfile"')
+      expect(content).to include('gem "activerecord", "~> 7.2"')
+      expect(content).not_to include('gem "combustion"')
+      expect(content).not_to include('gem "actionmailer"')
+      expect(content).not_to include('gem "railties"')
+      expect(content).not_to include('gem "activerecord", "~> 7.1"')
+    end
+  end
+
+  it "uses one framework-matrix default version for the default local test bundle" do
+    config = {
+      "workflows" => {
+        "preset" => "framework",
+        "framework_matrix" => {
+          "dimension" => "rails",
+          "gem" => "rails",
+          "gemfile_pattern" => "rails_{version}.gemfile",
+          "versions" => [
+            {"label" => "7.2", "slug" => "7_2", "requirement" => "~> 7.2.2", "default" => true}
+          ]
+        }
+      }
+    }
+
+    framework_matrix = described_class.send(:github_actions_framework_matrix, config)
+    bundle = described_class.send(:default_test_bundle_config, config, framework_matrix)
+
+    expect(bundle).to include(gemfiles: ["gemfiles/rails_7_2.gemfile"], gems: [], managed_gems: [])
+  end
+
   it "does not add broad standard support gemfiles to collapsed framework appraisals" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

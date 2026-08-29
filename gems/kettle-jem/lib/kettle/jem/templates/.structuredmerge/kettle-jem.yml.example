@@ -215,6 +215,11 @@ rubyforum:
 #                   label       - display value used in CI
 #                   slug        - path-safe value used in gemfile_pattern
 #                   requirement - Bundler requirement written to the gemfile
+#                   default     - true for the one generated framework
+#                                 gemfile loaded by the root Gemfile for local
+#                                 `bundle exec kettle-test` commands
+#                   replaces    - direct root Gemfile dependencies replaced by
+#                                 the default framework gemfile
 #   gemfile_pattern — pattern for gemfile paths; {version} is replaced
 #                     with each version slug (dots replaced by underscores
 #                     when the pattern contains an underscore placeholder).
@@ -225,7 +230,9 @@ rubyforum:
 #                       "rails_{version}"      → gemfiles/rails_7_0.gemfile
 #   Use this when you need a simple 2D matrix: Ruby × one framework gem/version axis.
 #   For deeper or more complex matrices that are better modeled as Appraisals entries,
-#   prefer kettle-jem-appraisals instead.
+#   prefer the kettle-jem-appraisals plugin instead. Its appraisal_matrix config
+#   controls generated Appraisals and CI strategy; pair it with test_bundle below
+#   when the root local Gemfile needs a stable framework or harness.
 #
 workflows:
   # Default command used by generated test workflows.
@@ -246,6 +253,35 @@ workflows:
   #       slug: "8_0_plus"
   #       requirement: ">= 8.0"
   #   gemfile_pattern: "ar-{version}.x"
+
+# Appraisal matrices are owned by the kettle-jem-appraisals plugin. It uses
+# appraisal_matrix.mode, freshness_ttl, exec_cmd, appraisal_gemfiles,
+# standard_appraisal_role, and gems.tier1 / gems.tier2 to generate the full
+# Appraisals and CI matrix. It does not implicitly select the root local bundle;
+# configure test_bundle below for that purpose.
+
+# Default local test bundle.
+# The root Gemfile is used by local bundle commands and is separate from
+# Appraisals and CI, which use their own generated Gemfiles. Declare the
+# project-specific test stack here instead of preserving it with freeze markers.
+#
+# gemfiles accepts either a path string or a mapping. `replaces` removes direct
+# root Gemfile declarations that are supplied by the modular fragment.
+# gems adds a direct declaration when a modular fragment is not warranted.
+#
+# test_bundle:
+#   gemfiles:
+#     - path: gemfiles/rails_7_2.gemfile
+#       replaces:
+#         - combustion
+#         - actionmailer
+#         - railties
+#   gems:
+#     - name: activerecord
+#       requirement: "~> 7.2"
+#     - name: debug
+#       requirement: "~> 1.11"
+#       require: false
 
 # Project-level third-party integrations.
 # Disabling an integration removes its upload/check action, suppresses its

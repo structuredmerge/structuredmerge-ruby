@@ -3539,6 +3539,8 @@ module Kettle
       facts[:ci][:coverage] = coverage_config unless coverage_config.empty?
       framework_matrix = github_actions_framework_matrix(kettle_config)
       facts[:ci][:framework_matrix] = framework_matrix unless framework_matrix.empty?
+      default_test_bundle = default_test_bundle_config(kettle_config, framework_matrix)
+      facts[:ci][:default_test_bundle] = default_test_bundle unless default_test_bundle.empty?
       template_facts = {}
       template_preferences = template_source_preferences(
         project_root,
@@ -7977,6 +7979,7 @@ module Kettle
           output = preserve_destination_gemfile_source(output, destination_content)
         end
         output = inject_main_gemfile_recording_eval(output, facts)
+        output = inject_main_gemfile_default_test_bundle(output, facts)
         output = remove_stale_main_gemfile_tree_sitter_language_pack(output, template_content)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
         output = deduplicate_main_gemfile_direct_sibling_blocks(output)
@@ -9309,6 +9312,43 @@ module Kettle
       insert_at = main_gemfile_recording_insertion_index(content) || lines.length
       lines.insert(insert_at, "# Test HTTP Interaction Recording\n", %(eval_gemfile "#{main_gemfile_recording_eval_path}"\n), "\n")
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    # The root Gemfile is the local-development bundle. Appraisals and CI use
+    # their own Gemfiles, so a project that needs a framework or application
+    # harness locally must declare that dependency separately in test_bundle.
+    def inject_main_gemfile_default_test_bundle(content, facts)
+      bundle = facts.to_h.dig(:ci, :default_test_bundle).to_h
+      return content if bundle.empty?
+
+      managed_gems = bundle.fetch(:managed_gems, [])
+      output = remove_gemfile_dependency_blocks(content, managed_gems)
+      existing_paths = gemfile_eval_paths(output).to_set
+      additions = bundle.fetch(:gemfiles, []).filter_map do |path|
+        next if existing_paths.include?(path)
+
+        %(eval_gemfile "#{path}")
+      end
+      additions.concat(bundle.fetch(:gems, []).map { |gem| default_test_bundle_gem_source(gem) })
+      return output if additions.empty?
+
+      lines = output.to_s.lines
+      insert_at = main_gemfile_default_test_bundle_insertion_index(output) || lines.length
+      block = ["# Default local test bundle", *additions].join("\n")
+      lines.insert(insert_at, "#{block}\n\n")
+      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def default_test_bundle_gem_source(gem)
+      arguments = [gem.fetch(:name).inspect, *gem.fetch(:requirements, []).map(&:inspect)]
+      arguments << "require: false" if gem[:require] == false
+      "gem #{arguments.join(', ')}"
+    end
+
+    def main_gemfile_default_test_bundle_insertion_index(content)
+      main_gemfile_templating_eval_line(content) ||
+        main_gemfile_first_eval_gemfile_line(content) ||
+        main_gemfile_after_gemspec_line(content)
     end
 
     def main_gemfile_recording_insertion_index(content)
@@ -18733,9 +18773,12 @@ module Kettle
           path: framework_gemfile_path(gemfile),
           gem: framework_gem,
           requirement: entry.fetch(:requirement),
-          env: entry.fetch(:env, {})
+          env: entry.fetch(:env, {}),
+          default: entry.fetch(:default, false),
+          replaces: entry.fetch(:replaces, [])
         }
       end.uniq { |entry| entry.fetch(:path) }
+      default_gemfiles = gemfiles.select { |entry| entry[:default] }
       gemfiles.reject! { |entry| template_keep_destination_path?(config, entry.fetch(:path)) }
       {
         dimension: dimension,
@@ -18750,6 +18793,7 @@ module Kettle
           }
         end,
         gemfiles: gemfiles,
+        default_gemfiles: default_gemfiles,
         appraisals: version_entries.map do |entry|
           gemfile = framework_gemfile_path(expand_framework_gemfile_pattern(pattern, entry.fetch(:slug)))
           name = entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug))
@@ -18804,12 +18848,16 @@ module Kettle
         requirement = raw.fetch("requirement", default_framework_matrix_requirement(label)).to_s.strip
         appraisal_name = (raw["appraisal"] || raw["appraisal_name"] || raw["standard_appraisal"]).to_s.strip
         env = framework_matrix_env(raw["env"])
+        default = DecisionPolicy.value_to_boolean(raw["default"]) == true
+        replaces = Array(raw["replaces"]).filter_map { |name| nonempty_string(name) }
       else
         label = raw.to_s.strip
         slug = label
         requirement = default_framework_matrix_requirement(label)
         appraisal_name = ""
         env = {}
+        default = false
+        replaces = []
       end
       return if label.empty? || slug.empty? || requirement.empty?
 
@@ -18821,7 +18869,73 @@ module Kettle
       entry[:appraisal_name] = appraisal_name unless appraisal_name.empty?
       entry[:standard_appraisal] = true if raw.is_a?(Hash) && raw["standard_appraisal"]
       entry[:env] = env unless env.empty?
+      entry[:default] = true if default
+      entry[:replaces] = replaces unless replaces.empty?
       entry
+    end
+
+    # Configures the dependencies used by `bundle exec kettle-test` without a
+    # BUNDLE_GEMFILE override. This intentionally does not alter Appraisals or
+    # CI matrices: those are owned by appraisal_matrix/framework_matrix.
+    def default_test_bundle_config(config, framework_matrix)
+      raw = config["test_bundle"]
+      raw = {} unless raw.is_a?(Hash)
+
+      gemfiles = Array(raw["gemfiles"]).filter_map { |entry| default_test_bundle_gemfile_entry(entry) }
+      gems = Array(raw["gems"]).filter_map { |entry| default_test_bundle_gem_entry(entry) }
+      framework_defaults = framework_matrix.to_h.fetch(:default_gemfiles, []).select { |entry| entry[:default] }
+      if framework_defaults.length > 1
+        paths = framework_defaults.map { |entry| entry.fetch(:path) }.join(", ")
+        raise ArgumentError, "workflows.framework_matrix has multiple default versions: #{paths}"
+      end
+      if (framework_default = framework_defaults.first)
+        gemfiles << {
+          path: framework_default.fetch(:path),
+          replaces: framework_default.fetch(:replaces, [])
+        }
+      end
+
+      return {} if gemfiles.empty? && gems.empty?
+
+      {
+        gemfiles: gemfiles.map { |entry| entry.fetch(:path) }.uniq,
+        gems: gems,
+        managed_gems: (gems.map { |entry| entry.fetch(:name) } + gemfiles.flat_map { |entry| entry.fetch(:replaces, []) }).uniq
+      }
+    end
+
+    def default_test_bundle_gemfile_entry(raw)
+      if raw.is_a?(Hash)
+        path = raw["path"].to_s.strip
+        replaces = Array(raw["replaces"]).filter_map { |name| nonempty_string(name) }
+      else
+        path = raw.to_s.strip
+        replaces = []
+      end
+      return if path.empty?
+
+      {path: path.start_with?("gemfiles/") ? path : "gemfiles/#{path}", replaces: replaces}
+    end
+
+    def default_test_bundle_gem_entry(raw)
+      return unless raw.is_a?(Hash)
+
+      name = (raw["name"] || raw["gem"]).to_s.strip
+      return if name.empty?
+
+      requirements = raw.key?("requirements") ? Array(raw["requirements"]) : [raw["requirement"]]
+      entry = {
+        name: name,
+        requirements: requirements.filter_map { |requirement| nonempty_string(requirement) }
+      }
+      require_value = DecisionPolicy.value_to_boolean(raw["require"])
+      entry[:require] = false if require_value == false
+      entry
+    end
+
+    def nonempty_string(value)
+      normalized = value.to_s.strip
+      normalized unless normalized.empty?
     end
 
     def framework_matrix_env(raw)
