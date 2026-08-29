@@ -6,7 +6,7 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-# ruby-merge Rakefile v7.1.5 - 2026-08-23
+# ruby-merge Rakefile v7.1.8 - 2026-08-29
 # Ruby 2.3 (Safe Navigation) or higher required
 #
 # See LICENSE.md for license information.
@@ -15,8 +15,7 @@
 #
 # Expected to work in any project that uses Bundler.
 #
-# Sets up tasks for appraisal2, floss_funding, kettle-jem, kettle-dev, rspec,
-# minitest, rubocop_gradual, reek, yard, and stone_checksums.
+# Sets up tasks for appraisal2, floss_funding, kettle-jem, kettle-dev, rspec, minitest, rubocop_gradual, reek, yard, and stone_checksums.
 #
 # rake appraisal:install                      # Install Appraisal gemfiles (initial setup...
 # rake appraisal:reset                        # Delete Appraisal lockfiles (gemfiles/*.gemfile.lock)
@@ -79,8 +78,6 @@ if Dir.exist?(File.join(__dir__, 'gems'))
     sh('bundle', 'exec', 'kettle-family', *args)
   end
 
-  # The family namespace intentionally keeps the monorepo task surface together.
-  # rubocop:disable Metrics/BlockLength
   namespace :family do
     desc 'List released Ruby subgems'
     task :list do
@@ -122,7 +119,6 @@ if Dir.exist?(File.join(__dir__, 'gems'))
       run_kettle_family('release', '--execute')
     end
   end
-  # rubocop:enable Metrics/BlockLength
 end
 # simplecov:enable
 
@@ -132,27 +128,6 @@ begin
   Kettle::Dev.install_tasks unless Kettle::Dev::RUNNING_AS == 'rake'
 rescue LoadError
   warn("NOTE: kettle-dev isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
-end
-
-### DUPLICATE DRIFT TASKS
-begin
-  require 'kettle/drift'
-  Kettle::Drift.install_tasks
-rescue LoadError
-  desc('(stub) kettle:drift:check is unavailable')
-  task('kettle:drift:check') do
-    warn("NOTE: kettle-drift isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
-  end
-  desc('(stub) kettle:drift:update is unavailable')
-  task('kettle:drift:update') do
-    warn("NOTE: kettle-drift isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
-  end
-  desc('(stub) kettle:drift:force_update is unavailable')
-  task('kettle:drift:force_update') do
-    warn("NOTE: kettle-drift isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
-  end
-  desc('(stub) kettle:drift is unavailable')
-  task('kettle:drift' => 'kettle:drift:update')
 end
 
 ### TEMPLATING TASKS
@@ -166,12 +141,10 @@ begin
   if Kettle::Jem.respond_to?(:install_tasks)
     Kettle::Jem.install_tasks
   else
-    kettle_jem_selftest_unavailable_note = \
-      "NOTE: kettle-jem #{Kettle::Jem::Version::VERSION} does not provide rake tasks in this environment"
+    kettle_jem_selftest_unavailable_note = "NOTE: kettle-jem #{Kettle::Jem::Version::VERSION} does not provide rake tasks in this environment"
   end
 rescue LoadError
-  kettle_jem_selftest_unavailable_note = \
-    "NOTE: kettle-jem isn't installed, or is disabled for #{RUBY_VERSION} in the current environment"
+  kettle_jem_selftest_unavailable_note = "NOTE: kettle-jem isn't installed, or is disabled for #{RUBY_VERSION} in the current environment"
 end
 
 if kettle_jem_selftest_unavailable_note

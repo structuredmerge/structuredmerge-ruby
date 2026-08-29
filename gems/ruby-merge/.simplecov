@@ -11,9 +11,9 @@
 #   and in 2 places in .github/workflows/coverage.yml.
 SimpleCov.configure do
   if SimpleCov::Configuration.instance_methods.include?(:cover)
-    cover 'lib/**/*.rb', 'lib/**/*.rake', 'exe/*.rb'
+    cover "lib/**/*.rb", "lib/**/*.rake", "exe/*.rb"
   else
-    track_files '{lib/**/*.rb,lib/**/*.rake,exe/*.rb}'
+    track_files "{lib/**/*.rb,lib/**/*.rake,exe/*.rb}"
   end
   cover 'lib/**/*.rb', 'lib/**/*.rake', 'exe/*.rb'
 end
