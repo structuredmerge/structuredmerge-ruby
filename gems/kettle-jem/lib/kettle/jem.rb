@@ -5399,12 +5399,12 @@ module Kettle
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.17"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.64"\n)},
-        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.8"\n)},
+        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.10"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.8"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.6"\n)}
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.7"\n)}
       ].freeze
     end
 
@@ -14199,7 +14199,7 @@ module Kettle
               root: ["src", "my", "kettle-dev"]
             )
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 1.0", ">= 1.0.5"
+            gem "kettle-changelog", "~> 1.0", ">= 1.0.6"
           end
         end
       RUBY

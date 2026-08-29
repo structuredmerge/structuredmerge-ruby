@@ -30,6 +30,11 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (123)
   - workflows (87)
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-changelog (>= 1.0.5 -> >= 1.0.6)
+  - kettle-jem (>= 7.1.8 -> >= 7.1.10)
+  - turbo_tests2 (>= 3.2.6 -> >= 3.2.7)
+
 ### Deprecated
 
 ### Removed
