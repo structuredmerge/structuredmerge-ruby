@@ -339,7 +339,8 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       expect(install.fetch(:mode)).to eq("install")
       expect(install.fetch(:installed)).to be(true)
-      expect(install.fetch(:changed_files)).to eq(["CHANGELOG.md", "bin/setup"])
+      expect(install.fetch(:changed_files)).to eq(["bin/setup"])
+      expect(install.fetch(:changelog)).to include(status: "skipped", reason: "missing_changelog")
       expect(install.fetch(:install_steps)).to include(
         name: "bin_setup_executable",
         path: "bin/setup",

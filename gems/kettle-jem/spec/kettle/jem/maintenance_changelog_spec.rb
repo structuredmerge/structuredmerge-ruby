@@ -73,6 +73,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
     it "records one keyed aggregate entry for actual template changes" do
       options = nil
+      allow(File).to receive(:file?).with("/workspace/example/CHANGELOG.md").and_return(true)
       allow(described_class).to receive(:upsert_unreleased_entry) do |**received_options|
         options = received_options
         {status: "updated", entry: "rendered entry"}
@@ -124,6 +125,20 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       expect(described_class).not_to have_received(:upsert_unreleased_entry)
     end
 
+    it "skips changelog recording for partial destination projects without a changelog" do
+      allow(described_class).to receive(:upsert_unreleased_entry)
+
+      Dir.mktmpdir("kettle-jem-maintenance-changelog-missing") do |root|
+        result = described_class.record_template_run(
+          project_root: root,
+          report: report
+        )
+
+        expect(result.fetch(:changelog)).to include(status: "skipped", reason: "missing_changelog")
+        expect(described_class).not_to have_received(:upsert_unreleased_entry)
+      end
+    end
+
     it "supports an explicit changelog opt-out" do
       allow(described_class).to receive(:upsert_unreleased_entry)
 
@@ -138,6 +153,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
     end
 
     it "adds later template changes to the existing keyed category totals" do
+      allow(File).to receive(:file?).with("/workspace/example/CHANGELOG.md").and_return(true)
       allow(described_class).to receive(:upsert_unreleased_entry) do |**options|
         body = options.fetch(:entry).call([{source: <<~MARKDOWN}])
           - [kc] kettle-jem/template: updated 4 project files:

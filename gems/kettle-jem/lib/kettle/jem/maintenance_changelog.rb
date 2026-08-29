@@ -95,6 +95,10 @@ module Kettle
           return report.merge(changelog: {status: "skipped", reason: "no_template_changes", changed_files: []})
         end
 
+        unless File.file?(File.join(project_root, "CHANGELOG.md"))
+          return report.merge(changelog: {status: "skipped", reason: "missing_changelog"})
+        end
+
         key = TEMPLATE_CHANGELOG_KEYS.fetch(label, "kettle-jem/template")
         entry = ->(matches) { template_run_entry(changed_files, matches) }
         result = upsert_unreleased_entry(project_root: project_root, section: "Changed", key: key, entry: entry)
