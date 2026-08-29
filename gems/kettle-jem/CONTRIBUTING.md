@@ -80,6 +80,23 @@ avoids stale generated binstubs shadowing the Reek gem executable:
 bin/rake reek:update
 ```
 
+## Version Namespace Bootstrap Shapes
+
+The `version_gem` bootstrap preserves the public namespace derived from the
+gem's entrypoint and version file. Its required invariants are:
+
+- A module namespace is reopened as modules in `version.rb`.
+- A namesake class is declared before `version.rb` is required, including its
+  superclass when one exists.
+- `version.rb` only reopens that class; it never redeclares the superclass.
+- `VersionGem::Basic` is extended only after `version.rb` has been required.
+- A legacy superclass found only in `version.rb` is moved to the entrypoint
+  declaration before rewriting the version file.
+
+The implementation discovers declaration kinds and superclass expressions with
+Prism, not text matching. Regression coverage for these shapes lives in
+`spec/integration/structural_merge_template_spec.rb`.
+
 ## Environment Variables for Local Development
 
 Below are the primary environment variables recognized by stone_checksums (and its integrated tools). Unless otherwise noted, set boolean values to the string "true" to enable.

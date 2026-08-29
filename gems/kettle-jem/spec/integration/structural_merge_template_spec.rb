@@ -917,12 +917,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       entrypoint_require: "turbo_tests"
     )
 
-    expect(updated).to include(<<~RUBY)
-      require "version_gem"
-      require_relative "turbo_tests/version"
-
-      TurboTests::Version.class_eval do
-    RUBY
+    expect(updated.index('require_relative "turbo_tests/version"')).to be < updated.index('require "securerandom"')
     expect(updated.index('require_relative "turbo_tests/version"')).to be < updated.index("TurboTests::Version.class_eval do")
   end
 
@@ -992,7 +987,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-  it "does not copy a stale version-file superclass into generated version_gem files" do
+  it "moves a version-file superclass declaration into the entrypoint before loading the version" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-version-namespace-superclass", tmp_root) do |root|
@@ -1029,9 +1024,39 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       described_class.send(:template_version_gem_bootstrap_step, root, report)
 
       version_file = File.read(File.join(root, "lib/simple_column/scopes/version.rb"))
+      entrypoint = File.read(File.join(root, "lib/simple_column/scopes.rb"))
       expect(version_file).to include("class Scopes\n")
       expect(version_file).not_to include("class Scopes < Module")
+      expect(entrypoint).to include("class Scopes < Module")
+      expect(entrypoint.index("class Scopes < Module")).to be < entrypoint.index('require_relative "scopes/version"')
     end
+  end
+
+  it "loads the version namespace before extending an inherited entrypoint namespace" do
+    content = <<~RUBY
+      require "logger"
+      require "version_gem"
+
+      module ActiveSupport
+        class Logger < ::Logger
+        end
+      end
+
+      ActiveSupport::Logger::Version.class_eval do
+        extend VersionGem::Basic
+      end
+    RUBY
+
+    updated = described_class.send(
+      :version_gem_bootstrap_entrypoint_content,
+      content,
+      namespace: "ActiveSupport::Logger",
+      entrypoint_require: "activesupport/logger",
+      namespace_superclasses: {1 => "::Logger"}
+    )
+
+    expect(updated.index('require_relative "logger/version"')).to be < updated.index("ActiveSupport::Logger::Version.class_eval do")
+    expect(updated).to include("class Logger < ::Logger")
   end
 
   it "does not copy an entrypoint superclass into the standalone version file" do

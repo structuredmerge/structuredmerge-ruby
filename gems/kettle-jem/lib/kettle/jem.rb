@@ -5549,8 +5549,9 @@ module Kettle
         namespace,
         preferred_path: entrypoint_path
       )
-      entrypoint_namespace_superclasses = namespace_superclass_details.fetch(:superclasses)
-      entrypoint_namespace_superclasses = entrypoint_namespace_superclasses.merge(
+      entrypoint_namespace_superclasses = version_namespace_superclasses_from_facts(facts).merge(
+        namespace_superclass_details.fetch(:superclasses)
+      ).merge(
         entrypoint_namespace_superclasses_from_facts(facts)
       )
       fact_superclass_path = facts.dig(:rubygems, :entrypoint_namespace_superclass_path).to_s
@@ -15341,8 +15342,9 @@ module Kettle
         namespace,
         preferred_path: entrypoint_path
       )
-      entrypoint_namespace_superclasses = namespace_superclass_details.fetch(:superclasses)
-      entrypoint_namespace_superclasses = entrypoint_namespace_superclasses.merge(
+      entrypoint_namespace_superclasses = version_namespace_superclasses_from_facts(facts).merge(
+        namespace_superclass_details.fetch(:superclasses)
+      ).merge(
         entrypoint_namespace_superclasses_from_facts(facts)
       )
       fact_superclass_path = facts.dig(:rubygems, :entrypoint_namespace_superclass_path).to_s
@@ -15832,13 +15834,31 @@ module Kettle
     end
 
     def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, namespace_superclasses: {}, version_require_path: nil)
-      current = normalize_entrypoint_version_require(
-        content,
-        entrypoint_require: entrypoint_require,
-        version_require_path: version_require_path,
-        after_declarations: !namespace_superclasses.empty?
-      )
-      current = remove_version_gem_class_eval_references(current) unless ruby_version_class_eval_namespaces(current).include?(namespace.to_s)
+      current = if namespace_superclasses.empty?
+        # Preserve the existing relative-require position when there is no
+        # declaration ordering constraint.
+        normalize_entrypoint_version_require(
+          content,
+          entrypoint_require: entrypoint_require,
+          version_require_path: version_require_path
+        )
+      else
+        # A namesake superclass is a declaration-order constraint: establish
+        # the class, load version.rb, then extend its Version module.
+        source = remove_version_gem_class_eval_references(content)
+        source = ensure_entrypoint_namespace_superclass_declarations(
+          source,
+          namespace: namespace,
+          namespace_superclasses: namespace_superclasses
+        )
+        normalize_entrypoint_version_require(
+          source,
+          entrypoint_require: entrypoint_require,
+          version_require_path: version_require_path,
+          after_declarations: true
+        )
+      end
+      current = remove_version_gem_class_eval_references(current)
       lines = current.lines
       insert_lines = []
       if File.basename(entrypoint_require) != "version_gem" && !ruby_top_level_require?(current, "require", "version_gem")
@@ -15855,6 +15875,34 @@ module Kettle
         updated += "\n#{version_gem_class_eval_block(namespace)}"
       end
       collapse_excess_blank_lines(updated)
+    end
+
+    def ensure_entrypoint_namespace_superclass_declarations(content, namespace:, namespace_superclasses: {})
+      # A version file must only reopen a namesake class.  When legacy source
+      # declared that class and its superclass in version.rb, establish the
+      # class in the entrypoint before requiring version.rb, then render the
+      # version file without a superclass.
+      segments = namespace.to_s.split("::").reject(&:empty?)
+      return content.to_s if segments.empty? || namespace_superclasses.empty?
+
+      missing_superclass_declaration = namespace_superclasses.any? do |index, _superclass|
+        ruby_namespace_declaration_node(content, segments.first(index + 1).join("::")).nil?
+      end
+      return content.to_s unless missing_superclass_declaration
+
+      namespace_kinds = segments.each_index.each_with_object({}) do |index, kinds|
+        prefix = segments.first(index + 1).join("::")
+        kinds[index] = ruby_namespace_declaration_kind(content, prefix) || :module
+        kinds[index] = :class if namespace_superclasses.key?(index)
+      end
+      declaration = wrap_ruby_namespace(
+        namespace,
+        [],
+        namespace_kinds: namespace_kinds,
+        namespace_superclasses: namespace_superclasses
+      ).join("\n")
+      current = trim_trailing_blank_lines(content)
+      current.empty? ? "#{declaration}\n" : "#{current}\n\n#{declaration}\n"
     end
 
     def version_gem_free_entrypoint_content(content, entrypoint_require:, ensure_version_require: true, after_declarations: false, version_require_path: nil)
