@@ -3251,7 +3251,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
       gemfile = File.read(File.join(root, "Gemfile"))
 
-      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.5", require: false')
+      expect(gemfile).to include(described_class.send(:nomono_gemfile_declaration))
       expect(gemfile).not_to include(">= 1.1.4")
     end
   end

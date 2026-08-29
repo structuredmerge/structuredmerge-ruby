@@ -24,10 +24,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Family lint now runs RuboCop Gradual read-only; use the explicit lint-fix task for intentional autocorrection.
 
-- [kc] kettle-jem/template: updated 1296 project files:
-  - code and tests (111)
-  - dependencies (1158)
-  - other (27)
+- [kc] kettle-jem/template: updated 2592 project files:
+  - code and tests (222)
+  - dependencies (2316)
+  - other (54)
 
 ### Deprecated
 
