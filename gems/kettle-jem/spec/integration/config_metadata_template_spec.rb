@@ -3215,6 +3215,47 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "normalizes static nomono declarations to the template requirement" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-static-nomono", tmp_root) do |root|
+      write_tree(root, {
+        "adapter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "adapter"
+            spec.version = "0.1.0"
+            spec.summary = "Adapter"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          # Local workspace dependency wiring for *_local.gemfile overrides
+          gem "nomono", "~> 1.1", ">= 1.1.4", require: false # ruby >= 3.2.0
+
+          gemspec
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.5", require: false')
+      expect(gemfile).not_to include(">= 1.1.4")
+    end
+  end
+
   it "does not add generic direct sibling wiring for gems already handled by local modular Gemfiles" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

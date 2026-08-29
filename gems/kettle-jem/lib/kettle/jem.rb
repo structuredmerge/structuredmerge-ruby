@@ -8250,8 +8250,6 @@ module Kettle
         )
       end
       main_gemfile_nomono_requirement_records(output).fetch(:calls).sort_by { |record| -record.fetch(:start_line) }.reduce(output) do |memo, record|
-        next memo unless record.fetch(:source).include?("*nomono_requirements")
-
         replace_source_range_lines(memo, record.fetch(:start_line), record.fetch(:end_line), "#{nomono_gemfile_declaration}\n")
       end
     end
