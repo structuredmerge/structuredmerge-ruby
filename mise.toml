@@ -90,3 +90,73 @@ run = "bundle exec kettle-family gha-sha-pins --execute"
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"
 raw = true
 run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --execute --publish --secrets-provider op --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
+
+[tasks.bupb]
+description = "Update Bundler across family members; pass options after --"
+raw = true
+run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bupb --execute"
+
+[tasks.bex]
+description = "Run a bundle exec command across family members; pass COMMAND after --"
+raw = true
+run = "bundle exec kettle-family bex --execute"
+
+[tasks.branch-lanes]
+description = "Audit configured branch lanes"
+raw = true
+run = "bundle exec kettle-family branch-lanes"
+
+[tasks.discover]
+description = "Discover family members and execution order"
+raw = true
+run = "bundle exec kettle-family discover"
+
+[tasks.metadata]
+description = "Report member version and project metadata"
+raw = true
+run = "bundle exec kettle-family metadata"
+
+[tasks.report]
+description = "Report family discovery and configuration"
+raw = true
+run = "bundle exec kettle-family report"
+
+[tasks.pull]
+description = "Pull selected family repositories; pass options after --"
+raw = true
+run = "bundle exec kettle-family pull --execute"
+
+[tasks.push]
+description = "Push selected family repositories; pass options after --"
+raw = true
+run = "bundle exec kettle-family push --execute"
+
+[tasks.up]
+description = "Pull then push selected family repositories; pass options after --"
+raw = true
+run = "bundle exec kettle-family up --execute"
+
+[tasks.sync]
+description = "Sync selected family branches; pass options after --"
+raw = true
+run = "bundle exec kettle-family sync --execute"
+
+[tasks.reset]
+description = "Reset a managed family artifact; pass TARGET after --"
+raw = true
+run = "bundle exec kettle-family reset --execute"
+
+[tasks.mise-trust]
+description = "Trust mise configuration for the family and members"
+raw = true
+run = "bundle exec kettle-family mise-trust"
+
+[tasks.reconcile-releases]
+description = "Create verified missing GitHub Releases; pass options after --"
+raw = true
+run = "bundle exec kettle-family reconcile-releases --execute"
+
+[tasks.release-state]
+description = "Report changelog release state for every family member"
+raw = true
+run = "bundle exec kettle-family release-state"
