@@ -764,6 +764,34 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(workflow.scan('exec_cmd: "kettle-test"').size).to eq(1)
   end
 
+  it "includes per-engine workflow commands in the template checksum fingerprint" do
+    report = {
+      recipe_name: "template_source_application_github_workflows_truffleruby_23_0_yml",
+      relative_path: ".github/workflows/truffleruby-23.0.yml",
+      request_envelope: {
+        request: {
+          recipe_name: "supplied_template_source_application",
+          recipe_version: "1",
+          runtime_context: {
+            ci: {engine_exec_cmds: {"truffleruby-23.0" => "kettle-test --tag ~type:acceptance"}}
+          }
+        }
+      },
+      metadata: {
+        template_source_preference: {
+          source_root_path: project_root.to_s,
+          source_relative_path: "lib/kettle/jem/templates/.github/workflows/truffleruby-23.0.yml.example"
+        }
+      }
+    }
+
+    payload = described_class.template_input_fingerprint_payload(project_root, report)
+
+    expect(payload).to include(
+      github_workflow_engine_exec_cmds: {"truffleruby-23.0" => "kettle-test --tag ~type:acceptance"}
+    )
+  end
+
   it "runs every dep-heads job directly from the generated appraisal gemfile" do
     template = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/dep-heads.yml.example"))
     workflow = YAML.safe_load(template, permitted_classes: [], aliases: true)

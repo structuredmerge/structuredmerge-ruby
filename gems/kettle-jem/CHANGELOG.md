@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserved configured per-engine CI commands across workflow template updates.
 
+- Invalidate workflow template checksums when a configured per-engine command changes.
+
 ### Security
 
 ## [7.1.12] - 2026-08-30

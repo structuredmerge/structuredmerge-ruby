@@ -4169,7 +4169,30 @@ module Kettle
       if report.fetch(:relative_path).to_s == "spec/spec_helper.rb"
         payload[:spec_helper_template_policy_fingerprint_version] = SPEC_HELPER_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
+      if report.fetch(:relative_path).to_s.start_with?(".github/workflows/")
+        engine_exec_cmds = github_workflow_engine_exec_cmds_for_template(
+          source_path,
+          report.dig(:request_envelope, :request, :runtime_context, :ci, :engine_exec_cmds) ||
+            report.dig(:request_envelope, :request, :runtime_context, "ci", "engine_exec_cmds") ||
+            {}
+        )
+        payload[:github_workflow_engine_exec_cmds] = engine_exec_cmds unless engine_exec_cmds.empty?
+      end
       payload
+    end
+
+    def github_workflow_engine_exec_cmds_for_template(source_path, overrides)
+      return {} unless source_path && File.file?(source_path)
+
+      configured = stringify_keys_for_json(overrides)
+      return {} if configured.empty?
+
+      yaml_mapping_nodes(File.read(source_path)).each_with_object({}) do |mapping, matching|
+        engine = yaml_mapping_scalar_value(mapping, "ruby")
+        matching[engine] = configured[engine] if configured.key?(engine)
+      end
+    rescue Psych::Exception
+      {}
     end
 
     def version_namespace_template_file?(relative_path)
