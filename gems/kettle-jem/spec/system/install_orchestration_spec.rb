@@ -1432,6 +1432,40 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "adds the local platform without resolving or rewriting locked dependencies" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-lockfile-platform-normalization", tmp_root) do |root|
+      lock_path = File.join(root, "Gemfile.lock")
+      original = <<~LOCK
+        GEM
+          remote: https://gem.coop/
+          specs:
+            example (1.0.0)
+
+        PLATFORMS
+          arm64-darwin
+          x86_64-darwin
+
+        DEPENDENCIES
+          example (= 1.0.0)
+
+        BUNDLED WITH
+           4.0.10
+      LOCK
+      File.write(lock_path, original)
+
+      result = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_platforms(root)
+
+      expect(result).to include(changed: true)
+      expect(result.fetch(:platforms)).to include("arm64-darwin", "x86_64-darwin", Gem::Platform.local.to_s)
+      normalized = File.read(lock_path)
+      expect(normalized).to include("  #{Gem::Platform.local}\n")
+      expect(normalized.split("PLATFORMS\n", 2).first).to eq(original.split("PLATFORMS\n", 2).first)
+      expect(normalized.split("DEPENDENCIES\n", 2).last).to eq(original.split("DEPENDENCIES\n", 2).last)
+    end
+  end
+
   it "normalizes lockfiles from the template task without templating env overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1491,6 +1525,12 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         run_options: {quiet: true},
         command_runner: command_runner
       )
+
+      expect(report.fetch(:template_steps)).to include(hash_including(
+        name: "lockfile_platform_normalization",
+        status: "succeeded",
+        reason: "local_platform_added"
+      ))
 
       expected_lock_command = [
         "bundle",

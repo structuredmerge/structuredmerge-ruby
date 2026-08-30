@@ -47,6 +47,7 @@ module Kettle
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
           install_steps << appraisal_generate_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env, run_options: effective_run_options)
+          install_steps << normalize_lockfile_platforms_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
@@ -745,6 +746,46 @@ module Kettle
           }
         end
 
+        def normalize_lockfile_platforms_step(project_root, env:, run_options: {})
+          return skipped_lockfile_normalization_step("lockfile_platform_normalization", "skip_lock_normalization") if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
+          return skipped_lockfile_normalization_step("lockfile_platform_normalization", "local_path_development_env") if local_path_development_env?(env)
+          return skipped_lockfile_normalization_step("lockfile_platform_normalization", "missing_Gemfile.lock") unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
+
+          {
+            name: "lockfile_platform_normalization",
+            status: "ready",
+            reason: "preserve_locked_dependencies_and_add_local_platform"
+          }
+        end
+
+        def normalize_lockfile_platforms(project_root)
+          lock_path = File.join(project_root.to_s, "Gemfile.lock")
+          contents = Bundler.read_file(lock_path)
+          platforms = (Bundler::LockfileParser.new(contents).platforms.map(&:to_s) + [Gem::Platform.local.to_s]).reject(&:empty?).uniq.sort
+          lines = contents.lines
+          platforms_index = lines.index { |line| line == "PLATFORMS\n" }
+          raise Bundler::LockfileError, "Gemfile.lock does not contain a PLATFORMS section" unless platforms_index
+
+          next_section_index = lines.each_index.find do |index|
+            index > platforms_index && !lines[index].start_with?("  ") && lines[index] != "\n"
+          end
+          raise Bundler::LockfileError, "Gemfile.lock PLATFORMS section has no following section" unless next_section_index
+
+          normalized_section = ["PLATFORMS\n", *platforms.map { |platform| "  #{platform}\n" }, "\n"]
+          return {changed: false, platforms: platforms} if lines[platforms_index...next_section_index] == normalized_section
+
+          # Bundler exposes a parser but no public platform-only writer. Keep the
+          # locked dependency graph byte-for-byte intact while rewriting this
+          # validated, line-oriented section.
+          lines[platforms_index...next_section_index] = normalized_section
+          File.write(lock_path, lines.join)
+          {changed: true, platforms: platforms}
+        end
+
+        def skipped_lockfile_normalization_step(name, reason)
+          {name: name, status: "skipped", reason: reason}
+        end
+
         def lockfile_normalization_command(project_root)
           platforms = lockfile_normalization_platforms(project_root)
           ["bundle", "lock", *platforms.map { |platform| "--add-platform=#{platform}" }, "--update"]
@@ -1161,6 +1202,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_lock_normalization"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "lockfile_platform_normalization"
+              execute_lockfile_platform_normalization_step(step, project_root: project_root)
             when "rubocop_lts_local_branch"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_install_requested_env"
@@ -1181,6 +1224,19 @@ module Kettle
             Kettle::Jem.emit_step_event(events, "command_step", result, phase: event_phase)
             result
           end
+        end
+
+        def execute_lockfile_platform_normalization_step(step, project_root:)
+          return step unless step.fetch(:status) == "ready"
+
+          result = normalize_lockfile_platforms(project_root)
+          step.merge(
+            status: "succeeded",
+            reason: result.fetch(:changed) ? "local_platform_added" : "local_platform_already_present",
+            platforms: result.fetch(:platforms)
+          )
+        rescue Bundler::LockfileError, Errno::ENOENT => error
+          step.merge(status: "failed", reason: "lockfile_platform_normalization_failed", stderr: error.message)
         end
 
         def setup_command_env(project_root, env)

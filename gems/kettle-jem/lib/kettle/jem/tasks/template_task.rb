@@ -23,9 +23,10 @@ module Kettle
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           hook_step = Kettle::Jem::Tasks::InstallTask.hook_templates_step(project_root, effective_run_options)
           git_drivers_step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(project_root, effective_run_options)
+          platform_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_platforms_step(project_root, env: setup_env, run_options: effective_run_options)
           lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           template_steps = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
-            [hook_step, git_drivers_step, lock_step],
+            [hook_step, git_drivers_step, platform_step, lock_step],
             project_root: project_root,
             env: setup_env,
             run_options: effective_run_options,
