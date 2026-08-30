@@ -23,10 +23,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - appraisal2 (>= 3.2.2 -> >= 3.2.3)
-  - appraisal2-rubocop (>= 1.0.1 -> >= 1.0.2)
-  - kettle-dev (>= 3.0.17 -> >= 3.0.18)
-  - kettle-jem (>= 7.1.10 -> >= 7.1.11)
+  - kettle-family (>= 1.2.64 -> >= 1.2.65)
 
 ### Deprecated
 
