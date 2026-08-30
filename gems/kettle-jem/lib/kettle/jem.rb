@@ -5422,10 +5422,10 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.3"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.18"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.19"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.65"\n)},
-        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.11"\n)},
+        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.12"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
@@ -14290,7 +14290,7 @@ module Kettle
               root: ["src", "my", "kettle-dev"]
             )
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 1.0", ">= 1.0.6"
+            gem "kettle-changelog", "~> 1.0", ">= 1.0.7"
           end
         end
       RUBY
