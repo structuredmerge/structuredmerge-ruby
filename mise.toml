@@ -60,9 +60,9 @@ description = "Update dependencies from released sources and commit lockfiles"
 run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
 
 [tasks.bup]
-description = "Update dependencies with local family and Kettle sources; pass gems or options after --"
+description = "Update dependencies from released sources; pass gems or options after --"
 raw = true
-run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --no-commit"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --no-commit"
 
 [tasks.bup-release]
 description = "Update dependencies from released sources and commit lockfiles"
@@ -89,12 +89,12 @@ run = "bundle exec kettle-family gha-sha-pins --execute"
 [tasks.release]
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"
 raw = true
-run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --execute --publish --secrets-provider op --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
+run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV=false bundle exec kettle-family release --execute --publish --secrets-provider op --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
 
 [tasks.bupb]
 description = "Update Bundler across family members; pass options after --"
 raw = true
-run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bupb --execute"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bupb --execute"
 
 [tasks.bex]
 description = "Run a bundle exec command across family members; pass COMMAND after --"
