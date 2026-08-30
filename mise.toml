@@ -60,17 +60,18 @@ description = "Update dependencies from released sources and commit lockfiles"
 run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
 
 [tasks.bup]
-description = "Compatibility alias for deps-local"
+description = "Update dependencies with local family and Kettle sources; pass gems or options after --"
+raw = true
 run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --no-commit"
 
 [tasks.bup-release]
-description = "Compatibility alias for deps-release"
+description = "Update dependencies from released sources and commit lockfiles"
 run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
 
 [tasks.bump]
 description = "Bump family versions; pass VERSION or major/minor/patch/pre"
 raw = true
-run = "bundle exec kettle-family bump"
+run = "bundle exec kettle-family bump --execute"
 
 [tasks.changelog]
 description = "Add a structured entry to a member Unreleased changelog"
@@ -84,11 +85,6 @@ run = "bundle exec kettle-family clean-unreleased --execute"
 [tasks.pins]
 description = "Review and update GitHub Actions pins across the family"
 run = "bundle exec kettle-family gha-sha-pins --execute"
-
-[tasks.release-plan]
-description = "Plan the family publish without changing files"
-raw = true
-run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev bundle exec kettle-family release --publish --secrets-provider op --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
 
 [tasks.release]
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"
