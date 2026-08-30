@@ -172,6 +172,12 @@ release:
   family_changelog:
     enabled: true
     command: kettle-changelog
+  aggregate_validation:
+    enabled: true
+    # Kettle Jem is independently releasable, so it retains its own
+    # changelog coverage, local suite, and monitored CI run.
+    exclude_members:
+      - kettle-jem
 
 pre_release:
   image_url_skip_patterns:

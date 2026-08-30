@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Run one aggregate CI family suite for coordinated releases and skip redundant CI jobs for subsequent marked member release commits.
+
 ### Deprecated
 
 ### Removed
