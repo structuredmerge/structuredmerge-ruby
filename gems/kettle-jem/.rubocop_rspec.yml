@@ -30,13 +30,7 @@ RSpec/DescribeClass:
     - 'spec/system/*'
     - 'spec/e2e/*'
 
-# These specs document end-to-end template behavior rather than individual
-# methods, and their filenames intentionally describe that behavior.
-RSpec/DescribeMethod:
-  Enabled: false
-
 RSpec/SpecFilePathFormat:
-  Enabled: false
   Exclude:
     - 'spec/byte_offset_edit_spec.rb'
     - 'spec/cli_spec.rb'
