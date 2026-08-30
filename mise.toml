@@ -24,7 +24,7 @@ run = "bundle exec kettle-family bex --execute --no-commit -- bin/rake rubocop_g
 
 [tasks.readiness]
 description = "Run family readiness checks without changing files"
-run = "bundle exec kettle-family check"
+run = "bundle exec kettle-family check --execute"
 
 [tasks.check]
 description = "Run readiness, lint, and tests across the family"
