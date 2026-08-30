@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve GitHub workflow mappings without Ruby or appraisal keys while pruning unsupported matrix entries and projecting framework matrix environment values.
 
+- Make transfer changelog parsing safe under threaded template execution and document intentional bounded worker threads for linting.
+
 ### Security
 
 ## [7.1.5] - 2026-08-30

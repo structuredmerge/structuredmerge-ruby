@@ -102,6 +102,24 @@ module Kettle
     ].freeze
     PACKAGED_TEMPLATE_ROOT = File.expand_path("jem/templates", __dir__)
     TRANSFER_CHANGELOG_TEMPLATE_PATH = "CHANGELOG.transfer.md"
+    TRANSFER_CHANGELOG_FILTER_FIELD_TYPES = {
+      "profile" => :enum,
+      "topology" => :enum,
+      "ruby.min" => :version,
+      "engine.jruby" => :boolean,
+      "engine.truffleruby" => :boolean,
+      "engine.alternates" => :boolean,
+      "feature.appraisals" => :boolean,
+      "feature.rubyforum" => :boolean,
+      "feature.rubyforum_project_tag" => :boolean,
+      "feature.corporate_sponsors" => :boolean,
+      "feature.organization_logo" => :boolean,
+      "feature.structuredmerge_driver" => :boolean,
+      "feature.dedicated_version_gem" => :boolean,
+      "workflow.dep_heads" => :boolean,
+      "workflow.jruby_94" => :boolean,
+      "version_gem.mode" => :enum
+    }.freeze
     COPY_ONLY_WHEN_MISSING_TEMPLATE_PATHS = %w[REEK bin/setup].freeze
     MONOREPO_ROOT_TEMPLATE_PROFILE = "monorepo-root"
     MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE = "monorepo-subgem-package"
@@ -4500,6 +4518,7 @@ module Kettle
         chunks.fetch(offset % chunks.length) << job
       end
       chunks.reject(&:empty?).flat_map do |chunk|
+        # rubocop:disable ThreadSafety/NewThread -- Bounded workers only read shared inputs and are joined below.
         Thread.new do
           thread_id = Thread.current.object_id
           chunk.map do |recipe, index|
@@ -4519,6 +4538,7 @@ module Kettle
             [index, report]
           end
         end
+        # rubocop:enable ThreadSafety/NewThread
       end.flat_map(&:value).to_h
     end
 
@@ -6346,24 +6366,7 @@ module Kettle
     end
 
     def transfer_changelog_filter_field_types
-      @transfer_changelog_filter_field_types ||= {
-        "profile" => :enum,
-        "topology" => :enum,
-        "ruby.min" => :version,
-        "engine.jruby" => :boolean,
-        "engine.truffleruby" => :boolean,
-        "engine.alternates" => :boolean,
-        "feature.appraisals" => :boolean,
-        "feature.rubyforum" => :boolean,
-        "feature.rubyforum_project_tag" => :boolean,
-        "feature.corporate_sponsors" => :boolean,
-        "feature.organization_logo" => :boolean,
-        "feature.structuredmerge_driver" => :boolean,
-        "feature.dedicated_version_gem" => :boolean,
-        "workflow.dep_heads" => :boolean,
-        "workflow.jruby_94" => :boolean,
-        "version_gem.mode" => :enum
-      }.freeze
+      TRANSFER_CHANGELOG_FILTER_FIELD_TYPES
     end
 
     def transfer_changelog_filter_predicate_applies?(type, actual, operator, expected)
@@ -6449,11 +6452,11 @@ module Kettle
     end
 
     def changelog_transfer_line_parser
-      @changelog_transfer_line_parser ||= TransferChangelogLineParser.new
+      TransferChangelogLineParser.new
     end
 
     def changelog_transfer_filter_parser
-      @changelog_transfer_filter_parser ||= TransferChangelogFilterParser.new
+      TransferChangelogFilterParser.new
     end
 
     def changelog_transfer_list_item_payload(source)
@@ -13847,7 +13850,9 @@ module Kettle
 
     def commit_file_work_units_thread(file_work_units, workers:)
       distribute_file_work_units(file_work_units, workers).map do |chunk|
+        # rubocop:disable ThreadSafety/NewThread -- Independent file units are joined before this method returns.
         Thread.new { chunk.each { |file_work_unit| commit_file_work_unit(file_work_unit) } }
+        # rubocop:enable ThreadSafety/NewThread
       end.each(&:join)
     end
 
