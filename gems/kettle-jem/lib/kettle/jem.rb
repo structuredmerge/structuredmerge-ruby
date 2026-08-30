@@ -9342,7 +9342,7 @@ module Kettle
     def default_test_bundle_gem_source(gem)
       arguments = [gem.fetch(:name).inspect, *gem.fetch(:requirements, []).map(&:inspect)]
       arguments << "require: false" if gem[:require] == false
-      "gem #{arguments.join(', ')}"
+      "gem #{arguments.join(", ")}"
     end
 
     def main_gemfile_default_test_bundle_insertion_index(content)

@@ -523,7 +523,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
           eval_gemfile "gemfiles/modular/style.gemfile"
         RUBY
-        "template/Gemfile.example" => <<~RUBY,
+        "template/Gemfile.example" => <<~RUBY
           source "https://gem.coop"
 
           gemspec

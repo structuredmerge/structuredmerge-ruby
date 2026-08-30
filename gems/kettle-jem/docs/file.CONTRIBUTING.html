@@ -145,6 +145,27 @@ avoids stale generated binstubs shadowing the Reek gem executable:</p>
 <pre class="code language-shell"><code class="language-shell">bin/rake reek:update
 </code></pre>
 
+<h2 id="version-namespace-bootstrap-shapes">Version Namespace Bootstrap Shapes</h2>
+
+<p>The <code>version_gem</code> bootstrap preserves the public namespace derived from the<br>
+gem’s entrypoint and version file. Its required invariants are:</p>
+
+<ul>
+  <li>A module namespace is reopened as modules in <code>version.rb</code>.</li>
+  <li>A namesake class is declared before <code>version.rb</code> is required, including its<br>
+superclass when one exists.</li>
+  <li>
+<code>version.rb</code> only reopens that class; it never redeclares the superclass.</li>
+  <li>
+<code>VersionGem::Basic</code> is extended only after <code>version.rb</code> has been required.</li>
+  <li>A legacy superclass found only in <code>version.rb</code> is moved to the entrypoint<br>
+declaration before rewriting the version file.</li>
+</ul>
+
+<p>The implementation discovers declaration kinds and superclass expressions with<br>
+Prism, not text matching. Regression coverage for these shapes lives in<br>
+<code>spec/integration/structural_merge_template_spec.rb</code>.</p>
+
 <h2 id="environment-variables-for-local-development">Environment Variables for Local Development</h2>
 
 <p>Below are the primary environment variables recognized by stone_checksums (and its integrated tools). Unless otherwise noted, set boolean values to the string “true” to enable.</p>
@@ -376,7 +397,7 @@ push git commits and tags, and push the <code>.gem</code> file to the gem host c
 </div></div>
 
       <div id="footer">
-  Generated on Sat Aug 29 14:22:16 2026 by
+  Generated on Sat Aug 29 20:53:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

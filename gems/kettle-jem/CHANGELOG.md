@@ -22,6 +22,23 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.11] - 2026-08-29
+
+- TAG: [v7.1.11][7.1.11t]
+- COVERAGE: 93.63% -- 11026/11776 lines in 16 files
+- BRANCH COVERAGE: 76.95% -- 4698/6105 branches in 16 files
+- 17.95% documented
+
+### Changed
+
 - [kc] kettle-jem/template: updated 398 project files:
   - code and tests (20)
   - configuration (12)
@@ -37,17 +54,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Raise first-party dependency minimums to their latest released versions.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Preserve inherited version namespaces by declaring their superclass before loading version.rb.
 
 - Template-manage default local test bundles independently from appraisal and framework CI matrices.
-
-### Security
 
 ## [7.1.10] - 2026-08-29
 
@@ -1693,7 +1704,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.10...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.11...HEAD
+[7.1.11]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.10...v7.1.11
+[7.1.11t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.11
 [7.1.10]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.8...v7.1.10
 [7.1.10t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.10
 [7.1.8]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.7...v7.1.8

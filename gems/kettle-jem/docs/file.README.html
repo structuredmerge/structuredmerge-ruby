@@ -141,7 +141,7 @@ to build <code>kettle-jem</code> extension gems against the supported plugin sea
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.690-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.776-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -466,7 +466,74 @@ good fit when you want kettle-jem to generate framework-version modular gemfiles
 
 <p>If you need a deeper or more complex matrix, prefer<br>
 <strong><code>kettle-jem-appraisals</code></strong>, which generates <code>Appraisals</code> entries and is the<br>
-better fit for Appraisals-style combinations.</p>
+better fit for Appraisals-style combinations. Its <code>appraisal_matrix</code> config is<br>
+the source of truth for the generated matrix: use <code>mode</code> (or per-gem <code>mode</code>),<br>
+<code>freshness_ttl</code>, <code>exec_cmd</code>, <code>appraisal_gemfiles</code>, <code>standard_appraisal_role</code>,<br>
+and <code>gems.tier1</code> / <code>gems.tier2</code> as documented in the<br>
+<a href="https://github.com/appraisal-rb/kettle-jem-appraisals#%EF%B8%8F-configuration"><code>kettle-jem-appraisals</code> configuration reference</a>.</p>
+
+<p>Neither <code>appraisal_matrix</code> nor <code>framework_matrix</code> implicitly changes the root<br>
+local development bundle. Pair either policy with <code>test_bundle</code> when the<br>
+default local test command needs a specific framework or harness.</p>
+
+<h3 id="default-local-test-bundle">Default Local Test Bundle</h3>
+
+<p>The root <code>Gemfile</code> is the default bundle for local commands such as<br>
+<code>bundle exec kettle-test</code>. It is intentionally separate from Appraisals and<br>
+CI, which run with their own generated Gemfiles. Declare its project-specific<br>
+test dependencies with <code>test_bundle</code>; kettle-jem will add them to the root<br>
+<code>Gemfile</code> on every template run.</p>
+
+<p>Use <code>test_bundle.gemfiles</code> for a modular fragment. A mapping may name direct<br>
+dependencies that the fragment replaces, so kettle-jem removes stale root<br>
+declarations before adding the <code>eval_gemfile</code> call:</p>
+
+<pre class="code language-yaml"><code class="language-yaml">test_bundle:
+  gemfiles:
+    - path: gemfiles/rails_7_2.gemfile
+      replaces:
+        - combustion
+        - actionmailer
+        - railties
+</code></pre>
+
+<p>Use <code>test_bundle.gems</code> for a small, explicit local test dependency that does<br>
+not warrant a modular fragment. Use either <code>requirement</code> or <code>requirements</code>; set<br>
+<code>require: false</code> only when the dependency must be available to Bundler but<br>
+should not be automatically required:</p>
+
+<pre class="code language-yaml"><code class="language-yaml">test_bundle:
+  gems:
+    - name: activerecord
+      requirement: &quot;~&gt; 7.2&quot;
+    - name: debug
+      requirement: &quot;~&gt; 1.11&quot;
+      require: false
+</code></pre>
+
+<p>For a simple <code>workflows.framework_matrix</code>, mark exactly one version as<br>
+<code>default: true</code> to load that generated framework gemfile into the root<br>
+<code>Gemfile</code> as the local default. The matrix still controls Appraisals and CI;<br>
+the flag only selects the root local bundle. <code>appraisal_matrix</code> deliberately<br>
+has no implicit default selector: use <code>test_bundle</code> to name the stable local<br>
+Gemfile fragment or direct dependencies while the plugin continues to generate<br>
+the full appraisal matrix.</p>
+
+<pre class="code language-yaml"><code class="language-yaml">workflows:
+  preset: framework
+  framework_matrix:
+    dimension: rails
+    gem: rails
+    gemfile_pattern: &quot;rails_{version}.gemfile&quot;
+    versions:
+      - label: &quot;7.2&quot;
+        slug: &quot;7_2&quot;
+        requirement: &quot;~&gt; 7.2.2&quot;
+        default: true
+</code></pre>
+
+<p>Do not use freeze markers for any of these declarations. The configuration is<br>
+the source of truth, and templating keeps the root bundle synchronized with it.</p>
 
 <h3 id="strategies">Strategies</h3>
 
@@ -1272,7 +1339,7 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Sat Aug 29 14:22:16 2026 by
+  Generated on Sat Aug 29 20:53:21 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
