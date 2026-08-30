@@ -1492,13 +1492,19 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         command_runner: command_runner
       )
 
+      expected_lock_command = [
+        "bundle",
+        "lock",
+        *["arm64-darwin", "ruby", "x86_64-darwin", Gem::Platform.local.to_s].uniq.sort.map { |platform| "--add-platform=#{platform}" },
+        "--update"
+      ]
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
-        command: %w[bundle update],
+        command: expected_lock_command,
         status: "succeeded",
         reason: "executed"
       ))
-      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
+      lock_command = commands.find { |entry| entry.fetch(:command) == expected_lock_command }
       expect(lock_command).not_to be_nil
       expect(lock_command.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),

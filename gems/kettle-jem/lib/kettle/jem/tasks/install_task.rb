@@ -738,15 +738,24 @@ module Kettle
 
           {
             name: "bundle_lock_normalization",
-            command: lockfile_normalization_command,
+            command: lockfile_normalization_command(project_root),
             status: "ready",
             env: normal_lockfile_env(project_root, env),
-            reason: "bundle_update_without_templating_overrides"
+            reason: "bundle_lock_update_preserving_platforms_without_templating_overrides"
           }
         end
 
-        def lockfile_normalization_command
-          %w[bundle update]
+        def lockfile_normalization_command(project_root)
+          platforms = lockfile_normalization_platforms(project_root)
+          ["bundle", "lock", *platforms.map { |platform| "--add-platform=#{platform}" }, "--update"]
+        end
+
+        def lockfile_normalization_platforms(project_root)
+          lock_path = File.join(project_root.to_s, "Gemfile.lock")
+          existing = Bundler::LockfileParser.new(Bundler.read_file(lock_path)).platforms.map(&:to_s)
+          (existing + [Gem::Platform.local.to_s]).reject(&:empty?).uniq.sort
+        rescue Bundler::LockfileError, Errno::ENOENT
+          [Gem::Platform.local.to_s]
         end
 
         def distinct_bundle_install_step(project_root, env:, setup_env:)
