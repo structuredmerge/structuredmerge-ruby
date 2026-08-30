@@ -24,11 +24,21 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Run one aggregate CI family suite for coordinated releases and skip redundant CI jobs for subsequent marked member release commits.
 
+- [kc] kettle-jem/template: updated 1194 project files:
+  - code and tests (60)
+  - configuration (36)
+  - dependencies (441)
+  - documentation (27)
+  - other (369)
+  - workflows (261)
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Preserve GitHub workflow mappings without Ruby or appraisal keys while pruning unsupported matrix entries and projecting framework matrix environment values.
 
 ### Security
 

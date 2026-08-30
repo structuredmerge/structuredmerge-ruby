@@ -9122,7 +9122,7 @@ module Kettle
         next unless insert_index
 
         indent = workflow_matrix_env_indent(lines, mapping)
-        additions = matrix_env.reject { |key, _value| yaml_mapping_scalar_value(mapping, key) }
+        additions = matrix_env.reject { |key, _value| yaml_mapping_scalar_node(mapping, key) }
         additions.reject! { |key, _value| inserted_locations.include?([insert_index, key.to_s]) }
         next if additions.empty?
 
@@ -9211,11 +9211,11 @@ module Kettle
     end
 
     def prune_workflow_matrix_item?(mapping, minimum)
-      ruby = yaml_mapping_scalar_value(mapping, "ruby")
-      return true if ruby && Gem::Version.new(ruby) < minimum
+      ruby = yaml_mapping_scalar_value(mapping, "ruby").to_s.strip
+      return true if !ruby.empty? && Gem::Version.new(ruby) < minimum
 
-      appraisal_ruby_version = appraisal_ruby_version(yaml_mapping_scalar_value(mapping, "appraisal"))
-      appraisal_ruby_version && Gem::Version.new(appraisal_ruby_version) < minimum
+      appraisal_ruby = appraisal_ruby_version(yaml_mapping_scalar_value(mapping, "appraisal")).to_s.strip
+      !appraisal_ruby.empty? && Gem::Version.new(appraisal_ruby) < minimum
     rescue ArgumentError
       false
     end
