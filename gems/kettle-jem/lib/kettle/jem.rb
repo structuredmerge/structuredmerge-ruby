@@ -18769,14 +18769,15 @@ module Kettle
       appraisal_gemfiles = framework_matrix_appraisal_gemfiles(raw)
       gemfiles = version_entries.map do |entry|
         gemfile = expand_framework_gemfile_pattern(pattern, entry.fetch(:slug))
-        {
+        gemfile_entry = {
           path: framework_gemfile_path(gemfile),
           gem: framework_gem,
           requirement: entry.fetch(:requirement),
-          env: entry.fetch(:env, {}),
-          default: entry.fetch(:default, false),
-          replaces: entry.fetch(:replaces, [])
+          env: entry.fetch(:env, {})
         }
+        gemfile_entry[:default] = true if entry[:default]
+        gemfile_entry[:replaces] = entry[:replaces] unless entry.fetch(:replaces, []).empty?
+        gemfile_entry
       end.uniq { |entry| entry.fetch(:path) }
       default_gemfiles = gemfiles.select { |entry| entry[:default] }
       gemfiles.reject! { |entry| template_keep_destination_path?(config, entry.fetch(:path)) }
@@ -18793,7 +18794,6 @@ module Kettle
           }
         end,
         gemfiles: gemfiles,
-        default_gemfiles: default_gemfiles,
         appraisals: version_entries.map do |entry|
           gemfile = framework_gemfile_path(expand_framework_gemfile_pattern(pattern, entry.fetch(:slug)))
           name = entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug))
@@ -18807,7 +18807,9 @@ module Kettle
             replaces: framework_matrix_replaced_appraisal_names(dimension, entry, name)
           }
         end
-      }
+      }.tap do |matrix|
+        matrix[:default_gemfiles] = default_gemfiles unless default_gemfiles.empty?
+      end
     end
 
     def framework_matrix_replaced_appraisal_names(dimension, entry, name)
