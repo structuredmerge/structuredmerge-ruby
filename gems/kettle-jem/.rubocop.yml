@@ -31,9 +31,16 @@ AllCops:
     - tmp/**/*
     - vendor/**/*
     - AGENTS.md
+    - benchmarks/fixtures/**/*
 
 RBS:
   Enabled: true
 
 Layout/IndentationConsistency:
   Exclude: ['*.md']
+
+# The template supports a Ruby 4-only release while linting generated fixtures
+# against the inherited Ruby 3.2 parser target.
+Gemspec/RequiredRubyVersion:
+  Exclude:
+    - kettle-jem.gemspec

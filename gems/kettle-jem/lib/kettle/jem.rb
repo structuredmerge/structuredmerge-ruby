@@ -6452,11 +6452,13 @@ module Kettle
     end
 
     def changelog_transfer_line_parser
-      TransferChangelogLineParser.new
+      Thread.current.thread_variable_get(:kettle_jem_transfer_changelog_line_parser) ||
+        Thread.current.thread_variable_set(:kettle_jem_transfer_changelog_line_parser, TransferChangelogLineParser.new)
     end
 
     def changelog_transfer_filter_parser
-      TransferChangelogFilterParser.new
+      Thread.current.thread_variable_get(:kettle_jem_transfer_changelog_filter_parser) ||
+        Thread.current.thread_variable_set(:kettle_jem_transfer_changelog_filter_parser, TransferChangelogFilterParser.new)
     end
 
     def changelog_transfer_list_item_payload(source)

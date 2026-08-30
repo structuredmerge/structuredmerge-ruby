@@ -654,6 +654,26 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(parsed.fetch(:rendered_payload)).to eq("kettle-jem-template-20260720-004 - MRI-only fix.")
   end
 
+  it "caches transfer changelog parsers per thread" do
+    main_line_parser = described_class.send(:changelog_transfer_line_parser)
+    main_filter_parser = described_class.send(:changelog_transfer_filter_parser)
+
+    expect(described_class.send(:changelog_transfer_line_parser)).to equal(main_line_parser)
+    expect(described_class.send(:changelog_transfer_filter_parser)).to equal(main_filter_parser)
+
+    # rubocop:disable ThreadSafety/NewThread -- This example verifies per-thread parser isolation.
+    worker_parsers = Thread.new do
+      [
+        described_class.send(:changelog_transfer_line_parser),
+        described_class.send(:changelog_transfer_filter_parser)
+      ]
+    end.value
+    # rubocop:enable ThreadSafety/NewThread
+
+    expect(worker_parsers).not_to include(main_line_parser)
+    expect(worker_parsers).not_to include(main_filter_parser)
+  end
+
   it "evaluates transfer filters against the fixed destination context schema" do
     filter = described_class.send(:parse_changelog_transfer_filter, "engine.alternates=false & ruby.min<2.2")
 
