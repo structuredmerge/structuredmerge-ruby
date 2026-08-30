@@ -822,7 +822,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       described_class.apply_project(root, env: {})
       gemspec = File.read(File.join(root, "example.gemspec"))
 
-      expect(gemspec).to include("path.delete_prefix(\"#{gemspec_root}/\")")
+      expect(gemspec).to include("path.delete_prefix(\"\#{gemspec_root}/\")")
       expect(gemspec).to include("filter_map")
       expect(gemspec).not_to include("files = []")
       expect { RubyVM::InstructionSequence.compile(gemspec) }.not_to raise_error
