@@ -15009,18 +15009,30 @@ module Kettle
       return [] unless project_root && gemspec_metadata.is_a?(Hash)
 
       sibling_root = File.expand_path("..", project_root.to_s)
-      dependencies = Array(
-        gemspec_metadata[:runtime_dependencies] || gemspec_metadata["runtime_dependencies"]
-      )
-      dependencies.each_with_object([]) do |dependency, names|
-        name = dependency.respond_to?(:name) ? dependency.name.to_s : dependency.to_s
-        next if name.empty? || name == package_name.to_s
-        next unless direct_sibling_directory_defines_gem?(File.join(sibling_root, name), name)
-        next if Array(local_modular_eval_paths[name]).any?
-        next if names.include?(name)
+      excluded = [package_name.to_s, *local_modular_eval_paths.keys.map(&:to_s)]
+      pending = gemspec_runtime_dependency_names(gemspec_metadata)
+      discovered = []
 
-        names << name
+      until pending.empty?
+        name = pending.shift.to_s
+        next if name.empty? || discovered.include?(name)
+
+        sibling_path = File.join(sibling_root, name)
+        next unless direct_sibling_directory_defines_gem?(sibling_path, name)
+
+        discovered << name
+        sibling_metadata = sibling_gemspec_metadata(sibling_path, name)
+        pending.concat(gemspec_runtime_dependency_names(sibling_metadata))
       end
+
+      discovered.reject { |name| excluded.include?(name) }
+    end
+
+    def sibling_gemspec_metadata(sibling_path, gem_name)
+      gemspec_path = Dir.glob(File.join(sibling_path, "*.gemspec")).find do |path|
+        metadata_value(static_project_gemspec_metadata(path), :gem_name).to_s == gem_name.to_s
+      end
+      gemspec_path ? static_project_gemspec_metadata(gemspec_path) : {}
     end
 
     def local_modular_runtime_eval_paths(project_root, gemspec_metadata, package_name:)

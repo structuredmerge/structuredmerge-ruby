@@ -9,9 +9,16 @@ RSpec.describe "kettle/jem require boundary" do
       env.keys.grep(/\ABUNDLE_/).each { |key| env[key] = nil }
       env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
       %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
-      env["BUNDLE_GEMFILE"] = File.expand_path("../Gemfile", __dir__)
+      env["BUNDLE_GEMFILE"] = ENV["KETTLE_FAMILY_BUNDLE_GEMFILE"] || File.expand_path("../Gemfile", __dir__)
       env["STRUCTUREDMERGE_DEV"] = File.expand_path("../..", __dir__)
     end
+  end
+
+  it "uses the aggregate family bundle when configured" do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("KETTLE_FAMILY_BUNDLE_GEMFILE").and_return("/workspace/Gemfile")
+
+    expect(clean_subprocess_env.fetch("BUNDLE_GEMFILE")).to eq("/workspace/Gemfile")
   end
 
   it "does not load parser-backed runtime dependencies before RuboCop" do

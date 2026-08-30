@@ -2682,13 +2682,24 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     Dir.mktmpdir("kettle-jem-main-gemfile-direct-sibling-wiring", tmp_root) do |workspace|
       root = File.join(workspace, "adapter")
       sibling = File.join(workspace, "shared-core")
-      FileUtils.mkdir_p([root, sibling])
+      leaf = File.join(workspace, "shared-leaf")
+      FileUtils.mkdir_p([root, sibling, leaf])
+      write_tree(leaf, {
+        "shared-leaf.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "shared-leaf"
+            spec.version = "0.1.0"
+            spec.summary = "Shared leaf"
+          end
+        RUBY
+      })
       write_tree(sibling, {
         "shared-core.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "shared-core"
             spec.version = "0.1.0"
             spec.summary = "Shared core"
+            spec.add_dependency "shared-leaf", "= 0.1.0"
           end
         RUBY
       })
@@ -2727,6 +2738,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(report.fetch(:changed_files)).to include("Gemfile")
       expect(direct_block).to include("direct_sibling_gems = %w[")
       expect(direct_block).to include("shared-core")
+      expect(direct_block).to include("shared-leaf")
       expect(direct_block).not_to include("version_gem")
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'

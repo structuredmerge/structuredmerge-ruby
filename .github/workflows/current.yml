@@ -195,6 +195,7 @@ jobs:
       - name: Run family suite
         env:
           K_JEM_TEMPLATING: true
+          KETTLE_FAMILY_BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 20m bundle exec kettle-test
 

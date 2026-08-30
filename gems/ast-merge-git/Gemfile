@@ -26,6 +26,7 @@ gem 'nomono', '~> 1.1', '>= 1.1.5', require: false # ruby >= 3.2.0
 # Direct sibling dependencies (env-switched via STRUCTUREDMERGE_DEV)
 direct_sibling_gems = %w[
   ast-merge
+  tree_haver
 ]
 provider_gems = %w[
   bash-merge

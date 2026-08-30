@@ -188,8 +188,17 @@ RSpec.describe 'ast-merge-git executable' do
       '-u', 'BUNDLER_VERSION',
       '-u', 'RUBYLIB',
       '-u', 'RUBYOPT',
-      "BUNDLE_GEMFILE=#{Shellwords.escape(driver_gemfile.to_s)}"
+      "BUNDLE_GEMFILE=#{Shellwords.escape(ENV.fetch('KETTLE_FAMILY_BUNDLE_GEMFILE', driver_gemfile.to_s))}"
     ]
+  end
+
+  it 'uses the aggregate family bundle for Git-driver subprocesses when configured' do
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch)
+      .with('KETTLE_FAMILY_BUNDLE_GEMFILE', anything)
+      .and_return('/workspace/Gemfile')
+
+    expect(bundle_driver_prefix).to include('BUNDLE_GEMFILE=/workspace/Gemfile')
   end
 
   def text_git_baseline(base:, ours:, theirs:)

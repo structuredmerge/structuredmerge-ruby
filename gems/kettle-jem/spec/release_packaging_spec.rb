@@ -11,12 +11,24 @@ RSpec.describe Kettle::Jem do
   end
 
   def clean_subprocess_env(overrides = {})
-    ENV.to_h.tap do |env|
+    family_bundle_gemfile = ENV["KETTLE_FAMILY_BUNDLE_GEMFILE"]
+    environment = ENV.to_h.tap do |env|
       env.keys.grep(/\ABUNDLE_/).each { |key| env[key] = nil }
       env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
       %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
-      env["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"] if ENV["BUNDLE_GEMFILE"]
-    end.merge(overrides)
+      env["BUNDLE_GEMFILE"] = family_bundle_gemfile || ENV["BUNDLE_GEMFILE"] if family_bundle_gemfile || ENV["BUNDLE_GEMFILE"]
+    end
+    return environment.merge(overrides) unless family_bundle_gemfile
+
+    environment.merge(overrides.except("BUNDLE_GEMFILE"))
+  end
+
+  it "uses the aggregate family bundle for source-checkout subprocesses when configured" do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("KETTLE_FAMILY_BUNDLE_GEMFILE").and_return("/workspace/Gemfile")
+
+    expect(clean_subprocess_env.fetch("BUNDLE_GEMFILE")).to eq("/workspace/Gemfile")
+    expect(clean_subprocess_env("BUNDLE_GEMFILE" => nil).fetch("BUNDLE_GEMFILE")).to eq("/workspace/Gemfile")
   end
 
   it "packages runtime template assets used by packaged template application" do
