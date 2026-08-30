@@ -22,13 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Family lint now runs RuboCop Gradual read-only; use the explicit lint-fix task for intentional autocorrection.
-
-- [kc] kettle-jem/template: updated 2592 project files:
-  - code and tests (222)
-  - dependencies (2316)
-  - other (54)
-
 ### Deprecated
 
 ### Removed
@@ -36,6 +29,22 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 ### Security
+
+## [7.1.5] - 2026-08-30
+
+- TAG: [v7.1.5][7.1.5t]
+- COVERAGE: 47.32% -- 1582/3343 lines in 37 files
+- BRANCH COVERAGE: 13.67% -- 188/1375 branches in 37 files
+- 73.88% documented
+
+### Changed
+
+- Family lint now runs RuboCop Gradual read-only; use the explicit lint-fix task for intentional autocorrection.
+
+- [kc] kettle-jem/template: updated 2592 project files:
+  - code and tests (222)
+  - dependencies (2316)
+  - other (54)
 
 ## [7.1.4] - 2026-08-24
 
@@ -557,7 +566,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.5...HEAD
+[7.1.5]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...v7.1.5
+[7.1.5t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.5
 [7.1.4]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.3...v7.1.4
 [7.1.4t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.4
 [7.1.3]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.2...v7.1.3
