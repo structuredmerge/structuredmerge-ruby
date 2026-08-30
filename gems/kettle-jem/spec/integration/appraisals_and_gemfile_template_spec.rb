@@ -743,6 +743,27 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "preserves configured per-engine workflow commands" do
+    workflow = described_class.send(
+      :apply_github_actions_engine_exec_cmd_overrides,
+      <<~YAML,
+        strategy:
+          matrix:
+            include:
+              - ruby: "truffleruby-22.3"
+                appraisal: "ruby-3-0"
+                exec_cmd: "kettle-test"
+              - ruby: "truffleruby-23.0"
+                appraisal: "ruby-3-1"
+                exec_cmd: "kettle-test"
+      YAML
+      {ci: {engine_exec_cmds: {"truffleruby-22.3" => "kettle-test --tag ~type:acceptance"}}}
+    )
+
+    expect(workflow).to include('exec_cmd: "kettle-test --tag ~type:acceptance"')
+    expect(workflow.scan('exec_cmd: "kettle-test"').size).to eq(1)
+  end
+
   it "runs every dep-heads job directly from the generated appraisal gemfile" do
     template = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/dep-heads.yml.example"))
     workflow = YAML.safe_load(template, permitted_classes: [], aliases: true)

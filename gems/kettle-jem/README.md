@@ -278,6 +278,21 @@ Neither `appraisal_matrix` nor `framework_matrix` implicitly changes the root
 local development bundle. Pair either policy with `test_bundle` when the
 default local test command needs a specific framework or harness.
 
+### Per-Engine Workflow Commands
+
+Generated workflows use `workflows.exec_cmd` by default. When a legacy engine
+needs a narrower test command but should still receive the normal generated
+workflow maintenance, configure `workflows.engine_exec_cmds` with the exact
+matrix `ruby` value. The override changes only that matrix entry's `exec_cmd`;
+setup, retry, cache, and pin behavior remains template-managed.
+
+```yaml
+workflows:
+  exec_cmd: kettle-test --example-status-log .rspec_status
+  engine_exec_cmds:
+    truffleruby-22.3: kettle-test --tag ~type:acceptance --example-status-log .rspec_status
+```
+
 ### Default Local Test Bundle
 
 The root `Gemfile` is the default bundle for local commands such as

@@ -3525,6 +3525,7 @@ module Kettle
         provider: "github_actions",
         default_branch: "main",
         exec_cmd: github_actions_exec_cmd(kettle_config, env),
+        engine_exec_cmds: github_actions_engine_exec_cmds(kettle_config),
         recording: project_recording_enabled?(project_root, kettle_config),
         ruby_versions: github_actions_ruby_versions(project_runtime.fetch(:test_min_ruby)),
         test_min_ruby: project_runtime.fetch(:test_min_ruby).to_s,
@@ -9056,7 +9057,30 @@ module Kettle
     end
 
     def finalize_github_workflow_template(content, facts = nil)
-      inject_framework_matrix_workflow_env(update_github_actions_pins(content), facts)
+      output = apply_github_actions_engine_exec_cmd_overrides(content, facts)
+      inject_framework_matrix_workflow_env(update_github_actions_pins(output), facts)
+    end
+
+    def apply_github_actions_engine_exec_cmd_overrides(content, facts)
+      overrides = facts.to_h.dig(:ci, :engine_exec_cmds).to_h
+      return content if overrides.empty?
+
+      lines = content.to_s.lines
+      yaml_mapping_nodes(content).sort_by { |mapping| -mapping.start_line }.each do |mapping|
+        engine = yaml_mapping_scalar_value(mapping, "ruby")
+        command = overrides[engine]
+        next if command.to_s.empty?
+
+        exec_cmd_node = yaml_mapping_scalar_node(mapping, "exec_cmd")
+        next unless exec_cmd_node
+
+        line_index = exec_cmd_node.start_line
+        indent = lines.fetch(line_index).to_s.match(/\A(\s*)/)[1]
+        lines[line_index] = "#{indent}exec_cmd: #{yaml_double_quoted_scalar(command)}\n"
+      end
+      lines.join
+    rescue Psych::Exception
+      content
     end
 
     def inject_framework_matrix_workflow_env(content, facts)
@@ -9174,11 +9198,15 @@ module Kettle
     end
 
     def yaml_mapping_scalar_value(mapping, key)
+      yaml_mapping_scalar_node(mapping, key)&.value.to_s
+    end
+
+    def yaml_mapping_scalar_node(mapping, key)
       mapping.children.each_slice(2) do |key_node, value_node|
         next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
         next unless value_node.is_a?(Psych::Nodes::Scalar)
 
-        return value_node.value.to_s
+        return value_node
       end
       nil
     end
@@ -18985,6 +19013,23 @@ module Kettle
       normalize_github_actions_exec_cmd(
         preferred_template_token_value("kettle-test", workflows["exec_cmd"], env, "KJ_EXEC_CMD").to_s
       )
+    end
+
+    # A generated workflow normally uses one command for every matrix entry.
+    # Legacy engines occasionally need a narrower command while retaining the
+    # rest of the generated workflow (setup, retries, cache keys, and pins).
+    def github_actions_engine_exec_cmds(config)
+      workflows = config["workflows"]
+      return {} unless workflows.is_a?(Hash)
+
+      raw = workflows["engine_exec_cmds"]
+      return {} unless raw.is_a?(Hash)
+
+      raw.each_with_object({}) do |(engine, command), overrides|
+        engine_name = engine.to_s.strip
+        command_text = command.to_s.strip
+        overrides[engine_name] = command_text unless engine_name.empty? || command_text.empty?
+      end
     end
 
     def normalize_github_actions_exec_cmd(command)

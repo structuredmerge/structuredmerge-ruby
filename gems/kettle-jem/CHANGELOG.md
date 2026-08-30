@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve locked dependencies while adding the local host platform to template-normalized lockfiles.
 
+- Preserved configured per-engine CI commands across workflow template updates.
+
 ### Security
 
 ## [7.1.12] - 2026-08-30
