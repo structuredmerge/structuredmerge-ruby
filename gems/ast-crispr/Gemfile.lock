@@ -8,14 +8,6 @@ GIT
       rubocop (>= 1.72.1, < 2.0)
 
 PATH
-  remote: .
-  specs:
-    ast-crispr (7.1.6)
-      ast-merge (= 7.1.6)
-      service_actor (~> 3.9)
-      version_gem (~> 1.1, >= 1.1.15)
-
-PATH
   remote: ../ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.6)
@@ -30,6 +22,14 @@ PATH
     ast-crispr-ruby-prism (7.1.6)
       ast-crispr (= 7.1.6)
       prism-merge (= 7.1.6)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: .
+  specs:
+    ast-crispr (7.1.6)
+      ast-merge (= 7.1.6)
+      service_actor (~> 3.9)
       version_gem (~> 1.1, >= 1.1.15)
 
 PATH
