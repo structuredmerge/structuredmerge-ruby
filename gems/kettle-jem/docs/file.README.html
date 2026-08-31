@@ -141,7 +141,7 @@ to build <code>kettle-jem</code> extension gems against the supported plugin sea
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.776-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.860-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -475,6 +475,20 @@ and <code>gems.tier1</code> / <code>gems.tier2</code> as documented in the<br>
 <p>Neither <code>appraisal_matrix</code> nor <code>framework_matrix</code> implicitly changes the root<br>
 local development bundle. Pair either policy with <code>test_bundle</code> when the<br>
 default local test command needs a specific framework or harness.</p>
+
+<h3 id="per-engine-workflow-commands">Per-Engine Workflow Commands</h3>
+
+<p>Generated workflows use <code>workflows.exec_cmd</code> by default. When a legacy engine<br>
+needs a narrower test command but should still receive the normal generated<br>
+workflow maintenance, configure <code>workflows.engine_exec_cmds</code> with the exact<br>
+matrix <code>ruby</code> value. The override changes only that matrix entry’s <code>exec_cmd</code>;<br>
+setup, retry, cache, and pin behavior remains template-managed.</p>
+
+<pre class="code language-yaml"><code class="language-yaml">workflows:
+  exec_cmd: kettle-test --example-status-log .rspec_status
+  engine_exec_cmds:
+    truffleruby-22.3: kettle-test --tag ~type:acceptance --example-status-log .rspec_status
+</code></pre>
 
 <h3 id="default-local-test-bundle">Default Local Test Bundle</h3>
 
@@ -1339,7 +1353,7 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Sun Aug 30 02:00:54 2026 by
+  Generated on Mon Aug 31 13:43:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

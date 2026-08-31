@@ -830,22 +830,22 @@
       <pre class="lines">
 
 
-894
-895
-896
-897
-898
-899
-900
-901
-902
-903
-904
-905
-906</pre>
+912
+913
+914
+915
+916
+917
+918
+919
+920
+921
+922
+923
+924</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 894</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 912</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_supported_versioned_engine_badges'>add_supported_versioned_engine_badges</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_min_ruby'>min_ruby</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_paths'>workflow_paths</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_existing_workflows'>existing_workflows</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_workflow_paths'>workflow_paths</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_delete_prefix'>delete_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>./</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
@@ -880,21 +880,21 @@
       <pre class="lines">
 
 
-930
-931
-932
-933
-934
-935
-936
-937
-938
-939
-940
-941</pre>
+948
+949
+950
+951
+952
+953
+954
+955
+956
+957
+958
+959</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 930</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 948</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_versioned_engine_badge_definitions'>add_versioned_engine_badge_definitions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_badge'>badge</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_processed'>processed</span> <span class='op'>=</span> <span class='id identifier rubyid_ensure_markdown_link_definition'>ensure_markdown_link_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_badge'>badge</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:badge_definition</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -928,25 +928,25 @@
       <pre class="lines">
 
 
-913
-914
-915
-916
-917
-918
-919
-920
-921
-922
-923
-924
-925
-926
-927
-928</pre>
+931
+932
+933
+934
+935
+936
+937
+938
+939
+940
+941
+942
+943
+944
+945
+946</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 913</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 931</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_versioned_engine_badge_to_row'>add_versioned_engine_badge_to_row</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_badge'>badge</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -984,18 +984,18 @@
       <pre class="lines">
 
 
-969
-970
-971
-972
-973
-974
-975
-976
-977</pre>
+987
+988
+989
+990
+991
+992
+993
+994
+995</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 969</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 987</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compatibility_badge_min_mri'>compatibility_badge_min_mri</span><span class='lparen'>(</span><span class='id identifier rubyid_label'>label</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_match'>match</span> <span class='op'>=</span> <span class='id identifier rubyid_label'>label</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A💎ruby-(?&lt;version&gt;\d+\.\d+)i\z</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -1049,13 +1049,13 @@
       <pre class="lines">
 
 
-1074
-1075
-1076
-1077</pre>
+1092
+1093
+1094
+1095</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1074</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1092</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compatibility_row?'>compatibility_row?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lstrip'>lstrip</span>
@@ -1081,18 +1081,18 @@
       <pre class="lines">
 
 
-1079
-1080
-1081
-1082
-1083
-1084
-1085
-1086
-1087</pre>
+1097
+1098
+1099
+1100
+1101
+1102
+1103
+1104
+1105</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1079</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1097</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_delete_markdown_link_definitions'>delete_markdown_link_definitions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_labels'>labels</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ensure_runtime_dependencies!'><span class='object_link'><a href="../Jem.html#ensure_runtime_dependencies!-class_method" title="Kettle::Jem.ensure_runtime_dependencies! (method)">ensure_runtime_dependencies!</a></span></span>
@@ -1123,16 +1123,16 @@
       <pre class="lines">
 
 
-943
-944
-945
-946
-947
-948
-949</pre>
+961
+962
+963
+964
+965
+966
+967</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 943</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 961</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_markdown_link_definition'>ensure_markdown_link_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_definition'>definition</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_label'>label</span> <span class='op'>=</span> <span class='id identifier rubyid_definition'>definition</span><span class='lbracket'>[</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A(\[[^\]]+\]):</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span>
@@ -1161,16 +1161,16 @@
       <pre class="lines">
 
 
-1048
-1049
-1050
-1051
-1052
-1053
-1054</pre>
+1066
+1067
+1068
+1069
+1070
+1071
+1072</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1048</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1066</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_inline_reference_owners'>markdown_inline_reference_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ensure_runtime_dependencies!'><span class='object_link'><a href="../Jem.html#ensure_runtime_dependencies!-class_method" title="Kettle::Jem.ensure_runtime_dependencies! (method)">ensure_runtime_dependencies!</a></span></span>
@@ -1199,16 +1199,16 @@
       <pre class="lines">
 
 
-1040
-1041
-1042
-1043
-1044
-1045
-1046</pre>
+1058
+1059
+1060
+1061
+1062
+1063
+1064</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1040</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1058</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_link_definition_owners'>markdown_link_definition_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ensure_runtime_dependencies!'><span class='object_link'><a href="../Jem.html#ensure_runtime_dependencies!-class_method" title="Kettle::Jem.ensure_runtime_dependencies! (method)">ensure_runtime_dependencies!</a></span></span>
@@ -1237,18 +1237,18 @@
       <pre class="lines">
 
 
-1064
-1065
-1066
-1067
-1068
-1069
-1070
-1071
-1072</pre>
+1082
+1083
+1084
+1085
+1086
+1087
+1088
+1089
+1090</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1064</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1082</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_structural_owners'>markdown_structural_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_owner_scopes'>owner_scopes</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ensure_runtime_dependencies!'><span class='object_link'><a href="../Jem.html#ensure_runtime_dependencies!-class_method" title="Kettle::Jem.ensure_runtime_dependencies! (method)">ensure_runtime_dependencies!</a></span></span>
@@ -1279,16 +1279,16 @@
       <pre class="lines">
 
 
-1056
-1057
-1058
-1059
-1060
-1061
-1062</pre>
+1074
+1075
+1076
+1077
+1078
+1079
+1080</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1056</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1074</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_markdown_table_row_owners'>markdown_table_row_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ensure_runtime_dependencies!'><span class='object_link'><a href="../Jem.html#ensure_runtime_dependencies!-class_method" title="Kettle::Jem.ensure_runtime_dependencies! (method)">ensure_runtime_dependencies!</a></span></span>
@@ -1317,18 +1317,18 @@
       <pre class="lines">
 
 
-1007
-1008
-1009
-1010
-1011
-1012
-1013
-1014
-1015</pre>
+1025
+1026
+1027
+1028
+1029
+1030
+1031
+1032
+1033</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1007</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1025</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_compatibility_badge_cell'>normalize_compatibility_badge_cell</span><span class='lparen'>(</span><span class='id identifier rubyid_cell'>cell</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cell'>cell</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -1359,27 +1359,27 @@
       <pre class="lines">
 
 
-988
-989
-990
-991
-992
-993
-994
-995
-996
-997
-998
-999
-1000
-1001
-1002
-1003
-1004
-1005</pre>
+1006
+1007
+1008
+1009
+1010
+1011
+1012
+1013
+1014
+1015
+1016
+1017
+1018
+1019
+1020
+1021
+1022
+1023</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 988</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1006</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_compatibility_rows'>normalize_compatibility_rows</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -1419,22 +1419,22 @@
       <pre class="lines">
 
 
-824
-825
-826
-827
-828
-829
-830
-831
-832
-833
-834
-835
-836</pre>
+842
+843
+844
+845
+846
+847
+848
+849
+850
+851
+852
+853
+854</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 824</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 842</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_process'>process</span><span class='lparen'>(</span><span class='label'>content:</span><span class='comma'>,</span> <span class='label'>min_ruby:</span><span class='comma'>,</span> <span class='label'>engines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>workflow_paths:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ensure_runtime_dependencies!'><span class='object_link'><a href="../Jem.html#ensure_runtime_dependencies!-class_method" title="Kettle::Jem.ensure_runtime_dependencies! (method)">ensure_runtime_dependencies!</a></span></span>
@@ -1469,20 +1469,20 @@
       <pre class="lines">
 
 
-1028
-1029
-1030
-1031
-1032
-1033
-1034
-1035
-1036
-1037
-1038</pre>
+1046
+1047
+1048
+1049
+1050
+1051
+1052
+1053
+1054
+1055
+1056</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1028</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1046</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prune_orphaned_workflow_inline_references'>prune_orphaned_workflow_inline_references</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_owners'>owners</span> <span class='op'>=</span> <span class='id identifier rubyid_markdown_structural_owners'>markdown_structural_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='symbol'>:link_definitions</span><span class='comma'>,</span> <span class='symbol'>:inline_references</span><span class='rparen'>)</span>
@@ -1515,19 +1515,19 @@
       <pre class="lines">
 
 
-1017
-1018
-1019
-1020
-1021
-1022
-1023
-1024
-1025
-1026</pre>
+1035
+1036
+1037
+1038
+1039
+1040
+1041
+1042
+1043
+1044</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1017</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1035</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prune_unused_compatibility_reference_definitions'>prune_unused_compatibility_reference_definitions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_owners'>owners</span> <span class='op'>=</span> <span class='id identifier rubyid_markdown_structural_owners'>markdown_structural_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='symbol'>:inline_references</span><span class='comma'>,</span> <span class='symbol'>:link_definitions</span><span class='rparen'>)</span>
@@ -1559,12 +1559,12 @@
       <pre class="lines">
 
 
-984
-985
-986</pre>
+1002
+1003
+1004</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 984</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1002</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_badge_occurrences'>remove_badge_occurrences</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_label'>label</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_remove_markdown_inline_references'>remove_markdown_inline_references</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_label'>label</span><span class='rparen'>)</span>
@@ -1589,24 +1589,6 @@
       <pre class="lines">
 
 
-838
-839
-840
-841
-842
-843
-844
-845
-846
-847
-848
-849
-850
-851
-852
-853
-854
-855
 856
 857
 858
@@ -1616,10 +1598,28 @@
 862
 863
 864
-865</pre>
+865
+866
+867
+868
+869
+870
+871
+872
+873
+874
+875
+876
+877
+878
+879
+880
+881
+882
+883</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 838</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 856</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_disabled_engine_content'>remove_disabled_engine_content</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_engines'>engines</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_enabled'>enabled</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_engines'>engines</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_engine'>engine</span><span class='op'>|</span> <span class='id identifier rubyid_engine'>engine</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='rbrace'>}</span>
@@ -1669,19 +1669,19 @@
       <pre class="lines">
 
 
-958
-959
-960
-961
-962
-963
-964
-965
-966
-967</pre>
+976
+977
+978
+979
+980
+981
+982
+983
+984
+985</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 958</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 976</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_incompatible_compatibility_badges'>remove_incompatible_compatibility_badges</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_min_ruby'>min_ruby</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_markdown_inline_reference_owners'>markdown_inline_reference_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:labels</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_label'>label</span><span class='op'>|</span>
@@ -1713,30 +1713,30 @@
       <pre class="lines">
 
 
-1089
-1090
-1091
-1092
-1093
-1094
-1095
-1096
-1097
-1098
-1099
-1100
-1101
-1102
-1103
-1104
-1105
-1106
 1107
 1108
-1109</pre>
+1109
+1110
+1111
+1112
+1113
+1114
+1115
+1116
+1117
+1118
+1119
+1120
+1121
+1122
+1123
+1124
+1125
+1126
+1127</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1089</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1107</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_markdown_inline_references'>remove_markdown_inline_references</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_label'>label</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -1779,16 +1779,16 @@
       <pre class="lines">
 
 
-1111
-1112
-1113
-1114
-1115
-1116
-1117</pre>
+1129
+1130
+1131
+1132
+1133
+1134
+1135</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1111</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1129</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_markdown_table_rows'>remove_markdown_table_rows</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -1817,19 +1817,19 @@
       <pre class="lines">
 
 
-867
-868
-869
-870
-871
-872
-873
-874
-875
-876</pre>
+885
+886
+887
+888
+889
+890
+891
+892
+893
+894</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 867</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 885</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_missing_workflow_badges'>remove_missing_workflow_badges</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_paths'>workflow_paths</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_existing'>existing</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_workflow_paths'>workflow_paths</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_delete_prefix'>delete_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>./</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
@@ -1861,12 +1861,12 @@
       <pre class="lines">
 
 
-890
-891
-892</pre>
+908
+909
+910</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 890</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 908</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_workflow_badge_occurrences'>remove_workflow_badge_occurrences</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_label'>workflow_label</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_remove_markdown_inline_references'>remove_markdown_inline_references</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_workflow_label'>workflow_label</span><span class='rparen'>)</span>
@@ -1891,13 +1891,13 @@
       <pre class="lines">
 
 
-979
-980
-981
-982</pre>
+997
+998
+999
+1000</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 979</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 997</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruby_minor_version'>ruby_minor_version</span><span class='lparen'>(</span><span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_segments'>segments</span> <span class='op'>=</span> <span class='id identifier rubyid_version'>version</span><span class='period'>.</span><span class='id identifier rubyid_segments'>segments</span>
@@ -1946,13 +1946,13 @@
       <pre class="lines">
 
 
-908
-909
-910
-911</pre>
+926
+927
+928
+929</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 908</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 926</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_versioned_engine_badge_compatible?'>versioned_engine_badge_compatible?</span><span class='lparen'>(</span><span class='id identifier rubyid_badge'>badge</span><span class='comma'>,</span> <span class='id identifier rubyid_min_ruby'>min_ruby</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_badge_min_mri'>badge_min_mri</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#ENGINE_COMPATIBILITY_MRI_VERSION-constant" title="Kettle::Jem::ReadmePostProcessor::ENGINE_COMPATIBILITY_MRI_VERSION (constant)">ENGINE_COMPATIBILITY_MRI_VERSION</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='id identifier rubyid_badge'>badge</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:engine</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_badge'>badge</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:version</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -1978,15 +1978,15 @@
       <pre class="lines">
 
 
-951
-952
-953
-954
-955
-956</pre>
+969
+970
+971
+972
+973
+974</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 951</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 969</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_workflow_definition_base_url'>workflow_definition_base_url</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_markdown_link_definition_owners'>markdown_link_definition_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span>
@@ -2014,20 +2014,20 @@
       <pre class="lines">
 
 
-878
-879
-880
-881
-882
-883
-884
-885
-886
-887
-888</pre>
+896
+897
+898
+899
+900
+901
+902
+903
+904
+905
+906</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 878</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 896</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_workflow_references'>workflow_references</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_markdown_structural_owners'>markdown_structural_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='symbol'>:link_definitions</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:link_definitions</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_references'>references</span><span class='op'>|</span>
@@ -2050,7 +2050,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Aug 30 02:00:57 2026 by
+  Generated on Mon Aug 31 13:43:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

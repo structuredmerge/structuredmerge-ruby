@@ -22,6 +22,23 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.13] - 2026-08-31
+
+- TAG: [v7.1.13][7.1.13t]
+- COVERAGE: 93.62% -- 11103/11860 lines in 16 files
+- BRANCH COVERAGE: 76.97% -- 4728/6143 branches in 16 files
+- 17.96% documented
+
+### Changed
+
 - [kc] kettle-jem/template: updated 796 project files:
   - code and tests (40)
   - configuration (24)
@@ -33,10 +50,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-family (>= 1.2.65 -> >= 1.2.74)
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Preserve existing lockfile platforms and add the local host platform during template lockfile normalization.
@@ -46,8 +59,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Preserved configured per-engine CI commands across workflow template updates.
 
 - Invalidate workflow template checksums when a configured per-engine command changes.
-
-### Security
 
 ## [7.1.12] - 2026-08-30
 
@@ -1735,7 +1746,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.12...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.13...HEAD
+[7.1.13]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.12...v7.1.13
+[7.1.13t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.13
 [7.1.12]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.11...v7.1.12
 [7.1.12t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.12
 [7.1.11]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.10...v7.1.11
