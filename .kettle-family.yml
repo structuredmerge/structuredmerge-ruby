@@ -151,7 +151,7 @@ release:
   # off for each member once its selected sibling dependencies are released.
   local_path_strategy: waves
   build_command: bundle exec rake build
-  publish_command: bundle exec kettle-release skip_steps=1
+  publish_command: bundle exec kettle-release
   waves:
     - [tree_haver]
     - [ast-merge]

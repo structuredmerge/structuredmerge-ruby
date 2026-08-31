@@ -89,7 +89,7 @@ run = "bundle exec kettle-family gha-sha-pins --execute"
 [tasks.release]
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"
 raw = true
-run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV=false bundle exec kettle-family release --execute --publish --secrets-provider op --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
+run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV=false bundle exec kettle-family release --execute --publish --secrets-provider op --skip-steps 1 --env K_JEM_TEMPLATING=true --env STRUCTUREDMERGE_DEV={{config_root}}/gems"
 
 [tasks.bupb]
 description = "Update Bundler across family members; pass options after --"
