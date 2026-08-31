@@ -31,7 +31,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - workflows (174)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-family (>= 1.2.65 -> >= 1.2.72)
+  - kettle-dev (>= 3.0.23 -> >= 3.0.24)
+  - kettle-family (>= 1.2.65 -> >= 1.2.73)
 
 ### Deprecated
 
