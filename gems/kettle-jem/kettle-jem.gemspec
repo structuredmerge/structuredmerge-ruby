@@ -108,7 +108,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.14")          # ruby >= 2.4.0
   spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.13")            # ruby >= 2.4.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.11")                 # ruby >= 1.8.7
-  spec.add_dependency("kramdown-merge", "~> 7.1", ">= 7.1.4")             # ruby >= 4.0.0
+  spec.add_dependency("kramdown-merge", "~> 7.1", ">= 7.1.6")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "~> 7.1", ">= 7.1.6")             # ruby >= 4.0.0
   spec.add_dependency("markly-merge", "~> 7.1", ">= 7.1.4")               # ruby >= 4.0.0
   spec.add_dependency("parslet", "~> 2.0")                               # ruby >= 2.6.0
