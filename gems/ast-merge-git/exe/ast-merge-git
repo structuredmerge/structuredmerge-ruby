@@ -3,31 +3,42 @@
 
 require 'ast/merge/git'
 
-if ARGV.first == 'benchmark-provider-diff'
+if %w[benchmark-provider-diff benchmark-provider-merge2].include?(ARGV.first)
   require 'json'
 
   begin
-    before_path, after_path, path_name = ARGV.drop(1)
-    raise ArgumentError, 'before, after, and path name are required' unless before_path && after_path && path_name
+    command = ARGV.first
+    first_path, second_path, path_name = ARGV.drop(1)
+    raise ArgumentError, 'two source paths and path name are required' unless first_path && second_path && path_name
 
+    operation, role_sources = if command == 'benchmark-provider-diff'
+                                [:diff2, {
+                                  before_source: File.binread(first_path),
+                                  after_source: File.binread(second_path)
+                                }]
+                              else
+                                [:merge2, {
+                                  incoming_source: File.binread(first_path),
+                                  current_source: File.binread(second_path)
+                                }]
+                              end
     require ENV.fetch('AST_MERGE_REQUIRE')
     result = Ast::Merge.dispatch_provider(
-      :diff2,
+      operation,
       {
         provider_id: ENV.fetch('AST_MERGE_PROVIDER'),
         family: ENV.fetch('AST_MERGE_FAMILY'),
         dialect: ENV.fetch('AST_MERGE_DIALECT'),
         backend: ENV.fetch('AST_MERGE_BACKEND'),
         profile_id: ENV.fetch('AST_MERGE_PROFILE'),
-        before_source: File.binread(before_path),
-        after_source: File.binread(after_path),
-        path_name: path_name
+        path_name: path_name,
+        **role_sources
       }
     )
     puts JSON.generate(Ast::Merge.json_ready(result))
     exit(result[:ok] == true ? 0 : 2)
   rescue ArgumentError, Ast::Merge::Error, KeyError, LoadError, SystemCallError => e
-    warn "ast-merge-git benchmark-provider-diff: #{e.message}"
+    warn "ast-merge-git #{ARGV.first}: #{e.message}"
     exit 2
   end
 end

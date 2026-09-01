@@ -15,8 +15,8 @@ module Ast
         Error = Class.new(StandardError)
         SCHEMA = 'structuredmerge.benchmark.corpus/v1'
         CASE_SCHEMA = 'structuredmerge.benchmark/v1'
-        OPERATIONS = %w[merge3 metamorphic diff].freeze
-        EXECUTABLE_OPERATIONS = %w[merge3 metamorphic].freeze
+        OPERATIONS = %w[merge2 merge3 metamorphic diff].freeze
+        EXECUTABLE_OPERATIONS = %w[merge2 merge3 metamorphic].freeze
         PARTITIONS = %w[sentinel gold metamorphic].freeze
         EXPECTATIONS = %w[clean conflict error excluded_ambiguous].freeze
         SEVERITIES = %w[none low high critical].freeze
@@ -34,6 +34,7 @@ module Ast
         ].freeze
         SELECTOR_FIELDS = %w[provider_id family dialect backend profile require].freeze
         INPUT_ROLES = {
+          'merge2' => %w[incoming current],
           'merge3' => %w[base ours theirs],
           'metamorphic' => %w[source transformed],
           'diff' => %w[before after]
@@ -267,7 +268,7 @@ module Ast
         end
 
         def validate_operation!(item, id)
-          if item['operation'] == 'merge3'
+          if %w[merge2 merge3].include?(item['operation'])
             require_keys(item, %w[expected expected_conflicts], id)
             expectation = item.dig('expected', 'outcome')
             error!("#{id}: unsupported expected outcome") unless EXPECTATIONS.include?(expectation)
@@ -433,6 +434,7 @@ module Ast
         end
 
         def execute_case(item)
+          return execute_merge2_case(item) if item['operation'] == 'merge2'
           return execute_merge3_case(item) if item['operation'] == 'merge3'
           return execute_metamorphic_case(item) if item['operation'] == 'metamorphic'
 
@@ -496,6 +498,20 @@ module Ast
           FileUtils.rm_rf(workspace) if workspace
         end
 
+        def execute_merge2_case(item)
+          workspace = @tmp_root.join("#{safe_id(item['id'])}-#{Process.pid}")
+          FileUtils.rm_rf(workspace)
+          FileUtils.mkdir_p(workspace)
+          write_merge2_roles(item, workspace)
+          baseline = execute_merge2_baseline(item, workspace)
+          candidate = execute_merge2_candidate(item, workspace)
+          rerun = execute_merge2_candidate(item, workspace)
+          candidate['deterministic_correctness_rerun'] = correctness_record(candidate) == correctness_record(rerun)
+          [baseline, candidate]
+        ensure
+          FileUtils.rm_rf(workspace) if workspace
+        end
+
         def execute_metamorphic_case(item)
           workspace = @tmp_root.join("#{safe_id(item['id'])}-#{Process.pid}")
           FileUtils.rm_rf(workspace)
@@ -540,6 +556,47 @@ module Ast
           %w[base ours theirs].each do |role|
             workspace.join(role).binwrite(item.dig('inputs', role, 'bytes'))
           end
+        end
+
+        def write_merge2_roles(item, workspace)
+          %w[incoming current].each do |role|
+            workspace.join(role).binwrite(item.dig('inputs', role, 'bytes'))
+          end
+        end
+
+        def execute_merge2_baseline(item, workspace)
+          started = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+          output = workspace.join('incoming').binread
+          capture = {
+            stdout: '',
+            stderr: '',
+            status: 0,
+            output: output,
+            duration_ns: Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - started
+          }
+          raw_result(item, 'template.overwrite', capture)
+        end
+
+        def execute_merge2_candidate(item, workspace)
+          selector = item.fetch('selector')
+          capture = timed_capture(
+            candidate_env(selector),
+            @driver_path.to_s,
+            'benchmark-provider-merge2',
+            'incoming',
+            'current',
+            "#{item['id']}.#{item['dialect']}",
+            chdir: workspace
+          )
+          result = capture[:stdout].empty? ? {} : JSON.parse(capture[:stdout])
+          capture[:output] = capture[:status].zero? ? result.fetch('output') : ''
+          raw_result(item, 'ast-merge-provider.merge2', capture)
+        rescue JSON::ParserError, KeyError => e
+          capture ||= { stdout: '', stderr: '', status: 2, duration_ns: 0 }
+          capture[:stderr] = [capture[:stderr], e.message].reject(&:empty?).join("\n")
+          capture[:status] = 2
+          capture[:output] = ''
+          raw_result(item, 'ast-merge-provider.merge2', capture)
         end
 
         def write_metamorphic_roles(item, workspace)
@@ -664,8 +721,15 @@ module Ast
         end
 
         def adapter_role(adapter)
-          return 'baseline' if adapter.start_with?('git.')
-          return 'candidate' if %w[ast-merge-git ast-merge-provider.diff2 structuredmerge.unsupported].include?(adapter)
+          return 'baseline' if adapter.start_with?('git.') || adapter == 'template.overwrite'
+
+          candidates = %w[
+            ast-merge-git
+            ast-merge-provider.diff2
+            ast-merge-provider.merge2
+            structuredmerge.unsupported
+          ]
+          return 'candidate' if candidates.include?(adapter)
 
           'competitor'
         end

@@ -280,6 +280,27 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(result).to include('ok' => true, 'operation' => 'diff2', 'changes' => [])
   end
 
+  it 'executes merge2 through the provider boundary against an explicit overwrite baseline' do
+    baseline, candidate = runner.send(:execute_case, merge2_case)
+
+    expect(baseline).to include(
+      'adapter_id' => 'template.overwrite',
+      'adapter_role' => 'baseline',
+      'outcome' => 'false_auto_merge'
+    )
+    expect(candidate).to include(
+      'adapter_id' => 'ast-merge-provider.merge2',
+      'adapter_role' => 'candidate',
+      'outcome' => 'correct_clean',
+      'deterministic_correctness_rerun' => true
+    )
+    expect(JSON.parse(candidate.dig('raw', 'output', 'inline'))).to eq(
+      'managed' => 1,
+      'recommended' => true,
+      'local' => true
+    )
+  end
+
   it 'executes a pinned merge competitor without letting its results alter the candidate safety gate' do
     FileUtils.mkdir_p(tmp_root)
     competitor = tmp_root.join('mergiraf')
@@ -358,6 +379,65 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       expect(first.dig('cache_identity', 'sha256')).to eq(second.dig('cache_identity', 'sha256'))
       expect { JSON.generate(first) }.not_to raise_error
     end
+  end
+
+  # rubocop:disable Metrics/MethodLength -- complete benchmark evidence is intentionally explicit
+  def merge2_case
+    incoming = "{\"managed\":2,\"recommended\":true}\n"
+    current = "{\"managed\":1,\"local\":true}\n"
+    expected = "{\"managed\":1,\"recommended\":true,\"local\":true}\n"
+    {
+      'schema_version' => 'structuredmerge.benchmark/v1',
+      'kind' => 'benchmark_case',
+      'id' => 'case.merge2.json.current-owned-fields.v1',
+      'operation' => 'merge2',
+      'family' => 'json',
+      'provider' => 'ruby.json',
+      'dialect' => 'json',
+      'capabilities' => %w[merge2 source_preserving structural_paths],
+      'partition' => 'gold',
+      'provenance' => benchmark.cases.first.fetch('provenance'),
+      'oracle' => {
+        'class' => 'structural_ast',
+        'artifact' => inline_record(expected),
+        'admission' => 'reviewed',
+        'score_eligible' => true,
+        'procedure' => 'Compare selected-provider structure and preservation requirements.'
+      },
+      'acceptable_equivalence' => [{
+        'class' => 'structural_ast',
+        'provider' => 'ruby.json',
+        'required' => true
+      }],
+      'preservation_policy' => {
+        'comments' => 'not_applicable',
+        'formatting' => 'allowed_to_change',
+        'order' => 'allowed_to_change',
+        'encoding' => 'required',
+        'line_endings' => 'required',
+        'unknown_fields' => 'required',
+        'source_regions' => 'allowed_to_change'
+      },
+      'false_auto_merge_severity' => 'high',
+      'selector' => benchmark.cases.first.fetch('selector'),
+      'inputs' => {
+        'incoming' => inline_record(incoming),
+        'current' => inline_record(current)
+      },
+      'independent_edits' => [
+        { 'id' => 'incoming.recommended', 'side' => 'incoming', 'path' => '/recommended' },
+        { 'id' => 'current.local', 'side' => 'current', 'path' => '/local' }
+      ],
+      'independent_edit_ids' => %w[incoming.recommended current.local],
+      'expected_conflict_regions' => [],
+      'expected' => { 'outcome' => 'clean', 'output' => inline_record(expected) },
+      'expected_conflicts' => false
+    }
+  end
+  # rubocop:enable Metrics/MethodLength
+
+  def inline_record(bytes)
+    { 'mode' => 'inline', 'bytes' => bytes, 'sha256' => Digest::SHA256.hexdigest(bytes) }
   end
 
   def semantic_case(dialect, expected)

@@ -24,7 +24,7 @@ RSpec.describe Ast::Merge::PortableBenchmarkContract do
       'schema' => 'structuredmerge.benchmark/v1',
       'counts' => {
         'adapters' => 2,
-        'cases' => 5,
+        'cases' => 6,
         'results' => 7,
         'selected_cases' => 5,
         'score_eligible_results' => 5,
@@ -33,6 +33,7 @@ RSpec.describe Ast::Merge::PortableBenchmarkContract do
       },
       'case_ids_by_operation' => {
         'diff' => ['case.diff.json.object-update.v1'],
+        'merge2' => ['case.merge2.json.current-owned-fields.v1'],
         'merge3' => [
           'case.merge3.json.independent-fields.v1',
           'case.merge3.json.region-conflict.v1'
@@ -43,6 +44,7 @@ RSpec.describe Ast::Merge::PortableBenchmarkContract do
       'case_ids_by_partition' => {
         'sentinel' => ['case.diff.json.object-update.v1'],
         'gold' => [
+          'case.merge2.json.current-owned-fields.v1',
           'case.merge3.json.independent-fields.v1',
           'case.merge3.json.region-conflict.v1'
         ],
@@ -77,7 +79,7 @@ RSpec.describe Ast::Merge::PortableBenchmarkContract do
         neighbor_samples
         sentinels
       ],
-      'contract_digest' => '1015727c1a9c4f132dfb8bb51118a594f6ad170459e2af9c73cdb586ec02ce22'
+      'contract_digest' => 'cc65ce8cb9312e1487fbde257bb80ae53169da6c5e23299957af653af9a616a8'
     }
   end
 
