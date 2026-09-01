@@ -2240,4 +2240,50 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       )
     end
   end
+
+  it "retains destination gitignore rules while adding new template rules" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gitignore-merge-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .gitignore
+        YAML
+        ".gitignore" => <<~GITIGNORE,
+          # Rails runtime logs
+          /log/
+          /tmp/
+        GITIGNORE
+        "template/.gitignore.example" => <<~GITIGNORE
+          # Build artifacts
+          /pkg/
+          /tmp/
+        GITIGNORE
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      content = File.read(File.join(root, ".gitignore"))
+
+      expect(content).to include("# Rails runtime logs\n/log/\n")
+      expect(content).to include("# Build artifacts\n/pkg/\n")
+      expect(content.scan(%r{^/tmp/$}).size).to eq(1)
+      expect(apply.fetch(:changed_files)).to include(".gitignore")
+    end
+  end
+
+  it "uses SSH for GitHub shorthand dependencies in the packaged Gemfile" do
+    packaged_gemfile = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Gemfile.example"))
+
+    expect(packaged_gemfile).to include('git_source(:github) { |repo_name| "git@github.com:#{repo_name}.git" }')
+  end
 end

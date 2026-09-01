@@ -1536,7 +1536,8 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         "bundle",
         "lock",
         *["arm64-darwin", "ruby", "x86_64-darwin", Gem::Platform.local.to_s].uniq.sort.map { |platform| "--add-platform=#{platform}" },
-        "--update"
+        "--update",
+        "--add-checksums"
       ]
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "bundle_lock_normalization",

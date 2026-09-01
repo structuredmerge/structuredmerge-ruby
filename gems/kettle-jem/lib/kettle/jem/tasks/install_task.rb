@@ -788,7 +788,7 @@ module Kettle
 
         def lockfile_normalization_command(project_root)
           platforms = lockfile_normalization_platforms(project_root)
-          ["bundle", "lock", *platforms.map { |platform| "--add-platform=#{platform}" }, "--update"]
+          ["bundle", "lock", *platforms.map { |platform| "--add-platform=#{platform}" }, "--update", "--add-checksums"]
         end
 
         def lockfile_normalization_platforms(project_root)

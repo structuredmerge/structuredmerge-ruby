@@ -7912,6 +7912,8 @@ module Kettle
       end
 
       case file_type
+      when :gitignore
+        return merge_gitignore_template_source(template_content, destination_content)
       when :gemspec
         return merge_gemspec_template_source(template_content, destination_content, facts: facts, env: env)
       when :ruby, :gemfile, :rakefile, :appraisals
@@ -12291,6 +12293,7 @@ module Kettle
       relative_path = recipe.fetch(:target_path).to_s
       basename = File.basename(relative_path)
       extension = File.extname(relative_path).downcase
+      return :gitignore if basename == ".gitignore"
       return :gemfile if basename == "Gemfile" || basename.end_with?(".gemfile")
       return :appraisals if basename.start_with?("Appraisals") || basename == "Appraisal.root.gemfile"
       return :gemspec if basename.end_with?(".gemspec")
@@ -12309,6 +12312,40 @@ module Kettle
       return :rbs if extension == ".rbs"
 
       :text
+    end
+
+    def merge_gitignore_template_source(template_content, destination_content)
+      # Git ignore files have no parser-backed AST. Treat each non-comment line
+      # as a rule node, retain destination order and comments, and append only
+      # template rules that the destination does not already declare.
+      destination_rules = destination_content.lines.map(&:strip).reject { |line| line.empty? || line.start_with?("#") }.to_set
+      additions = []
+      pending_comments = []
+
+      template_content.lines.each do |line|
+        stripped = line.strip
+        if stripped.empty?
+          pending_comments << line unless pending_comments.empty?
+          next
+        end
+        if stripped.start_with?("#")
+          pending_comments << line
+          next
+        end
+        next if destination_rules.include?(stripped)
+
+        additions.concat(pending_comments)
+        additions << line
+        destination_rules << stripped
+        pending_comments = []
+      end
+
+      return destination_content if additions.empty?
+
+      output = destination_content.dup
+      output << "\n" unless output.empty? || output.end_with?("\n\n")
+      output << additions.join
+      ensure_trailing_newline(output)
     end
 
     def apply_kettle_config_bootstrap(project_root, recipe, env: ENV, template_contents: nil)
@@ -18346,6 +18383,7 @@ module Kettle
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
       return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == KETTLE_CONFIG_PATH
+      return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == ".gitignore"
       return {strategy: :accept_template} if target_path.to_s == "CITATION.cff"
       return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == "Rakefile"
       return {strategy: :accept_template} if version_gem_template_target_path?(target_path)

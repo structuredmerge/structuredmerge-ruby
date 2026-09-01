@@ -27,11 +27,21 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-family (>= 1.2.74 -> >= 1.2.75)
   - kettle-jem (>= 7.1.12 -> >= 7.1.13)
 
+- [kc] kettle-jem/template: updated 398 project files:
+  - code and tests (20)
+  - configuration (12)
+  - dependencies (147)
+  - documentation (9)
+  - other (123)
+  - workflows (87)
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Preserve destination .gitignore rules while adding template ignore rules, retain SSH GitHub sources, and keep Bundler lockfile checksums during template normalization.
 
 ### Security
 
