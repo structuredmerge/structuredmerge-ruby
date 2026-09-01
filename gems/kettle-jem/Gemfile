@@ -8,6 +8,7 @@
 
 source "https://gem.coop"
 
+git_source(:github) { |repo_name| "git@github.com:#{repo_name}.git" }
 git_source(:codeberg) { |repo_name| "https://codeberg.org/#{repo_name}" }
 git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 
@@ -18,14 +19,13 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from kettle-jem.gemspec
 gemspec
 
-gem "kettle-family", "~> 1.2", ">= 1.2.64"
+gem "kettle-family", "~> 1.2", ">= 1.2.80"
 
 # Local workspace dependency wiring for *_local.gemfile overrides
 gem "nomono", "~> 1.1", ">= 1.1.5", require: false # ruby >= 3.2.0
 
 # Direct sibling dependencies (env-switched via STRUCTUREDMERGE_DEV)
 direct_sibling_gems = %w[
-  ast-crispr
   ast-crispr-markdown-markly
   ast-crispr-ruby-prism
   ast-merge
@@ -39,12 +39,13 @@ direct_sibling_gems = %w[
   markly-merge
   prism-merge
   psych-merge
-  plain-merge
   rbs-merge
   ruby-merge
   toml-merge
   tree_haver
   yaml-merge
+  ast-crispr
+  plain-merge
 ]
 direct_sibling_dev = ENV.fetch("STRUCTUREDMERGE_DEV", "")
 direct_sibling_local =
