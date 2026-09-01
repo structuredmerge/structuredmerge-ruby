@@ -183,7 +183,7 @@ module Kettle
 
         def local_path_development_env?(env)
           (env || {}).any? do |key, raw_value|
-            next false unless key.to_s.end_with?("_DEV")
+            next false unless key.to_s.end_with?("_DEV", "_LOCAL")
 
             value = raw_value.to_s.strip
             !value.empty? && !Kettle::Jem::DecisionPolicy.falsey?(value)

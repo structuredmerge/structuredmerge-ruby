@@ -106,6 +106,8 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include(
         "declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)"
       )
+      expect(final_content).to include('ENV.fetch("RUBOCOP_LTS_DEV", "false")')
+      expect(final_content).not_to include("RUBOCOP_LTS_LOCAL")
       expect(final_content).to include(
         'unless declared_gems.include?("rubocop-ruby3_1")'
       )

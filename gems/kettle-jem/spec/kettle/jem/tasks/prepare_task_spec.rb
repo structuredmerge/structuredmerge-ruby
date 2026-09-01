@@ -306,6 +306,30 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "treats legacy local-path environment names as local development" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), "GEM\n")
+      command_runner = ->(_command) { raise "unexpected command" }
+
+      step = described_class.reset_release_lockfiles_step(
+        project_root: root,
+        setup_env: {
+          "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+          "RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"
+        },
+        quiet: false,
+        command_runner: command_runner,
+        events: nil
+      )
+
+      expect(step).to include(
+        name: "reset_release_lockfiles",
+        status: "skipped",
+        reason: "local_path_development_env"
+      )
+    end
+  end
+
   it "keeps templating enabled for bootstrap bundle commands during local path development" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")

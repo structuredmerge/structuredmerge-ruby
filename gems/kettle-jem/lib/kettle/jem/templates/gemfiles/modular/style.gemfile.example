@@ -22,7 +22,7 @@ platform :mri do
     ref: "3539ba858d379740d638566faee9e56b2b854145"
   gem "standard", "~> 1.56", ">= 1.56.0"
 
-  if ENV.fetch("RUBOCOP_LTS_LOCAL", "false").casecmp("false").zero?
+  if ENV.fetch("RUBOCOP_LTS_DEV", "false").casecmp("false").zero?
     declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
     gem "rubocop-lts", {KJ|RUBOCOP_LTS_CONSTRAINT} unless declared_gems.include?("rubocop-lts")
     gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.5" unless declared_gems.include?("rubocop-lts-rspec")

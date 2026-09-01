@@ -34,9 +34,9 @@ module Kettle
           install_steps << config_migration_step if config_migration_step
           install_steps << gemspec_dependency_sync_step(report)
           install_steps.concat(version_gem_bootstrap_steps(project_root, report))
-          mise_step = mise_trust_step(project_root, report, env: env)
-          install_steps << mise_step if mise_step
           install_steps.concat(post_template_project_fix_steps(project_root, report, env: env))
+          mise_step = mise_trust_step(project_root, report, env: env, install_steps: install_steps)
+          install_steps << mise_step if mise_step
           install_steps << hook_templates_step(project_root, effective_run_options)
           install_steps << git_drivers_step(project_root, effective_run_options)
           install_steps << ensure_bin_setup_executable(project_root)
@@ -257,11 +257,14 @@ module Kettle
           }
         end
 
-        def mise_trust_step(project_root, report, env:)
+        def mise_trust_step(project_root, report, env:, install_steps: [])
           mise_report = report.fetch(:recipe_reports, []).find do |recipe_report|
             recipe_report.fetch(:relative_path, "") == "mise.toml"
           end
-          return nil unless mise_report&.fetch(:changed, false)
+          mise_migrated = Array(install_steps).any? do |step|
+            step.fetch(:name, "") == "legacy_rubocop_lts_local_env_cleanup" && step.fetch(:status, "") == "applied"
+          end
+          return nil unless mise_report&.fetch(:changed, false) || mise_migrated
 
           command = ["mise", "trust", "-C", project_root.to_s]
           if mise_installed?(env)
@@ -296,6 +299,7 @@ module Kettle
         def post_template_project_fix_steps(project_root, report, env:)
           [
             cleanup_legacy_ruby_version_files(project_root),
+            cleanup_legacy_rubocop_lts_local_env(project_root),
             trim_readme_compatibility_badges(project_root, report),
             sync_readme_gemspec_grapheme(project_root, env),
             repair_gemspec_homepage(project_root, env),
@@ -318,6 +322,35 @@ module Kettle
             status: removed.empty? ? "already_current" : "applied",
             removed_files: removed
           }
+        end
+
+        def cleanup_legacy_rubocop_lts_local_env(project_root)
+          path = File.join(project_root.to_s, "mise.toml")
+          return nil unless File.file?(path)
+
+          parsed = TomlRB.parse(File.read(path))
+          return {name: "legacy_rubocop_lts_local_env_cleanup", path: "mise.toml", status: "already_current"} unless parsed.dig("env", "RUBOCOP_LTS_LOCAL")
+
+          in_env_table = false
+          changed = false
+          rewritten = File.readlines(path).reject do |line|
+            stripped = line.strip
+            in_env_table = stripped == "[env]" if stripped.start_with?("[") && stripped.end_with?("]")
+            remove = in_env_table && stripped.split("=", 2).first.to_s.strip == "RUBOCOP_LTS_LOCAL"
+            changed ||= remove
+            remove
+          end
+          return {name: "legacy_rubocop_lts_local_env_cleanup", path: "mise.toml", status: "already_current"} unless changed
+
+          File.write(path, rewritten.join)
+          {
+            name: "legacy_rubocop_lts_local_env_cleanup",
+            path: "mise.toml",
+            status: "applied",
+            removed_key: "RUBOCOP_LTS_LOCAL"
+          }
+        rescue TomlRB::ParseError
+          {name: "legacy_rubocop_lts_local_env_cleanup", path: "mise.toml", status: "skipped", reason: "invalid_mise_toml"}
         end
 
         def trim_readme_compatibility_badges(project_root, report)
@@ -883,7 +916,7 @@ module Kettle
           ruby_gem = report.dig(:facts, :templates, :tokens, "KJ|RUBOCOP_RUBY_GEM").to_s
           branch = Kettle::Rb::CompatMatrix.rubocop_lts_branch_for_gem(ruby_gem)
           unless branch
-            raise Kettle::Jem::Error, "Cannot select RUBOCOP_LTS_LOCAL branch for #{ruby_gem.inspect}"
+            raise Kettle::Jem::Error, "Cannot select RUBOCOP_LTS_DEV branch for #{ruby_gem.inspect}"
           end
 
           checkout = File.join(local_root, "rubocop-lts")
@@ -925,7 +958,10 @@ module Kettle
         end
 
         def rubocop_lts_local_root(env)
-          value = (env || {})["RUBOCOP_LTS_LOCAL"].to_s.strip
+          env ||= {}
+          # RUBOCOP_LTS_LOCAL is a compatibility alias for projects generated
+          # before the workspace selector was normalized to *_DEV.
+          value = env.fetch("RUBOCOP_LTS_DEV", env["RUBOCOP_LTS_LOCAL"]).to_s.strip
           return nil if value.empty? || Kettle::Jem::DecisionPolicy.falsey?(value)
           return File.join((env || {})["HOME"].to_s.empty? ? Dir.home : (env || {})["HOME"].to_s, "src", "rubocop-lts") if value.casecmp("true").zero? || value == "1" || value.casecmp("yes").zero? || value.casecmp("on").zero?
           return value if value.start_with?("/")
@@ -1327,7 +1363,7 @@ module Kettle
 
         def local_path_development_env?(env)
           (env || {}).any? do |key, value|
-            key.to_s.end_with?("_DEV") && !local_env_disabled?(value)
+            key.to_s.end_with?("_DEV", "_LOCAL") && !local_env_disabled?(value)
           end
         end
 

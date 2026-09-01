@@ -1737,7 +1737,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
     step = Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
       report,
-      env: {"RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"}
+      env: {"RUBOCOP_LTS_DEV" => "/workspace/rubocop-lts"}
     )
 
     expect(step).to include(
@@ -1872,7 +1872,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         report,
         env: {"RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"}
       )
-    }.to raise_error(Kettle::Jem::Error, /Cannot select RUBOCOP_LTS_LOCAL branch/)
+    }.to raise_error(Kettle::Jem::Error, /Cannot select RUBOCOP_LTS_DEV branch/)
   end
 
   it "executes the RuboCop-LTS branch switch before later orchestration commands" do
@@ -2474,7 +2474,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
           [🚎current]: https://github.com/example-org/example/actions/workflows/current.yml
         MARKDOWN
         ".github/workflows/ruby-3.2.yml" => "name: Ruby 3.2\n",
-        "mise.toml" => "[tools]\nruby = \"3.4.1\"\n",
+        "mise.toml" => "[env]\nRUBOCOP_LTS_LOCAL = \"false\"\n\n[tools]\nruby = \"3.4.1\"\n",
         ".ruby-version" => "3.4.1\n",
         ".tool-versions" => "ruby 3.4.1\n",
         ".env.local.example" => "KETTLE_DEV_DEV=false\n",
@@ -2501,6 +2501,12 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         removed_files: [".ruby-version", ".tool-versions"]
       )
       expect(install.fetch(:install_steps)).to include(
+        name: "legacy_rubocop_lts_local_env_cleanup",
+        path: "mise.toml",
+        status: "applied",
+        removed_key: "RUBOCOP_LTS_LOCAL"
+      )
+      expect(install.fetch(:install_steps)).to include(
         name: "gemspec_homepage_literal",
         path: "example.gemspec",
         status: "applied",
@@ -2525,6 +2531,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(gemspec).to include('spec.summary = "🔧 Example gem"')
       expect(gemspec).to include('spec.description = "🔧 Example description"')
       expect(File.read(File.join(root, ".gitignore"))).to include(".env.local")
+      expect(File.read(File.join(root, "mise.toml"))).not_to include("RUBOCOP_LTS_LOCAL")
       readme = File.read(File.join(root, "README.md"))
       expect(readme).to include("# 🔧 Example")
       expect(readme).not_to include("ruby-2.7")
@@ -2536,6 +2543,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         phase: "post_template",
         statuses: hash_including(
           "legacy_ruby_version_file_cleanup" => "applied",
+          "legacy_rubocop_lts_local_env_cleanup" => "applied",
           "readme_compatibility_badges" => satisfy { |status| %w[applied already_current].include?(status) },
           "readme_gemspec_grapheme_sync" => "applied",
           "gemspec_homepage_literal" => "applied",
