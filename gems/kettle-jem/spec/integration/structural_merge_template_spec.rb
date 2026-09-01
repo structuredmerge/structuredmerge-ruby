@@ -2284,6 +2284,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
   it "uses SSH for GitHub shorthand dependencies in the packaged Gemfile" do
     packaged_gemfile = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Gemfile.example"))
 
-    expect(packaged_gemfile).to include('git_source(:github) { |repo_name| "git@github.com:#{repo_name}.git" }')
+    expect(packaged_gemfile).to include("git_source(:github) { |repo_name| \"git@github.com:\#{repo_name}.git\" }")
   end
 end
