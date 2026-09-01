@@ -2501,12 +2501,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         removed_files: [".ruby-version", ".tool-versions"]
       )
       expect(install.fetch(:install_steps)).to include(
-        name: "legacy_rubocop_lts_local_env_cleanup",
-        path: "mise.toml",
-        status: "applied",
-        removed_key: "RUBOCOP_LTS_LOCAL"
-      )
-      expect(install.fetch(:install_steps)).to include(
         name: "gemspec_homepage_literal",
         path: "example.gemspec",
         status: "applied",
@@ -2543,7 +2537,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         phase: "post_template",
         statuses: hash_including(
           "legacy_ruby_version_file_cleanup" => "applied",
-          "legacy_rubocop_lts_local_env_cleanup" => "applied",
           "readme_compatibility_badges" => satisfy { |status| %w[applied already_current].include?(status) },
           "readme_gemspec_grapheme_sync" => "applied",
           "gemspec_homepage_literal" => "applied",
@@ -2555,6 +2548,28 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         statuses: include("applied" => be >= 4),
         summary: include("install steps")
       )
+    end
+  end
+
+  it "removes the legacy RuboCop-LTS local selector from mise environment configuration" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rubocop-lts-env", tmp_root) do |root|
+      File.write(File.join(root, "mise.toml"), <<~TOML)
+        [env]
+        RUBOCOP_LTS_LOCAL = "false"
+        KEEP_ME = "true"
+      TOML
+
+      step = Kettle::Jem::Tasks::InstallTask.cleanup_legacy_rubocop_lts_local_env(root)
+
+      expect(step).to include(
+        name: "legacy_rubocop_lts_local_env_cleanup",
+        path: "mise.toml",
+        status: "applied",
+        removed_key: "RUBOCOP_LTS_LOCAL"
+      )
+      expect(File.read(File.join(root, "mise.toml"))).to eq("[env]\nKEEP_ME = \"true\"\n")
     end
   end
 

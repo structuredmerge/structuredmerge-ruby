@@ -329,7 +329,7 @@ module Kettle
           return nil unless File.file?(path)
 
           parsed = TomlRB.parse(File.read(path))
-          return {name: "legacy_rubocop_lts_local_env_cleanup", path: "mise.toml", status: "already_current"} unless parsed.dig("env", "RUBOCOP_LTS_LOCAL")
+          return {name: "legacy_rubocop_lts_local_env_cleanup", path: "mise.toml", status: "already_current"} unless parsed.fetch("env", {}).key?("RUBOCOP_LTS_LOCAL")
 
           in_env_table = false
           changed = false

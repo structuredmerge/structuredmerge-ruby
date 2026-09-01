@@ -26,13 +26,13 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-dev (>= 3.0.27 -> >= 3.0.28)
   - kettle-family (>= 1.2.80 -> >= 1.2.82)
 
-- [kc] kettle-jem/template: updated 796 project files:
-  - code and tests (40)
-  - configuration (24)
-  - dependencies (294)
-  - documentation (18)
-  - other (246)
-  - workflows (174)
+- [kc] kettle-jem/template: updated 1592 project files:
+  - code and tests (80)
+  - configuration (48)
+  - dependencies (588)
+  - documentation (36)
+  - other (492)
+  - workflows (348)
 
 ### Deprecated
 
@@ -43,6 +43,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Use RUBOCOP_LTS_DEV for generated RuboCop-LTS local workspace wiring while accepting RUBOCOP_LTS_LOCAL as a legacy input alias.
 
 - Remove the legacy RUBOCOP_LTS_LOCAL mise environment key during template installation.
+
+- Correct legacy RuboCop-LTS mise selector migration when its value is false.
 
 ### Security
 
