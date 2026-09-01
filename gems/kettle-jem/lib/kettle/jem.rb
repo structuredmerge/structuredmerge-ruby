@@ -5537,6 +5537,12 @@ module Kettle
         preferred_path: entrypoint_path
       )
       entrypoint_path = namespace_superclass_details[:path] if namespace_superclass_details[:path]
+      namespace_kinds_override = existing_version_namespace_kinds(
+        project_root,
+        version_path,
+        namespace,
+        entrypoint_path: entrypoint_path
+      )
       version_gem_bootstrap_step_for_paths(
         project_root,
         facts,
@@ -5547,7 +5553,8 @@ module Kettle
         # the generated version file must reopen as that same class.
         manage_version_file: !templated_paths.include?(version_path) ||
           version_namespace_outer_kind_for_template(project_root, facts, entrypoint_path, version_path, namespace) == :class,
-        manage_signature_file: !templated_paths.include?(signature_path)
+        manage_signature_file: !templated_paths.include?(signature_path),
+        namespace_kinds_override: namespace_kinds_override
       )
     end
 
@@ -14534,6 +14541,9 @@ module Kettle
       version = "0.0.1.pre" if version.empty?
       return {} if namespace.empty?
 
+      namespace_kinds = version_namespace_kinds_from_facts(facts)
+      outer_namespace_kind = namespace_kinds.fetch(namespace.split("::").length - 1, :module)
+
       version_rb = if facts.dig(:shim, :version_strategy).to_s == "shim"
         shim_version_file_content(
           namespace: namespace,
@@ -14541,7 +14551,13 @@ module Kettle
           replacement_require: facts.dig(:shim, :replacement_require)
         )
       else
-        version_gem_version_file_content(existing_version: "", namespace: namespace, version: version)
+        version_gem_version_file_content(
+          existing_version: "",
+          namespace: namespace,
+          version: version,
+          outer_namespace_kind: outer_namespace_kind,
+          namespace_kinds: namespace_kinds
+        )
       end
 
       {
@@ -14552,7 +14568,11 @@ module Kettle
           entrypoint_require: facts.dig(:rubygems, :entrypoint_require).to_s,
           dedicated: true
         ).chomp,
-        "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(namespace: namespace).chomp
+        "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(
+          namespace: namespace,
+          outer_namespace_kind: outer_namespace_kind,
+          namespace_kinds: namespace_kinds
+        ).chomp
       }
     end
 
@@ -15454,12 +15474,13 @@ module Kettle
     end
 
     def version_gem_bootstrap_step_for_paths(project_root, facts, manage_version_file: true, manage_signature_file: true,
-      package_entrypoint_preexisting: true, preserve_version_module_include: nil)
+      package_entrypoint_preexisting: true, preserve_version_module_include: nil, namespace_kinds_override: {})
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
 
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
+      namespace = facts.dig(:rubygems, :namespace).to_s
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = version_gem_bootstrap_entrypoint_path(
         project_root,
@@ -15472,7 +15493,6 @@ module Kettle
       version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
       signature_path = File.join("sig", "#{entrypoint_require}.rbs")
       legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
-      namespace = facts.dig(:rubygems, :namespace).to_s
       if namespace.empty?
         namespace = existing_entrypoint_version_namespace(
           project_root,
@@ -15512,14 +15532,17 @@ module Kettle
       version = "0.0.1.pre" if version.empty?
       changes = []
       current_entrypoint = read_project_file(project_root, entrypoint_path)
-      outer_namespace_kind = ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
-      namespace_kinds = version_namespace_kinds_from_facts(facts).merge(
-        existing_version_namespace_kinds(
-          project_root,
-          version_path,
-          namespace,
-          entrypoint_path: entrypoint_path
-        )
+      discovered_namespace_kinds = existing_version_namespace_kinds(
+        project_root,
+        version_path,
+        namespace,
+        entrypoint_path: entrypoint_path
+      )
+      namespace_kinds = version_namespace_kinds_from_facts(facts).merge(discovered_namespace_kinds)
+      namespace_kinds = namespace_kinds.merge(namespace_kinds_override)
+      outer_namespace_kind = namespace_kinds.fetch(
+        namespace.split("::").length - 1,
+        ruby_entrypoint_outer_namespace_kind(current_entrypoint, namespace)
       )
       preserve_version_module_include = existing_version_file_includes_version_module?(project_root, version_path) if preserve_version_module_include.nil?
 
@@ -15587,7 +15610,9 @@ module Kettle
             project_root,
             signature_path,
             legacy_signature_paths,
-            namespace: namespace
+            namespace: namespace,
+            outer_namespace_kind: outer_namespace_kind,
+            namespace_kinds: namespace_kinds
           )
         )
       end
@@ -15878,8 +15903,13 @@ module Kettle
       end
     end
 
-    def write_consolidated_version_signature(project_root, signature_path, legacy_signature_paths, namespace:)
-      template = version_gem_signature_file_content(namespace: namespace)
+    def write_consolidated_version_signature(project_root, signature_path, legacy_signature_paths, namespace:,
+      outer_namespace_kind: :module, namespace_kinds: {})
+      template = version_gem_signature_file_content(
+        namespace: namespace,
+        outer_namespace_kind: outer_namespace_kind,
+        namespace_kinds: namespace_kinds
+      )
       current = read_project_file(project_root, signature_path)
       merged = current
       legacy_signature_paths.each do |legacy_signature_path|
@@ -15969,7 +15999,7 @@ module Kettle
       "#{sections.reject(&:empty?).join("\n\n")}\n"
     end
 
-    def version_gem_signature_file_content(namespace:)
+    def version_gem_signature_file_content(namespace:, outer_namespace_kind: :module, namespace_kinds: {})
       body = [
         "module Version",
         "  VERSION: String",
@@ -15977,7 +16007,7 @@ module Kettle
         "VERSION: String"
       ]
 
-      "#{wrap_ruby_namespace(namespace, body).join("\n")}\n"
+      "#{wrap_ruby_namespace(namespace, body, outer_namespace_kind: outer_namespace_kind, namespace_kinds: namespace_kinds).join("\n")}\n"
     end
 
     def version_gem_bootstrap_entrypoint_content(content, namespace:, entrypoint_require:, namespace_superclasses: {}, version_require_path: nil)

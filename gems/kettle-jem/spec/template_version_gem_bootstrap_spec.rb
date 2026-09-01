@@ -45,6 +45,71 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "renders class-shaped version files and signatures from discovered facts" do
+    facts = {
+      rubygems: {
+        namespace: "ActiveSupport::Logger",
+        version_namespace_kinds: {0 => :module, 1 => :class}
+      },
+      project_runtime: {version: "3.0.1"}
+    }
+
+    tokens = described_class.send(:version_gem_template_tokens, facts)
+
+    expect(tokens.fetch("KJ|VERSION_GEM:VERSION_RB")).to include("class Logger")
+    expect(tokens.fetch("KJ|VERSION_GEM:VERSION_RB")).not_to include("module Logger")
+    expect(tokens.fetch("KJ|VERSION_GEM:VERSION_RBS")).to include("class Logger")
+    expect(tokens.fetch("KJ|VERSION_GEM:VERSION_RBS")).not_to include("module Logger")
+  end
+
+  it "preserves a nested class namespace when a package wrapper is the public entrypoint" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-package-wrapper-class-namespace", tmp_root) do |root|
+      write_file(root, "activesupport-broadcast_logger.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "activesupport-broadcast_logger"
+          spec.version = "3.0.1"
+          spec.summary = "Broadcast logger"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
+        end
+      RUBY
+      write_file(root, "lib/activesupport-broadcast_logger.rb", <<~RUBY)
+        require_relative "activesupport/broadcast_logger"
+        require_relative "activesupport/broadcast_logger/version"
+
+        ActiveSupport::BroadcastLogger::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+      write_file(root, "lib/activesupport/broadcast_logger.rb", <<~RUBY)
+        module ActiveSupport
+          class BroadcastLogger
+          end
+        end
+      RUBY
+      write_file(root, "lib/activesupport/broadcast_logger/version.rb", <<~RUBY)
+        module ActiveSupport
+          class BroadcastLogger
+            module Version
+              VERSION = "3.0.1"
+            end
+          end
+        end
+      RUBY
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      version = File.read(File.join(root, "lib/activesupport/broadcast_logger/version.rb"))
+      signature = File.read(File.join(root, "sig/activesupport/broadcast_logger.rbs"))
+      expect(version).to include("class BroadcastLogger")
+      expect(version).not_to include("module BroadcastLogger")
+      expect(signature).to include("class BroadcastLogger")
+      expect(signature).not_to include("module BroadcastLogger")
+    end
+  end
+
   it "includes the version namespace policy in managed version fingerprints" do
     report = {
       relative_path: "lib/demo/widget/version.rb",

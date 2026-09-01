@@ -43,6 +43,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination .gitignore rules while adding template ignore rules, retain SSH GitHub sources, and keep Bundler lockfile checksums during template normalization.
 
+- Preserve class namespaces and matching RBS declarations when templating version_gem package wrappers.
+
 ### Security
 
 ## [7.1.13] - 2026-08-31
