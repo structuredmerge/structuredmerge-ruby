@@ -105,7 +105,7 @@ module Json
       # @param dest_nodes [Array<NodeWrapper>] Destination nodes
       # @param template_analysis [FileAnalysis] Template analysis for line access
       # @param dest_analysis [FileAnalysis] Destination analysis for line access
-      def merge_node_lists_to_emitter(template_nodes, dest_nodes, template_analysis, dest_analysis, dest_owners: nil)
+      def merge_node_lists_to_emitter(template_nodes, dest_nodes, template_analysis, dest_analysis)
         # Build signature maps for matching
         template_by_sig = build_signature_map(template_nodes, template_analysis)
         dest_by_sig = build_signature_map(dest_nodes, dest_analysis)
@@ -154,6 +154,8 @@ module Json
 
           # Check for signature match
           if dest_sig && template_by_sig[dest_sig]
+            emit_retained_gap_before_destination_node(dest_node, dest_analysis, owners: dest_nodes)
+
             # Find the next unconsumed template node with this signature
             candidates = template_by_sig[dest_sig]
             cursor = sig_cursor[dest_sig]
@@ -172,8 +174,7 @@ module Json
               template_node = template_info[:node]
 
               # Both have this node - merge them (recursively if containers)
-              merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis,
-                                             dest_owners: dest_nodes)
+              merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
 
               consumed_template_indices << template_info[:index]
               sig_cursor[dest_sig] = cursor + 1
@@ -182,6 +183,8 @@ module Json
               emit_atomic_node(dest_node, dest_analysis)
             end
           elsif refined_dest_to_template.key?(dest_node)
+            emit_retained_gap_before_destination_node(dest_node, dest_analysis, owners: dest_nodes)
+
             # Found refined match
             template_node = refined_dest_to_template[dest_node]
             template_sig = template_analysis.generate_signature(template_node)
@@ -197,12 +200,12 @@ module Json
             end
 
             # Merge matched nodes
-            merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis,
-                                           dest_owners: dest_nodes)
+            merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
           elsif @remove_template_missing_nodes
             emit_removed_destination_node_comments(dest_node, dest_analysis)
           else
             # Destination-only node - always keep
+            emit_retained_gap_before_destination_node(dest_node, dest_analysis, owners: dest_nodes)
             emit_atomic_node(dest_node, dest_analysis)
           end
 
@@ -239,11 +242,7 @@ module Json
       # @param dest_node [NodeWrapper] Destination node
       # @param template_analysis [FileAnalysis] Template analysis
       # @param dest_analysis [FileAnalysis] Destination analysis
-      def merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis, dest_owners: nil)
-        if preference_for_pair(template_node, dest_node) == :template
-          emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: dest_owners)
-        end
-
+      def merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
         if dest_node.container? && template_node.container?
           # Both are containers - recursively merge their children
           merge_container_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
@@ -305,8 +304,7 @@ module Json
                   template_value.mergeable_children,
                   dest_value.mergeable_children,
                   template_analysis,
-                  dest_analysis,
-                  dest_owners: dest_value.mergeable_children
+                  dest_analysis
                 )
 
                 emit_container_trailing_lines(trailing_source_node, trailing_source_analysis)
@@ -363,7 +361,7 @@ module Json
         end
       end
 
-      def emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: nil)
+      def emit_retained_gap_before_destination_node(dest_node, dest_analysis, owners: nil)
         gap_lines = retained_owner_leading_gap_lines_for(dest_node, dest_analysis, owners: owners)
         return if gap_lines.empty?
         return if @emitter.blank_lines?(gap_lines) && @emitter.ends_with_blank_line?
