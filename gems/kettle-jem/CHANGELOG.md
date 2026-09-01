@@ -23,9 +23,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-dev (>= 3.0.24 -> >= 3.0.25)
-  - kettle-family (>= 1.2.74 -> >= 1.2.75)
-  - kettle-jem (>= 7.1.12 -> >= 7.1.13)
+  - kettle-dev (>= 3.0.24 -> >= 3.0.27)
+  - kettle-family (>= 1.2.74 -> >= 1.2.77)
 
 - [kc] kettle-jem/template: updated 398 project files:
   - code and tests (20)
