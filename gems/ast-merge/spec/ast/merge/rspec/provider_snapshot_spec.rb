@@ -150,6 +150,10 @@ RSpec.describe Ast::Merge::RSpec::ProviderSnapshot do
 
     expect(evidence).to include(operation: 'merge2', equivalent: true, output_bytes_equal: true)
     expect(evidence[:original_sha256]).to eq(evidence[:replay_sha256])
+    expect(evidence[:transported_request]).to eq(described_class.round_trip(evidence[:original_request]))
+    expect(described_class.canonical_json(evidence[:transported_result])).to eq(
+      described_class.canonical_json(evidence[:original_result])
+    )
   end
 
   it 'rejects extensions without a versioned StructuredMerge namespace' do

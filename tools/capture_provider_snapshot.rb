@@ -64,7 +64,7 @@ class CaptureProviderSnapshot
       schema: SNAPSHOT_SCHEMA,
       snapshot_id: @target,
       producer: producer,
-      workflow_provider: provider_identity(definition.fetch(:provider)),
+      workflow_provider: provider_identity(definition),
       parser_backend: definition.fetch(:backend_identity),
       captures: captures,
       differential_replays: differential_replays,
@@ -113,6 +113,7 @@ class CaptureProviderSnapshot
     ]
     {
       provider: Prism::Merge.merge_provider,
+      workflow_package: 'prism-merge',
       language: :ruby,
       dialect: :ruby,
       backend_id: :prism,
@@ -137,6 +138,7 @@ class CaptureProviderSnapshot
     fixture = fixture_json('yaml/slice-721-formatting-preservation/comments-anchors-documents-sequences.json')
     {
       provider: Psych::Merge.merge_provider,
+      workflow_package: 'psych-merge',
       language: :yaml,
       dialect: :yaml,
       backend_id: :psych,
@@ -157,6 +159,7 @@ class CaptureProviderSnapshot
     require 'rbs/merge/rspec/provider_snapshot_extension'
     {
       provider: Rbs::Merge.merge_provider,
+      workflow_package: 'rbs-merge',
       language: :rbs,
       dialect: :rbs,
       backend_id: :rbs,
@@ -187,6 +190,7 @@ class CaptureProviderSnapshot
     source = fixture.fetch('source')
     {
       provider: Markly::Merge.merge_provider,
+      workflow_package: 'markly-merge',
       language: :markdown,
       dialect: :markdown,
       backend_id: :markly,
@@ -232,6 +236,7 @@ class CaptureProviderSnapshot
     backend_id = provider.capabilities.fetch(:backends).fetch(0)
     {
       provider: provider,
+      workflow_package: "#{language}-merge",
       language: language,
       dialect: dialect,
       backend_id: backend_id,
@@ -280,11 +285,15 @@ class CaptureProviderSnapshot
     JSON.parse(File.binread(File.join(@options.fetch(:fixture_root), relative_path)))
   end
 
-  def provider_identity(provider)
+  def provider_identity(definition)
+    provider = definition.fetch(:provider)
+    package = definition.fetch(:workflow_package)
     capabilities = provider.capabilities
     {
       provider_id: provider.provider_id,
       family: provider.family,
+      package: package,
+      package_version: gem_version(package),
       role: capabilities.fetch(:role),
       capabilities: capabilities
     }

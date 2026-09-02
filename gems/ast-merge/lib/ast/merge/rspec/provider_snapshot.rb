@@ -71,7 +71,11 @@ module Ast
             equivalent: original_json == replay_json,
             original_sha256: Digest::SHA256.hexdigest(original_json),
             replay_sha256: Digest::SHA256.hexdigest(replay_json),
-            output_bytes_equal: output_bytes(original_result) == output_bytes(replay_result)
+            output_bytes_equal: output_bytes(original_result) == output_bytes(replay_result),
+            original_request: original_request,
+            transported_request: replay_request,
+            original_result: original_result,
+            transported_result: replay_result
           }
         end
 
