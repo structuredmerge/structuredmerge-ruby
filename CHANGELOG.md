@@ -33,6 +33,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Return unbalanced Ruby block directives as structured Prism provider parse failures instead of leaking exceptions.
 - Move source-preserving YAML provider mechanics into `yaml-merge`, add its TSLP workflow provider, and make `psych-merge` supply only its native parser projection.
 - Retain provider-owned native Psych AST extensions in production analysis results so coarse Alef workflow hosts can forward them without reparsing or flattening the native tree.
+- Let cross-runtime benchmark descriptors declare operation and dialect support plus merge-provider identity per format family, avoiding false support claims from Cartesian-product capability lists.
 
 ### Changed
 

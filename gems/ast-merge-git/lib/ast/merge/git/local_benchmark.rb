@@ -745,6 +745,14 @@ module Ast
           return true unless @adapter_descriptor
 
           support = @adapter_descriptor.fetch('supports')
+          if support['combinations']
+            return support.fetch('combinations').any? do |combination|
+              combination.fetch('family') == item.fetch('family') &&
+              combination.fetch('dialects').include?(item.fetch('dialect')) &&
+              combination.fetch('operations').include?(item.fetch('operation'))
+            end
+          end
+
           support.fetch('operations').include?(item.fetch('operation')) &&
             support.fetch('families').include?(item.fetch('family')) &&
             support.fetch('dialects').include?(item.fetch('dialect'))
@@ -1456,7 +1464,7 @@ module Ast
               case_configuration = {
                 'case_id' => id,
                 'operation' => item.fetch('operation'),
-                'merge_provider' => provider&.fetch('merge_provider') || {
+                'merge_provider' => adapter_merge_provider(item) || {
                   'provider_id' => selector.fetch('provider_id'),
                   'require_path' => selector.fetch('require')
                 },
@@ -1471,6 +1479,13 @@ module Ast
               case_configuration
             end
           }
+        end
+
+        def adapter_merge_provider(item)
+          return unless @adapter_descriptor
+
+          provider = @adapter_descriptor.fetch('provider')
+          provider.dig('merge_providers', item.fetch('family')) || provider['merge_provider']
         end
 
         def performance_sample(session, item, iteration)
@@ -1612,8 +1627,10 @@ module Ast
           unless descriptor.dig('adapter', 'source', 'repository')
             error!('adapter descriptor missing adapter.source.repository')
           end
-          %w[merge_provider parser_provider].each do |key|
-            error!("adapter descriptor missing provider.#{key}") unless descriptor.fetch('provider').key?(key)
+          provider = descriptor.fetch('provider')
+          error!('adapter descriptor missing provider.parser_provider') unless provider.key?('parser_provider')
+          unless provider.key?('merge_provider') || provider['merge_providers'].is_a?(Hash)
+            error!('adapter descriptor requires provider.merge_provider or provider.merge_providers')
           end
           %w[operations families dialects].each do |key|
             values = descriptor.fetch('supports')[key]
@@ -1621,6 +1638,7 @@ module Ast
               error!("adapter descriptor supports.#{key} must be a non-empty array")
             end
           end
+          validate_support_combinations!(descriptor.fetch('supports'))
           source_root = Pathname(descriptor.fetch('source_root'))
           source_root = descriptor_path.dirname.join(source_root) unless source_root.absolute?
           descriptor.merge('source_root' => source_root.expand_path)
@@ -1628,6 +1646,24 @@ module Ast
           error!("invalid adapter descriptor JSON: #{e.message}")
         rescue SystemCallError => e
           error!("cannot read adapter descriptor: #{e.message}")
+        end
+
+        def validate_support_combinations!(support)
+          return unless support.key?('combinations')
+
+          combinations = support.fetch('combinations')
+          unless combinations.is_a?(Array) && combinations.any?
+            error!('adapter descriptor supports.combinations must be a non-empty array')
+          end
+          combinations.each do |combination|
+            error!('adapter support combination requires family') unless combination['family'].is_a?(String)
+            %w[operations dialects].each do |key|
+              values = combination[key]
+              unless values.is_a?(Array) && values.any?
+                error!("adapter support combination #{key} must be a non-empty array")
+              end
+            end
+          end
         end
 
         def benchmark_environment

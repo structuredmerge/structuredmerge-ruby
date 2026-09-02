@@ -308,7 +308,10 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         },
         'source_root' => source_root.to_s,
         'provider' => {
-          'merge_provider' => { 'provider_id' => 'rust.json', 'package' => 'json-merge' },
+          'merge_providers' => {
+            'json' => { 'provider_id' => 'rust.json', 'package' => 'json-merge' },
+            'yaml' => { 'provider_id' => 'rust.yaml', 'package' => 'yaml-merge' }
+          },
           'parser_provider' => {
             'provider_id' => 'tree-sitter-language-pack',
             'backend_family' => 'tree-sitter',
@@ -318,8 +321,12 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         },
         'supports' => {
           'operations' => %w[merge2 merge3 metamorphic],
-          'families' => ['json'],
-          'dialects' => %w[json jsonc json5]
+          'families' => %w[json yaml],
+          'dialects' => %w[json jsonc json5 yaml],
+          'combinations' => [
+            { 'family' => 'json', 'operations' => %w[merge2 merge3 metamorphic], 'dialects' => %w[json jsonc json5] },
+            { 'family' => 'yaml', 'operations' => %w[merge2], 'dialects' => %w[yaml] }
+          ]
         },
         'environment' => { 'runtime' => 'rust' }
       )
@@ -361,6 +368,10 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'adapter_role' => 'candidate',
       'outcome' => 'unsupported'
     )
+    yaml = benchmark.case_by_id('case.merge3.yaml.delete-modify.v1')
+    expect(candidate.send(:candidate_supports?, yaml)).to be(false)
+    expect(candidate.send(:candidate_supports?, yaml.merge('operation' => 'merge2'))).to be(true)
+    expect(candidate.send(:adapter_merge_provider, yaml)).to include('provider_id' => 'rust.yaml')
   end
 
   it 'carries run-manifest identity into cache and aggregate report evidence' do
