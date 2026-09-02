@@ -30,7 +30,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(benchmark.cases.length).to eq(16)
     expect(benchmark.document.fetch('expected_summary')).to include(
       'case_count' => 16,
-      'partition_counts' => { 'sentinel' => 4, 'gold' => 10, 'metamorphic' => 2 },
+      'partition_counts' => { 'sentinel' => 7, 'gold' => 7, 'metamorphic' => 2 },
       'operation_counts' => { 'merge2' => 1, 'merge3' => 13, 'metamorphic' => 2 }
     )
     expect(benchmark.document.fetch('provenance')).to include(
@@ -49,6 +49,9 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         case.merge3.json.same-owner-conflict.v1
         case.merge3.json.malformed-ours.v1
         case.merge2.jsonc.current-layout-preservation.v1
+        case.merge3.jsonc.comment-preservation.v1
+        case.merge3.json5.order-format.v1
+        case.merge3.json.duplicate-identity.v1
       ]
     )
     expect(selection.fetch('explanation')).to include(
@@ -354,8 +357,12 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'reported_version' => 'mergiraf 0.18.0'
     )
     expect(report.dig('dimensions', 'competitive')).to include(
-      'outcomes' => { 'false_conflict' => 2, 'true_conflict' => 1, 'unsupported' => 1 },
-      'unsupported_case_ids' => ['case.merge2.jsonc.current-layout-preservation.v1'],
+      'outcomes' => { 'false_conflict' => 2, 'true_conflict' => 2, 'unsupported' => 3 },
+      'unsupported_case_ids' => [
+        'case.merge2.jsonc.current-layout-preservation.v1',
+        'case.merge3.jsonc.comment-preservation.v1',
+        'case.merge3.json5.order-format.v1'
+      ],
       'affects_candidate_safety_gate' => false
     )
     expect(report.dig('dimensions', 'safety', 'gate')).to eq('pass')
