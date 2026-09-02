@@ -412,7 +412,7 @@ module Ast
 
       # Owns one long-lived benchmark adapter subprocess and its JSONL exchange.
       class BenchmarkAdapterSession
-        attr_reader :startup_duration_ns
+        attr_reader :spawn_duration_ns
 
         def initialize(driver_path:, chdir:, timeout:, env: {})
           @driver_path = Pathname(driver_path).expand_path
@@ -433,7 +433,8 @@ module Ast
           )
           [@stdin, @stdout, @stderr].each(&:binmode)
           @stderr_reader = Thread.new { @stderr.read }
-          @startup_duration_ns = monotonic_nanoseconds - started
+          @spawn_duration_ns = monotonic_nanoseconds - started
+          @request_count = 0
           self
         rescue Errno::ENOENT => e
           raise LocalBenchmark::Error, "cannot start benchmark adapter session: #{e.message}"
@@ -446,7 +447,11 @@ module Ast
           @stdin.flush
           line = read_response_line
           response = JSON.parse(line)
-          response.merge('round_trip_duration_ns' => monotonic_nanoseconds - started)
+          @request_count += 1
+          response.merge(
+            'round_trip_duration_ns' => monotonic_nanoseconds - started,
+            'session_request_index' => @request_count
+          )
         rescue Errno::EPIPE, IOError, JSON::ParserError => e
           raise LocalBenchmark::Error, "benchmark adapter session failed: #{e.message}#{stderr_suffix}"
         end
@@ -571,7 +576,8 @@ module Ast
           execution = {
             'kind' => 'performance',
             'adapter_mode' => 'persistent-jsonl',
-            'iterations' => count
+            'iterations' => count,
+            'timing_components' => %w[spawn adapter_execution harness_overhead round_trip]
           }
           manifest = run_manifest(selection, execution: execution)
           FileUtils.mkdir_p(@tmp_root)
@@ -596,9 +602,10 @@ module Ast
             'cache_identity' => cache_identity(selection, manifest),
             'session' => {
               'adapter_mode' => 'persistent-jsonl',
-              'startup_duration_ns' => session.startup_duration_ns,
+              'spawn_duration_ns' => session.spawn_duration_ns,
               'process_ids' => samples.map { |sample| sample['process_id'] }.uniq
             },
+            'timing' => performance_timing(samples, session.spawn_duration_ns),
             'samples' => samples
           }
         ensure
@@ -1437,6 +1444,14 @@ module Ast
           request_id = "#{item.fetch('id')}.#{iteration}"
           response = session.request(benchmark_adapter_request(item, request_id))
           output = BenchmarkAdapter.decode_source(response.fetch('output_base64'))
+          adapter_duration = response.fetch('duration_ns')
+          round_trip_duration = response.fetch('round_trip_duration_ns')
+          harness_overhead = [round_trip_duration - adapter_duration, 0].max
+          measurement_class = if response.fetch('session_request_index') == 1
+                                'session_startup_and_first_request'
+                              else
+                                'warm_persistent_process'
+                              end
           {
             'case_id' => item.fetch('id'),
             'request_id' => request_id,
@@ -1448,13 +1463,26 @@ module Ast
             'diagnostics' => diagnostics(response.fetch('stderr'), nil),
             'output' => raw_record(output),
             'runtime' => {
-              'adapter_duration_ns' => response.fetch('duration_ns'),
-              'round_trip_duration_ns' => response.fetch('round_trip_duration_ns'),
-              'measurement_class' => 'warm_persistent_process'
+              'adapter_duration_ns' => adapter_duration,
+              'harness_overhead_ns' => harness_overhead,
+              'round_trip_duration_ns' => round_trip_duration,
+              'measurement_class' => measurement_class
             }
           }
         rescue ArgumentError => e
           error!("invalid adapter response for #{request_id}: #{e.message}")
+        end
+
+        def performance_timing(samples, spawn_duration)
+          runtimes = samples.map { |sample| sample.fetch('runtime') }
+          {
+            'spawn_duration_ns' => spawn_duration,
+            'adapter_execution_total_ns' => runtimes.sum { |runtime| runtime.fetch('adapter_duration_ns') },
+            'harness_overhead_total_ns' => runtimes.sum { |runtime| runtime.fetch('harness_overhead_ns') },
+            'round_trip_total_ns' => runtimes.sum { |runtime| runtime.fetch('round_trip_duration_ns') },
+            'first_request_includes_runtime_startup' => true,
+            'quality_classification_uses_these_values' => false
+          }
         end
 
         def benchmark_adapter_request(item, request_id)

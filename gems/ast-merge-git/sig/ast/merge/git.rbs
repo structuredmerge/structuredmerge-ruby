@@ -126,7 +126,7 @@ module Ast
       end
 
       class BenchmarkAdapterSession
-        attr_reader startup_duration_ns: Integer?
+        attr_reader spawn_duration_ns: Integer?
 
         def initialize: (
           driver_path: String | Pathname,

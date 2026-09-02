@@ -305,21 +305,38 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'kind' => 'performance_only',
       'quality_classification_performed' => false
     )
-    expect(performance.dig('run_manifest', 'configuration', 'execution')).to eq(
+    expect(performance.dig('run_manifest', 'configuration', 'execution')).to include(
       'kind' => 'performance',
       'adapter_mode' => 'persistent-jsonl',
       'iterations' => 2
     )
     expect(performance.fetch('samples').length).to eq(14)
     expect(performance.dig('session', 'process_ids').length).to eq(1)
-    performance.fetch('samples').each do |sample|
+    expect(performance.dig('samples', 0, 'runtime', 'measurement_class')).to eq(
+      'session_startup_and_first_request'
+    )
+    performance.fetch('samples').drop(1).each do |sample|
       expect(sample).to include(
         'process_id' => performance.dig('session', 'process_ids').first,
         'runtime' => include(
           'adapter_duration_ns' => be_positive,
+          'harness_overhead_ns' => be >= 0,
           'round_trip_duration_ns' => be_positive,
           'measurement_class' => 'warm_persistent_process'
         )
+      )
+    end
+    runtimes = performance.fetch('samples').map { |sample| sample.fetch('runtime') }
+    expect(performance.fetch('timing')).to include(
+      'spawn_duration_ns' => be_positive,
+      'adapter_execution_total_ns' => runtimes.sum { |runtime| runtime.fetch('adapter_duration_ns') },
+      'harness_overhead_total_ns' => runtimes.sum { |runtime| runtime.fetch('harness_overhead_ns') },
+      'round_trip_total_ns' => runtimes.sum { |runtime| runtime.fetch('round_trip_duration_ns') },
+      'quality_classification_uses_these_values' => false
+    )
+    runtimes.each do |runtime|
+      expect(runtime.fetch('adapter_duration_ns') + runtime.fetch('harness_overhead_ns')).to eq(
+        runtime.fetch('round_trip_duration_ns')
       )
     end
   end

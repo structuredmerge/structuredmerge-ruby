@@ -24,6 +24,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Add a binary-safe, persistent JSONL benchmark adapter and performance-only run mode that measures many Ruby golden-master operations in one process without changing correctness classification.
 - Add bounded process-level parallelism for independent cold benchmark cases with deterministic result ordering and explicit worker-process evidence.
 - Add explicit full-corpus `nightly` and competitor-enabled `competitive` benchmark profiles, and reject competitor sweeps from ordinary correctness profiles.
+- Separate benchmark process-spawn, first-request startup/loading, adapter execution, JSONL/IPC harness overhead, and warm round-trip timing evidence.
 
 ### Changed
 

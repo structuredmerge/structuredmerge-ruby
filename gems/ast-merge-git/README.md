@@ -136,6 +136,9 @@ Use `benchmark run` and `benchmark report` for cold-process correctness
 classification. Use `benchmark performance` to send repeated binary-safe JSONL
 requests through one persistent Ruby process without scoring those warm-process
 results as correctness evidence.
+Performance output reports process spawn, adapter execution, JSONL/IPC harness
+overhead, and total round-trip time separately; the first request is identified
+as startup/loading evidence instead of a warm sample.
 
 Correctness runs accept `--workers COUNT` to distribute independent cases
 across a bounded set of worker processes. Results retain corpus order regardless
