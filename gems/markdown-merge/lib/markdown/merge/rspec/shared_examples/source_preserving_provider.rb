@@ -143,6 +143,29 @@ RSpec.shared_examples 'Markdown::Merge::SourcePreservingProvider' do
     )
   end
 
+  it 'preserves current section customizations while inserting incoming-only sections in order' do
+    current = "# Title\n\ncurrent body\n\n# Last\n\ncurrent ending\n"
+    incoming = "# Title\n\ntemplate body\n\n# Added\n\nnew section\n\n# Last\n\ntemplate ending\n"
+    expected = "# Title\n\ncurrent body\n\n# Added\n\nnew section\n\n# Last\n\ncurrent ending\n"
+
+    result = provider.merge2(current_source: current, incoming_source: incoming)
+
+    expect(result).to include(ok: true, operation: :merge2, output: expected)
+    expect(result.fetch(:changes)).to contain_exactly(hash_including(change: :added))
+    expect(result.dig(:render_report, :provenance)).to contain_exactly(
+      hash_including(source_role: :current, copied_source: true),
+      hash_including(source_role: :incoming, copied_source: true),
+      hash_including(source_role: :current, copied_source: true)
+    )
+    expect(result.fetch(:verification)).to include(
+      output_reparsed: true,
+      semantic_match: true,
+      byte_provenance_verified: true,
+      delegated_backend_verified: true,
+      backend: provider_backend
+    )
+  end
+
   it 'localizes a same-section conflict to the parser-proven owner range' do
     result = provider.merge3(
       base_source: base,

@@ -198,14 +198,40 @@ module Markdown
       end
 
       def merge2(request)
-        merged = merge3(
-          request.merge(
-            base_source: request.fetch(:current_source),
-            ours_source: request.fetch(:current_source),
-            theirs_source: request.fetch(:incoming_source)
-          )
+        current = parse_document(:merge2, request, :current)
+        return current if provider_failure?(current)
+
+        incoming = parse_document(:merge2, request, :incoming)
+        return incoming if provider_failure?(incoming)
+
+        choices = current.owners.to_h { |owner| [owner.id, :current] }
+        incoming.owners.each { |owner| choices[owner.id] ||= :incoming }
+        decision = Decision.new(changes: [], conflicts: [], choices: choices.freeze)
+        documents = { current: current, incoming: incoming }.freeze
+        ordered = merged_order(documents, decision)
+        return unsafe_merge2_order_failure(request) unless ordered
+
+        fragments = ordered.map do |id|
+          role = decision.choices.fetch(id)
+          [documents.fetch(role).by_id.fetch(id), role]
+        end
+        output = fragments.map { |owner, _role| owner.source_text }.join
+        expected = fragments.map { |owner, _role| [owner.signature, owner.fingerprint] }
+        verification = verify_composite(output, expected)
+        unless verification[:semantic_match]
+          return render_failure(request, verification, :exact_markdown_composite, operation: :merge2)
+        end
+
+        output_document = parse_source(output, :output)
+        changes = diff_documents(current, output_document)
+        result(
+          :merge2,
+          request,
+          output: output,
+          changes: changes,
+          render_report: composite_render_report(fragments, output),
+          verification: verification
         )
-        merged.merge(operation: :merge2, verification: merged.fetch(:verification).except(:base_participated))
       end
 
       def merge3(request)
@@ -714,9 +740,20 @@ module Markdown
         )
       end
 
-      def render_failure(request, verification, strategy, changes = [])
+      def unsafe_merge2_order_failure(request)
         failure(
-          :merge3,
+          :merge2,
+          request,
+          category: :unsafe_source_range,
+          message: 'Markdown section order cannot be proven across current and incoming sources.',
+          conflicts: [{ category: :incompatible_section_order, path: '<document>' }],
+          render_report: { strategy: :no_output, provenance: :exact_source_bytes }
+        )
+      end
+
+      def render_failure(request, verification, strategy, changes = [], operation: :merge3)
+        failure(
+          operation,
           request,
           category: :render_failure,
           message: 'Markdown output failed backend reparse and ordered semantic verification.',
