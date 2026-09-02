@@ -71,6 +71,19 @@ RSpec.describe Prism::Merge::Provider do
     expect(resolved).to equal(Prism::Merge.merge_provider)
   end
 
+  it 'reports unbalanced block directives as a structured parse failure' do
+    result = provider.analyze(
+      source: "class Demo\n  # :nocov:\n  def call = :ok\nend\n",
+      dialect: :ruby,
+      backend: :prism
+    )
+
+    expect(result).to include(ok: false, operation: :analyze, source_role: :source)
+    expect(result.fetch(:diagnostics)).to include(
+      hash_including(category: :parse_error, message: /unclosed coverage directive/)
+    )
+  end
+
   it 'merges independent top-level owner edits with exact source fragments' do
     result = provider.merge3(base_source: base, ours_source: ours, theirs_source: theirs)
 

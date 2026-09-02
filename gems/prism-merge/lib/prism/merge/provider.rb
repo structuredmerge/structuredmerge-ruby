@@ -144,6 +144,8 @@ module Prism
           by_id: owners.to_h { |owner| [owner.id, owner] }.freeze,
           unmanaged_fingerprint: unmanaged_fingerprint(source, owners)
         )
+      rescue Prism::Merge::Error => e
+        { parse_error: e.message, source_role: role }
       end
 
       def unmanaged_fingerprint(source, owners)
