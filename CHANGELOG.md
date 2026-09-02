@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Add executable `merge2` benchmark support through the shared provider contract, paired with an explicit naive template-overwrite baseline.
+
 ### Changed
 
 ### Deprecated
@@ -27,6 +29,10 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Removed
 
 ### Fixed
+
+- Preserve destination blank-line gaps before retained matched and destination-only JSON object members, preventing whitespace churn during repeated templating.
+
+- Report benchmark semantic correctness, source preservation, and expected parse rejections independently, and enforce source preservation as a hard gate.
 
 ### Security
 
