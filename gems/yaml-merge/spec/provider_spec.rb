@@ -54,6 +54,15 @@ RSpec.describe Yaml::Merge::Provider do
     expect(result.dig(:verification, :source_match)).to be(true)
   end
 
+  it 'does not report mapping order or formatting as a semantic diff' do
+    result = provider.diff2(
+      before_source: "a: 1\nb: 2\n",
+      after_source: "b: 2\na: 1\n"
+    )
+
+    expect(result).to include(ok: true, changes: [])
+  end
+
   it 'recursively adds template-only mapping leaves while retaining destination values' do
     incoming = <<~YAML
       patient:

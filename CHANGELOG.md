@@ -37,6 +37,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Load `ast-merge-git`'s optional benchmark providers from `STRUCTUREDMERGE_DEV` during local development so benchmarks exercise the current monorepo providers.
 - Reuse YAML's recursive AST resolver in its workflow provider so nested template-only mapping leaves merge without sacrificing destination values or source-line provenance.
 - Route structurally rich TOML `merge2` provider requests through the existing TreeHaver-backed TOML substrate merger, sharing table and dotted-key behavior across TSLP, Citrus, and Parslet providers.
+- Add the reviewed nested-table TOML `merge2` sentinel to local benchmark profiles and recognize TOML provider identity in cross-runtime benchmark evidence.
 
 ### Changed
 
@@ -47,6 +48,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 - Accept shared snake_case diagnostics from non-Ruby benchmark adapters so expected parser rejections are classified as successful fail-closed outcomes.
+- Compare YAML `diff2` entries by semantic value and parser attributes rather than owned source fragments, so mapping order and formatting changes do not become semantic edits.
 
 ### Security
 

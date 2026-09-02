@@ -292,10 +292,14 @@ module Yaml
         ordered_keys(before, after).filter_map do |key|
           left = before.by_key[key]
           right = after.by_key[key]
-          next if entry_state(left) == entry_state(right)
+          next if semantic_entry_state(left) == semantic_entry_state(right)
 
           { path: "/#{key}", ours: :unchanged, theirs: change_kind(left, right) }.freeze
         end.freeze
+      end
+
+      def semantic_entry_state(entry)
+        entry && [entry.semantic, entry.attributes]
       end
 
       def ordered_keys(*documents)
