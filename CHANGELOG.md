@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Pin released StructuredMerge fixtures v7.1.6 so CI validates the benchmark contracts exercised by the family suite.
+
 ### Security
 
 ## [7.1.7] - 2026-09-01
