@@ -505,6 +505,7 @@ module Ast
       class LocalBenchmarkRunner
         DEFAULT_TIMEOUT = 30
         MAX_WORKERS = 32
+        ADAPTER_DESCRIPTOR_SCHEMA = 'structuredmerge.benchmark.adapter-descriptor/v1'
         MERGIRAF_EXTENSIONS = {
           'bash' => 'sh',
           'html' => 'html',
@@ -517,7 +518,8 @@ module Ast
         }.freeze
 
         # rubocop:disable Metrics/ParameterLists -- runner dependencies and resource limits remain explicit
-        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT, competitor_paths: {}, workers: 1)
+        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT, competitor_paths: {}, workers: 1,
+                       adapter_descriptor: nil)
           @benchmark = benchmark
           @driver_path = Pathname(driver_path).expand_path
           @tmp_root = Pathname(tmp_root).expand_path
@@ -525,6 +527,7 @@ module Ast
           @competitor_paths = competitor_paths.transform_values { |path| Pathname(path).expand_path }
           @workers = Integer(workers)
           error!("workers must be between 1 and #{MAX_WORKERS}") unless @workers.between?(1, MAX_WORKERS)
+          @adapter_descriptor = load_adapter_descriptor(adapter_descriptor)
         end
         # rubocop:enable Metrics/ParameterLists
 
@@ -1357,23 +1360,12 @@ module Ast
         end
 
         def run_manifest(selection, execution: { 'kind' => 'correctness', 'adapter_mode' => 'cold-process' })
-          source = source_provenance
           configuration = benchmark_configuration(selection, execution: execution)
           manifest = {
             'schema_version' => 'structuredmerge.benchmark.run-manifest/v1',
-            'adapter' => {
-              'adapter_id' => 'ruby-gm.ast-merge-git',
-              'implementation' => 'ruby-golden-master',
-              'package' => Ast::Merge::Git::PACKAGE_NAME,
-              'package_version' => Ast::Merge::Git::VERSION,
-              'source' => source,
-              'artifact' => {
-                'path' => @driver_path.to_s,
-                'sha256' => Digest::SHA256.file(@driver_path).hexdigest
-              }
-            },
+            'adapter' => adapter_identity,
             'configuration' => configuration,
-            'environment' => benchmark_environment,
+            'environment' => run_environment,
             'corpus' => {
               'id' => @benchmark.document.fetch('id'),
               'sha256' => @benchmark.corpus_digest
@@ -1409,6 +1401,7 @@ module Ast
         end
 
         def benchmark_configuration(selection, execution:)
+          provider = @adapter_descriptor&.fetch('provider')
           {
             'profile' => selection.fetch('profile'),
             'changed_paths' => selection.fetch('changed_paths'),
@@ -1421,21 +1414,23 @@ module Ast
             'cases' => selection.fetch('selected_case_ids').map do |id|
               item = @benchmark.case_by_id(id)
               selector = item.fetch('selector')
-              backend_ref = TreeHaver::BackendRegistry.fetch(selector.fetch('backend'))
-              {
+              backend_ref = TreeHaver::BackendRegistry.fetch(selector.fetch('backend')) unless provider
+              case_configuration = {
                 'case_id' => id,
                 'operation' => item.fetch('operation'),
-                'merge_provider' => {
+                'merge_provider' => provider&.fetch('merge_provider') || {
                   'provider_id' => selector.fetch('provider_id'),
                   'require_path' => selector.fetch('require')
                 },
-                'parser_provider' => {
+                'parser_provider' => provider&.fetch('parser_provider') || {
                   'requested_backend_id' => selector.fetch('backend'),
                   'backend_family' => backend_ref&.family,
                   'selection_mode' => 'explicit'
                 },
                 'selector' => selector
               }
+              case_configuration['selector_role'] = 'oracle_context' if provider
+              case_configuration
             end
           }
         end
@@ -1509,20 +1504,86 @@ module Ast
           end
         end
 
-        def source_provenance
-          root = Pathname(__dir__).join('..', '..', '..', '..').expand_path
+        def source_provenance(root: Pathname(__dir__).join('..', '..', '..', '..').expand_path,
+                              repository: 'structuredmerge/structuredmerge-ruby', label: 'Ruby golden-master')
           revision, revision_status = Open3.capture2('git', '-C', root.to_s, 'rev-parse', 'HEAD')
-          error!('cannot determine Ruby golden-master source revision') unless revision_status.success?
+          error!("cannot determine #{label} source revision") unless revision_status.success?
 
           status, status_result = Open3.capture2('git', '-C', root.to_s, 'status', '--porcelain',
                                                  '--untracked-files=no')
-          error!('cannot determine Ruby golden-master source state') unless status_result.success?
+          error!("cannot determine #{label} source state") unless status_result.success?
 
           {
-            'repository' => 'structuredmerge/structuredmerge-ruby',
+            'repository' => repository,
             'revision' => revision.strip,
             'dirty' => !status.empty?
           }
+        end
+
+        def adapter_identity
+          artifact = {
+            'path' => @driver_path.to_s,
+            'sha256' => Digest::SHA256.file(@driver_path).hexdigest
+          }
+          unless @adapter_descriptor
+            return {
+              'adapter_id' => 'ruby-gm.ast-merge-git',
+              'implementation' => 'ruby-golden-master',
+              'package' => Ast::Merge::Git::PACKAGE_NAME,
+              'package_version' => Ast::Merge::Git::VERSION,
+              'source' => source_provenance,
+              'artifact' => artifact
+            }
+          end
+
+          declared = @adapter_descriptor.fetch('adapter')
+          source = declared.fetch('source')
+          declared.slice('adapter_id', 'implementation', 'package', 'package_version').merge(
+            'source' => source_provenance(
+              root: @adapter_descriptor.fetch('source_root'),
+              repository: source.fetch('repository'),
+              label: declared.fetch('adapter_id')
+            ),
+            'artifact' => artifact
+          )
+        end
+
+        def run_environment
+          return benchmark_environment unless @adapter_descriptor
+
+          {
+            'harness' => benchmark_environment,
+            'adapter' => @adapter_descriptor.fetch('environment')
+          }
+        end
+
+        def load_adapter_descriptor(path)
+          return unless path
+
+          descriptor_path = Pathname(path).expand_path
+          descriptor = JSON.parse(descriptor_path.binread)
+          unless descriptor['schema_version'] == ADAPTER_DESCRIPTOR_SCHEMA
+            error!('unsupported adapter descriptor schema')
+          end
+          %w[adapter source_root provider environment].each do |key|
+            error!("adapter descriptor missing #{key}") unless descriptor.key?(key)
+          end
+          %w[adapter_id implementation package package_version source].each do |key|
+            error!("adapter descriptor missing adapter.#{key}") unless descriptor.fetch('adapter').key?(key)
+          end
+          unless descriptor.dig('adapter', 'source', 'repository')
+            error!('adapter descriptor missing adapter.source.repository')
+          end
+          %w[merge_provider parser_provider].each do |key|
+            error!("adapter descriptor missing provider.#{key}") unless descriptor.fetch('provider').key?(key)
+          end
+          source_root = Pathname(descriptor.fetch('source_root'))
+          source_root = descriptor_path.dirname.join(source_root) unless source_root.absolute?
+          descriptor.merge('source_root' => source_root.expand_path)
+        rescue JSON::ParserError => e
+          error!("invalid adapter descriptor JSON: #{e.message}")
+        rescue SystemCallError => e
+          error!("cannot read adapter descriptor: #{e.message}")
         end
 
         def benchmark_environment

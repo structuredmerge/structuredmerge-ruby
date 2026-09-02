@@ -149,6 +149,11 @@ process IDs.
 ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev --iterations 5
 ```
 
+When benchmarking another StructuredMerge runtime, pass its versioned identity,
+source checkout, provider selection, and runtime details with
+`--adapter-descriptor path/to/adapter.json`. The runner derives the source
+revision and dirty state, and hashes the executable selected by `--driver`.
+
 ## 🔐 Security
 
 See [SECURITY.md][🔐security].

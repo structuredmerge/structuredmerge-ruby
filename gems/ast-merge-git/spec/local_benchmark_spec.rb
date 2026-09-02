@@ -288,6 +288,65 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     )
   end
 
+  it 'records a cross-runtime adapter without attributing it to the Ruby golden master' do
+    FileUtils.mkdir_p(tmp_root)
+    descriptor_path = tmp_root.join('rust-adapter.json')
+    source_root = Pathname(__dir__).join('..').expand_path
+    descriptor_path.binwrite(
+      JSON.generate(
+        'schema_version' => 'structuredmerge.benchmark.adapter-descriptor/v1',
+        'adapter' => {
+          'adapter_id' => 'rust-candidate.smorg-rs',
+          'implementation' => 'rust',
+          'package' => 'smorg-rs',
+          'package_version' => '0.2.0',
+          'source' => { 'repository' => 'structuredmerge/structuredmerge-ruby' }
+        },
+        'source_root' => source_root.to_s,
+        'provider' => {
+          'merge_provider' => { 'provider_id' => 'rust.json', 'package' => 'json-merge' },
+          'parser_provider' => {
+            'provider_id' => 'tree-sitter-language-pack',
+            'backend_family' => 'tree-sitter',
+            'selection_mode' => 'explicit',
+            'boundary' => 'tree-haver'
+          }
+        },
+        'environment' => { 'runtime' => 'rust' }
+      )
+    )
+    candidate = Ast::Merge::Git::LocalBenchmarkRunner.new(
+      benchmark: benchmark,
+      driver_path: driver,
+      tmp_root: tmp_root,
+      adapter_descriptor: descriptor_path
+    )
+
+    manifest = candidate.send(:run_manifest, benchmark.select(profile: 'micro'))
+
+    expect(manifest.fetch('adapter')).to include(
+      'adapter_id' => 'rust-candidate.smorg-rs',
+      'implementation' => 'rust',
+      'package' => 'smorg-rs',
+      'source' => include(
+        'repository' => 'structuredmerge/structuredmerge-ruby',
+        'revision' => match(/\A[0-9a-f]{40}\z/)
+      ),
+      'artifact' => include('path' => driver, 'sha256' => match(/\A[0-9a-f]{64}\z/))
+    )
+    expect(manifest.fetch('environment')).to include(
+      'harness' => include('ruby_engine' => RUBY_ENGINE),
+      'adapter' => { 'runtime' => 'rust' }
+    )
+    manifest.dig('configuration', 'cases').each do |configuration|
+      expect(configuration).to include(
+        'merge_provider' => include('provider_id' => 'rust.json'),
+        'parser_provider' => include('provider_id' => 'tree-sitter-language-pack'),
+        'selector_role' => 'oracle_context'
+      )
+    end
+  end
+
   it 'carries run-manifest identity into cache and aggregate report evidence' do
     run = runner.run(profile: 'micro')
     report = Ast::Merge::Git::LocalBenchmarkReport.build(run)
