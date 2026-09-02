@@ -44,6 +44,25 @@ RSpec.describe Parslet::Toml::Merge::Provider do
     expect { JSON.generate(result) }.not_to raise_error
   end
 
+  it 'merges nested tables through the shared TOML substrate' do
+    fixture = JSON.parse(
+      File.read(
+        File.expand_path(
+          '../../../../fixtures/toml/slice-720-advanced-leaf-merge/nested-table-leaf-merge.json',
+          __dir__
+        )
+      ),
+      symbolize_names: true
+    )
+    result = provider.merge2(
+      current_source: fixture.fetch(:destination),
+      incoming_source: fixture.fetch(:template)
+    )
+
+    expect(result).to include(ok: true, output: fixture.dig(:expected, :output))
+    expect(result.dig(:verification, :backend)).to eq('parslet')
+  end
+
   it 'reports Parslet AST attributes and exact owned source ranges' do
     result = provider.analyze(
       source: "first = 1\n# array docs\narray = [1, 2]\npublished = 1979-05-27T07:32:00Z\n"

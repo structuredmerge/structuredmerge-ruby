@@ -44,6 +44,25 @@ RSpec.describe Citrus::Toml::Merge::Provider do
     expect { JSON.generate(result) }.not_to raise_error
   end
 
+  it 'merges nested tables through the shared TOML substrate' do
+    fixture = JSON.parse(
+      File.read(
+        File.expand_path(
+          '../../../../fixtures/toml/slice-720-advanced-leaf-merge/nested-table-leaf-merge.json',
+          __dir__
+        )
+      ),
+      symbolize_names: true
+    )
+    result = provider.merge2(
+      current_source: fixture.fetch(:destination),
+      incoming_source: fixture.fetch(:template)
+    )
+
+    expect(result).to include(ok: true, output: fixture.dig(:expected, :output))
+    expect(result.dig(:verification, :backend)).to eq('citrus')
+  end
+
   it 'validates then copies an exact winner byte-for-byte' do
     winner = "alpha = 'theirs' # exact\r\n"
     result = provider.merge3(base_source: base, ours_source: base, theirs_source: winner)

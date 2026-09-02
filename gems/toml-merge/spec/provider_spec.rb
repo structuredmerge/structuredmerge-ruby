@@ -107,6 +107,27 @@ RSpec.describe Toml::Merge::Provider do
     )
   end
 
+  it 'routes nested table merge2 through the shared TOML substrate' do
+    fixture = JSON.parse(
+      File.read(
+        File.expand_path(
+          '../../../../fixtures/toml/slice-720-advanced-leaf-merge/nested-table-leaf-merge.json',
+          __dir__
+        )
+      ),
+      symbolize_names: true
+    )
+    result = provider.merge2(
+      current_source: fixture.fetch(:destination),
+      incoming_source: fixture.fetch(:template)
+    )
+
+    expect(result).to include(ok: true, output: fixture.dig(:expected, :output))
+    expect(result.dig(:render_report, :strategy)).to eq(:toml_substrate)
+    expect(result.dig(:verification, :output_reparsed)).to be(true)
+    expect(result.dig(:verification, :backend)).to eq('kreuzberg-language-pack')
+  end
+
   it 'preserves KLP temporal numeric string array and inline-table source fidelity' do
     result = provider.merge3(
       base_source: "stable = true\n",

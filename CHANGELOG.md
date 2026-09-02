@@ -36,6 +36,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Let cross-runtime benchmark descriptors declare operation and dialect support plus merge-provider identity per format family, avoiding false support claims from Cartesian-product capability lists.
 - Load `ast-merge-git`'s optional benchmark providers from `STRUCTUREDMERGE_DEV` during local development so benchmarks exercise the current monorepo providers.
 - Reuse YAML's recursive AST resolver in its workflow provider so nested template-only mapping leaves merge without sacrificing destination values or source-line provenance.
+- Route structurally rich TOML `merge2` provider requests through the existing TreeHaver-backed TOML substrate merger, sharing table and dotted-key behavior across TSLP, Citrus, and Parslet providers.
 
 ### Changed
 

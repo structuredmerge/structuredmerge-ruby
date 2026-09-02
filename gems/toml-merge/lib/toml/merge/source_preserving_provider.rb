@@ -92,6 +92,7 @@ module Toml
           current: analyze_role(:current, request.fetch(:current_source))
         }
         unsafe = documents.values.reject { |document| document.issues.empty? }
+        return merge2_with_toml_substrate(request, documents) if structural_merge2_candidate?(documents.values)
         return invalid_document_failure(:merge2, request, unsafe) unless unsafe.empty?
 
         additions = documents[:incoming].entries.reject { |entry| documents[:current].by_key.key?(entry.key) }
@@ -135,6 +136,58 @@ module Toml
       end
 
       private
+
+      def structural_merge2_candidate?(documents)
+        allowed = %i[table array_of_tables dotted_key]
+        documents.any? { |document| document.issues.any? } && documents.all? do |document|
+          document.analysis && document.issues.all? { |item| allowed.include?(item[:category]) }
+        end
+      end
+
+      def merge2_with_toml_substrate(request, documents)
+        merged = TreeHaver.with_backend(backend_id) do
+          SmartMerger.new(
+            documents.fetch(:incoming).source,
+            documents.fetch(:current).source,
+            preference: :destination,
+            add_template_only_nodes: true
+          ).merge_result
+        end
+        output = merged.to_toml
+        verification = TreeHaver.with_backend(backend_id) { FileAnalysis.new(output) }
+        unless verification.valid?
+          return failure(
+            :merge2,
+            request,
+            category: :verification_failure,
+            message: 'TOML substrate output did not reparse with the selected backend.',
+            verification: { output_reparsed: false }
+          )
+        end
+
+        result(
+          :merge2,
+          request,
+          output: output,
+          changes: merged.decision_summary,
+          render_report: {
+            strategy: :toml_substrate,
+            line_records: merged.lines_array.each_with_index.map do |line, index|
+              {
+                output_line: index + 1,
+                source_role: line[:source],
+                original_line: line[:original_line],
+                decision: line[:decision]
+              }
+            end
+          },
+          verification: {
+            output_reparsed: true,
+            backend: backend_id,
+            unresolved_case_count: merged.unresolved_cases.length
+          }
+        )
+      end
 
       def analyze_role(role, source)
         analysis = TreeHaver.with_backend(backend_id) { ::Toml::Merge::FileAnalysis.new(source) }
