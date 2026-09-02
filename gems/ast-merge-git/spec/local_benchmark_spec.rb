@@ -65,8 +65,12 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
   it 'maps changed paths to all directly affected cases plus deterministic neighbors' do
     first = benchmark.select(profile: 'dev', changed_paths: ['gems/json-merge/lib/provider.rb'])
     second = benchmark.select(profile: 'dev', changed_paths: ['gems/json-merge/lib/provider.rb'])
+    rust = benchmark.select(profile: 'dev', changed_paths: ['crates/json-merge/src/lib.rs'])
 
     expect(first).to eq(second)
+    expect(rust.slice('inferred_capabilities', 'direct_cases', 'neighbor_sample', 'selected_case_ids')).to eq(
+      first.slice('inferred_capabilities', 'direct_cases', 'neighbor_sample', 'selected_case_ids')
+    )
     expect(first.fetch('inferred_capabilities')).to eq(%w[json json5 jsonc metamorphic])
     expect(first.fetch('direct_cases')).to include(
       'case.merge3.jsonc.comment-preservation.v1',
