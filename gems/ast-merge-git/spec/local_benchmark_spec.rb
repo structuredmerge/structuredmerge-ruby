@@ -30,7 +30,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(benchmark.cases.length).to eq(23)
     expect(benchmark.document.fetch('expected_summary')).to include(
       'case_count' => 23,
-      'partition_counts' => { 'sentinel' => 15, 'gold' => 6, 'metamorphic' => 2 },
+      'partition_counts' => { 'sentinel' => 16, 'gold' => 5, 'metamorphic' => 2 },
       'operation_counts' => { 'merge2' => 6, 'merge3' => 15, 'metamorphic' => 2 }
     )
     expect(benchmark.document.fetch('profiles').keys).to eq(%w[micro dev nightly competitive])
@@ -57,6 +57,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         case.merge2.toml.nested-table-leaf.v1
         case.merge3.jsonc.comment-preservation.v1
         case.merge3.json5.order-format.v1
+        case.merge3.bash.independent-functions.v1
         case.merge3.typescript.independent-functions.v1
         case.merge3.go.independent-functions.v1
         case.merge3.rust.independent-functions.v1
@@ -322,6 +323,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         'source_root' => source_root.to_s,
         'provider' => {
           'merge_providers' => {
+            'bash' => { 'provider_id' => 'rust.bash', 'package' => 'bash-merge' },
             'go' => { 'provider_id' => 'rust.go', 'package' => 'go-merge' },
             'json' => { 'provider_id' => 'rust.json', 'package' => 'json-merge' },
             'markdown' => { 'provider_id' => 'rust.markdown', 'package' => 'markdown-merge' },
@@ -341,9 +343,10 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         },
         'supports' => {
           'operations' => %w[merge2 merge3 metamorphic],
-          'families' => %w[go json markdown rbs ruby rust toml typescript yaml],
-          'dialects' => %w[go json jsonc json5 markdown rbs ruby rust toml typescript tsx yaml],
+          'families' => %w[bash go json markdown rbs ruby rust toml typescript yaml],
+          'dialects' => %w[bash go json jsonc json5 markdown rbs ruby rust toml typescript tsx yaml],
           'combinations' => [
+            { 'family' => 'bash', 'operations' => %w[merge3], 'dialects' => %w[bash] },
             { 'family' => 'go', 'operations' => %w[merge3], 'dialects' => %w[go] },
             { 'family' => 'json', 'operations' => %w[merge2 merge3 metamorphic], 'dialects' => %w[json jsonc json5] },
             { 'family' => 'markdown', 'operations' => %w[merge2], 'dialects' => %w[markdown] },
@@ -435,7 +438,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'adapter_mode' => 'persistent-jsonl',
       'iterations' => 2
     )
-    expect(performance.fetch('samples').length).to eq(30)
+    expect(performance.fetch('samples').length).to eq(32)
     expect(performance.dig('session', 'process_ids').length).to eq(1)
     expect(performance.dig('samples', 0, 'runtime', 'measurement_class')).to eq(
       'session_startup_and_first_request'
