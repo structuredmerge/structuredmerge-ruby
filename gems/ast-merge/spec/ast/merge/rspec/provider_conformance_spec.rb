@@ -42,15 +42,15 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
     )
   end
 
-  it 'covers and advertises all 20 tested providers' do
+  it 'covers and advertises all 21 tested providers' do
     matrix = described_class.new(fixture).validate!
 
     expect(matrix.advertised_provider_ids).to eq(
       %w[ruby.bash ruby.binary ruby.dotenv ruby.go ruby.html ruby.json ruby.markdown ruby.markdown.commonmarker
-         ruby.markdown.kramdown ruby.markdown.markly ruby.rbs ruby.ruby.prism ruby.rust ruby.text ruby.toml
+         ruby.markdown.kramdown ruby.markdown.markly ruby.rbs ruby.ruby ruby.ruby.prism ruby.rust ruby.text ruby.toml
          ruby.toml.citrus ruby.toml.parslet ruby.typescript ruby.yaml.psych ruby.zip]
     )
-    expect(matrix.blocked_provider_ids).to eq(%w[ruby.ruby ruby.yaml])
+    expect(matrix.blocked_provider_ids).to eq(%w[ruby.yaml])
     expect(
       matrix.tested?(
         provider_id: 'ruby.bash',
@@ -147,6 +147,14 @@ RSpec.describe Ast::Merge::RSpec::ProviderConformanceMatrix do
         provider_id: 'ruby.json',
         dialect: :json5,
         backend: :'kreuzberg-language-pack',
+        profile_id: :source_preserving
+      )
+    ).to be(true)
+    expect(
+      matrix.tested?(
+        provider_id: 'ruby.ruby',
+        dialect: :ruby,
+        backend: :tslp,
         profile_id: :source_preserving
       )
     ).to be(true)

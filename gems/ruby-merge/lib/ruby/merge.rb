@@ -24,7 +24,7 @@ module Ruby
   # those phases to satisfy generic size metrics would obscure the contract
   # they implement and make provider behavior harder to audit.
   # rubocop:disable Metrics/AbcSize, Metrics/BlockLength, Metrics/BlockNesting
-  # rubocop:disable Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength
+  # rubocop:disable Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists
   # rubocop:disable Metrics/ModuleLength, Metrics/PerceivedComplexity
   # rubocop:disable Style/MultilineBlockChain
   module Merge
@@ -236,14 +236,14 @@ module Ruby
       ).to_h
     end
 
-    def merge_ruby(template_source, destination_source, dialect, merge_template_requires: false,
+    def merge_ruby(template_source, destination_source, dialect, backend: nil, merge_template_requires: false,
                    method_move_policy: DEFAULT_METHOD_MOVE_POLICY)
-      template = parse_ruby(template_source, dialect)
+      template = parse_ruby(template_source, dialect, backend: backend)
       return template unless template[:ok]
 
       method_move_policy = normalize_method_move_policy(method_move_policy)
 
-      destination = parse_ruby(destination_source, dialect)
+      destination = parse_ruby(destination_source, dialect, backend: backend)
       unless destination[:ok]
         return {
           ok: false,
@@ -3212,12 +3212,15 @@ module Ruby
     )
     # rubocop:enable Style/MultilineBlockChain
     # rubocop:enable Metrics/ModuleLength, Metrics/PerceivedComplexity
-    # rubocop:enable Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength
+    # rubocop:enable Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists
     # rubocop:enable Metrics/AbcSize, Metrics/BlockLength, Metrics/BlockNesting
   end
 end
 
+require_relative 'merge/provider'
+
 Ruby::Merge.register_backend!
+Ruby::Merge.register_provider!
 
 TreeHaver::BackendRegistry.register_tag(
   :tslp_ruby_import_records,
