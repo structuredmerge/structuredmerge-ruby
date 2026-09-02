@@ -70,7 +70,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 and <a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">yes</a>, platform and engine support are part of the <a href="https://github.com/semver/semver/issues/716#issuecomment-869336139">public API</a>.<br>
 Please file a bug if you notice a violation of semantic versioning.</p>
 
-<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.15...HEAD">Unreleased</a></h2>
+<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.16...HEAD">Unreleased</a></h2>
 
 <h3 id="added">Added</h3>
 
@@ -84,6 +84,58 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h3 id="security">Security</h3>
 
+<h2 id="7116---2026-09-01">
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.15...v7.1.16">7.1.16</a> - 2026-09-01</h2>
+
+<ul>
+  <li>TAG: <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.16">v7.1.16</a>
+</li>
+  <li>COVERAGE: 93.62% – 11159/11920 lines in 16 files</li>
+  <li>BRANCH COVERAGE: 76.97% – 4749/6170 branches in 16 files</li>
+  <li>17.92% documented</li>
+</ul>
+
+<h3 id="changed-1">Changed</h3>
+
+<ul>
+  <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+    <ul>
+      <li>kettle-dev (&gt;= 3.0.27 -&gt; &gt;= 3.0.28)</li>
+      <li>kettle-family (&gt;= 1.2.80 -&gt; &gt;= 1.2.82)</li>
+    </ul>
+  </li>
+  <li>[kc] kettle-jem/template: updated 1592 project files:
+    <ul>
+      <li>code and tests (80)</li>
+      <li>configuration (48)</li>
+      <li>dependencies (588)</li>
+      <li>documentation (36)</li>
+      <li>other (492)</li>
+      <li>workflows (348)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="fixed-1">Fixed</h3>
+
+<ul>
+  <li>
+    <p>Use RUBOCOP_LTS_DEV for generated RuboCop-LTS local workspace wiring while accepting RUBOCOP_LTS_LOCAL as a legacy input alias.</p>
+  </li>
+  <li>
+    <p>Remove the legacy RUBOCOP_LTS_LOCAL mise environment key during template installation.</p>
+  </li>
+  <li>
+    <p>Correct legacy RuboCop-LTS mise selector migration when its value is false.</p>
+  </li>
+  <li>
+    <p>Prevent inherited changelog paths from redirecting template maintenance updates.</p>
+  </li>
+  <li>
+    <p>Boot workflow-pin maintenance through the repository bundle to avoid mixing installed and checkout Kettle Jem code.</p>
+  </li>
+</ul>
+
 <h2 id="7115---2026-09-01">
 <a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.14...v7.1.15">7.1.15</a> - 2026-09-01</h2>
 
@@ -95,7 +147,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-1">Changed</h3>
+<h3 id="changed-2">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -129,7 +181,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-2">Changed</h3>
+<h3 id="changed-3">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -155,7 +207,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="fixed-1">Fixed</h3>
+<h3 id="fixed-2">Fixed</h3>
 
 <ul>
   <li>
@@ -177,7 +229,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.96% documented</li>
 </ul>
 
-<h3 id="changed-3">Changed</h3>
+<h3 id="changed-4">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem/template: updated 796 project files:
@@ -197,7 +249,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="fixed-2">Fixed</h3>
+<h3 id="fixed-3">Fixed</h3>
 
 <ul>
   <li>
@@ -225,7 +277,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-4">Changed</h3>
+<h3 id="changed-5">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -246,7 +298,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-5">Changed</h3>
+<h3 id="changed-6">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem/template: updated 398 project files:
@@ -269,7 +321,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>Raise first-party dependency minimums to their latest released versions.</li>
 </ul>
 
-<h3 id="fixed-3">Fixed</h3>
+<h3 id="fixed-4">Fixed</h3>
 
 <ul>
   <li>
@@ -291,7 +343,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.92% documented</li>
 </ul>
 
-<h3 id="changed-6">Changed</h3>
+<h3 id="changed-7">Changed</h3>
 
 <ul>
   <li>
@@ -347,7 +399,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="fixed-4">Fixed</h3>
+<h3 id="fixed-5">Fixed</h3>
 
 <ul>
   <li>
@@ -375,7 +427,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>Gemspec author metadata now expands existing authors with Git-derived copyright holders and consolidates configured author aliases, while applying the documented default machine-account filter.</li>
 </ul>
 
-<h3 id="changed-7">Changed</h3>
+<h3 id="changed-8">Changed</h3>
 
 <ul>
   <li>
@@ -401,7 +453,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.97% documented</li>
 </ul>
 
-<h3 id="changed-8">Changed</h3>
+<h3 id="changed-9">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -423,7 +475,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.97% documented</li>
 </ul>
 
-<h3 id="changed-9">Changed</h3>
+<h3 id="changed-10">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -458,7 +510,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>17.97% documented</li>
 </ul>
 
-<h3 id="changed-10">Changed</h3>
+<h3 id="changed-11">Changed</h3>
 
 <ul>
   <li>
@@ -499,7 +551,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>Make the repository-local kettle-jem-deps-floor executable bootstrap the consistent StructuredMerge development bundle before loading parser dependencies.</li>
 </ul>
 
-<h3 id="fixed-5">Fixed</h3>
+<h3 id="fixed-6">Fixed</h3>
 
 <ul>
   <li>
@@ -524,7 +576,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>18.00% documented</li>
 </ul>
 
-<h3 id="changed-11">Changed</h3>
+<h3 id="changed-12">Changed</h3>
 
 <ul>
   <li>
@@ -551,7 +603,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>Main templating commands now record an aggregate Changed entry through kettle-changelog only when template files change, while transfer replay uses kettle-changelog’s structural merger.</li>
 </ul>
 
-<h3 id="fixed-6">Fixed</h3>
+<h3 id="fixed-7">Fixed</h3>
 
 <ul>
   <li>Restore source-checkout loading for the repository-local dependency-floor and workflow-pin maintenance tools.</li>
@@ -568,7 +620,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>18.01% documented</li>
 </ul>
 
-<h3 id="changed-12">Changed</h3>
+<h3 id="changed-13">Changed</h3>
 
 <ul>
   <li>
@@ -579,7 +631,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="fixed-7">Fixed</h3>
+<h3 id="fixed-8">Fixed</h3>
 
 <ul>
   <li>
@@ -636,7 +688,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="changed-13">Changed</h3>
+<h3 id="changed-14">Changed</h3>
 
 <ul>
   <li>
@@ -656,7 +708,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="fixed-8">Fixed</h3>
+<h3 id="fixed-9">Fixed</h3>
 
 <ul>
   <li>
@@ -752,7 +804,7 @@ RSpec helpers provided by <code>kettle-test</code>.</p>
   <li>Transfer changelog replay now supports destination applicability filters and filter-aware status reporting.</li>
 </ul>
 
-<h3 id="changed-14">Changed</h3>
+<h3 id="changed-15">Changed</h3>
 
 <ul>
   <li>Runtime dependency metadata now requires <code>kettle-ndjson</code> 0.1.3 or newer and<br>
@@ -968,7 +1020,7 @@ use ClickGems instead of BestGems.</p>
   <li>Record explicit modular dependency removals and compatible keep_both decisions so repeated templating remains deterministic.</li>
 </ul>
 
-<h3 id="fixed-9">Fixed</h3>
+<h3 id="fixed-10">Fixed</h3>
 
 <ul>
   <li>Templating now removes the obsolete <code>tree_sitter_language_pack</code> entry from<br>
@@ -2237,7 +2289,7 @@ preserving comments and trailing commas during template updates.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Tue Sep  1 13:57:01 2026 by
+  Generated on Tue Sep  1 23:25:32 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
