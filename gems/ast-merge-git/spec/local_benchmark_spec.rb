@@ -33,6 +33,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'partition_counts' => { 'sentinel' => 7, 'gold' => 7, 'metamorphic' => 2 },
       'operation_counts' => { 'merge2' => 1, 'merge3' => 13, 'metamorphic' => 2 }
     )
+    expect(benchmark.document.fetch('profiles').keys).to eq(%w[micro dev nightly competitive])
     expect(benchmark.document.fetch('provenance')).to include(
       'spdx_license' => 'CC0-1.0',
       'authorship' => 'project_authored',
@@ -75,6 +76,27 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(first.dig('neighbor_sample', 'selected_case_ids')).to eq(
       %w[case.merge3.toml.independent-tables.v1 case.merge3.yaml.delete-modify.v1]
     )
+  end
+
+  it 'selects all admitted cases only for nightly and competitive tiers' do
+    expected_ids = benchmark.cases.map { |item| item.fetch('id') }
+
+    nightly = benchmark.select(profile: 'nightly')
+    competitive = benchmark.select(profile: 'competitive')
+
+    expect(nightly).to include(
+      'selection_mode' => 'all',
+      'competitor_policy' => 'none',
+      'selected_case_ids' => expected_ids,
+      'excluded_case_ids' => []
+    )
+    expect(competitive).to include(
+      'selection_mode' => 'all',
+      'competitor_policy' => 'configured',
+      'selected_case_ids' => expected_ids,
+      'excluded_case_ids' => []
+    )
+    expect(competitive.dig('explanation', 'profile_rule')).to eq('all admitted cases in canonical corpus order')
   end
 
   it 'rejects malformed cases before execution' do
@@ -485,20 +507,25 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       tmp_root: tmp_root.join('competitive-runs'),
       competitor_paths: { 'mergiraf' => competitor }
     )
+    expect { competitive_runner.run(profile: 'micro') }.to raise_error(
+      Ast::Merge::Git::LocalBenchmark::Error,
+      /competitor adapters require the competitive profile/
+    )
     previous = ENV['BENCHMARK_EXPECTED_ORACLE_BYTES']
     ENV['BENCHMARK_EXPECTED_ORACLE_BYTES'] = 'must-not-reach-competitor'
-    report = Ast::Merge::Git::LocalBenchmarkReport.build(competitive_runner.run(profile: 'micro'))
+    report = Ast::Merge::Git::LocalBenchmarkReport.build(competitive_runner.run(profile: 'competitive'))
 
     expect(report.dig('dimensions', 'competitive', 'configured', 'mergiraf')).to include(
       'source_revision' => '13b813c02da9511c7433131aed142473ffe62d52',
       'reported_version' => 'mergiraf 0.18.0'
     )
     expect(report.dig('dimensions', 'competitive')).to include(
-      'outcomes' => { 'false_conflict' => 2, 'true_conflict' => 2, 'unsupported' => 3 },
       'unsupported_case_ids' => [
         'case.merge2.jsonc.current-layout-preservation.v1',
         'case.merge3.jsonc.comment-preservation.v1',
-        'case.merge3.json5.order-format.v1'
+        'case.merge3.json5.order-format.v1',
+        'case.metamorphic.json.reorder-format.v1',
+        'case.metamorphic.jsonc.comment-format.v1'
       ],
       'affects_candidate_safety_gate' => false
     )

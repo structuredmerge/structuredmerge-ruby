@@ -40,6 +40,12 @@ module Ast
           'metamorphic' => %w[source transformed],
           'diff' => %w[before after]
         }.freeze
+        PROFILE_POLICIES = {
+          'micro' => %w[sentinels none],
+          'dev' => %w[affected none],
+          'nightly' => %w[all none],
+          'competitive' => %w[all configured]
+        }.freeze
 
         attr_reader :document, :corpus_digest, :path
 
@@ -89,14 +95,22 @@ module Ast
           capabilities = inferred.values.flatten.uniq.sort
           direct = cases.select { |item| direct_case?(item, capabilities) }.map { |item| item.fetch('id') }
           sentinels = definition.fetch('mandatory_sentinels')
-          selected = ordered(sentinels + direct)
-          population = cases.map { |item| item.fetch('id') } - selected
-          neighbors = neighbor_order(population).first(definition.fetch('neighbor_count'))
-          selected = ordered(selected + neighbors)
-          selected = sentinels if profile == 'micro'
+          base = ordered(sentinels + direct)
+          population = cases.map { |item| item.fetch('id') } - base
+          neighbors = if definition.fetch('selection_mode') == 'affected'
+                        neighbor_order(population).first(definition.fetch('neighbor_count'))
+                      else
+                        []
+                      end
+          selected = selected_ids_for(definition.fetch('selection_mode'), sentinels, base, neighbors)
+          if selected.length > definition.dig('budgets', 'case_count')
+            error!("profile #{profile} case budget does not fit selection")
+          end
 
           {
             'profile' => profile,
+            'selection_mode' => definition.fetch('selection_mode'),
+            'competitor_policy' => definition.fetch('competitor_policy'),
             'seed' => document.dig('selection', 'seed'),
             'selected_case_ids' => selected,
             'excluded_case_ids' => cases.map { |item| item.fetch('id') } - selected,
@@ -121,7 +135,7 @@ module Ast
             end,
             'budgets' => definition.fetch('budgets'),
             'explanation' => explanation(
-              profile,
+              definition.fetch('selection_mode'),
               inferred: inferred,
               direct: direct,
               sentinels: sentinels,
@@ -138,10 +152,18 @@ module Ast
         private
 
         def validate_profiles!
-          error!('profiles must be exactly micro and dev') unless document['profiles'].keys.sort == %w[dev micro]
+          unless document['profiles'].keys.sort == PROFILE_POLICIES.keys.sort
+            error!('profiles must be exactly micro, dev, nightly, and competitive')
+          end
           document['profiles'].each do |name, profile|
-            require_keys(profile, %w[mandatory_sentinels neighbor_count budgets], "profile #{name}")
+            require_keys(
+              profile,
+              %w[selection_mode competitor_policy mandatory_sentinels neighbor_count budgets],
+              "profile #{name}"
+            )
             require_keys(profile['budgets'], %w[wall_seconds case_count output_bytes], "profile #{name} budgets")
+            actual = [profile['selection_mode'], profile['competitor_policy']]
+            error!("profile #{name} policy differs") unless actual == PROFILE_POLICIES.fetch(name)
           end
         end
 
@@ -333,9 +355,22 @@ module Ast
           ids.sort_by { |id| [digest("#{seed}\0#{id}"), id] }
         end
 
-        def explanation(profile, details)
+        def selected_ids_for(mode, sentinels, base, neighbors)
+          case mode
+          when 'sentinels' then sentinels
+          when 'affected' then ordered(base + neighbors)
+          when 'all' then cases.map { |item| item.fetch('id') }
+          else error!("unknown selection mode: #{mode}")
+          end
+        end
+
+        def explanation(selection_mode, details)
           {
-            'profile_rule' => profile == 'micro' ? 'mandatory sentinels only' : 'sentinels + direct + neighbors',
+            'profile_rule' => {
+              'sentinels' => 'mandatory sentinels only',
+              'affected' => 'sentinels + direct + neighbors',
+              'all' => 'all admitted cases in canonical corpus order'
+            }.fetch(selection_mode),
             'changed_paths' => details[:inferred].map { |path, caps| "#{path} => #{caps.join(',')}" },
             'direct_cases' => details[:direct],
             'sentinels' => details[:sentinels],
@@ -491,6 +526,9 @@ module Ast
         def run(profile:, changed_paths: [])
           verify_environment!
           selection = @benchmark.select(profile: profile, changed_paths: changed_paths)
+          if @competitor_paths.any? && selection.fetch('competitor_policy') != 'configured'
+            error!('competitor adapters require the competitive profile')
+          end
           execution = {
             'kind' => 'correctness',
             'adapter_mode' => 'cold-process',
@@ -498,7 +536,10 @@ module Ast
           }
           manifest = run_manifest(selection, execution: execution)
           original_cwd = Dir.pwd
-          results, worker_process_ids = execute_selected_cases(selection.fetch('selected_case_ids'))
+          results, worker_process_ids = execute_selected_cases(
+            selection.fetch('selected_case_ids'),
+            competitors: selection.fetch('competitor_policy') == 'configured'
+          )
           raise LocalBenchmark::Error, 'runner changed its working directory' unless Dir.pwd == original_cwd
 
           {
@@ -566,23 +607,25 @@ module Ast
 
         private
 
-        def execute_selected_cases(case_ids)
+        def execute_selected_cases(case_ids, competitors:)
           return [[], []] if case_ids.empty?
-          return [execute_case_group(case_ids.each_with_index.to_a), [Process.pid]] if @workers == 1
+          if @workers == 1
+            return [execute_case_group(case_ids.each_with_index.to_a, competitors: competitors), [Process.pid]]
+          end
 
           error!('parallel benchmark workers require Process.fork') unless Process.respond_to?(:fork)
 
           groups = Array.new([@workers, case_ids.length].min) { [] }
           case_ids.each_with_index { |id, index| groups[index % groups.length] << [id, index] }
-          execute_case_groups(groups)
+          execute_case_groups(groups, competitors: competitors)
         end
 
-        def execute_case_groups(groups)
+        def execute_case_groups(groups, competitors:)
           root = @tmp_root.join("workers-#{Process.pid}-#{monotonic_nanoseconds}")
           FileUtils.mkdir_p(root)
           workers = groups.each_with_index.map do |group, index|
             result_path = root.join("worker-#{index}.marshal")
-            pid = fork_case_group(group, result_path)
+            pid = fork_case_group(group, result_path, competitors: competitors)
             { pid: pid, result_path: result_path }
           end
           statuses = workers.to_h do |worker|
@@ -608,11 +651,11 @@ module Ast
           FileUtils.rm_rf(root) if root
         end
 
-        def fork_case_group(group, result_path)
+        def fork_case_group(group, result_path, competitors:)
           fork do
             payload = {
               process_id: Process.pid,
-              entries: execute_case_group_entries(group)
+              entries: execute_case_group_entries(group, competitors: competitors)
             }
             result_path.binwrite(Marshal.dump(payload))
             exit! 0
@@ -624,14 +667,15 @@ module Ast
           end
         end
 
-        def execute_case_group(indexed_case_ids)
-          execute_case_group_entries(indexed_case_ids).sort_by(&:first).flat_map(&:last)
+        def execute_case_group(indexed_case_ids, competitors:)
+          execute_case_group_entries(indexed_case_ids, competitors: competitors).sort_by(&:first).flat_map(&:last)
         end
 
-        def execute_case_group_entries(indexed_case_ids)
+        def execute_case_group_entries(indexed_case_ids, competitors:)
           indexed_case_ids.map do |id, index|
             item = @benchmark.case_by_id(id)
-            [index, execute_case(item) + execute_competitors(item)]
+            competitor_results = competitors ? execute_competitors(item) : []
+            [index, execute_case(item) + competitor_results]
           end
         end
 

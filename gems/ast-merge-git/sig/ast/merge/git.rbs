@@ -91,6 +91,7 @@ module Ast
         PROVENANCE_FIELDS: Array[String]
         SELECTOR_FIELDS: Array[String]
         INPUT_ROLES: Hash[String, Array[String]]
+        PROFILE_POLICIES: Hash[String, Array[String]]
 
         attr_reader document: Hash[String, untyped]
         attr_reader corpus_digest: String
