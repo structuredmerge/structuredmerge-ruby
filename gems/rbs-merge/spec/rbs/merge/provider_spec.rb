@@ -26,7 +26,7 @@ RSpec.describe Rbs::Merge::Provider do
     expect(provider.capabilities).to include(
       operations: %i[analyze diff2 merge2 merge3],
       dialects: %i[rbs],
-      backends: %i[rbs tslp],
+      backends: %i[rbs tslp kreuzberg-language-pack],
       profiles: %i[source_preserving],
       role: :workflow
     )
@@ -36,6 +36,16 @@ RSpec.describe Rbs::Merge::Provider do
         family: :rbs,
         dialect: :rbs,
         backend: :rbs,
+        profile_id: :source_preserving,
+        operation: :merge3
+      )
+    ).to equal(Rbs::Merge.merge_provider)
+    expect(
+      Ast::Merge.resolve_provider(
+        provider_id: 'ruby.rbs',
+        family: :rbs,
+        dialect: :rbs,
+        backend: :'kreuzberg-language-pack',
         profile_id: :source_preserving,
         operation: :merge3
       )
@@ -110,6 +120,22 @@ RSpec.describe Rbs::Merge::Provider do
 
     expect(result).to include(ok: true, operation: :merge2, output: incoming)
     expect(result.dig(:verification, :semantic_match)).to be(true)
+  end
+
+  it 'preserves destination member customizations during a two-way merge' do
+    incoming = "class Api\n  def call: () -> String\nend\n\nclass Required\nend\n"
+    current = "class Api\n  def call: () -> bool\nend\n"
+    expected = "class Api\n  def call: () -> bool\nend\n\nclass Required\nend\n"
+
+    result = provider.merge2(current_source: current, incoming_source: incoming)
+
+    expect(result).to include(ok: true, operation: :merge2, output: expected)
+    expect(result.dig(:render_report, :strategy)).to eq(:rbs_substrate)
+    expect(result.fetch(:verification)).to include(
+      output_reparsed: true,
+      semantic_match: true,
+      ordered_declaration_signatures_verified: true
+    )
   end
 
   it 'merges independent top-level edits while preserving exact source and ours order' do

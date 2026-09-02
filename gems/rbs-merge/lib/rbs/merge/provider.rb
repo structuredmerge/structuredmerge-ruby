@@ -9,7 +9,7 @@ module Rbs
     # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists, Metrics/PerceivedComplexity -- provider decisions, source plans, and verification form one boundary
     class Provider
       DEFAULT_PROFILE = :source_preserving
-      SUPPORTED_BACKENDS = %i[rbs tslp].freeze
+      SUPPORTED_BACKENDS = %i[rbs tslp kreuzberg-language-pack].freeze
       Owner = Data.define(:id, :signature, :fingerprint, :start_line, :end_line, :role)
       Document = Data.define(:source, :analysis, :owners, :by_id, :unmanaged_fingerprint, :backend)
       ExactDocument = Data.define(:source, :analysis, :declarations, :issues, :role, :backend)
@@ -67,16 +67,59 @@ module Rbs
       end
 
       def merge2(request)
-        merge3_request = request.merge(
-          base_source: request.fetch(:current_source),
-          ours_source: request.fetch(:current_source),
-          theirs_source: request.fetch(:incoming_source)
+        incoming = parse_document(:merge2, request, :incoming)
+        return incoming if provider_failure?(incoming)
+
+        current = parse_document(:merge2, request, :current)
+        return current if provider_failure?(current)
+
+        merged = with_requested_backend(request) do
+          SmartMerger.new(
+            request.fetch(:incoming_source),
+            request.fetch(:current_source),
+            add_template_only_nodes: true
+          ).merge_result
+        end
+        output = merged.to_s
+        parsed = parse_source(output, :output, request)
+        return parse_failure(:merge2, request, :output, parsed) if provider_failure?(parsed)
+
+        planned_ids = current.owners.map(&:id) + incoming.owners.reject do |owner|
+          current.by_id.key?(owner.id)
+        end.map(&:id)
+        actual_ids = parsed.owners.map(&:id)
+        verification = {
+          output_reparsed: true,
+          semantic_match: actual_ids == planned_ids,
+          ordered_declaration_signatures_verified: actual_ids == planned_ids,
+          planned_declaration_count: planned_ids.length,
+          output_declaration_count: actual_ids.length
+        }
+        unless verification[:semantic_match]
+          return failure(
+            :merge2,
+            request,
+            category: :render_failure,
+            message: 'RBS two-way merge did not match the planned ordered declaration structure.',
+            verification: verification
+          )
+        end
+
+        changes = diff_documents(current, parsed)
+        result(
+          :merge2,
+          request,
+          output: output,
+          changes: changes,
+          render_report: {
+            strategy: :rbs_substrate,
+            decisions: merged.decisions,
+            summary: merged.summary
+          },
+          verification: verification
         )
-        merged = merge3(merge3_request)
-        merged.merge(
-          operation: :merge2,
-          verification: merged.fetch(:verification).except(:base_participated)
-        )
+      rescue StandardError => e
+        failure(:merge2, request, category: :merge_failure, message: e.message)
       end
 
       def merge3(request)
