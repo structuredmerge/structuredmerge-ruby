@@ -63,6 +63,25 @@ RSpec.describe Citrus::Toml::Merge::Provider do
     expect(result.dig(:verification, :backend)).to eq('citrus')
   end
 
+  it 'preserves dotted keys, inline tables, arrays, and comments without duplicating parser-owned gaps' do
+    fixture = JSON.parse(
+      File.read(
+        File.expand_path(
+          '../../../../fixtures/toml/slice-721-formatting-preservation/dotted-inline-comments-arrays.json',
+          __dir__
+        )
+      ),
+      symbolize_names: true
+    )
+    result = provider.merge2(
+      current_source: fixture.fetch(:destination),
+      incoming_source: fixture.fetch(:template)
+    )
+
+    expect(result).to include(ok: true, output: fixture.dig(:expected, :output))
+    expect(result.fetch(:output).scan('# local operator notes').length).to eq(1)
+  end
+
   it 'validates then copies an exact winner byte-for-byte' do
     winner = "alpha = 'theirs' # exact\r\n"
     result = provider.merge3(base_source: base, ours_source: base, theirs_source: winner)

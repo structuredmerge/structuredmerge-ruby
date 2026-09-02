@@ -97,7 +97,12 @@ module Toml
         return unless pair?
         return unless @start_line && @end_line && @end_line > @start_line
 
-        line_count = [node_text(@node).sub(/\n\z/, '').lines.count, 1].max
+        range_text = if @backend == :citrus
+                       node_text(citrus_pair_value_node || @node).rstrip
+                     else
+                       node_text(@node).sub(/\n\z/, '')
+                     end
+        line_count = [range_text.lines.count, 1].max
         @end_line = @start_line + line_count - 1
       end
 
@@ -470,6 +475,14 @@ module Toml
       end
 
       private
+
+      def citrus_pair_value_node
+        each_child(@node).find do |child|
+          canonical = NodeTypeNormalizer.canonical_type(child.type, @backend)
+          !NodeTypeNormalizer.key_type?(canonical) &&
+            !%i[comment equals whitespace unknown space indent line_break].include?(canonical)
+        end
+      end
 
       def table_name_container
         return @node unless parslet_element_node?
