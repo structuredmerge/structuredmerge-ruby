@@ -40,6 +40,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Route structurally rich TOML `merge2` provider requests through the existing TreeHaver-backed TOML substrate merger, sharing table and dotted-key behavior across TSLP, Citrus, and Parslet providers.
 - Add the reviewed nested-table TOML `merge2` sentinel to local benchmark profiles and recognize TOML provider identity in cross-runtime benchmark evidence.
 - Promote the shared Ruby class/method `merge2` fixture into the local benchmark corpus and recognize the Rust Ruby substrate as a cross-runtime candidate.
+- Promote source-preserving Markdown heading-section `merge2` into the mandatory benchmark profile and recognize the Rust Markdown substrate as a cross-runtime candidate.
 
 ### Changed
 
