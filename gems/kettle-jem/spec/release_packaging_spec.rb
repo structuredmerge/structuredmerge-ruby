@@ -69,18 +69,19 @@ RSpec.describe Kettle::Jem do
     expect(spec.extra_rdoc_files).to be_empty
   end
 
-  it "runs repository maintenance tools from the source checkout" do
+  it "runs repository maintenance tools from the source checkout without loading an installed kettle-jem" do
     %w[kettle-jem-deps-floor kettle-jem-workflow-pins].each do |executable|
       stdout, stderr, status = Open3.capture3(
         clean_subprocess_env("BUNDLE_GEMFILE" => nil),
         Gem.ruby,
-        "-rbundler/setup",
         gem_root.join("bin", executable).to_s,
         "--help",
         chdir: gem_root.to_s
       )
 
       expect(status.success?).to be(true), "#{executable} failed\nstdout=#{stdout}\nstderr=#{stderr}"
+      expect(stderr).not_to include("already initialized constant")
+      expect(stderr).not_to include("gems/kettle-jem-")
     end
   end
 

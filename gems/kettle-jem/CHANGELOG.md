@@ -48,6 +48,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prevent inherited changelog paths from redirecting template maintenance updates.
 
+- Boot workflow-pin maintenance through the repository bundle to avoid mixing installed and checkout Kettle Jem code.
+
 ### Security
 
 ## [7.1.15] - 2026-09-01
