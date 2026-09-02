@@ -75,6 +75,17 @@ module Ast
         end
 
         class << self
+          def tree_sitter_extension(nodes:, **)
+            {
+              schema: 'structuredmerge.extension/tree-sitter/v1',
+              namespace: 'tree-sitter',
+              capabilities: ['grammar-node-types'],
+              payload: {
+                grammar_node_types: nodes.map { |node| node.fetch(:native_type).to_s }.uniq.sort
+              }
+            }
+          end
+
           def canonical_json(value)
             JSON.generate(canonical_value(Ast::Merge.json_ready(value)))
           end

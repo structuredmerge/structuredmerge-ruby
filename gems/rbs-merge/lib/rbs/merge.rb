@@ -75,6 +75,7 @@ module Rbs
     autoload :CommentTracker, 'rbs/merge/comment_tracker'
     autoload :FreezeNode, 'rbs/merge/freeze_node'
     autoload :MergeResult, 'rbs/merge/merge_result'
+    autoload :NativeProjection, 'rbs/merge/native_projection'
     autoload :NodeTypeNormalizer, 'rbs/merge/node_type_normalizer'
     autoload :NodeWrapper, 'rbs/merge/node_wrapper'
     autoload :FileAnalysis, 'rbs/merge/file_analysis'

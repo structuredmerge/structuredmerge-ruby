@@ -291,35 +291,15 @@ module Psych
       end
 
       def ast_semantic(node)
-        {
-          type: node.class.name.delete_prefix('Psych::Nodes::'),
-          value: (node.value if node.respond_to?(:value)),
-          tag: (node.tag if node.respond_to?(:tag)),
-          children: Array(node.respond_to?(:children) ? node.children : []).map { |child| ast_semantic(child) }
-        }.compact.freeze
+        NativeProjection.semantic(node)
       end
 
       def ast_attribute_tree(node)
-        {
-          attributes: ast_attributes(node),
-          children: Array(node.respond_to?(:children) ? node.children : []).map { |child| ast_attribute_tree(child) }
-        }.freeze
+        NativeProjection.attribute_tree(node)
       end
 
       def ast_attributes(node)
-        attribute_names = %i[anchor tag style plain quoted implicit implicit_end version tag_directives]
-        attribute_names.each_with_object({}) do |name, attrs|
-          attrs[name] = public_value(node.public_send(name)) if node.respond_to?(name)
-        end.freeze
-      end
-
-      def public_value(value)
-        case value
-        when Array then value.map { |item| public_value(item) }
-        when Hash then value.to_h { |key, item| [key.to_s, public_value(item)] }
-        when String, Integer, Float, TrueClass, FalseClass, NilClass then value
-        else value.to_s
-        end
+        NativeProjection.attributes(node)
       end
 
       def analysis_payload(document)

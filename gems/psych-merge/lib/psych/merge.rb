@@ -104,6 +104,7 @@ module Psych
     autoload :FileAnalysis, 'psych/merge/file_analysis'
     autoload :MappingEntry, 'psych/merge/file_analysis'
     autoload :MergeResult, 'psych/merge/merge_result'
+    autoload :NativeProjection, 'psych/merge/native_projection'
     autoload :NodeTypeNormalizer, 'psych/merge/node_type_normalizer'
     autoload :NodeWrapper, 'psych/merge/node_wrapper'
     autoload :ConflictResolver, 'psych/merge/conflict_resolver'

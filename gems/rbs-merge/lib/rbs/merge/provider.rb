@@ -164,7 +164,7 @@ module Rbs
             source: source,
             backend: :rbs
           )
-          [wrapper.signature, semantic_attributes(declaration)]
+          [wrapper.signature, NativeProjection.call(declaration)]
         end.freeze
         duplicate = declarations.group_by(&:first).find { |_signature, matches| matches.length > 1 }
         issues = if duplicate
@@ -210,27 +210,11 @@ module Rbs
         end.join
       end
 
-      def semantic_attributes(value)
-        case value
-        when Array
-          value.map { |item| semantic_attributes(item) }
-        when Hash
-          value.map { |key, item| [semantic_attributes(key), semantic_attributes(item)] }
-        when String, Symbol, Numeric, true, false, nil
-          value
-        else
-          attributes = value.instance_variables.reject { |name| %i[@location @comment].include?(name) }
-          [
-            value.class.name,
-            attributes.map { |name| [name, semantic_attributes(value.instance_variable_get(name))] }
-          ]
-        end
-      end
-
       def owner_fingerprint(source, declaration)
         location = declaration.location
         exact_source = source.byteslice(location.start_pos...location.end_pos)
-        Digest::SHA256.hexdigest(JSON.generate(Ast::Merge.json_ready([semantic_attributes(declaration), exact_source])))
+        fingerprint_value = [NativeProjection.call(declaration), exact_source]
+        Digest::SHA256.hexdigest(JSON.generate(Ast::Merge.json_ready(fingerprint_value)))
       end
 
       def owner_id(signature)
