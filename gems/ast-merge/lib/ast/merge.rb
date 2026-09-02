@@ -87,7 +87,6 @@ module Ast
     autoload :ProviderContract, 'ast/merge/provider_contract'
     autoload :ProviderRegistry, 'ast/merge/provider_registry'
     autoload :ProviderResult, 'ast/merge/provider_result'
-    autoload :YamlDocument, 'ast/merge/yaml_document'
     autoload :SectionTyping, 'ast/merge/section_typing'
     autoload :SmartMergerBase, 'ast/merge/smart_merger_base'
     autoload :SourceRegionReportSupport, 'ast/merge/source_region_report_support'

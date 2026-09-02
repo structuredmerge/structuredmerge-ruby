@@ -45,6 +45,8 @@ module Yaml
     autoload :MergeResult, 'yaml/merge/merge_result'
     autoload :NodeWrapper, 'yaml/merge/node_wrapper'
     autoload :SmartMerger, 'yaml/merge/smart_merger'
+    autoload :SourcePreservingProvider, 'yaml/merge/source_preserving_provider'
+    autoload :Provider, 'yaml/merge/provider'
 
     module_function
 
@@ -589,3 +591,5 @@ module Yaml
 end
 
 Yaml::Merge.register_backend!
+require_relative 'merge/provider'
+Yaml::Merge.register_provider!

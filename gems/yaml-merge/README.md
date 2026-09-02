@@ -22,8 +22,9 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
 `Yaml::Merge` is the canonical YAML family package. It is the YAML substrate for
-StructuredMerge Ruby: it registers the tree-sitter YAML path and should own the
-shared YAML merge behavior used by provider implementations. YAML parsing and
+StructuredMerge Ruby: it registers the TSLP YAML path and owns the shared
+source-preserving provider behavior used by parser-specific implementations.
+YAML parsing and
 backend selection enter through `tree_haver`; source-preserving
 partial document insertion, replacement, and removal should enter through
 `ast-crispr`; merge orchestration should use `ast-merge`.
@@ -39,6 +40,7 @@ Hash/Array round-trips.
 - Backend feature profiles for the shared language-pack parser.
 - Path-based owner matching for mapping entries.
 - Shared YAML-family merge semantics for provider gems.
+- A TSLP workflow provider and a reusable provider engine for native parsers.
 - Destination-wins array policy.
 - Hash result API for fixture runners and higher-level tools.
 

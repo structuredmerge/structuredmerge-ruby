@@ -26,9 +26,8 @@ AST analysis. It is built on [ast-merge][ast-merge] and [tree_haver][tree_haver]
 and shares YAML-family behavior with [yaml-merge][yaml-merge].
 
 `psych-merge` is a YAML provider gem, not an alternate home for YAML merge
-semantics. Psych-specific code should be isolated behind its TreeHaver backend
-adapter. Merge behavior should consume normalized YAML-family owners and
-source-preserving edit plans supplied by the StructuredMerge stack. Partial YAML
+semantics. Its provider subclasses `Yaml::Merge::SourcePreservingProvider` and
+supplies only Psych AST validation and projection. Partial YAML
 insertion, replacement, and removal should route through `ast-crispr` rather
 than converting documents to Ruby objects and serializing them with `Psych.dump`.
 
@@ -36,7 +35,7 @@ than converting documents to Ruby objects and serializing them with `Psych.dump`
 
 - **Psych-Powered**: Uses Ruby's built-in Psych parser for YAML AST analysis
 - **YAML-Aware**: Understands YAML structure including mappings, sequences, and scalars
-- **YAML Family Behavior**: Delegates shared YAML merge semantics to `yaml-merge`
+- **YAML Family Behavior**: Inherits shared YAML merge semantics from `yaml-merge`
 - **Intelligent**: Matches nodes by structural signatures
 - **Fuzzy Key Matching**: `MappingMatchRefiner` matches similar keys (e.g., `database_url` ↔ `db_url`)
   using Levenshtein distance for typos and naming convention differences
