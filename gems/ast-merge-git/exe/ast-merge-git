@@ -58,7 +58,8 @@ if ARGV.first == 'benchmark'
     changed_paths: [],
     tmp_root: File.expand_path('../tmp/benchmark', __dir__),
     timeout: 30,
-    iterations: 1
+    iterations: 1,
+    workers: 1
   }
   parser = OptionParser.new do |opts|
     opts.banner = 'usage: ast-merge-git benchmark validate|select|run|report|performance [options]'
@@ -70,6 +71,7 @@ if ARGV.first == 'benchmark'
     opts.on('--tmp-root PATH') { |value| options[:tmp_root] = value }
     opts.on('--timeout SECONDS', Integer) { |value| options[:timeout] = value }
     opts.on('--iterations COUNT', Integer) { |value| options[:iterations] = value }
+    opts.on('--workers COUNT', Integer) { |value| options[:workers] = value }
   end
 
   begin
@@ -90,7 +92,8 @@ if ARGV.first == 'benchmark'
                  driver_path: driver,
                  tmp_root: options[:tmp_root],
                  timeout: options[:timeout],
-                 competitor_paths: options[:mergiraf] ? { 'mergiraf' => options[:mergiraf] } : {}
+                 competitor_paths: options[:mergiraf] ? { 'mergiraf' => options[:mergiraf] } : {},
+                 workers: options[:workers]
                ).run(profile: options[:profile], changed_paths: options[:changed_paths])
                command == 'report' ? Ast::Merge::Git::LocalBenchmarkReport.build(run) : run
              when 'performance'

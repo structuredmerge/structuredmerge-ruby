@@ -137,6 +137,11 @@ classification. Use `benchmark performance` to send repeated binary-safe JSONL
 requests through one persistent Ruby process without scoring those warm-process
 results as correctness evidence.
 
+Correctness runs accept `--workers COUNT` to distribute independent cases
+across a bounded set of worker processes. Results retain corpus order regardless
+of completion order; the run records the requested, used, and actual worker
+process IDs.
+
 ```shell
 ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev --iterations 5
 ```

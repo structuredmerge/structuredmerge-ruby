@@ -311,6 +311,42 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(encoded.encoding).to eq(Encoding::US_ASCII)
   end
 
+  it 'runs independent correctness cases in bounded workers and restores corpus order' do
+    parallel_runner = Ast::Merge::Git::LocalBenchmarkRunner.new(
+      benchmark: benchmark,
+      driver_path: driver,
+      tmp_root: tmp_root,
+      workers: 3
+    )
+
+    run = parallel_runner.run(profile: 'micro')
+    selected_ids = run.dig('selection', 'selected_case_ids')
+
+    expect(run.fetch('execution')).to include(
+      'workers_requested' => 3,
+      'workers_used' => 3
+    )
+    expect(run.dig('execution', 'worker_process_ids')).to all(be_a(Integer))
+    expect(run.dig('execution', 'worker_process_ids').uniq.length).to eq(3)
+    expect(run.dig('run_manifest', 'configuration', 'execution')).to eq(
+      'kind' => 'correctness',
+      'adapter_mode' => 'cold-process',
+      'workers' => 3
+    )
+    expect(run.fetch('results').each_slice(2).map { |pair| pair.first.fetch('case_id') }).to eq(selected_ids)
+  end
+
+  it 'rejects unbounded worker counts before execution' do
+    expect do
+      Ast::Merge::Git::LocalBenchmarkRunner.new(
+        benchmark: benchmark,
+        driver_path: driver,
+        tmp_root: tmp_root,
+        workers: Ast::Merge::Git::LocalBenchmarkRunner::MAX_WORKERS + 1
+      )
+    end.to raise_error(Ast::Merge::Git::LocalBenchmark::Error, /workers must be between/)
+  end
+
   it 'never injects oracle or expected material into candidate arguments or selector environment' do
     FileUtils.mkdir_p(tmp_root)
     log_path = tmp_root.join('invocations.jsonl')

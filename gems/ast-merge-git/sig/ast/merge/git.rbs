@@ -106,13 +106,15 @@ module Ast
 
       class LocalBenchmarkRunner
         DEFAULT_TIMEOUT: Integer
+        MAX_WORKERS: Integer
 
         def initialize: (
           benchmark: LocalBenchmark,
           driver_path: String | Pathname,
           tmp_root: String | Pathname,
           ?timeout: Integer,
-          ?competitor_paths: Hash[String, String | Pathname]
+          ?competitor_paths: Hash[String, String | Pathname],
+          ?workers: Integer
         ) -> void
         def run: (profile: String | Symbol, ?changed_paths: Array[String]) -> Hash[String, untyped]
         def performance: (

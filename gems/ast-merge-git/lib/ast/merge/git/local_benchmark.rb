@@ -464,6 +464,7 @@ module Ast
       # Executes the same authored merge bytes through Git and the installed driver.
       class LocalBenchmarkRunner
         DEFAULT_TIMEOUT = 30
+        MAX_WORKERS = 32
         MERGIRAF_EXTENSIONS = {
           'bash' => 'sh',
           'html' => 'html',
@@ -475,23 +476,29 @@ module Ast
           'yaml' => 'yaml'
         }.freeze
 
-        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT, competitor_paths: {})
+        # rubocop:disable Metrics/ParameterLists -- runner dependencies and resource limits remain explicit
+        def initialize(benchmark:, driver_path:, tmp_root:, timeout: DEFAULT_TIMEOUT, competitor_paths: {}, workers: 1)
           @benchmark = benchmark
           @driver_path = Pathname(driver_path).expand_path
           @tmp_root = Pathname(tmp_root).expand_path
           @timeout = Integer(timeout)
           @competitor_paths = competitor_paths.transform_values { |path| Pathname(path).expand_path }
+          @workers = Integer(workers)
+          error!("workers must be between 1 and #{MAX_WORKERS}") unless @workers.between?(1, MAX_WORKERS)
         end
+        # rubocop:enable Metrics/ParameterLists
 
         def run(profile:, changed_paths: [])
           verify_environment!
           selection = @benchmark.select(profile: profile, changed_paths: changed_paths)
-          manifest = run_manifest(selection)
+          execution = {
+            'kind' => 'correctness',
+            'adapter_mode' => 'cold-process',
+            'workers' => @workers
+          }
+          manifest = run_manifest(selection, execution: execution)
           original_cwd = Dir.pwd
-          results = selection['selected_case_ids'].flat_map do |id|
-            item = @benchmark.case_by_id(id)
-            execute_case(item) + execute_competitors(item)
-          end
+          results, worker_process_ids = execute_selected_cases(selection.fetch('selected_case_ids'))
           raise LocalBenchmark::Error, 'runner changed its working directory' unless Dir.pwd == original_cwd
 
           {
@@ -503,6 +510,11 @@ module Ast
             'run_manifest' => manifest,
             'cache_identity' => cache_identity(selection, manifest),
             'competitors' => competitor_provenance,
+            'execution' => {
+              'workers_requested' => @workers,
+              'workers_used' => worker_process_ids.length,
+              'worker_process_ids' => worker_process_ids
+            },
             'results' => results
           }
         ensure
@@ -553,6 +565,79 @@ module Ast
         end
 
         private
+
+        def execute_selected_cases(case_ids)
+          return [[], []] if case_ids.empty?
+          return [execute_case_group(case_ids.each_with_index.to_a), [Process.pid]] if @workers == 1
+
+          error!('parallel benchmark workers require Process.fork') unless Process.respond_to?(:fork)
+
+          groups = Array.new([@workers, case_ids.length].min) { [] }
+          case_ids.each_with_index { |id, index| groups[index % groups.length] << [id, index] }
+          execute_case_groups(groups)
+        end
+
+        def execute_case_groups(groups)
+          root = @tmp_root.join("workers-#{Process.pid}-#{monotonic_nanoseconds}")
+          FileUtils.mkdir_p(root)
+          workers = groups.each_with_index.map do |group, index|
+            result_path = root.join("worker-#{index}.marshal")
+            pid = fork_case_group(group, result_path)
+            { pid: pid, result_path: result_path }
+          end
+          statuses = workers.to_h do |worker|
+            pid, status = Process.wait2(worker.fetch(:pid))
+            [pid, status]
+          end
+          payloads = workers.map do |worker|
+            result_path = worker.fetch(:result_path)
+            error!("benchmark worker #{worker.fetch(:pid)} produced no result") unless result_path.file?
+
+            # The parent reads only a result written by its own forked child in a private run directory.
+            Marshal.load(result_path.binread) # rubocop:disable Security/MarshalLoad
+          end
+          failed = workers.find { |worker| !statuses.fetch(worker.fetch(:pid)).success? }
+          if failed
+            payload = payloads.fetch(workers.index(failed))
+            details = payload[:error]&.first(2)&.join(': ') || statuses.fetch(failed.fetch(:pid)).inspect
+            error!("benchmark worker #{failed.fetch(:pid)} failed: #{details}")
+          end
+          entries = payloads.flat_map { |payload| payload.fetch(:entries) }
+          [entries.sort_by(&:first).flat_map(&:last), payloads.map { |payload| payload.fetch(:process_id) }]
+        ensure
+          FileUtils.rm_rf(root) if root
+        end
+
+        def fork_case_group(group, result_path)
+          fork do
+            payload = {
+              process_id: Process.pid,
+              entries: execute_case_group_entries(group)
+            }
+            result_path.binwrite(Marshal.dump(payload))
+            exit! 0
+          rescue Exception => e # rubocop:disable Lint/RescueException -- worker must serialize all failures
+            result_path.binwrite(
+              Marshal.dump(process_id: Process.pid, entries: [], error: [e.class.name, e.message, e.backtrace])
+            )
+            exit! 1
+          end
+        end
+
+        def execute_case_group(indexed_case_ids)
+          execute_case_group_entries(indexed_case_ids).sort_by(&:first).flat_map(&:last)
+        end
+
+        def execute_case_group_entries(indexed_case_ids)
+          indexed_case_ids.map do |id, index|
+            item = @benchmark.case_by_id(id)
+            [index, execute_case(item) + execute_competitors(item)]
+          end
+        end
+
+        def monotonic_nanoseconds
+          Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+        end
 
         def verify_environment!
           error!("missing installed driver: #{@driver_path}") unless @driver_path.file? && @driver_path.executable?
