@@ -179,6 +179,17 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     )
   end
 
+  it 'accepts expected parse rejection from any adapter using shared diagnostic categories' do
+    item = benchmark.case_by_id('case.merge3.json.malformed-ours.v1')
+    stderr = 'smorg-rs: parse_error: ours parse error: invalid JSON'
+    checks = runner.send(:equivalence_checks, item, '')
+
+    expect(runner.send(:classify, item, 2, checks, stderr: stderr)).to eq('correct_clean')
+    expect(runner.send(:diagnostics, stderr, nil)).to eq(
+      [{ 'severity' => 'error', 'category' => 'parse_error', 'message' => stderr }]
+    )
+  end
+
   it 'does not use structural equality unless the ordered policy names the selected provider' do
     item = semantic_case('json', "{\"a\":1}\n")
     item['acceptable_equivalence'] = [{ 'class' => 'exact_bytes' }]

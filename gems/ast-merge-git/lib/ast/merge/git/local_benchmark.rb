@@ -1149,7 +1149,7 @@ module Ast
         end
 
         def expected_error_diagnostic?(status, stderr)
-          status >= 2 && /\Aast-merge-git: parse_error:/i.match?(stderr.to_s)
+          status >= 2 && /\A[^:\r\n]+: (?:destination_)?parse_error:/i.match?(stderr.to_s)
         end
 
         def equivalence_checks(item, output)
@@ -1331,7 +1331,7 @@ module Ast
           lines = stderr.lines.map(&:strip).reject(&:empty?)
           lines << unsupported_reason if unsupported_reason
           lines.map do |line|
-            match = /\Aast-merge-git: ([a-z_]+):/.match(line)
+            match = /\A[^:\r\n]+: ([a-z_]+):/i.match(line)
             category = match&.[](1) || (unsupported_reason == line ? 'unsupported' : 'process')
             { 'severity' => 'error', 'category' => category, 'message' => line }
           end

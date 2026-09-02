@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Accept shared snake_case diagnostics from non-Ruby benchmark adapters so expected parser rejections are classified as successful fail-closed outcomes.
+
 ### Security
 
 ## [7.1.7] - 2026-09-01
