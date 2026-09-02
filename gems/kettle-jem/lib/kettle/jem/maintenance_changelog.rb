@@ -37,6 +37,7 @@ module Kettle
         RUBYLIB
         RUBYOPT
       ].freeze
+      CHANGELOG_PATH_MUTEX = Mutex.new
 
       module_function
 
@@ -74,13 +75,15 @@ module Kettle
       end
 
       def upsert_unreleased_entry(project_root:, section:, key:, entry:, legacy_prefixes: [])
-        result = Kettle::Changelog::KeyedEntryUpserter.new(
-          root: project_root,
-          section: section,
-          key: key,
-          entry: entry,
-          legacy_prefixes: legacy_prefixes
-        ).run
+        result = with_project_changelog_path(project_root) do
+          Kettle::Changelog::KeyedEntryUpserter.new(
+            root: project_root,
+            section: section,
+            key: key,
+            entry: entry,
+            legacy_prefixes: legacy_prefixes
+          ).run
+        end
         result.merge(status: result.fetch(:changed) ? "updated" : "unchanged")
       end
 
@@ -156,6 +159,24 @@ module Kettle
 
       def bootstrap_only_report?(report)
         report.fetch(:setup_status, "").to_s.start_with?("bootstrap_")
+      end
+
+      def with_project_changelog_path(project_root)
+        CHANGELOG_PATH_MUTEX.synchronize do
+          previous_path = ENV.fetch("K_CHANGELOG_PATH", nil)
+          # The destination root is explicit here; inherited mise settings belong to
+          # the caller and must not redirect a template maintenance entry.
+          # rubocop:disable Env/Assign
+          ENV["K_CHANGELOG_PATH"] = File.join(project_root, "CHANGELOG.md")
+          yield
+        ensure
+          if previous_path.nil?
+            ENV.delete("K_CHANGELOG_PATH")
+          else
+            ENV["K_CHANGELOG_PATH"] = previous_path
+          end
+          # rubocop:enable Env/Assign
+        end
       end
     end
   end

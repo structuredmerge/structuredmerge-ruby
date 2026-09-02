@@ -30,6 +30,48 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
     end
   end
 
+  it "writes to the explicit destination when the caller exports a changelog path" do
+    Dir.mktmpdir("kettle-jem-maintenance-changelog-source") do |source_root|
+      Dir.mktmpdir("kettle-jem-maintenance-changelog-destination") do |destination_root|
+        source_path = File.join(source_root, "CHANGELOG.md")
+        destination_path = File.join(destination_root, "CHANGELOG.md")
+        source_content = "# Source changelog\n"
+        destination_content = <<~MARKDOWN
+          # Destination changelog
+
+          ## [Unreleased]
+
+          ### Changed
+
+          ### Fixed
+        MARKDOWN
+        File.write(source_path, source_content)
+        File.write(destination_path, destination_content)
+        previous_path = ENV.fetch("K_CHANGELOG_PATH", nil)
+        # rubocop:disable Env/Assign
+        ENV["K_CHANGELOG_PATH"] = source_path
+        described_class.upsert_unreleased_entry(
+          project_root: destination_root,
+          section: "Changed",
+          key: "kettle-jem/template",
+          entry: "updated 1 project file:\n  - documentation (1)"
+        )
+      ensure
+        if previous_path.nil?
+          ENV.delete("K_CHANGELOG_PATH")
+        else
+          ENV["K_CHANGELOG_PATH"] = previous_path
+        end
+        # rubocop:enable Env/Assign
+
+        expect(File.read(source_path)).to eq(source_content)
+        expect(File.read(destination_path)).to include(
+          "- [kc] kettle-jem/template: updated 1 project file:\n  - documentation (1)"
+        )
+      end
+    end
+  end
+
   it "supports compound keys without extending kettle-changelog's keyed entry format" do
     Dir.mktmpdir("kettle-jem-maintenance-changelog-compound-key") do |root|
       stub_env("K_CHANGELOG_PATH" => nil)

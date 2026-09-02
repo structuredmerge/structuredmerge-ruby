@@ -46,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Correct legacy RuboCop-LTS mise selector migration when its value is false.
 
+- Prevent inherited changelog paths from redirecting template maintenance updates.
+
 ### Security
 
 ## [7.1.15] - 2026-09-01
