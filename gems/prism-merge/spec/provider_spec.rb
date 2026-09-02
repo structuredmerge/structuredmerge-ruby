@@ -84,6 +84,43 @@ RSpec.describe Prism::Merge::Provider do
     )
   end
 
+  it 'preserves the shared leading gap for a template-only method' do
+    result = provider.merge2(
+      incoming_source: <<~'RUBY',
+        class Greeter
+          def greet(name)
+            "Hello #{name}"
+          end
+
+          def wave
+            :wave
+          end
+        end
+      RUBY
+      current_source: <<~RUBY,
+        class Greeter
+          def greet(name)
+            name.upcase
+          end
+        end
+      RUBY
+      backend: :prism
+    )
+
+    expect(result).to include(ok: true)
+    expect(result.fetch(:output)).to eq(<<~RUBY)
+      class Greeter
+        def greet(name)
+          name.upcase
+        end
+
+        def wave
+          :wave
+        end
+      end
+    RUBY
+  end
+
   it 'merges independent top-level owner edits with exact source fragments' do
     result = provider.merge3(base_source: base, ours_source: ours, theirs_source: theirs)
 

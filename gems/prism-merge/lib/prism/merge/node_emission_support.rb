@@ -402,6 +402,19 @@ module Prism
         inline_comment_entries = analysis.send(:owner_inline_comment_entries, node)
 
         if source == :template
+          if leading_comments.empty?
+            last_emitted_template_line = result.line_metadata.reverse_each.find do |metadata|
+              metadata[:template_line]
+            end&.fetch(:template_line, 0) || 0
+            emit_layout_leading_gap_lines(
+              result: result,
+              analysis: analysis,
+              owner: node,
+              source: source,
+              decision: decision,
+              last_output_line: last_emitted_template_line
+            )
+          end
           emit_template_blank_lines_before_leading_comments(
             result: result,
             node: node,
