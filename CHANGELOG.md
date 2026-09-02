@@ -45,6 +45,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Promote source-preserving Go independent-function `merge3` into the mandatory benchmark profile and map both Ruby and Rust Go provider paths to affected-case selection.
 - Promote source-preserving Rust independent-function `merge3` into the mandatory benchmark profile and map both Ruby and Rust-language provider paths to affected-case selection.
 - Promote source-preserving Bash independent-function `merge3` into the mandatory benchmark profile and map both Ruby and Rust Bash provider paths to affected-case selection.
+- Add a reviewed Python `merge3` gold case for the explicitly limited Rust
+  generic TSLP provider, including deterministic changed-path selection without
+  claiming a Ruby Python provider or adding it to the mandatory GM profile.
 
 ### Changed
 
