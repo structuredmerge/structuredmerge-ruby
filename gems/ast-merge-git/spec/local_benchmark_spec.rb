@@ -27,11 +27,11 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
   it 'validates the exact canonical authored corpus and inline digests' do
     expect(benchmark.validate!).to be(true)
-    expect(benchmark.cases.length).to eq(15)
+    expect(benchmark.cases.length).to eq(16)
     expect(benchmark.document.fetch('expected_summary')).to include(
-      'case_count' => 15,
-      'partition_counts' => { 'sentinel' => 3, 'gold' => 10, 'metamorphic' => 2 },
-      'operation_counts' => { 'merge3' => 13, 'metamorphic' => 2 }
+      'case_count' => 16,
+      'partition_counts' => { 'sentinel' => 4, 'gold' => 10, 'metamorphic' => 2 },
+      'operation_counts' => { 'merge2' => 1, 'merge3' => 13, 'metamorphic' => 2 }
     )
     expect(benchmark.document.fetch('provenance')).to include(
       'spdx_license' => 'CC0-1.0',
@@ -48,6 +48,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         case.merge3.json.independent-fields.v1
         case.merge3.json.same-owner-conflict.v1
         case.merge3.json.malformed-ours.v1
+        case.merge2.jsonc.current-layout-preservation.v1
       ]
     )
     expect(selection.fetch('explanation')).to include(
@@ -128,8 +129,29 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
     checks = runner.send(:equivalence_checks, item, "{a:1}\n")
 
-    expect(checks).to include('structural' => true, 'acceptable' => false)
+    expect(checks).to include(
+      'structural' => true,
+      'equivalence_acceptable' => true,
+      'preservation_acceptable' => false,
+      'acceptable' => false
+    )
     expect(checks.fetch('preservation_violations')).to include('formatting')
+    expect(runner.send(:classify, item, 0, checks)).to eq('correct_clean')
+  end
+
+  it 'does not infer unrelated preservation losses from byte inequality' do
+    item = semantic_case('json5', "{ a: 1, }\n")
+    item['preservation_policy'].transform_values! { 'required' }
+
+    checks = runner.send(:equivalence_checks, item, "{a:1}\n".b)
+
+    expect(checks.fetch('preservation_violations')).to contain_exactly('formatting', 'source_regions')
+    expect(checks.fetch('preservation_unverified')).to contain_exactly('comments', 'order')
+    expect(checks.fetch('preservation_evaluations')).to include(
+      'encoding' => 'pass',
+      'line_endings' => 'pass',
+      'unknown_fields' => 'pass'
+    )
   end
 
   it 'does not use structural equality unless the ordered policy names the selected provider' do
@@ -206,8 +228,9 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
     expect(invocations).not_to be_empty
     expect(invocations).to all(satisfy do |invocation|
-      invocation['argv'].length == 5 &&
-        invocation['argv'].first(3) == %w[base ours theirs] &&
+      merge3 = invocation['argv'].length == 5 && invocation['argv'].first(3) == %w[base ours theirs]
+      merge2 = invocation['argv'].length == 4 && invocation['argv'].first == 'benchmark-provider-merge2'
+      (merge3 || merge2) &&
         invocation['selector_env'].keys.all? { |key| key.start_with?('AST_MERGE_') } &&
         invocation['forbidden_env'].empty?
     end)
@@ -331,8 +354,8 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'reported_version' => 'mergiraf 0.18.0'
     )
     expect(report.dig('dimensions', 'competitive')).to include(
-      'outcomes' => { 'false_conflict' => 2, 'true_conflict' => 1 },
-      'unsupported_case_ids' => [],
+      'outcomes' => { 'false_conflict' => 2, 'true_conflict' => 1, 'unsupported' => 1 },
+      'unsupported_case_ids' => ['case.merge2.jsonc.current-layout-preservation.v1'],
       'affects_candidate_safety_gate' => false
     )
     expect(report.dig('dimensions', 'safety', 'gate')).to eq('pass')
@@ -360,13 +383,13 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       expect(results.last.fetch('deterministic_correctness_rerun')).to be(true)
     end
 
-    it 'preserves intentional-conflict safety and attributes malformed ours errors' do
+    it 'preserves intentional-conflict safety and accepts expected malformed-input rejection' do
       by_case = run.fetch('results').group_by { |item| item['case_id'] }
       conflict = by_case.fetch('case.merge3.json.same-owner-conflict.v1')
       malformed = by_case.fetch('case.merge3.json.malformed-ours.v1').last
 
       expect(conflict.map { |item| item['outcome'] }).to eq(%w[true_conflict true_conflict])
-      expect(malformed['outcome']).to eq('error')
+      expect(malformed['outcome']).to eq('correct_clean')
       expect(malformed.fetch('diagnostics').map { |item| item['message'] }.join).to include('ours parse error')
     end
 

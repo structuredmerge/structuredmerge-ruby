@@ -689,7 +689,12 @@ module Ast
           output = capture&.fetch(:output, '') || ''
           checks = equivalence_checks(item, output)
           markers = conflict_regions(output)
-          classified = outcome || classify(item, capture.fetch(:status), checks)
+          classified = outcome || classify(
+            item,
+            capture.fetch(:status),
+            checks,
+            stderr: capture.fetch(:stderr, '')
+          )
           eligible = item.dig('oracle', 'score_eligible') && !%w[unsupported excluded_ambiguous].include?(classified)
           {
             'schema_version' => 'structuredmerge.benchmark.result/v1',
@@ -856,16 +861,24 @@ module Ast
           'analyzed'
         end
 
-        def classify(item, status, checks)
+        def classify(item, status, checks, stderr: '')
           expected = item.dig('expected', 'outcome')
           return 'excluded_ambiguous' if expected == 'excluded_ambiguous'
+          if expected == 'error'
+            return 'error' if status.nil?
+            return expected_error_diagnostic?(status, stderr) ? 'correct_clean' : 'error' if status >= 2
+            return status == 1 ? 'false_conflict' : 'false_auto_merge'
+          end
           return 'error' if status.nil? || status >= 2
-          return status == 1 ? 'false_conflict' : 'false_auto_merge' if expected == 'error'
           return status == 1 ? 'true_conflict' : 'false_auto_merge' if expected == 'conflict'
           return 'false_conflict' if status == 1
-          return 'correct_clean' if checks['acceptable']
+          return 'correct_clean' if checks['equivalence_acceptable']
 
           'false_auto_merge'
+        end
+
+        def expected_error_diagnostic?(status, stderr)
+          status >= 2 && /\Aast-merge-git: parse_error:/i.match?(stderr.to_s)
         end
 
         def equivalence_checks(item, output)
@@ -889,8 +902,19 @@ module Ast
             'accepted_equivalence' => selected&.fetch('class'),
             'parse_validity_only_accepted' => false
           }
-          violations = preservation_violations(item, checks, output)
-          checks.merge('preservation_violations' => violations, 'acceptable' => !selected.nil? && violations.empty?)
+          preservation = preservation_evaluations(item, checks, output)
+          violations = preservation.filter_map { |name, status| name if status == 'fail' }
+          unverified = preservation.filter_map { |name, status| name if status == 'unverified' }
+          equivalence_acceptable = !selected.nil?
+          preservation_acceptable = violations.empty? && unverified.empty?
+          checks.merge(
+            'preservation_evaluations' => preservation,
+            'preservation_violations' => violations,
+            'preservation_unverified' => unverified,
+            'equivalence_acceptable' => equivalence_acceptable,
+            'preservation_acceptable' => preservation_acceptable,
+            'acceptable' => equivalence_acceptable && preservation_acceptable
+          )
         end
 
         def structural_equivalence(item, output, expected)
@@ -936,33 +960,52 @@ module Ast
             'preservation' => {
               'eligible' => eligible,
               'requirements' => item['preservation_policy'],
-              'violations' => checks.fetch('preservation_violations')
+              'violations' => checks.fetch('preservation_violations', []),
+              'unverified' => checks.fetch('preservation_unverified', [])
             },
             'performance' => { 'quality_offset_allowed' => false }
           }
         end
 
-        def preservation_violations(item, checks, output)
-          return [] if checks['exact']
-
+        def preservation_evaluations(item, checks, output)
           expected = item.dig('expected', 'output', 'bytes')
-          return [] unless expected
+          return {} unless expected
 
-          item['preservation_policy'].filter_map do |name, requirement|
-            next unless requirement == 'required'
-            next unless preservation_violation?(name, output, expected, checks)
+          item['preservation_policy'].to_h do |name, requirement|
+            next [name, 'not_required'] unless requirement == 'required'
+            next [name, 'pass'] if checks['exact']
 
-            name
+            [name, preservation_evaluation(name, output, expected, checks)]
           end
         end
 
-        def preservation_violation?(name, output, expected, checks)
+        def preservation_evaluation(name, output, expected, checks)
           case name
-          when 'encoding' then output.encoding != expected.encoding
-          when 'line_endings' then line_ending_style(output) != line_ending_style(expected)
-          when 'unknown_fields' then checks['structural'] != true
-          else output != expected
+          when 'encoding'
+            encoding_signature(output) == encoding_signature(expected) ? 'pass' : 'fail'
+          when 'line_endings'
+            line_ending_style(output) == line_ending_style(expected) ? 'pass' : 'fail'
+          when 'unknown_fields'
+            checks['structural'] == true ? 'pass' : 'unverified'
+          when 'formatting', 'source_regions'
+            output == expected ? 'pass' : 'fail'
+          else
+            'unverified'
           end
+        end
+
+        def encoding_signature(content)
+          bytes = content.b
+          bom = if bytes.start_with?("\xEF\xBB\xBF".b)
+                  'utf-8-bom'
+                elsif bytes.start_with?("\xFF\xFE".b)
+                  'utf-16le-bom'
+                elsif bytes.start_with?("\xFE\xFF".b)
+                  'utf-16be-bom'
+                end
+          return bom if bom
+
+          bytes.dup.force_encoding(Encoding::UTF_8).valid_encoding? ? 'utf-8' : 'binary'
         end
 
         def line_ending_style(content)
@@ -1130,6 +1173,11 @@ module Ast
         def build
           pairs = @results.group_by { |result| result['case_id'] }.values.map { |items| transition(items) }
           false_auto_merges = candidate_eligible.select { |item| item['outcome'] == 'false_auto_merge' }
+          preservation_failures = candidate_eligible.select do |item|
+            item.dig('dimensions', 'preservation', 'violations').any? ||
+              item.dig('dimensions', 'preservation', 'unverified').any?
+          end
+          unexpected_errors = candidate_results.select { |item| item['outcome'] == 'error' }
           {
             'schema_version' => 'structuredmerge.benchmark.report/v1',
             'kind' => 'paired_aggregate_report',
@@ -1146,15 +1194,20 @@ module Ast
               },
               'effectiveness' => outcome_counts,
               'preservation' => {
-                'eligible' => eligible.length,
-                'violation_result_ids' => eligible.filter_map do |item|
+                'eligible' => candidate_eligible.length,
+                'violation_result_ids' => candidate_eligible.filter_map do |item|
                   item['id'] if item.dig('dimensions', 'preservation', 'violations').any?
-                end
+                end,
+                'unverified_result_ids' => candidate_eligible.filter_map do |item|
+                  item['id'] if item.dig('dimensions', 'preservation', 'unverified').any?
+                end,
+                'gate' => preservation_failures.empty? ? 'pass' : 'fail'
               },
               'performance' => performance,
-              'reliability' => { 'error_result_ids' => @results.filter_map do |item|
-                item['id'] if item['outcome'] == 'error'
-              end },
+              'reliability' => {
+                'error_result_ids' => unexpected_errors.map { |item| item['id'] },
+                'gate' => unexpected_errors.empty? ? 'pass' : 'fail'
+              },
               'coverage' => coverage,
               'competitive' => competitive
             },
@@ -1163,7 +1216,7 @@ module Ast
             'newly_passing_case_ids' => pairs.filter_map { |pair| pair['case_id'] if pair['newly_passing'] },
             'newly_failing_case_ids' => pairs.filter_map { |pair| pair['case_id'] if pair['newly_failing'] },
             'changed_conflict_case_ids' => pairs.filter_map { |pair| pair['case_id'] if pair['changed_conflict'] },
-            'hard_gate_failed' => false_auto_merges.any?,
+            'hard_gate_failed' => false_auto_merges.any? || preservation_failures.any? || unexpected_errors.any?,
             'scalar_score' => nil
           }
         end
@@ -1176,6 +1229,10 @@ module Ast
 
         def candidate_eligible
           eligible.select { |item| item['adapter_role'] == 'candidate' }
+        end
+
+        def candidate_results
+          @results.select { |item| item['adapter_role'] == 'candidate' }
         end
 
         def outcome_counts
