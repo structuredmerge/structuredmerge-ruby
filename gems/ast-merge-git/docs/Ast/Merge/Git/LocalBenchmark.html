@@ -140,12 +140,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
         <dt id="OPERATIONS-constant" class="">OPERATIONS =
           
         </dt>
-        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>merge3</span><span class='words_sep'> </span><span class='tstring_content'>metamorphic</span><span class='words_sep'> </span><span class='tstring_content'>diff</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>merge2</span><span class='words_sep'> </span><span class='tstring_content'>merge3</span><span class='words_sep'> </span><span class='tstring_content'>metamorphic</span><span class='words_sep'> </span><span class='tstring_content'>diff</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="EXECUTABLE_OPERATIONS-constant" class="">EXECUTABLE_OPERATIONS =
           
         </dt>
-        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>merge3</span><span class='words_sep'> </span><span class='tstring_content'>metamorphic</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>merge2</span><span class='words_sep'> </span><span class='tstring_content'>merge3</span><span class='words_sep'> </span><span class='tstring_content'>metamorphic</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="PARTITIONS-constant" class="">PARTITIONS =
           
@@ -203,6 +203,7 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
           
         </dt>
         <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>merge2</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>incoming</span><span class='words_sep'> </span><span class='tstring_content'>current</span><span class='tstring_end'>]</span></span><span class='comma'>,</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>merge3</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>base</span><span class='words_sep'> </span><span class='tstring_content'>ours</span><span class='words_sep'> </span><span class='tstring_content'>theirs</span><span class='tstring_end'>]</span></span><span class='comma'>,</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>metamorphic</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>source</span><span class='words_sep'> </span><span class='tstring_content'>transformed</span><span class='tstring_end'>]</span></span><span class='comma'>,</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>diff</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>before</span><span class='words_sep'> </span><span class='tstring_content'>after</span><span class='tstring_end'>]</span></span>
@@ -496,14 +497,14 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-53
 54
 55
 56
-57</pre>
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_document'>document</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>corpus_digest:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@document</span> <span class='op'>=</span> <span class='id identifier rubyid_document'>document</span>
@@ -547,12 +548,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-42
 43
-44</pre>
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corpus_digest'>corpus_digest</span>
   <span class='ivar'>@corpus_digest</span>
@@ -589,12 +590,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-42
 43
-44</pre>
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_document'>document</span>
   <span class='ivar'>@document</span>
@@ -631,12 +632,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-42
 43
-44</pre>
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_path'>path</span>
   <span class='ivar'>@path</span>
@@ -668,17 +669,17 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-44
 45
 46
 47
 48
 49
 50
-51</pre>
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_source'>source</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_binread'>binread</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
@@ -714,12 +715,12 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-132
 133
-134</pre>
+134
+135</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 133</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_case_by_id'>case_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_document'>document</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cases</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_id'>id</span> <span class='rbrace'>}</span> <span class='op'>||</span> <span class='id identifier rubyid_error!'>error!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unknown case: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -744,13 +745,13 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-75
 76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 76</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cases'>cases</span>
   <span class='id identifier rubyid_validate!'>validate!</span>
@@ -776,7 +777,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-80
 81
 82
 83
@@ -826,10 +826,11 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 127
 128
 129
-130</pre>
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='label'>profile:</span><span class='comma'>,</span> <span class='label'>changed_paths:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_validate!'>validate!</span>
@@ -902,7 +903,6 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
       <pre class="lines">
 
 
-59
 60
 61
 62
@@ -916,10 +916,11 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 70
 71
 72
-73</pre>
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/git/local_benchmark.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate!'>validate!</span>
   <span class='id identifier rubyid_require_keys'>require_keys</span><span class='lparen'>(</span><span class='id identifier rubyid_document'>document</span><span class='comma'>,</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>schema_version</span><span class='words_sep'> </span><span class='tstring_content'>kind</span><span class='words_sep'> </span><span class='tstring_content'>id</span><span class='words_sep'> </span><span class='tstring_content'>version</span><span class='words_sep'> </span><span class='tstring_content'>extends</span><span class='words_sep'> </span><span class='tstring_content'>provenance</span><span class='words_sep'> </span><span class='tstring_content'>profiles</span><span class='words_sep'> </span><span class='tstring_content'>capability_map</span><span class='words_sep'>
@@ -946,7 +947,7 @@ rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexi
 </div>
 
       <div id="footer">
-  Generated on Mon Aug 31 13:35:48 2026 by
+  Generated on Tue Sep  1 23:18:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
