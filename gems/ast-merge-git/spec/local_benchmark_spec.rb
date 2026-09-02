@@ -210,6 +210,71 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(first['sha256']).not_to eq(second['sha256'])
   end
 
+  it 'records complete Ruby golden-master adapter and parser provenance in every run manifest' do
+    selection = benchmark.select(profile: 'micro')
+    manifest = runner.send(:run_manifest, selection)
+
+    expect(manifest).to include(
+      'schema_version' => 'structuredmerge.benchmark.run-manifest/v1',
+      'sha256' => match(/\A[0-9a-f]{64}\z/)
+    )
+    expect(manifest.fetch('adapter')).to include(
+      'adapter_id' => 'ruby-gm.ast-merge-git',
+      'implementation' => 'ruby-golden-master',
+      'package' => 'ast-merge-git',
+      'package_version' => Ast::Merge::Git::VERSION,
+      'source' => include(
+        'repository' => 'structuredmerge/structuredmerge-ruby',
+        'revision' => match(/\A[0-9a-f]{40}\z/),
+        'dirty' => satisfy { |value| [true, false].include?(value) }
+      ),
+      'artifact' => include('path' => driver, 'sha256' => match(/\A[0-9a-f]{64}\z/))
+    )
+    expect(manifest.fetch('configuration')).to include(
+      'profile' => 'micro',
+      'selected_case_ids' => selection.fetch('selected_case_ids'),
+      'network_policy' => 'denied'
+    )
+    manifest.dig('configuration', 'cases').each do |case_configuration|
+      expect(case_configuration).to include(
+        'merge_provider' => include('provider_id' => 'ruby.json', 'require_path' => 'json/merge'),
+        'parser_provider' => include(
+          'requested_backend_id' => 'kreuzberg-language-pack',
+          'backend_family' => 'tree-sitter',
+          'selection_mode' => 'explicit'
+        )
+      )
+    end
+    expect(manifest.fetch('environment')).to include(
+      'ruby' => RUBY_DESCRIPTION,
+      'ruby_engine' => RUBY_ENGINE,
+      'ruby_version' => RUBY_VERSION,
+      'rubygems' => Gem::VERSION,
+      'platform' => RUBY_PLATFORM,
+      'allowlisted_env' => include('TREE_HAVER_BACKEND', 'TSLP_DEV')
+    )
+  end
+
+  it 'carries run-manifest identity into cache and aggregate report evidence' do
+    run = runner.run(profile: 'micro')
+    report = Ast::Merge::Git::LocalBenchmarkReport.build(run)
+
+    expect(run.dig('cache_identity', 'run_manifest_sha256')).to eq(run.dig('run_manifest', 'sha256'))
+    expect(run.dig('cache_identity', 'configuration_sha256')).to eq(
+      runner.send(:canonical_digest, run.dig('run_manifest', 'configuration'))
+    )
+    expect(run.dig('cache_identity', 'parser_providers')).to eq(
+      [
+        {
+          'requested_backend_id' => 'kreuzberg-language-pack',
+          'backend_family' => 'tree-sitter',
+          'selection_mode' => 'explicit'
+        }
+      ]
+    )
+    expect(report.fetch('run_manifest')).to eq(run.fetch('run_manifest'))
+  end
+
   it 'never injects oracle or expected material into candidate arguments or selector environment' do
     FileUtils.mkdir_p(tmp_root)
     log_path = tmp_root.join('invocations.jsonl')

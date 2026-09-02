@@ -5,6 +5,7 @@ require 'fileutils'
 require 'json'
 require 'open3'
 require 'rbconfig'
+require 'tree_haver'
 
 module Ast
   module Merge
@@ -399,6 +400,7 @@ module Ast
         def run(profile:, changed_paths: [])
           verify_environment!
           selection = @benchmark.select(profile: profile, changed_paths: changed_paths)
+          manifest = run_manifest(selection)
           original_cwd = Dir.pwd
           results = selection['selected_case_ids'].flat_map do |id|
             item = @benchmark.case_by_id(id)
@@ -412,7 +414,8 @@ module Ast
             'corpus_id' => @benchmark.document['id'],
             'corpus_digest' => @benchmark.corpus_digest,
             'selection' => selection,
-            'cache_identity' => cache_identity(selection),
+            'run_manifest' => manifest,
+            'cache_identity' => cache_identity(selection, manifest),
             'competitors' => competitor_provenance,
             'results' => results
           }
@@ -864,9 +867,12 @@ module Ast
         def classify(item, status, checks, stderr: '')
           expected = item.dig('expected', 'outcome')
           return 'excluded_ambiguous' if expected == 'excluded_ambiguous'
+
           if expected == 'error'
             return 'error' if status.nil?
+
             return expected_error_diagnostic?(status, stderr) ? 'correct_clean' : 'error' if status >= 2
+
             return status == 1 ? 'false_conflict' : 'false_auto_merge'
           end
           return 'error' if status.nil? || status >= 2
@@ -1085,26 +1091,47 @@ module Ast
           ENV.keys.grep(/(?:ORACLE|EXPECTED)/i).to_h { |name| [name, nil] }
         end
 
-        def cache_identity(selection)
-          source_sha, = Open3.capture2('git', '-C', Pathname(__dir__).join('..', '..', '..', '..').to_s,
-                                       'rev-parse', 'HEAD')
-          environment = {
-            'ruby' => RUBY_DESCRIPTION,
-            'platform' => RUBY_PLATFORM,
-            'host_os' => RbConfig::CONFIG['host_os'],
-            'host_cpu' => RbConfig::CONFIG['host_cpu']
+        def run_manifest(selection)
+          source = source_provenance
+          configuration = benchmark_configuration(selection)
+          manifest = {
+            'schema_version' => 'structuredmerge.benchmark.run-manifest/v1',
+            'adapter' => {
+              'adapter_id' => 'ruby-gm.ast-merge-git',
+              'implementation' => 'ruby-golden-master',
+              'package' => Ast::Merge::Git::PACKAGE_NAME,
+              'package_version' => Ast::Merge::Git::VERSION,
+              'source' => source,
+              'artifact' => {
+                'path' => @driver_path.to_s,
+                'sha256' => Digest::SHA256.file(@driver_path).hexdigest
+              }
+            },
+            'configuration' => configuration,
+            'environment' => benchmark_environment,
+            'corpus' => {
+              'id' => @benchmark.document.fetch('id'),
+              'sha256' => @benchmark.corpus_digest
+            }
           }
-          configuration = selection['selected_case_ids'].map do |id|
-            @benchmark.case_by_id(id).slice('id', 'selector')
-          end
+          manifest.merge('sha256' => canonical_digest(manifest))
+        end
+
+        def cache_identity(selection, manifest = run_manifest(selection))
+          configuration = manifest.fetch('configuration')
           competitors = competitor_provenance
           identity = {
-            'adapter_source_sha' => source_sha.strip,
-            'adapter_artifact_sha256' => Digest::SHA256.file(@driver_path).hexdigest,
-            'configuration_sha256' => Digest::SHA256.hexdigest(JSON.generate(configuration)),
+            'adapter_id' => manifest.dig('adapter', 'adapter_id'),
+            'adapter_source_sha' => manifest.dig('adapter', 'source', 'revision'),
+            'adapter_artifact_sha256' => manifest.dig('adapter', 'artifact', 'sha256'),
+            'configuration_sha256' => canonical_digest(configuration),
+            'parser_providers' => configuration.fetch('cases').map do |item|
+              item.fetch('parser_provider')
+            end.uniq,
+            'run_manifest_sha256' => manifest.fetch('sha256'),
             'competitors' => competitors,
             'corpus_sha256' => @benchmark.corpus_digest,
-            'environment' => environment,
+            'environment' => manifest.fetch('environment'),
             'profile' => selection['profile'],
             'changed_paths' => selection['changed_paths'],
             'inferred_capabilities' => selection['inferred_capabilities'],
@@ -1114,6 +1141,79 @@ module Ast
             'selected_case_ids' => selection['selected_case_ids']
           }
           identity.merge('sha256' => Digest::SHA256.hexdigest(JSON.generate(identity)))
+        end
+
+        def benchmark_configuration(selection)
+          {
+            'profile' => selection.fetch('profile'),
+            'changed_paths' => selection.fetch('changed_paths'),
+            'inferred_capabilities' => selection.fetch('inferred_capabilities'),
+            'selected_case_ids' => selection.fetch('selected_case_ids'),
+            'timeout_seconds' => @timeout,
+            'network_policy' => @benchmark.document.fetch('network_policy'),
+            'competitor_ids' => @competitor_paths.keys.sort,
+            'cases' => selection.fetch('selected_case_ids').map do |id|
+              item = @benchmark.case_by_id(id)
+              selector = item.fetch('selector')
+              backend_ref = TreeHaver::BackendRegistry.fetch(selector.fetch('backend'))
+              {
+                'case_id' => id,
+                'operation' => item.fetch('operation'),
+                'merge_provider' => {
+                  'provider_id' => selector.fetch('provider_id'),
+                  'require_path' => selector.fetch('require')
+                },
+                'parser_provider' => {
+                  'requested_backend_id' => selector.fetch('backend'),
+                  'backend_family' => backend_ref&.family,
+                  'selection_mode' => 'explicit'
+                },
+                'selector' => selector
+              }
+            end
+          }
+        end
+
+        def source_provenance
+          root = Pathname(__dir__).join('..', '..', '..', '..').expand_path
+          revision, revision_status = Open3.capture2('git', '-C', root.to_s, 'rev-parse', 'HEAD')
+          error!('cannot determine Ruby golden-master source revision') unless revision_status.success?
+
+          status, status_result = Open3.capture2('git', '-C', root.to_s, 'status', '--porcelain',
+                                                 '--untracked-files=no')
+          error!('cannot determine Ruby golden-master source state') unless status_result.success?
+
+          {
+            'repository' => 'structuredmerge/structuredmerge-ruby',
+            'revision' => revision.strip,
+            'dirty' => !status.empty?
+          }
+        end
+
+        def benchmark_environment
+          allowlisted = %w[
+            BUNDLE_GEMFILE
+            STRUCTUREDMERGE_DEV
+            TREE_HAVER_BACKEND
+            TREE_HAVER_NATIVE_BACKEND
+            TREE_HAVER_RUBY_BACKEND
+            TSLP_DEV
+          ].to_h { |name| [name, ENV[name]] }
+          {
+            'ruby' => RUBY_DESCRIPTION,
+            'ruby_engine' => defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby',
+            'ruby_version' => RUBY_VERSION,
+            'rubygems' => Gem::VERSION,
+            'bundler' => Gem.loaded_specs['bundler']&.version&.to_s,
+            'platform' => RUBY_PLATFORM,
+            'host_os' => RbConfig::CONFIG['host_os'],
+            'host_cpu' => RbConfig::CONFIG['host_cpu'],
+            'allowlisted_env' => allowlisted
+          }
+        end
+
+        def canonical_digest(value)
+          Digest::SHA256.hexdigest(JSON.generate(deep_sort(value)))
         end
 
         def competitor_provenance
@@ -1184,6 +1284,7 @@ module Ast
             'corpus_id' => @run['corpus_id'],
             'corpus_digest' => @run['corpus_digest'],
             'selection' => @run['selection'],
+            'run_manifest' => @run.fetch('run_manifest'),
             'cache_identity' => @run['cache_identity'],
             'dimensions' => {
               'safety' => {
