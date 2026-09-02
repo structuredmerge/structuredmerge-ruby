@@ -40,6 +40,13 @@ RSpec.describe Ast::Merge::LineRangeSupport do
     expect(harness.object_end_line(object)).to eq(19)
   end
 
+  it 'reads normalized hash point line ranges' do
+    object = Struct.new(:start_point, :end_point).new({ row: 20 }, { row: 22 })
+
+    expect(harness.object_start_line(object)).to eq(21)
+    expect(harness.object_end_line(object)).to eq(23)
+  end
+
   it 'normalizes raw line objects' do
     analysis = Struct.new(:lines) do
       def line_at(line_number)

@@ -243,8 +243,7 @@ module Rbs
         if @backend == :rbs
           @node.location&.start_line
         else
-          pos = @node.start_point
-          pos ? pos.row + 1 : nil
+          super
         end
       end
 
@@ -254,8 +253,7 @@ module Rbs
         if @backend == :rbs
           @node.location&.end_line
         else
-          pos = @node.end_point
-          pos ? pos.row + 1 : nil
+          super
         end
       end
 

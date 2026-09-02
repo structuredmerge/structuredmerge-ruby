@@ -18,7 +18,8 @@ module Ast
         elsif object.respond_to?(:source_position)
           object.source_position&.dig(:start_line)
         elsif object.respond_to?(:start_point) && object.start_point
-          object.start_point.row + 1
+          row = line_point_row(object.start_point)
+          row + 1 if row
         end
       end
 
@@ -30,8 +31,16 @@ module Ast
         elsif object.respond_to?(:source_position)
           object.source_position&.dig(:end_line)
         elsif object.respond_to?(:end_point) && object.end_point
-          object.end_point.row + 1
+          row = line_point_row(object.end_point)
+          row + 1 if row
         end
+      end
+
+      def line_point_row(point)
+        return point.row if point.respond_to?(:row)
+        return point[:row] if point.respond_to?(:[])
+
+        nil
       end
 
       def source_line_at(analysis, line_number)
