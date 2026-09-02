@@ -42,6 +42,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Promote the shared Ruby class/method `merge2` fixture into the local benchmark corpus and recognize the Rust Ruby substrate as a cross-runtime candidate.
 - Promote source-preserving Markdown heading-section `merge2` into the mandatory benchmark profile and recognize the Rust Markdown substrate as a cross-runtime candidate.
 - Promote source-preserving TypeScript independent-function `merge3` into the mandatory benchmark profile and map both Ruby and Rust TypeScript provider paths to affected-case selection.
+- Promote source-preserving Go independent-function `merge3` into the mandatory benchmark profile and map both Ruby and Rust Go provider paths to affected-case selection.
 
 ### Changed
 
