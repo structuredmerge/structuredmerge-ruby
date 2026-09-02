@@ -27,11 +27,11 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
   it 'validates the exact canonical authored corpus and inline digests' do
     expect(benchmark.validate!).to be(true)
-    expect(benchmark.cases.length).to eq(22)
+    expect(benchmark.cases.length).to eq(23)
     expect(benchmark.document.fetch('expected_summary')).to include(
-      'case_count' => 22,
-      'partition_counts' => { 'sentinel' => 14, 'gold' => 6, 'metamorphic' => 2 },
-      'operation_counts' => { 'merge2' => 6, 'merge3' => 14, 'metamorphic' => 2 }
+      'case_count' => 23,
+      'partition_counts' => { 'sentinel' => 15, 'gold' => 6, 'metamorphic' => 2 },
+      'operation_counts' => { 'merge2' => 6, 'merge3' => 15, 'metamorphic' => 2 }
     )
     expect(benchmark.document.fetch('profiles').keys).to eq(%w[micro dev nightly competitive])
     expect(benchmark.document.fetch('provenance')).to include(
@@ -59,6 +59,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         case.merge3.json5.order-format.v1
         case.merge3.typescript.independent-functions.v1
         case.merge3.go.independent-functions.v1
+        case.merge3.rust.independent-functions.v1
         case.merge3.json.duplicate-identity.v1
       ]
     )
@@ -326,6 +327,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
             'markdown' => { 'provider_id' => 'rust.markdown', 'package' => 'markdown-merge' },
             'rbs' => { 'provider_id' => 'rust.rbs', 'package' => 'rbs-merge' },
             'ruby' => { 'provider_id' => 'rust.ruby', 'package' => 'ruby-merge' },
+            'rust' => { 'provider_id' => 'rust.rust', 'package' => 'rust-merge' },
             'toml' => { 'provider_id' => 'rust.toml', 'package' => 'toml-merge' },
             'typescript' => { 'provider_id' => 'rust.typescript', 'package' => 'typescript-merge' },
             'yaml' => { 'provider_id' => 'rust.yaml', 'package' => 'yaml-merge' }
@@ -339,14 +341,15 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         },
         'supports' => {
           'operations' => %w[merge2 merge3 metamorphic],
-          'families' => %w[go json markdown rbs ruby toml typescript yaml],
-          'dialects' => %w[go json jsonc json5 markdown rbs ruby toml typescript tsx yaml],
+          'families' => %w[go json markdown rbs ruby rust toml typescript yaml],
+          'dialects' => %w[go json jsonc json5 markdown rbs ruby rust toml typescript tsx yaml],
           'combinations' => [
             { 'family' => 'go', 'operations' => %w[merge3], 'dialects' => %w[go] },
             { 'family' => 'json', 'operations' => %w[merge2 merge3 metamorphic], 'dialects' => %w[json jsonc json5] },
             { 'family' => 'markdown', 'operations' => %w[merge2], 'dialects' => %w[markdown] },
             { 'family' => 'rbs', 'operations' => %w[merge2], 'dialects' => %w[rbs] },
             { 'family' => 'ruby', 'operations' => %w[merge2], 'dialects' => %w[ruby] },
+            { 'family' => 'rust', 'operations' => %w[merge3], 'dialects' => %w[rust] },
             { 'family' => 'toml', 'operations' => %w[merge2], 'dialects' => %w[toml] },
             { 'family' => 'typescript', 'operations' => %w[merge3], 'dialects' => %w[typescript tsx] },
             { 'family' => 'yaml', 'operations' => %w[merge2], 'dialects' => %w[yaml] }
@@ -432,7 +435,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'adapter_mode' => 'persistent-jsonl',
       'iterations' => 2
     )
-    expect(performance.fetch('samples').length).to eq(28)
+    expect(performance.fetch('samples').length).to eq(30)
     expect(performance.dig('session', 'process_ids').length).to eq(1)
     expect(performance.dig('samples', 0, 'runtime', 'measurement_class')).to eq(
       'session_startup_and_first_request'
@@ -669,6 +672,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         'case.merge3.jsonc.comment-preservation.v1',
         'case.merge3.json5.order-format.v1',
         'case.merge3.go.independent-functions.v1',
+        'case.merge3.rust.independent-functions.v1',
         'case.metamorphic.json.reorder-format.v1',
         'case.metamorphic.jsonc.comment-format.v1'
       ],
