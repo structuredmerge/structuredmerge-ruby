@@ -9,7 +9,9 @@ module ProviderSnapshotSpecSupport
     def end_point = Point.new(0, end_byte)
     def named? = named
     def missing? = missing
+    # rubocop:disable Naming/PredicatePrefix -- mirrors the TreeHaver node contract
     def has_error? = has_error
+    # rubocop:enable Naming/PredicatePrefix
   end
   Comment = Data.define(:type, :start_byte, :end_byte, :style, :attachment_hint) do
     def start_point = Point.new(0, start_byte)
@@ -92,6 +94,7 @@ RSpec.describe Ast::Merge::RSpec::ProviderSnapshot do
   let(:snapshot) do
     described_class.new(
       snapshot_id: 'snapshot.spec',
+      source_id: 'fixture:spec:retained-key',
       provider: provider,
       source: source,
       language: :spec,
@@ -118,6 +121,8 @@ RSpec.describe Ast::Merge::RSpec::ProviderSnapshot do
     expect(capture.dig(:parse_result, :schema)).to eq('structuredmerge.parse-result/v1')
     expect(capture.dig(:analysis_result, :schema)).to eq('structuredmerge.analysis-result/v1')
     expect(capture.dig(:parse_result, :selection, :selected_backend)).to eq('spec')
+    expect(capture.dig(:parse_request, :source, :source_id)).to eq('fixture:spec:retained-key')
+    expect(capture.dig(:parse_result, :request_id)).to end_with(Digest::SHA256.hexdigest(source)[0, 12])
     expect(capture.dig(:parse_result, :nodes).map { |node| node[:native_type] }).to eq(
       %w[native_document native_pair line_comment]
     )

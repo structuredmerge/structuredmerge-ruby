@@ -21,12 +21,13 @@ module Ast
 
         class Error < StandardError; end
 
-        attr_reader :snapshot_id, :provider, :source, :language, :dialect, :backend_id,
+        attr_reader :snapshot_id, :source_id, :provider, :source, :language, :dialect, :backend_id,
                     :backend_identity, :parser_contract, :profile_id, :extension_builder
 
         def initialize(snapshot_id:, provider:, source:, language:, dialect:, backend_id:, backend_identity:,
-                       parser_contract: nil, profile_id: :source_preserving, extension_builder: nil)
+                       source_id: nil, parser_contract: nil, profile_id: :source_preserving, extension_builder: nil)
           @snapshot_id = required_string(snapshot_id, :snapshot_id)
+          @source_id = required_string(source_id || "#{@snapshot_id}:source", :source_id)
           @provider = provider
           @source = source.to_s
           @language = required_string(language, :language)
@@ -281,7 +282,7 @@ module Ast
 
         def source_descriptor(include_content: false)
           descriptor = {
-            source_id: "#{snapshot_id}:source",
+            source_id: source_id,
             role: 'source',
             byte_length: source.bytesize,
             sha256: Digest::SHA256.hexdigest(source.b),
@@ -322,7 +323,7 @@ module Ast
         end
 
         def request_id
-          "#{snapshot_id}:parse"
+          "#{snapshot_id}:parse:#{Digest::SHA256.hexdigest(source.b)[0, 12]}"
         end
 
         def output_bytes(result)

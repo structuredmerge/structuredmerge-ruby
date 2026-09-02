@@ -27,6 +27,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Separate benchmark process-spawn, first-request startup/loading, adapter execution, JSONL/IPC harness overhead, and warm round-trip timing evidence.
 - Add shared RSpec support for deterministic TreeHaver/provider contract snapshots, namespaced native-extension evidence, and serialization differential replay.
 - Add provider-owned Prism, Psych, RBS, and Markly snapshot extensions, and share one native RBS semantic projection between merge verification and contract evidence.
+- Add a clean-producer, one-process-per-replay capture driver for the seven representative Ruby golden-master provider snapshot targets.
 - Return unbalanced Ruby block directives as structured Prism provider parse failures instead of leaking exceptions.
 - Move source-preserving YAML provider mechanics into `yaml-merge`, add its TSLP workflow provider, and make `psych-merge` supply only its native parser projection.
 
