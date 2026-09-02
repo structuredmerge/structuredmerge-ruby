@@ -128,6 +128,24 @@ RSpec.describe Toml::Merge::Provider do
     expect(result.dig(:verification, :backend)).to eq('kreuzberg-language-pack')
   end
 
+  it 'preserves the shared advanced dotted-key fixture through the TSLP substrate' do
+    fixture = JSON.parse(
+      File.read(
+        File.expand_path(
+          '../../../../fixtures/toml/slice-721-formatting-preservation/dotted-inline-comments-arrays.json',
+          __dir__
+        )
+      ),
+      symbolize_names: true
+    )
+    result = provider.merge2(
+      current_source: fixture.fetch(:destination),
+      incoming_source: fixture.fetch(:template)
+    )
+
+    expect(result).to include(ok: true, output: fixture.dig(:expected, :output))
+  end
+
   it 'preserves KLP temporal numeric string array and inline-table source fidelity' do
     result = provider.merge3(
       base_source: "stable = true\n",
