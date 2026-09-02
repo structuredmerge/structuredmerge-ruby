@@ -24,6 +24,18 @@ module Ast
       def self.run: (Array[String] argv, ?env: Hash[String, String], ?stderr: IO) -> Integer
       def self.git_exit_code: (Hash[Symbol, untyped] result) -> Integer
 
+      module BenchmarkAdapter
+        REQUEST_SCHEMA: String
+        RESPONSE_SCHEMA: String
+        OPERATIONS: Array[String]
+        SOURCE_ROLES: Hash[String, Array[String]]
+
+        def self.serve: (?input: IO, ?output: IO) -> void
+        def self.execute: (Hash[String, untyped] request) -> Hash[String, untyped]
+        def self.encode_source: (String source) -> String
+        def self.decode_source: (String encoded) -> String
+      end
+
       class Corpus
         class Error < StandardError
         end
@@ -99,9 +111,29 @@ module Ast
           benchmark: LocalBenchmark,
           driver_path: String | Pathname,
           tmp_root: String | Pathname,
-          ?timeout: Integer
+          ?timeout: Integer,
+          ?competitor_paths: Hash[String, String | Pathname]
         ) -> void
         def run: (profile: String | Symbol, ?changed_paths: Array[String]) -> Hash[String, untyped]
+        def performance: (
+          profile: String | Symbol,
+          ?changed_paths: Array[String],
+          ?iterations: Integer
+        ) -> Hash[String, untyped]
+      end
+
+      class BenchmarkAdapterSession
+        attr_reader startup_duration_ns: Integer?
+
+        def initialize: (
+          driver_path: String | Pathname,
+          chdir: String | Pathname,
+          timeout: Integer,
+          ?env: Hash[String, String?]
+        ) -> void
+        def start: () -> BenchmarkAdapterSession
+        def request: (Hash[String, untyped] payload) -> Hash[String, untyped]
+        def close: () -> void
       end
 
       class LocalBenchmarkReport

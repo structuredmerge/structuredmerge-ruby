@@ -275,6 +275,42 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(report.fetch('run_manifest')).to eq(run.fetch('run_manifest'))
   end
 
+  it 'measures repeated requests in one persistent process without classifying quality' do
+    performance = runner.performance(profile: 'micro', iterations: 2)
+
+    expect(performance).to include(
+      'schema_version' => 'structuredmerge.benchmark.performance-run/v1',
+      'kind' => 'performance_only',
+      'quality_classification_performed' => false
+    )
+    expect(performance.dig('run_manifest', 'configuration', 'execution')).to eq(
+      'kind' => 'performance',
+      'adapter_mode' => 'persistent-jsonl',
+      'iterations' => 2
+    )
+    expect(performance.fetch('samples').length).to eq(14)
+    expect(performance.dig('session', 'process_ids').length).to eq(1)
+    performance.fetch('samples').each do |sample|
+      expect(sample).to include(
+        'process_id' => performance.dig('session', 'process_ids').first,
+        'runtime' => include(
+          'adapter_duration_ns' => be_positive,
+          'round_trip_duration_ns' => be_positive,
+          'measurement_class' => 'warm_persistent_process'
+        )
+      )
+    end
+  end
+
+  it 'round-trips arbitrary bytes through the benchmark adapter transport' do
+    source = "\x00\xFFline\r\n".b
+
+    encoded = Ast::Merge::Git::BenchmarkAdapter.encode_source(source)
+
+    expect(Ast::Merge::Git::BenchmarkAdapter.decode_source(encoded)).to eq(source)
+    expect(encoded.encoding).to eq(Encoding::US_ASCII)
+  end
+
   it 'never injects oracle or expected material into candidate arguments or selector environment' do
     FileUtils.mkdir_p(tmp_root)
     log_path = tmp_root.join('invocations.jsonl')

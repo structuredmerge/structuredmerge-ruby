@@ -375,6 +375,92 @@ module Ast
         end
       end
 
+      # Owns one long-lived benchmark adapter subprocess and its JSONL exchange.
+      class BenchmarkAdapterSession
+        attr_reader :startup_duration_ns
+
+        def initialize(driver_path:, chdir:, timeout:, env: {})
+          @driver_path = Pathname(driver_path).expand_path
+          @chdir = Pathname(chdir).expand_path
+          @timeout = timeout
+          @env = env
+        end
+
+        def start
+          return self if @process
+
+          started = monotonic_nanoseconds
+          @stdin, @stdout, @stderr, @process = Open3.popen3(
+            @env,
+            @driver_path.to_s,
+            'benchmark-provider-session',
+            chdir: @chdir.to_s
+          )
+          [@stdin, @stdout, @stderr].each(&:binmode)
+          @stderr_reader = Thread.new { @stderr.read }
+          @startup_duration_ns = monotonic_nanoseconds - started
+          self
+        rescue Errno::ENOENT => e
+          raise LocalBenchmark::Error, "cannot start benchmark adapter session: #{e.message}"
+        end
+
+        def request(payload)
+          start
+          started = monotonic_nanoseconds
+          @stdin.puts(JSON.generate(payload))
+          @stdin.flush
+          line = read_response_line
+          response = JSON.parse(line)
+          response.merge('round_trip_duration_ns' => monotonic_nanoseconds - started)
+        rescue Errno::EPIPE, IOError, JSON::ParserError => e
+          raise LocalBenchmark::Error, "benchmark adapter session failed: #{e.message}#{stderr_suffix}"
+        end
+
+        def close
+          return unless @process
+
+          @stdin.close unless @stdin.closed?
+          terminate unless @process.join(1)
+          @stderr_reader.join(1)
+        ensure
+          [@stdin, @stdout, @stderr].compact.each { |io| io.close unless io.closed? }
+          @process = nil
+        end
+
+        private
+
+        def read_response_line
+          reader = Thread.new { @stdout.gets }
+          unless reader.join(@timeout)
+            terminate
+            raise LocalBenchmark::Error, "benchmark adapter session timed out after #{@timeout}s#{stderr_suffix}"
+          end
+
+          reader.value || raise(LocalBenchmark::Error, "benchmark adapter session closed#{stderr_suffix}")
+        end
+
+        def terminate
+          Process.kill('TERM', @process.pid)
+          return if @process.join(1)
+
+          Process.kill('KILL', @process.pid)
+          @process.join
+        rescue Errno::ESRCH, Errno::ECHILD
+          @process.join
+        end
+
+        def stderr_suffix
+          return '' unless @stderr_reader&.join(0)
+
+          stderr = @stderr_reader.value
+          stderr.empty? ? '' : ": #{stderr}"
+        end
+
+        def monotonic_nanoseconds
+          Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+        end
+      end
+
       # Executes the same authored merge bytes through Git and the installed driver.
       class LocalBenchmarkRunner
         DEFAULT_TIMEOUT = 30
@@ -421,6 +507,49 @@ module Ast
           }
         ensure
           Dir.chdir(original_cwd) if original_cwd && Dir.pwd != original_cwd
+        end
+
+        def performance(profile:, changed_paths: [], iterations: 1)
+          verify_environment!
+          count = Integer(iterations)
+          error!('iterations must be positive') unless count.positive?
+
+          selection = @benchmark.select(profile: profile, changed_paths: changed_paths)
+          execution = {
+            'kind' => 'performance',
+            'adapter_mode' => 'persistent-jsonl',
+            'iterations' => count
+          }
+          manifest = run_manifest(selection, execution: execution)
+          FileUtils.mkdir_p(@tmp_root)
+          session = BenchmarkAdapterSession.new(
+            driver_path: @driver_path,
+            chdir: @tmp_root,
+            timeout: @timeout,
+            env: oracle_free_env
+          ).start
+          samples = selection.fetch('selected_case_ids').flat_map do |id|
+            item = @benchmark.case_by_id(id)
+            Array.new(count) do |index|
+              performance_sample(session, item, index + 1)
+            end
+          end
+          {
+            'schema_version' => 'structuredmerge.benchmark.performance-run/v1',
+            'kind' => 'performance_only',
+            'quality_classification_performed' => false,
+            'selection' => selection,
+            'run_manifest' => manifest,
+            'cache_identity' => cache_identity(selection, manifest),
+            'session' => {
+              'adapter_mode' => 'persistent-jsonl',
+              'startup_duration_ns' => session.startup_duration_ns,
+              'process_ids' => samples.map { |sample| sample['process_id'] }.uniq
+            },
+            'samples' => samples
+          }
+        ensure
+          session&.close
         end
 
         private
@@ -1091,9 +1220,9 @@ module Ast
           ENV.keys.grep(/(?:ORACLE|EXPECTED)/i).to_h { |name| [name, nil] }
         end
 
-        def run_manifest(selection)
+        def run_manifest(selection, execution: { 'kind' => 'correctness', 'adapter_mode' => 'cold-process' })
           source = source_provenance
-          configuration = benchmark_configuration(selection)
+          configuration = benchmark_configuration(selection, execution: execution)
           manifest = {
             'schema_version' => 'structuredmerge.benchmark.run-manifest/v1',
             'adapter' => {
@@ -1143,7 +1272,7 @@ module Ast
           identity.merge('sha256' => Digest::SHA256.hexdigest(JSON.generate(identity)))
         end
 
-        def benchmark_configuration(selection)
+        def benchmark_configuration(selection, execution:)
           {
             'profile' => selection.fetch('profile'),
             'changed_paths' => selection.fetch('changed_paths'),
@@ -1152,6 +1281,7 @@ module Ast
             'timeout_seconds' => @timeout,
             'network_policy' => @benchmark.document.fetch('network_policy'),
             'competitor_ids' => @competitor_paths.keys.sort,
+            'execution' => execution,
             'cases' => selection.fetch('selected_case_ids').map do |id|
               item = @benchmark.case_by_id(id)
               selector = item.fetch('selector')
@@ -1172,6 +1302,54 @@ module Ast
               }
             end
           }
+        end
+
+        def performance_sample(session, item, iteration)
+          request_id = "#{item.fetch('id')}.#{iteration}"
+          response = session.request(benchmark_adapter_request(item, request_id))
+          output = BenchmarkAdapter.decode_source(response.fetch('output_base64'))
+          {
+            'case_id' => item.fetch('id'),
+            'request_id' => request_id,
+            'iteration' => iteration,
+            'operation' => response['operation'],
+            'process_id' => response.fetch('process_id'),
+            'status' => response.fetch('status'),
+            'result' => response.fetch('result'),
+            'diagnostics' => diagnostics(response.fetch('stderr'), nil),
+            'output' => raw_record(output),
+            'runtime' => {
+              'adapter_duration_ns' => response.fetch('duration_ns'),
+              'round_trip_duration_ns' => response.fetch('round_trip_duration_ns'),
+              'measurement_class' => 'warm_persistent_process'
+            }
+          }
+        rescue ArgumentError => e
+          error!("invalid adapter response for #{request_id}: #{e.message}")
+        end
+
+        def benchmark_adapter_request(item, request_id)
+          operation, roles = benchmark_adapter_operation(item)
+          {
+            'schema_version' => BenchmarkAdapter::REQUEST_SCHEMA,
+            'request_id' => request_id,
+            'operation' => operation,
+            'selector' => item.fetch('selector'),
+            'path_name' => "#{item.fetch('id')}.#{item.fetch('dialect')}",
+            'sources' => roles.to_h do |adapter_role, corpus_role|
+              [adapter_role, BenchmarkAdapter.encode_source(item.dig('inputs', corpus_role, 'bytes'))]
+            end
+          }
+        end
+
+        def benchmark_adapter_operation(item)
+          case item.fetch('operation')
+          when 'merge2' then ['merge2', { 'incoming' => 'incoming', 'current' => 'current' }]
+          when 'merge3' then ['merge3', { 'base' => 'base', 'ours' => 'ours', 'theirs' => 'theirs' }]
+          when 'metamorphic' then ['diff2', { 'before' => 'source', 'after' => 'transformed' }]
+          when 'diff' then ['diff2', { 'before' => 'before', 'after' => 'after' }]
+          else error!("unsupported benchmark adapter operation: #{item.fetch('operation')}")
+          end
         end
 
         def source_provenance

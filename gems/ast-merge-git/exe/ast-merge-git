@@ -3,6 +3,11 @@
 
 require 'ast/merge/git'
 
+if ARGV.first == 'benchmark-provider-session'
+  Ast::Merge::Git::BenchmarkAdapter.serve
+  exit 0
+end
+
 if %w[benchmark-provider-diff benchmark-provider-merge2].include?(ARGV.first)
   require 'json'
 
@@ -52,10 +57,11 @@ if ARGV.first == 'benchmark'
     profile: 'micro',
     changed_paths: [],
     tmp_root: File.expand_path('../tmp/benchmark', __dir__),
-    timeout: 30
+    timeout: 30,
+    iterations: 1
   }
   parser = OptionParser.new do |opts|
-    opts.banner = 'usage: ast-merge-git benchmark validate|select|run|report [options]'
+    opts.banner = 'usage: ast-merge-git benchmark validate|select|run|report|performance [options]'
     opts.on('--corpus PATH') { |value| options[:corpus] = value }
     opts.on('--profile PROFILE') { |value| options[:profile] = value }
     opts.on('--changed-path PATH') { |value| options[:changed_paths] << value }
@@ -63,6 +69,7 @@ if ARGV.first == 'benchmark'
     opts.on('--mergiraf PATH') { |value| options[:mergiraf] = value }
     opts.on('--tmp-root PATH') { |value| options[:tmp_root] = value }
     opts.on('--timeout SECONDS', Integer) { |value| options[:timeout] = value }
+    opts.on('--iterations COUNT', Integer) { |value| options[:iterations] = value }
   end
 
   begin
@@ -86,6 +93,18 @@ if ARGV.first == 'benchmark'
                  competitor_paths: options[:mergiraf] ? { 'mergiraf' => options[:mergiraf] } : {}
                ).run(profile: options[:profile], changed_paths: options[:changed_paths])
                command == 'report' ? Ast::Merge::Git::LocalBenchmarkReport.build(run) : run
+             when 'performance'
+               driver = options[:driver] || Gem.bin_path('ast-merge-git', 'ast-merge-git')
+               Ast::Merge::Git::LocalBenchmarkRunner.new(
+                 benchmark: benchmark,
+                 driver_path: driver,
+                 tmp_root: options[:tmp_root],
+                 timeout: options[:timeout]
+               ).performance(
+                 profile: options[:profile],
+                 changed_paths: options[:changed_paths],
+                 iterations: options[:iterations]
+               )
              else
                warn parser
                exit 2

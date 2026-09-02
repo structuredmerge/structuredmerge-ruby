@@ -130,6 +130,17 @@ invalid provider output, configuration failures, and file errors exit `2`.
 `AST_MERGE_CONFLICT_POLICY=leave_ours` prevents conflicted output from replacing
 `%A`; the default `write` policy writes provider conflict output when available.
 
+## Benchmarking
+
+Use `benchmark run` and `benchmark report` for cold-process correctness
+classification. Use `benchmark performance` to send repeated binary-safe JSONL
+requests through one persistent Ruby process without scoring those warm-process
+results as correctness evidence.
+
+```shell
+ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev --iterations 5
+```
+
 ## 🔐 Security
 
 See [SECURITY.md][🔐security].

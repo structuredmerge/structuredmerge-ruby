@@ -2,6 +2,7 @@
 
 require 'ast/merge'
 require_relative 'git/version'
+require_relative 'git/benchmark_adapter'
 require_relative 'git/corpus'
 require_relative 'git/local_benchmark'
 
