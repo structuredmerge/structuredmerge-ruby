@@ -28,8 +28,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Pin released StructuredMerge fixtures v7.1.6 so CI validates the benchmark contracts exercised by the family suite.
-
 ### Security
 
 ## [7.1.7] - 2026-09-01
@@ -48,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Preserve destination blank-line gaps before retained matched and destination-only JSON object members, preventing whitespace churn during repeated templating.
 
 - Report benchmark semantic correctness, source preservation, and expected parse rejections independently, and enforce source preservation as a hard gate.
+
+- Pin released StructuredMerge fixtures v7.1.6 so CI validates the benchmark contracts exercised by the family suite.
 
 ## [7.1.6] - 2026-08-31
 
