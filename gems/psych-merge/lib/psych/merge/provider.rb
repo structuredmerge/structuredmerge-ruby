@@ -47,6 +47,10 @@ module Psych
         invalid_document(role, source, :structural_error, e.message)
       end
 
+      def analysis_extensions(document)
+        [ProviderExtension.call(analysis: document.analysis)]
+      end
+
       def document_issues(document)
         return [] unless document
 

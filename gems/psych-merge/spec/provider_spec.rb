@@ -40,6 +40,14 @@ RSpec.describe Psych::Merge::Provider do
     expect(result.dig(:analysis, :backend)).to eq('psych')
     expect(result.dig(:analysis, :entries).map { |entry| entry[:key] }).to eq(%w[plain quoted nested])
     expect(result.dig(:analysis, :entries, 1, :attributes, :attributes, :quoted)).to be(true)
+    expect(result.fetch(:extensions)).to contain_exactly(
+      hash_including(
+        schema: 'structuredmerge.extension/ruby-psych/v1',
+        namespace: 'ruby-psych',
+        capabilities: %w[aliases anchors documents scalar-styles tags],
+        payload: hash_including(native_tree_visibility: 'provider_internal')
+      )
+    )
     expect(result.dig(:verification, :source_parsed)).to be(true)
   end
 

@@ -67,6 +67,7 @@ module Yaml
           :analyze,
           request,
           analysis: analysis_payload(document),
+          extensions: analysis_extensions(document),
           verification: { source_parsed: true, structurally_unambiguous: true }
         )
       end
@@ -168,6 +169,10 @@ module Yaml
           end,
           structurally_unambiguous: document.issues.empty?
         }
+      end
+
+      def analysis_extensions(_document)
+        []
       end
 
       def entry_state(entry)

@@ -32,6 +32,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Record workflow package identity and complete request/result transport evidence in provider snapshot differential replays.
 - Return unbalanced Ruby block directives as structured Prism provider parse failures instead of leaking exceptions.
 - Move source-preserving YAML provider mechanics into `yaml-merge`, add its TSLP workflow provider, and make `psych-merge` supply only its native parser projection.
+- Retain provider-owned native Psych AST extensions in production analysis results so coarse Alef workflow hosts can forward them without reparsing or flattening the native tree.
 
 ### Changed
 

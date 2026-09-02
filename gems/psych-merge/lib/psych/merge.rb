@@ -111,6 +111,7 @@ module Psych
     autoload :PartialTemplateMerger, 'psych/merge/partial_template_merger'
     autoload :SmartMerger, 'psych/merge/smart_merger'
     autoload :MappingMatchRefiner, 'psych/merge/mapping_match_refiner'
+    autoload :ProviderExtension, 'psych/merge/provider_extension'
 
     class << self
       def yaml_feature_profile
