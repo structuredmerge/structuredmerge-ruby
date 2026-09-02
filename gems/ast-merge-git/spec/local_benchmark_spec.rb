@@ -668,6 +668,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         'case.merge2.toml.nested-table-leaf.v1',
         'case.merge3.jsonc.comment-preservation.v1',
         'case.merge3.json5.order-format.v1',
+        'case.merge3.go.independent-functions.v1',
         'case.metamorphic.json.reorder-format.v1',
         'case.metamorphic.jsonc.comment-format.v1'
       ],
