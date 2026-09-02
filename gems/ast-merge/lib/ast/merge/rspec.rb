@@ -34,6 +34,9 @@ require_relative 'rspec/dependency_tags'
 # Load conformance fixture helpers for shared fixture harnesses
 require_relative 'rspec/conformance_fixtures'
 
+# Load portable provider snapshot and differential replay support
+require_relative 'rspec/provider_snapshot'
+
 # Load Ast::Merge shared examples (for testing *-merge implementations)
 require_relative 'rspec/shared_examples'
 

@@ -17,6 +17,7 @@ That loads:
 - TreeHaver backend dependency tags
 - Ast::Merge merge-gem dependency tags
 - Shared conformance fixture helpers
+- Portable provider snapshot and differential replay helpers
 - Ast::Merge shared examples
 
 ### Split loading for `ast-merge` itself or registration-heavy suites
@@ -249,3 +250,47 @@ Use this namespace for test support shared across the merge-gem family:
 - shared examples for common contracts
 
 Format-specific parser fixtures and merge behavior specs belong in the corresponding `*-merge` gem.
+
+## Provider snapshots
+
+`Ast::Merge::RSpec::ProviderSnapshot` captures the versioned parse and analysis
+projections used by the cross-runtime fixture repository. Parsing always enters
+through an explicitly selected TreeHaver backend. The capture harness only
+reads the normalized TreeHaver node contract; a provider suite supplies a
+callback for parser-native evidence:
+
+```ruby
+snapshot = Ast::Merge::RSpec::ProviderSnapshot.new(
+  snapshot_id: "snapshot.prism.ruby",
+  provider: Prism::Merge.merge_provider,
+  source: source,
+  language: :ruby,
+  dialect: :ruby,
+  backend_id: :prism,
+  parser_contract: :prism,
+  backend_identity: {
+    id: :prism,
+    family: :native,
+    host_runtime: :ruby,
+    package: :prism,
+    parser: :Prism,
+    capabilities: %i[comments directives exact_source_spans normalized_tree],
+  },
+  extension_builder: lambda do |tree:, **|
+    {
+      schema: "structuredmerge.extension/ruby-prism/v1",
+      namespace: "ruby-prism",
+      capabilities: %w[magic-comments],
+      payload: {magic_comments: tree.magic_comments.map(&:to_s)},
+    }
+  end,
+)
+
+artifacts = snapshot.capture
+```
+
+The extension callback is intentionally provider-owned. The common harness
+does not reflect over native parser objects or flatten their capabilities.
+`#differential_replay` serializes a provider request through canonical JSON,
+replays it, and reports whether the provider result and output bytes remain
+identical.
