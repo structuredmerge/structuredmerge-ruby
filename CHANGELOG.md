@@ -39,6 +39,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Reuse YAML's recursive AST resolver in its workflow provider so nested template-only mapping leaves merge without sacrificing destination values or source-line provenance.
 - Route structurally rich TOML `merge2` provider requests through the existing TreeHaver-backed TOML substrate merger, sharing table and dotted-key behavior across TSLP, Citrus, and Parslet providers.
 - Add the reviewed nested-table TOML `merge2` sentinel to local benchmark profiles and recognize TOML provider identity in cross-runtime benchmark evidence.
+- Promote the shared Ruby class/method `merge2` fixture into the local benchmark corpus and recognize the Rust Ruby substrate as a cross-runtime candidate.
 
 ### Changed
 

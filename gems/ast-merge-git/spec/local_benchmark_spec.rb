@@ -27,11 +27,11 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
   it 'validates the exact canonical authored corpus and inline digests' do
     expect(benchmark.validate!).to be(true)
-    expect(benchmark.cases.length).to eq(18)
+    expect(benchmark.cases.length).to eq(19)
     expect(benchmark.document.fetch('expected_summary')).to include(
-      'case_count' => 18,
-      'partition_counts' => { 'sentinel' => 9, 'gold' => 7, 'metamorphic' => 2 },
-      'operation_counts' => { 'merge2' => 3, 'merge3' => 13, 'metamorphic' => 2 }
+      'case_count' => 19,
+      'partition_counts' => { 'sentinel' => 10, 'gold' => 7, 'metamorphic' => 2 },
+      'operation_counts' => { 'merge2' => 4, 'merge3' => 13, 'metamorphic' => 2 }
     )
     expect(benchmark.document.fetch('profiles').keys).to eq(%w[micro dev nightly competitive])
     expect(benchmark.document.fetch('provenance')).to include(
@@ -51,6 +51,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         case.merge3.json.malformed-ours.v1
         case.merge2.jsonc.current-layout-preservation.v1
         case.merge2.yaml.nested-mapping-leaf.v1
+        case.merge2.ruby.class-method.v1
         case.merge2.toml.nested-table-leaf.v1
         case.merge3.jsonc.comment-preservation.v1
         case.merge3.json5.order-format.v1
@@ -316,6 +317,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         'provider' => {
           'merge_providers' => {
             'json' => { 'provider_id' => 'rust.json', 'package' => 'json-merge' },
+            'ruby' => { 'provider_id' => 'rust.ruby', 'package' => 'ruby-merge' },
             'toml' => { 'provider_id' => 'rust.toml', 'package' => 'toml-merge' },
             'yaml' => { 'provider_id' => 'rust.yaml', 'package' => 'yaml-merge' }
           },
@@ -328,10 +330,11 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         },
         'supports' => {
           'operations' => %w[merge2 merge3 metamorphic],
-          'families' => %w[json toml yaml],
-          'dialects' => %w[json jsonc json5 toml yaml],
+          'families' => %w[json ruby toml yaml],
+          'dialects' => %w[json jsonc json5 ruby toml yaml],
           'combinations' => [
             { 'family' => 'json', 'operations' => %w[merge2 merge3 metamorphic], 'dialects' => %w[json jsonc json5] },
+            { 'family' => 'ruby', 'operations' => %w[merge2], 'dialects' => %w[ruby] },
             { 'family' => 'toml', 'operations' => %w[merge2], 'dialects' => %w[toml] },
             { 'family' => 'yaml', 'operations' => %w[merge2], 'dialects' => %w[yaml] }
           ]
@@ -416,7 +419,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'adapter_mode' => 'persistent-jsonl',
       'iterations' => 2
     )
-    expect(performance.fetch('samples').length).to eq(18)
+    expect(performance.fetch('samples').length).to eq(20)
     expect(performance.dig('session', 'process_ids').length).to eq(1)
     expect(performance.dig('samples', 0, 'runtime', 'measurement_class')).to eq(
       'session_startup_and_first_request'
@@ -646,6 +649,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'unsupported_case_ids' => [
         'case.merge2.jsonc.current-layout-preservation.v1',
         'case.merge2.yaml.nested-mapping-leaf.v1',
+        'case.merge2.ruby.class-method.v1',
         'case.merge2.toml.nested-table-leaf.v1',
         'case.merge3.jsonc.comment-preservation.v1',
         'case.merge3.json5.order-format.v1',
