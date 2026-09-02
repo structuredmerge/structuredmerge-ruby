@@ -152,7 +152,8 @@ ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev -
 When benchmarking another StructuredMerge runtime, pass its versioned identity,
 source checkout, provider selection, and runtime details with
 `--adapter-descriptor path/to/adapter.json`. The runner derives the source
-revision and dirty state, and hashes the executable selected by `--driver`.
+revision and dirty state, hashes the executable selected by `--driver`, and
+records out-of-scope operations, families, and dialects as unsupported coverage.
 
 ## 🔐 Security
 

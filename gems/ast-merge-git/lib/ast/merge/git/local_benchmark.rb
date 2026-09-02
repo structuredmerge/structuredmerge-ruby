@@ -705,11 +705,49 @@ module Ast
         end
 
         def execute_case(item)
+          return unsupported_candidate(item) unless candidate_supports?(item)
           return execute_merge2_case(item) if item['operation'] == 'merge2'
           return execute_merge3_case(item) if item['operation'] == 'merge3'
           return execute_metamorphic_case(item) if item['operation'] == 'metamorphic'
 
           unsupported_pair(item)
+        end
+
+        def unsupported_candidate(item)
+          [execute_baseline_for(item), raw_result(
+            item,
+            'structuredmerge.unsupported',
+            nil,
+            outcome: 'unsupported',
+            unsupported_reason: "candidate does not support #{item['operation']}/#{item['family']}/#{item['dialect']}"
+          )]
+        end
+
+        def execute_baseline_for(item)
+          workspace = @tmp_root.join("#{safe_id(item['id'])}-unsupported-#{Process.pid}")
+          FileUtils.rm_rf(workspace)
+          FileUtils.mkdir_p(workspace)
+          if item['operation'] == 'merge2'
+            write_merge2_roles(item, workspace)
+            execute_merge2_baseline(item, workspace)
+          elsif item['operation'] == 'metamorphic'
+            write_metamorphic_roles(item, workspace)
+            execute_metamorphic_baseline(item, workspace)
+          else
+            write_roles(item, workspace)
+            execute_baseline(item, workspace)
+          end
+        ensure
+          FileUtils.rm_rf(workspace) if workspace
+        end
+
+        def candidate_supports?(item)
+          return true unless @adapter_descriptor
+
+          support = @adapter_descriptor.fetch('supports')
+          support.fetch('operations').include?(item.fetch('operation')) &&
+            support.fetch('families').include?(item.fetch('family')) &&
+            support.fetch('dialects').include?(item.fetch('dialect'))
         end
 
         def execute_competitors(item)
@@ -1565,7 +1603,7 @@ module Ast
           unless descriptor['schema_version'] == ADAPTER_DESCRIPTOR_SCHEMA
             error!('unsupported adapter descriptor schema')
           end
-          %w[adapter source_root provider environment].each do |key|
+          %w[adapter source_root provider supports environment].each do |key|
             error!("adapter descriptor missing #{key}") unless descriptor.key?(key)
           end
           %w[adapter_id implementation package package_version source].each do |key|
@@ -1576,6 +1614,12 @@ module Ast
           end
           %w[merge_provider parser_provider].each do |key|
             error!("adapter descriptor missing provider.#{key}") unless descriptor.fetch('provider').key?(key)
+          end
+          %w[operations families dialects].each do |key|
+            values = descriptor.fetch('supports')[key]
+            unless values.is_a?(Array) && values.any?
+              error!("adapter descriptor supports.#{key} must be a non-empty array")
+            end
           end
           source_root = Pathname(descriptor.fetch('source_root'))
           source_root = descriptor_path.dirname.join(source_root) unless source_root.absolute?

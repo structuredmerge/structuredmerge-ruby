@@ -312,6 +312,11 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
             'boundary' => 'tree-haver'
           }
         },
+        'supports' => {
+          'operations' => %w[merge2 merge3 metamorphic],
+          'families' => ['json'],
+          'dialects' => %w[json jsonc json5]
+        },
         'environment' => { 'runtime' => 'rust' }
       )
     )
@@ -345,6 +350,13 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         'selector_role' => 'oracle_context'
       )
     end
+
+    unsupported = candidate.send(:execute_case, benchmark.case_by_id('case.merge3.toml.independent-tables.v1')).last
+    expect(unsupported).to include(
+      'adapter_id' => 'structuredmerge.unsupported',
+      'adapter_role' => 'candidate',
+      'outcome' => 'unsupported'
+    )
   end
 
   it 'carries run-manifest identity into cache and aggregate report evidence' do

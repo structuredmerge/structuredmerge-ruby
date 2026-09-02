@@ -22,7 +22,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Record the Ruby golden-master adapter identity, source revision and dirty state, executable digest, complete benchmark configuration, requested merge and parser providers, and allowlisted runtime environment in every local benchmark run and aggregate report.
 - Add a binary-safe, persistent JSONL benchmark adapter and performance-only run mode that measures many Ruby golden-master operations in one process without changing correctness classification.
-- Accept versioned adapter descriptors for cross-runtime benchmark runs, recording the candidate source state, executable digest, runtime environment, and actual merge/parser providers without mislabeling the candidate as Ruby.
+- Accept versioned adapter descriptors for cross-runtime benchmark runs, recording the candidate source state, executable digest, runtime environment, actual merge/parser providers, and declared support without mislabeling the candidate or treating out-of-scope neighbor cases as errors.
 - Add bounded process-level parallelism for independent cold benchmark cases with deterministic result ordering and explicit worker-process evidence.
 - Add explicit full-corpus `nightly` and competitor-enabled `competitive` benchmark profiles, and reject competitor sweeps from ordinary correctness profiles.
 - Separate benchmark process-spawn, first-request startup/loading, adapter execution, JSONL/IPC harness overhead, and warm round-trip timing evidence.
