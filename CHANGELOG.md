@@ -20,8 +20,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
-- Add executable `merge2` benchmark support through the shared provider contract, paired with an explicit naive template-overwrite baseline.
-
 ### Changed
 
 ### Deprecated
@@ -30,11 +28,24 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+### Security
+
+## [7.1.7] - 2026-09-01
+
+- TAG: [v7.1.7][7.1.7t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 73.88% documented
+
+### Added
+
+- Add executable `merge2` benchmark support through the shared provider contract, paired with an explicit naive template-overwrite baseline.
+
+### Fixed
+
 - Preserve destination blank-line gaps before retained matched and destination-only JSON object members, preventing whitespace churn during repeated templating.
 
 - Report benchmark semantic correctness, source preservation, and expected parse rejections independently, and enforce source preservation as a hard gate.
-
-### Security
 
 ## [7.1.6] - 2026-08-31
 
@@ -597,7 +608,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.6...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.7...HEAD
+[7.1.7]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.6...v7.1.7
+[7.1.7t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.7
 [7.1.6]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.5...v7.1.6
 [7.1.6t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.6
 [7.1.5]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.4...v7.1.5
