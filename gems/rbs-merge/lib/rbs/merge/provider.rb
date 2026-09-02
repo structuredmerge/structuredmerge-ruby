@@ -5,13 +5,14 @@ require 'json'
 
 module Rbs
   module Merge
-    # Base-aware, source-preserving provider for native RBS declarations.
+    # Base-aware, source-preserving provider for normalized RBS declarations.
     # rubocop:disable Metrics/AbcSize, Metrics/ClassLength, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/ParameterLists, Metrics/PerceivedComplexity -- provider decisions, source plans, and verification form one boundary
     class Provider
       DEFAULT_PROFILE = :source_preserving
+      SUPPORTED_BACKENDS = %i[rbs tslp].freeze
       Owner = Data.define(:id, :signature, :fingerprint, :start_line, :end_line, :role)
-      Document = Data.define(:source, :analysis, :owners, :by_id, :unmanaged_fingerprint)
-      ExactDocument = Data.define(:source, :analysis, :declarations, :issues, :role)
+      Document = Data.define(:source, :analysis, :owners, :by_id, :unmanaged_fingerprint, :backend)
+      ExactDocument = Data.define(:source, :analysis, :declarations, :issues, :role, :backend)
       Decision = Data.define(:changes, :conflicts, :choices)
 
       def provider_id = 'ruby.rbs'
@@ -21,9 +22,13 @@ module Rbs
         {
           operations: Ast::Merge::ProviderContract::OPERATIONS,
           dialects: %i[rbs],
-          backends: %i[rbs],
+          backends: SUPPORTED_BACKENDS,
           profiles: [DEFAULT_PROFILE],
           role: :workflow,
+          parser_requirements: {
+            allowed_backend_families: %w[rbs tree-sitter],
+            required_capabilities: %w[normalized-nodes exact-byte-spans]
+          },
           source_preservation: %i[exact_source declaration_fragments line_provenance reparse semantic_verification]
         }.freeze
       end
@@ -36,7 +41,7 @@ module Rbs
           :analyze,
           request,
           analysis: {
-            backend: 'rbs',
+            backend: document.backend.to_s,
             valid: true,
             declarations: document.owners.map { |owner| owner_description(owner) }
           },
@@ -92,7 +97,7 @@ module Rbs
       def parse_merge3_documents(request)
         %i[base ours theirs].each_with_object({}) do |role, documents|
           source = request.fetch(:"#{role}_source")
-          document = parse_source(source, role)
+          document = parse_source(source, role, request)
           if document.is_a?(Hash) && document[:parse_error]
             return parse_failure(:merge3, request, role, document)
           elsif provider_failure?(document)
@@ -105,15 +110,15 @@ module Rbs
 
       def parse_document(operation, request, role)
         source = request.fetch(role == :source ? :source : :"#{role}_source")
-        parsed = parse_source(source, role)
+        parsed = parse_source(source, role, request)
         return parse_failure(operation, request, role, parsed) if provider_failure?(parsed)
 
         parsed
       end
 
-      def parse_source(source, role)
-        analysis = TreeHaver.with_backend(:rbs) { FileAnalysis.new(source) }
-        unless analysis.errors.empty? && analysis.backend == :rbs
+      def parse_source(source, role, request)
+        analysis = with_requested_backend(request) { FileAnalysis.new(source) }
+        unless analysis.errors.empty?
           return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role }
         end
 
@@ -122,15 +127,17 @@ module Rbs
             declaration,
             lines: source.split("\n", -1),
             source: source,
-            backend: :rbs
+            backend: analysis.backend
           )
-          return { unsafe_range: wrapper.signature, source_role: role } unless safe_range?(source, declaration.location)
+          unless safe_declaration_range?(source, declaration, wrapper, analysis.backend)
+            return { unsafe_range: wrapper.signature, source_role: role }
+          end
 
           signature = wrapper.signature
           Owner.new(
             id: owner_id(signature),
             signature: signature,
-            fingerprint: owner_fingerprint(source, declaration),
+            fingerprint: owner_fingerprint(source, declaration, wrapper, analysis.backend),
             start_line: wrapper.start_line,
             end_line: wrapper.end_line,
             role: role
@@ -145,15 +152,16 @@ module Rbs
           analysis: analysis,
           owners: owners.freeze,
           by_id: owners.to_h { |owner| [owner.id, owner] }.freeze,
-          unmanaged_fingerprint: unmanaged_fingerprint(source, owners)
+          unmanaged_fingerprint: unmanaged_fingerprint(source, owners),
+          backend: analysis.backend
         )
       rescue StandardError => e
         { parse_error: e.message, source_role: role }
       end
 
-      def parse_exact_source(source, role)
-        analysis = TreeHaver.with_backend(:rbs) { FileAnalysis.new(source) }
-        unless analysis.errors.empty? && analysis.backend == :rbs
+      def parse_exact_source(source, role, request)
+        analysis = with_requested_backend(request) { FileAnalysis.new(source) }
+        unless analysis.errors.empty?
           return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role }
         end
 
@@ -162,9 +170,9 @@ module Rbs
             declaration,
             lines: source.split("\n", -1),
             source: source,
-            backend: :rbs
+            backend: analysis.backend
           )
-          [wrapper.signature, NativeProjection.call(declaration)]
+          [wrapper.signature, semantic_projection(declaration, wrapper, analysis.backend)]
         end.freeze
         duplicate = declarations.group_by(&:first).find { |_signature, matches| matches.length > 1 }
         issues = if duplicate
@@ -181,7 +189,8 @@ module Rbs
           analysis: analysis,
           declarations: declarations,
           issues: issues.freeze,
-          role: role
+          role: role,
+          backend: analysis.backend
         )
       rescue StandardError => e
         { parse_error: e.message, source_role: role }
@@ -197,6 +206,27 @@ module Rbs
         source.byteslice(location.end_pos...line_end).to_s.each_byte.all? { |byte| [9, 13, 32].include?(byte) }
       end
 
+      def safe_declaration_range?(source, declaration, wrapper, backend)
+        return safe_range?(source, declaration.location) if backend == :rbs
+        return false unless wrapper.start_line&.positive? && wrapper.end_line.to_i >= wrapper.start_line
+        return false unless declaration.respond_to?(:start_byte) && declaration.respond_to?(:end_byte)
+
+        start_byte = declaration.start_byte
+        end_byte = declaration.end_byte
+        return false unless start_byte && end_byte && start_byte >= 0 && end_byte <= source.bytesize
+        return false unless point_column(declaration.start_point) == 0
+
+        line_end = source.index("\n", end_byte) || source.bytesize
+        source.byteslice(end_byte...line_end).to_s.each_byte.all? { |byte| [9, 13, 32].include?(byte) }
+      end
+
+      def point_column(point)
+        return point.column if point.respond_to?(:column)
+        return point[:column] if point.respond_to?(:[])
+
+        nil
+      end
+
       def non_overlapping?(owners)
         owners.each_cons(2).all? { |left, right| left.end_line < right.start_line }
       end
@@ -210,11 +240,35 @@ module Rbs
         end.join
       end
 
-      def owner_fingerprint(source, declaration)
-        location = declaration.location
-        exact_source = source.byteslice(location.start_pos...location.end_pos)
-        fingerprint_value = [NativeProjection.call(declaration), exact_source]
+      def owner_fingerprint(source, declaration, wrapper, backend)
+        exact_source = if backend == :rbs
+                         location = declaration.location
+                         source.byteslice(location.start_pos...location.end_pos)
+                       else
+                         source.byteslice(declaration.start_byte...declaration.end_byte)
+                       end
+        fingerprint_value = [semantic_projection(declaration, wrapper, backend), exact_source]
         Digest::SHA256.hexdigest(JSON.generate(Ast::Merge.json_ready(fingerprint_value)))
+      end
+
+      def semantic_projection(declaration, wrapper, backend)
+        return NativeProjection.call(declaration) if backend == :rbs
+
+        [wrapper.signature, tree_projection(declaration)]
+      end
+
+      def tree_projection(node)
+        children = []
+        node.each { |child| children << tree_projection(child) } if node.respond_to?(:each)
+        leaf_text = node.text.to_s if children.empty? && node.respond_to?(:text)
+        [node.type.to_s, leaf_text, children]
+      end
+
+      def with_requested_backend(request, &block)
+        backend = request[:backend]
+        return yield unless backend
+
+        TreeHaver.with_backend(backend, &block)
       end
 
       def owner_id(signature)
@@ -391,7 +445,7 @@ module Rbs
 
       def merge3_exact(request, role)
         documents = %i[base ours theirs].to_h do |source_role|
-          [source_role, parse_exact_source(request.fetch(:"#{source_role}_source"), source_role)]
+          [source_role, parse_exact_source(request.fetch(:"#{source_role}_source"), source_role, request)]
         end
         winner = documents.fetch(role)
         return parse_failure(:merge3, request, role, winner) if provider_failure?(winner)
@@ -402,7 +456,7 @@ module Rbs
       def render_exact(request, documents, role)
         winner = documents.fetch(role)
         rendered = render_plan(request, [whole_source_fragment(role, request.fetch(:"#{role}_source"))])
-        verification = verify_exact_rendered(rendered.content, winner)
+        verification = verify_exact_rendered(rendered.content, winner, request)
         unless verification[:semantic_match] && verification[:byte_exact]
           return failure(
             :merge3,
@@ -425,8 +479,8 @@ module Rbs
         )
       end
 
-      def verify_exact_rendered(output, expected)
-        parsed = parse_exact_source(output, :output)
+      def verify_exact_rendered(output, expected, request)
+        parsed = parse_exact_source(output, :output, request)
         if provider_failure?(parsed)
           return {
             output_reparsed: false,
@@ -479,7 +533,7 @@ module Rbs
         fragments = composite_fragments(documents, decision)
         rendered = render_plan(request, fragments)
         expected = expected_owners(documents, decision)
-        verification = verify_rendered(rendered.content, expected)
+        verification = verify_rendered(rendered.content, expected, request)
         unless verification[:semantic_match]
           return failure(
             :merge3,
@@ -599,8 +653,8 @@ module Rbs
         expected
       end
 
-      def verify_rendered(output, expected)
-        parsed = parse_source(output, :output)
+      def verify_rendered(output, expected, request)
+        parsed = parse_source(output, :output, request)
         if provider_failure?(parsed)
           return {
             output_reparsed: false,

@@ -49,6 +49,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Let the RBS workflow provider honor explicit native RBS or TSLP TreeHaver selection across analysis, diff, and two- or three-way merge operations, rejecting TSLP's embedded inline-RBS parse mode for document merges.
 - Normalize object and hash tree-sitter points in shared line-range mechanics, and let RBS wrappers reuse that contract so TSLP merges do not fail on point shape.
 - Preserve shared layout-owned leading blank lines before template-only Prism Ruby nodes that have no leading comments.
 - Accept shared snake_case diagnostics from non-Ruby benchmark adapters so expected parser rejections are classified as successful fail-closed outcomes.

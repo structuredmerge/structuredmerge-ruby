@@ -360,9 +360,29 @@ module Rbs
 
         # Check for parse errors in the tree
         collect_parse_errors(@ast.root_node) if @ast&.root_node&.has_error?
+        validate_tree_sitter_document
 
         # Extract declarations from AST
         extract_tree_sitter_declarations
+      end
+
+      def validate_tree_sitter_document
+        return unless @ast&.root_node
+
+        @ast.root_node.each do |child|
+          child_type = child.type.to_s
+          next if %w[comment decl use_directive].include?(child_type)
+
+          canonical = NodeTypeNormalizer.canonical_type(child_type, :tree_sitter)
+          next if NodeTypeNormalizer.declaration_type?(canonical)
+
+          @errors << {
+            type: child_type,
+            start_point: child.start_point,
+            end_point: child.end_point,
+            message: 'RBS merge requires document syntax; inline RBS syntax is unsupported'
+          }
+        end
       end
 
       def collect_parse_errors(node)

@@ -21,12 +21,12 @@ RSpec.describe Rbs::Merge::Provider do
     RBS
   end
 
-  it 'auto-registers the ruby.rbs workflow with the native RBS source-preserving profile' do
+  it 'auto-registers the ruby.rbs workflow for native RBS and TSLP' do
     expect(provider).to have_attributes(provider_id: 'ruby.rbs', family: 'rbs')
     expect(provider.capabilities).to include(
       operations: %i[analyze diff2 merge2 merge3],
       dialects: %i[rbs],
-      backends: %i[rbs],
+      backends: %i[rbs tslp],
       profiles: %i[source_preserving],
       role: :workflow
     )
@@ -36,6 +36,16 @@ RSpec.describe Rbs::Merge::Provider do
         family: :rbs,
         dialect: :rbs,
         backend: :rbs,
+        profile_id: :source_preserving,
+        operation: :merge3
+      )
+    ).to equal(Rbs::Merge.merge_provider)
+    expect(
+      Ast::Merge.resolve_provider(
+        provider_id: 'ruby.rbs',
+        family: :rbs,
+        dialect: :rbs,
+        backend: :tslp,
         profile_id: :source_preserving,
         operation: :merge3
       )
@@ -297,6 +307,62 @@ RSpec.describe Rbs::Merge::Provider do
       hash_including(category: :parse_error, message: /ours parse error/)
     )
     expect { JSON.generate(Ast::Merge.json_ready(result)) }.not_to raise_error
+  end
+
+  context 'with the TSLP backend' do
+    before do
+      skip 'tree-sitter-rbs grammar is unavailable' unless TreeHaver::GrammarFinder.new(:rbs).available?
+    end
+
+    it 'analyzes and diffs normalized declarations' do
+      analysis = provider.analyze(source: base, backend: :tslp)
+      diff = provider.diff2(
+        before_source: base,
+        after_source: base.sub('Integer', 'bool'),
+        backend: :tslp
+      )
+
+      expect(analysis).to include(ok: true)
+      expect(analysis.dig(:provider, :backend)).to eq(:tslp)
+      expect(analysis.dig(:analysis, :backend)).to eq('tree_sitter')
+      expect(analysis.dig(:analysis, :declarations).map { |item| item.fetch(:signature) }).to eq(
+        [[:class, 'Alpha'], [:class, 'Beta']]
+      )
+      expect(diff.fetch(:changes)).to contain_exactly(hash_including(change: :edited))
+    end
+
+    it 'performs exact two-way and composite three-way merges' do
+      current = "class Current\nend\n"
+      incoming = "class Current\n  def added: () -> void\nend\nclass Incoming\nend\n"
+      merge2 = provider.merge2(current_source: current, incoming_source: incoming, backend: :tslp)
+      ours = base.sub('String', 'bool')
+      theirs = base.sub('Integer', 'untyped')
+      merge3 = provider.merge3(base_source: base, ours_source: ours, theirs_source: theirs, backend: :tslp)
+
+      expect(merge2).to include(ok: true, output: incoming)
+      expect(merge2.dig(:verification, :semantic_match)).to be(true)
+      expect(merge3).to include(ok: true, output: ours.sub('Integer', 'untyped'))
+      expect(merge3.fetch(:verification)).to include(
+        semantic_match: true,
+        ordered_declaration_signatures_verified: true,
+        ast_attributes_verified: true,
+        base_participated: true
+      )
+    end
+
+    it 'fails closed on malformed syntax' do
+      result = provider.merge3(
+        base_source: base,
+        ours_source: "class Broken\n",
+        theirs_source: base,
+        backend: :tslp
+      )
+
+      expect(result).to include(ok: false, source_role: :ours)
+      expect(result.fetch(:diagnostics)).to contain_exactly(
+        hash_including(category: :parse_error, blocking: true)
+      )
+    end
   end
 end
 
