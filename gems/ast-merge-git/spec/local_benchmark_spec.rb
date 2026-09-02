@@ -27,11 +27,11 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
 
   it 'validates the exact canonical authored corpus and inline digests' do
     expect(benchmark.validate!).to be(true)
-    expect(benchmark.cases.length).to eq(16)
+    expect(benchmark.cases.length).to eq(17)
     expect(benchmark.document.fetch('expected_summary')).to include(
-      'case_count' => 16,
-      'partition_counts' => { 'sentinel' => 7, 'gold' => 7, 'metamorphic' => 2 },
-      'operation_counts' => { 'merge2' => 1, 'merge3' => 13, 'metamorphic' => 2 }
+      'case_count' => 17,
+      'partition_counts' => { 'sentinel' => 8, 'gold' => 7, 'metamorphic' => 2 },
+      'operation_counts' => { 'merge2' => 2, 'merge3' => 13, 'metamorphic' => 2 }
     )
     expect(benchmark.document.fetch('profiles').keys).to eq(%w[micro dev nightly competitive])
     expect(benchmark.document.fetch('provenance')).to include(
@@ -50,6 +50,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
         case.merge3.json.same-owner-conflict.v1
         case.merge3.json.malformed-ours.v1
         case.merge2.jsonc.current-layout-preservation.v1
+        case.merge2.yaml.nested-mapping-leaf.v1
         case.merge3.jsonc.comment-preservation.v1
         case.merge3.json5.order-format.v1
         case.merge3.json.duplicate-identity.v1
@@ -273,8 +274,12 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'network_policy' => 'denied'
     )
     manifest.dig('configuration', 'cases').each do |case_configuration|
+      yaml = case_configuration.fetch('case_id') == 'case.merge2.yaml.nested-mapping-leaf.v1'
       expect(case_configuration).to include(
-        'merge_provider' => include('provider_id' => 'ruby.json', 'require_path' => 'json/merge'),
+        'merge_provider' => include(
+          'provider_id' => yaml ? 'ruby.yaml' : 'ruby.json',
+          'require_path' => yaml ? 'yaml/merge' : 'json/merge'
+        ),
         'parser_provider' => include(
           'requested_backend_id' => 'kreuzberg-language-pack',
           'backend_family' => 'tree-sitter',
@@ -355,8 +360,13 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'adapter' => { 'runtime' => 'rust' }
     )
     manifest.dig('configuration', 'cases').each do |configuration|
+      provider_id = if configuration.fetch('case_id') == 'case.merge2.yaml.nested-mapping-leaf.v1'
+                      'rust.yaml'
+                    else
+                      'rust.json'
+                    end
       expect(configuration).to include(
-        'merge_provider' => include('provider_id' => 'rust.json'),
+        'merge_provider' => include('provider_id' => provider_id),
         'parser_provider' => include('provider_id' => 'tree-sitter-language-pack'),
         'selector_role' => 'oracle_context'
       )
@@ -407,7 +417,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'adapter_mode' => 'persistent-jsonl',
       'iterations' => 2
     )
-    expect(performance.fetch('samples').length).to eq(14)
+    expect(performance.fetch('samples').length).to eq(16)
     expect(performance.dig('session', 'process_ids').length).to eq(1)
     expect(performance.dig('samples', 0, 'runtime', 'measurement_class')).to eq(
       'session_startup_and_first_request'
@@ -636,6 +646,7 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     expect(report.dig('dimensions', 'competitive')).to include(
       'unsupported_case_ids' => [
         'case.merge2.jsonc.current-layout-preservation.v1',
+        'case.merge2.yaml.nested-mapping-leaf.v1',
         'case.merge3.jsonc.comment-preservation.v1',
         'case.merge3.json5.order-format.v1',
         'case.metamorphic.json.reorder-format.v1',

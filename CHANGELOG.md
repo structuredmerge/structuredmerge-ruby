@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Move source-preserving YAML provider mechanics into `yaml-merge`, add its TSLP workflow provider, and make `psych-merge` supply only its native parser projection.
 - Retain provider-owned native Psych AST extensions in production analysis results so coarse Alef workflow hosts can forward them without reparsing or flattening the native tree.
 - Let cross-runtime benchmark descriptors declare operation and dialect support plus merge-provider identity per format family, avoiding false support claims from Cartesian-product capability lists.
+- Load `ast-merge-git`'s optional benchmark providers from `STRUCTUREDMERGE_DEV` during local development so benchmarks exercise the current monorepo providers.
+- Reuse YAML's recursive AST resolver in its workflow provider so nested template-only mapping leaves merge without sacrificing destination values or source-line provenance.
 
 ### Changed
 

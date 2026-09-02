@@ -53,6 +53,37 @@ RSpec.describe Yaml::Merge::Provider do
     expect(result).to include(ok: true, output: source)
     expect(result.dig(:verification, :source_match)).to be(true)
   end
+
+  it 'recursively adds template-only mapping leaves while retaining destination values' do
+    incoming = <<~YAML
+      patient:
+        name:
+          given: Pat
+          family: Template
+        active: false
+    YAML
+    current = <<~YAML
+      patient:
+        name:
+          family: Destination
+        active: true
+    YAML
+    expected = <<~YAML
+      patient:
+        name:
+          given: Pat
+          family: Destination
+        active: true
+    YAML
+
+    result = provider.merge2(incoming_source: incoming, current_source: current)
+
+    expect(result).to include(ok: true, output: expected)
+    expect(result.dig(:render_report, :strategy)).to eq(:recursive_mapping_composite)
+    expect(result.dig(:render_report, :synthesized_fragments)).to be_empty
+    expect(result.dig(:verification, :semantic_match)).to be(true)
+    expect(result.dig(:verification, :source_match)).to be(true)
+  end
 end
 
 RSpec.describe 'Yaml::Merge workflow provider conformance' do

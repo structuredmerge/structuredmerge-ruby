@@ -60,6 +60,8 @@ direct_sibling_templating = ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true
 if direct_sibling_gems.any? &&
    (direct_sibling_local ||
      ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  local_sibling_gems = direct_sibling_gems.dup
+  local_sibling_gems.concat(provider_gems) if direct_sibling_local && !direct_sibling_templating
   direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
   direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
   require 'nomono/bundler'
@@ -67,7 +69,7 @@ if direct_sibling_gems.any? &&
     ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
 
     eval_nomono_gems(
-      gems: direct_sibling_gems,
+      gems: local_sibling_gems,
       prefix: 'STRUCTUREDMERGE',
       path_env: 'STRUCTUREDMERGE_DEV',
       root: %w[src my structuredmerge ruby gems]

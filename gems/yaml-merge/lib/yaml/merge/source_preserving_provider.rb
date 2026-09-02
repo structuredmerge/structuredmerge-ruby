@@ -95,17 +95,11 @@ module Yaml
         }
         unsafe = documents.values.reject { |document| document.issues.empty? }
         return invalid_document_failure(:merge2, request, unsafe) unless unsafe.empty?
+        return render_exact_merge2(request, documents) if documents[:incoming].source == documents[:current].source
 
-        additions = documents[:incoming].entries.reject { |entry| documents[:current].by_key.key?(entry.key) }
-        render_documents = { ours: documents[:current], theirs: documents[:incoming] }
-        fragments = [whole_source_fragment(:ours, documents[:current].source)]
-        fragments.concat(additions.map { |entry| entry_fragment(:theirs, entry) })
-        rendered = render_plan(request, separated_fragments(fragments, render_documents))
-        expected = [
-          *documents[:current].entries.map { |entry| selected_entry(entry, :current) },
-          *additions.map { |entry| selected_entry(entry, :incoming) }
-        ]
-        verification = verify_composite(rendered.content, expected)
+        merged = recursive_merge2(documents)
+        rendered = render_recursive_merge2(request, documents, merged)
+        verification = verify_recursive_merge2(rendered, documents)
         return verification_failure(:merge2, request, rendered, [], verification) unless verification[:semantic_match]
 
         result(
@@ -113,7 +107,7 @@ module Yaml
           request,
           output: rendered.content,
           changes: mapping_changes(documents[:current], analyze_role(:output, rendered.content)),
-          render_report: render_report(rendered, :exact_mapping_entry_composite),
+          render_report: render_report(rendered, :recursive_mapping_composite),
           verification: verification
         )
       end
@@ -175,6 +169,81 @@ module Yaml
         []
       end
 
+      def render_exact_merge2(request, documents)
+        current = documents.fetch(:current)
+        rendered = render_plan(request, [whole_source_fragment(:ours, current.source)])
+        verification = verify_exact(rendered.content, current, :current)
+        result(
+          :merge2,
+          request,
+          output: rendered.content,
+          changes: [],
+          render_report: render_report(rendered, :exact_revision),
+          verification: verification
+        )
+      end
+
+      def recursive_merge2(documents)
+        result = MergeResult.new(
+          template_analysis: documents[:incoming].analysis,
+          dest_analysis: documents[:current].analysis
+        )
+        SmartMerger::Resolver.new(
+          documents[:incoming].analysis,
+          documents[:current].analysis,
+          preference: :destination,
+          add_template_only_nodes: true,
+          merge_sequences: false
+        ).resolve(result)
+        result
+      end
+
+      def render_recursive_merge2(request, documents, merged)
+        fragments = merged.lines.map do |line|
+          recursive_merge2_line_fragment(line, documents)
+        end
+        render_plan(request, fragments)
+      end
+
+      def recursive_merge2_line_fragment(line, documents)
+        role = line.fetch(:source) == :template ? :theirs : :ours
+        original_line = line[:original_line]
+        content = "#{line.fetch(:content)}\n"
+        source = documents.fetch(role == :theirs ? :incoming : :current).source
+        if original_line && source.lines[original_line - 1] == content
+          return range_fragment(role, original_line, original_line)
+        end
+
+        Ast::Merge::SourceRender::SynthesizedFragment.new(
+          content: content,
+          reason: :structured_emitter_line,
+          producer: provider_id,
+          metadata: { source_role: role, original_line: original_line }.compact
+        )
+      end
+
+      def verify_recursive_merge2(rendered, documents)
+        parsed = analyze_role(:output, rendered.content)
+        expected = Yaml::Merge.send(
+          :merge_yaml_mappings,
+          document_semantics(documents[:incoming]),
+          document_semantics(documents[:current])
+        )
+        actual = document_semantics(parsed)
+        {
+          output_reparsed: true,
+          semantic_match: parsed.issues.empty? && actual == expected,
+          ast_attributes_match: parsed.issues.empty?,
+          source_match: rendered.synthesized_fragments.empty?,
+          ordered_entries: actual.to_a,
+          line_sources: rendered.line_records.map { |record| record.slice(:source_role, :original_line) }
+        }
+      end
+
+      def document_semantics(document)
+        document.entries.to_h { |entry| [entry.key, entry.semantic] }
+      end
+
       def entry_state(entry)
         entry && [entry.semantic, entry.attributes, entry.fragment]
       end
@@ -210,6 +279,7 @@ module Yaml
         {
           output_reparsed: true,
           byte_exact: output == expected.source,
+          source_match: output == expected.source,
           semantic_match: fatal_issues(parsed).empty? && document_signature(parsed) == document_signature(expected),
           ast_attributes_match: parsed.document_attributes == expected.document_attributes &&
             parsed.entries.map(&:attributes) == expected.entries.map(&:attributes),
