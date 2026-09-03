@@ -135,6 +135,21 @@ RSpec.describe Prism::Merge::Provider do
     expect(result.dig(:verification, :semantic_match)).to be(true)
   end
 
+  it 'composes independent direct method edits inside a class owner' do
+    result = provider.merge3(
+      base_source: "class Box\n  def left = 1\n  def right = 1\nend\n",
+      ours_source: "class Box\n  def left = 2\n  def right = 1\nend\n",
+      theirs_source: "class Box\n  def left = 1\n  def right = 2\nend\n"
+    )
+
+    expect(result).to include(
+      ok: true,
+      output: "class Box\n  def left = 2\n  def right = 2\nend\n"
+    )
+    expect(result.dig(:render_report, :strategy)).to eq(:nested_owner_composite)
+    expect(result.dig(:verification, :base_participated)).to be(true)
+  end
+
   it 'merges independent additions that overlap under ordinary line merge' do
     stable = "VALUE = 0\n"
     left = "VALUE = 0\nOURS = 1\n"
