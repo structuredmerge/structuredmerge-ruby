@@ -669,6 +669,12 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'source_revision' => '13b813c02da9511c7433131aed142473ffe62d52',
       'reported_version' => 'mergiraf 0.18.0'
     )
+    expect(report.dig('dimensions', 'competitive', 'adapters', 'mergiraf')).to include(
+      'selected_cases' => 24,
+      'supported_cases' => 11,
+      'eligible_cases' => 11,
+      'coverage' => { 'numerator' => 11, 'denominator' => 24, 'percent' => 45.83 }
+    )
     expect(report.dig('dimensions', 'competitive')).to include(
       'unsupported_case_ids' => [
         'case.merge2.jsonc.current-layout-preservation.v1',

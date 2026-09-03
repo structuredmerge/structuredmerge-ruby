@@ -1906,9 +1906,24 @@ module Ast
 
         def competitive
           results = @results.select { |item| item['adapter_role'] == 'competitor' }
+          adapters = results.group_by { |item| item['adapter_id'] }.transform_values do |items|
+            unsupported = items.select { |item| item['outcome'] == 'unsupported' }
+            supported = items - unsupported
+            eligible = supported.count { |item| item['score_eligible'] }
+            selected = items.map { |item| item['case_id'] }.uniq.length
+            {
+              'selected_cases' => selected,
+              'supported_cases' => supported.length,
+              'eligible_cases' => eligible,
+              'coverage' => coverage_ratio(eligible, selected),
+              'unsupported_case_ids' => unsupported.map { |item| item['case_id'] },
+              'outcomes' => items.group_by { |item| item['outcome'] }.transform_values(&:length)
+            }
+          end
           {
             'configured' => @run.fetch('competitors'),
             'outcomes' => results.group_by { |item| item['outcome'] }.transform_values(&:length),
+            'adapters' => adapters,
             'unsupported_case_ids' => results.filter_map do |item|
               item['case_id'] if item['outcome'] == 'unsupported'
             end,
@@ -1916,6 +1931,14 @@ module Ast
               item['id'] if item['outcome'] == 'false_auto_merge'
             end,
             'affects_candidate_safety_gate' => false
+          }
+        end
+
+        def coverage_ratio(numerator, denominator)
+          {
+            'numerator' => numerator,
+            'denominator' => denominator,
+            'percent' => denominator.zero? ? nil : (numerator * 100.0 / denominator).round(2)
           }
         end
 

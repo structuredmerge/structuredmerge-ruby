@@ -55,6 +55,8 @@ Please file a bug if you notice a violation of semantic versioning.
   environment provenance.
 - Add an opt-in competitive Git merge-file adapter with pinned corpus
   provenance and the same strict version and digest checks as other tools.
+- Add per-competitor supported and eligible case counts with explicit coverage
+  ratios so comparative outcomes are not read without their denominators.
 
 ### Changed
 
