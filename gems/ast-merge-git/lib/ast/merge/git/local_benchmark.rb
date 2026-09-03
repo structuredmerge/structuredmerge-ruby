@@ -771,8 +771,35 @@ module Ast
               )
             end
 
-            execute_mergiraf(item, path)
+            execute_competitor(item, id, path)
           end
+        end
+
+        def execute_competitor(item, id, path)
+          return execute_mergiraf(item, path) if id == 'mergiraf'
+          return execute_git_competitor(item, path) if id == 'git'
+
+          error!("unsupported competitor adapter: #{id}")
+        end
+
+        def execute_git_competitor(item, path)
+          workspace = @tmp_root.join("#{safe_id(item['id'])}-git-#{Process.pid}")
+          FileUtils.rm_rf(workspace)
+          FileUtils.mkdir_p(workspace)
+          write_roles(item, workspace)
+          capture = timed_capture(
+            oracle_free_env,
+            path.to_s,
+            'merge-file',
+            '-p',
+            'ours',
+            'base',
+            'theirs',
+            chdir: workspace
+          )
+          raw_result(item, 'git', capture)
+        ensure
+          FileUtils.rm_rf(workspace) if workspace
         end
 
         def execute_mergiraf(item, path)

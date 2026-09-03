@@ -53,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
   reviewed Cargo TOML, Kubernetes Go/YAML, and RBS histories.
 - Record the Git baseline executable path, version, and digest in benchmark
   environment provenance.
+- Add an opt-in competitive Git merge-file adapter with pinned corpus
+  provenance and the same strict version and digest checks as other tools.
 
 ### Changed
 
