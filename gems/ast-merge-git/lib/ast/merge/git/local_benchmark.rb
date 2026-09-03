@@ -1255,6 +1255,7 @@ module Ast
           equivalence_acceptable = !selected.nil?
           preservation_acceptable = violations.empty? && unverified.empty?
           checks.merge(
+            'agreement' => agreement(expected, output),
             'preservation_evaluations' => preservation,
             'preservation_violations' => violations,
             'preservation_unverified' => unverified,
@@ -1291,6 +1292,34 @@ module Ast
           policy['provider'].to_s == item.dig('selector', 'provider_id').to_s
         end
 
+        def agreement(expected, output)
+          return nil unless expected
+
+          {
+            'line' => sequence_agreement(expected.lines, output.lines),
+            'token' => sequence_agreement(lexemes(expected), lexemes(output))
+          }
+        end
+
+        def lexemes(content)
+          content.split(/(\s+)/).reject(&:empty?)
+        end
+
+        def sequence_agreement(expected, output)
+          expected_counts = expected.tally
+          output_counts = output.tally
+          matched = expected_counts.sum do |value, count|
+            [count, output_counts.fetch(value, 0)].min
+          end
+          denominator = [expected.length, output.length].max
+          {
+            'matched' => matched,
+            'expected' => expected.length,
+            'observed' => output.length,
+            'percent' => denominator.zero? ? nil : (matched * 100.0 / denominator).round(2)
+          }
+        end
+
         def dimensions(item, outcome, checks)
           eligible = item.dig('oracle', 'score_eligible')
           {
@@ -1307,6 +1336,7 @@ module Ast
             'preservation' => {
               'eligible' => eligible,
               'requirements' => item['preservation_policy'],
+              'agreement' => checks['agreement'],
               'violations' => checks.fetch('preservation_violations', []),
               'unverified' => checks.fetch('preservation_unverified', [])
             },

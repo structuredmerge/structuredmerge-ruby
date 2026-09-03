@@ -194,6 +194,10 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
       'line_endings' => 'pass',
       'unknown_fields' => 'pass'
     )
+    expect(checks.fetch('agreement')).to eq(
+      'line' => { 'matched' => 0, 'expected' => 1, 'observed' => 1, 'percent' => 0.0 },
+      'token' => { 'matched' => 1, 'expected' => 8, 'observed' => 2, 'percent' => 12.5 }
+    )
   end
 
   it 'accepts expected parse rejection from any adapter using shared diagnostic categories' do

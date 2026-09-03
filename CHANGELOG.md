@@ -57,6 +57,8 @@ Please file a bug if you notice a violation of semantic versioning.
   provenance and the same strict version and digest checks as other tools.
 - Add per-competitor supported and eligible case counts with explicit coverage
   ratios so comparative outcomes are not read without their denominators.
+- Add preservation-only line and lexeme agreement details to benchmark results;
+  these metrics do not affect merge correctness or safety gates.
 
 ### Changed
 
