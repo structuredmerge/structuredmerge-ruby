@@ -125,7 +125,7 @@ module Yaml
 
         def merge_matched_nodes(template_node, dest_node, template_analysis, dest_analysis, template_owners: nil,
                                 dest_owners: nil, template_boundary_line: nil, dest_boundary_line: nil)
-          if template_node.document? && dest_node.document?
+          if node_kind?(template_node, :document?) && node_kind?(dest_node, :document?)
             dest_header_end = emit_document_header(dest_node, dest_analysis)
             template_header_end = document_header_end_line(template_node)
             merge_node_lists(
@@ -136,12 +136,12 @@ module Yaml
               template_boundary_line: template_header_end,
               dest_boundary_line: dest_header_end
             )
-          elsif template_node.mapping_pair? && dest_node.mapping_pair?
+          elsif node_kind?(template_node, :mapping_pair?) && node_kind?(dest_node, :mapping_pair?)
             merge_mapping_pair(template_node, dest_node, template_analysis, dest_analysis, template_owners: template_owners,
                                                                                            dest_owners: dest_owners,
                                                                                            template_boundary_line: template_boundary_line,
                                                                                            dest_boundary_line: dest_boundary_line)
-          elsif template_node.mapping? && dest_node.mapping?
+          elsif node_kind?(template_node, :mapping?) && node_kind?(dest_node, :mapping?)
             merge_node_lists(
               template_node.mergeable_children,
               dest_node.mergeable_children,
@@ -165,6 +165,10 @@ module Yaml
             emit_node_leading_gap(gap_node, gap_analysis, gap_owners, boundary_line: gap_boundary_line)
             emit_raw_node(selected_node, selected_analysis)
           end
+        end
+
+        def node_kind?(node, predicate)
+          node.respond_to?(predicate) && node.public_send(predicate)
         end
 
         def merge_mapping_pair(template_node, dest_node, template_analysis, dest_analysis, template_owners: nil,
