@@ -1741,7 +1741,11 @@ module Ast
             metadata = @benchmark.document.fetch('competitors').fetch(id)
             capture = timed_capture(oracle_free_env, path.to_s, '--version', chdir: path.dirname)
             error!("#{id} version probe failed: #{capture[:stderr].strip}") unless capture[:status].zero?
-            expected = "#{metadata.fetch('adapter_id')} #{metadata.fetch('version')}"
+            expected = if id == 'git'
+                         "#{metadata.fetch('adapter_id')} version #{metadata.fetch('version')}"
+                       else
+                         "#{metadata.fetch('adapter_id')} #{metadata.fetch('version')}"
+                       end
             error!("#{id} version differs: #{capture[:stdout].strip}") unless capture[:stdout].strip == expected
 
             [id, metadata.merge(

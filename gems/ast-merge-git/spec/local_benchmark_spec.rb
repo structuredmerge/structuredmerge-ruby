@@ -692,6 +692,23 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     ENV['BENCHMARK_EXPECTED_ORACLE_BYTES'] = previous
   end
 
+  it 'probes the pinned Git competitor using Git version output' do
+    git_path = Pathname(`command -v git`.strip)
+    runner = Ast::Merge::Git::LocalBenchmarkRunner.new(
+      benchmark: benchmark,
+      driver_path: driver,
+      tmp_root: tmp_root.join('git-competitive-runs'),
+      competitor_paths: { 'git' => git_path }
+    )
+
+    provenance = runner.send(:competitor_provenance)
+
+    expect(provenance.fetch('git')).to include(
+      'source_revision' => 'e9019fcafe0040228b8631c30f97ae1adb61bcdc',
+      'reported_version' => 'git version 2.55.0'
+    )
+  end
+
   context 'with the installed paired drivers' do
     subject(:run) do
       Ast::Merge::Git::LocalBenchmarkRunner.new(
