@@ -742,7 +742,10 @@ module Ast
         end
 
         def candidate_supports?(item)
-          return true unless @adapter_descriptor
+          # The default candidate is the Ruby golden master. Cross-runtime
+          # corpus cases must opt in through an adapter descriptor rather than
+          # being executed and reported as Ruby failures.
+          return item.fetch('selector').fetch('provider_id').start_with?('ruby.') unless @adapter_descriptor
 
           support = @adapter_descriptor.fetch('supports')
           if support['combinations']
@@ -1906,8 +1909,10 @@ module Ast
             'candidate_result_id' => candidate['id'],
             'from' => baseline['outcome'],
             'to' => candidate['outcome'],
-            'newly_passing' => !SUCCESS.include?(baseline['outcome']) && SUCCESS.include?(candidate['outcome']),
-            'newly_failing' => SUCCESS.include?(baseline['outcome']) && !SUCCESS.include?(candidate['outcome']),
+            'newly_passing' => !unsupported?(candidate) &&
+              !SUCCESS.include?(baseline['outcome']) && SUCCESS.include?(candidate['outcome']),
+            'newly_failing' => !unsupported?(candidate) &&
+              SUCCESS.include?(baseline['outcome']) && !SUCCESS.include?(candidate['outcome']),
             'changed_conflict' => conflict?(baseline) && conflict?(candidate) &&
               baseline.dig('raw', 'output', 'sha256') != candidate.dig('raw', 'output', 'sha256')
           }
@@ -1915,6 +1920,10 @@ module Ast
 
         def conflict?(result)
           %w[false_conflict true_conflict].include?(result['outcome'])
+        end
+
+        def unsupported?(result)
+          result['outcome'] == 'unsupported'
         end
 
         def performance

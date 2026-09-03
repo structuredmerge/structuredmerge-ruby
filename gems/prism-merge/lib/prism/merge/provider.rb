@@ -88,6 +88,8 @@ module Prism
 
         exact_role = exact_revision_role(request)
         decision = decide(documents, include_unmanaged_conflict: exact_role.nil?)
+        nested = render_nested_composite(request, documents, decision)
+        return nested if nested
         return render_conflicts(request, documents, decision) unless decision.conflicts.empty?
 
         return render_exact(request, documents, decision, exact_role) if exact_role
@@ -363,6 +365,95 @@ module Prism
           render_report: render_report(rendered, :exact_owner_composite),
           verification: verification.merge(base_participated: true)
         )
+      end
+
+      # Top-level Prism owners intentionally include a class body as one source
+      # range. When both revisions edit different direct methods, compose those
+      # method ranges before falling back to a class-level conflict.
+      def render_nested_composite(request, documents, decision)
+        return unless decision.conflicts.length == 1
+
+        conflict = decision.conflicts.first
+        ours_owner = documents.fetch(:ours).by_id[conflict[:owner_id]]
+        base_owner = documents.fetch(:base).by_id[conflict[:owner_id]]
+        theirs_owner = documents.fetch(:theirs).by_id[conflict[:owner_id]]
+        return unless [ours_owner, base_owner, theirs_owner].all?
+        return unless %i[class module].include?(ours_owner.signature.first)
+
+        nodes = {
+          base: owner_node(documents.fetch(:base), base_owner),
+          ours: owner_node(documents.fetch(:ours), ours_owner),
+          theirs: owner_node(documents.fetch(:theirs), theirs_owner)
+        }
+        return unless nodes.values.all?
+
+        replacements = nested_method_replacements(documents, nodes)
+        return if replacements.nil? || replacements.empty?
+
+        output_lines = documents.fetch(:ours).source.lines
+        replacements.sort_by { |replacement| -replacement.fetch(:start_line) }.each do |replacement|
+          start = replacement.fetch(:start_line) - 1
+          length = replacement.fetch(:end_line) - replacement.fetch(:start_line) + 1
+          output_lines[start, length] = replacement.fetch(:source).lines
+        end
+        output = output_lines.join
+        parsed = parse_source(output, :output)
+        return if provider_failure?(parsed)
+
+        result(
+          :merge3,
+          request,
+          output: output,
+          changes: decision.changes,
+          render_report: {
+            strategy: :nested_owner_composite,
+            parent_path: owner_path(ours_owner),
+            replacements: replacements.map { |replacement| replacement.slice(:path, :start_line, :end_line, :source_role) }
+          },
+          verification: { base_participated: true, output_reparsed: true, semantic_match: true }
+        )
+      end
+
+      def owner_node(document, owner)
+        document.analysis.nodes_with_comments.find { |info| info[:signature] == owner.signature }&.fetch(:node)
+      end
+
+      def nested_method_replacements(documents, nodes)
+        methods = nodes.transform_values do |node|
+          body = node.respond_to?(:body) ? node.body : nil
+          statements = body.respond_to?(:body) ? body.body : []
+          statements.select { |statement| statement.is_a?(::Prism::DefNode) }.to_h do |method|
+            [[method.name, method.parameters&.signature], method]
+          end
+        end
+        replacements = []
+        methods.fetch(:base).each do |signature, base_method|
+          ours_method = methods.fetch(:ours)[signature]
+          theirs_method = methods.fetch(:theirs)[signature]
+          next unless ours_method && theirs_method
+
+          base_source = node_source(documents.fetch(:base).source, base_method)
+          ours_source = node_source(documents.fetch(:ours).source, ours_method)
+          theirs_source = node_source(documents.fetch(:theirs).source, theirs_method)
+          next if ours_source == theirs_source || base_source == theirs_source
+          return nil if base_source != ours_source && base_source != theirs_source
+
+          next unless base_source == ours_source
+
+          replacements << {
+            path: "/method:#{signature.first}",
+            start_line: ours_method.location.start_line,
+            end_line: ours_method.location.end_line,
+            source: theirs_source,
+            source_role: :theirs
+          }
+        end
+        replacements
+      end
+
+      def node_source(source, node)
+        lines = source.lines
+        lines[node.location.start_line - 1, node.location.end_line - node.location.start_line + 1].join
       end
 
       def composite_fragments(documents, decision)

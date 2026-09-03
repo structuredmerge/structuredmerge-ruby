@@ -215,7 +215,7 @@ module Markdown
           role = decision.choices.fetch(id)
           [documents.fetch(role).by_id.fetch(id), role]
         end
-        output = fragments.map { |owner, _role| owner.source_text }.join
+        output = composite_prefix(documents, :current) + fragments.map { |owner, _role| owner.source_text }.join
         expected = fragments.map { |owner, _role| [owner.signature, owner.fingerprint] }
         verification = verify_composite(output, expected)
         unless verification[:semantic_match]
@@ -276,13 +276,16 @@ module Markdown
         headings = parsed.fetch(:headings)
         return { unsafe: :headingless_document, source_role: role } if headings.empty?
         return { unsafe: :setext_heading, source_role: role } unless headings.all? { |heading| heading.style == :atx }
-        return { unsafe: :nested_heading_hierarchy, source_role: role } unless headings.map(&:level).uniq.one?
+        headings = independently_ownable_headings(headings)
+        return { unsafe: :nested_heading_hierarchy, source_role: role } if headings.empty?
 
         starts = headings.map(&:start_line).map { |line| line_start_byte(source, line) }
         if starts.any?(&:nil?) || starts != starts.sort.uniq
           return { unsafe: :invalid_heading_start, source_role: role }
         end
-        return { unsafe: :source_before_first_section, source_role: role } unless starts.first.zero?
+        unless starts.first.zero? || heading_only_prefix?(source, parsed.fetch(:headings), starts.first)
+          return { unsafe: :source_before_first_section, source_role: role }
+        end
 
         owners = headings.each_with_index.map do |heading, index|
           signature = [heading.level, heading.text].freeze
@@ -312,6 +315,27 @@ module Markdown
         )
       rescue StandardError => e
         { parse_error: e.message, source_role: role }
+      end
+
+      # A nested heading is ownable when it has no descendant headings. Ancestor
+      # headings remain unmanaged framing, so edits to them still fail closed.
+      def independently_ownable_headings(headings)
+        headings.each_with_index.reject do |heading, index|
+          headings[(index + 1)..].any? do |candidate|
+            candidate.level > heading.level &&
+              headings[(index + 1)..].take_while { |item| item.level > heading.level }.include?(candidate)
+          end
+        end.map(&:first)
+      end
+
+      def heading_only_prefix?(source, headings, first_owner_start)
+        prefix = source.byteslice(0...first_owner_start).to_s
+        heading_lines = headings.select { |heading| line_start_byte(source, heading.start_line) < first_owner_start }
+        heading_lines.any? && prefix.lines.all? do |line|
+          line.strip.empty? || heading_lines.any? do |heading|
+            line.strip.match?(/\A\#{1,6}\s+#{Regexp.escape(heading.text.to_s)}\s*\z/)
+          end
+        end
       end
 
       def parse_exact_source(source, role)
@@ -543,7 +567,7 @@ module Markdown
           owner = role && documents.fetch(role).by_id[id]
           owner && [owner, role]
         end
-        output = fragments.map { |owner, _role| owner.source_text }.join
+        output = composite_prefix(documents) + fragments.map { |owner, _role| owner.source_text }.join
         expected = fragments.map { |owner, _role| [owner.signature, owner.fingerprint] }
         verification = verify_composite(output, expected)
         return render_failure(request, verification, :exact_markdown_composite, decision.changes) unless
@@ -639,6 +663,14 @@ module Markdown
           end,
           synthesized_fragments: []
         }
+      end
+
+      def composite_prefix(documents, role = :ours)
+        document = documents.fetch(role)
+        first_owner = document.owners.first
+        return '' unless first_owner
+
+        document.source.byteslice(0...first_owner.start_byte).to_s
       end
 
       def render_conflicts(request, documents, decision)

@@ -197,14 +197,25 @@ RSpec.shared_examples 'Markdown::Merge::SourcePreservingProvider' do
       expect(result.dig(:render_report, :strategy)).to eq(:full_file_conflict)
     end
 
-    expect(provider.analyze(source: "# Alpha\n\n## Nested\n\ntext\n")).to include(
-      ok: false,
-      diagnostics: include(hash_including(category: :unsafe_source_range))
-    )
+    expect(provider.analyze(source: "# Alpha\n\n## Nested\n\ntext\n")).to include(ok: true)
     expect(provider.analyze(source: "headingless prose\n")).to include(
       ok: false,
       diagnostics: include(hash_including(category: :unsafe_source_range))
     )
+  end
+
+  it 'merges independent nested leaf heading edits while preserving ancestor framing' do
+    result = provider.merge3(
+      base_source: "# Guide\n\n## Left\nOne.\n\n## Right\nOne.\n",
+      ours_source: "# Guide\n\n## Left\nTwo.\n\n## Right\nOne.\n",
+      theirs_source: "# Guide\n\n## Left\nOne.\n\n## Right\nTwo.\n"
+    )
+
+    expect(result).to include(
+      ok: true,
+      output: "# Guide\n\n## Left\nTwo.\n\n## Right\nTwo.\n"
+    )
+    expect(result.dig(:verification, :semantic_match)).to be(true)
   end
 
   it 'fails closed for setext headings and non-whitespace prose outside sections' do
