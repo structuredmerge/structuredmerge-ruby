@@ -114,13 +114,21 @@ RSpec.describe Ast::Merge::Git::Corpus do
     corpora = paths.map { |path| described_class.load(path) }
 
     expect(paths.map(&:basename).map(&:to_s)).to eq(
-      %w[manifest.alef.json manifest.git-bash.json manifest.json manifest.typescript.json]
+      %w[
+        manifest.alef.json
+        manifest.cargo-toml.json
+        manifest.git-bash.json
+        manifest.json
+        manifest.kubernetes.json
+        manifest.rbs.json
+        manifest.typescript.json
+      ]
     )
     expect(corpora).to all(satisfy(&:validate!))
-    expect(corpora.sum { |corpus| corpus.manifest.fetch('cases').length }).to eq(9)
+    expect(corpora.sum { |corpus| corpus.manifest.fetch('cases').length }).to eq(13)
     expect(corpora.sum do |corpus|
       corpus.manifest.fetch('cases').count { |item| item.dig('oracle', 'score_eligible') }
-    end).to eq(6)
+    end).to eq(10)
     expect(corpora).to all(satisfy do |corpus|
       corpus.manifest.dig('claim_policy', 'quality_claims_allowed') == false
     end)
