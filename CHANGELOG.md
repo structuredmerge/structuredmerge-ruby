@@ -51,6 +51,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Validate the expanded reviewed-history corpus, including pinned Alef Rust
   source and Markdown conflict resolutions, a clean JSON schema merge, and
   reviewed Cargo TOML, Kubernetes Go/YAML, and RBS histories.
+- Record the Git baseline executable path, version, and digest in benchmark
+  environment provenance.
 
 ### Changed
 

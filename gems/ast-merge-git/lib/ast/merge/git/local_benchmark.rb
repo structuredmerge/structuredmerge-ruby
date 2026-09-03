@@ -1676,6 +1676,7 @@ module Ast
             TSLP_DEV
           ].to_h { |name| [name, ENV[name]] }
           {
+            'git' => git_environment,
             'ruby' => RUBY_DESCRIPTION,
             'ruby_engine' => defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby',
             'ruby_version' => RUBY_VERSION,
@@ -1686,6 +1687,22 @@ module Ast
             'host_cpu' => RbConfig::CONFIG['host_cpu'],
             'allowlisted_env' => allowlisted
           }
+        end
+
+        def git_environment
+          executable, = Open3.capture2('sh', '-c', 'command -v git')
+          version, status = Open3.capture2('git', '--version')
+          return { 'available' => false } unless status.success?
+
+          path = Pathname(executable.strip)
+          {
+            'available' => true,
+            'path' => path.to_s,
+            'version' => version.strip,
+            'sha256' => path.file? ? Digest::SHA256.file(path).hexdigest : nil
+          }
+        rescue SystemCallError
+          { 'available' => false }
         end
 
         def canonical_digest(value)

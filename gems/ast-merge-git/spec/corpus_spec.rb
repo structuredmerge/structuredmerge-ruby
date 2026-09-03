@@ -157,6 +157,19 @@ RSpec.describe Ast::Merge::Git::Corpus do
     expect(result.dig(:candidate, :runtime_comparable)).to be(false)
   end
 
+  it 'records the Git executable identity used by the baseline' do
+    runner = Ast::Merge::Git::LocalBenchmarkRunner.new(
+      benchmark: described_class.new(synthetic_manifest),
+      driver_path: Gem.bin_path('ast-merge-git', 'ast-merge-git'),
+      tmp_root: Pathname(__dir__).join('..', 'tmp', 'git-identity').expand_path
+    )
+    environment = runner.send(:benchmark_environment)
+
+    expect(environment.fetch('git')).to include('available' => true)
+    expect(environment.dig('git', 'version')).to start_with('git version ')
+    expect(environment.dig('git', 'sha256')).to match(/\A[0-9a-f]{64}\z/)
+  end
+
   it 'rejects octopus metadata and premature score eligibility' do
     manifest = synthetic_manifest
     octopus = Marshal.load(Marshal.dump(manifest))
