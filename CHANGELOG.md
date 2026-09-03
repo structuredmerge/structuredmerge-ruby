@@ -48,6 +48,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Add a reviewed Python `merge3` gold case for the explicitly limited Rust
   generic TSLP provider, including deterministic changed-path selection without
   claiming a Ruby Python provider or adding it to the mandatory GM profile.
+- Validate the expanded reviewed-history corpus, including pinned Alef Rust
+  source and Markdown changelog conflict resolutions.
 
 ### Changed
 
