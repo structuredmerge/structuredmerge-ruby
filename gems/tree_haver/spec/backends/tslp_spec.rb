@@ -134,6 +134,40 @@ RSpec.describe TreeHaver::Backends::Tslp do
     expect(tree.root_node.end_point).to eq({ row: 0, column: 9 })
   end
 
+  it 'retags valid UTF-8 filesystem bytes without transcoding before TSLP parsing' do
+    source = "{\"label\":\"caf\u00e9\"}".b
+    raw_tree = double('TreeSitterLanguagePack::Tree')
+    parser = double('TreeSitterLanguagePack::Parser', parse: raw_tree)
+    allow(described_class).to receive(:available?).and_return(true)
+    stub_const('TreeSitterLanguagePack', Module.new)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('json').and_return(parser)
+
+    tree_haver_parser = described_class::Parser.new
+    tree_haver_parser.language = described_class::Language.new(:json)
+    tree_haver_parser.parse(source)
+
+    expect(parser).to have_received(:parse) do |parsed_source|
+      expect(parsed_source.encoding).to eq(Encoding::UTF_8)
+      expect(parsed_source.b).to eq(source)
+    end
+    expect(source.encoding).to eq(Encoding::BINARY)
+  end
+
+  it 'does not relabel invalid binary source as UTF-8' do
+    source = "{\"label\":\"\xFF\"}".b
+    raw_tree = double('TreeSitterLanguagePack::Tree')
+    parser = double('TreeSitterLanguagePack::Parser', parse: raw_tree)
+    allow(described_class).to receive(:available?).and_return(true)
+    stub_const('TreeSitterLanguagePack', Module.new)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('json').and_return(parser)
+
+    tree_haver_parser = described_class::Parser.new
+    tree_haver_parser.language = described_class::Language.new(:json)
+    tree_haver_parser.parse(source)
+
+    expect(parser).to have_received(:parse).with(source)
+  end
+
   it 'can parse through a real TSLP language when the installed binding exposes parser methods' do
     begin
       require 'tree_sitter_language_pack'

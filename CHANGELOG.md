@@ -59,6 +59,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Let TreeHaver's TSLP adapter parse valid UTF-8 filesystem bytes whose Ruby
+  string is binary-labelled, without transcoding bytes or accepting invalid
+  UTF-8 as text.
 - Preserve destination-customized Markdown heading sections during provider `merge2`, insert parser-proven incoming-only sections according to shared ordering constraints, and reuse this source-preserving behavior across TSLP, Markly, Commonmarker, and Kramdown providers.
 - Let the RBS workflow provider honor explicit native RBS or TSLP TreeHaver selection, including the canonical `kreuzberg-language-pack` selector, across analysis, diff, and two- or three-way merge operations; route two-way operations through the RBS substrate so destination customizations survive; and reject TSLP's embedded inline-RBS parse mode for document merges.
 - Normalize object and hash tree-sitter points in shared line-range mechanics, and let RBS wrappers reuse that contract so TSLP merges do not fail on point shape.

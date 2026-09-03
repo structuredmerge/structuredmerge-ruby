@@ -163,13 +163,21 @@ module TreeHaver
           parser = ::TreeSitterLanguagePack.get_parser(language.name.to_s)
           raise TreeHaver::NotAvailable, "TSLP did not return a parser for #{language.name}" unless parser
 
-          raw_tree = parser.parse(source)
+          normalized_source = normalize_source_encoding(source)
+          raw_tree = parser.parse(normalized_source)
           raise TreeHaver::NotAvailable, "TSLP did not return a parse tree for #{language.name}" unless raw_tree
 
-          Tree.new(raw_tree, source: source, language: language.name)
+          Tree.new(raw_tree, source: normalized_source, language: language.name)
         end
 
         private
+
+        def normalize_source_encoding(source)
+          return source unless source.encoding == Encoding::BINARY
+
+          utf8 = source.dup.force_encoding(Encoding::UTF_8)
+          utf8.valid_encoding? ? utf8 : source
+        end
 
         def unavailable_message
           reason = Tslp.unavailable_reason
