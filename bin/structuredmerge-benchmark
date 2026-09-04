@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 ruby_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
 benchmark_root="${ruby_root}/gems/ast-merge-git"
+default_corpus="${ruby_root}/../fixtures/diagnostics/slice-1023-local-paired-benchmark/corpus.json"
 
 if [[ ! -d "${benchmark_root}" ]]; then
   printf 'structuredmerge-benchmark: missing benchmark gem: %s\n' "${benchmark_root}" >&2
@@ -13,4 +14,16 @@ fi
 # Force every benchmark worker to resolve the current monorepo providers.
 export STRUCTUREDMERGE_DEV="${ruby_root}/gems"
 export BUNDLE_GEMFILE="${benchmark_root}/Gemfile"
+has_corpus=false
+for argument in "$@"; do
+  if [[ "${argument}" == '--corpus' || "${argument}" == --corpus=* ]]; then
+    has_corpus=true
+    break
+  fi
+done
+if [[ "${has_corpus}" == false && -f "${default_corpus}" ]]; then
+  command="${1:?benchmark command is required}"
+  shift
+  set -- "${command}" --corpus "${default_corpus}" "$@"
+fi
 exec bundle exec ast-merge-git benchmark "$@"

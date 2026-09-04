@@ -154,13 +154,15 @@ Bundler and its cold worker processes use the current sibling provider gems:
 
 ```shell
 /path/to/structuredmerge/ruby/bin/structuredmerge-benchmark report \
-  --corpus path/to/corpus.json --profile micro --workers 4
+  --profile micro --workers 4
 ```
 
 The launcher forces `STRUCTUREDMERGE_DEV` to its own checkout. Without it,
 Bundler may select installed provider releases. The benchmark records an
 unavailable provider as an error and includes its structured diagnostic rather
-than silently substituting another provider.
+than silently substituting another provider. With the canonical sibling
+fixtures checkout present, the launcher uses its reviewed local corpus by
+default; pass `--corpus PATH` to select another corpus.
 
 When benchmarking another StructuredMerge runtime, pass its versioned identity,
 source checkout, provider selection, and runtime details with
