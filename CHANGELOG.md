@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Add a repository-local benchmark report formatter that writes stable,
+  idempotent Markdown tables from JSON reports or standard input.
 - Make the repository-local benchmark launcher use the canonical reviewed sibling corpus by default while retaining explicit corpus selection.
 - Add a repository-local benchmark launcher that forces all cold workers to use the current StructuredMerge monorepo providers.
 - Preserve structured provider diagnostics in merge2 benchmark results so installed-stack and local-provider mismatches identify the actual unavailable provider.

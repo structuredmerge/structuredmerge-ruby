@@ -1,0 +1,108 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+require 'optparse'
+
+def table(headers, rows)
+  escape = ->(value) { value.to_s.gsub('|', '\\|').gsub("\n", '<br>') }
+  [
+    "| #{headers.map { |header| escape.call(header) }.join(' | ')} |",
+    "| #{headers.map { '---' }.join(' | ')} |",
+    *rows.map { |row| "| #{row.map { |value| escape.call(value) }.join(' | ')} |" }
+  ].join("\n")
+end
+
+def gate_result(value)
+  value.to_s == 'pass' ? 'PASS' : 'FAIL'
+end
+
+def format_duration(nanoseconds)
+  return 'n/a' unless nanoseconds
+
+  format('%.3fs', nanoseconds.to_f / 1_000_000_000)
+end
+
+options = {marker: 'structuredmerge-benchmark-report'}
+parser = OptionParser.new do |opts|
+  opts.banner = 'usage: structuredmerge-benchmark-markdown REPORT|- [MARKDOWN|-] [options]'
+  opts.on('--marker NAME', 'managed block marker name') { |value| options[:marker] = value }
+end
+
+begin
+  parser.parse!(ARGV)
+  input_path = ARGV.shift || '-'
+  output_path = ARGV.shift || '-'
+  report = JSON.parse(input_path == '-' ? $stdin.read : File.binread(input_path))
+  coverage = report.dig('dimensions', 'coverage') || {}
+
+  markdown = []
+  markdown << "## StructuredMerge Benchmark"
+  markdown << ''
+  markdown << table(
+    %w[Property Value],
+    [
+      ['Profile', report.dig('selection', 'profile') || 'unknown'],
+      ['Corpus', report['corpus_id'] || 'unknown'],
+      ['Selected cases', coverage['selected_cases']],
+      ['Executed cases', coverage['executed_candidate_cases']],
+      ['Unsupported cases', coverage['unsupported_case_ids']&.length || 0],
+      ['Hard gates', report['hard_gate_failed'] ? 'FAIL' : 'PASS']
+    ]
+  )
+  markdown << ''
+  markdown << '### Quality Gates'
+  markdown << ''
+  markdown << table(
+    %w[Gate Result Details],
+    [
+      ['Safety', gate_result(report.dig('dimensions', 'safety', 'gate')), "eligible: #{report.dig('dimensions', 'safety', 'eligible') || 0}"],
+      ['Preservation', gate_result(report.dig('dimensions', 'preservation', 'gate')), "eligible: #{report.dig('dimensions', 'preservation', 'eligible') || 0}"],
+      ['Reliability', gate_result(report.dig('dimensions', 'reliability', 'gate')), "errors: #{report.dig('dimensions', 'reliability', 'error_result_ids')&.length || 0}"],
+      ['Coverage', coverage['unsupported_case_ids']&.empty? ? 'PASS' : 'REVIEW', "unsupported: #{coverage['unsupported_case_ids']&.length || 0}"]
+    ]
+  )
+  markdown << ''
+  markdown << '### Effectiveness'
+  markdown << ''
+  effectiveness = report.dig('dimensions', 'effectiveness') || {}
+  markdown << table(
+    %w[Outcome Count],
+    effectiveness.keys.sort.map { |outcome| [outcome, effectiveness[outcome]] }
+  )
+  performance = report.dig('dimensions', 'performance') || {}
+  unless performance.empty?
+    markdown << ''
+    markdown << '### Performance'
+    markdown << ''
+    markdown << table(
+      ['Adapter', 'Samples', 'Total'],
+      performance.keys.sort.map do |adapter|
+        evidence = performance.fetch(adapter)
+        [adapter, evidence['samples'], format_duration(evidence['total_ns'])]
+      end
+    )
+  end
+  generated = markdown.join("\n")
+
+  if output_path == '-'
+    puts generated
+  else
+    existing = File.file?(output_path) ? File.binread(output_path) : ''
+    open_marker = "<!-- #{options[:marker]}:start -->"
+    close_marker = "<!-- #{options[:marker]}:end -->"
+    block = [open_marker, generated, close_marker].join("\n")
+    pattern = /#{Regexp.escape(open_marker)}.*?#{Regexp.escape(close_marker)}/m
+    updated = if existing.match?(pattern)
+                existing.sub(pattern, block)
+              elsif existing.empty?
+                "#{block}\n"
+              else
+                "#{existing.rstrip}\n\n#{block}\n"
+              end
+    File.binwrite(output_path, updated) unless updated == existing
+  end
+rescue JSON::ParserError, Errno::ENOENT, OptionParser::ParseError => e
+  warn "structuredmerge-benchmark-markdown: #{e.message}"
+  exit 2
+end

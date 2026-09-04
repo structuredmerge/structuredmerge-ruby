@@ -157,6 +157,19 @@ Bundler and its cold worker processes use the current sibling provider gems:
   --profile micro --workers 4
 ```
 
+The JSON report can be rendered into a managed Markdown section. The formatter
+accepts a report path or standard input and an optional Markdown destination:
+
+```shell
+/path/to/structuredmerge/ruby/bin/structuredmerge-benchmark report \
+  --profile micro --workers 4 \
+  | /path/to/structuredmerge/ruby/bin/structuredmerge-benchmark-markdown - benchmark-results.md
+```
+
+The destination is updated between `structuredmerge-benchmark-report` markers,
+or the section is appended when the markers are absent. Re-running the command
+is idempotent. Pass `--marker NAME` to use a different managed block name.
+
 The launcher forces `STRUCTUREDMERGE_DEV` to its own checkout. Without it,
 Bundler may select installed provider releases. The benchmark records an
 unavailable provider as an error and includes its structured diagnostic rather
