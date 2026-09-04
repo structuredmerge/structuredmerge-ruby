@@ -133,12 +133,33 @@ invalid provider output, configuration failures, and file errors exit `2`.
 ## Benchmarking
 
 Use `benchmark run` and `benchmark report` for cold-process correctness
-classification. Use `benchmark performance` to send repeated binary-safe JSONL
-requests through one persistent Ruby process without scoring those warm-process
-results as correctness evidence.
+classification. `run` emits the complete per-case evidence; `report` emits a
+smaller paired aggregate with gates, counts, transitions, and performance
+totals. Use `benchmark performance` to send repeated binary-safe JSONL requests
+through one persistent Ruby process without scoring those warm-process results
+as correctness evidence.
 Performance output reports process spawn, adapter execution, JSONL/IPC harness
 overhead, and total round-trip time separately; the first request is identified
 as startup/loading evidence instead of a warm sample.
+
+### Profiles
+
+Every corpus provides four profiles. The profile changes case selection and
+competitor policy; it does not change the merge implementation or correctness
+rules.
+
+| Profile | Selection | Competitors | Purpose |
+| --- | --- | --- | --- |
+| `micro` | Mandatory sentinels only | None | Fast smoke check for local development. |
+| `dev` | Sentinels, changed-path cases, and deterministic neighbors | None | Focused validation after a source change. |
+| `nightly` | Full corpus | None | Full StructuredMerge correctness and preservation run. |
+| `competitive` | Full corpus | Configured competitors | Compare StructuredMerge with explicitly configured tools. |
+
+`micro` is the default only because it is the safe, fast starting point. It is
+not the only report type or a substitute for the other profiles. `dev` is most
+useful with one or more `--changed-path` options. `competitive` requires the
+competitor adapter options configured by the corpus and is intended for
+comparison runs, not ordinary smoke checks.
 
 Correctness runs accept `--workers COUNT` to distribute independent cases
 across a bounded set of worker processes. Results retain corpus order regardless
@@ -146,6 +167,12 @@ of completion order; the run records the requested, used, and actual worker
 process IDs.
 
 ```shell
+ast-merge-git benchmark validate --corpus path/to/corpus.json
+ast-merge-git benchmark select --corpus path/to/corpus.json --profile dev \
+  --changed-path gems/json-merge/lib/json/merge.rb
+ast-merge-git benchmark run --corpus path/to/corpus.json --profile nightly --workers 4
+ast-merge-git benchmark report --corpus path/to/corpus.json --profile competitive \
+  --mergiraf path/to/mergiraf
 ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev --iterations 5
 ```
 
@@ -157,18 +184,33 @@ Bundler and its cold worker processes use the current sibling provider gems:
   --profile micro --workers 4
 ```
 
-Run `bin/structuredmerge-benchmark --help` for the complete command and option
-reference. The wrapper supports `validate`, `select`, `run`, `report`, and
-`performance`; `report` is usually the right command for a Markdown summary.
+The repository wrapper defaults to the canonical local corpus and local source
+gems. These commands exercise the four profiles directly:
+
+```shell
+bin/structuredmerge-benchmark report --profile micro --workers 4
+bin/structuredmerge-benchmark report --profile dev \
+  --changed-path gems/json-merge/lib/json/merge.rb
+bin/structuredmerge-benchmark report --profile nightly --workers 4
+bin/structuredmerge-benchmark report --profile competitive \
+  --mergiraf /path/to/mergiraf
+```
+
+Run `bin/structuredmerge-benchmark --help` for the complete command, profile,
+and option reference.
 
 The JSON report can be rendered into a managed Markdown section. The formatter
 accepts a report path or standard input and an optional Markdown destination:
 
 ```shell
 /path/to/structuredmerge/ruby/bin/structuredmerge-benchmark report \
-  --profile micro --workers 4 \
+  --profile nightly --workers 4 \
   | /path/to/structuredmerge/ruby/bin/structuredmerge-benchmark-markdown - benchmark-results.md
 ```
+
+The formatter consumes aggregate `report` JSON, not raw `run` or
+`performance` JSON. Choose the profile on the benchmark command before the
+pipe; the Markdown output records which profile produced it.
 
 The destination is updated between `structuredmerge-benchmark-report` markers,
 or the section is appended when the markers are absent. Re-running the command

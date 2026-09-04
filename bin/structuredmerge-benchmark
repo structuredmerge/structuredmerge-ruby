@@ -16,14 +16,23 @@ Commands:
   report         Execute cases and print the aggregate report as JSON.
   performance    Measure repeated warm adapter requests as JSON.
 
+Profiles:
+  micro          Mandatory sentinel cases only. Fast smoke check (default).
+  dev            Sentinels plus cases affected by --changed-path and a small
+                 deterministic neighbor sample.
+  nightly        Full corpus correctness run without competitors.
+  competitive    Full corpus run with configured competitor adapters. This is
+                 the only profile that accepts competitor options.
+
 Options are passed through to ast-merge-git. Common options:
   --corpus PATH              Corpus to use. Defaults to the sibling reviewed
                              corpus when it exists.
-  --profile NAME             micro, dev, nightly, or competitive (default:
-                             micro).
+  --profile NAME             Select a profile (default: micro).
   --workers COUNT            Cold-process worker count (default: 1).
   --changed-path PATH        Select cases affected by a changed path.
   --adapter-descriptor PATH  Describe a non-default benchmark adapter.
+  --mergiraf PATH             Configure the pinned Mergiraf competitor
+                             (competitive profile only).
   --driver PATH              Benchmark driver executable.
   --tmp-root PATH            Temporary benchmark directory.
   --help                     Show this help.
@@ -31,6 +40,9 @@ Options are passed through to ast-merge-git. Common options:
 Examples:
   structuredmerge-benchmark report --profile micro --workers 4
   structuredmerge-benchmark run --corpus /path/to/corpus.json --profile dev
+  structuredmerge-benchmark report --profile dev --changed-path gems/json-merge/lib/json/merge.rb
+  structuredmerge-benchmark report --profile nightly --workers 4
+  structuredmerge-benchmark report --profile competitive --mergiraf /path/to/mergiraf
   structuredmerge-benchmark performance --profile micro --iterations 5
 
 To render a report as Markdown, pipe report output to:
