@@ -157,9 +157,10 @@ rules.
 
 `micro` is the default only because it is the safe, fast starting point. It is
 not the only report type or a substitute for the other profiles. `dev` is most
-useful with one or more `--changed-path` options. `competitive` requires the
-competitor adapter options configured by the corpus and is intended for
-comparison runs, not ordinary smoke checks.
+useful with one or more `--changed-path` options. `competitive` requires one or
+more explicit competitor executable options. The corpus describes which
+competitors are admissible, but the runner does not discover or download them.
+The current CLI adapter is Mergiraf, supplied with `--mergiraf PATH`.
 
 Correctness runs accept `--workers COUNT` to distribute independent cases
 across a bounded set of worker processes. Results retain corpus order regardless
@@ -210,7 +211,10 @@ accepts a report path or standard input and an optional Markdown destination:
 
 The formatter consumes aggregate `report` JSON, not raw `run` or
 `performance` JSON. Choose the profile on the benchmark command before the
-pipe; the Markdown output records which profile produced it.
+pipe; the Markdown output records which profile produced it. Competitive
+reports include competitor coverage and outcome summaries only when an adapter
+was actually supplied; selecting `--profile competitive` alone produces no
+competitor results.
 
 The destination is updated between `structuredmerge-benchmark-report` markers,
 or the section is appended when the markers are absent. Re-running the command
