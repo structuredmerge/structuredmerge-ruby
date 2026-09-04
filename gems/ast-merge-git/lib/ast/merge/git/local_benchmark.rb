@@ -936,6 +936,7 @@ module Ast
             chdir: workspace
           )
           result = capture[:stdout].empty? ? {} : JSON.parse(capture[:stdout])
+          capture[:stderr] = provider_diagnostics(result, capture[:stderr])
           capture[:output] = capture[:status].zero? ? result.fetch('output') : ''
           raw_result(item, 'ast-merge-provider.merge2', capture)
         rescue JSON::ParserError, KeyError => e
@@ -944,6 +945,14 @@ module Ast
           capture[:status] = 2
           capture[:output] = ''
           raw_result(item, 'ast-merge-provider.merge2', capture)
+        end
+
+        def provider_diagnostics(result, stderr)
+          diagnostics = Array(result['diagnostics']).filter_map do |diagnostic|
+            message = diagnostic['message'] || diagnostic[:message]
+            message && "#{diagnostic['category'] || diagnostic[:category]}: #{message}"
+          end
+          [stderr, *diagnostics].reject(&:empty?).join("\n")
         end
 
         def write_metamorphic_roles(item, workspace)
@@ -1440,7 +1449,7 @@ module Ast
           lines = stderr.lines.map(&:strip).reject(&:empty?)
           lines << unsupported_reason if unsupported_reason
           lines.map do |line|
-            match = /\A[^:\r\n]+: ([a-z_]+):/i.match(line)
+            match = /\A(?:[^:\r\n]+:\s+)?([a-z_]+):/i.match(line)
             category = match&.[](1) || (unsupported_reason == line ? 'unsupported' : 'process')
             { 'severity' => 'error', 'category' => category, 'message' => line }
           end

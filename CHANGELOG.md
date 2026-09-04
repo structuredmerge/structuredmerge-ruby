@@ -20,6 +20,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Preserve structured provider diagnostics in merge2 benchmark results so installed-stack and local-provider mismatches identify the actual unavailable provider.
 - Make YAML recursive resolution handle normalized `MappingEntry` nodes without assuming parser-wrapper predicates are present, restoring Psych provider conformance.
 - Make the local benchmark runner fail closed for non-Ruby corpus providers by recording them as unsupported coverage, support independently owned nested Markdown leaf sections while preserving ancestor framing, and compose independent direct-method edits inside Prism Ruby owners.
 - Add the generic `ruby.ruby` workflow provider over the Ruby substrate, accepting TreeHaver tree-sitter runtimes while keeping Prism as a distinct native backend provider.
