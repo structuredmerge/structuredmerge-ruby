@@ -149,18 +149,18 @@ process IDs.
 ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev --iterations 5
 ```
 
-When running from the StructuredMerge monorepo, point Bundler at the sibling
-provider gems so the benchmark and its cold worker processes use the same
-source revision:
+When running from the StructuredMerge monorepo, use the repository launcher so
+Bundler and its cold worker processes use the current sibling provider gems:
 
 ```shell
-STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems \
-  bundle exec ast-merge-git benchmark report --corpus path/to/corpus.json --profile micro --workers 4
+/path/to/structuredmerge/ruby/bin/structuredmerge-benchmark report \
+  --corpus path/to/corpus.json --profile micro --workers 4
 ```
 
-Without this override, Bundler may select installed provider releases. The
-benchmark records an unavailable provider as an error and includes its
-structured diagnostic rather than silently substituting another provider.
+The launcher forces `STRUCTUREDMERGE_DEV` to its own checkout. Without it,
+Bundler may select installed provider releases. The benchmark records an
+unavailable provider as an error and includes its structured diagnostic rather
+than silently substituting another provider.
 
 When benchmarking another StructuredMerge runtime, pass its versioned identity,
 source checkout, provider selection, and runtime details with
