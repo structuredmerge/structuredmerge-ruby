@@ -157,6 +157,10 @@ Bundler and its cold worker processes use the current sibling provider gems:
   --profile micro --workers 4
 ```
 
+Run `bin/structuredmerge-benchmark --help` for the complete command and option
+reference. The wrapper supports `validate`, `select`, `run`, `report`, and
+`performance`; `report` is usually the right command for a Markdown summary.
+
 The JSON report can be rendered into a managed Markdown section. The formatter
 accepts a report path or standard input and an optional Markdown destination:
 
@@ -168,7 +172,8 @@ accepts a report path or standard input and an optional Markdown destination:
 
 The destination is updated between `structuredmerge-benchmark-report` markers,
 or the section is appended when the markers are absent. Re-running the command
-is idempotent. Pass `--marker NAME` to use a different managed block name.
+is idempotent. Pass `--marker NAME` to use a different managed block name. Run
+`bin/structuredmerge-benchmark-markdown --help` for the input/output details.
 
 The launcher forces `STRUCTUREDMERGE_DEV` to its own checkout. Without it,
 Bundler may select installed provider releases. The benchmark records an

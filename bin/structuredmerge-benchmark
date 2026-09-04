@@ -1,6 +1,54 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  cat <<'USAGE'
+Usage: structuredmerge-benchmark COMMAND [OPTIONS]
+
+Run the local ast-merge-git benchmark against the current StructuredMerge
+monorepo sources. This wrapper sets STRUCTUREDMERGE_DEV and BUNDLE_GEMFILE so
+cold worker processes do not resolve installed provider releases.
+
+Commands:
+  validate       Validate a corpus without running cases.
+  select         Show the cases selected by a profile.
+  run            Execute cases and print raw run evidence as JSON.
+  report         Execute cases and print the aggregate report as JSON.
+  performance    Measure repeated warm adapter requests as JSON.
+
+Options are passed through to ast-merge-git. Common options:
+  --corpus PATH              Corpus to use. Defaults to the sibling reviewed
+                             corpus when it exists.
+  --profile NAME             micro, dev, nightly, or competitive (default:
+                             micro).
+  --workers COUNT            Cold-process worker count (default: 1).
+  --changed-path PATH        Select cases affected by a changed path.
+  --adapter-descriptor PATH  Describe a non-default benchmark adapter.
+  --driver PATH              Benchmark driver executable.
+  --tmp-root PATH            Temporary benchmark directory.
+  --help                     Show this help.
+
+Examples:
+  structuredmerge-benchmark report --profile micro --workers 4
+  structuredmerge-benchmark run --corpus /path/to/corpus.json --profile dev
+  structuredmerge-benchmark performance --profile micro --iterations 5
+
+To render a report as Markdown, pipe report output to:
+  bin/structuredmerge-benchmark-markdown - benchmark-results.md
+USAGE
+}
+
+if [[ "${1:-}" == '--help' || "${1:-}" == '-h' || $# -eq 0 ]]; then
+  usage
+  exit 0
+fi
+for argument in "$@"; do
+  if [[ "${argument}" == '--help' || "${argument}" == '-h' ]]; then
+    usage
+    exit 0
+  fi
+done
+
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 ruby_root="$(CDPATH= cd -- "${script_dir}/.." && pwd -P)"
 benchmark_root="${ruby_root}/gems/ast-merge-git"

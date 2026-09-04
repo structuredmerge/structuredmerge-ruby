@@ -25,8 +25,37 @@ end
 
 options = {marker: 'structuredmerge-benchmark-report'}
 parser = OptionParser.new do |opts|
-  opts.banner = 'usage: structuredmerge-benchmark-markdown REPORT|- [MARKDOWN|-] [options]'
+  opts.banner = 'Usage: structuredmerge-benchmark-markdown REPORT|- [MARKDOWN|-] [options]'
+  opts.separator ''
+  opts.separator 'Render an aggregate StructuredMerge benchmark JSON report as Markdown tables.'
+  opts.separator ''
+  opts.separator 'Arguments:'
+  opts.separator '  REPORT|-       JSON report path, or - to read JSON from standard input.'
+  opts.separator '  MARKDOWN|-     destination path, or - to write Markdown to standard output.'
+  opts.separator '                  Defaults to standard output.'
+  opts.separator ''
+  opts.separator 'Options:'
   opts.on('--marker NAME', 'managed block marker name') { |value| options[:marker] = value }
+  opts.on('-h', '--help', 'show this help') do
+    puts opts
+    puts <<~TEXT
+
+      Examples:
+        structuredmerge-benchmark report --profile micro --workers 4 | structuredmerge-benchmark-markdown - benchmark-results.md
+        structuredmerge-benchmark-markdown report.json benchmark-results.md
+        structuredmerge-benchmark-markdown report.json --marker nightly-report
+
+      The destination is updated between HTML markers named
+      structuredmerge-benchmark-report:start and :end. Existing content outside
+      those markers is preserved. Re-running the command is idempotent.
+    TEXT
+    exit 0
+  end
+end
+
+if ARGV.empty?
+  puts parser
+  exit 0
 end
 
 begin
