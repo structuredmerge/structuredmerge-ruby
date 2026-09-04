@@ -72,13 +72,38 @@ begin
     %w[Property Value],
     [
       ['Profile', report.dig('selection', 'profile') || 'unknown'],
+      ['Selection mode', report.dig('selection', 'selection_mode') || 'unknown'],
+      ['Competitor policy', report.dig('selection', 'competitor_policy') || 'none'],
       ['Corpus', report['corpus_id'] || 'unknown'],
       ['Selected cases', coverage['selected_cases']],
       ['Executed cases', coverage['executed_candidate_cases']],
       ['Unsupported cases', coverage['unsupported_case_ids']&.length || 0],
+      ['Changed paths', Array(report.dig('selection', 'changed_paths')).length],
       ['Hard gates', report['hard_gate_failed'] ? 'FAIL' : 'PASS']
     ]
   )
+  selection = report['selection'] || {}
+  selected_case_ids = Array(selection['selected_case_ids'])
+  excluded_case_ids = Array(selection['excluded_case_ids'])
+  markdown << ''
+  markdown << '### Selection'
+  markdown << ''
+  markdown << table(
+    ['Group', 'Count'],
+    [
+      ['Selected', selected_case_ids.length],
+      ['Directly affected', Array(selection['direct_cases']).length],
+      ['Deterministic neighbors', Array(selection.dig('neighbor_sample', 'selected_case_ids')).length],
+      ['Excluded', excluded_case_ids.length]
+    ]
+  )
+  markdown << ''
+  markdown << '<details>'
+  markdown << '<summary>Selected case IDs</summary>'
+  markdown << ''
+  markdown << table(['Case ID'], selected_case_ids.map { |case_id| [case_id] })
+  markdown << ''
+  markdown << '</details>'
   markdown << ''
   markdown << '### Quality Gates'
   markdown << ''

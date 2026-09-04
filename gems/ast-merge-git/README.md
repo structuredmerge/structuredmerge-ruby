@@ -134,8 +134,8 @@ invalid provider output, configuration failures, and file errors exit `2`.
 
 Use `benchmark run` and `benchmark report` for cold-process correctness
 classification. `run` emits the complete per-case evidence; `report` emits a
-smaller paired aggregate with gates, counts, transitions, and performance
-totals. Use `benchmark performance` to send repeated binary-safe JSONL requests
+smaller paired aggregate with profile selection metadata, case IDs, gates,
+counts, transitions, and performance totals. Use `benchmark performance` to send repeated binary-safe JSONL requests
 through one persistent Ruby process without scoring those warm-process results
 as correctness evidence.
 Performance output reports process spawn, adapter execution, JSONL/IPC harness
