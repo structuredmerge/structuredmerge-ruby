@@ -33,6 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Apply StructuredMerge local template dependencies on the active development platform.
+
 ### Security
 
 ## [7.1.16] - 2026-09-01

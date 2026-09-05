@@ -1421,6 +1421,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(template).to include(
       "kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])"
     )
+    expect(template).not_to include("platform :mri do")
   end
 
   it "omits kettle-family from its own main Gemfile dependency token" do
