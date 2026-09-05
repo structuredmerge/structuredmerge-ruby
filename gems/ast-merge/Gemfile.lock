@@ -16,6 +16,15 @@ PATH
       tree_haver (= 7.1.7)
       version_gem (~> 1.1, >= 1.1.15)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/tree_haver
+  specs:
+    tree_haver (7.1.7)
+      citrus (~> 3.0)
+      parslet (~> 2.0)
+      tree_sitter_language_pack (>= 1.13.2, < 2.0)
+      version_gem (~> 1.1, >= 1.1.15)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -502,11 +511,6 @@ GEM
     toml-rb (4.2.1)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_haver (7.1.7)
-      citrus (~> 3.0)
-      parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.13.2, < 2.0)
-      version_gem (~> 1.1, >= 1.1.15)
     tree_sitter_language_pack (1.15.12-aarch64-linux)
       sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.15.12-arm64-darwin)
@@ -609,6 +613,7 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.8)
   stringio (>= 3.0)
+  tree_haver!
   turbo_tests2 (~> 3.2, >= 3.2.6)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.5)
