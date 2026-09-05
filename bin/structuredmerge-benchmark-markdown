@@ -166,6 +166,18 @@ begin
          outcome_summary(evidence['outcomes'] || {})]
       end
     )
+    configured = competitive['configured'] || {}
+    markdown << ''
+    markdown << '### Competitor Provenance'
+    markdown << ''
+    markdown << table(
+      ['Adapter', 'Reported version', 'Binary', 'Binary SHA-256'],
+      adapters.keys.sort.map do |adapter|
+        metadata = configured.fetch(adapter, {})
+        [adapter, metadata['reported_version'] || metadata['version'] || 'unknown',
+         metadata['binary_path'] || 'unknown', metadata['binary_sha256'] || 'unknown']
+      end
+    )
   end
   generated = markdown.join("\n")
 

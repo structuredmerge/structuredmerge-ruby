@@ -31,6 +31,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - Render configured competitor coverage and outcome summaries in competitive
   Markdown reports, and document that competitor executables must be supplied
   explicitly.
+- Expose the existing Git competitor adapter through `--git` so local
+  competitive runs can compare against the Git executable selected by PATH
+  without requiring the currently broken Mergiraf build.
+- Include competitor reported versions, executable paths, and binary digests in
+  the Markdown competitive report for reproducibility.
 - Make the repository-local benchmark launcher use the canonical reviewed sibling corpus by default while retaining explicit corpus selection.
 - Add a repository-local benchmark launcher that forces all cold workers to use the current StructuredMerge monorepo providers.
 - Preserve structured provider diagnostics in merge2 benchmark results so installed-stack and local-provider mismatches identify the actual unavailable provider.

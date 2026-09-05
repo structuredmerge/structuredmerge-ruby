@@ -160,7 +160,8 @@ not the only report type or a substitute for the other profiles. `dev` is most
 useful with one or more `--changed-path` options. `competitive` requires one or
 more explicit competitor executable options. The corpus describes which
 competitors are admissible, but the runner does not discover or download them.
-The current CLI adapter is Mergiraf, supplied with `--mergiraf PATH`.
+The CLI adapters are Git, supplied with `--git PATH`, and Mergiraf, supplied
+with `--mergiraf PATH`.
 
 Correctness runs accept `--workers COUNT` to distribute independent cases
 across a bounded set of worker processes. Results retain corpus order regardless
@@ -172,6 +173,8 @@ ast-merge-git benchmark validate --corpus path/to/corpus.json
 ast-merge-git benchmark select --corpus path/to/corpus.json --profile dev \
   --changed-path gems/json-merge/lib/json/merge.rb
 ast-merge-git benchmark run --corpus path/to/corpus.json --profile nightly --workers 4
+ast-merge-git benchmark report --corpus path/to/corpus.json --profile competitive \
+  --git /path/to/git
 ast-merge-git benchmark report --corpus path/to/corpus.json --profile competitive \
   --mergiraf path/to/mergiraf
 ast-merge-git benchmark performance --corpus path/to/corpus.json --profile dev --iterations 5
@@ -214,7 +217,8 @@ The formatter consumes aggregate `report` JSON, not raw `run` or
 pipe; the Markdown output records which profile produced it. Competitive
 reports include competitor coverage and outcome summaries only when an adapter
 was actually supplied; selecting `--profile competitive` alone produces no
-competitor results.
+competitor results. Competitive Markdown reports also include the reported
+tool version, binary path, and binary SHA-256 for reproducibility.
 
 The destination is updated between `structuredmerge-benchmark-report` markers,
 or the section is appended when the markers are absent. Re-running the command
