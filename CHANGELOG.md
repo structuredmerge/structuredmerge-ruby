@@ -91,6 +91,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Align generated modular development Gemfiles with the `nomono` 1.1.5
+  bootstrap requirement used by the owning Gemfiles.
 - Let TreeHaver's TSLP adapter parse valid UTF-8 filesystem bytes whose Ruby
   string is binary-labelled, without transcoding bytes or accepting invalid
   UTF-8 as text.
