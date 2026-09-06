@@ -161,9 +161,7 @@ module Rbs
 
       def parse_source(source, role, request)
         analysis = with_requested_backend(request) { FileAnalysis.new(source) }
-        unless analysis.errors.empty?
-          return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role }
-        end
+        return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role } unless analysis.errors.empty?
 
         owners = analysis.declarations.map do |declaration|
           wrapper = NodeWrapper.new(
@@ -204,9 +202,7 @@ module Rbs
 
       def parse_exact_source(source, role, request)
         analysis = with_requested_backend(request) { FileAnalysis.new(source) }
-        unless analysis.errors.empty?
-          return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role }
-        end
+        return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role } unless analysis.errors.empty?
 
         declarations = analysis.declarations.map do |declaration|
           wrapper = NodeWrapper.new(
