@@ -1096,6 +1096,28 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "passes the family-derived worker budget to appraisal generation" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-family-workers", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
+      allow(Etc).to receive(:nprocessors).and_return(22)
+
+      env = Kettle::Jem::Tasks::InstallTask.setup_command_env(
+        root,
+        "KETTLE_FAMILY_WAVE_JOBS" => "6"
+      )
+      expect(env).to include("APPRAISAL_JOBS" => "2")
+
+      explicit_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(
+        root,
+        "KETTLE_FAMILY_WAVE_JOBS" => "6",
+        "APPRAISAL_JOBS" => "5"
+      )
+      expect(explicit_env).to include("APPRAISAL_JOBS" => "5")
+    end
+  end
+
   it "preserves explicit checksum validation settings for setup commands" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

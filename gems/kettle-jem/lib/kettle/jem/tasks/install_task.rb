@@ -1290,6 +1290,7 @@ module Kettle
           command_env["K_JEM_TEMPLATING"] = "true" if templating_requested
           command_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = disable_checksum_validation unless disable_checksum_validation.nil?
           apply_kettle_family_local_install_env!(command_env)
+          apply_kettle_family_appraisal_workers!(command_env)
           command_env["K_JEM_TEMPLATING"] = if templating_requested && local_path_development_env?(command_env)
             "true"
           else
@@ -1337,6 +1338,17 @@ module Kettle
 
           kettle_root = kettle_family_dependency_root(marker)
           command_env["KETTLE_DEV_DEV"] = kettle_root if kettle_root && !command_env.key?("KETTLE_DEV_DEV")
+        end
+
+        # Appraisal generation is an install finishing step, so it runs after
+        # template recipe/file pools have completed. In a family template
+        # wave, keep its worker count within the same member budget unless the
+        # caller deliberately selected APPRAISAL_JOBS.
+        def apply_kettle_family_appraisal_workers!(command_env)
+          return if command_env.key?("APPRAISAL_JOBS")
+          return unless Kettle::Jem::Tasks::TemplateTask.family_wave_jobs(command_env)
+
+          command_env["APPRAISAL_JOBS"] = Kettle::Jem::Tasks::TemplateTask.default_thread_worker_count(command_env).to_s
         end
 
         def kettle_family_local_install_marker(command_env)
