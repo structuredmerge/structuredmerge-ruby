@@ -2,11 +2,11 @@
   ".simplecov:479300517": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:1441291970": [
+  "Rakefile:899392380": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [144, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [147, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -90,8 +90,8 @@
   "lib/yaml-merge.rb:3997364401": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`yaml-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/yaml/merge.rb:1698302426": [
-    [112, 5, 79, "Lint/ShadowedException: Do not shadow rescued Exceptions.", 514462306]
+  "lib/yaml/merge.rb:2464305459": [
+    [114, 5, 79, "Lint/ShadowedException: Do not shadow rescued Exceptions.", 514462306]
   ],
   "lib/yaml/merge/debug_logger.rb:1199302346": [
     [5, 5, 18, "Style/Documentation: Missing top-level documentation comment for `module Yaml::Merge::DebugLogger`.", 2665994874]
@@ -115,27 +115,27 @@
     [131, 7, 628, "Metrics/AbcSize: Assignment Branch Condition size for `scalar_text` is too high. [<4, 16, 7> 17.92/17]", 4064538637],
     [131, 7, 628, "Metrics/MethodLength: Method has too many lines. [15/10]", 4064538637]
   ],
-  "lib/yaml/merge/smart_merger.rb:3891369900": [
+  "lib/yaml/merge/smart_merger.rb:1222100112": [
     [5, 5, 17, "Style/Documentation: Missing top-level documentation comment for `class Yaml::Merge::SmartMerger`.", 497427992],
     [53, 7, 14, "Style/Documentation: Missing top-level documentation comment for `class Yaml::Merge::SmartMerger::Resolver`.", 246603789],
-    [53, 7, 11754, "Metrics/ClassLength: Class has too many lines. [222/100]", 3403485685],
+    [53, 7, 11960, "Metrics/ClassLength: Class has too many lines. [225/100]", 3403485685],
     [79, 9, 1732, "Metrics/AbcSize: Assignment Branch Condition size for `merge_node_lists` is too high. [<7, 16, 6> 18.47/17]", 450262146],
     [79, 9, 1732, "Metrics/MethodLength: Method has too many lines. [34/10]", 450262146],
     [79, 29, 145, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 2477726420],
-    [126, 9, 2387, "Metrics/AbcSize: Assignment Branch Condition size for `merge_matched_nodes` is too high. [<8, 18, 7> 20.9/17]", 2618134068],
-    [126, 9, 2387, "Metrics/MethodLength: Method has too many lines. [40/10]", 2618134068],
+    [126, 9, 2471, "Metrics/AbcSize: Assignment Branch Condition size for `merge_matched_nodes` is too high. [<8, 18, 7> 20.9/17]", 3769875990],
+    [126, 9, 2471, "Metrics/MethodLength: Method has too many lines. [40/10]", 3769875990],
     [126, 32, 186, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 3152212802],
     [140, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2087424909],
     [142, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 2937407567],
     [143, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 3781823699],
-    [170, 9, 2278, "Metrics/AbcSize: Assignment Branch Condition size for `merge_mapping_pair` is too high. [<14, 22, 7> 27/17]", 1090440619],
-    [170, 9, 2278, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_mapping_pair` is too high. [8/7]", 1090440619],
-    [170, 9, 2278, "Metrics/MethodLength: Method has too many lines. [42/10]", 1090440619],
-    [170, 31, 185, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 445012610],
-    [219, 42, 238, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 3756071712],
-    [220, 43, 15, "Lint/UnusedMethodArgument: Unused method argument - `template_owners`.", 4125284088],
-    [220, 83, 22, "Lint/UnusedMethodArgument: Unused method argument - `template_boundary_line`.", 1490012195],
-    [297, 9, 520, "Metrics/AbcSize: Assignment Branch Condition size for `emit_container_tail` is too high. [<4, 16, 6> 17.55/17]", 3480636332]
+    [174, 9, 2278, "Metrics/AbcSize: Assignment Branch Condition size for `merge_mapping_pair` is too high. [<14, 22, 7> 27/17]", 1090440619],
+    [174, 9, 2278, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_mapping_pair` is too high. [8/7]", 1090440619],
+    [174, 9, 2278, "Metrics/MethodLength: Method has too many lines. [42/10]", 1090440619],
+    [174, 31, 185, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 445012610],
+    [223, 42, 238, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 3756071712],
+    [224, 43, 15, "Lint/UnusedMethodArgument: Unused method argument - `template_owners`.", 4125284088],
+    [224, 83, 22, "Lint/UnusedMethodArgument: Unused method argument - `template_boundary_line`.", 1490012195],
+    [301, 9, 520, "Metrics/AbcSize: Assignment Branch Condition size for `emit_container_tail` is too high. [<4, 16, 6> 17.55/17]", 3480636332]
   ],
   "spec/fixtures_integration_spec.rb:2725675905": [
     [3, 1, 10020, "Metrics/BlockLength: Block has too many lines. [235/25]", 4279594244],
@@ -146,7 +146,7 @@
   "spec/retained_blank_gap_spec.rb:3080228732": [
     [5, 1, 914, "Metrics/BlockLength: Block has too many lines. [33/25]", 2851550009]
   ],
-  "yaml-merge.gemspec:842405845": [
+  "yaml-merge.gemspec:892976881": [
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [149, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
