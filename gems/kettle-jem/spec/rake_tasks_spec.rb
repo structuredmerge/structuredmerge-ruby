@@ -88,12 +88,49 @@ RSpec.describe Kettle::Jem do
     )
   end
 
+  it "allocates each templating member its share of CPUs left by a family wave" do
+    allow(Etc).to receive(:nprocessors).and_return(22)
+
+    expect(
+      Kettle::Jem::Tasks::TemplateTask.templating_run_options(
+        {"KETTLE_FAMILY_WAVE_JOBS" => "6"},
+        {}
+      )
+    ).to include(
+      recipe_planning_thread_workers: 2,
+      file_work_thread_workers: 2
+    )
+  end
+
+  it "caps family-provided internal workers at half the available CPUs" do
+    allow(Etc).to receive(:nprocessors).and_return(8)
+
+    expect(
+      Kettle::Jem::Tasks::TemplateTask.templating_run_options(
+        {"KETTLE_FAMILY_WAVE_JOBS" => "1"},
+        {}
+      )
+    ).to include(recipe_planning_thread_workers: 4, file_work_thread_workers: 4)
+  end
+
+  it "rejects an invalid family wave width" do
+    expect do
+      Kettle::Jem::Tasks::TemplateTask.templating_run_options(
+        {"KETTLE_FAMILY_WAVE_JOBS" => "0"},
+        {}
+      )
+    end.to raise_error(ArgumentError, /positive integer/)
+  end
+
   it "preserves explicit templating worker options" do
     allow(Etc).to receive(:nprocessors).and_return(22)
 
     expect(
       Kettle::Jem::Tasks::TemplateTask.templating_run_options(
-        {"KETTLE_JEM_THREAD_WORKERS" => "3"},
+        {
+          "KETTLE_FAMILY_WAVE_JOBS" => "6",
+          "KETTLE_JEM_THREAD_WORKERS" => "3"
+        },
         {}
       )
     ).not_to include(:file_work_thread_workers)

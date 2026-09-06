@@ -42,7 +42,7 @@ module Kettle
           options = env_run_options(env || {}).merge(run_options || {})
           return options if worker_or_strategy_option_provided?(env || {}, options)
 
-          workers = default_thread_worker_count
+          workers = default_thread_worker_count(env)
           options.merge(
             recipe_planning_strategy: "classified",
             recipe_planning_thread_workers: workers,
@@ -78,8 +78,31 @@ module Kettle
           }.compact
         end
 
-        def default_thread_worker_count
-          [1, Etc.nprocessors / 2].max
+        # A standalone template run may use half of the available CPUs. When
+        # kettle-family supplies its rolling wave width, each member keeps its
+        # base process and receives an equal share of the remaining CPUs for
+        # command-internal work. Explicit KETTLE_JEM_* worker settings remain
+        # authoritative and bypass this default.
+        def default_thread_worker_count(env = ENV)
+          cpu_count = Etc.nprocessors
+          standalone_limit = [cpu_count / 2, 1].max
+          wave_jobs = family_wave_jobs(env)
+          return standalone_limit unless wave_jobs
+
+          available_per_member = (cpu_count - wave_jobs) / wave_jobs
+          [standalone_limit, [available_per_member, 1].max].min
+        end
+
+        def family_wave_jobs(env)
+          value = env["KETTLE_FAMILY_WAVE_JOBS"]
+          return nil if value.nil? || value.strip.empty?
+
+          wave_jobs = Integer(value)
+          raise ArgumentError, "KETTLE_FAMILY_WAVE_JOBS must be positive" unless wave_jobs.positive?
+
+          wave_jobs
+        rescue ArgumentError
+          raise ArgumentError, "KETTLE_FAMILY_WAVE_JOBS must be a positive integer"
         end
 
         def worker_or_strategy_option_provided?(env, run_options)

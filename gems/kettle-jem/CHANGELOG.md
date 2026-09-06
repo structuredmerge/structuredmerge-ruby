@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Allocate template worker pools from the active kettle-family wave width when provided.
+
 ### Security
 
 ## [7.1.17] - 2026-09-06
