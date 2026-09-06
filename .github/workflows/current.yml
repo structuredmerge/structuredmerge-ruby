@@ -85,6 +85,7 @@ jobs:
                   "Gemfile",
                   "Gemfile.lock",
                   ".structuredmerge/fixtures.lock",
+                  ".structuredmerge/benchmark-fixtures.lock",
                   ".github/workflows/current.yml",
               }
               for path in changed
@@ -215,11 +216,13 @@ jobs:
           set -euo pipefail
           lock=".structuredmerge/benchmark-fixtures.lock"
           repository="$(ruby -ryaml -e 'puts YAML.safe_load_file(ARGV.fetch(0)).fetch("repository")' "${lock}")"
+          tag="$(ruby -ryaml -e 'puts YAML.safe_load_file(ARGV.fetch(0)).fetch("tag")' "${lock}")"
           revision="$(ruby -ryaml -e 'puts YAML.safe_load_file(ARGV.fetch(0)).fetch("revision")' "${lock}")"
           git clone --filter=blob:none --no-checkout "${repository}" ../benchmark-fixtures
-          git -C ../benchmark-fixtures fetch --depth 1 origin "${revision}"
+          git -C ../benchmark-fixtures fetch --depth 1 origin "refs/tags/${tag}:refs/tags/${tag}"
           git -C ../benchmark-fixtures checkout --detach "${revision}"
           test "$(git -C ../benchmark-fixtures rev-parse HEAD)" = "${revision}"
+          test "$(git -C ../benchmark-fixtures rev-parse "refs/tags/${tag}^{commit}")" = "${revision}"
       - name: Setup Ruby
         uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
         with:

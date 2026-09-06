@@ -100,6 +100,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Compare YAML `diff2` entries by semantic value and parser attributes rather than owned source fragments, so mapping order and formatting changes do not become semantic edits.
 - Normalize Citrus TOML pair ranges to their parsed value extent so comments following arrays are not emitted both as pair content and as shared owned comments.
 
+- Pin released StructuredMerge fixtures v7.1.8 for provider validation and benchmark profiles.
+
 ### Security
 
 ## [7.1.7] - 2026-09-01
