@@ -8,10 +8,8 @@ module ProviderSnapshotSpecSupport
     def start_point = Point.new(0, start_byte)
     def end_point = Point.new(0, end_byte)
     def named? = named
-    def missing? = missing
-    # rubocop:disable Naming/PredicatePrefix -- mirrors the TreeHaver node contract
+    def missing? = missing # -- mirrors the TreeHaver node contract
     def has_error? = has_error
-    # rubocop:enable Naming/PredicatePrefix
   end
   Comment = Data.define(:type, :start_byte, :end_byte, :style, :attachment_hint) do
     def start_point = Point.new(0, start_byte)
