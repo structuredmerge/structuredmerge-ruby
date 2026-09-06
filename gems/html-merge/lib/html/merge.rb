@@ -265,9 +265,9 @@ module Html
   end
 end
 
+Html::Merge.register_backend!
+Html::Merge.register_provider!
+
 Html::Merge::Version.class_eval do
   extend VersionGem::Basic
 end
-
-Html::Merge.register_backend!
-Html::Merge.register_provider!
