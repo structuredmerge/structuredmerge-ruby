@@ -20,6 +20,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.8] - 2026-09-06
+
+- TAG: [v7.1.8][7.1.8t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 73.88% documented
+
+### Added
+
 - Raise the minimum supported `tree_sitter_language_pack` version to `1.16.2`,
   the first released TSLP version containing the Ruby platform-gem metadata fix.
 - Add a repository-local benchmark report formatter that writes stable,
@@ -83,12 +102,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Add preservation-only line and lexeme agreement details to benchmark results;
   these metrics do not affect merge correctness or safety gates.
 
-### Changed
-
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Align generated modular development Gemfiles with the `nomono` 1.1.5
@@ -107,8 +120,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Pin released StructuredMerge fixtures v7.1.8 for provider validation and benchmark profiles.
 
 - Run the Git benchmark competitor probe through a shell so CI can resolve the Git executable.
-
-### Security
 
 ## [7.1.7] - 2026-09-01
 
@@ -689,7 +700,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.7...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.8...HEAD
+[7.1.8]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.7...v7.1.8
+[7.1.8t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.8
 [7.1.7]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.6...v7.1.7
 [7.1.7t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.7
 [7.1.6]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.5...v7.1.6
