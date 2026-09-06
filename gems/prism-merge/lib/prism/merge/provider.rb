@@ -408,7 +408,9 @@ module Prism
           render_report: {
             strategy: :nested_owner_composite,
             parent_path: owner_path(ours_owner),
-            replacements: replacements.map { |replacement| replacement.slice(:path, :start_line, :end_line, :source_role) }
+            replacements: replacements.map do |replacement|
+              replacement.slice(:path, :start_line, :end_line, :source_role)
+            end
           },
           verification: { base_participated: true, output_reparsed: true, semantic_match: true }
         )

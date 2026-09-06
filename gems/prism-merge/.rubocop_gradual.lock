@@ -2,11 +2,11 @@
   ".simplecov:4237457061": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:3290772226": [
+  "Rakefile:2547893980": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
-    [144, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
-    [147, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
+    [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
+    [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -367,9 +367,9 @@
     [114, 121, 12, "Layout/LineLength: Line is too long. [132/120]", 2068513341],
     [116, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 270242779]
   ],
-  "lib/prism/merge/node_emission_support.rb:3755563677": [
+  "lib/prism/merge/node_emission_support.rb:1168327191": [
     [5, 5, 25, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::NodeEmissionSupport`.", 1335077453],
-    [5, 5, 43530, "Metrics/ClassLength: Class has too many lines. [812/100]", 1230969491],
+    [5, 5, 44032, "Metrics/ClassLength: Class has too many lines. [825/100]", 1230969491],
     [14, 7, 2734, "Metrics/AbcSize: Assignment Branch Condition size for `emit_dest_prefix_lines` is too high. [<18, 54, 18> 59.7/17]", 4241256208],
     [14, 7, 2734, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `emit_dest_prefix_lines` is too high. [16/7]", 4241256208],
     [14, 7, 2734, "Metrics/MethodLength: Method has too many lines. [54/10]", 4241256208],
@@ -390,39 +390,39 @@
     [269, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 2775680224],
     [334, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 2267103911],
     [364, 121, 27, "Layout/LineLength: Line is too long. [147/120]", 988398654],
-    [376, 7, 7993, "Metrics/AbcSize: Assignment Branch Condition size for `emit_node` is too high. [<55, 101, 59> 129.3/17]", 3670591372],
-    [376, 7, 7993, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `emit_node` is too high. [40/7]", 3670591372],
-    [376, 7, 7993, "Metrics/MethodLength: Method has too many lines. [167/10]", 3670591372],
-    [376, 7, 7993, "Metrics/PerceivedComplexity: Perceived complexity for `emit_node` is too high. [48/8]", 3670591372],
-    [514, 15, 379, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 3006808047],
-    [568, 7, 1166, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `filter_previous_destination_owned_template_leading_comments` is too high. [8/7]", 2076094754],
-    [568, 7, 1166, "Metrics/MethodLength: Method has too many lines. [15/10]", 2076094754],
-    [568, 71, 13, "Lint/UnusedMethodArgument: Unused method argument - `template_node`.", 1616609802],
-    [619, 7, 973, "Metrics/MethodLength: Method has too many lines. [15/10]", 1892360110],
-    [619, 60, 172, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 2784840176],
-    [620, 121, 5, "Layout/LineLength: Line is too long. [125/120]", 169966263],
-    [646, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2087656651],
-    [659, 7, 873, "Metrics/AbcSize: Assignment Branch Condition size for `previous_template_gap_already_precedes_leading_comments?` is too high. [<5, 19, 11> 22.52/17]", 268778340],
-    [659, 7, 873, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `previous_template_gap_already_precedes_leading_comments?` is too high. [9/7]", 268778340],
-    [659, 7, 873, "Metrics/MethodLength: Method has too many lines. [13/10]", 268778340],
-    [659, 7, 873, "Metrics/PerceivedComplexity: Perceived complexity for `previous_template_gap_already_precedes_leading_comments?` is too high. [9/8]", 268778340],
-    [668, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 618947799],
-    [728, 7, 457, "Metrics/MethodLength: Method has too many lines. [11/10]", 349820622],
-    [756, 7, 758, "Metrics/AbcSize: Assignment Branch Condition size for `partial_same_line_node?` is too high. [<8, 31, 5> 32.4/17]", 1768803955],
-    [807, 7, 597, "Metrics/MethodLength: Method has too many lines. [12/10]", 2742538822],
-    [807, 40, 67, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 725821220],
-    [824, 7, 552, "Metrics/MethodLength: Method has too many lines. [12/10]", 4255654885],
-    [847, 7, 845, "Metrics/MethodLength: Method has too many lines. [13/10]", 3468050888],
-    [878, 7, 1097, "Metrics/AbcSize: Assignment Branch Condition size for `filter_emitted_template_leading_comments` is too high. [<6, 18, 3> 19.21/17]", 2091395187],
-    [878, 7, 1097, "Metrics/MethodLength: Method has too many lines. [17/10]", 2091395187],
-    [914, 7, 931, "Metrics/AbcSize: Assignment Branch Condition size for `filter_already_emitted_leading_comments` is too high. [<6, 19, 1> 19.95/17]", 2862453682],
-    [914, 7, 931, "Metrics/MethodLength: Method has too many lines. [15/10]", 2862453682],
-    [933, 7, 1359, "Metrics/AbcSize: Assignment Branch Condition size for `collapse_matched_template_leading_prefix` is too high. [<7, 22, 10> 25.16/17]", 3976364089],
-    [933, 7, 1359, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collapse_matched_template_leading_prefix` is too high. [9/7]", 3976364089],
-    [933, 7, 1359, "Metrics/MethodLength: Method has too many lines. [21/10]", 3976364089],
-    [933, 7, 1359, "Metrics/PerceivedComplexity: Perceived complexity for `collapse_matched_template_leading_prefix` is too high. [9/8]", 3976364089],
-    [977, 121, 37, "Layout/LineLength: Line is too long. [157/120]", 3703011298],
-    [981, 7, 746, "Metrics/MethodLength: Method has too many lines. [17/10]", 3532927627]
+    [376, 7, 8495, "Metrics/AbcSize: Assignment Branch Condition size for `emit_node` is too high. [<57, 108, 63> 137.4/17]", 623087823],
+    [376, 7, 8495, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `emit_node` is too high. [44/7]", 623087823],
+    [376, 7, 8495, "Metrics/MethodLength: Method has too many lines. [180/10]", 623087823],
+    [376, 7, 8495, "Metrics/PerceivedComplexity: Perceived complexity for `emit_node` is too high. [52/8]", 623087823],
+    [527, 15, 379, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 3006808047],
+    [581, 7, 1166, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `filter_previous_destination_owned_template_leading_comments` is too high. [8/7]", 2076094754],
+    [581, 7, 1166, "Metrics/MethodLength: Method has too many lines. [15/10]", 2076094754],
+    [581, 71, 13, "Lint/UnusedMethodArgument: Unused method argument - `template_node`.", 1616609802],
+    [632, 7, 973, "Metrics/MethodLength: Method has too many lines. [15/10]", 1892360110],
+    [632, 60, 172, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 2784840176],
+    [633, 121, 5, "Layout/LineLength: Line is too long. [125/120]", 169966263],
+    [659, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2087656651],
+    [672, 7, 873, "Metrics/AbcSize: Assignment Branch Condition size for `previous_template_gap_already_precedes_leading_comments?` is too high. [<5, 19, 11> 22.52/17]", 268778340],
+    [672, 7, 873, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `previous_template_gap_already_precedes_leading_comments?` is too high. [9/7]", 268778340],
+    [672, 7, 873, "Metrics/MethodLength: Method has too many lines. [13/10]", 268778340],
+    [672, 7, 873, "Metrics/PerceivedComplexity: Perceived complexity for `previous_template_gap_already_precedes_leading_comments?` is too high. [9/8]", 268778340],
+    [681, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 618947799],
+    [741, 7, 457, "Metrics/MethodLength: Method has too many lines. [11/10]", 349820622],
+    [769, 7, 758, "Metrics/AbcSize: Assignment Branch Condition size for `partial_same_line_node?` is too high. [<8, 31, 5> 32.4/17]", 1768803955],
+    [820, 7, 597, "Metrics/MethodLength: Method has too many lines. [12/10]", 2742538822],
+    [820, 40, 67, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 725821220],
+    [837, 7, 552, "Metrics/MethodLength: Method has too many lines. [12/10]", 4255654885],
+    [860, 7, 845, "Metrics/MethodLength: Method has too many lines. [13/10]", 3468050888],
+    [891, 7, 1097, "Metrics/AbcSize: Assignment Branch Condition size for `filter_emitted_template_leading_comments` is too high. [<6, 18, 3> 19.21/17]", 2091395187],
+    [891, 7, 1097, "Metrics/MethodLength: Method has too many lines. [17/10]", 2091395187],
+    [927, 7, 931, "Metrics/AbcSize: Assignment Branch Condition size for `filter_already_emitted_leading_comments` is too high. [<6, 19, 1> 19.95/17]", 2862453682],
+    [927, 7, 931, "Metrics/MethodLength: Method has too many lines. [15/10]", 2862453682],
+    [946, 7, 1359, "Metrics/AbcSize: Assignment Branch Condition size for `collapse_matched_template_leading_prefix` is too high. [<7, 22, 10> 25.16/17]", 3976364089],
+    [946, 7, 1359, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collapse_matched_template_leading_prefix` is too high. [9/7]", 3976364089],
+    [946, 7, 1359, "Metrics/MethodLength: Method has too many lines. [21/10]", 3976364089],
+    [946, 7, 1359, "Metrics/PerceivedComplexity: Perceived complexity for `collapse_matched_template_leading_prefix` is too high. [9/8]", 3976364089],
+    [990, 121, 37, "Layout/LineLength: Line is too long. [157/120]", 3703011298],
+    [994, 7, 746, "Metrics/MethodLength: Method has too many lines. [17/10]", 3532927627]
   ],
   "lib/prism/merge/partial_template_merger.rb:2834308314": [
     [14, 7, 826, "Metrics/MethodLength: Method has too many lines. [14/10]", 713706122],
@@ -627,7 +627,7 @@
     [422, 7, 755, "Metrics/MethodLength: Method has too many lines. [14/10]", 3130034424],
     [452, 7, 850, "Metrics/AbcSize: Assignment Branch Condition size for `runtime_line_numbers_for` is too high. [<6, 26, 6> 27.35/17]", 966446340]
   ],
-  "prism-merge.gemspec:3852907": [
+  "prism-merge.gemspec:2975110287": [
     [139, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [150, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [151, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
