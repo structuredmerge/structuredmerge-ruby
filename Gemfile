@@ -5,7 +5,7 @@ kettle_dev_dev = ENV.fetch('KETTLE_DEV_DEV', 'false')
 source 'https://rubygems.org'
 
 # Use released TSLP with the Ruby ABI platform-gem fix.
-gem 'tree_sitter_language_pack', '~> 1.13', '>= 1.13.7'
+gem 'tree_sitter_language_pack', '~> 1.16', '>= 1.16.2'
 
 unless kettle_dev_dev.casecmp('false').zero?
   require 'nomono/bundler'

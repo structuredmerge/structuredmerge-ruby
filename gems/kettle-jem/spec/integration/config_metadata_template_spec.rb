@@ -2764,7 +2764,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(direct_block).to include('root: ["src", "my", "rubythems"]')
       expect(gemfile).not_to include("Use released TSLP with the Ruby ABI platform-gem fix")
       expect(gemfile).not_to include(
-        'gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.3"'
+        'gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"'
       )
       expect(gemfile).not_to include('branch: "fix/ruby-parser-api-methods"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
@@ -2790,7 +2790,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           gemspec
 
           # Use released TSLP with the Ruby ABI platform-gem fix.
-          gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.3"
+          gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"
 
           # Templating
           eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
@@ -2817,7 +2817,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           # frozen_string_literal: true
 
           if ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false").zero?
-            gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7"
+            gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"
           end
         RUBY
       })
@@ -2829,7 +2829,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(gemfile).not_to include("tree_sitter_language_pack")
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
       expect(File.read(File.join(root, "gemfiles/modular/templating.gemfile"))).to include(
-        'gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.7"'
+        'gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"'
       )
     end
   end

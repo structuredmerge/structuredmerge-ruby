@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Raise the minimum supported `tree_sitter_language_pack` version to `1.16.2`,
+  the first released TSLP version containing the Ruby platform-gem metadata fix.
 - Add a repository-local benchmark report formatter that writes stable,
   idempotent Markdown tables from JSON reports or standard input.
 - Add comprehensive `--help` output and usage examples to the repository-local
@@ -500,9 +502,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Root architecture specs now guard merge emission files against new ad hoc
   comment or blank-line ownership scans, keeping the remaining cleanup debt
   explicit while shared ast-merge attachment and layout helpers are adopted.
-- Development Gemfiles for gems that use `tree_sitter_language_pack` now default
-  to the StructuredMerge fork branch with the Ruby ABI platform-gem fix until
-  that fix is released upstream.
+- Development Gemfiles for gems that use `tree_sitter_language_pack` now require
+  the released `1.16.2` minimum containing the Ruby ABI platform-gem fix.
 - Structured merge gems now fail closed when no registered TreeHaver backend is
   available instead of falling back to direct parser-library paths outside the
   TreeHaver and ast-merge stack.
