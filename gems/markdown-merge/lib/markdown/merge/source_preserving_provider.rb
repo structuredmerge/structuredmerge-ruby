@@ -276,6 +276,7 @@ module Markdown
         headings = parsed.fetch(:headings)
         return { unsafe: :headingless_document, source_role: role } if headings.empty?
         return { unsafe: :setext_heading, source_role: role } unless headings.all? { |heading| heading.style == :atx }
+
         headings = independently_ownable_headings(headings)
         return { unsafe: :nested_heading_hierarchy, source_role: role } if headings.empty?
 
