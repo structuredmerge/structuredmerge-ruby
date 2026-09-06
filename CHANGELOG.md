@@ -102,6 +102,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Pin released StructuredMerge fixtures v7.1.8 for provider validation and benchmark profiles.
 
+- Run the Git benchmark competitor probe through a shell so CI can resolve the Git executable.
+
 ### Security
 
 ## [7.1.7] - 2026-09-01

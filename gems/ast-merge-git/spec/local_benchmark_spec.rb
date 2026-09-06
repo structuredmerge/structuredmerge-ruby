@@ -703,12 +703,13 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
   end
 
   it 'probes the pinned Git competitor using Git version output' do
-    git_path = Pathname(`command -v git`.strip)
+    git_path, status = Open3.capture2('sh', '-c', 'command -v git')
+    expect(status).to be_success
     runner = Ast::Merge::Git::LocalBenchmarkRunner.new(
       benchmark: benchmark,
       driver_path: driver,
       tmp_root: tmp_root.join('git-competitive-runs'),
-      competitor_paths: { 'git' => git_path }
+      competitor_paths: { 'git' => Pathname(git_path.strip) }
     )
 
     provenance = runner.send(:competitor_provenance)
