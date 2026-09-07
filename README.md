@@ -296,12 +296,17 @@ mise run check
 ```
 
 `lint` is read-only. Use `mise run lint-fix` when applying RuboCop Gradual
-autocorrections is intentional. `mise run deps` updates against released
-dependencies without committing; `mise run deps-local` uses sibling checkouts
-without committing; and `mise run deps-release` uses released dependencies and
-permits lockfile commits. `mise run state` shows release state, while
-`mise run release-plan` previews a publish and `mise run release -- --only pend`
-executes one with additional release options forwarded after `--`.
+autocorrections is intentional. `mise run bup` is the normal dependency update:
+it resolves the in-repository StructuredMerge sibling graph, uses released
+Kettle tooling, validates that no external paths entered the lockfiles, and
+commits the resulting lockfile changes. `mise run deps-local` is the exceptional
+integration path for testing unreleased StructuredMerge and Kettle sources; it
+does not commit because the adjacent Kettle checkout is not available in CI.
+`mise run deps` previews a registry-only update without committing, while
+`mise run deps-release` performs and commits that registry-only update.
+`mise run state` shows release state, while `mise run release-plan` previews a
+publish and `mise run release -- --only pend` executes one with additional
+release options forwarded after `--`.
 
 The same task names are available from the other Ruby family roots in this
 workspace, including `appraisal-rb`, `galtzo-floss`, `kettle-dev`, `omniauth`,

@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Make the default bup task commit CI-usable lockfiles against local StructuredMerge monorepo siblings while reserving deps-local for non-committing integration with unreleased Kettle sources.
+
 ### Security
 
 ## [7.1.8] - 2026-09-06
