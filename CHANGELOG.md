@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Keep normal bup and bupb dependency updates on the CI-resident StructuredMerge sibling graph while reserving unreleased Kettle tooling for deps-local.
+
 ### Security
 
 ## [7.1.8] - 2026-09-07
