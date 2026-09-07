@@ -224,7 +224,8 @@
 167
 168
 169
-170</pre>
+170
+171</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/tslp.rb', line 159</span>
@@ -236,10 +237,11 @@
   <span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>TreeSitterLanguagePack</span><span class='period'>.</span><span class='id identifier rubyid_get_parser'>get_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TSLP did not return a parser for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_parser'>parser</span>
 
-  <span class='id identifier rubyid_raw_tree'>raw_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_normalized_source'>normalized_source</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_source_encoding'>normalize_source_encoding</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raw_tree'>raw_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized_source'>normalized_source</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TSLP did not return a parse tree for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_raw_tree'>raw_tree</span>
 
-  <span class='const'><span class='object_link'><a href="Tree.html" title="TreeHaver::Backends::Tslp::Tree (class)">Tree</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Tree.html#initialize-instance_method" title="TreeHaver::Backends::Tslp::Tree#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_raw_tree'>raw_tree</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>language:</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="Tree.html" title="TreeHaver::Backends::Tslp::Tree (class)">Tree</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Tree.html#initialize-instance_method" title="TreeHaver::Backends::Tslp::Tree#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_raw_tree'>raw_tree</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='id identifier rubyid_normalized_source'>normalized_source</span><span class='comma'>,</span> <span class='label'>language:</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -251,7 +253,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Sep  1 22:51:36 2026 by
+  Generated on Mon Sep  7 02:30:26 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

@@ -28,15 +28,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Make the default bup task commit CI-usable lockfiles against local StructuredMerge monorepo siblings while reserving deps-local for non-committing integration with unreleased Kettle sources.
-
-- Keep the root orchestration bundle on released tooling while passing local dependency overrides only to member bundle updates, preventing deps-local from polluting the root lockfile.
-
-- Run the default bupb task against local StructuredMerge siblings, matching the normal bup workflow.
-
 ### Security
 
-## [7.1.8] - 2026-09-06
+## [7.1.8] - 2026-09-07
 
 - TAG: [v7.1.8][7.1.8t]
 - COVERAGE: 0.00% -- 0/0 lines in 0 files
@@ -126,6 +120,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - Pin released StructuredMerge fixtures v7.1.8 for provider validation and benchmark profiles.
 
 - Run the Git benchmark competitor probe through a shell so CI can resolve the Git executable.
+
+- Make the default bup task commit CI-usable lockfiles against local StructuredMerge monorepo siblings while reserving deps-local for non-committing integration with unreleased Kettle sources.
+
+- Keep the root orchestration bundle on released tooling while passing local dependency overrides only to member bundle updates, preventing deps-local from polluting the root lockfile.
+
+- Run the default bupb task against local StructuredMerge siblings, matching the normal bup workflow.
 
 ## [7.1.7] - 2026-09-01
 
