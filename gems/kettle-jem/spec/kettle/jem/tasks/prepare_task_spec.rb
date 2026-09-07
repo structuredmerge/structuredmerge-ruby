@@ -272,8 +272,10 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         events: Kettle::Jem.event_stream_from_options({})
       )
 
+      kettle_dev = Kettle::Jem::TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == "kettle-dev" }
+      requirements = kettle_dev.fetch(:requirements)
       expect(step).to include(name: "reconcile_template_managed_dependencies", status: "applied", changed_files: ["example.gemspec"])
-      expect(File.read(gemspec)).to include('spec.add_development_dependency("kettle-dev", "~> 3.0", ">= 3.0.32")')
+      expect(File.read(gemspec)).to include(%(spec.add_development_dependency("kettle-dev", "#{requirements[0]}", "#{requirements[1]}")))
       expect(File).not_to exist(File.join(root, "Gemfile"))
     end
   end
@@ -291,8 +293,10 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         events: Kettle::Jem.event_stream_from_options({})
       )
 
+      kettle_dev = Kettle::Jem::TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == "kettle-dev" }
+      requirements = kettle_dev.fetch(:requirements)
       expect(step.fetch(:changed_files)).to contain_exactly("Gemfile", "gemfiles/modular/templating_local.gemfile")
-      expect(File.read(gemfile)).to include('gem "kettle-dev", "~> 3.0", ">= 3.0.32", require: false')
+      expect(File.read(gemfile)).to include(%(gem "kettle-dev", "#{requirements[0]}", "#{requirements[1]}", require: false))
       expect(File.read(local_gemfile)).to include('gem "nomono", "~> 1.1", ">= 1.1.5"')
       expect(File).not_to exist(File.join(root, "example.gemspec"))
     end

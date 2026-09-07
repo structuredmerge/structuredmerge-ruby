@@ -37,6 +37,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Declare JSON v2 as a Kettle Jem development dependency for repository-local maintenance executables.
 
+- Keep managed dependency reconciliation specs aligned with their declared requirements.
+
 ### Security
 
 ## [7.1.22] - 2026-09-07
