@@ -151,7 +151,17 @@ jobs:
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
           bundle config set frozen false
-          bundle install --jobs 4
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
       - name: Run checks
         working-directory: ${{ matrix.gem }}
         env:
@@ -192,7 +202,17 @@ jobs:
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
           bundle config set frozen false
-          bundle install --jobs 4
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
       - name: Run family suite
         env:
           K_JEM_TEMPLATING: true
@@ -238,7 +258,17 @@ jobs:
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
           bundle config set frozen false
-          bundle install --jobs 4
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
       - name: Run affected-capability benchmark
         working-directory: gems/ast-merge-git
         env:
@@ -366,7 +396,17 @@ jobs:
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
           bundle config set frozen false
-          bundle install --jobs 4
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
       - name: Run cold-cache TSLP checks
         working-directory: gems/tree_haver
         env:
