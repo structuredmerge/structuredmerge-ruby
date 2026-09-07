@@ -299,7 +299,8 @@ mise run check
 autocorrections is intentional. `mise run bup` is the normal dependency update:
 it resolves the in-repository StructuredMerge sibling graph, uses released
 Kettle tooling, validates that no external paths entered the lockfiles, and
-commits the resulting lockfile changes. `mise run deps-local` is the exceptional
+commits the resulting lockfile changes. `mise run bupb` uses the same local
+StructuredMerge graph when updating Bundler itself. `mise run deps-local` is the exceptional
 integration path for testing unreleased StructuredMerge and Kettle sources; it
 does not commit because the adjacent Kettle checkout is not available in CI.
 Both tasks boot the root orchestration bundle with registry dependencies and

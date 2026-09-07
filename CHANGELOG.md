@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep the root orchestration bundle on released tooling while passing local dependency overrides only to member bundle updates, preventing deps-local from polluting the root lockfile.
 
+- Run the default bupb task against local StructuredMerge siblings, matching the normal bup workflow.
+
 ### Security
 
 ## [7.1.8] - 2026-09-06
