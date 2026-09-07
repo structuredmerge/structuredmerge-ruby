@@ -57,7 +57,7 @@ module Kettle
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.5"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.0", ">= 3.0.32"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.0", ">= 3.0.33"], bootstrap: true},
       {
         name: "kettle-changelog",
         requirements: ["~> 1.0", ">= 1.0.7"],
@@ -5464,7 +5464,7 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.3"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.32"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.33"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.95"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
