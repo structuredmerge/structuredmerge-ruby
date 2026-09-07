@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Externalize active template tooling from gemspecs, remove legacy gem-release declarations from managed Gemfiles and gemspecs, and enforce self-test divergence thresholds inclusively.
+
 ### Security
 
 ## [7.1.22] - 2026-09-07

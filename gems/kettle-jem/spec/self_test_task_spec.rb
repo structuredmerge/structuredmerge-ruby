@@ -19,7 +19,7 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
       result = described_class.run(
         project_root: root,
         template_root: File.join(root, "template"),
-        min_divergence_threshold: 100
+        min_divergence_threshold: 101
       )
 
       expect(result.fetch(:mode)).to eq("selftest")
@@ -31,7 +31,7 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
     end
   end
 
-  it "fails when divergence exceeds the configured threshold after writing the report" do
+  it "fails when divergence reaches the configured threshold after writing the report" do
     tmp_root = File.join(__dir__, "tmp").tap { |path| FileUtils.mkdir_p(path) }
     Dir.mktmpdir("kettle-jem-selftest", tmp_root) do |root|
       write_file(root, "README.md", "before\n")
@@ -41,8 +41,8 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
       end
 
       expect {
-        described_class.run(project_root: root, min_divergence_threshold: 0)
-      }.to raise_error(Kettle::Jem::Error, /divergence 100\.0% exceeds threshold 0\.0%/)
+        described_class.run(project_root: root, min_divergence_threshold: 100)
+      }.to raise_error(Kettle::Jem::Error, /divergence 100\.0% reaches or exceeds threshold 100\.0%/)
 
       expect(File).to exist(File.join(root, "tmp", "template_test", "report", "summary.md"))
     end
@@ -61,7 +61,7 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
         {mode: "apply"}
       end
 
-      result = described_class.run(project_root: root, min_divergence_threshold: 100)
+      result = described_class.run(project_root: root, min_divergence_threshold: 101)
 
       expect(result.fetch(:comparison).fetch(:added)).to eq(["unexpected.txt"])
     end

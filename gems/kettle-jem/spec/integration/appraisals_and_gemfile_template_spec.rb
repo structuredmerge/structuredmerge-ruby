@@ -1433,6 +1433,14 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(updated.scan(/^gem "kettle-jem"/).length).to eq(1)
   end
 
+  it "removes prohibited legacy release tools from the managed root Gemfile" do
+    updated = described_class.ensure_monorepo_root_gemfile_dependencies(
+      "source \"https://gem.coop\"\ngem \"gem-release\", \"~> 2\"\n"
+    )
+
+    expect(updated).not_to include('gem "gem-release"')
+  end
+
   it "keeps kettle-dev local overrides available for kettle-jem transitive runtime dependencies" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
 

@@ -89,7 +89,13 @@ module Kettle
     ].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
     DEFAULT_OPENCOLLECTIVE_ORG = "galtzo-floss"
-    RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover rubocop-rspec yard-junk].freeze
+    # These tools remain active, but their dependency ownership belongs to the
+    # generated modular Gemfiles rather than a destination gemspec.
+    EXTERNALIZED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover rubocop-rspec yard-junk].freeze
+    # These legacy release tools must not be retained in any managed dependency
+    # declaration. Kettle Dev owns release workflows.
+    PROHIBITED_GEMSPEC_DEPENDENCIES = %w[gem-release].freeze
+    PROHIBITED_GEMFILE_DEPENDENCIES = PROHIBITED_GEMSPEC_DEPENDENCIES.freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion
@@ -5444,6 +5450,7 @@ module Kettle
       updated = reconcile_template_managed_dependencies(
         ensure_trailing_newline(content.to_s.empty? ? %(source "https://gem.coop"\n) : content.to_s).dup
       )
+      updated = remove_gemfile_dependency_blocks(updated, PROHIBITED_GEMFILE_DEPENDENCIES)
       monorepo_root_gemfile_dependency_lines.each do |line|
         next if gemfile_declares_gem?(updated, line.fetch(:name))
 
@@ -9375,7 +9382,7 @@ module Kettle
 
     def merge_gemfile_template_policy(content, facts:, template_content: nil, preserve_self_word_entries: false)
       package_name = facts.dig(:package, :name).to_s if facts
-      removable_gems = ["appraisal"]
+      removable_gems = ["appraisal", *PROHIBITED_GEMFILE_DEPENDENCIES]
       removable_gems << package_name unless package_name.to_s.empty?
       removable_gems.concat(package_runtime_dependency_names(facts))
       removable_gems << "version_gem" unless version_gem_enabled?(facts)
@@ -10686,6 +10693,11 @@ module Kettle
         template_declares_version_gem: gemspec_dependency_names(template_content).include?("version_gem")
       )
       merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
+      merged = remove_gemspec_dependency_lines(
+        merged,
+        receiver: template_receiver,
+        names: PROHIBITED_GEMSPEC_DEPENDENCIES
+      )
       # Yard owns the documentation dependency graph. A direct gemspec rdoc
       # development dependency creates an unnecessary second owner and can
       # conflict with the documentation modular Gemfile.
@@ -11823,7 +11835,7 @@ module Kettle
           enforce_gemspec_dependency_minimum_requirements(normalized, receiver: template_receiver)
         end
       destination_dependencies = destination_dependencies.reject do |key, _source|
-        retired_gemspec_development_dependency_key?(key)
+        excluded_gemspec_dependency_key?(key)
       end
       return template_content if destination_dependencies.empty?
 
@@ -12223,9 +12235,11 @@ module Kettle
       [record.fetch(:kind), record.fetch(:name)]
     end
 
-    def retired_gemspec_development_dependency_key?(key)
+    def excluded_gemspec_dependency_key?(key)
+      return true if PROHIBITED_GEMSPEC_DEPENDENCIES.include?(key.last)
+
       key.first == "add_development_dependency" &&
-        RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES.include?(key.last)
+        EXTERNALIZED_GEMSPEC_DEVELOPMENT_DEPENDENCIES.include?(key.last)
     end
 
     def gemspec_dependency_source_newer?(candidate_source, current_source, receiver:)

@@ -79,8 +79,8 @@ module Kettle
             min_divergence_threshold: threshold,
             drift: drift
           }
-          if threshold && divergence > threshold
-            raise Kettle::Jem::Error, "selftest divergence #{divergence}% exceeds threshold #{threshold}%"
+          if threshold && divergence >= threshold
+            raise Kettle::Jem::Error, "selftest divergence #{divergence}% reaches or exceeds threshold #{threshold}%"
           end
           result
         end
