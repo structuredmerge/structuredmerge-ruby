@@ -41,6 +41,43 @@ PATH
       yaml-merge (~> 7.1, >= 7.1.7)
 
 PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-changelog
+  specs:
+    kettle-changelog (1.0.7)
+      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
+      kettle-dev (>= 3.0.19, < 4.0.0)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-dev
+  specs:
+    kettle-dev (3.0.31)
+      emoji_regex (>= 15.0)
+      kettle-gha-pins (~> 0.3, >= 0.3.14)
+      kettle-ndjson (~> 0.1, >= 0.1.15)
+      kettle-rb (~> 0.1, >= 0.1.11)
+      kettle-test (~> 2.0, >= 2.0.21)
+      ruby-progressbar (~> 1.13)
+      tty-progressbar (~> 0.18)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-drift
+  specs:
+    kettle-drift (1.0.13)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-soup-cover
+  specs:
+    kettle-soup-cover (3.0.10)
+      kettle-wash (~> 0.1, >= 0.1.6)
+      simplecov (>= 1.0)
+      simplecov-cobertura (>= 4.0)
+      simplecov-console (~> 0.9, >= 0.9.5)
+      simplecov-rcov (~> 0.3, >= 0.3.7)
+      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
+
+PATH
   remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.8)
@@ -403,20 +440,6 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.21.2)
-    kettle-changelog (1.0.7)
-      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
-      kettle-dev (>= 3.0.19, < 4.0.0)
-      version_gem (~> 1.1, >= 1.1.15)
-    kettle-dev (3.0.31)
-      emoji_regex (>= 15.0)
-      kettle-gha-pins (~> 0.3, >= 0.3.14)
-      kettle-ndjson (~> 0.1, >= 0.1.15)
-      kettle-rb (~> 0.1, >= 0.1.11)
-      kettle-test (~> 2.0, >= 2.0.21)
-      ruby-progressbar (~> 1.13)
-      tty-progressbar (~> 0.18)
-    kettle-drift (1.0.13)
-      version_gem (~> 1.1, >= 1.1.15)
     kettle-family (1.2.93)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
@@ -436,13 +459,6 @@ GEM
     kettle-ndjson (0.1.15)
       version_gem (~> 1.1, >= 1.1.15)
     kettle-rb (0.1.11)
-    kettle-soup-cover (3.0.10)
-      kettle-wash (~> 0.1, >= 0.1.6)
-      simplecov (>= 1.0)
-      simplecov-cobertura (>= 4.0)
-      simplecov-console (~> 0.9, >= 0.9.5)
-      simplecov-rcov (~> 0.3, >= 0.3.7)
-      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
     kettle-test (2.0.21)
       appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
@@ -776,10 +792,12 @@ DEPENDENCIES
   html-merge!
   irb (~> 1.17)
   json-merge!
-  kettle-drift (~> 1.0, >= 1.0.13)
+  kettle-changelog!
+  kettle-dev!
+  kettle-drift!
   kettle-family (~> 1.2, >= 1.2.92)
   kettle-jem!
-  kettle-soup-cover (~> 3.0, >= 3.0.10)
+  kettle-soup-cover!
   kettle-test (~> 2.0, >= 2.0.21)
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-merge!
