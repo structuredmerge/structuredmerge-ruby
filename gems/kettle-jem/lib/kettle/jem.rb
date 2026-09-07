@@ -5442,10 +5442,10 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.3"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.31"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.32"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.94"\n)},
-        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.18"\n)},
+        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.19"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},

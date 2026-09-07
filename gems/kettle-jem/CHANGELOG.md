@@ -22,6 +22,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-dev (>= 3.0.31 -> >= 3.0.32)
+  - kettle-jem (>= 7.1.18 -> >= 7.1.19)
+
 ### Deprecated
 
 ### Removed
