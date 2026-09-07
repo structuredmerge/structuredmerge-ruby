@@ -323,7 +323,8 @@ class KettleJemDepsFloor
   def ruby_dependency_records(content, relative_path)
     [
       *ruby_call_dependency_records(content, relative_path),
-      *ruby_requirement_assignment_records(content, relative_path)
+      *ruby_requirement_assignment_records(content, relative_path),
+      *template_managed_dependency_records(content, relative_path)
     ]
   end
 
@@ -358,6 +359,37 @@ class KettleJemDepsFloor
     end.filter_map do |node|
       values = Array(node.value&.elements).select { |element| element.is_a?(::Prism::StringNode) }
       record_from_arguments(relative_path, "nomono", values, source_kind: "ruby")
+    end
+  end
+
+  def template_managed_dependency_records(content, relative_path)
+    result = Kettle::Jem.prism_parse_success(content)
+    return [] unless result
+
+    registry = nil
+    result.value.breadth_first_search_all do |node|
+      next unless node.is_a?(::Prism::ConstantWriteNode) && node.name == :TEMPLATE_MANAGED_DEPENDENCIES
+
+      registry = node
+      break
+    end
+    registry_value = registry&.value
+    registry_value = registry_value.receiver if registry_value.is_a?(::Prism::CallNode) && registry_value.name == :freeze
+    return [] unless registry_value.is_a?(::Prism::ArrayNode)
+
+    registry_value.elements.filter_map do |entry|
+      next unless entry.is_a?(::Prism::HashNode)
+
+      values = entry.elements.each_with_object({}) do |association, memo|
+        next unless association.is_a?(::Prism::AssocNode) && association.key.is_a?(::Prism::SymbolNode)
+
+        memo[association.key.unescaped.to_s] = association.value
+      end
+      name = Kettle::Jem.ruby_static_string_value(values["name"])
+      requirements = values["requirements"]
+      next unless requirements.is_a?(::Prism::ArrayNode)
+
+      record_from_arguments(relative_path, name, requirements.elements, source_kind: "template_registry")
     end
   end
 

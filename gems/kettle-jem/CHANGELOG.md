@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Reconcile managed template-tool dependency requirements in their existing declarations before template bootstrapping, and maintain their floors with kettle-jem-deps-floor.
+
 ### Security
 
 ## [7.1.21] - 2026-09-07

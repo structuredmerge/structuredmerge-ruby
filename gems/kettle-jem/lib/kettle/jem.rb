@@ -52,6 +52,19 @@ module Kettle
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
       "rspec-stubbed_env" => ">= 1.0.6"
     }.freeze
+    # Template dependency transitions are location-independent. Prepare finds
+    # declarations in the destination and reconciles their complete requirement
+    # set in place before Bundler is allowed to evaluate that destination.
+    TEMPLATE_MANAGED_DEPENDENCIES = [
+      {name: "nomono", requirements: ["~> 1.1", ">= 1.1.5"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.0", ">= 3.0.32"], bootstrap: true},
+      {
+        name: "kettle-changelog",
+        requirements: ["~> 1.0", ">= 1.0.7"],
+        bootstrap: true,
+        ruby_requirement: ">= 4.0.0"
+      }
+    ].freeze
     DEFAULT_GEMSPEC_METADATA_VALUES = {
       "allowed_push_host" => "TODO: Set to your gem server 'https://example.com'"
     }.freeze
@@ -9889,6 +9902,65 @@ module Kettle
       end
     end
 
+    def template_managed_dependency(name)
+      TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == name.to_s }
+    end
+
+    def template_managed_dependency_names(bootstrap: nil, ruby_version: RUBY_VERSION)
+      TEMPLATE_MANAGED_DEPENDENCIES.filter_map do |dependency|
+        next if !bootstrap.nil? && dependency.fetch(:bootstrap) != bootstrap
+        next unless template_managed_dependency_active?(dependency, ruby_version)
+
+        dependency.fetch(:name)
+      end
+    end
+
+    def template_managed_dependency_active?(dependency, ruby_version = RUBY_VERSION)
+      requirement = dependency[:ruby_requirement]
+      return true unless requirement
+
+      Gem::Requirement.new(requirement).satisfied_by?(Gem::Version.new(ruby_version))
+    end
+
+    def reconcile_template_managed_dependencies(source)
+      replacements = ruby_call_records(source, nil).filter_map do |call|
+        next unless template_managed_dependency_call?(call)
+
+        dependency = template_managed_dependency(ruby_string_argument(call))
+        next unless dependency
+
+        requirement_nodes = Array(call.arguments&.arguments).drop(1).reject do |argument|
+          argument.is_a?(::Prism::KeywordHashNode)
+        end
+        if requirement_nodes.empty?
+          raise Error, "Managed template dependency #{dependency.fetch(:name)} must use static version requirements"
+        end
+        requirement_nodes.each do |argument|
+          value = ruby_static_string_value(argument)
+          next if value && Gem::Requirement::OPS.keys.any? { |operator| value.start_with?(operator) }
+
+          raise Error, "Managed template dependency #{dependency.fetch(:name)} must use static version requirements"
+        end
+
+        expected = dependency.fetch(:requirements)
+        current = requirement_nodes.map { |argument| ruby_static_string_value(argument) }
+        next if current == expected
+
+        {
+          start_offset: requirement_nodes.first.location.start_offset,
+          end_offset: requirement_nodes.last.location.end_offset,
+          replacement: expected.map { |requirement| JSON.generate(requirement) }.join(", ")
+        }
+      end
+      replace_source_offsets(source, replacements)
+    end
+
+    def template_managed_dependency_call?(call)
+      return call.receiver.nil? && call.name == :gem if call.name == :gem
+
+      %i[add_dependency add_runtime_dependency add_development_dependency].include?(call.name)
+    end
+
     def ruby_keyword_string_argument(call, key)
       keyword_hash = Array(call&.arguments&.arguments).find { |argument| argument.is_a?(::Prism::KeywordHashNode) }
       assoc = keyword_hash&.elements&.find do |element|
@@ -14341,7 +14413,7 @@ module Kettle
               root: ["src", "my", "kettle-dev"]
             )
           elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", "~> 1.0", ">= 1.0.7"
+            gem "kettle-changelog", #{template_managed_dependency("kettle-changelog").fetch(:requirements).map(&:inspect).join(", ")}
           end
         end
       RUBY

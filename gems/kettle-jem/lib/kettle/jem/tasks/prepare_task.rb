@@ -12,6 +12,7 @@ module Kettle
         PREPARE_ONLY_PATHS = [
           Kettle::Jem::KETTLE_CONFIG_PATH,
           "Gemfile",
+          "*.gemspec",
           # Gemfile evaluates these fragments immediately.  Preparing only the
           # templating pair leaves a newly migrated project with references to
           # files that do not exist yet, so Bundler cannot perform the bootstrap.
@@ -36,6 +37,7 @@ module Kettle
             Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           end
           report = merge_supplemental_prepare_report(report, supplemental_report)
+          transition_step = reconcile_template_managed_dependencies_step(project_root, events: events)
           nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
@@ -81,9 +83,10 @@ module Kettle
               %w[skipped succeeded].include?(reset_step.fetch(:status)) &&
               %w[skipped succeeded].include?(bundle_step.fetch(:status)),
             prepare_only: PREPARE_ONLY_PATHS,
-            prepare_steps: [profile_sync_step, nomono_bootstrap_step, reset_step, bootstrap_step, bundle_step].compact,
+            prepare_steps: [profile_sync_step, transition_step, nomono_bootstrap_step, reset_step, bootstrap_step, bundle_step].compact,
             changed_files: (
               report.fetch(:changed_files, []) +
+                transition_step.fetch(:changed_files, []) +
                 nomono_bootstrap_step.fetch(:changed_files, []) +
                 reset_step.fetch(:changed_files, []) +
                 bootstrap_step.fetch(:changed_files, []) +
@@ -129,6 +132,30 @@ module Kettle
           end
           step = {
             name: "normalize_local_gemfile_bootstraps",
+            status: changed_files.empty? ? "already_current" : "applied",
+            changed_files: changed_files
+          }
+          Kettle::Jem.emit_step_event(events, "command_step", step, phase: "prepare")
+          step
+        end
+
+        def reconcile_template_managed_dependencies_step(project_root, events:)
+          paths = [
+            File.join(project_root.to_s, "Gemfile"),
+            *Dir.glob(File.join(project_root.to_s, "*.gemfile")),
+            *Dir.glob(File.join(project_root.to_s, "*.gemspec")),
+            *Dir.glob(File.join(project_root.to_s, "gemfiles/modular/**/*.gemfile"))
+          ].select { |path| File.file?(path) }.sort
+          changed_files = paths.filter_map do |path|
+            before = File.read(path)
+            after = Kettle::Jem.reconcile_template_managed_dependencies(before)
+            next if after == before
+
+            File.write(path, after)
+            Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
+          end
+          step = {
+            name: "reconcile_template_managed_dependencies",
             status: changed_files.empty? ? "already_current" : "applied",
             changed_files: changed_files
           }
@@ -191,7 +218,7 @@ module Kettle
         end
 
         def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)
-          %w[bundle update] + CRITICAL_TEMPLATING_GEMS + locked_templating_gems(project_root)
+          %w[bundle update] + managed_bootstrap_gems(project_root) + locked_templating_gems(project_root)
         end
 
         def templating_bootstrap_command(project_root = Dir.pwd)
@@ -211,10 +238,31 @@ module Kettle
           return false unless File.file?(lock_path)
 
           locked_gem_names(project_root).then do |names|
-            CRITICAL_TEMPLATING_GEMS.all? { |gem_name| names.include?(gem_name) }
+            managed_bootstrap_gems(project_root).all? { |gem_name| names.include?(gem_name) }
           end
         rescue Bundler::LockfileError
           false
+        end
+
+        def managed_bootstrap_gems(project_root)
+          declared = declared_managed_dependency_names(project_root)
+          (CRITICAL_TEMPLATING_GEMS + Kettle::Jem.template_managed_dependency_names(bootstrap: true).select do |name|
+            declared.include?(name)
+          end).uniq
+        end
+
+        def declared_managed_dependency_names(project_root)
+          paths = [
+            File.join(project_root.to_s, "Gemfile"),
+            *Dir.glob(File.join(project_root.to_s, "*.gemfile")),
+            *Dir.glob(File.join(project_root.to_s, "*.gemspec")),
+            *Dir.glob(File.join(project_root.to_s, "gemfiles/modular/**/*.gemfile"))
+          ].select { |path| File.file?(path) }
+          paths.flat_map do |path|
+            Kettle::Jem.ruby_call_records(File.read(path), nil).filter_map do |call|
+              Kettle::Jem.ruby_string_argument(call) if Kettle::Jem.template_managed_dependency_call?(call)
+            end
+          end.uniq
         end
 
         def bundle_install_after_bootstrap_step(project_root:, setup_env:, quiet:, command_runner:, events:, bootstrap_command:)

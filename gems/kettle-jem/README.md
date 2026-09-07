@@ -655,6 +655,21 @@ The `kettle:jem:*` rake tasks are internal targets used by the executable after
 it prepares the templating environment; call `kettle-jem` directly for normal
 templating work.
 
+### Template Dependency Transitions
+
+Before Bundler prepares a destination, `kettle-jem` reconciles its managed
+template-tool dependencies where they are already declared: the root Gemfile,
+root `*.gemfile` files, gemspecs, and modular Gemfile fragments. It updates the
+complete requirement set in place; it never moves a declaration, adds a missing
+dependency, or uses a local path as a compatibility fallback. A managed
+dependency with non-static version requirements is rejected before Bundler runs.
+
+The managed dependency registry is owned by `kettle-jem`. Run
+`kettle-jem-deps-floor --write` to raise its requirement floors together with
+the template dependency floors. The registry may declare a Ruby-version
+requirement, so a bootstrap only updates dependencies active for the current
+Ruby.
+
 ## 🔐 Security
 
 See [SECURITY.md][🔐security].

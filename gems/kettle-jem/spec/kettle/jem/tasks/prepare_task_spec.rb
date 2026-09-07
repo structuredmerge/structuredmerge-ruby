@@ -6,7 +6,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
   end
 
   it "prepares every modular Gemfile needed by the generated main Gemfile before Bundler runs" do
-    expect(described_class::PREPARE_ONLY_PATHS).to include("Gemfile", "gemfiles/modular/**")
+    expect(described_class::PREPARE_ONLY_PATHS).to include("Gemfile", "*.gemspec", "gemfiles/modular/**")
     expect(described_class::PREPARE_ONLY_PATHS).not_to include("gemfiles/modular/templating.gemfile")
   end
 
@@ -151,6 +151,11 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       )
       expect(result.fetch(:prepare_steps)).to eq([
         {
+          name: "reconcile_template_managed_dependencies",
+          status: "already_current",
+          changed_files: []
+        },
+        {
           name: "normalize_local_gemfile_bootstraps",
           status: "already_current",
           changed_files: []
@@ -231,6 +236,11 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       )
       expect(result.fetch(:prepare_steps)).to eq([
         {
+          name: "reconcile_template_managed_dependencies",
+          status: "already_current",
+          changed_files: []
+        },
+        {
           name: "normalize_local_gemfile_bootstraps",
           status: "already_current",
           changed_files: []
@@ -245,6 +255,68 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         }
       ])
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run_command_step).once
+    end
+  end
+
+  it "reconciles managed dependency requirements in their existing gemspec location" do
+    Dir.mktmpdir("kettle-jem-prepare-transition", tmp_root) do |root|
+      gemspec = File.join(root, "example.gemspec")
+      File.write(gemspec, <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.add_development_dependency("kettle-dev", "~> 2.5", ">= 2.5.17")
+        end
+      RUBY
+
+      step = described_class.reconcile_template_managed_dependencies_step(
+        root,
+        events: Kettle::Jem.event_stream_from_options({})
+      )
+
+      expect(step).to include(name: "reconcile_template_managed_dependencies", status: "applied", changed_files: ["example.gemspec"])
+      expect(File.read(gemspec)).to include('spec.add_development_dependency("kettle-dev", "~> 3.0", ">= 3.0.32")')
+      expect(File).not_to exist(File.join(root, "Gemfile"))
+    end
+  end
+
+  it "reconciles every existing managed declaration without moving it" do
+    Dir.mktmpdir("kettle-jem-prepare-transition", tmp_root) do |root|
+      gemfile = File.join(root, "Gemfile")
+      local_gemfile = File.join(root, "gemfiles/modular/templating_local.gemfile")
+      FileUtils.mkdir_p(File.dirname(local_gemfile))
+      File.write(gemfile, "gem \"kettle-dev\", \"~> 2.5\", \">= 2.5.17\", require: false\n")
+      File.write(local_gemfile, "gem \"nomono\", \"~> 1.0\", \">= 1.0.8\"\n")
+
+      step = described_class.reconcile_template_managed_dependencies_step(
+        root,
+        events: Kettle::Jem.event_stream_from_options({})
+      )
+
+      expect(step.fetch(:changed_files)).to contain_exactly("Gemfile", "gemfiles/modular/templating_local.gemfile")
+      expect(File.read(gemfile)).to include('gem "kettle-dev", "~> 3.0", ">= 3.0.32", require: false')
+      expect(File.read(local_gemfile)).to include('gem "nomono", "~> 1.1", ">= 1.1.5"')
+      expect(File).not_to exist(File.join(root, "example.gemspec"))
+    end
+  end
+
+  it "rejects a managed dependency without static version requirements" do
+    source = "gem \"kettle-dev\", ENV.fetch(\"KETTLE_DEV_REQUIREMENT\")\n"
+
+    expect {
+      Kettle::Jem.reconcile_template_managed_dependencies(source)
+    }.to raise_error(Kettle::Jem::Error, /kettle-dev must use static version requirements/)
+  end
+
+  it "updates every active managed bootstrap dependency declared by the destination" do
+    Dir.mktmpdir("kettle-jem-prepare-bootstrap", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile"), <<~RUBY)
+        gem "nomono", "~> 1.1", ">= 1.1.5"
+        gem "kettle-dev", "~> 3.0", ">= 3.0.32"
+        gem "kettle-changelog", "~> 1.0", ">= 1.0.7"
+      RUBY
+
+      expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
+        %w[bundle update nomono kettle-dev kettle-changelog]
+      )
     end
   end
 
