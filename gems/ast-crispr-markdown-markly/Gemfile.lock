@@ -17,43 +17,6 @@ PATH
       version_gem (~> 1.1, >= 1.1.15)
 
 PATH
-  remote: /var/home/pboling/src/my/kettle-dev/kettle-changelog
-  specs:
-    kettle-changelog (1.0.7)
-      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
-      kettle-dev (>= 3.0.19, < 4.0.0)
-      version_gem (~> 1.1, >= 1.1.15)
-
-PATH
-  remote: /var/home/pboling/src/my/kettle-dev/kettle-dev
-  specs:
-    kettle-dev (3.0.31)
-      emoji_regex (>= 15.0)
-      kettle-gha-pins (~> 0.3, >= 0.3.14)
-      kettle-ndjson (~> 0.1, >= 0.1.15)
-      kettle-rb (~> 0.1, >= 0.1.11)
-      kettle-test (~> 2.0, >= 2.0.21)
-      ruby-progressbar (~> 1.13)
-      tty-progressbar (~> 0.18)
-
-PATH
-  remote: /var/home/pboling/src/my/kettle-dev/kettle-drift
-  specs:
-    kettle-drift (1.0.13)
-      version_gem (~> 1.1, >= 1.1.15)
-
-PATH
-  remote: /var/home/pboling/src/my/kettle-dev/kettle-soup-cover
-  specs:
-    kettle-soup-cover (3.0.10)
-      kettle-wash (~> 0.1, >= 0.1.6)
-      simplecov (>= 1.0)
-      simplecov-cobertura (>= 4.0)
-      simplecov-console (~> 0.9, >= 0.9.5)
-      simplecov-rcov (~> 0.3, >= 0.3.7)
-      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
-
-PATH
   remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr-ruby-prism
   specs:
     ast-crispr-ruby-prism (7.1.8)
@@ -440,7 +403,21 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.21.2)
-    kettle-family (1.2.90)
+    kettle-changelog (1.0.7)
+      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
+      kettle-dev (>= 3.0.19, < 4.0.0)
+      version_gem (~> 1.1, >= 1.1.15)
+    kettle-dev (3.0.31)
+      emoji_regex (>= 15.0)
+      kettle-gha-pins (~> 0.3, >= 0.3.14)
+      kettle-ndjson (~> 0.1, >= 0.1.15)
+      kettle-rb (~> 0.1, >= 0.1.11)
+      kettle-test (~> 2.0, >= 2.0.21)
+      ruby-progressbar (~> 1.13)
+      tty-progressbar (~> 0.18)
+    kettle-drift (1.0.13)
+      version_gem (~> 1.1, >= 1.1.15)
+    kettle-family (1.2.91)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
       kettle-changelog (~> 1.0, >= 1.0.7)
@@ -459,6 +436,13 @@ GEM
     kettle-ndjson (0.1.15)
       version_gem (~> 1.1, >= 1.1.15)
     kettle-rb (0.1.11)
+    kettle-soup-cover (3.0.10)
+      kettle-wash (~> 0.1, >= 0.1.6)
+      simplecov (>= 1.0)
+      simplecov-cobertura (>= 4.0)
+      simplecov-console (~> 0.9, >= 0.9.5)
+      simplecov-rcov (~> 0.3, >= 0.3.7)
+      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
     kettle-test (2.0.21)
       appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
@@ -793,12 +777,12 @@ DEPENDENCIES
   html-merge!
   irb (~> 1.17)
   json-merge!
-  kettle-changelog!
-  kettle-dev (~> 3.0, >= 3.0.31, >= 0)!
-  kettle-drift!
-  kettle-family (~> 1.2, >= 1.2.90)
+  kettle-changelog (~> 1.0, >= 1.0.7)
+  kettle-dev (~> 3.0, >= 3.0.31)
+  kettle-drift (~> 1.0, >= 1.0.13)
+  kettle-family (~> 1.2, >= 1.2.91)
   kettle-jem!
-  kettle-soup-cover!
+  kettle-soup-cover (~> 3.0, >= 3.0.10)
   kettle-test (~> 2.0, >= 2.0.21)
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-merge!
@@ -908,15 +892,15 @@ CHECKSUMS
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   json-merge (7.1.8)
-  kettle-changelog (1.0.7)
-  kettle-dev (3.0.31)
-  kettle-drift (1.0.13)
-  kettle-family (1.2.90) sha256=efe10d5d7ad562927f1095ea88c7fa0984497a2c2ea25337c65126883bc494ec
+  kettle-changelog (1.0.7) sha256=42b9307e46e1e551434e8054ca4f467e8b13b69bd65e5dea4544b279179a50ff
+  kettle-dev (3.0.31) sha256=791e5829b2b936857b1c73b318b303c76fd56bfe95ed1676a134138535c51554
+  kettle-drift (1.0.13) sha256=bb39982c637ecc6cdc56276cbd7679cb071317bb601dcd40c122997543643ed6
+  kettle-family (1.2.91) sha256=fc75fd9ccef33385f49b69e73da1aa22c717e53d953c4979c7c9309a583c065a
   kettle-gha-pins (0.3.14) sha256=443a218149d3a2ab300875eb10ef55d5c4bc340bce7ba7caba026e1680dd8c21
   kettle-jem (7.1.18)
   kettle-ndjson (0.1.15) sha256=8606ab5b59092d46ba50394b2ad65738f6a5cc11258c6cc943f8e451da864a1f
   kettle-rb (0.1.11) sha256=3e50b413048906f2c5aea69ff805fbf8f7f2b5ea9d9e3d95151d38d97d6640f3
-  kettle-soup-cover (3.0.10)
+  kettle-soup-cover (3.0.10) sha256=579e09d382d5c46b2a4787df492fdf598c774545d4ab1b7bd8cfaf6104424edd
   kettle-test (2.0.21) sha256=2ab0dd1a1d11568f8fba61084ebef84717cd4dff028a527777c92d4e77f0e9c5
   kettle-wash (0.1.6) sha256=934dfb955f41b89540fe5df87614cf718a73ebc1696de7c50e7940a4695753ed
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
