@@ -25,12 +25,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-family (>= 1.2.84 -> >= 1.2.92)
 
-- [kc] kettle-jem/prepare: updated 8 project files:
-  - dependencies (8)
+- [kc] kettle-jem/prepare: updated 15 project files:
+  - dependencies (15)
 
-- [kc] kettle-jem/template: updated 2 project files:
-  - code and tests (1)
-  - other (1)
+- [kc] kettle-jem/template: updated 4 project files:
+  - code and tests (2)
+  - other (2)
 
 ### Deprecated
 
