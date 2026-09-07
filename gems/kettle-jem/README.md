@@ -670,6 +670,11 @@ the template dependency floors. The registry may declare a Ruby-version
 requirement, so a bootstrap only updates dependencies active for the current
 Ruby.
 
+`kettle-jem` itself is not a dependency floor. Generated templating Gemfiles
+derive its pessimistic requirement from `Kettle::Jem::Version.major` and
+`.minor`, and use the running full version as the minimum. This makes a major
+release emit the matching major requirement without a second version to update.
+
 ## 🔐 Security
 
 See [SECURITY.md][🔐security].

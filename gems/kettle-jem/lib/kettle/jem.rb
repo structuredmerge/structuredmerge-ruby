@@ -5441,7 +5441,9 @@ module Kettle
     end
 
     def ensure_monorepo_root_gemfile_dependencies(content)
-      updated = ensure_trailing_newline(content.to_s.empty? ? %(source "https://gem.coop"\n) : content.to_s).dup
+      updated = reconcile_template_managed_dependencies(
+        ensure_trailing_newline(content.to_s.empty? ? %(source "https://gem.coop"\n) : content.to_s).dup
+      )
       monorepo_root_gemfile_dependency_lines.each do |line|
         next if gemfile_declares_gem?(updated, line.fetch(:name))
 
@@ -5458,7 +5460,7 @@ module Kettle
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.32"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.95"\n)},
-        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.1", ">= 7.1.20"\n)},
+        {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
@@ -5480,6 +5482,17 @@ module Kettle
           false
         end
       end
+    end
+
+    def kettle_jem_dependency_requirements(version_module: Version)
+      require_relative "jem/version_gem" unless version_module.respond_to?(:major)
+
+      ["~> #{version_module.major}.#{version_module.minor}", ">= #{version_module::VERSION}"]
+    end
+
+    def kettle_jem_dependency_source(version_module: Version)
+      requirements = kettle_jem_dependency_requirements(version_module: version_module)
+      %(gem #{PACKAGE_NAME.inspect}, #{requirements.map(&:inspect).join(", ")}\n)
     end
 
     def gemspec_path_declares_gem?(path, gem_name)
@@ -9906,6 +9919,12 @@ module Kettle
       TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == name.to_s }
     end
 
+    def template_managed_dependency_requirements(name, version_module: Version)
+      return kettle_jem_dependency_requirements(version_module: version_module) if name.to_s == PACKAGE_NAME
+
+      template_managed_dependency(name)&.fetch(:requirements)
+    end
+
     def template_managed_dependency_names(bootstrap: nil, ruby_version: RUBY_VERSION)
       TEMPLATE_MANAGED_DEPENDENCIES.filter_map do |dependency|
         next if !bootstrap.nil? && dependency.fetch(:bootstrap) != bootstrap
@@ -9913,6 +9932,10 @@ module Kettle
 
         dependency.fetch(:name)
       end
+    end
+
+    def template_bootstrap_dependency_names(ruby_version: RUBY_VERSION)
+      ([PACKAGE_NAME] + template_managed_dependency_names(bootstrap: true, ruby_version: ruby_version)).uniq
     end
 
     def template_managed_dependency_active?(dependency, ruby_version = RUBY_VERSION)
@@ -9926,23 +9949,24 @@ module Kettle
       replacements = ruby_call_records(source, nil).filter_map do |call|
         next unless template_managed_dependency_call?(call)
 
-        dependency = template_managed_dependency(ruby_string_argument(call))
-        next unless dependency
+        name = ruby_string_argument(call)
+        requirements = template_managed_dependency_requirements(name)
+        next unless requirements
 
         requirement_nodes = Array(call.arguments&.arguments).drop(1).reject do |argument|
           argument.is_a?(::Prism::KeywordHashNode)
         end
         if requirement_nodes.empty?
-          raise Error, "Managed template dependency #{dependency.fetch(:name)} must use static version requirements"
+          raise Error, "Managed template dependency #{name} must use static version requirements"
         end
         requirement_nodes.each do |argument|
           value = ruby_static_string_value(argument)
           next if value && Gem::Requirement::OPS.keys.any? { |operator| value.start_with?(operator) }
 
-          raise Error, "Managed template dependency #{dependency.fetch(:name)} must use static version requirements"
+          raise Error, "Managed template dependency #{name} must use static version requirements"
         end
 
-        expected = dependency.fetch(:requirements)
+        expected = requirements
         current = requirement_nodes.map { |argument| ruby_static_string_value(argument) }
         next if current == expected
 
@@ -15107,6 +15131,7 @@ module Kettle
       compact_hash(
         freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
         kettle_jem_version: VERSION,
+        kettle_jem_dependency_arguments: kettle_jem_dependency_requirements.map(&:inspect).join(", "),
         template_run_date: run_timestamp.strftime("%Y-%m-%d"),
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_local_gems: kettle_dev_local_gems(config),
@@ -15430,6 +15455,7 @@ module Kettle
       {
         "KJ|FREEZE_TOKEN" => project_runtime[:freeze_token].to_s,
         "KJ|KETTLE_JEM_VERSION" => project_runtime[:kettle_jem_version].to_s,
+        "KJ|KETTLE_JEM_DEPENDENCY_ARGUMENTS" => project_runtime[:kettle_jem_dependency_arguments].to_s,
         "KJ|TEMPLATE_RUN_DATE" => project_runtime[:template_run_date].to_s,
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_LOCAL_GEMS" => project_runtime[:kettle_dev_local_gems].to_s,

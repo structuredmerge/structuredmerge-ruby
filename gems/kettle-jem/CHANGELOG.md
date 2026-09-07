@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Reconcile managed template-tool dependency requirements in their existing declarations before template bootstrapping, and maintain their floors with kettle-jem-deps-floor.
 
+- Derive injected kettle-jem template requirements from VersionGem major, minor, and current version so releases cannot leave a stale self-dependency floor.
+
 ### Security
 
 ## [7.1.21] - 2026-09-07

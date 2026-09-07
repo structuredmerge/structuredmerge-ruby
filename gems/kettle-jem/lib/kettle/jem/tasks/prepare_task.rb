@@ -246,7 +246,7 @@ module Kettle
 
         def managed_bootstrap_gems(project_root)
           declared = declared_managed_dependency_names(project_root)
-          (CRITICAL_TEMPLATING_GEMS + Kettle::Jem.template_managed_dependency_names(bootstrap: true).select do |name|
+          (CRITICAL_TEMPLATING_GEMS + Kettle::Jem.template_bootstrap_dependency_names.select do |name|
             declared.include?(name)
           end).uniq
         end

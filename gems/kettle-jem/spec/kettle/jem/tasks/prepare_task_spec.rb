@@ -312,12 +312,21 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         gem "nomono", "~> 1.1", ">= 1.1.5"
         gem "kettle-dev", "~> 3.0", ">= 3.0.32"
         gem "kettle-changelog", "~> 1.0", ">= 1.0.7"
+        gem "kettle-jem", ">= 7.0"
       RUBY
 
       expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
-        %w[bundle update nomono kettle-dev kettle-changelog]
+        %w[bundle update nomono kettle-jem kettle-dev kettle-changelog]
       )
     end
+  end
+
+  it "reconciles an injected kettle-jem dependency to the running template version" do
+    source = "gem \"kettle-jem\", \">= 7.0\"\n"
+
+    expect(Kettle::Jem.reconcile_template_managed_dependencies(source)).to eq(
+      "gem \"kettle-jem\", \"~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}\", \">= #{Kettle::Jem::Version::VERSION}\"\n"
+    )
   end
 
   it "resets release lockfiles before running the templating bootstrap command" do

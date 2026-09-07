@@ -1408,6 +1408,31 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
+  it "derives injected kettle-jem requirements through VersionGem major and minor" do
+    version_module = Module.new
+    version_module.const_set(:VERSION, "8.0.0")
+    version_module.define_singleton_method(:major) { 8 }
+    version_module.define_singleton_method(:minor) { 0 }
+
+    expect(described_class.kettle_jem_dependency_requirements(version_module: version_module)).to eq(
+      ["~> 8.0", ">= 8.0.0"]
+    )
+    expect(described_class.kettle_jem_dependency_source(version_module: version_module)).to eq(
+      "gem \"kettle-jem\", \"~> 8.0\", \">= 8.0.0\"\n"
+    )
+  end
+
+  it "converges an existing injected kettle-jem dependency to the running version" do
+    updated = described_class.ensure_monorepo_root_gemfile_dependencies(
+      "source \"https://gem.coop\"\ngem \"kettle-jem\", \">= 7.0\"\n"
+    )
+
+    expect(updated).to include(
+      "gem \"kettle-jem\", \"~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}\", \">= #{Kettle::Jem::Version::VERSION}\""
+    )
+    expect(updated.scan(/^gem "kettle-jem"/).length).to eq(1)
+  end
+
   it "keeps kettle-dev local overrides available for kettle-jem transitive runtime dependencies" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
 

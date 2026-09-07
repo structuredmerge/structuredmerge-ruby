@@ -18,7 +18,7 @@ end
 
 if structuredmerge_remote
   # Merge recipes for released installs.
-  gem "kettle-jem", ">= 7.0"
+  gem "kettle-jem", {KJ|KETTLE_JEM_DEPENDENCY_ARGUMENTS}
 end
 
 if kettle_remote
