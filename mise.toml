@@ -63,7 +63,7 @@ run = "bundle exec kettle-family bup --execute --no-commit"
 [tasks.deps-local]
 raw = true
 description = "Test unreleased StructuredMerge and Kettle sources without committing"
-run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --no-commit"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --no-commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env KETTLE_DEV_DEV={{config_root}}/../../kettle-dev --env K_JEM_TEMPLATING=true"
 
 [tasks.deps-release]
 raw = true
@@ -73,7 +73,7 @@ run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bun
 [tasks.bup]
 description = "Update and commit against local StructuredMerge siblings; pass gems or options after --"
 raw = true
-run = "STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV=false K_JEM_TEMPLATING=true bundle exec kettle-family bup --execute --commit"
+run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env KETTLE_DEV_DEV=false --env K_JEM_TEMPLATING=true"
 
 [tasks.bup-release]
 raw = true

@@ -302,6 +302,9 @@ Kettle tooling, validates that no external paths entered the lockfiles, and
 commits the resulting lockfile changes. `mise run deps-local` is the exceptional
 integration path for testing unreleased StructuredMerge and Kettle sources; it
 does not commit because the adjacent Kettle checkout is not available in CI.
+Both tasks boot the root orchestration bundle with registry dependencies and
+pass local-path settings only to member updates, so local Kettle testing cannot
+rewrite the root `Gemfile.lock` during `bundle exec` startup.
 `mise run deps` previews a registry-only update without committing, while
 `mise run deps-release` performs and commits that registry-only update.
 `mise run state` shows release state, while `mise run release-plan` previews a

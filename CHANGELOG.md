@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Make the default bup task commit CI-usable lockfiles against local StructuredMerge monorepo siblings while reserving deps-local for non-committing integration with unreleased Kettle sources.
 
+- Keep the root orchestration bundle on released tooling while passing local dependency overrides only to member bundle updates, preventing deps-local from polluting the root lockfile.
+
 ### Security
 
 ## [7.1.8] - 2026-09-06
