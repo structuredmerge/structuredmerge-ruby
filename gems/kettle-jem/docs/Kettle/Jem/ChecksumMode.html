@@ -366,19 +366,6 @@
       <pre class="lines">
 
 
-1851
-1852
-1853
-1854
-1855
-1856
-1857
-1858
-1859
-1860
-1861
-1862
-1863
 1864
 1865
 1866
@@ -393,10 +380,23 @@
 1875
 1876
 1877
-1878</pre>
+1878
+1879
+1880
+1881
+1882
+1883
+1884
+1885
+1886
+1887
+1888
+1889
+1890
+1891</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1851</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1864</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raw_tokens'>raw_tokens</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="#DEFAULT-constant" title="Kettle::Jem::ChecksumMode::DEFAULT (constant)">DEFAULT</a></span></span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -463,12 +463,12 @@
       <pre class="lines">
 
 
-1845
-1846
-1847</pre>
+1858
+1859
+1860</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1845</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1858</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tokens'>tokens</span>
   <span class='ivar'>@tokens</span>
@@ -500,12 +500,12 @@
       <pre class="lines">
 
 
-1847
-1848
-1849</pre>
+1860
+1861
+1862</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1847</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1860</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
@@ -559,12 +559,12 @@
       <pre class="lines">
 
 
-1888
-1889
-1890</pre>
+1901
+1902
+1903</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1888</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1901</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_check_destination?'>check_destination?</span>
   <span class='op'>!</span><span class='id identifier rubyid_off?'>off?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tokens'>tokens</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>dest</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -612,12 +612,12 @@
       <pre class="lines">
 
 
-1884
-1885
-1886</pre>
+1897
+1898
+1899</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1884</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1897</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_check_template?'>check_template?</span>
   <span class='op'>!</span><span class='id identifier rubyid_off?'>off?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tokens'>tokens</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>template</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -665,12 +665,12 @@
       <pre class="lines">
 
 
-1880
-1881
-1882</pre>
+1893
+1894
+1895</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1880</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1893</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_off?'>off?</span>
   <span class='id identifier rubyid_tokens'>tokens</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>off</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -695,12 +695,12 @@
       <pre class="lines">
 
 
-1892
-1893
-1894</pre>
+1905
+1906
+1907</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1892</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1905</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_tokens'>tokens</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -715,7 +715,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Sep  7 15:22:36 2026 by
+  Generated on Mon Sep  7 16:38:44 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

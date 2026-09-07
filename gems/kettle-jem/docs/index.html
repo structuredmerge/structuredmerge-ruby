@@ -141,7 +141,7 @@ to build <code>kettle-jem</code> extension gems against the supported plugin sea
     <tr>
       <td>Source</td>
       <td>
-<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-11.937-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=GitHub&amp;logoColor=green" alt="Source on GitHub.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-12.008-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
 </td>
     </tr>
     <tr>
@@ -1232,6 +1232,26 @@ K_JEM_TEMPLATING=true FAILURE_MODE=rescue bundle exec kettle-jem install
 it prepares the templating environment; call <code>kettle-jem</code> directly for normal<br>
 templating work.</p>
 
+<h3 id="template-dependency-transitions">Template Dependency Transitions</h3>
+
+<p>Before Bundler prepares a destination, <code>kettle-jem</code> reconciles its managed<br>
+template-tool dependencies where they are already declared: the root Gemfile,<br>
+root <code>*.gemfile</code> files, gemspecs, and modular Gemfile fragments. It updates the<br>
+complete requirement set in place; it never moves a declaration, adds a missing<br>
+dependency, or uses a local path as a compatibility fallback. A managed<br>
+dependency with non-static version requirements is rejected before Bundler runs.</p>
+
+<p>The managed dependency registry is owned by <code>kettle-jem</code>. Run<br>
+<code>kettle-jem-deps-floor --write</code> to raise its requirement floors together with<br>
+the template dependency floors. The registry may declare a Ruby-version<br>
+requirement, so a bootstrap only updates dependencies active for the current<br>
+Ruby.</p>
+
+<p><code>kettle-jem</code> itself is not a dependency floor. Generated templating Gemfiles<br>
+derive its pessimistic requirement from <code>Kettle::Jem::Version.major</code> and<br>
+<code>.minor</code>, and use the running full version as the minimum. This makes a major<br>
+release emit the matching major requirement without a second version to update.</p>
+
 <h2 id="-security">🔐 Security</h2>
 
 <p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md">SECURITY.md</a>.</p>
@@ -1353,7 +1373,7 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Mon Sep  7 15:22:32 2026 by
+  Generated on Mon Sep  7 16:38:41 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
