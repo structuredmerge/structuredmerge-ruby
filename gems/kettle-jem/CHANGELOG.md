@@ -30,6 +30,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Externalize active template tooling from gemspecs, remove legacy gem-release declarations from managed Gemfiles and gemspecs, and enforce self-test divergence thresholds inclusively.
 
+- Load Bundler before JSON in maintenance executables so Ruby 4 default JSON activation cannot conflict with the project bundle.
+
+- Declare JSON v2 as a Kettle Jem development dependency for repository-local maintenance executables.
+
 ### Security
 
 ## [7.1.22] - 2026-09-07

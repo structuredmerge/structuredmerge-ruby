@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "json"
 require "fileutils"
 require "open3"
 require "optparse"
@@ -24,6 +23,7 @@ ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 
 require "rubygems"
 require "bundler/setup"
+require "json"
 
 # Repository-local executable must boot from the unreleased source checkout.
 # rubocop:disable Packaging/RequireRelativeHardcodingLib -- Installed execution is not available while maintaining templates.
@@ -179,7 +179,8 @@ class KettleJemDepsFloor
 
   def self.run(argv = ARGV, out: $stdout, err: $stderr)
     options = parse_options(argv)
-    result = new(project_root: options.delete(:project_root), options: options).run
+    project_root = options.fetch(:project_root)
+    result = new(project_root: project_root, options: options.except(:project_root)).run
     if options[:json]
       out.puts(JSON.pretty_generate(result))
     else

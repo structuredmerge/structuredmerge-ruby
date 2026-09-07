@@ -21,6 +21,14 @@ RSpec.describe "kettle/jem require boundary" do
     expect(clean_subprocess_env.fetch("BUNDLE_GEMFILE")).to eq("/workspace/Gemfile")
   end
 
+  it "boots maintenance executables before loading Bundler-managed gems" do
+    %w[kettle-jem-deps-floor kettle-jem-workflow-pins].each do |executable|
+      source = File.read(File.expand_path("../bin/#{executable}", __dir__))
+
+      expect(source.index('require "bundler/setup"')).to be < source.index('require "json"')
+    end
+  end
+
   it "does not load parser-backed runtime dependencies before RuboCop" do
     script = <<~RUBY
       require "kettle/jem"

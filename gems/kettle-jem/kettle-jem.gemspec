@@ -140,6 +140,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("bundler-audit", "~> 0.9.3")                      # ruby >= 2.0.0
 
   # Tasks
+  # Required by repository-local maintenance executables before loading Kettle Jem.
+  spec.add_development_dependency("json", "~> 2.0", ">= 2.21.2")                 # ruby >= 4.0.0
   spec.add_development_dependency("rake", "~> 13.0")                                # ruby >= 2.2.0
 
   # Debugging
