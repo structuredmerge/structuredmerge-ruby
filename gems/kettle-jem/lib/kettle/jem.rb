@@ -1422,7 +1422,7 @@ module Kettle
         end
       end
     end
-    README_DEFAULT_PRESERVE_SECTIONS = ["synopsis", "configuration", "basic usage"].freeze
+    README_DEFAULT_PRESERVE_SECTIONS = ["synopsis", "configuration", "basic usage", "advanced usage"].freeze
     README_DEFAULT_PRESERVE_PATTERNS = ["note:*"].freeze
     README_CODETRIAGE_BADGE = "[![Open Source Helpers][👽oss-helpi]][👽oss-help]"
     README_CODETRIAGE_LINK_LABELS = ["👽oss-help", "👽oss-helpi"].freeze

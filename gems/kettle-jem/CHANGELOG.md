@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Preserve destination README Advanced Usage sections and their reference definitions during template merges.
+
 ### Security
 
 ## [7.1.23] - 2026-09-07

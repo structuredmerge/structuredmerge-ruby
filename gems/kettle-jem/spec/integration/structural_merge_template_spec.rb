@@ -1630,6 +1630,55 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     )
   end
 
+  it "preserves the default Advanced Usage section and its reference definitions" do
+    template = <<~MARKDOWN
+      # Example
+
+      ## Configuration
+
+      Template configuration.
+
+      ## Basic Usage
+
+      Template usage.
+
+      ## Funding
+
+      Template funding.
+    MARKDOWN
+    destination = <<~MARKDOWN
+      # Example
+
+      ## Configuration
+
+      Destination configuration.
+
+      ## Basic Usage
+
+      Destination usage.
+
+      ## Advanced Usage
+
+      Configure [Standard Ruby][standardrb] for legacy projects.
+
+      [standardrb]: https://github.com/standardrb/standard
+
+      ## Funding
+
+      Destination funding.
+    MARKDOWN
+
+    merged = described_class.send(
+      :merge_readme_template,
+      template_content: template,
+      destination_content: destination
+    )
+
+    expect(merged).to include("## Advanced Usage\n\nConfigure [Standard Ruby][standardrb] for legacy projects.")
+    expect(merged).to include("[standardrb]: https://github.com/standardrb/standard")
+    expect(merged).to match(/## Basic Usage.*## Advanced Usage.*## Funding/m)
+  end
+
   it "preserves a front Important section that encloses the README badge cloud" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
