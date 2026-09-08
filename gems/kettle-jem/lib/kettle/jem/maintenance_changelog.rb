@@ -104,14 +104,25 @@ module Kettle
         end
 
         key = TEMPLATE_CHANGELOG_KEYS.fetch(label, "kettle-jem/template")
-        entry = ->(matches) { template_run_entry(changed_files, matches) }
+        tracked_paths = nil
+        entry = lambda do |matches|
+          existing_paths = matches.empty? ? [] : TemplateLock.maintenance_changelog_paths(project_root: project_root, key: key).to_a
+          tracked_paths = (existing_paths + changed_files).uniq.sort
+          template_run_entry(tracked_paths)
+        end
         result = upsert_unreleased_entry(project_root: project_root, section: "Changed", key: key, entry: entry)
-        changelog = result.merge(changed_files: changed_files, entry: result.fetch(:entry))
+        state_changed = TemplateLock.update_maintenance_changelog_paths(
+          project_root: project_root,
+          key: key,
+          paths: tracked_paths || changed_files
+        )
+        changelog = result.merge(changed_files: changed_files, tracked_paths: tracked_paths, entry: result.fetch(:entry))
         changed_files_with_changelog = if result.fetch(:status) == "updated"
           (Array(report.fetch(:changed_files, [])) + ["CHANGELOG.md"]).uniq.sort
         else
           Array(report.fetch(:changed_files, [])).uniq.sort
         end
+        changed_files_with_changelog << KETTLE_LOCK_PATH if state_changed
         report.merge(changelog: changelog, changed_files: changed_files_with_changelog)
       end
 
@@ -121,8 +132,8 @@ module Kettle
         end
       end
 
-      def template_run_entry(changed_files, matches)
-        counts = template_entry_counts(matches)
+      def template_run_entry(changed_files)
+        counts = {}
         changed_files.group_by { |path| template_change_category(path) }.each do |category, paths|
           counts[category] = counts.fetch(category, 0) + paths.length
         end
@@ -131,19 +142,6 @@ module Kettle
           "  - #{category.to_s.tr("_", " ")} (#{count})"
         end
         ["updated #{total} project file#{"s" unless total == 1}:", *details].join("\n")
-      end
-
-      def template_entry_counts(matches)
-        source = Array(matches).first.to_h.fetch(:source, "")
-        source.lines.filter_map do |line|
-          match = line.match(/\A\s{2,}- (.+?) \((\d+)\)\s*\z/)
-          next unless match
-
-          category = match[1].tr(" ", "_").to_sym
-          next unless TEMPLATE_CHANGE_CATEGORIES.key?(category) || category == :other
-
-          [category, match[2].to_i]
-        end.to_h
       end
 
       def template_change_category(path)

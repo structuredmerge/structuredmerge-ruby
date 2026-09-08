@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- [kc] kettle-jem/template-file-tracking: Track distinct changed template files across repeated Unreleased template runs.
+
 ### Security
 
 ## [7.1.25] - 2026-09-08

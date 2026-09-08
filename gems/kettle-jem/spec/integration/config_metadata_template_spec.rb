@@ -1857,6 +1857,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
             version: 7.1.0
             changelog_replay:
               last_entry_key: kettle-jem-template-20260720-001
+            maintenance_changelog:
+              kettle-jem/template:
+                - README.md
             checksums:
               config.yml.example: old
           files: {}
@@ -1878,7 +1881,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
 
       expect(File).not_to exist(File.join(root, Kettle::Jem::LEGACY_KETTLE_LOCK_PATH))
-      expect(lock.fetch("template_state")).to include("changelog_replay", "checksums")
+      expect(lock.fetch("template_state")).to include("changelog_replay", "maintenance_changelog", "checksums")
+      expect(lock.dig("template_state", "maintenance_changelog", "kettle-jem/template")).to eq(["README.md"])
       expect(apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "kettle_jem_state_sync" }).to include(
         changed_files: include(Kettle::Jem::KETTLE_LOCK_PATH, Kettle::Jem::LEGACY_KETTLE_LOCK_PATH)
       )

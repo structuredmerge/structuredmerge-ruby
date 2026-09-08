@@ -2087,6 +2087,7 @@ module Kettle
       VERSION = 1
       TEMPLATE_STATE_KEY = "template_state"
       FILES_KEY = "files"
+      MAINTENANCE_CHANGELOG_SUBKEY = "maintenance_changelog"
 
       module_function
 
@@ -2153,6 +2154,34 @@ module Kettle
       def file_record(lock, relative_path)
         record = files(lock)[relative_path.to_s]
         record.is_a?(Hash) ? record : {}
+      end
+
+      def maintenance_changelog(lock)
+        value = lock.dig(TEMPLATE_STATE_KEY, MAINTENANCE_CHANGELOG_SUBKEY)
+        value.is_a?(Hash) ? value : {}
+      end
+
+      def maintenance_changelog_paths(project_root:, key:)
+        state = maintenance_changelog(load(project_root: project_root))
+        return unless state.key?(key.to_s)
+
+        Array(state.fetch(key.to_s)).map(&:to_s).uniq.sort
+      end
+
+      def update_maintenance_changelog_paths(project_root:, key:, paths:)
+        lock = load(project_root: project_root)
+        template_state = lock.fetch(TEMPLATE_STATE_KEY, {}).dup
+        changelog = maintenance_changelog(lock).dup
+        normalized_paths = Array(paths).map(&:to_s).uniq.sort
+        return false if changelog[key.to_s] == normalized_paths
+
+        changelog[key.to_s] = normalized_paths
+        template_state[MAINTENANCE_CHANGELOG_SUBKEY] = changelog
+        lock[TEMPLATE_STATE_KEY] = template_state
+        lock["version"] ||= VERSION
+        lock[FILES_KEY] ||= {}
+        write(project_root: project_root, lock: lock)
+        true
       end
 
       def build_lock(template_state:, file_records:)
@@ -5206,6 +5235,7 @@ module Kettle
       latest_replay = report.dig(:facts, :changelog, :latest_transfer_entry)
       existing_state = TemplateLock.load(project_root: project_root, config_path: config_path)
       existing_replay = existing_state.dig(TemplateLock::TEMPLATE_STATE_KEY, TemplateChecksums::CHANGELOG_REPLAY_SUBKEY)
+      maintenance_changelog = TemplateLock.maintenance_changelog(existing_state)
       changelog_replay = if latest_replay
         {
           TemplateChecksums::LAST_ENTRY_KEY_SUBKEY => latest_replay.fetch(:key),
@@ -5218,6 +5248,7 @@ module Kettle
         "version" => VERSION,
         "applied_at" => Time.now.utc.strftime("%Y-%m-%d"),
         TemplateChecksums::CHANGELOG_REPLAY_SUBKEY => changelog_replay,
+        TemplateLock::MAINTENANCE_CHANGELOG_SUBKEY => maintenance_changelog,
         TemplateChecksums::CHECKSUMS_SUBKEY => TemplateChecksums.compute(
           template_root: template_root_path(project_root, config: kettle_jem_config(project_root))
         )
