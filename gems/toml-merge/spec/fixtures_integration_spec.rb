@@ -277,7 +277,7 @@ RSpec.describe Toml::Merge do
       path = ["exe", "bin"]
 
       [tools]
-      ruby = "4.0.2"
+      ruby = "4.0.6"
     TOML
 
     analysis = described_class::FileAnalysis.new(source)
