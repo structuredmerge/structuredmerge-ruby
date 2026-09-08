@@ -22,12 +22,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-family (>= 1.2.95 -> >= 1.2.96)
-
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.24] - 2026-09-08
+
+- TAG: [v7.1.24][7.1.24t]
+- COVERAGE: 93.66% -- 11248/12010 lines in 16 files
+- BRANCH COVERAGE: 77.04% -- 4786/6212 branches in 16 files
+- 18.14% documented
+
+### Changed
+
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-family (>= 1.2.95 -> >= 1.2.96)
 
 ### Fixed
 
@@ -36,8 +49,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem/template-destination-preservation: Preserve destination Markdown, retain the required version_gem runtime dependency for dedicated entrypoints, and rebuild RuboCop Gradual work lists after template dependency and style-rule updates.
 
 - Rebuild the RuboCop Gradual work list after templating so generated-code, dependency, and rubocop-lts updates cannot retain stale cop names or locations.
-
-### Security
 
 ## [7.1.23] - 2026-09-07
 
@@ -1959,7 +1970,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.23...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.24...HEAD
+[7.1.24]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.23...v7.1.24
+[7.1.24t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.24
 [7.1.23]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.22...v7.1.23
 [7.1.23t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.23
 [7.1.22]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.21...v7.1.22
