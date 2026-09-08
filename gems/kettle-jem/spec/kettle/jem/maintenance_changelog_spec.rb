@@ -123,8 +123,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
-        report: report,
-        run_options: {changelog: true}
+        report: report
       )
 
       expect(result.fetch(:changelog)).to include(status: "updated")
@@ -149,8 +148,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
-        report: {changed_files: ["CHANGELOG.md", ".structuredmerge/kettle-jem.lock"]},
-        run_options: {changelog: true}
+        report: {changed_files: ["CHANGELOG.md", ".structuredmerge/kettle-jem.lock"]}
       )
 
       expect(result.fetch(:changelog)).to include(status: "skipped", reason: "no_template_changes")
@@ -162,8 +160,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
-        report: {setup_status: "bootstrap_config_written", changed_files: [".structuredmerge/kettle-jem.yml"]},
-        run_options: {changelog: true}
+        report: {setup_status: "bootstrap_config_written", changed_files: [".structuredmerge/kettle-jem.yml"]}
       )
 
       expect(result.fetch(:changelog)).to include(status: "skipped", reason: "bootstrap_only")
@@ -176,8 +173,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       Dir.mktmpdir("kettle-jem-maintenance-changelog-missing") do |root|
         result = described_class.record_template_run(
           project_root: root,
-          report: report,
-          run_options: {changelog: true}
+          report: report
         )
 
         expect(result.fetch(:changelog)).to include(status: "skipped", reason: "missing_changelog")
@@ -198,18 +194,6 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
       expect(described_class).not_to have_received(:upsert_unreleased_entry)
     end
 
-    it "does not manufacture a product changelog entry by default" do
-      allow(described_class).to receive(:upsert_unreleased_entry)
-
-      result = described_class.record_template_run(
-        project_root: "/workspace/example",
-        report: report
-      )
-
-      expect(result.fetch(:changelog)).to include(status: "skipped", reason: "not_requested")
-      expect(described_class).not_to have_received(:upsert_unreleased_entry)
-    end
-
     it "adds later template changes to the existing keyed category totals" do
       allow(File).to receive(:file?).with("/workspace/example/CHANGELOG.md").and_return(true)
       allow(described_class).to receive(:upsert_unreleased_entry) do |**options|
@@ -223,8 +207,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
       result = described_class.record_template_run(
         project_root: "/workspace/example",
-        report: {changed_files: ["Gemfile", "README.md"]},
-        run_options: {changelog: true}
+        report: {changed_files: ["Gemfile", "README.md"]}
       )
 
       expect(result.fetch(:changelog).fetch(:entry)).to include(

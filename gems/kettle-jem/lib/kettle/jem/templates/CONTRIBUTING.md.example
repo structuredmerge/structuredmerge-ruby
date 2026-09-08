@@ -196,6 +196,8 @@ bundle exec rake rubocop_gradual:autocorrect
 
 For more detailed information about using RuboCop in this project, please see the [RUBOCOP.md](RUBOCOP.md) guide. This project uses `rubocop_gradual` instead of vanilla RuboCop, which requires specific commands for checking violations.
 
+Kettle Jem resets `.rubocop_gradual.lock` before its post-template autocorrect step. Template and dependency updates, including updates to the `rubocop-lts` suite, can change the applicable cops; the regenerated lock is the current work list, not a preserved baseline.
+
 ### Important: Do not add inline RuboCop disables
 
 Never add `# rubocop:disable ...` / `# rubocop:enable ...` comments to code or specs (except when following the few existing `rubocop:disable` patterns for a rule already being disabled elsewhere in the code). Instead:

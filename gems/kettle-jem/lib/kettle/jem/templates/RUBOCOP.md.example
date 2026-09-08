@@ -29,6 +29,8 @@ bundle exec rake rubocop_gradual:check
 
 The `.rubocop_gradual.lock` file is a work list, not a permanent baseline. Every entry represents a style issue that should be resolved by either fixing the code or making an intentional exception explicit.
 
+Kettle Jem deletes this work list before its post-template `rubocop_gradual:autocorrect` step. Templating can update generated code and dependencies, including the `rubocop-lts` suite, which can add, remove, or rename cops. Rebuilding the work list against the resulting project prevents stale cop names and locations from masking the current style state.
+
 This allows the team to:
 
 1. Prevent new violations while existing issues are handled deliberately

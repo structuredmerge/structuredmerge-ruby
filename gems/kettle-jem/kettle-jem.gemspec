@@ -110,7 +110,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.11")                 # ruby >= 1.8.7
   spec.add_dependency("kramdown-merge", "~> 7.1", ">= 7.1.8")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "~> 7.1", ">= 7.1.8")             # ruby >= 4.0.0
-  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.15")                # ruby >= 2.2.0
   spec.add_dependency("markly-merge", "~> 7.1", ">= 7.1.8")               # ruby >= 4.0.0
   spec.add_dependency("parslet", "~> 2.0")                               # ruby >= 2.6.0
   spec.add_dependency("prism-merge", "~> 7.1", ">= 7.1.8")                # ruby >= 4.0.0
@@ -122,6 +121,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("toml-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.15")                # ruby >= 2.2.0
   spec.add_dependency("yaml-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased

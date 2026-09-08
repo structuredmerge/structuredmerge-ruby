@@ -30,7 +30,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination README Advanced Usage sections and their reference definitions during template merges.
 
-- Preserve destination Markdown, retain the required version_gem runtime dependency for dedicated entrypoints, and prevent template runs from creating or replacing RuboCop Gradual baselines.
+- [kc] kettle-jem/template-destination-preservation: Preserve destination Markdown, retain the required version_gem runtime dependency for dedicated entrypoints, and rebuild RuboCop Gradual work lists after template dependency and style-rule updates.
+
+- Rebuild the RuboCop Gradual work list after templating so generated-code, dependency, and rubocop-lts updates cannot retain stale cop names or locations.
 
 ### Security
 
