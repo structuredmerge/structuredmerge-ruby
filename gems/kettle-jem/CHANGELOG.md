@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination README Advanced Usage sections and their reference definitions during template merges.
 
+- Preserve destination Markdown, retain the required version_gem runtime dependency for dedicated entrypoints, and prevent template runs from creating or replacing RuboCop Gradual baselines.
+
 ### Security
 
 ## [7.1.23] - 2026-09-07

@@ -889,6 +889,13 @@ module Kettle
               reason: "missing_rubocop_gradual_task"
             }
           end
+          unless File.file?(File.join(project_root.to_s, ".rubocop_gradual.lock"))
+            return {
+              name: "rubocop_gradual_autocorrect",
+              status: "skipped",
+              reason: "missing_rubocop_gradual_lock"
+            }
+          end
 
           {
             name: "rubocop_gradual_autocorrect",
@@ -899,7 +906,7 @@ module Kettle
         end
 
         def rubocop_gradual_autocorrect_command
-          ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+          ["bin/rake", "rubocop_gradual:autocorrect"]
         end
 
         def rake_task_available?(project_root, task_name, env: nil)

@@ -55,11 +55,7 @@ RSpec.describe Kettle::Jem do
       end
 
       gemspec_content = File.read(gemspec_path)
-      if Dir.glob(gem_root.join("lib", "**", "version_gem.rb")).any?
-        expect(gemspec_content).not_to match(/spec\.add_dependency(?:\(| )["']version_gem["']/)
-      else
-        expect(gemspec_content).to match(/spec\.add_dependency(?:\(| )["']version_gem["']/)
-      end
+      expect(gemspec_content).to match(/spec\.add_dependency(?:\(| )["']version_gem["']/)
     end
   end
 end

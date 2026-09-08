@@ -146,7 +146,8 @@ module Kettle
           opts.on("--skip-rubocop-gradual", "Skip post-template RuboCop Gradual autocorrect.") do
             options[:run_options][:skip_rubocop_gradual] = true
           end
-          opts.on("--[no-]changelog", "Add a Changed entry summarizing actual template changes (default).") do |value|
+          opts.on("--[no-]changelog", "Add a Changed entry summarizing template maintenance changes (opt-in).") do |value|
+            options[:run_options][:changelog] = value
             options[:run_options][:skip_changelog] = !value
           end
           opts.on("--skip-binstubs", "Skip post-template curated Bundler binstub generation.") do

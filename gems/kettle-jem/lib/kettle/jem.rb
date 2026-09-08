@@ -17,6 +17,7 @@ require "token/resolver"
 require "yaml"
 require "ast/merge"
 require "ast/crispr/markdown/markly"
+require "markdown/merge"
 require "kettle/ndjson"
 require "rbs"
 require "kettle/dev"
@@ -7977,7 +7978,7 @@ module Kettle
       when :markdown
         return merge_changelog_template_source(template_content, destination_content, facts: facts) if recipe.fetch(:target_path) == "CHANGELOG.md"
 
-        return template_content
+        merge_result = Markdown::Merge.merge_markdown(template_content, destination_content, "markdown")
       when :dotenv
         merge_result = merge_dotenv_template_source(template_content, destination_content, recipe)
       when :rbs
@@ -10692,7 +10693,6 @@ module Kettle
         receiver: template_receiver,
         template_declares_version_gem: gemspec_dependency_names(template_content).include?("version_gem")
       )
-      merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_dependency_lines(
         merged,
         receiver: template_receiver,
@@ -11084,13 +11084,6 @@ module Kettle
 
     def version_gem_explicitly_disabled?(facts)
       facts.to_h.dig(:version_gem, :enabled) == false
-    end
-
-    def remove_gemspec_version_gem_dependency_when_non_default_entrypoint(content, facts, receiver:)
-      return content unless facts.to_h.dig(:version_gem, :non_default_entrypoint)
-
-      cleaned = remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
-      remove_ruby_comment_lines_containing(cleaned, "version_gem")
     end
 
     def remove_gemspec_assignment(content, receiver:, field:)

@@ -89,8 +89,9 @@ module Kettle
 
       def record_template_run(project_root:, report:, run_options: {}, label: "Apply kettle-jem templates")
         report = report.to_h
-        if template_changelog_disabled?(run_options) || bootstrap_only_report?(report)
-          return report.merge(changelog: {status: "skipped", reason: template_changelog_disabled?(run_options) ? "disabled" : "bootstrap_only"})
+        if !template_changelog_enabled?(run_options) || bootstrap_only_report?(report)
+          reason = template_changelog_disabled?(run_options) ? "disabled" : (bootstrap_only_report?(report) ? "bootstrap_only" : "not_requested")
+          return report.merge(changelog: {status: "skipped", reason: reason})
         end
 
         changed_files = template_changed_files(report.fetch(:changed_files, []))
@@ -155,6 +156,13 @@ module Kettle
       def template_changelog_disabled?(run_options)
         options = run_options.to_h
         DecisionPolicy.value_to_boolean(options[:skip_changelog] || options["skip_changelog"])
+      end
+
+      def template_changelog_enabled?(run_options)
+        options = run_options.to_h
+        return false if template_changelog_disabled?(options)
+
+        DecisionPolicy.value_to_boolean(options[:changelog] || options["changelog"])
       end
 
       def bootstrap_only_report?(report)

@@ -1167,7 +1167,7 @@ RSpec.describe Kettle::Jem do
       expect(entrypoint).not_to include('require "version_gem"')
       expect(entrypoint).not_to include("VersionGem::Basic")
       gemspec = File.read(File.join(root, "nomono.gemspec"))
-      expect(gemspec).not_to include("version_gem")
+      expect(gemspec).to include("version_gem")
       expect(File.read(File.join(root, "lib/nomono/version_gem.rb"))).to eq(dedicated_entrypoint)
       version_spec = File.read(File.join(root, "spec/nomono/version_spec.rb"))
       expect(version_spec).to include('require "anonymous_loader"')
