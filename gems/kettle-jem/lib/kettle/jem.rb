@@ -19878,7 +19878,10 @@ module Kettle
     end
 
     def github_actions_push_branches(content, default_branch:)
-      managed = [default_branch.to_s, "*-stable"]
+      # Branch-stack releases use names such as r3_2-even-v24. They must run
+      # the same push workflows as stable branches because kettle-release
+      # monitors those runs before publishing the branch release.
+      managed = [default_branch.to_s, "*-stable", "r*_*-*-v*"]
       existing = yaml_scalar_sequence_at_path(content, %w[on push branches])
       (managed + existing).uniq
     end

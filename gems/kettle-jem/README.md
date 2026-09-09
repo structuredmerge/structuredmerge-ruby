@@ -293,6 +293,14 @@ workflows:
     truffleruby-22.3: kettle-test --tag ~type:acceptance --example-status-log .rspec_status
 ```
 
+### Branch-Stack CI
+
+Generated GitHub Actions workflows run on the default branch, `*-stable`, and
+branch-stack release names matching `r*_*-*-v*` (for example,
+`r3_2-even-v24`). This keeps release CI active for every target that
+`kettle-family` publishes from a branch stack. Existing project-specific push
+branch patterns remain preserved during templating.
+
 ### Default Local Test Bundle
 
 The root `Gemfile` is the default bundle for local commands such as

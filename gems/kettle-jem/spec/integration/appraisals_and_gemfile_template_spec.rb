@@ -862,7 +862,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       })
     ]
 
-    expect(workflows + [coverage_workflow]).not_to include(include('      - "r*_*-*-v*"'))
+    expect(workflows + [coverage_workflow]).to all(include('      - "r*_*-*-v*"'))
     expect(preserved_workflows).to all(include('      - "r*_*-*-v*"'))
     expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'ruby-2.4' && matrix.ruby != 'ruby-2.5' && matrix.ruby != 'ruby-2.6' && matrix.ruby != 'ruby-2.7' && matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' && matrix.ruby != 'jruby-9.4' }}"))
     expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
