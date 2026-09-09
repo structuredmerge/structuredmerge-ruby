@@ -24,6 +24,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-family (>= 1.2.97 -> >= 1.2.99)
+  - rubocop-lts-rspec (>= 1.0.5 -> >= 1.0.6)
+
 ### Deprecated
 
 ### Removed
