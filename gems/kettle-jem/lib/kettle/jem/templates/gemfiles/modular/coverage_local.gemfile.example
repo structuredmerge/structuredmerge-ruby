@@ -7,7 +7,7 @@
 
 local_gems = %w[{KJ|KETTLE_DEV_LOCAL_GEMS}]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
-local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems
+local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])
 
 # export KETTLE_DEV_DEV=/path/to/my
 platform :mri do

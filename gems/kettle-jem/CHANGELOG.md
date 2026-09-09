@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep branch-stack release CI active by managing the r*_*-*-v* GitHub Actions push trigger.
 
+- Allow KETTLE_DEV_DEV to override a directly declared kettle-dev development dependency in local coverage Gemfiles.
+
 ### Security
 
 ## [7.1.25] - 2026-09-08
