@@ -301,7 +301,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
   it "runs install as active apply plus local post-template checks" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
-    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
+    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard rubocop-gradual kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
     Dir.mktmpdir("kettle-jem-install-post-template-slice", tmp_root) do |root|
       write_tree(root, {
         "example.gemspec" => <<~RUBY,
@@ -756,7 +756,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
   it "applies full templates after accepting a newly bootstrapped config before bundled handoff" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
-    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
+    curated_binstubs = %w[bundle binstubs appraisal2 rake rbs rspec-core yard rubocop-gradual kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
     Dir.mktmpdir("kettle-jem-install-bootstrap-followup", tmp_root) do |root|
       write_tree(root, {
         "Gemfile" => <<~RUBY,
@@ -881,20 +881,20 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     allow(Open3).to receive(:capture3).and_return(["", "", status])
 
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
-      %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
+      %w[bundle binstubs appraisal2 rake rbs rspec-core yard rubocop-gradual kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums]
     )
   end
 
   it "omits curated binstubs for gems missing from the destination bundle" do
     status = instance_double(Process::Status, success?: true)
     allow(Open3).to receive(:capture3).and_return([
-      "appraisal2\nrake\nrbs\nrspec-core\nkettle-dev\nkettle-test\nkettle-soup-cover\nstone_checksums\n",
+      "appraisal2\nrake\nrbs\nrspec-core\nrubocop-gradual\nkettle-dev\nkettle-test\nkettle-soup-cover\nstone_checksums\n",
       "",
       status
     ])
 
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command("/example", env: {})).to eq(
-      %w[bundle binstubs appraisal2 rake rbs rspec-core kettle-dev kettle-test kettle-soup-cover stone_checksums]
+      %w[bundle binstubs appraisal2 rake rbs rspec-core rubocop-gradual kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )
   end
 

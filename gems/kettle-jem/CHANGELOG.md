@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Curated Bundler binstub generation now includes `rubocop-gradual`.
+
 ### Changed
 
 ### Deprecated
