@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Make the family GitHub Actions pin task request major upgrades.
+
 ### Deprecated
 
 ### Removed

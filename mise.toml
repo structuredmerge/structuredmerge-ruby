@@ -98,7 +98,7 @@ run = "bundle exec kettle-family clean-unreleased --execute"
 [tasks.pins]
 raw = true
 description = "Review and update GitHub Actions pins across the family"
-run = "bundle exec kettle-family gha-sha-pins --execute"
+run = "bundle exec kettle-family gha-sha-pins --upgrade major --execute"
 
 [tasks.release]
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"
