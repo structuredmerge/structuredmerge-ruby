@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Predeclare the intentional version_gem runtime-heads dependency overlap in generated Kettle Jem configuration.
 
+- Preserve declared kettle-dev requirements when local coverage and templating Gemfiles replace it with a workspace path.
+
 ### Security
 
 ## [7.1.25] - 2026-09-08

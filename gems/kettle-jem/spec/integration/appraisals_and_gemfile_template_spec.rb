@@ -1441,7 +1441,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(updated).not_to include('gem "gem-release"')
   end
 
-  it "keeps kettle-dev local overrides available for kettle-jem transitive runtime dependencies" do
+  it "replaces declared kettle-dev dependencies with local paths without duplicate declarations" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
     coverage_template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/coverage_local.gemfile.example", __dir__))
 
@@ -1453,12 +1453,74 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       "structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
     )
     expect(template).to include(
-      "kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])"
+      "gem kettle_dev_dependency.name, *kettle_dev_dependency.requirements_list, path: kettle_dev_local_path"
     )
     expect(coverage_template).to include(
-      "local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - (declared_gems - %w[kettle-dev])"
+      "gem kettle_dev_dependency.name, *kettle_dev_dependency.requirements_list, path: kettle_dev_local_path"
+    )
+    expect(template).to include(
+      "kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
+    )
+    expect(coverage_template).to include(
+      "local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
     )
     expect(template).not_to include("platform :mri do")
+  end
+
+  it "evaluates a generated local coverage Gemfile with a declared kettle-dev path override" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-local-kettle-dev-override", tmp_root) do |root|
+      workspace_root = File.join(root, "workspace")
+      kettle_dev_path = File.join(workspace_root, "kettle-dev")
+      coverage_template = File.read(
+        File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/coverage_local.gemfile.example", __dir__)
+      )
+      coverage_local_gemfile = coverage_template
+        .gsub("{KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP}", 'require "nomono/bundler"')
+        .gsub("{KJ|KETTLE_DEV_LOCAL_GEMS}", "kettle-dev")
+        .gsub("{KJ|PACKAGE_NAME}", "example")
+
+      write_tree(root, {
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec
+          eval_gemfile "gemfiles/modular/coverage_local.gemfile"
+        RUBY
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.version = "0.1.0"
+            spec.summary = "Example"
+            spec.authors = ["Example"]
+            spec.files = []
+            spec.add_development_dependency "kettle-dev", "~> 3.0", ">= 3.0.34"
+          end
+        RUBY
+        "gemfiles/modular/coverage_local.gemfile" => coverage_local_gemfile,
+        "workspace/kettle-dev/kettle-dev.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "kettle-dev"
+            spec.version = "3.0.34"
+            spec.summary = "Kettle Dev"
+            spec.authors = ["Example"]
+            spec.files = []
+          end
+        RUBY
+      })
+
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("KETTLE_DEV_DEV").and_return(workspace_root)
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("KETTLE_DEV_DEV", "false").and_return(workspace_root)
+      definition = Bundler::Dsl.evaluate(File.join(root, "Gemfile"), nil, {})
+      dependency = definition.dependencies.find { |candidate| candidate.name == "kettle-dev" }
+
+      expect(definition.dependencies.count { |candidate| candidate.name == "kettle-dev" }).to eq(1)
+      expect(dependency.requirement).to eq(Gem::Requirement.new("~> 3.0", ">= 3.0.34"))
+      expect(dependency.source.path.to_s).to eq(kettle_dev_path)
+    end
   end
 
   it "omits kettle-family from its own main Gemfile dependency token" do
