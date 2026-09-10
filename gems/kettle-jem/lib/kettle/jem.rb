@@ -58,7 +58,7 @@ module Kettle
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.5"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.0", ">= 3.0.34"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.0"], bootstrap: true},
       {
         name: "kettle-changelog",
         requirements: ["~> 1.0", ">= 1.0.7"],
@@ -5496,9 +5496,9 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.3"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.0", ">= 3.0.34"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.0"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.100"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.0"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
@@ -15527,7 +15527,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.2", ">= 1.2.100"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.0"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
