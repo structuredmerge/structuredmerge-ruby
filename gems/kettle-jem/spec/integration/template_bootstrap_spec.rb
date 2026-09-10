@@ -179,6 +179,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       packaged_config_template = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".structuredmerge/kettle-jem.yml.example"))
       expect(packaged_config_template).to include('family_tag: "{KJ|RUBYFORUM:FAMILY_TAG}"')
       expect(packaged_config_template).to include('project_tag: "{KJ|RUBYFORUM:PROJECT_TAG}"')
+      expect(packaged_config_template).to include('direct: "{KJ|GEMSPEC_PATH}"')
 
       write_tree(root, {
         "example.gemspec" => <<~RUBY
@@ -204,8 +205,18 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(bootstrap_report.fetch(:final_content)).to include("# kettle-jem configuration file")
       expect(bootstrap_report.fetch(:final_content)).to include("min_divergence_threshold: 7")
       expect(bootstrap_report.fetch(:final_content)).to include("#   tokens    - values for {KJ|...} placeholders used across template files")
-      expect(YAML.safe_load(bootstrap_report.fetch(:final_content)).dig("rubyforum", "family_tag")).to eq("")
-      expect(YAML.safe_load(bootstrap_report.fetch(:final_content)).dig("rubyforum", "project_tag")).to eq("")
+      bootstrap_config = YAML.safe_load(bootstrap_report.fetch(:final_content))
+      expect(bootstrap_config.dig("rubyforum", "family_tag")).to eq("")
+      expect(bootstrap_config.dig("rubyforum", "project_tag")).to eq("")
+      expect(bootstrap_config.dig("dependency_conflicts", "resolve")).to include(
+        {
+          "gem" => "version_gem",
+          "direct" => "example.gemspec",
+          "modular" => "gemfiles/modular/runtime_heads.gemfile",
+          "action" => "keep_both",
+          "reason" => "The gemspec declares the released runtime contract while runtime_heads intentionally tests version_gem from main."
+        }
+      )
 
       described_class.apply_project(root, env: {"KJ_MIN_DIVERGENCE_THRESHOLD" => "7"})
       applied_config = File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))
@@ -215,6 +226,20 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         "version" => described_class::VERSION,
         "checksums" => a_kind_of(Hash)
       )
+
+      reports = [
+        {
+          relative_path: "example.gemspec",
+          final_content: %(spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.15")\n)
+        },
+        {
+          relative_path: "gemfiles/modular/runtime_heads.gemfile",
+          final_content: %(gem "version_gem", github: "ruby-oauth/version_gem", branch: "main"\n)
+        }
+      ]
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.not_to raise_error
     end
   end
 

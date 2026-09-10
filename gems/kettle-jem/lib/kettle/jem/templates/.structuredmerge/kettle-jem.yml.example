@@ -108,7 +108,15 @@ author_aliases:
 dependency_conflicts:
   # Set true only after every discovered conflict has an intentional action.
   reviewed: false
-  resolve: []
+  resolve:
+    # The gemspec defines the released runtime contract. runtime_heads
+    # intentionally resolves version_gem from main to detect upstream changes
+    # before release, so both declarations must remain.
+    - gem: version_gem
+      direct: "{KJ|GEMSPEC_PATH}"
+      modular: gemfiles/modular/runtime_heads.gemfile
+      action: keep_both
+      reason: "The gemspec declares the released runtime contract while runtime_heads intentionally tests version_gem from main."
 
 # This project's identifying emoji.
 # Used as the leading emoji in the README H1 heading and in the gemspec

@@ -14397,6 +14397,7 @@ module Kettle
       github_org = facts.fetch(:repository, {})[:slug].to_s.split("/", 2).first.to_s if github_org.empty?
       tokens = {
         "KJ|GEM_NAME" => package.fetch(:name).to_s,
+        "KJ|GEMSPEC_PATH" => rubygems.fetch(:gemspec_path, "").to_s,
         "KJ|PACKAGE_SUMMARY" => package.fetch(:summary, package.fetch(:description, "")).to_s,
         "KJ|PACKAGE_DESCRIPTION" => package.fetch(:description, package.fetch(:summary, "")).to_s,
         "KJ|GEMSPEC_PACKAGE_SUMMARY" => ruby_double_quoted_string_body(strip_leading_decorative_graphemes(package.fetch(:summary, package.fetch(:description, "")).to_s)),
@@ -18626,6 +18627,7 @@ module Kettle
       )
       recipe[:template_preference] = bootstrap.fetch(:template_preference)
       recipe[:template_tokens] = {
+        "KJ|GEMSPEC_PATH" => bootstrap[:gemspec_path].to_s,
         "KJ|MIN_DIVERGENCE_THRESHOLD" => bootstrap.fetch(:min_divergence_threshold).to_s,
         "KJ|MIN_RUBY" => bootstrap[:min_ruby].to_s,
         "KJ|MIN_TEST_RUBY" => bootstrap[:test_min_ruby].to_s,

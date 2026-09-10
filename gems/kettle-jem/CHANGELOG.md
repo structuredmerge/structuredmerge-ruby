@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Allow KETTLE_DEV_DEV to override a directly declared kettle-dev development dependency in local coverage Gemfiles.
 
+- Predeclare the intentional version_gem runtime-heads dependency overlap in generated Kettle Jem configuration.
+
 ### Security
 
 ## [7.1.25] - 2026-09-08
