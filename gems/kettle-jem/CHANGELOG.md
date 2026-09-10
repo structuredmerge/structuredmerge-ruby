@@ -20,6 +20,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.26] - 2026-09-10
+
+- TAG: [v7.1.26][7.1.26t]
+- COVERAGE: 93.67% -- 11268/12030 lines in 16 files
+- BRANCH COVERAGE: 77.10% -- 4794/6218 branches in 16 files
+- 18.11% documented
+
+### Added
+
 - Curated Bundler binstub generation now includes `rubocop-gradual`.
 
 ### Changed
@@ -36,10 +55,6 @@ Please file a bug if you notice a violation of semantic versioning.
   - dependencies (3)
   - other (1)
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - [kc] kettle-jem/template-file-tracking: Track distinct changed template files across repeated Unreleased template runs.
@@ -51,8 +66,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Predeclare the intentional version_gem runtime-heads dependency overlap in generated Kettle Jem configuration.
 
 - Preserve declared kettle-dev requirements when local coverage and templating Gemfiles replace it with a workspace path.
-
-### Security
 
 ## [7.1.25] - 2026-09-08
 
@@ -2006,7 +2019,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.25...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.26...HEAD
+[7.1.26]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.25...v7.1.26
+[7.1.26t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.26
 [7.1.25]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.24...v7.1.25
 [7.1.25t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.25
 [7.1.24]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.23...v7.1.24

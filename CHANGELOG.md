@@ -22,8 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Make the family GitHub Actions pin task request major upgrades.
-
 ### Deprecated
 
 ### Removed
@@ -31,6 +29,17 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 ### Security
+
+## [7.1.9] - 2026-09-10
+
+- TAG: [v7.1.9][7.1.9t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 73.88% documented
+
+### Changed
+
+- Make the family GitHub Actions pin task request major upgrades.
 
 ## [7.1.8] - 2026-09-07
 
@@ -708,7 +717,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.8...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.9...HEAD
+[7.1.9]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.8...v7.1.9
+[7.1.9t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.9
 [7.1.8]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.7...v7.1.8
 [7.1.8t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.8
 [7.1.7]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.6...v7.1.7
