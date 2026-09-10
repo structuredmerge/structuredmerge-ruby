@@ -28,6 +28,14 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-dev (>= 3.0.33 -> >= 3.0.34)
   - kettle-family (>= 1.2.97 -> >= 1.2.100)
 
+- [kc] kettle-jem/prepare: updated 10 project files:
+  - dependencies (10)
+
+- [kc] kettle-jem/template: updated 5 project files:
+  - code and tests (1)
+  - dependencies (3)
+  - other (1)
+
 ### Deprecated
 
 ### Removed

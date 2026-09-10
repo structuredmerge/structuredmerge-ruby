@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   # Linux distros often package gems and securely certify them independent
   #   of the official RubyGem certification process. Allowed via ENV["SKIP_GEM_SIGNING"]
+  # Ref: https://gitlab.com/ruby-oauth/version_gem/-/issues/3
   # Hence, only enable signing if `SKIP_GEM_SIGNING` is not set in ENV.
   # See CONTRIBUTING.md
   unless ENV.include?("SKIP_GEM_SIGNING")
@@ -103,8 +104,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency("commonmarker-merge", "~> 7.1", ">= 7.1.8")         # ruby >= 4.0.0
   spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.8")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
-  spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.6")          # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", ">= 3.0.17", "< 4.0.0")               # ruby >= 2.3.0
+  spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.7")          # ruby >= 4.0.0
+  spec.add_dependency("kettle-dev", "~> 3.0", ">= 3.0.34")               # ruby >= 2.3.0
   spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.14")          # ruby >= 2.4.0
   spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.13")            # ruby >= 2.4.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.11")                 # ruby >= 1.8.7
@@ -121,7 +122,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("toml-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
-  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.15")                # ruby >= 2.2.0
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.15")              # ruby >= 2.2.0
   spec.add_dependency("yaml-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
@@ -141,8 +142,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("bundler-audit", "~> 0.9.3")                      # ruby >= 2.0.0
 
   # Tasks
-  # Required by repository-local maintenance executables before loading Kettle Jem.
-  spec.add_development_dependency("json", "~> 2.0", ">= 2.21.2")                 # ruby >= 4.0.0
   spec.add_development_dependency("rake", "~> 13.0")                                # ruby >= 2.2.0
 
   # Debugging
@@ -165,4 +164,12 @@ Gem::Specification.new do |spec|
   # /opt/hostedtoolcache/Ruby/2.3.8/x64/lib/ruby/gems/2.3.0/gems/erb-2.2.2/lib/erb.rb:670:in `prepare_trim_mode': undefined method `match?' for "-":String (NoMethodError)
   # spec.add_development_dependency("erb", ">= 2.2")                                  # ruby >= 2.3.0, not SemVer, old rubies get dropped in a patch.
   spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.12")            # ruby >= 2.4
+
+  # HTTP recording for deterministic specs
+  # In Ruby 3.5 (HEAD) the CGI library has been pared down, so we also need to depend on gem "cgi" for ruby@head
+  # This is done in the "head" appraisal.
+  # See: https://github.com/vcr/vcr/issues/1057
+  # spec.add_development_dependency("vcr", ">= 4")                        # 6.0 claims to support ruby >= 2.3, but fails on ruby 2.4
+  # spec.add_development_dependency("webmock", ">= 3")                    # Last version to support ruby >= 2.3
+  spec.add_development_dependency("json", "~> 2.0", ">= 2.21.2")                 # ruby >= 4.0.0
 end
