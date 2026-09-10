@@ -296,7 +296,7 @@ RSpec.describe Toml::Merge do
     )
     expect(table_fragments).to eq(
       'env' => "[env]\nproject = \"kettle-jem\"\npath = [\"exe\", \"bin\"]",
-      'tools' => "[tools]\nruby = \"4.0.2\""
+      'tools' => "[tools]\nruby = \"4.0.6\""
     )
   end
 

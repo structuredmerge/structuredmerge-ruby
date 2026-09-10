@@ -1476,8 +1476,19 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       coverage_template = File.read(
         File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/coverage_local.gemfile.example", __dir__)
       )
+      nomono_dsl_stub = <<~RUBY
+        def nomono_gems(gems:, **)
+          gems.to_h { |name| [name, File.join(ENV.fetch("KETTLE_DEV_DEV"), name)] }
+        end
+
+        def eval_nomono_gems(gems:, **)
+          nomono_gems(gems: gems).each do |name, path|
+            gem name, path: path
+          end
+        end
+      RUBY
       coverage_local_gemfile = coverage_template
-        .gsub("{KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP}", 'require "nomono/bundler"')
+        .gsub("{KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP}", nomono_dsl_stub)
         .gsub("{KJ|KETTLE_DEV_LOCAL_GEMS}", "kettle-dev")
         .gsub("{KJ|PACKAGE_NAME}", "example")
 
@@ -1513,6 +1524,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with("KETTLE_DEV_DEV").and_return(workspace_root)
       allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("KETTLE_DEV_DEV").and_return(workspace_root)
       allow(ENV).to receive(:fetch).with("KETTLE_DEV_DEV", "false").and_return(workspace_root)
       definition = Bundler::Dsl.evaluate(File.join(root, "Gemfile"), nil, {})
       dependency = definition.dependencies.find { |candidate| candidate.name == "kettle-dev" }
