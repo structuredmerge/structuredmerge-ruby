@@ -25,6 +25,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-family (>= 1.3.0 -> >= 1.3.1)
 
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - github/codeql-action/analyze v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
+  - github/codeql-action/autobuild v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
+  - github/codeql-action/init v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
+
 ### Deprecated
 
 ### Removed
