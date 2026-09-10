@@ -110,6 +110,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'go-merge', "= #{spec.version}"
   spec.add_dependency 'html-merge', "= #{spec.version}"
   spec.add_dependency 'json-merge', "= #{spec.version}"
+  # `smorg-rb git install` delegates Git-driver installation and orchestration
+  # to Kettle::Jem::Tasks::InstallTask; this is a runtime integration, not
+  # merely a templating or development dependency.
   spec.add_dependency 'kettle-jem', '~> 7.1', '>= 7.1.26'
   spec.add_dependency 'markdown-merge', "= #{spec.version}"
   spec.add_dependency 'plain-merge', "= #{spec.version}"
