@@ -408,21 +408,21 @@ GEM
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
       kettle-dev (>= 3.0.19, < 4.0.0)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-dev (3.0.33)
+    kettle-dev (3.0.34)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.14)
       kettle-ndjson (~> 0.1, >= 0.1.15)
-      kettle-rb (~> 0.1, >= 0.1.11)
+      kettle-rb (~> 0.1, >= 0.1.12)
       kettle-test (~> 2.0, >= 2.0.21)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
     kettle-drift (1.0.13)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-family (1.2.97)
+    kettle-family (1.2.100)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
       kettle-changelog (~> 1.0, >= 1.0.7)
-      kettle-dev (~> 3.0, >= 3.0.33)
+      kettle-dev (~> 3.0, >= 3.0.34)
       kettle-gha-pins (~> 0.3, >= 0.3.14)
       kettle-jem (~> 7.1, >= 7.1.23)
       kettle-test (~> 2.0, >= 2.0.21)
@@ -436,7 +436,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.15)
     kettle-ndjson (0.1.15)
       version_gem (~> 1.1, >= 1.1.15)
-    kettle-rb (0.1.11)
+    kettle-rb (0.1.12)
     kettle-soup-cover (3.0.10)
       kettle-wash (~> 0.1, >= 0.1.6)
       simplecov (>= 1.0)
@@ -464,7 +464,7 @@ GEM
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     logger (1.7.0)
-    markly (0.17.0)
+    markly (0.19.0)
     mister_bin (0.9.0)
       colsole (~> 1.0.0)
       docopt_ng (~> 0.7.1)
@@ -573,11 +573,11 @@ GEM
       parallel (~> 1.10)
       rainbow (>= 2.2.2, < 4.0)
       rubocop (~> 1.0)
-    rubocop-lts (24.2.2)
-      rubocop-ruby3_2 (~> 3.0, >= 3.0.1)
-      standard-rubocop-lts (~> 2.0, >= 2.0.3)
-      version_gem (~> 1.1, >= 1.1.13)
-    rubocop-lts-rspec (1.0.5)
+    rubocop-lts (24.2.3)
+      rubocop-ruby3_2 (~> 3.0, >= 3.0.8)
+      standard-rubocop-lts (~> 2.0, >= 2.0.13)
+      version_gem (~> 1.1, >= 1.1.15)
+    rubocop-lts-rspec (1.0.6)
       rubocop (~> 1.84, >= 1.84.2)
       rubocop-env (~> 0.1, >= 0.1.0)
       rubocop-factory_bot (~> 2.28, >= 2.28.0)
@@ -585,8 +585,8 @@ GEM
       rubocop-rspec-extra (~> 0.3, >= 0.3.0)
       standard (~> 1.54, >= 1.54.0)
       standard-rspec (~> 0.5, >= 0.5.0)
-      version_gem (~> 1.1, >= 1.1.13)
-    rubocop-lts-ruby (0.1.3)
+      version_gem (~> 1.1, >= 1.1.15)
+    rubocop-lts-ruby (0.1.4)
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1, < 2.0)
       version_gem (~> 1.1, >= 1.1.15)
@@ -620,13 +620,13 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-rspec (~> 3.5)
-    rubocop-ruby3_2 (3.0.7)
+    rubocop-ruby3_2 (3.0.8)
       rubocop-gradual (~> 0.3, >= 0.3.6)
       rubocop-md (~> 2.0, >= 2.0.4)
       rubocop-rake (~> 0.7, >= 0.7.1)
       rubocop-thread_safety (~> 0.7, >= 0.7.3)
-      standard-rubocop-lts (~> 2.0, >= 2.0.9)
-      version_gem (~> 1.1, >= 1.1.13)
+      standard-rubocop-lts (~> 2.0, >= 2.0.13)
+      version_gem (~> 1.1, >= 1.1.15)
     rubocop-thread_safety (0.7.3)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
@@ -651,7 +651,7 @@ GEM
       simplecov (>= 0.4.1)
     simplecov_lcov_formatter (0.9.0)
       simplecov (>= 0.18)
-    sorbet-runtime (0.6.13486)
+    sorbet-runtime (0.6.13490)
     standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -670,8 +670,8 @@ GEM
       rubocop-factory_bot (~> 2.27)
       rubocop-rspec (~> 3.9)
       rubocop-rspec_rails (~> 2.31)
-    standard-rubocop-lts (2.0.12)
-      rubocop-lts-ruby (~> 0.1, >= 0.1.0)
+    standard-rubocop-lts (2.0.13)
+      rubocop-lts-ruby (~> 0.1, >= 0.1.4)
       standard (~> 1.54, >= 1.54.0)
       standard-custom (~> 1.0, >= 1.0.2)
       standard-performance (~> 1.9, >= 1.9.0)
@@ -899,13 +899,13 @@ CHECKSUMS
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   json-merge (7.1.8)
   kettle-changelog (1.0.7) sha256=42b9307e46e1e551434e8054ca4f467e8b13b69bd65e5dea4544b279179a50ff
-  kettle-dev (3.0.33) sha256=973ecd9c4729b857a83e1c3541ae64e86dac888eadc1fb696df6744b5acf668f
+  kettle-dev (3.0.34) sha256=3e49c743fea5ed564cd3e7517b6ce2998dac289123747f61090618956c567af5
   kettle-drift (1.0.13) sha256=bb39982c637ecc6cdc56276cbd7679cb071317bb601dcd40c122997543643ed6
-  kettle-family (1.2.97) sha256=3145aefa33178089a5fafadd1099a361ba1f4c65e2808a519243a8fbf8eb1c25
+  kettle-family (1.2.100) sha256=b5d1ebd647eb45afbef7b84c20270dd2ea1c17e221152996266b963634db2d80
   kettle-gha-pins (0.3.14) sha256=443a218149d3a2ab300875eb10ef55d5c4bc340bce7ba7caba026e1680dd8c21
   kettle-jem (7.1.25)
   kettle-ndjson (0.1.15) sha256=8606ab5b59092d46ba50394b2ad65738f6a5cc11258c6cc943f8e451da864a1f
-  kettle-rb (0.1.11) sha256=3e50b413048906f2c5aea69ff805fbf8f7f2b5ea9d9e3d95151d38d97d6640f3
+  kettle-rb (0.1.12) sha256=918ea072d3069f998e7dbd76836a14378cc9a16e317e2bf79da714f5ec0be5a4
   kettle-soup-cover (3.0.10) sha256=579e09d382d5c46b2a4787df492fdf598c774545d4ab1b7bd8cfaf6104424edd
   kettle-test (2.0.21) sha256=2ab0dd1a1d11568f8fba61084ebef84717cd4dff028a527777c92d4e77f0e9c5
   kettle-wash (0.1.6) sha256=934dfb955f41b89540fe5df87614cf718a73ebc1696de7c50e7940a4695753ed
@@ -916,7 +916,7 @@ CHECKSUMS
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
   markdown-merge (7.1.8)
-  markly (0.17.0) sha256=fab61b604f7c4c8f771c3b7f2f16b971034bb72ddd27009b90c3fae1990b17e6
+  markly (0.19.0) sha256=cd2c0e86eaf3660ed2a3a94104877f8bd41adda78e7c295c017d03de0d4044ca
   markly-merge (7.1.8)
   mister_bin (0.9.0) sha256=624fe401db4faf1978e84c17e0b320827697a13a6cba4fe656001269079be7d3
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
@@ -968,9 +968,9 @@ CHECKSUMS
   rubocop-env (0.1.0) sha256=5ab9a259e71822bf514c8e900a9b68cc2f74ccc87d5493efcd03213f3068e718
   rubocop-factory_bot (2.28.0) sha256=4b17fc02124444173317e131759d195b0d762844a71a29fe8139c1105d92f0cb
   rubocop-gradual (0.4.0) sha256=9c7e584e6fef6c2539266a193a4572c970c22f99046fd6b0305bdde6228f96ad
-  rubocop-lts (24.2.2) sha256=be6c745e1bb61daebd6af3cc3227c60f95be9f642a080773cad7df14c5f9f174
-  rubocop-lts-rspec (1.0.5) sha256=439552fd27440802cc499889e013bffa28aadc41adae5d4dfff3d984a2a809b4
-  rubocop-lts-ruby (0.1.3) sha256=fa002117b94c5eb403eb476d5fde393913dbcc4253b6151ed9a3393c73fd3916
+  rubocop-lts (24.2.3) sha256=510ca38a90393c7c5cac0e0defa35151805797b1ff9a2d130b649c20c2ca0842
+  rubocop-lts-rspec (1.0.6) sha256=b7f7dae919c9712dee09df76b027563e154f510d9b4423bb0453394b5474cf38
+  rubocop-lts-ruby (0.1.4) sha256=eb0039d61d645d2b6754abd4006842945b7848a916a664f522f5e2f7a5a69bf1
   rubocop-md (2.0.4) sha256=0d076b6b5e99dea2ddc928c4bd702497decb9a8400da7808091e02ebcafcfb93
   rubocop-minitest (0.40.0) sha256=353c698199115f12151144cf0b5a96f69bb9d77b660cf6536df2c4250c672a9d
   rubocop-on-rbs (2.0.0) sha256=ce74d1b3d5daead19f4b611623656c185821dfc9aed9c7079bb1e5d7d7c464be
@@ -980,7 +980,7 @@ CHECKSUMS
   rubocop-rspec (3.10.2) sha256=0b3e2ecc592cd10ecbf0095bb58d1e357905276e069643523cc19eb7495f65e2
   rubocop-rspec-extra (0.3.0) sha256=ee4b6484d0332a0d23c4a465eeb607e41888eb3d4ed479f850b9f5212514f787
   rubocop-rspec_rails (2.32.0) sha256=4a0d641c72f6ebb957534f539d9d0a62c47abd8ce0d0aeee1ef4701e892a9100
-  rubocop-ruby3_2 (3.0.7) sha256=f53dd6d286fb05186214fc6ec116783e7f837030918e8931c05de773e98f8466
+  rubocop-ruby3_2 (3.0.8) sha256=ccc76e2f0a4a3751a1e4dd51f59e8a357c8ba11bb39e1ad76cfd9fb8f51e191f
   rubocop-thread_safety (0.7.3) sha256=067cdd52fbf5deffc18995437e45b5194236eaff4f71de3375a1f6052e48f431
   ruby-merge (7.1.8)
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
@@ -995,12 +995,12 @@ CHECKSUMS
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_lcov_formatter (0.9.0) sha256=4c1839bb31dcf7a8f7a6474c94ed228aa03b994e9dd5e1965e58b4121b049bed
   smorg-rb (7.1.8)
-  sorbet-runtime (0.6.13486) sha256=5bf87f227b38c87fecc8be6d3a2e5a5a21d06c2a5136e78f73ac22c95ce7274f
+  sorbet-runtime (0.6.13490) sha256=b7818903f86867eec8912bd4ca258558e41d7b3514bdc1a91f9df1d09b4a775f
   standard (1.56.0) sha256=ae2af4d9669589162ac69ed5ef59dcf9f346d4afc81f7e62b84339310dfcb787
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
   standard-rspec (0.5.0) sha256=64d396524a65af47f5331b423d8cdd313e0267401647bb7892489ca89dad2973
-  standard-rubocop-lts (2.0.12) sha256=4b55efc56691d4edef197df8df27ffebdb4a273e26d7bf00799d00ac6a71532f
+  standard-rubocop-lts (2.0.13) sha256=acc0f7e73db0215a50b5e2df01fbf1b6bbcc68bb128f429f970db3fdd62a8243
   stone_checksums (1.0.8) sha256=91c5453d6c67c468653bf5396a33936c85d7731077be756ed0ff7eb78f981117
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   strings-ansi (0.2.0) sha256=90262d760ea4a94cc2ae8d58205277a343409c288cbe7c29416b1826bd511c88
