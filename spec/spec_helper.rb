@@ -4,6 +4,10 @@ require_relative "bootstrap/tree_haver_backends"
 require_relative "bootstrap/merge_gems"
 require_relative "support/fixture_repository"
 
+# Git-driver integration specs execute from temporary repositories. Their
+# subprocesses must use this aggregate bundle to resolve unreleased siblings.
+ENV['KETTLE_FAMILY_BUNDLE_GEMFILE'] = File.expand_path('../Gemfile', __dir__)
+
 warn StructuredMerge::FixtureRepository.report
 
 # Register every parser-backed merge gem before ast-merge installs RSpec's
