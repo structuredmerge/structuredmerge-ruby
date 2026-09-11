@@ -504,7 +504,10 @@ RSpec.describe 'ast-merge-git executable' do
       source: "package demo\n\nfunc shared() {}\n\nfunc other() {}\n",
       ours: "package demo\n\nfunc shared() { /* ours */ }\n\nfunc other() {}\n",
       theirs: "package demo\n\nfunc shared() {}\n\nfunc other() { /* theirs */ }\n",
-      expected: "package demo\n\nfunc shared() { /* ours */ }\n\nfunc other() { /* theirs */ }\n"
+      expected: "package demo\n\nfunc shared() { /* ours */ }\n\nfunc other() { /* theirs */ }\n",
+      conflict_base: "package demo\n\nfunc shared() {}\n",
+      conflict_ours: "package demo\n\nfunc shared() { /* ours */ }\n",
+      conflict_theirs: "package demo\n\nfunc shared() { /* theirs */ }\n"
     },
     {
       label: 'Rust Rust',
@@ -516,7 +519,10 @@ RSpec.describe 'ast-merge-git executable' do
       source: "fn shared() {}\n\nfn other() {}\n",
       ours: "fn shared() { /* ours */ }\n\nfn other() {}\n",
       theirs: "fn shared() {}\n\nfn other() { /* theirs */ }\n",
-      expected: "fn shared() { /* ours */ }\n\nfn other() { /* theirs */ }\n"
+      expected: "fn shared() { /* ours */ }\n\nfn other() { /* theirs */ }\n",
+      conflict_base: "fn shared() {}\n",
+      conflict_ours: "fn shared() { /* ours */ }\n",
+      conflict_theirs: "fn shared() { /* theirs */ }\n"
     },
     {
       label: 'Rust TypeScript',
@@ -528,7 +534,10 @@ RSpec.describe 'ast-merge-git executable' do
       source: "export function shared() {}\n\nexport function other() {}\n",
       ours: "export function shared() { /* ours */ }\n\nexport function other() {}\n",
       theirs: "export function shared() {}\n\nexport function other() { /* theirs */ }\n",
-      expected: "export function shared() { /* ours */ }\n\nexport function other() { /* theirs */ }\n"
+      expected: "export function shared() { /* ours */ }\n\nexport function other() { /* theirs */ }\n",
+      conflict_base: "export function shared() {}\n",
+      conflict_ours: "export function shared() { /* ours */ }\n",
+      conflict_theirs: "export function shared() { /* theirs */ }\n"
     }
   ].each do |provider|
     it "runs the explicit #{provider.fetch(:label)} selector through the installed Git-driver path" do
@@ -552,6 +561,26 @@ RSpec.describe 'ast-merge-git executable' do
 
       expect(status.exitstatus).to eq(0), stderr
       expect(repository.join(path).binread).to eq(provider.fetch(:expected))
+    end
+
+    it "returns a conflict status for the explicit #{provider.fetch(:label)} selector" do
+      path = configure_opaque_repository(
+        extension: provider.fetch(:extension),
+        base: provider.fetch(:conflict_base),
+        ours: provider.fetch(:conflict_ours),
+        theirs: provider.fetch(:conflict_theirs),
+        require_path: provider.fetch(:require_path),
+        provider_id: provider.fetch(:provider_id),
+        family: provider.fetch(:family),
+        dialect: provider.fetch(:dialect),
+        backend: 'rust_tslp',
+        profile: 'source_preserving'
+      )
+
+      _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+      expect(status.exitstatus).to eq(1), stderr
+      expect(repository.join(path).binread).to eq(provider.fetch(:conflict_ours))
     end
   end
 
