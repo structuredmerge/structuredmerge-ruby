@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Wire the optional Rust host package into TypeScript merge development fallback bundles.
 
+- Wire the optional Rust host package into YAML merge development fallback bundles.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
