@@ -68,6 +68,16 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'preserves native merge2 output' do
+    request = request_base.merge(incoming_source: ours_source, current_source: base_source)
+    native = Rust::Merge::Provider.new.merge2(request)
+    rust = provider.merge2(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
+
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 

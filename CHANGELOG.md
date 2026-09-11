@@ -52,6 +52,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Make Rust host provider diff2 detect edits to unchanged declarations and preserve native owner identities.
 
+- Correct Rust host merge2 transport ordering so incoming and current Ruby sources retain native winner semantics.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

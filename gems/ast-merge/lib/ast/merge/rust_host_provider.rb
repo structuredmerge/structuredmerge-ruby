@@ -101,8 +101,8 @@ module Ast
       def merge2(request)
         raw = call_host(
           :merge2,
-          request.fetch(:incoming_source),
           request.fetch(:current_source),
+          request.fetch(:incoming_source),
           request.fetch(:dialect).to_s
         )
         merge_result(:merge2, request, raw)
