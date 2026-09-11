@@ -174,6 +174,21 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq("const left = 2;\n\nconst right = 2;\n")
   end
 
+  it 'fails closed when native ownership treats a multi-variable declaration as one owner' do
+    base = "const left = 1, right = 2;\n"
+    ours = base.sub('left = 1', 'left = 3')
+    theirs = base.sub('right = 2', 'right = 4')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = TypeScript::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    expect(native.fetch(:conflicts)).not_to be_empty
+    expect(rust.fetch(:diagnostics)).not_to be_empty
+  end
+
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 
