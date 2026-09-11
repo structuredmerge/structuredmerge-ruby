@@ -128,4 +128,26 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:provider)).to include(provider_id: 'rust.rust')
     expect(result.fetch(:conflicts)).not_to be_empty
   end
+
+  it 'matches native behavior for independently edited reordered declarations' do
+    reordered_ours = base_source.sub(
+      'fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }',
+      'fn right() -> i32 { 1 }\n\nfn left() -> i32 { 2 }'
+    )
+    reordered_theirs = base_source.sub(
+      'fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }',
+      'fn right() -> i32 { 3 }\n\nfn left() -> i32 { 1 }'
+    )
+    request = request_base.merge(
+      base_source: base_source,
+      ours_source: reordered_ours,
+      theirs_source: reordered_theirs
+    )
+    native = Rust::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
 end
