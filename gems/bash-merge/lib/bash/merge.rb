@@ -120,6 +120,7 @@ module Bash
     autoload :MergeResult, 'bash/merge/merge_result'
     autoload :NodeWrapper, 'bash/merge/node_wrapper'
     autoload :Provider, 'bash/merge/provider'
+    autoload :RustHostProvider, 'bash/merge/rust_host_provider'
     autoload :SmartMerger, 'bash/merge/smart_merger'
 
     class << self
@@ -142,6 +143,14 @@ module Bash
 
       def available?(source: "#!/usr/bin/env bash\necho hello\n")
         availability(source: source).available?
+      end
+
+      def rust_host_provider
+        @rust_host_provider ||= RustHostProvider.new
+      end
+
+      def register_rust_host_provider!(replace: false)
+        Ast::Merge.register_provider(rust_host_provider, replace: replace)
       end
 
       def availability(source: "#!/usr/bin/env bash\necho hello\n")
