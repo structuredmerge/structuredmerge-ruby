@@ -22,7 +22,7 @@ module Ast
 
       def capabilities
         {
-          operations: %i[options_report profile_report],
+          operations: %i[options_report profile_report plan_report],
           backend: :rust_tslp,
           execution: :report_only,
           source_projection: :ruby_owned
@@ -34,6 +34,10 @@ module Ast
         raw.transform_keys(&:to_sym)
       rescue KeyError, JSON::ParserError => e
         raise ArgumentError, e.message
+      end
+
+      def plan(request)
+        report(request.merge(kind: 'plan'))
       end
 
       private

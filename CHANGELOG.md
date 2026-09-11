@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add explicit Rust-backed source-edit projection while keeping structural selection Ruby-owned.
 
+- Add an opt-in Rust-backed ast-template plan report while keeping apply execution Ruby-owned.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.
