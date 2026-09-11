@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Map Rust host diff2 results to native before/after presence and line-range records.
 
+- Preserve Rust declaration kinds in the opt-in host provider analysis and diff contract.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

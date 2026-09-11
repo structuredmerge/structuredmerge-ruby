@@ -45,13 +45,15 @@ module Ast
         return failure(:analyze, request, raw) unless raw.fetch('ok')
 
         analysis = raw.fetch('analysis')
+        owners = Array(analysis['declarations'])
+        owners = Array(analysis['owners']) if owners.empty?
         success(
           :analyze,
           request,
           analysis: {
             backend: :rust_tslp,
             valid: true,
-            declarations: Array(analysis['owners']).map do |owner|
+            declarations: owners.map do |owner|
             {
               path: logical_owner_path(owner),
               signature: logical_owner_path(owner),
@@ -211,7 +213,9 @@ module Ast
         match_key = owner['match_key']
         return owner.fetch('path') if match_key.nil? || match_key.empty?
 
-        kind = if owner['owner_kind'].nil? || owner['owner_kind'] == 'declaration'
+        kind = if owner['declaration_kind']
+                 owner['declaration_kind']
+               elsif owner['owner_kind'].nil? || owner['owner_kind'] == 'declaration'
                  'function'
                else
                  owner.fetch('owner_kind')

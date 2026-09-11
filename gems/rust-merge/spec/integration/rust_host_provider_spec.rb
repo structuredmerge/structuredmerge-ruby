@@ -104,6 +104,19 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
   end
 
+  it 'preserves named declaration kinds in host analysis and diff paths' do
+    source = "const LIMIT: usize = 1;\n\nstruct Config {\n    value: usize,\n}\n"
+    analysis = provider.analyze(request_base.merge(source: source))
+    paths = analysis.dig(:analysis, :declarations).map { |declaration| declaration.fetch(:path) }
+
+    expect(paths).to contain_exactly('[:const, "LIMIT"]', '[:struct, "Config"]')
+
+    changed = source.sub('LIMIT: usize = 1', 'LIMIT: usize = 2')
+    diff = provider.diff2(request_base.merge(before_source: source, after_source: changed))
+
+    expect(diff.fetch(:changes).map { |change| change.fetch(:path) }).to include('[:const, "LIMIT"]')
+  end
+
   it 'reports added and deleted declarations with explicit presence records' do
     after_source = "fn left() -> i32 { 1 }\n\nfn added() -> i32 { 4 }\n"
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: after_source))
