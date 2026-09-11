@@ -538,6 +538,21 @@ RSpec.describe 'ast-merge-git executable' do
       conflict_base: "export function shared() {}\n",
       conflict_ours: "export function shared() { /* ours */ }\n",
       conflict_theirs: "export function shared() { /* theirs */ }\n"
+    },
+    {
+      label: 'Rust Bash',
+      extension: 'sh',
+      require_path: 'bash/merge',
+      provider_id: 'rust.bash',
+      family: 'bash',
+      dialect: 'bash',
+      source: "shared() { :; }\n\nother() { :; }\n",
+      ours: "shared() { echo ours; }\n\nother() { :; }\n",
+      theirs: "shared() { :; }\n\nother() { echo theirs; }\n",
+      expected: "shared() { echo ours; }\n\nother() { echo theirs; }\n",
+      conflict_base: "shared() { :; }\n",
+      conflict_ours: "shared() { echo ours; }\n",
+      conflict_theirs: "shared() { echo theirs; }\n"
     }
   ].each do |provider|
     it "runs the explicit #{provider.fetch(:label)} selector through the installed Git-driver path" do
