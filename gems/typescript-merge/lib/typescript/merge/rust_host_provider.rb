@@ -23,6 +23,10 @@ module TypeScript
           }
         )
       end
+
+      def capabilities
+        super.merge(dialects: %i[typescript tsx]).freeze
+      end
     end
   end
 end

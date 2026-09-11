@@ -84,6 +84,18 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'supports the advertised TSX dialect through the host' do
+    source = "interface Props { value: string }\nfunction Component(props: Props) { return <div>{props.value}</div>; }\n"
+    result = provider.analyze(request_base.merge(dialect: :tsx, source: source))
+
+    expect(result.fetch(:ok)).to be(true), result.inspect
+    expect(result.fetch(:provider)).to include(dialect: :tsx)
+    expect(result.fetch(:analysis).fetch(:declarations)).to include(
+      include(signature: '[:function, "Component"]'),
+      include(signature: '[:interface, "Props"]')
+    )
+  end
+
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 

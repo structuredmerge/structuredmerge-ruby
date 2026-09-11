@@ -62,6 +62,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Expose conservative Rust-host merge3 support for one-sided top-level owner additions and deletions.
 
+- Report both TypeScript and TSX dialects in the opt-in Rust host provider capability metadata.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
