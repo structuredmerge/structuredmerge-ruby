@@ -85,7 +85,7 @@ RSpec.describe Json::Merge::RustHostProvider do
     expect(merge3).to include(ok: true, operation: :merge3, output: '{"answer": 42}\n')
   end
 
-  it 'preserves native semantic results across the JSON-family dialects' do
+  it 'preserves native semantic results across the JSON-family dialects', not_rust_tslp_backend: true do
     skip 'compiled Rust host unavailable' unless described_class.available?
 
     sources = {
@@ -118,11 +118,71 @@ RSpec.describe Json::Merge::RustHostProvider do
       expect(analysis).to include(ok: true, operation: :analyze)
       expect(analysis.dig(:analysis, :declarations)).not_to be_empty
       expect(result).to include(ok: true, operation: :merge3)
-      expect(Json::Merge.json_value_for_source(result.fetch(:output), dialect: dialect)).to eq(
+      expect(
+        Json::Merge.json_value_for_source(
+          result.fetch(:output),
+          dialect: dialect,
+          backend: 'kreuzberg-language-pack'
+        )
+      ).to eq(
         'stable' => true,
         'ours' => 1,
         'theirs' => 2
       )
+    end
+  end
+
+  it 'matches native merge status and semantic output for exact and conflicting revisions',
+     not_rust_tslp_backend: true do
+    skip 'compiled Rust host unavailable' unless described_class.available?
+
+    cases = [
+      {
+        name: :exact_theirs,
+        base: "{\"stable\": true}\n",
+        ours: "{\"stable\": true}\n",
+        theirs: "{\"stable\": true, \"theirs\": 2}\n"
+      },
+      {
+        name: :independent_additions,
+        base: "{\"stable\": true}\n",
+        ours: "{\"stable\": true, \"ours\": 1}\n",
+        theirs: "{\"stable\": true, \"theirs\": 2}\n"
+      },
+      {
+        name: :conflicting_revisions,
+        base: "{\"value\": 0}\n",
+        ours: "{\"value\": 1}\n",
+        theirs: "{\"value\": 2}\n"
+      }
+    ]
+
+    native_provider = Json::Merge::Provider.new
+    cases.each do |example|
+      native = native_provider.merge3(
+        base_source: example.fetch(:base),
+        ours_source: example.fetch(:ours),
+        theirs_source: example.fetch(:theirs),
+        dialect: :json,
+        backend: 'kreuzberg-language-pack'
+      )
+      rust = provider.merge3(
+        base_source: example.fetch(:base),
+        ours_source: example.fetch(:ours),
+        theirs_source: example.fetch(:theirs),
+        dialect: :json
+      )
+
+      expect(rust.fetch(:ok)).to eq(native.fetch(:ok))
+      next unless native.fetch(:ok)
+
+      rust_value = Json::Merge.json_value_for_source(
+        rust.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack'
+      )
+      native_value = Json::Merge.json_value_for_source(
+        native.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack'
+      )
+      expect(rust_value).to eq(native_value)
     end
   end
 end
