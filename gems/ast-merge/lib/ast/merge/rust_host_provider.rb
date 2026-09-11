@@ -201,10 +201,14 @@ module Ast
       def line_range(source, fragment)
         return [nil, nil] if fragment.nil?
 
+        # Host declaration fragments include their terminating newline. The
+        # public provider contract reports the declaration's content lines,
+        # not the separator owned by the following region.
+        content = fragment.sub(/\r?\n+\z/, '')
         start = source.index(fragment)
         return [nil, nil] unless start
 
-        end_index = start + fragment.length
+        end_index = start + content.length
         start_line = source[0...start].count("\n") + 1
         end_line = source[0...end_index].count("\n") + 1
         [start_line, end_line]

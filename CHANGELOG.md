@@ -68,6 +68,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Calculate Rust host source-fragment line ranges with one-based start and end lines.
 
+- Restore Rust host declaration line ranges to exclude terminating separator newlines.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
