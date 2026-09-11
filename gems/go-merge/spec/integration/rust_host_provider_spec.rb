@@ -82,7 +82,12 @@ RSpec.describe Go::Merge::RustHostProvider do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 
     expect(result.fetch(:ok)).to be(true), result.inspect
-    expect(result.fetch(:changes)).to include(path: '[:function, "left"]', change: :edited)
+    change = result.fetch(:changes).find { |entry| entry[:path] == '[:function, "left"]' }
+    expect(change).to include(
+      before: { present: true, source_role: :before, line_range: [3, 3] },
+      after: { present: true, source_role: :after, line_range: [3, 3] },
+      change: :edited
+    )
   end
 
   it 'fails closed on malformed source with a normalized parse diagnostic' do

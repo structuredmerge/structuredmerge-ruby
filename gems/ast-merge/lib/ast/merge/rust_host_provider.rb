@@ -73,17 +73,32 @@ module Ast
         after = analysis_for(request.fetch(:after_source), request.fetch(:dialect).to_s)
         return failure(:diff2, request, after) unless after.fetch('ok')
 
-        before_owners = owner_map(before)
-        after_owners = owner_map(after)
+        before_owners = owner_map(
+          before,
+          source: request.fetch(:before_source),
+          source_role: :before
+        )
+        after_owners = owner_map(
+          after,
+          source: request.fetch(:after_source),
+          source_role: :after
+        )
         changes = (before_owners.keys | after_owners.keys).filter_map do |path|
-          next if before_owners[path] == after_owners[path]
+          before_owner = before_owners[path]
+          after_owner = after_owners[path]
+          next if same_owner?(before_owner, after_owner)
 
           change = if before_owners.key?(path)
                      after_owners.key?(path) ? :edited : :deleted
                    else
                      :added
                    end
-          { path: path, change: change }
+          {
+            path: path,
+            before: revision_record(before_owner, :before),
+            after: revision_record(after_owner, :after),
+            change: change
+          }
         end
         success(
           :diff2,
@@ -138,18 +153,58 @@ module Ast
         call_host(:analyze, source, dialect)
       end
 
-      def owner_map(raw)
+      def owner_map(raw, source:, source_role:)
         analysis = raw.fetch('analysis')
         declarations = Array(analysis['declarations'])
         unless declarations.empty?
           return declarations.to_h do |declaration|
-            [logical_owner_path(declaration), declaration.merge('path' => logical_owner_path(declaration))]
+            path = logical_owner_path(declaration)
+            [path, declaration.merge(
+              'path' => path,
+              'line_range' => line_range(source, declaration['text']),
+              'source_role' => source_role
+            )]
           end
         end
 
         analysis.fetch('owners').to_h do |owner|
-          [logical_owner_path(owner), owner.merge('path' => logical_owner_path(owner))]
+          path = logical_owner_path(owner)
+          [path, owner.merge(
+            'path' => path,
+            'line_range' => line_range(source, owner['text']),
+            'source_role' => source_role
+          )]
         end
+      end
+
+      def same_owner?(before_owner, after_owner)
+        return true if before_owner.nil? && after_owner.nil?
+        return false if before_owner.nil? || after_owner.nil?
+
+        if before_owner.key?('text') || after_owner.key?('text')
+          before_owner['text'] == after_owner['text']
+        else
+          before_owner == after_owner
+        end
+      end
+
+      def revision_record(owner, source_role)
+        return { present: false, source_role: source_role, line_range: [nil, nil] } unless owner
+
+        { present: true, source_role: source_role, line_range: owner.fetch('line_range', [nil, nil]) }
+      end
+
+      def line_range(source, fragment)
+        return [nil, nil] if fragment.nil?
+
+        start = source.index(fragment)
+        return [nil, nil] unless start
+
+        end_index = start + fragment.length
+        start_line = source[0...start].count("\n") + 1
+        end_line = source[0...end_index].count("\n")
+        end_line = start_line if end_line.zero?
+        [start_line, end_line]
       end
 
       def logical_owner_path(owner)

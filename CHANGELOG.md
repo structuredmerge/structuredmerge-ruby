@@ -54,6 +54,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Correct Rust host merge2 transport ordering so incoming and current Ruby sources retain native winner semantics.
 
+- Map Rust host diff2 results to native before/after presence and line-range records.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
