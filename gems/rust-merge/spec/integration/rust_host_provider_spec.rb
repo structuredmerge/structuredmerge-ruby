@@ -68,6 +68,20 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'preserves native merge3 output for independent named item edits' do
+    base = "const LIMIT: usize = 1;\n\nstruct Config {\n    value: usize,\n}\n"
+    ours = base.sub('LIMIT: usize = 1', 'LIMIT: usize = 2')
+    theirs = base.sub('value: usize', 'value: u64')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
+
   it 'preserves native merge2 output' do
     request = request_base.merge(incoming_source: ours_source, current_source: base_source)
     native = Rust::Merge::Provider.new.merge2(request)
