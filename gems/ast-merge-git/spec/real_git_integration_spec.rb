@@ -493,6 +493,68 @@ RSpec.describe 'ast-merge-git executable' do
     expect(repository.join(path).binread).to eq("#{base}export function ours() {}\nexport function theirs() {}\n")
   end
 
+  [
+    {
+      label: 'Rust Go',
+      extension: 'go',
+      require_path: 'go/merge',
+      provider_id: 'rust.go',
+      family: 'go',
+      dialect: 'go',
+      source: "package demo\n\nfunc shared() {}\n\nfunc other() {}\n",
+      ours: "package demo\n\nfunc shared() { /* ours */ }\n\nfunc other() {}\n",
+      theirs: "package demo\n\nfunc shared() {}\n\nfunc other() { /* theirs */ }\n",
+      expected: "package demo\n\nfunc shared() { /* ours */ }\n\nfunc other() { /* theirs */ }\n"
+    },
+    {
+      label: 'Rust Rust',
+      extension: 'rs',
+      require_path: 'rust/merge',
+      provider_id: 'rust.rust',
+      family: 'rust',
+      dialect: 'rust',
+      source: "fn shared() {}\n\nfn other() {}\n",
+      ours: "fn shared() { /* ours */ }\n\nfn other() {}\n",
+      theirs: "fn shared() {}\n\nfn other() { /* theirs */ }\n",
+      expected: "fn shared() { /* ours */ }\n\nfn other() { /* theirs */ }\n"
+    },
+    {
+      label: 'Rust TypeScript',
+      extension: 'ts',
+      require_path: 'typescript/merge',
+      provider_id: 'rust.typescript',
+      family: 'typescript',
+      dialect: 'typescript',
+      source: "export function shared() {}\n\nexport function other() {}\n",
+      ours: "export function shared() { /* ours */ }\n\nexport function other() {}\n",
+      theirs: "export function shared() {}\n\nexport function other() { /* theirs */ }\n",
+      expected: "export function shared() { /* ours */ }\n\nexport function other() { /* theirs */ }\n"
+    }
+  ].each do |provider|
+    it "runs the explicit #{provider.fetch(:label)} selector through the installed Git-driver path" do
+      base = provider.fetch(:source)
+      ours = provider.fetch(:ours)
+      theirs = provider.fetch(:theirs)
+      path = configure_opaque_repository(
+        extension: provider.fetch(:extension),
+        base: base,
+        ours: ours,
+        theirs: theirs,
+        require_path: provider.fetch(:require_path),
+        provider_id: provider.fetch(:provider_id),
+        family: provider.fetch(:family),
+        dialect: provider.fetch(:dialect),
+        backend: 'rust_tslp',
+        profile: 'source_preserving'
+      )
+
+      _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
+
+      expect(status.exitstatus).to eq(0), stderr
+      expect(repository.join(path).binread).to eq(provider.fetch(:expected))
+    end
+  end
+
   it 'runs the exact HTML selector where baseline text merge conflicts' do
     base = "<main id=content>base</main>\n<footer id=footer>base</footer>\n"
     ours = "<main id=content>ours</main>\n<footer id=footer>base</footer>\n"

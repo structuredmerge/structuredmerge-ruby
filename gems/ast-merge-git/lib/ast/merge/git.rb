@@ -22,6 +22,13 @@ module Ast
         invalid_provider_output
         invalid_provider_result
       ].freeze
+      RUST_PROVIDER_FAMILIES = {
+        'bash' => 'Bash::Merge',
+        'go' => 'Go::Merge',
+        'json' => 'Json::Merge',
+        'rust' => 'Rust::Merge',
+        'typescript' => 'TypeScript::Merge'
+      }.freeze
 
       module_function
 
@@ -60,6 +67,7 @@ module Ast
       def run(argv, env: ENV, stderr: $stderr)
         load_provider_requirements(env['AST_MERGE_REQUIRE'])
         request = command_request(argv, env)
+        register_explicit_rust_provider(request)
         result = merge_files(**request)
         emit_diagnostics(result, stderr)
         result.dig(:git, :exit_code)
@@ -263,6 +271,20 @@ module Ast
         value.to_s.split(',').map(&:strip).reject(&:empty?).each { |require_path| require require_path }
       end
       private_class_method :load_provider_requirements
+
+      def register_explicit_rust_provider(request)
+        provider_id = request[:provider_id].to_s
+        return unless provider_id.start_with?('rust.')
+
+        family_module_name = RUST_PROVIDER_FAMILIES[request[:family].to_s]
+        return unless family_module_name
+
+        family_module = family_module_name.split('::').inject(Object) { |namespace, name| namespace.const_get(name) }
+        return unless family_module.respond_to?(:register_rust_host_provider!)
+
+        family_module.register_rust_host_provider!(replace: true)
+      end
+      private_class_method :register_explicit_rust_provider
 
       def emit_diagnostics(result, stderr)
         result.fetch(:diagnostics).each do |item|
