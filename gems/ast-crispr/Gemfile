@@ -21,6 +21,12 @@ gemspec
 
 gem 'kettle-family', '~> 1.2', '>= 1.2.100'
 
+# Optional local development bridge to the generated Rust profile host.
+structuredmerge_rust_dev = ENV.fetch('STRUCTUREDMERGE_RUST_DEV', '').strip
+if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredmerge_rust_dev.downcase)
+  gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
+end
+
 # Local workspace dependency wiring for *_local.gemfile overrides
 gem 'nomono', '~> 1.1', '>= 1.1.5', require: false # ruby >= 3.2.0
 

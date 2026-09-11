@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an explicit Rust ast-merge-git JSON provider through the compiled host.
 
+- Add an explicit Rust ast-crispr profile-report provider with Ruby-owned source projection.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.

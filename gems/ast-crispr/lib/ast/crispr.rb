@@ -6,6 +6,7 @@ require_relative 'crispr/version'
 
 module Ast
   module Crispr
+    autoload :RustHostProvider, 'ast/crispr/rust_host_provider'
     PACKAGE_NAME = 'ast-crispr'
 
     class Error < StandardError
@@ -1683,6 +1684,10 @@ module Ast
     end
 
     class << self
+      def rust_host_provider
+        @rust_host_provider ||= RustHostProvider.new
+      end
+
       def ast_merge_contract_anchor
         'Ast::Merge.structured_edit'
       end
