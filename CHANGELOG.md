@@ -26,6 +26,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an opt-in Rust host provider for JSON, JSONC, and JSON5 analysis and source-preserving merge operations.
 
+- Add an explicit Rust ast-merge-git JSON provider through the compiled host.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.

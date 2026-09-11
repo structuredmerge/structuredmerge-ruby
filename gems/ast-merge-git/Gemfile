@@ -8,6 +8,11 @@
 
 source 'https://gem.coop'
 
+structuredmerge_rust_dev = ENV.fetch('STRUCTUREDMERGE_RUST_DEV', '').strip
+if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredmerge_rust_dev.downcase)
+  gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
+end
+
 git_source(:github) { |repo_name| "git@github.com:#{repo_name}.git" }
 git_source(:codeberg) { |repo_name| "https://codeberg.org/#{repo_name}" }
 git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }

@@ -12,6 +12,7 @@ module Ast
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ModuleLength -- Git protocol translation is one cohesive adapter boundary
     module Git
       PACKAGE_NAME = 'ast-merge-git'
+      autoload :RustHostProvider, 'ast/merge/git/rust_host_provider'
       EXIT_SUCCESS = 0
       EXIT_CONFLICT = 1
       EXIT_ERROR = 2
@@ -30,6 +31,14 @@ module Ast
         adapt_provider_result(provider_result)
       rescue Ast::Merge::ProviderContract::Error, ArgumentError, KeyError => e
         adapt_provider_result(adapter_failure(:invalid_provider_result, e.message))
+      end
+
+      def rust_host_provider
+        RustHostProvider.new
+      end
+
+      def register_rust_host_provider!(replace: false)
+        Ast::Merge.register_provider(rust_host_provider, replace: replace)
       end
 
       def merge_files(base_path:, ours_path:, theirs_path:, conflict_policy: :write, **request)
