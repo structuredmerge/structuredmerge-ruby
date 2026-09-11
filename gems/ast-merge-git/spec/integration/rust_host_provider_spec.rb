@@ -102,4 +102,33 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
   ensure
     FileUtils.rm_rf(root) if root
   end
+
+  it 'writes localized conflicts and returns the Git conflict exit status' do
+    root = Pathname(__dir__).join('../../tmp/rust-host-provider-conflict')
+    FileUtils.rm_rf(root)
+    FileUtils.mkdir_p(root)
+    base_path = root.join('base.json')
+    ours_path = root.join('ours.json')
+    theirs_path = root.join('theirs.json')
+    base_path.write("{\"enabled\":true}\n")
+    ours_path.write("{\"enabled\":false}\n")
+    theirs_path.write("{\"enabled\":\"yes\"}\n")
+
+    result = Ast::Merge::Git.merge_files(
+      base_path: base_path,
+      ours_path: ours_path,
+      theirs_path: theirs_path,
+      provider_id: 'rust.git.json',
+      family: :json,
+      dialect: :json,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      conflict_policy: :write
+    )
+
+    expect(result.fetch(:git)).to include(exit_code: 1, output_written: true)
+    expect(ours_path.read).to include('<<<<<<< ours', '>>>>>>> theirs')
+  ensure
+    FileUtils.rm_rf(root) if root
+  end
 end
