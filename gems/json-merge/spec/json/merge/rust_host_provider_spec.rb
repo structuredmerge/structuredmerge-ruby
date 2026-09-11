@@ -29,6 +29,21 @@ RSpec.describe Json::Merge::RustHostProvider do
     )
   end
 
+  it 'resolves through the shared registry when the Rust backend is selected' do
+    registry = Ast::Merge::ProviderRegistry.new
+    registry.register(provider)
+
+    expect(
+      registry.resolve(
+        family: :json,
+        dialect: :json5,
+        backend: :rust_tslp,
+        profile_id: :source_preserving,
+        operation: :merge3
+      )
+    ).to equal(provider)
+  end
+
   it 'maps the Rust host analysis and source-preserving merge envelopes' do
     stub_const('StructuredmergeHostPrototype', Module.new)
     allow(StructuredmergeHostPrototype).to receive(:parse_json_analysis)
