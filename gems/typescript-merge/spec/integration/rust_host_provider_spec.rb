@@ -134,6 +134,30 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'fails closed on imports in source-preserving merge' do
+    base = <<~TS
+      import { value } from './shared';
+
+      interface Props { value: string }
+      function left(props: Props) { return props.value; }
+      function right() { return value; }
+    TS
+    ours = base.sub('return props.value;', 'return props.value.toUpperCase();')
+    theirs = base.sub('return value;', 'return value.trim();')
+    request = request_base.merge(
+      base_source: base,
+      ours_source: ours,
+      theirs_source: theirs
+    )
+
+    rust = provider.merge3(request)
+
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    expect(rust.fetch(:diagnostics)).to include(
+      include(category: :parse_error, blocking: true, message: include('unsupported top-level TypeScript node'))
+    )
+  end
+
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 
