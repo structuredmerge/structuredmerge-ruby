@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/tree_haver.rb<span class="defines">,<br>
-  lib/tree_haver.rb,<br> lib/tree_haver/node.rb,<br> lib/tree_haver/tree.rb,<br> lib/tree_haver/point.rb,<br> lib/tree_haver/parser.rb,<br> lib/tree_haver/version.rb,<br> lib/tree_haver/language.rb,<br> lib/tree_haver/base/node.rb,<br> lib/tree_haver/base/tree.rb,<br> lib/tree_haver/contracts.rb,<br> lib/tree_haver/base/point.rb,<br> lib/tree_haver/backend_api.rb,<br> lib/tree_haver/base/parser.rb,<br> lib/tree_haver/backends/ffi.rb,<br> lib/tree_haver/backends/mri.rb,<br> lib/tree_haver/base/comment.rb,<br> lib/tree_haver/peg_backends.rb,<br> lib/tree_haver/backends/java.rb,<br> lib/tree_haver/backends/rust.rb,<br> lib/tree_haver/backends/tslp.rb,<br> lib/tree_haver/base/language.rb,<br> lib/tree_haver/language_pack.rb,<br> lib/tree_haver/backends/prism.rb,<br> lib/tree_haver/backends/psych.rb,<br> lib/tree_haver/grammar_finder.rb,<br> lib/tree_haver/kaitai_backend.rb,<br> lib/tree_haver/path_validator.rb,<br> lib/tree_haver/backend_context.rb,<br> lib/tree_haver/backends/citrus.rb,<br> lib/tree_haver/backend_registry.rb,<br> lib/tree_haver/backends/parslet.rb,<br> lib/tree_haver/language_registry.rb,<br> lib/tree_haver/library_path_utils.rb,<br> lib/tree_haver/citrus_grammar_finder.rb,<br> lib/tree_haver/rspec/dependency_tags.rb,<br> lib/tree_haver/parslet_grammar_finder.rb</span>
+  lib/tree_haver.rb,<br> lib/tree_haver/node.rb,<br> lib/tree_haver/tree.rb,<br> lib/tree_haver/point.rb,<br> lib/tree_haver/parser.rb,<br> lib/tree_haver/version.rb,<br> lib/tree_haver/language.rb,<br> lib/tree_haver/base/node.rb,<br> lib/tree_haver/base/tree.rb,<br> lib/tree_haver/contracts.rb,<br> lib/tree_haver/base/point.rb,<br> lib/tree_haver/backend_api.rb,<br> lib/tree_haver/base/parser.rb,<br> lib/tree_haver/backends/ffi.rb,<br> lib/tree_haver/backends/mri.rb,<br> lib/tree_haver/base/comment.rb,<br> lib/tree_haver/peg_backends.rb,<br> lib/tree_haver/backends/java.rb,<br> lib/tree_haver/backends/rust.rb,<br> lib/tree_haver/backends/tslp.rb,<br> lib/tree_haver/base/language.rb,<br> lib/tree_haver/language_pack.rb,<br> lib/tree_haver/backends/prism.rb,<br> lib/tree_haver/backends/psych.rb,<br> lib/tree_haver/grammar_finder.rb,<br> lib/tree_haver/kaitai_backend.rb,<br> lib/tree_haver/path_validator.rb,<br> lib/tree_haver/backend_context.rb,<br> lib/tree_haver/backends/citrus.rb,<br> lib/tree_haver/backend_registry.rb,<br> lib/tree_haver/backends/parslet.rb,<br> lib/tree_haver/language_registry.rb,<br> lib/tree_haver/backends/rust_tslp.rb,<br> lib/tree_haver/library_path_utils.rb,<br> lib/tree_haver/citrus_grammar_finder.rb,<br> lib/tree_haver/rspec/dependency_tags.rb,<br> lib/tree_haver/parslet_grammar_finder.rb</span>
 
 </dd>
   </dl>
@@ -137,7 +137,7 @@
         <dt id="VALID_BACKENDS-constant" class="">VALID_BACKENDS =
           
         </dt>
-        <dd><pre class="code"><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#VALID_NATIVE_BACKENDS-constant" title="TreeHaver::VALID_NATIVE_BACKENDS (constant)">VALID_NATIVE_BACKENDS</a></span></span> <span class='op'>+</span> <span class='const'><span class='object_link'><a href="#VALID_RUBY_BACKENDS-constant" title="TreeHaver::VALID_RUBY_BACKENDS (constant)">VALID_RUBY_BACKENDS</a></span></span> <span class='op'>+</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>auto</span><span class='words_sep'> </span><span class='tstring_content'>none</span><span class='words_sep'> </span><span class='tstring_content'>tslp</span><span class='words_sep'> </span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>]</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#VALID_NATIVE_BACKENDS-constant" title="TreeHaver::VALID_NATIVE_BACKENDS (constant)">VALID_NATIVE_BACKENDS</a></span></span> <span class='op'>+</span> <span class='const'><span class='object_link'><a href="#VALID_RUBY_BACKENDS-constant" title="TreeHaver::VALID_RUBY_BACKENDS (constant)">VALID_RUBY_BACKENDS</a></span></span> <span class='op'>+</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>auto</span><span class='words_sep'> </span><span class='tstring_content'>none</span><span class='words_sep'> </span><span class='tstring_content'>tslp</span><span class='words_sep'> </span><span class='tstring_content'>rust_tslp</span><span class='words_sep'> </span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>]</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
         <dt id="DEFAULT_BACKEND_ID-constant" class="">DEFAULT_BACKEND_ID =
           
@@ -295,6 +295,14 @@ providing all the necessary functionality.</p>
         </dt>
         <dd><pre class="code"><span class='const'><span class='object_link'><a href="TreeHaver/BackendReference.html" title="TreeHaver::BackendReference (class)">BackendReference</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
   <span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>kreuzberg-language-pack</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&#39;</span></span>
+<span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="RUST_TSLP_BACKEND-constant" class="">RUST_TSLP_BACKEND =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'><span class='object_link'><a href="TreeHaver/BackendReference.html" title="TreeHaver::BackendReference (class)">BackendReference</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+  <span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rust_tslp</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
   <span class='label'>family:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&#39;</span></span>
 <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
@@ -1572,12 +1580,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-147
-148
-149</pre>
+151
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 147</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 151</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allowed_native_backends'>allowed_native_backends</span>
   <span class='ivar'>@allowed_native_backends</span> <span class='op'>||=</span> <span class='id identifier rubyid_parse_backend_list_env'>parse_backend_list_env</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_HAVER_NATIVE_BACKEND</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#VALID_NATIVE_BACKENDS-constant" title="TreeHaver::VALID_NATIVE_BACKENDS (constant)">VALID_NATIVE_BACKENDS</a></span></span><span class='rparen'>)</span>
@@ -1602,12 +1610,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-151
-152
-153</pre>
+155
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 151</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allowed_ruby_backends'>allowed_ruby_backends</span>
   <span class='ivar'>@allowed_ruby_backends</span> <span class='op'>||=</span> <span class='id identifier rubyid_parse_backend_list_env'>parse_backend_list_env</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TREE_HAVER_RUBY_BACKEND</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#VALID_RUBY_BACKENDS-constant" title="TreeHaver::VALID_RUBY_BACKENDS (constant)">VALID_RUBY_BACKENDS</a></span></span><span class='rparen'>)</span>
@@ -1632,12 +1640,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-85
-86
-87</pre>
+89
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 89</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend'>backend</span>
   <span class='ivar'>@backend</span> <span class='op'>||=</span> <span class='id identifier rubyid_parse_single_backend_env'>parse_single_backend_env</span>
@@ -1662,12 +1670,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-89
-90
-91</pre>
+93
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 93</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend='>backend=</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -1715,10 +1723,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-155
-156
-157
-158
 159
 160
 161
@@ -1734,10 +1738,14 @@ providing all the necessary functionality.</p>
 171
 172
 173
-174</pre>
+174
+175
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 155</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 159</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend_allowed?'>backend_allowed?</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_name'>backend_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backend_sym'>backend_sym</span> <span class='op'>=</span> <span class='id identifier rubyid_backend_name'>backend_name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -1779,10 +1787,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-220
-221
-222
-223
 224
 225
 226
@@ -1796,10 +1800,14 @@ providing all the necessary functionality.</p>
 234
 235
 236
-237</pre>
+237
+238
+239
+240
+241</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 220</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 224</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend_module'>backend_module</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_effective_backend'>effective_backend</span>
@@ -1839,12 +1847,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-110
-111
-112</pre>
+114
+115
+116</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 110</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend_protect'>backend_protect</span>
   <span class='id identifier rubyid_backend_protect?'>backend_protect?</span>
@@ -1869,12 +1877,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-100
-101
-102</pre>
+104
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 100</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 104</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend_protect='>backend_protect=</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backend_protect_mutex'>backend_protect_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='lbrace'>{</span> <span class='ivar'>@backend_protect</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='rbrace'>}</span>
@@ -1922,14 +1930,14 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-104
-105
-106
-107
-108</pre>
+108
+109
+110
+111
+112</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 108</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backend_protect?'>backend_protect?</span>
   <span class='kw'>return</span> <span class='ivar'>@backend_protect</span> <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='ivar'>@backend_protect</span><span class='rparen'>)</span>
@@ -1956,12 +1964,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-114
-115
-116</pre>
+118
+119
+120</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 114</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 118</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_backends_used'>backends_used</span>
   <span class='ivar'>@backends_used</span> <span class='op'>||=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -2299,12 +2307,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-239
-240
-241</pre>
+243
+244
+245</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 239</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 243</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
   <span class='id identifier rubyid_backend_module'>backend_module</span><span class='op'>&amp;.</span><span class='id identifier rubyid_capabilities'>capabilities</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -2352,18 +2360,18 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-137
-138
-139
-140
 141
 142
 143
 144
-145</pre>
+145
+146
+147
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 137</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 141</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_check_backend_conflict!'>check_backend_conflict!</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_name'>backend_name</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_backend_protect?'>backend_protect?</span>
@@ -2394,10 +2402,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-123
-124
-125
-126
 127
 128
 129
@@ -2406,10 +2410,14 @@ providing all the necessary functionality.</p>
 132
 133
 134
-135</pre>
+135
+136
+137
+138
+139</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 123</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 127</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_conflicting_backends_for'>conflicting_backends_for</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_name'>backend_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_blockers'>blockers</span> <span class='op'>=</span> <span class='lbrace'>{</span>
@@ -2474,12 +2482,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-81
-82
-83</pre>
+85
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 81</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_default_backend_id'>default_backend_id</span>
   <span class='const'><span class='object_link'><a href="#DEFAULT_BACKEND_ID-constant" title="TreeHaver::DEFAULT_BACKEND_ID (constant)">DEFAULT_BACKEND_ID</a></span></span>
@@ -2504,15 +2512,15 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-176
-177
-178
-179
 180
-181</pre>
+181
+182
+183
+184
+185</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 176</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 180</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_effective_backend'>effective_backend</span>
   <span class='id identifier rubyid_contextual'>contextual</span> <span class='op'>=</span> <span class='id identifier rubyid_current_backend_id'>current_backend_id</span>
@@ -2684,17 +2692,17 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-24
-25
-26
-27
-28
 29
 30
-31</pre>
+31
+32
+33
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_pack.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_pack.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_language_pack_adapter_info'>language_pack_adapter_info</span>
   <span class='const'><span class='object_link'><a href="TreeHaver/AdapterInfo.html" title="TreeHaver::AdapterInfo (class)">AdapterInfo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
@@ -2724,17 +2732,17 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-33
-34
-35
-36
-37
 38
 39
-40</pre>
+40
+41
+42
+43
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_pack.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/language_pack.rb', line 38</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_language_pack_feature_profile'>language_pack_feature_profile</span>
   <span class='const'><span class='object_link'><a href="TreeHaver/FeatureProfile.html" title="TreeHaver::FeatureProfile (class)">FeatureProfile</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
@@ -3003,10 +3011,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-291
-292
-293
-294
 295
 296
 297
@@ -3056,10 +3060,14 @@ providing all the necessary functionality.</p>
 341
 342
 343
-344</pre>
+344
+345
+346
+347
+348</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 291</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 295</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='id identifier rubyid_language_name'>language_name</span><span class='comma'>,</span> <span class='label'>library_path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>citrus_config:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parslet_config:</span> <span class='kw'>nil</span><span class='comma'>,</span>
                <span class='label'>backend_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>contract:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>preferred:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -3215,13 +3223,13 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-118
-119
-120
-121</pre>
+122
+123
+124
+125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 118</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_record_backend_usage'>record_backend_usage</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_name'>backend_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backends_used'>backends_used</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_backend_name'>backend_name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -3247,13 +3255,13 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-243
-244
-245
-246</pre>
+247
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 243</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 247</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_backend'>register_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_mod'>mod</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backend_module_registry'>backend_module_registry</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_mod'>mod</span>
@@ -3279,10 +3287,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-256
-257
-258
-259
 260
 261
 262
@@ -3302,10 +3306,14 @@ providing all the necessary functionality.</p>
 276
 277
 278
-279</pre>
+279
+280
+281
+282
+283</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 256</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_language'>register_language</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>path:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>symbol:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>grammar_module:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>grammar_class:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>backend_module:</span> <span class='kw'>nil</span><span class='comma'>,</span>
                       <span class='label'>backend_type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>gem_name:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>contract:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
@@ -3351,7 +3359,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-66
 67
 68
 69
@@ -3364,10 +3371,14 @@ providing all the necessary functionality.</p>
 76
 77
 78
-79</pre>
+79
+80
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_standard_dependency_tags!'>register_standard_dependency_tags!</span>
   <span class='const'><span class='object_link'><a href="TreeHaver/BackendRegistry.html" title="TreeHaver::BackendRegistry (module)">BackendRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_register_tag'><span class='object_link'><a href="TreeHaver/BackendRegistry.html#register_tag-class_method" title="TreeHaver::BackendRegistry.register_tag (method)">register_tag</a></span></span><span class='lparen'>(</span><span class='symbol'>:mri_backend</span><span class='comma'>,</span> <span class='label'>category:</span> <span class='symbol'>:backend</span><span class='comma'>,</span> <span class='label'>backend_name:</span> <span class='symbol'>:mri</span><span class='rparen'>)</span> <span class='kw'>do</span>
@@ -3381,6 +3392,9 @@ providing all the necessary functionality.</p>
   <span class='kw'>end</span>
   <span class='const'><span class='object_link'><a href="TreeHaver/BackendRegistry.html" title="TreeHaver::BackendRegistry (module)">BackendRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_register_tag'><span class='object_link'><a href="TreeHaver/BackendRegistry.html#register_tag-class_method" title="TreeHaver::BackendRegistry.register_tag (method)">register_tag</a></span></span><span class='lparen'>(</span><span class='symbol'>:java_backend</span><span class='comma'>,</span> <span class='label'>category:</span> <span class='symbol'>:backend</span><span class='comma'>,</span> <span class='label'>backend_name:</span> <span class='symbol'>:java</span><span class='rparen'>)</span> <span class='kw'>do</span>
     <span class='const'><span class='object_link'><a href="TreeHaver/Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="TreeHaver/Backends/Java.html" title="TreeHaver::Backends::Java (module)">Java</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="TreeHaver/Backends/Java.html#available%3F-class_method" title="TreeHaver::Backends::Java.available? (method)">available?</a></span></span>
+  <span class='kw'>end</span>
+  <span class='const'><span class='object_link'><a href="TreeHaver/BackendRegistry.html" title="TreeHaver::BackendRegistry (module)">BackendRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_register_tag'><span class='object_link'><a href="TreeHaver/BackendRegistry.html#register_tag-class_method" title="TreeHaver::BackendRegistry.register_tag (method)">register_tag</a></span></span><span class='lparen'>(</span><span class='symbol'>:rust_tslp_backend</span><span class='comma'>,</span> <span class='label'>category:</span> <span class='symbol'>:backend</span><span class='comma'>,</span> <span class='label'>backend_name:</span> <span class='symbol'>:rust_tslp</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='const'><span class='object_link'><a href="TreeHaver/Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="TreeHaver/Backends/RustTslp.html" title="TreeHaver::Backends::RustTslp (module)">RustTslp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_available?'><span class='object_link'><a href="TreeHaver/Backends/RustTslp.html#available%3F-class_method" title="TreeHaver::Backends::RustTslp.available? (method)">available?</a></span></span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -3403,12 +3417,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-248
-249
-250</pre>
+252
+253
+254</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 248</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 252</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_registered_backend'>registered_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_backend_module_registry'>backend_module_registry</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
@@ -3433,12 +3447,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-252
-253
-254</pre>
+256
+257
+258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 256</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_registered_language'>registered_language</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="TreeHaver/LanguageRegistry.html" title="TreeHaver::LanguageRegistry (module)">LanguageRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'><span class='object_link'><a href="TreeHaver/LanguageRegistry.html#registered-class_method" title="TreeHaver::LanguageRegistry.registered (method)">registered</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -3463,12 +3477,12 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-287
-288
-289</pre>
+291
+292
+293</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 287</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 291</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_registered_languages'>registered_languages</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="TreeHaver/LanguageRegistry.html" title="TreeHaver::LanguageRegistry (module)">LanguageRegistry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_registered'><span class='object_link'><a href="TreeHaver/LanguageRegistry.html#registered-class_method" title="TreeHaver::LanguageRegistry.registered (method)">registered</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -3493,15 +3507,15 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-93
-94
-95
-96
 97
-98</pre>
+98
+99
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 93</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 97</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_backend!'>reset_backend!</span><span class='lparen'>(</span><span class='label'>to:</span> <span class='symbol'>:auto</span><span class='rparen'>)</span>
   <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='id identifier rubyid_to'>to</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
@@ -3529,10 +3543,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-189
-190
-191
-192
 193
 194
 195
@@ -3543,10 +3553,14 @@ providing all the necessary functionality.</p>
 200
 201
 202
-203</pre>
+203
+204
+205
+206
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve_backend_module'>resolve_backend_module</span><span class='lparen'>(</span><span class='id identifier rubyid_explicit_backend'>explicit_backend</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_effective_backend'>resolve_effective_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_explicit_backend'>explicit_backend</span><span class='rparen'>)</span>
@@ -3583,14 +3597,14 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-183
-184
-185
-186
-187</pre>
+187
+188
+189
+190
+191</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 187</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve_effective_backend'>resolve_effective_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_explicit_backend'>explicit_backend</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_explicit_backend'>explicit_backend</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>if</span> <span class='id identifier rubyid_explicit_backend'>explicit_backend</span>
@@ -3617,10 +3631,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-205
-206
-207
-208
 209
 210
 211
@@ -3630,10 +3640,14 @@ providing all the necessary functionality.</p>
 215
 216
 217
-218</pre>
+218
+219
+220
+221
+222</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve_native_backend_module'>resolve_native_backend_module</span><span class='lparen'>(</span><span class='id identifier rubyid_explicit_backend'>explicit_backend</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_effective_backend'>resolve_effective_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_explicit_backend'>explicit_backend</span><span class='rparen'>)</span>
@@ -3669,10 +3683,6 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-346
-347
-348
-349
 350
 351
 352
@@ -3721,10 +3731,14 @@ providing all the necessary functionality.</p>
 395
 396
 397
-398</pre>
+398
+399
+400
+401
+402</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 346</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 350</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruby_reference_parser_backend_contract_report'>ruby_reference_parser_backend_contract_report</span>
   <span class='lbrace'>{</span>
@@ -4129,14 +4143,14 @@ providing all the necessary functionality.</p>
       <pre class="lines">
 
 
-281
-282
-283
-284
-285</pre>
+285
+286
+287
+288
+289</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 281</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver.rb', line 285</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_with_language_registration'>with_language_registration</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_backend_type'>backend_type</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_config'>config</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Block required</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span>
@@ -4153,7 +4167,7 @@ providing all the necessary functionality.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 10 20:15:53 2026 by
+  Generated on Thu Sep 10 21:40:25 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

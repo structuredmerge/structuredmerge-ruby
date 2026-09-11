@@ -35,7 +35,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - TAG: [v7.1.9][7.1.9t]
 - COVERAGE: 0.00% -- 0/0 lines in 0 files
 - BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
-- 73.88% documented
+- 73.06% documented
 
 ### Changed
 

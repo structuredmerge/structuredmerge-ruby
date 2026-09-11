@@ -9,9 +9,14 @@ module TreeHaver
     id: 'kreuzberg-language-pack',
     family: 'tree-sitter'
   ).freeze
+  RUST_TSLP_BACKEND = BackendReference.new(
+    id: 'rust_tslp',
+    family: 'tree-sitter'
+  ).freeze
 
   BackendRegistry.register(TSLP_BACKEND)
   BackendRegistry.register(KREUZBERG_LANGUAGE_PACK_BACKEND)
+  BackendRegistry.register(RUST_TSLP_BACKEND)
   BackendRegistry.register_availability_checker(:tslp) do
     Backends::Tslp.available?
   end

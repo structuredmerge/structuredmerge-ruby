@@ -32,6 +32,7 @@ require_relative 'tree_haver/backends/ffi'
 require_relative 'tree_haver/backends/rust'
 require_relative 'tree_haver/backends/java'
 require_relative 'tree_haver/backends/tslp'
+require_relative 'tree_haver/backends/rust_tslp'
 require_relative 'tree_haver/grammar_finder'
 require_relative 'tree_haver/citrus_grammar_finder'
 require_relative 'tree_haver/parslet_grammar_finder'
@@ -50,7 +51,7 @@ module TreeHaver
   RUBY_BACKENDS = %i[citrus parslet prism psych commonmarker markly rbs].freeze
   VALID_NATIVE_BACKENDS = NATIVE_BACKENDS.map(&:to_s).freeze
   VALID_RUBY_BACKENDS = RUBY_BACKENDS.map(&:to_s).freeze
-  VALID_BACKENDS = (VALID_NATIVE_BACKENDS + VALID_RUBY_BACKENDS + %w[auto none tslp kreuzberg-language-pack]).freeze
+  VALID_BACKENDS = (VALID_NATIVE_BACKENDS + VALID_RUBY_BACKENDS + %w[auto none tslp rust_tslp kreuzberg-language-pack]).freeze
   DEFAULT_BACKEND_ID = 'tslp'
   NATIVE_BACKEND_REFERENCES = NATIVE_BACKENDS.to_h do |backend_name|
     [
@@ -75,6 +76,9 @@ module TreeHaver
     end
     BackendRegistry.register_tag(:java_backend, category: :backend, backend_name: :java) do
       Backends::Java.available?
+    end
+    BackendRegistry.register_tag(:rust_tslp_backend, category: :backend, backend_name: :rust_tslp) do
+      Backends::RustTslp.available?
     end
   end
 
@@ -562,6 +566,8 @@ module TreeHaver
       Backends::Java
     when :tslp, :"kreuzberg-language-pack"
       Backends::Tslp
+    when :rust_tslp
+      Backends::RustTslp
     when :citrus
       Backends::Citrus
     when :parslet

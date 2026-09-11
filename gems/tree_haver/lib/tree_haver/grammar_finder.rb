@@ -314,11 +314,12 @@ module TreeHaver
     # @raise [NotAvailable] if library not found and raise_on_missing is true
     def register!(raise_on_missing: false)
       if tree_sitter_language_pack_parser_available?
+        backend_module, backend_type, gem_name = language_pack_registration
         TreeHaver.register_language(
           @language_name,
-          backend_module: TreeHaver::Backends::Tslp,
-          backend_type: :tslp,
-          gem_name: 'tree_sitter_language_pack'
+          backend_module: backend_module,
+          backend_type: backend_type,
+          gem_name: gem_name
         )
         return true
       end
@@ -377,6 +378,14 @@ module TreeHaver
 
     private
 
+    def language_pack_registration
+      if TreeHaver.effective_backend == :rust_tslp
+        [TreeHaver::Backends::RustTslp, :rust_tslp, 'structuredmerge_host_prototype']
+      else
+        [TreeHaver::Backends::Tslp, :tslp, 'tree_sitter_language_pack']
+      end
+    end
+
     def registered_tree_sitter_registration
       TreeHaver::LanguageRegistry.registered(@language_name, :tree_sitter)
     end
@@ -399,11 +408,15 @@ module TreeHaver
       return @tree_sitter_language_pack_parser_available if defined?(@tree_sitter_language_pack_parser_available)
 
       @tree_sitter_language_pack_parser_available = begin
-        require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
-        TreeHaver::Backends::Tslp.available? &&
-          ::TreeSitterLanguagePack.respond_to?(:has_language) &&
-          ::TreeSitterLanguagePack.has_language(@language_name.to_s) &&
-          TreeHaver::Backends::Tslp.parser_available_for?(@language_name)
+        if TreeHaver.effective_backend == :rust_tslp
+          TreeHaver::Backends::RustTslp.available?
+        else
+          require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
+          TreeHaver::Backends::Tslp.available? &&
+            ::TreeSitterLanguagePack.respond_to?(:has_language) &&
+            ::TreeSitterLanguagePack.has_language(@language_name.to_s) &&
+            TreeHaver::Backends::Tslp.parser_available_for?(@language_name)
+        end
       rescue LoadError
         false
       rescue StandardError => e
