@@ -67,4 +67,11 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(rust.fetch(:ok)).to be(true), rust.inspect
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
+
+  it 'reports edits when declaration identity is unchanged' do
+    result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
+
+    expect(result.fetch(:ok)).to be(true), result.inspect
+    expect(result.fetch(:changes)).to include(path: '[:function, "left"]', change: :edited)
+  end
 end

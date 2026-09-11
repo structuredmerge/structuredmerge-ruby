@@ -52,9 +52,9 @@ module Ast
             backend: :rust_tslp,
             valid: true,
             declarations: Array(analysis['owners']).map do |owner|
-              {
-                path: owner.fetch('path'),
-                signature: owner.fetch('path'),
+            {
+              path: logical_owner_path(owner),
+              signature: logical_owner_path(owner),
                 source_role: :source,
                 line_range: owner.fetch('line_range', [nil, nil])
               }
@@ -139,7 +139,29 @@ module Ast
       end
 
       def owner_map(raw)
-        raw.fetch('analysis').fetch('owners').to_h { |owner| [owner.fetch('path'), owner] }
+        analysis = raw.fetch('analysis')
+        declarations = Array(analysis['declarations'])
+        unless declarations.empty?
+          return declarations.to_h do |declaration|
+            [logical_owner_path(declaration), declaration.merge('path' => logical_owner_path(declaration))]
+          end
+        end
+
+        analysis.fetch('owners').to_h do |owner|
+          [logical_owner_path(owner), owner.merge('path' => logical_owner_path(owner))]
+        end
+      end
+
+      def logical_owner_path(owner)
+        match_key = owner['match_key']
+        return owner.fetch('path') if match_key.nil? || match_key.empty?
+
+        kind = if owner['owner_kind'].nil? || owner['owner_kind'] == 'declaration'
+                 'function'
+               else
+                 owner.fetch('owner_kind')
+               end
+        "[:#{kind}, #{match_key.inspect}]"
       end
 
       def merge_result(operation, request, raw)

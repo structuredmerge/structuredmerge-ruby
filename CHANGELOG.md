@@ -50,6 +50,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Wire the optional Rust host package into Markdown merge development fallback bundles.
 
+- Make Rust host provider diff2 detect edits to unchanged declarations and preserve native owner identities.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
