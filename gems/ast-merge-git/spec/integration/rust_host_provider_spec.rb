@@ -2,6 +2,8 @@
 
 require 'spec_helper'
 require 'ast/merge/git/rust_host_provider'
+require 'fileutils'
+require 'pathname'
 
 RSpec.describe Ast::Merge::Git::RustHostProvider do
   subject(:provider) { described_class.new }
@@ -71,5 +73,33 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
 
     expect(result).to include(ok: true, merged_source: include('"ours":1'))
     expect(result).not_to have_key(:git)
+  end
+
+  it 'writes a clean result through the Git merge-files protocol' do
+    root = Pathname(__dir__).join('../../tmp/rust-host-provider-protocol')
+    FileUtils.rm_rf(root)
+    FileUtils.mkdir_p(root)
+    base_path = root.join('base.json')
+    ours_path = root.join('ours.json')
+    theirs_path = root.join('theirs.json')
+    base_path.write("{\"shared\":true}\n")
+    ours_path.write("{\"shared\":true,\"ours\":1}\n")
+    theirs_path.write("{\"shared\":true,\"theirs\":2}\n")
+
+    result = Ast::Merge::Git.merge_files(
+      base_path: base_path,
+      ours_path: ours_path,
+      theirs_path: theirs_path,
+      provider_id: 'rust.git.json',
+      family: :json,
+      dialect: :json,
+      backend: :rust_tslp,
+      profile_id: :source_preserving
+    )
+
+    expect(result.fetch(:git)).to include(exit_code: 0, output_written: true)
+    expect(ours_path.read).to include('"theirs":2')
+  ensure
+    FileUtils.rm_rf(root) if root
   end
 end
