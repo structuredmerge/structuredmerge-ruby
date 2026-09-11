@@ -159,6 +159,21 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include("import { value } from './shared';", 'interface Props')
   end
 
+  it 'preserves native output for independent single-variable edits' do
+    base = "const left = 1;\n\nconst right = 1;\n"
+    ours = base.sub('const left = 1', 'const left = 2')
+    theirs = base.sub('const right = 1', 'const right = 2')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = TypeScript::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to eq("const left = 2;\n\nconst right = 2;\n")
+  end
+
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 
