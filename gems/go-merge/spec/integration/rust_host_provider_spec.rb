@@ -165,4 +165,19 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
     expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
   end
+
+  it 'matches native behavior for one-sided owner addition' do
+    base = "package main\n\nfunc left() int { return 1 }\n\nfunc right() int { return 1 }\n"
+    ours = base.sub('func left() int { return 1 }', 'func left() int { return 2 }')
+    theirs = base.sub("func right() int { return 1 }\n", "func right() int { return 1 }\n\nfunc added() int { return 3 }\n")
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Go::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    expect(native.fetch(:conflicts)).not_to be_empty
+    expect(rust.fetch(:conflicts)).not_to be_empty
+  end
 end
