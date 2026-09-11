@@ -26,6 +26,16 @@ module Rust
       end
     end
 
+    autoload :RustHostProvider, 'rust/merge/rust_host_provider'
+
+    def rust_host_provider
+      @rust_host_provider ||= RustHostProvider.new
+    end
+
+    def register_rust_host_provider!(replace: false)
+      Ast::Merge.register_provider(rust_host_provider, replace: replace)
+    end
+
     def rust_feature_profile
       { family: 'rust', supported_dialects: ['rust'], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
     end

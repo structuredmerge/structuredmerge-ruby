@@ -18,6 +18,7 @@ module Go
     autoload :NodeWrapper, 'go/merge/node_wrapper'
     autoload :FileAnalysis, 'go/merge/file_analysis'
     autoload :Provider, 'go/merge/provider'
+    autoload :RustHostProvider, 'go/merge/rust_host_provider'
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
@@ -111,6 +112,14 @@ module Go
 
     def register_provider!(replace: false)
       Ast::Merge.register_provider(merge_provider, replace: replace)
+    end
+
+    def rust_host_provider
+      @rust_host_provider ||= RustHostProvider.new
+    end
+
+    def register_rust_host_provider!(replace: false)
+      Ast::Merge.register_provider(rust_host_provider, replace: replace)
     end
 
     # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity -- legacy merge result assembly remains one compatibility boundary

@@ -86,6 +86,7 @@ module Ast
     autoload :PortableBenchmarkContract, 'ast/merge/portable_benchmark_contract'
     autoload :ProviderContract, 'ast/merge/provider_contract'
     autoload :ProviderRegistry, 'ast/merge/provider_registry'
+    autoload :RustHostProvider, 'ast/merge/rust_host_provider'
     autoload :ProviderResult, 'ast/merge/provider_result'
     autoload :SectionTyping, 'ast/merge/section_typing'
     autoload :SmartMergerBase, 'ast/merge/smart_merger_base'
