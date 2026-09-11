@@ -279,7 +279,11 @@ module Ast
         family_module_name = RUST_PROVIDER_FAMILIES[request[:family].to_s]
         return unless family_module_name
 
-        family_module = family_module_name.split('::').inject(Object) { |namespace, name| namespace.const_get(name) }
+        family_module = family_module_name.split('::').inject(Object) do |namespace, name|
+          break nil unless namespace.const_defined?(name, false)
+
+          namespace.const_get(name, false)
+        end
         return unless family_module.respond_to?(:register_rust_host_provider!)
 
         family_module.register_rust_host_provider!(replace: true)
