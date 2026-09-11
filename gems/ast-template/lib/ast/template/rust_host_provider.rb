@@ -24,7 +24,7 @@ module Ast
         {
           operations: %i[options_report profile_report plan_report],
           backend: :rust_tslp,
-          execution: :report_only,
+          execution: :report_and_plan_only,
           source_projection: :ruby_owned
         }.freeze
       end

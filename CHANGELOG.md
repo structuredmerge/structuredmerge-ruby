@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Require tree_sitter_language_pack 1.17.0 or later.
 
+- Advertise ast-template Rust planning separately from Ruby-owned apply execution.
+
 ### Deprecated
 
 ### Removed

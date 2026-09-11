@@ -7,6 +7,14 @@ RSpec.describe Ast::Template::RustHostProvider do
     end
   end
 
+  it 'advertises read-only planning separately from Ruby-owned apply execution' do
+    expect(described_class.new.capabilities).to include(
+      operations: %i[options_report profile_report plan_report],
+      execution: :report_and_plan_only,
+      source_projection: :ruby_owned
+    )
+  end
+
   it 'reports missing roots through the portable options contract' do
     report = described_class.new.report(
       kind: 'options',
