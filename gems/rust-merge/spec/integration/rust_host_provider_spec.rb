@@ -7,6 +7,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
   before { skip 'compiled Rust host is unavailable' unless described_class.available? }
 
+  before { Rust::Merge.register_rust_host_provider!(replace: true) }
+
   let(:request_base) do
     {
       family: :rust,
@@ -34,5 +36,20 @@ RSpec.describe Rust::Merge::RustHostProvider do
       expect(result.fetch(:verification)).to include(rust_host: true)
       expect(result.fetch(:ok)).to be(true), result.inspect
     end
+  end
+
+  it 'dispatches an explicitly selected Rust provider through the registry' do
+    result = Ast::Merge.dispatch_provider(
+      :merge2,
+      request_base.merge(
+        provider_id: 'rust.rust',
+        incoming_source: ours_source,
+        current_source: base_source
+      )
+    )
+
+    expect(result.fetch(:provider)).to include(provider_id: 'rust.rust')
+    expect(result.fetch(:verification)).to include(rust_host: true)
+    expect(result.fetch(:ok)).to be(true), result.inspect
   end
 end
