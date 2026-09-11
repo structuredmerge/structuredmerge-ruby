@@ -46,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Wire the optional Rust host package into Bash merge development fallback bundles and preserve explicit parser-path failures.
 
+- Wire the optional Rust host package into Markdown merge development fallback bundles.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
