@@ -230,6 +230,10 @@ module Bash
         # TreeHaver handles backend selection against the grammars Bash::Merge
         # has already registered during bootstrap.
         # Set TREE_HAVER_BACKEND=ffi for bash (MRI/Rust have compatibility issues)
+        if @parser_path && (TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']).to_s == 'rust_tslp'
+          raise TreeHaver::NotAvailable, 'Rust TSLP fallback does not support an explicit parser path'
+        end
+
         parser = if @parser_path
                    TreeHaver.with_language_registration(
                      :bash,
