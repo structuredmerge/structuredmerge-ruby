@@ -7,12 +7,13 @@ RSpec.describe Ast::Crispr::RustHostProvider do
 
   before { skip 'compiled Rust host is unavailable' unless described_class.available? }
 
-  it 'advertises profile-report capabilities without claiming edit execution' do
+  it 'advertises profile reports and explicit source edits without claiming selection' do
     expect(provider.provider_id).to eq('rust.ast-crispr.profile')
     expect(provider.capabilities).to include(
       backend: :rust_tslp,
-      execution: :profile_reports_only,
-      source_projection: :ruby_owned
+      execution: :profile_reports_and_explicit_source_edits,
+      source_projection: :explicit_byte_ranges,
+      structural_selection: :ruby_owned
     )
   end
 
@@ -34,7 +35,7 @@ RSpec.describe Ast::Crispr::RustHostProvider do
     )
   end
 
-  it 'round-trips a batch report while keeping execution Ruby-owned' do
+  it 'round-trips a batch report while keeping structural selection Ruby-owned' do
     report = provider.report(
       kind: 'batch_operations',
       operations: [
@@ -50,5 +51,35 @@ RSpec.describe Ast::Crispr::RustHostProvider do
     )
 
     expect(report).to include('operation_count' => 1, 'operation_kinds' => ['replace'])
+  end
+
+  it 'applies explicit UTF-8 source edits through the Rust renderer' do
+    report = provider.apply_source_edits(
+      source: "alpha = 1\nβeta = 2\n",
+      edits: [
+        { start_byte: 8, end_byte: 9, replacement: '9' },
+        { start_byte: 10, end_byte: 15, replacement: 'gamma' }
+      ]
+    )
+
+    expect(report).to include(
+      'ok' => true,
+      'output' => "alpha = 9\ngamma = 2\n",
+      'edit_count' => 2,
+      'source_projection' => 'explicit_byte_ranges'
+    )
+  end
+
+  it 'reports overlapping explicit edits without mutating source' do
+    report = provider.apply_source_edits(
+      source: 'abcdef',
+      edits: [
+        { start_byte: 1, end_byte: 4, replacement: 'x' },
+        { start_byte: 3, end_byte: 5, replacement: 'y' }
+      ]
+    )
+
+    expect(report).to include('ok' => false, 'source_projection' => 'explicit_byte_ranges')
+    expect(report.fetch('diagnostics').first.fetch('category')).to eq('source_edit_rejected')
   end
 end
