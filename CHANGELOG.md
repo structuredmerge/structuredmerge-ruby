@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve native RBS semantics when the Rust TSLP fallback is selected.
 
+- Route tree-sitter contract requests through the selected Rust TSLP fallback provider.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

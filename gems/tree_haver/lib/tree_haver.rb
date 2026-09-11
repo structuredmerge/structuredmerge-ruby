@@ -456,7 +456,7 @@ module TreeHaver
   def parser_for_registered_backend(name, backend_type, registrations)
     config = registrations.fetch(backend_type)
     case backend_type
-    when :psych, :prism, :commonmarker, :markly, :rbs
+    when :psych, :prism, :commonmarker, :markly, :rbs, :rust_tslp
       parser_for_backend_module(config.fetch(:backend_module), name)
     when :citrus
       parser_for_citrus(config.fetch(:grammar_module))

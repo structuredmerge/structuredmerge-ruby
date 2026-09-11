@@ -74,6 +74,16 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     expect(root.first_child.prev_sibling).to be_nil
   end
 
+  it 'routes tree-sitter contract requests through the selected Rust provider' do
+    parser = TreeHaver.with_backend(:rust_tslp) do
+      TreeHaver::GrammarFinder.new(:json).register!(raise_on_missing: true)
+      TreeHaver.parser_for(:json, backend_type: :tree_sitter)
+    end
+
+    expect(parser).to be_a(described_class::Parser)
+    expect(parser.parse(source).root_node.type).to eq('document')
+  end
+
   it 'rejects invalid binary source rather than changing source bytes' do
     parser = described_class::Parser.new
     parser.language = described_class::Language.new(:json)
