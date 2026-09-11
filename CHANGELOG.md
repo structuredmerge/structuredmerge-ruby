@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Require tree_sitter_language_pack 1.17.0 or later.
+
 ### Deprecated
 
 ### Removed
