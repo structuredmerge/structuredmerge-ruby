@@ -93,4 +93,15 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(result.fetch(:provider)).to include(provider_id: 'rust.go')
     expect(result.fetch(:diagnostics).first).to include(category: :parse_error, blocking: true)
   end
+
+  it 'preserves a localized conflict envelope for incompatible edits' do
+    conflicting_theirs = base_source.sub('func left() int { return 1 }', 'func left() int { return 3 }')
+    result = provider.merge3(
+      request_base.merge(base_source: base_source, ours_source: ours_source, theirs_source: conflicting_theirs)
+    )
+
+    expect(result.fetch(:ok)).to be(false)
+    expect(result.fetch(:provider)).to include(provider_id: 'rust.go')
+    expect(result.fetch(:conflicts)).not_to be_empty
+  end
 end
