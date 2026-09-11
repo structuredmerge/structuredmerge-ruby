@@ -96,4 +96,18 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(rust.fetch(:ok)).to be(true), rust.inspect
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
+
+  it 'preserves native output for literal test-harness prerequisites' do
+    base = "test_expect_success PERL 'works' 'echo one'\n"
+    ours = "test_expect_success PERL 'works' 'echo two'\n"
+    theirs = base
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
 end
