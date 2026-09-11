@@ -39,6 +39,18 @@ module TreeHaver
           }
         end
 
+        def register_language_host(language)
+          return unless available?
+          return unless ::StructuredmergeHostPrototype.respond_to?(:registered_parser_hosts)
+          return unless ::StructuredmergeHostPrototype.respond_to?(:register_tslp_parser_host)
+
+          provider_name = "tree_haver.rust_tslp.#{language}"
+          return provider_name if ::StructuredmergeHostPrototype.registered_parser_hosts.include?(provider_name)
+
+          ::StructuredmergeHostPrototype.register_tslp_parser_host(provider_name, language.to_s)
+          provider_name
+        end
+
         private
 
         # rubocop:disable Metrics/MethodLength

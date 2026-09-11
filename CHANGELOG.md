@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Propagate normalized Rust TSLP error nodes through TreeHaver and resolve public tree-sitter backend identities.
 
+- Register TreeHaver Rust TSLP language hosts when the optional host registry is available.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

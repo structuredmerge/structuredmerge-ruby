@@ -321,6 +321,7 @@ module TreeHaver
           backend_type: backend_type,
           gem_name: gem_name
         )
+        backend_module.register_language_host(@language_name) if backend_type == :rust_tslp
         return true
       end
 
