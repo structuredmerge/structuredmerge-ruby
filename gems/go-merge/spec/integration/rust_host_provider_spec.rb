@@ -52,4 +52,19 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(result.fetch(:verification)).to include(rust_host: true)
     expect(result.fetch(:ok)).to be(true), result.inspect
   end
+
+  it 'preserves native merge3 output for independent function edits' do
+    request = request_base.merge(
+      base_source: base_source,
+      ours_source: ours_source,
+      theirs_source: theirs_source
+    )
+
+    native = Go::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
 end
