@@ -134,7 +134,7 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
-  it 'fails closed on imports in source-preserving merge' do
+  it 'preserves native output for imports and declaration membership' do
     base = <<~TS
       import { value } from './shared';
 
@@ -150,12 +150,13 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
       theirs_source: theirs
     )
 
+    native = TypeScript::Merge::Provider.new.merge3(request)
     rust = provider.merge3(request)
 
-    expect(rust.fetch(:ok)).to be(false), rust.inspect
-    expect(rust.fetch(:diagnostics)).to include(
-      include(category: :parse_error, blocking: true, message: include('unsupported top-level TypeScript node'))
-    )
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to include("import { value } from './shared';", 'interface Props')
   end
 
   it 'reports edits when declaration identity is unchanged' do
