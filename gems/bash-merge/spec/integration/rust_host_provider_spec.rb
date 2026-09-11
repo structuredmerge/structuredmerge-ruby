@@ -36,6 +36,10 @@ RSpec.describe Bash::Merge::RustHostProvider do
     end
   end
 
+  it 'reports the ownership boundary for its portable subset' do
+    expect(provider.capabilities.fetch(:ast_ownership)).to eq(:top_level_functions_and_variable_assignments)
+  end
+
   it 'dispatches an explicitly selected Rust Bash provider' do
     Bash::Merge.register_rust_host_provider!(replace: true)
     result = Ast::Merge.dispatch_provider(

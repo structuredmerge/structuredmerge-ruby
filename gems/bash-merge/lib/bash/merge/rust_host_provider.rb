@@ -4,8 +4,8 @@ require 'ast/merge'
 
 module Bash
   module Merge
-    # Opt-in Rust provider for the portable top-level-function subset.
-    # Assignments, test-harness titles, and comment attachment remain Ruby-owned.
+    # Opt-in Rust provider for the portable top-level function/assignment subset.
+    # Test-harness titles and comment attachment remain Ruby-owned.
     class RustHostProvider < Ast::Merge::RustHostProvider
       def self.available?
         super(%i[parse_bash_analysis merge_bash_two_way merge_bash_three_way])
@@ -27,7 +27,7 @@ module Bash
       end
 
       def capabilities
-        super.merge(ast_ownership: :top_level_functions_only).freeze
+        super.merge(ast_ownership: :top_level_functions_and_variable_assignments).freeze
       end
     end
   end

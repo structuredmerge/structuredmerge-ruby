@@ -46,6 +46,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Extend the opt-in Rust Bash provider to preserve top-level variable assignments.
 
+- Correct the Rust Bash provider capability metadata to describe its top-level variable-assignment ownership.
+
 ### Deprecated
 
 ### Removed
