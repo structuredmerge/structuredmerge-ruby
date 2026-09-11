@@ -47,6 +47,29 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
     expect(result.fetch(:verification)).to include(rust_host: true, base_participated: true)
   end
 
+  it 'keeps non-merge3 Git operations explicitly unsupported' do
+    result = provider.analyze(request_base)
+
+    expect(result).to include(ok: false)
+    expect(result.fetch(:diagnostics)).to include(
+      include(category: :unsupported_capability, blocking: true)
+    )
+  end
+
+  it 'preserves the explicit JSON5 dialect through the Git provider' do
+    result = provider.merge3(
+      request_base.merge(
+        dialect: :json5,
+        base_source: "{shared: true}\n",
+        ours_source: "{shared: true, ours: 1}\n",
+        theirs_source: "{shared: true, theirs: 2}\n"
+      )
+    )
+
+    expect(result).to include(ok: true)
+    expect(result.fetch(:output)).to include('ours: 1', 'theirs: 2')
+  end
+
   it 'preserves localized conflict output for the Git adapter' do
     result = provider.merge3(
       request_base.merge(
