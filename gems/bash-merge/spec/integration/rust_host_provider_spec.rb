@@ -37,7 +37,7 @@ RSpec.describe Bash::Merge::RustHostProvider do
   end
 
   it 'reports the ownership boundary for its portable subset' do
-    expect(provider.capabilities.fetch(:ast_ownership)).to eq(:top_level_functions_and_variable_assignments)
+    expect(provider.capabilities.fetch(:ast_ownership)).to eq(:top_level_functions_assignments_and_literal_test_titles)
   end
 
   it 'dispatches an explicitly selected Rust Bash provider' do
@@ -73,6 +73,20 @@ RSpec.describe Bash::Merge::RustHostProvider do
     base = "VALUE=one\nleft() { echo one; }\n"
     ours = "VALUE=two\nleft() { echo one; }\n"
     theirs = "VALUE=one\nleft() { echo two; }\n"
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
+
+  it 'preserves native output for literal test-harness edits' do
+    base = "test_expect_success 'works' 'echo one'\n"
+    ours = "test_expect_success 'works' 'echo two'\n"
+    theirs = "test_expect_success 'works' 'echo one'\n"
     request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
 
     native = Bash::Merge::Provider.new.merge3(request)

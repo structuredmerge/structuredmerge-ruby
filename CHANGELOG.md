@@ -48,6 +48,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Correct the Rust Bash provider capability metadata to describe its top-level variable-assignment ownership.
 
+- Extend the opt-in Rust Bash provider to preserve literal-title test_expect_success calls.
+
 ### Deprecated
 
 ### Removed
