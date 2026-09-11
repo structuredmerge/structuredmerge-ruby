@@ -22,14 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-family (>= 1.3.0 -> >= 1.3.1)
-
-- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - github/codeql-action/analyze v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
-  - github/codeql-action/autobuild v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
-  - github/codeql-action/init v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
-
 ### Deprecated
 
 ### Removed
@@ -37,6 +29,23 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 ### Security
+
+## [7.1.28] - 2026-09-10
+
+- TAG: [v7.1.28][7.1.28t]
+- COVERAGE: 93.67% -- 11268/12030 lines in 16 files
+- BRANCH COVERAGE: 77.10% -- 4794/6218 branches in 16 files
+- 18.11% documented
+
+### Changed
+
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-family (>= 1.3.0 -> >= 1.3.1)
+
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - github/codeql-action/analyze v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
+  - github/codeql-action/autobuild v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
+  - github/codeql-action/init v4.37.9 (cdf488f595d80d6e07e03d4674febd5ab45fa938) -> v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63)
 
 ## [7.1.27] - 2026-09-10
 
@@ -2040,7 +2049,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.27...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.28...HEAD
+[7.1.28]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.27...v7.1.28
+[7.1.28t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.28
 [7.1.27]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.26...v7.1.27
 [7.1.27t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.27
 [7.1.26]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.25...v7.1.26
