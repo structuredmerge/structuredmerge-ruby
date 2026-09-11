@@ -64,4 +64,18 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(rust.fetch(:ok)).to be(true), rust.inspect
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
+
+  it 'preserves native output for independent variable and function edits' do
+    base = "VALUE=one\nleft() { echo one; }\n"
+    ours = "VALUE=two\nleft() { echo one; }\n"
+    theirs = "VALUE=one\nleft() { echo two; }\n"
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
 end

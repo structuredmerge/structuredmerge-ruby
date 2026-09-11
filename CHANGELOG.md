@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Advertise ast-template Rust planning separately from Ruby-owned apply execution.
 
+- Extend the opt-in Rust Bash provider to preserve top-level variable assignments.
+
 ### Deprecated
 
 ### Removed
