@@ -54,11 +54,11 @@ module Ast
             backend: :rust_tslp,
             valid: true,
             declarations: owners.map do |owner|
-            {
-              path: logical_owner_path(owner),
-              signature: logical_owner_path(owner),
+              {
+                path: logical_owner_path(owner),
+                signature: logical_owner_path(owner),
                 source_role: :source,
-                line_range: owner.fetch('line_range', [nil, nil])
+                line_range: owner.fetch('line_range', line_range(request.fetch(:source), owner['source_fragment']))
               }
             end
           },
@@ -163,7 +163,7 @@ module Ast
             path = logical_owner_path(declaration)
             [path, declaration.merge(
               'path' => path,
-              'line_range' => line_range(source, declaration['text']),
+              'line_range' => line_range(source, declaration['text'] || declaration['source_fragment']),
               'source_role' => source_role
             )]
           end
@@ -173,7 +173,7 @@ module Ast
           path = logical_owner_path(owner)
           [path, owner.merge(
             'path' => path,
-            'line_range' => line_range(source, owner['text']),
+            'line_range' => line_range(source, owner['text'] || owner['source_fragment']),
             'source_role' => source_role
           )]
         end
@@ -183,8 +183,10 @@ module Ast
         return true if before_owner.nil? && after_owner.nil?
         return false if before_owner.nil? || after_owner.nil?
 
-        if before_owner.key?('text') || after_owner.key?('text')
-          before_owner['text'] == after_owner['text']
+        if before_owner.key?('text') || after_owner.key?('text') ||
+           before_owner.key?('source_fragment') || after_owner.key?('source_fragment')
+          (before_owner['text'] || before_owner['source_fragment']) ==
+            (after_owner['text'] || after_owner['source_fragment'])
         else
           before_owner == after_owner
         end
@@ -204,8 +206,7 @@ module Ast
 
         end_index = start + fragment.length
         start_line = source[0...start].count("\n") + 1
-        end_line = source[0...end_index].count("\n")
-        end_line = start_line if end_line.zero?
+        end_line = source[0...end_index].count("\n") + 1
         [start_line, end_line]
       end
 

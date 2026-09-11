@@ -51,7 +51,12 @@ RSpec.describe Json::Merge::RustHostProvider do
                     'ok' => true,
                     'analysis' => {
                       'dialect' => 'json',
-                      'owners' => [{ 'path' => '/answer', 'owner_kind' => 'member', 'match_key' => 'answer' }]
+                      'owners' => [{
+                        'path' => '/answer',
+                        'owner_kind' => 'member',
+                        'match_key' => 'answer',
+                        'source_fragment' => '"answer": 42'
+                      }]
                     },
                     'diagnostics' => []
                   ))
@@ -75,6 +80,7 @@ RSpec.describe Json::Merge::RustHostProvider do
 
     expect(analysis).to include(ok: true, operation: :analyze)
     expect(analysis.dig(:analysis, :declarations, 0, :path)).to eq('[:member, "answer"]')
+    expect(analysis.dig(:analysis, :declarations, 0, :line_range)).to eq([1, 1])
     expect(merge2).to include(ok: true, operation: :merge2, output: '{"answer": 42}\n')
     expect(merge3).to include(ok: true, operation: :merge3, output: '{"answer": 42}\n')
   end

@@ -66,6 +66,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Report both TypeScript and TSX dialects in the opt-in Rust host provider capability metadata.
 
+- Calculate Rust host source-fragment line ranges with one-based start and end lines.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
