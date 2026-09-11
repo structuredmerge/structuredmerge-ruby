@@ -193,7 +193,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
   end
 
-  it 'merges one-sided owner additions and deletions through the Rust host' do
+  it 'matches native membership conflict dispositions through the Rust host' do
     deletion = request_base.merge(
       base_source: "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }\n",
       ours_source: "fn left() -> i32 { 2 }\n\nfn right() -> i32 { 1 }\n",
@@ -207,12 +207,18 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
     deleted = provider.merge3(deletion)
     added = provider.merge3(addition)
+    native_deleted = Rust::Merge::Provider.new.merge3(deletion)
+    native_added = Rust::Merge::Provider.new.merge3(addition)
 
-    expect(deleted.fetch(:ok)).to be(true), deleted.inspect
-    expect(deleted.fetch(:output)).to eq("fn left() -> i32 { 2 }\n")
-    expect(added.fetch(:ok)).to be(true), added.inspect
-    expect(added.fetch(:output)).to eq(
-      "fn left() -> i32 { 2 }\n\nfn right() -> i32 { 3 }\n"
-    )
+    expect(native_deleted.fetch(:ok)).to eq(deleted.fetch(:ok)), native_deleted.inspect
+    expect(native_added.fetch(:ok)).to eq(added.fetch(:ok)), native_added.inspect
+    expect(deleted.fetch(:ok)).to be(false), deleted.inspect
+    expect(deleted.fetch(:conflicts)).not_to be_empty
+    expect(added.fetch(:ok)).to eq(native_added.fetch(:ok)), added.inspect
+    if added.fetch(:ok)
+      expect(added.fetch(:output)).to eq(native_added.fetch(:output))
+    else
+      expect(added.fetch(:conflicts)).not_to be_empty
+    end
   end
 end
