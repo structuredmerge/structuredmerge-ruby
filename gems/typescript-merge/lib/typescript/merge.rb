@@ -16,6 +16,7 @@ module TypeScript
     autoload :NodeWrapper, 'typescript/merge/node_wrapper'
     autoload :FileAnalysis, 'typescript/merge/file_analysis'
     autoload :Provider, 'typescript/merge/provider'
+    autoload :RustHostProvider, 'typescript/merge/rust_host_provider'
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
@@ -122,6 +123,14 @@ module TypeScript
       return unless Ast::Merge.respond_to?(:register_provider)
 
       Ast::Merge.register_provider(merge_provider, replace: replace)
+    end
+
+    def rust_host_provider
+      @rust_host_provider ||= RustHostProvider.new
+    end
+
+    def register_rust_host_provider!(replace: false)
+      Ast::Merge.register_provider(rust_host_provider, replace: replace)
     end
 
     def merge_type_script(template_source, destination_source, dialect)

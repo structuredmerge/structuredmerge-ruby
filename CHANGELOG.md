@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add opt-in Rust host provider adapters for Go and Rust merge operations.
 
+- Add an opt-in RustHostProvider for TypeScript analyze, merge2, and merge3 operations.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.
