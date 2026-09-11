@@ -84,4 +84,45 @@ RSpec.describe Json::Merge::RustHostProvider do
     expect(merge2).to include(ok: true, operation: :merge2, output: '{"answer": 42}\n')
     expect(merge3).to include(ok: true, operation: :merge3, output: '{"answer": 42}\n')
   end
+
+  it 'preserves native semantic results across the JSON-family dialects' do
+    skip 'compiled Rust host unavailable' unless described_class.available?
+
+    sources = {
+      json: {
+        base: "{\"stable\": true}\n",
+        ours: "{\"stable\": true, \"ours\": 1}\n",
+        theirs: "{\"stable\": true, \"theirs\": 2}\n"
+      },
+      jsonc: {
+        base: "// base\n{\n  \"stable\": true,\n}\n",
+        ours: "// ours\n{\n  \"stable\": true,\n  \"ours\": 1,\n}\n",
+        theirs: "// theirs\n{\n  \"stable\": true,\n  \"theirs\": 2,\n}\n"
+      },
+      json5: {
+        base: "{\n  stable: true,\n}\n",
+        ours: "{\n  stable: true,\n  ours: 1,\n}\n",
+        theirs: "{\n  stable: true,\n  theirs: 2,\n}\n"
+      }
+    }
+
+    sources.each do |dialect, source_set|
+      analysis = provider.analyze(source: source_set.fetch(:ours), dialect: dialect)
+      result = provider.merge3(
+        base_source: source_set.fetch(:base),
+        ours_source: source_set.fetch(:ours),
+        theirs_source: source_set.fetch(:theirs),
+        dialect: dialect
+      )
+
+      expect(analysis).to include(ok: true, operation: :analyze)
+      expect(analysis.dig(:analysis, :declarations)).not_to be_empty
+      expect(result).to include(ok: true, operation: :merge3)
+      expect(Json::Merge.json_value_for_source(result.fetch(:output), dialect: dialect)).to eq(
+        'stable' => true,
+        'ours' => 1,
+        'theirs' => 2
+      )
+    end
+  end
 end
