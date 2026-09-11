@@ -81,5 +81,37 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     expect { parser.parse("{\"bad\":\"\xFF\"}".b) }
       .to raise_error(TreeHaver::NotAvailable, /requires valid UTF-8/)
   end
+
+  it 'advertises unsupported operations instead of emulating native behavior' do
+    expect(described_class.capabilities).to include(
+      backend: :rust_tslp,
+      query: false,
+      incremental: false,
+      comment_support: :nodes_only,
+      provenance: :rust_tree_haver
+    )
+  end
+
+  it 'preserves parser diagnostics and error-node flags from a partial tree' do
+    malformed = result.merge(
+      'ok' => false,
+      'diagnostics' => ['tree-sitter-language-pack reported syntax errors for json.'],
+      'nodes' => result.fetch('nodes').map do |node|
+        node.merge('role' => node.fetch('kind') == 'object' ? 'error' : node.fetch('role'))
+      end
+    )
+    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
+      .with('json', source, 'json')
+      .and_return(JSON.generate(malformed))
+
+    tree = TreeHaver.with_backend(:rust_tslp) do
+      TreeHaver::GrammarFinder.new(:json).register!(raise_on_missing: true)
+      TreeHaver.parser_for(:json).parse(source)
+    end
+
+    expect(tree.errors).to eq(['tree-sitter-language-pack reported syntax errors for json.'])
+    expect(tree.has_error?).to be(true)
+    expect(tree.root_node.children.first.error?).to be(true)
+  end
 end
 # rubocop:enable Metrics/BlockLength

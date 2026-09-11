@@ -25,4 +25,17 @@ RSpec.describe 'Rust TSLP host integration' do
     expect(pair.child_by_field_name(:key).text).to eq('"answer"')
     expect(pair.child_by_field_name(:value).text).to eq('42')
   end
+
+  it 'returns a partial tree with diagnostics for malformed source' do
+    skip TreeHaver::Backends::RustTslp.unavailable_reason unless TreeHaver::Backends::RustTslp.available?
+
+    tree = TreeHaver.with_backend(:rust_tslp) do
+      TreeHaver::GrammarFinder.new(:json).register!(raise_on_missing: true)
+      TreeHaver.parser_for(:json).parse('{"answer":')
+    end
+
+    expect(tree.errors).not_to be_empty
+    expect(tree.has_error?).to be(true)
+    expect(tree.root_node.text).to eq('{"answer":')
+  end
 end
