@@ -150,4 +150,19 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(rust.fetch(:ok)).to be(true), rust.inspect
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
+
+  it 'preserves native comment and layout ownership for independent edits' do
+    base = "package main\n\n// left documentation\nfunc left() int { return 1 }\n\n// right documentation\nfunc right() int { return 1 }\n"
+    ours = base.sub('func left() int { return 1 }', 'func left() int { return 2 }')
+    theirs = base.sub('func right() int { return 1 }', 'func right() int { return 2 }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Go::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
+  end
 end

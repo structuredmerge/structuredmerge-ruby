@@ -84,6 +84,21 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'preserves native comment and layout ownership for independent edits' do
+    base = "// left documentation\nfunction left(): number { return 1; }\n\n// right documentation\nfunction right(): number { return 1; }\n"
+    ours = base.sub('function left(): number { return 1; }', 'function left(): number { return 2; }')
+    theirs = base.sub('function right(): number { return 1; }', 'function right(): number { return 2; }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = TypeScript::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
+  end
+
   it 'supports the advertised TSX dialect through the host' do
     source = "interface Props { value: string }\nfunction Component(props: Props) { return <div>{props.value}</div>; }\n"
     result = provider.analyze(request_base.merge(dialect: :tsx, source: source))
