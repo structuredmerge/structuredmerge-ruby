@@ -90,6 +90,25 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
   end
 
+  it 'reports added and deleted declarations with explicit presence records' do
+    after_source = "fn left() -> i32 { 1 }\n\nfn added() -> i32 { 4 }\n"
+    result = provider.diff2(request_base.merge(before_source: base_source, after_source: after_source))
+
+    expect(result.fetch(:ok)).to be(true), result.inspect
+    deleted = result.fetch(:changes).find { |entry| entry[:path] == '[:function, "right"]' }
+    added = result.fetch(:changes).find { |entry| entry[:path] == '[:function, "added"]' }
+    expect(deleted).to include(
+      before: { present: true, source_role: :before, line_range: [3, 3] },
+      after: { present: false, source_role: :after, line_range: [nil, nil] },
+      change: :deleted
+    )
+    expect(added).to include(
+      before: { present: false, source_role: :before, line_range: [nil, nil] },
+      after: { present: true, source_role: :after, line_range: [3, 3] },
+      change: :added
+    )
+  end
+
   it 'fails closed on malformed source with a normalized parse diagnostic' do
     request = request_base.merge(source: "fn {")
     result = provider.analyze(request)
