@@ -25,8 +25,13 @@ module Ast
       'rust' => 'Rust',
       'typescript' => 'TypeScript'
     }.freeze
+    autoload :RustHostProvider, 'ast/template/rust_host_provider'
 
     class << self
+      def rust_host_provider
+        @rust_host_provider ||= RustHostProvider.new
+      end
+
       def readme_family_language_aliases(self_language, language_order = README_FAMILY_LANGUAGE_ORDER)
         self_id = self_language.to_s
         alternatives = language_order.map(&:to_s).reject { |language| language == self_id }

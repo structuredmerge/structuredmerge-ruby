@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an explicit Rust ast-crispr profile-report provider with Ruby-owned source projection.
 
+- Add an explicit Rust ast-template session-report provider with Ruby-owned execution.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.
