@@ -39,6 +39,7 @@ module Json
     autoload :SmartMerger, 'json/merge/smart_merger'
     autoload :ObjectMatchRefiner, 'json/merge/object_match_refiner'
     autoload :Provider, 'json/merge/provider'
+    autoload :RustHostProvider, 'json/merge/rust_host_provider'
     autoload :SourceLocator, 'json/merge/source_locator'
     autoload :ThreeWayDecision, 'json/merge/three_way_decision'
 
@@ -76,6 +77,14 @@ module Json
 
     def register_provider!(replace: false)
       Ast::Merge.register_provider(merge_provider, replace: replace)
+    end
+
+    def rust_host_provider
+      @rust_host_provider ||= RustHostProvider.new
+    end
+
+    def register_rust_host_provider!(replace: false)
+      Ast::Merge.register_provider(rust_host_provider, replace: replace)
     end
 
     def available_json_backends
