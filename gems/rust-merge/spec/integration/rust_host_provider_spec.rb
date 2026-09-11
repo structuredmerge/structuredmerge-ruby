@@ -178,6 +178,21 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'preserves native comment and layout ownership for independent edits' do
+    base = "// left documentation\nfn left() -> i32 { 1 }\n\n// right documentation\nfn right() -> i32 { 1 }\n"
+    ours = base.sub('fn left() -> i32 { 1 }', 'fn left() -> i32 { 2 }')
+    theirs = base.sub('fn right() -> i32 { 1 }', 'fn right() -> i32 { 2 }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
+  end
+
   it 'merges one-sided owner additions and deletions through the Rust host' do
     deletion = request_base.merge(
       base_source: "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }\n",
