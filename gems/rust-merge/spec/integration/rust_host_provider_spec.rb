@@ -177,4 +177,27 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:ok)).to be(true), rust.inspect
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
+
+  it 'merges one-sided owner additions and deletions through the Rust host' do
+    deletion = request_base.merge(
+      base_source: "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }\n",
+      ours_source: "fn left() -> i32 { 2 }\n\nfn right() -> i32 { 1 }\n",
+      theirs_source: "fn left() -> i32 { 1 }\n"
+    )
+    addition = request_base.merge(
+      base_source: "fn left() -> i32 { 1 }\n",
+      ours_source: "fn left() -> i32 { 2 }\n",
+      theirs_source: "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 3 }\n"
+    )
+
+    deleted = provider.merge3(deletion)
+    added = provider.merge3(addition)
+
+    expect(deleted.fetch(:ok)).to be(true), deleted.inspect
+    expect(deleted.fetch(:output)).to eq("fn left() -> i32 { 2 }\n")
+    expect(added.fetch(:ok)).to be(true), added.inspect
+    expect(added.fetch(:output)).to eq(
+      "fn left() -> i32 { 2 }\n\nfn right() -> i32 { 3 }\n"
+    )
+  end
 end

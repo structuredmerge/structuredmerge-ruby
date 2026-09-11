@@ -58,6 +58,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve Rust declaration kinds in the opt-in host provider analysis and diff contract.
 
+- Expose conservative Rust-host merge3 support for one-sided top-level owner additions and deletions.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
