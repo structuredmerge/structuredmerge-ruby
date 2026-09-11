@@ -74,4 +74,13 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:ok)).to be(true), result.inspect
     expect(result.fetch(:changes)).to include(path: '[:function, "left"]', change: :edited)
   end
+
+  it 'fails closed on malformed source with a normalized parse diagnostic' do
+    request = request_base.merge(source: "fn {")
+    result = provider.analyze(request)
+
+    expect(result.fetch(:ok)).to be(false)
+    expect(result.fetch(:provider)).to include(provider_id: 'rust.rust')
+    expect(result.fetch(:diagnostics).first).to include(category: :parse_error, blocking: true)
+  end
 end
