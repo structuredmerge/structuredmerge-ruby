@@ -35,6 +35,7 @@ RSpec.describe 'Rust TSLP host integration' do
     end
 
     expect(tree.errors).not_to be_empty
+    expect(tree.errors).to include('tree-sitter-language-pack reported syntax errors for json.')
     expect(tree.has_error?).to be(true)
     expect(tree.root_node.text).to eq('{"answer":')
   end
