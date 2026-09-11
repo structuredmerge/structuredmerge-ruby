@@ -129,6 +129,15 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     )
   end
 
+  it 'fails closed when the selected Rust provider is unavailable' do
+    allow(described_class).to receive(:available?).and_return(false)
+    parser = described_class::Parser.new
+    parser.language = described_class::Language.new(:json)
+
+    expect { parser.parse(source) }
+      .to raise_error(TreeHaver::NotAvailable, /Rust TreeHaver normalized parser is unavailable/)
+  end
+
   it 'preserves parser diagnostics and error-node flags from a partial tree' do
     malformed = result.merge(
       'ok' => false,
