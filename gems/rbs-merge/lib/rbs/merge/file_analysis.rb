@@ -318,18 +318,7 @@ module Rbs
       private
 
       def parse_rbs
-        # Use TreeHaver to get the appropriate parser
-        # TreeHaver handles backend selection automatically for the current
-        # sibling-development environment and respects explicit backend overrides.
-        parser = TreeHaver.parser_for(:rbs)
-        result = parser.parse(@source)
-
-        # Determine which backend was used based on the result type
-        if result.is_a?(Backends::RbsBackend::Tree)
-          process_rbs_gem_result(result)
-        else
-          process_tree_sitter_result(result)
-        end
+        process_parse_result(rbs_parser.parse(@source))
       rescue TreeHaver::NotAvailable => e
         @errors << "No RBS parser available: #{e.message}"
         @ast = nil
@@ -339,6 +328,28 @@ module Rbs
       rescue StandardError => e
         @errors << e.message
         @ast = nil
+      end
+
+      def process_parse_result(result)
+        # Determine which backend was used based on the result type
+        if result.is_a?(Backends::RbsBackend::Tree)
+          process_rbs_gem_result(result)
+        else
+          process_tree_sitter_result(result)
+        end
+      end
+
+      def rbs_parser
+        return TreeHaver.parser_for(:rbs) unless native_rbs_required?
+
+        # RBS has a native semantic parser. The Rust TSLP fallback remains
+        # available on runtimes without it, but must not replace this contract
+        # while it lacks parity.
+        TreeHaver.with_backend(:rbs) { TreeHaver.parser_for(:rbs) }
+      end
+
+      def native_rbs_required?
+        TreeHaver.effective_backend == :rust_tslp && Backends::RbsBackend.available?
       end
 
       # Process result from RBS gem backend

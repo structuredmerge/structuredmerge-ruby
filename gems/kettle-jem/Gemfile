@@ -19,6 +19,11 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from kettle-jem.gemspec
 gemspec
 
+structuredmerge_rust_dev = ENV.fetch("STRUCTUREDMERGE_RUST_DEV", "").strip
+unless structuredmerge_rust_dev.empty? || %w[false 0 no off].include?(structuredmerge_rust_dev.downcase)
+  gem "structuredmerge_host_prototype", path: File.join(structuredmerge_rust_dev, "packages/ruby")
+end
+
 gem "kettle-family", "~> 1.2", ">= 1.2.100"
 
 # Local workspace dependency wiring for *_local.gemfile overrides

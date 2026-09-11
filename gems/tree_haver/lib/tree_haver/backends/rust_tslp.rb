@@ -162,6 +162,16 @@ module TreeHaver
 
       # Adapts normalized node records to TreeHaver's node contract.
       class Node < TreeHaver::Base::Node
+        # Preserve the established TreeHaver surface when the two language-pack
+        # implementations expose equivalent JSON5 grammar nodes under different
+        # native names.
+        NODE_TYPE_ALIASES = {
+          'json5' => {
+            'file' => 'document',
+            'member' => 'pair'
+          }
+        }.freeze
+
         attr_reader :language
 
         def initialize(node, nodes_by_id:, source: nil, lines: nil, language: nil)
@@ -170,8 +180,11 @@ module TreeHaver
           @language = language.to_s
         end
 
-        def type = inner_node.fetch('kind')
-        alias native_type type
+        def type
+          NODE_TYPE_ALIASES.fetch(language, {}).fetch(native_type, native_type)
+        end
+
+        def native_type = inner_node.fetch('kind')
 
         def start_byte = span.fetch('range').fetch('start_byte')
         def end_byte = span.fetch('range').fetch('end_byte')

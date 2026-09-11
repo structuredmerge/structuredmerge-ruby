@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Preserve native RBS semantics when the Rust TSLP fallback is selected.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
