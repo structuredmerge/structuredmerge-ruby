@@ -111,6 +111,29 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     )
   end
 
+  it 'preserves native output for independent TSX edits' do
+    base = <<~TSX
+      interface Props { value: string }
+      function left(props: Props) { return <div>{props.value}</div>; }
+      function right() { return <span />; }
+    TSX
+    ours = base.sub('props.value', 'props.value.toUpperCase()')
+    theirs = base.sub('return <span />;', 'return <strong />;')
+    request = request_base.merge(
+      dialect: :tsx,
+      base_source: base,
+      ours_source: ours,
+      theirs_source: theirs
+    )
+
+    native = TypeScript::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+  end
+
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 
