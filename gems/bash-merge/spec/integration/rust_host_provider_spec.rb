@@ -83,6 +83,21 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
+  it 'preserves native output for independent edits with leading comments' do
+    base = "# left documentation\nleft() { echo one; }\n\n# right documentation\nright() { echo one; }\n"
+    ours = base.sub('left() { echo one; }', 'left() { echo two; }')
+    theirs = base.sub('right() { echo one; }', 'right() { echo two; }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to include('# left documentation', '# right documentation')
+  end
+
   it 'preserves native output for literal test-harness edits' do
     base = "test_expect_success 'works' 'echo one'\n"
     ours = "test_expect_success 'works' 'echo two'\n"
