@@ -192,7 +192,9 @@ module TreeHaver
         def end_point = symbolize_point(span.fetch('end_point'))
         def child_count = inner_node.fetch('child_ids', []).length
         def named? = inner_node.fetch('named', false)
-        def has_error? = role == 'error' || backend_roles.include?('error') # rubocop:disable Naming/PredicatePrefix
+        def has_error? # rubocop:disable Naming/PredicatePrefix
+          role == 'error' || backend_roles.include?('error') || children.any?(&:has_error?)
+        end
         def error? = has_error?
         def missing? = backend_roles.include?('missing')
         def extra? = backend_roles.include?('extra')

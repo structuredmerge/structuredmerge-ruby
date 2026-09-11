@@ -90,7 +90,10 @@ module Rust
       return backend.to_s unless backend.to_s.empty?
 
       contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
-      contextual.to_s.empty? || contextual.to_s == 'auto' ? TREE_SITTER_BACKEND.id : contextual.to_s
+      return TREE_SITTER_BACKEND.id if contextual.to_s.empty? || contextual.to_s == 'auto'
+      return TREE_SITTER_BACKEND.id if contextual.to_s == 'rust_tslp'
+
+      contextual.to_s
     end
     private_class_method :requested_tree_sitter_backend_id
 

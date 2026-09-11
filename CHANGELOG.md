@@ -34,6 +34,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Route tree-sitter contract requests through the selected Rust TSLP fallback provider.
 
+- Preserve public tree-sitter backend identity and syntax-error failures when using the Rust TSLP fallback.
+
+- Propagate normalized Rust TSLP error nodes through TreeHaver and resolve public tree-sitter backend identities.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

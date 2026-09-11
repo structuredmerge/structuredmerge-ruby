@@ -411,7 +411,9 @@ module TreeHaver
            elsif (registered_type = registered_backend_type_for_requested_backend(backend_id, registrations))
              registered_type
            elsif backend_ref&.family == 'tree-sitter'
-             :tree_sitter
+             registrations.find do |registered_type, config|
+               registration_contract(registered_type, config) == :tree_sitter
+             end&.first || :tree_sitter
            else
              backend_id.to_s.to_sym
            end
