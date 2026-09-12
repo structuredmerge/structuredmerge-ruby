@@ -2295,7 +2295,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     resolver = Class.new do
       def versions(gem_name, requirements: nil)
         case gem_name
-        when "debug"
+        when "example-shunted-gem"
           [{number: "1.9.2", ruby_version: ">= 3.3"}]
         when "rack-session"
           [
@@ -2311,7 +2311,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
       def min_ruby_version(gem_name, version)
         case gem_name
-        when "debug"
+        when "example-shunted-gem"
           Gem::Version.new("3.3")
         when "rack-session"
           (version == "1.0.1") ? Gem::Version.new("2.3") : Gem::Version.new("2.5")
@@ -2332,7 +2332,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
             spec.name = "example"
             spec.summary = "Example"
             spec.required_ruby_version = ">= 3.2"
-            spec.add_development_dependency "debug", "~> 1.9"
+            spec.add_development_dependency "example-shunted-gem", "~> 1.9"
             spec.add_development_dependency "rack-session", ">= 0"
             spec.add_development_dependency "rake", "~> 13.0"
           end
@@ -2357,7 +2357,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(report.fetch(:request_envelope).fetch(:request).fetch(:provider_backend)).to eq("ast-crispr-ruby-prism")
       expect(report.fetch(:report_envelope).fetch(:report).fetch(:step_reports).first.fetch(:metadata).fetch(:provider_family)).to eq("ruby")
       expect(content).to include("# local notes remain outside the generated block")
-      expect_gem_dependency_declared(content, "debug")
+      expect_gem_dependency_declared(content, "example-shunted-gem")
       expect(content).not_to include('gem "rack-session"')
       expect(content).not_to include('gem "rake"')
       expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(content)

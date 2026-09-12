@@ -131,6 +131,35 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "raises on a second run when a surfaced conflict is still unreviewed" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-direct-modular-dependency-unreviewed-blocks", tmp_root) do |root|
+      config_path = File.join(root, ".structuredmerge/kettle-jem.yml")
+      first_run_reports = [
+        {relative_path: ".structuredmerge/kettle-jem.yml", final_content: "dependency_conflicts:\n  resolve: []\n"},
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("yard-relative_markdown_links", "~> 0.5.0")\n)},
+        {relative_path: "gemfiles/modular/documentation.gemfile", final_content: %(gem "yard-relative_markdown_links", "~> 0.6", require: false\n)}
+      ]
+
+      expect { described_class.validate_modular_dependency_conflicts!(root, first_run_reports) }.not_to raise_error
+
+      # Simulate the completed first run: its placeholder-injected config is
+      # now what's actually on disk for the next templating run to see.
+      FileUtils.mkdir_p(File.dirname(config_path))
+      File.write(config_path, first_run_reports.first.fetch(:final_content))
+
+      second_run_reports = [
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("yard-relative_markdown_links", "~> 0.5.0")\n)},
+        {relative_path: "gemfiles/modular/documentation.gemfile", final_content: %(gem "yard-relative_markdown_links", "~> 0.6", require: false\n)}
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, second_run_reports)
+      }.to raise_error(Kettle::Jem::Error, include("yard-relative_markdown_links"))
+    end
+  end
+
   it "filters template recipes with old only/include semantics" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

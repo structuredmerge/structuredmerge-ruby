@@ -9680,10 +9680,24 @@ module Kettle
         return
       end
 
+      # A conflict is "newly surfaced" only if no entry exists yet in
+      # dependency_conflicts.resolve for its exact gem/direct/modular triple
+      # (regardless of whether that entry's action/reason are filled in or
+      # valid). Newly surfaced conflicts get a placeholder entry written for
+      # review and do not block this run. A conflict that already has an
+      # entry but is still undecided (e.g. the placeholder was never
+      # completed, or reviewed was never flipped to true) has already had
+      # its chance to be reviewed, so it blocks the run instead of silently
+      # regenerating the same placeholder forever.
+      surfaced_entries = modular_dependency_conflict_entries(config)
+      newly_surfaced, previously_surfaced = unresolved.partition do |conflict|
+        !modular_dependency_conflict_previously_surfaced?(surfaced_entries, conflict)
+      end
+
       bootstrap_report = recipe_reports.find { |report| report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH }
-      if bootstrap_report && !modular_dependency_conflicts_reviewed?(config)
-        bootstrap_report[:final_content] = add_dependency_conflict_review_list(bootstrap_report.fetch(:final_content, ""), conflicts)
-        return
+      if bootstrap_report && newly_surfaced.any?
+        bootstrap_report[:final_content] = add_dependency_conflict_review_list(bootstrap_report.fetch(:final_content, ""), newly_surfaced)
+        return if previously_surfaced.empty?
       end
 
       details = unresolved.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.map do |conflict|
@@ -9716,6 +9730,12 @@ module Kettle
         relative = path.delete_prefix("gemfiles/modular/")
         !relative.include?("/") || relative.start_with?("x_std_libs/")
       end
+      # shunted.gemfile is derived from the gemspec's own dependencies
+      # (#shunted_gemfile_block): it's expected to redeclare a gem the
+      # gemspec already declares, so it isn't a real direct-vs-modular
+      # authoring conflict. Every other consumer of the packaged modular
+      # gemfile list excludes it the same way.
+      modular_paths = modular_paths.reject { |path| path == "gemfiles/modular/shunted.gemfile" }
       modular = dependency_file_contents(project_root, recipe_reports, modular_paths)
       direct.flat_map do |direct_path, content|
         direct_records = dependency_records_for(direct_path, content)
@@ -9771,6 +9791,27 @@ module Kettle
       config.dig("dependency_conflicts", "reviewed") == true
     end
 
+    # Every entry currently in dependency_conflicts.resolve, keyed loosely
+    # (unlike #modular_dependency_conflict_decisions, incomplete entries such
+    # as an unfinished "action: review" placeholder are included) so callers
+    # can tell "this conflict was already surfaced for review" apart from
+    # "this conflict has never been seen before".
+    def modular_dependency_conflict_entries(config)
+      Array(config.dig("dependency_conflicts", "resolve")).filter_map do |entry|
+        next unless entry.is_a?(Hash)
+
+        entry.each_with_object({}) { |(key, value), result| result[key.to_s] = value.to_s }
+      end
+    end
+
+    def modular_dependency_conflict_previously_surfaced?(entries, conflict)
+      entries.any? do |entry|
+        entry["gem"] == conflict.fetch(:name) &&
+          entry["direct"] == conflict.fetch(:direct) &&
+          entry["modular"] == conflict.fetch(:modular)
+      end
+    end
+
     def modular_dependency_conflict_decided?(decisions, conflict)
       decisions.any? do |decision|
         decision.fetch("gem") == conflict.fetch(:name) &&
@@ -9807,33 +9848,65 @@ module Kettle
       false
     end
 
+    # Writes a placeholder "action: review" entry for each newly surfaced
+    # conflict. When dependency_conflicts: already exists, this only adds
+    # entries for these specific conflicts and resets reviewed: to false
+    # (a new, unreviewed conflict invalidates a prior reviewed: true) —
+    # existing entries, including ones a human already wrote, are left
+    # exactly as they are.
     def add_dependency_conflict_review_list(content, conflicts)
-      lines = content.to_s.lines
-      index = lines.index { |line| line.match?(/\Adependency_conflicts:\s*\z/) }
-      unless index
-        lines << "\n" unless lines.empty? || lines.last.strip.empty?
-        lines.concat(["dependency_conflicts:\n", "  # Review each entry and choose a supported action.\n", "  resolve:\n"])
-        index = lines.length - 3
-      end
+      return content if conflicts.empty?
 
-      block_end = (index + 1...lines.length).find { |line_index| lines[line_index].match?(/\A\S/) } || lines.length
-      replacement = [
-        "dependency_conflicts:\n",
-        "  # Review each entry and choose a supported action.\n",
-        "  # keep_both is for a broad direct requirement plus a compatible modular narrowing.\n",
-        "  reviewed: false\n",
-        "  resolve:\n"
-      ]
-      conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.each do |conflict|
-        replacement.concat([
+      new_entry_lines = conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.flat_map do |conflict|
+        [
           "    - gem: #{conflict.fetch(:name)}\n",
           "      direct: #{conflict.fetch(:direct)}\n",
           "      modular: #{conflict.fetch(:modular)}\n",
           "      action: review\n",
           "      reason: \"\"\n"
-        ])
+        ]
       end
-      ensure_trailing_newline([*lines[0...index], *replacement, *lines[block_end..].to_a].join)
+
+      lines = content.to_s.lines
+      index = lines.index { |line| line.match?(/\Adependency_conflicts:\s*\z/) }
+      unless index
+        lines << "\n" unless lines.empty? || lines.last.strip.empty?
+        lines.concat([
+          "dependency_conflicts:\n",
+          "  # Review each entry and choose a supported action.\n",
+          "  # keep_both is for a broad direct requirement plus a compatible modular narrowing.\n",
+          "  reviewed: false\n",
+          "  resolve:\n",
+          *new_entry_lines
+        ])
+        return ensure_trailing_newline(lines.join)
+      end
+
+      block_end = (index + 1...lines.length).find { |line_index| lines[line_index].match?(/\A\S/) } || lines.length
+      block_lines = lines[index...block_end]
+
+      reviewed_index = block_lines.index { |line| line.match?(/\A\s*reviewed:\s*\S/) }
+      if reviewed_index
+        block_lines[reviewed_index] = block_lines[reviewed_index].sub(/reviewed:\s*\S+/, "reviewed: false")
+      else
+        insert_at = 1
+        insert_at += 1 while block_lines[insert_at]&.match?(/\A\s*#/)
+        block_lines.insert(insert_at, "  reviewed: false\n")
+      end
+
+      resolve_index = block_lines.index { |line| line.match?(/\A\s*resolve:\s*(\[\s*\])?\s*\z/) }
+      if resolve_index
+        if block_lines[resolve_index].match?(/\[\s*\]\s*\z/)
+          indent = block_lines[resolve_index][/\A\s*/]
+          block_lines[resolve_index] = "#{indent}resolve:\n"
+        end
+        block_lines.insert(resolve_index + 1, *new_entry_lines)
+      else
+        block_lines << "  resolve:\n"
+        block_lines.concat(new_entry_lines)
+      end
+
+      ensure_trailing_newline([*lines[0...index], *block_lines, *lines[block_end..].to_a].join)
     end
 
     def apply_modular_dependency_conflict_resolutions(project_root, decisions)
@@ -11128,14 +11201,59 @@ module Kettle
 
     def remove_gemspec_dependency_lines(content, receiver:, names:, runtime_only: false, development_only: false)
       wanted = names.map(&:to_s).to_set
-      records_by_line = gemspec_dependency_records(content, receiver: receiver)
-        .select { |record| wanted.include?(record.fetch(:name)) }
-        .select { |record| !runtime_only || record.fetch(:kind) != "add_development_dependency" }
-        .select { |record| !development_only || record.fetch(:kind) == "add_development_dependency" }
-        .to_h { |record| [record.fetch(:start_line), record.merge(replacement: "")] }
-      return content if records_by_line.empty?
+      return content if wanted.empty?
 
-      ensure_trailing_newline(replace_record_ranges(content, records_by_line).gsub(/\n{3,}/, "\n\n"))
+      allowed_kinds = gemspec_dependency_call_kinds(runtime_only: runtime_only, development_only: development_only)
+      targets = wanted.map do |name|
+        ast_crispr_gemspec_dependency_delete_target(receiver: receiver, name: name, allowed_kinds: allowed_kinds)
+      end
+
+      result = Ast::Crispr::DeleteBatch.call(content: content, targets: targets, source_label: "gemspec")
+      return content unless result.changed
+
+      ensure_trailing_newline(result.updated_content.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def gemspec_dependency_call_kinds(runtime_only: false, development_only: false)
+      kinds = %w[add_dependency add_runtime_dependency add_development_dependency]
+      kinds = kinds.reject { |kind| kind == "add_development_dependency" } if runtime_only
+      kinds = kinds.select { |kind| kind == "add_development_dependency" } if development_only
+      kinds.map(&:to_sym)
+    end
+
+    # Removes a single named gemspec dependency call, along with its owned
+    # leading comment (if any) — matching by call name and the same
+    # receiver, kind, and first-argument matching #gemspec_dependency_records
+    # uses, but locating the call anywhere in the tree via the :all_statements
+    # owner scope (not just the top level), and deleting it with
+    # Ast::Crispr::DeleteBatch instead of raw line-range replacement so its
+    # owned comments come with it rather than being left dangling.
+    def ast_crispr_gemspec_dependency_delete_target(receiver:, name:, allowed_kinds:)
+      Ast::Crispr::Ruby::Prism::Selectors.owner_filter(
+        id: "remove_gemspec_dependency_#{receiver}_#{name}",
+        owner_scope: :all_statements,
+        limit: {none_or_one: true}
+      ) do |context, owner|
+        next false unless owner.respond_to?(:receiver) && owner.respond_to?(:name)
+        next false unless owner.receiver&.slice == receiver.to_s
+        next false unless allowed_kinds.include?(owner.name)
+
+        argument = owner.arguments&.arguments&.first
+        next false unless ruby_static_string_value(argument) == name
+
+        leading = context.comment_regions_for(owner, region: :leading, owner_scope: :all_statements)
+        start_line = leading.any? ? leading.map { |comment| comment.location.start_line }.min : owner.location.start_line
+        Ast::Crispr::Match.new(
+          node: owner,
+          start_line: start_line,
+          end_line: owner.location.end_line,
+          metadata: {
+            start_boundary: (leading.any? ? :comment_region_start : :owner_start),
+            end_boundary: :owner_end,
+            payload_kind: :structural_owner_body
+          }
+        )
+      end
     end
 
     def remove_ruby_comment_lines_containing(content, text)

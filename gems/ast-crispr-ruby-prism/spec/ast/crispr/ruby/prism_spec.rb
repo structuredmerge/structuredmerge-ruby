@@ -192,6 +192,72 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
     end
   end
 
+  describe ':all_statements owner scope' do
+    let(:content) do
+      <<~RUBY
+        Gem::Specification.new do |spec|
+          spec.name = "example"
+
+          spec.add_development_dependency "appraisal"
+          spec.add_development_dependency "bundler"
+          # Debugging - Ensure ENV["DEBUG"] == "true" to use debuggers within spec suite
+          spec.add_development_dependency "debug" # trailing note
+          spec.add_development_dependency "rspec"
+          spec.add_development_dependency "rubocop"
+        end
+      RUBY
+    end
+
+    def debug_dependency_target
+      Ast::Crispr::Ruby::Prism::Selectors.owner_filter(
+        id: 'remove_debug_dep',
+        owner_scope: :all_statements
+      ) do |context, owner|
+        next false unless owner.respond_to?(:receiver) && owner.respond_to?(:name)
+        next false unless owner.name == :add_development_dependency
+
+        arg = owner.arguments&.arguments&.first
+        next false unless arg.respond_to?(:unescaped) && arg.unescaped == 'debug'
+
+        leading = context.comment_regions_for(owner, region: :leading, owner_scope: :all_statements)
+        start_line = leading.any? ? leading.map { |c| c.location.start_line }.min : owner.location.start_line
+
+        Ast::Crispr::Match.new(
+          node: owner,
+          start_line: start_line,
+          end_line: owner.location.end_line,
+          metadata: {
+            start_boundary: (leading.any? ? :comment_region_start : :owner_start),
+            end_boundary: :owner_end,
+            payload_kind: :structural_owner_body
+          }
+        )
+      end
+    end
+
+    it 'finds a call nested inside a block body, unlike :shared_default' do
+      context = described_class.document_context(content: content, source_label: 'example.gemspec')
+      owners = context.structural_owners(owner_scope: :all_statements)
+
+      expect(owners.any? { |owner| owner.respond_to?(:name) && owner.name == :add_development_dependency }).to be(true)
+      top_level_owners = context.structural_owners(owner_scope: :shared_default)
+      expect(top_level_owners.any? { |owner| owner.respond_to?(:name) && owner.name == :add_development_dependency }).to be(false)
+    end
+
+    it 'deletes a nested dependency call along with its leading and trailing comments only' do
+      actor = Ast::Crispr::DeleteBatch.call(content: content, targets: [debug_dependency_target], source_label: 'example.gemspec')
+
+      expect(actor.changed).to be(true)
+      expect(actor.match_count).to eq(1)
+      expect(actor.updated_content).not_to include('debug')
+      expect(actor.updated_content).not_to include('trailing note')
+      expect(actor.updated_content).to include('"appraisal"')
+      expect(actor.updated_content).to include('"bundler"')
+      expect(actor.updated_content).to include('"rspec"')
+      expect(actor.updated_content).to include('"rubocop"')
+    end
+  end
+
   describe Ast::Crispr::Move do
     let(:operation_profile) { described_class.operation_profile }
     let(:expected_operation_kind) { :move }

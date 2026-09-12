@@ -2,6 +2,7 @@
 
 require 'ast/crispr'
 require 'prism/merge'
+require 'tree_haver'
 require_relative 'prism/version'
 
 module Ast
@@ -36,6 +37,8 @@ module Ast
             case owner_scope
             when :shared_default, :line_bound_statements, :top_level_statements
               analysis.statements
+            when :all_statements
+              statement_groups(document).flatten(1)
             when :ruby_comments
               analysis.parse_result.comments
             else
@@ -45,7 +48,12 @@ module Ast
 
           def comment_regions_for(document, owner, region: :leading, owner_scope: :shared_default)
             analysis = document.ast
-            owners = structural_owners(document, owner_scope: owner_scope)
+            owners = case owner_scope
+            when :all_statements
+              statement_groups(document).find { |group| group.include?(owner) } || []
+            else
+              structural_owners(document, owner_scope: owner_scope)
+            end
 
             case region
             when :leading
@@ -68,6 +76,13 @@ module Ast
                 supported_comment_regions: [:leading],
                 metadata: { adapter: :prism }
               )
+            when :all_statements
+              Ast::Crispr::StructureProfile.new(
+                owner_scope: owner_scope,
+                owner_selector: :line_bound_statements,
+                supported_comment_regions: [:leading],
+                metadata: { adapter: :prism, selector: :all_statements }
+              )
             when :ruby_comments
               Ast::Crispr::StructureProfile.new(
                 owner_scope: owner_scope,
@@ -78,6 +93,32 @@ module Ast
             else
               raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
+          end
+
+          private
+
+          # Every StatementsNode body found anywhere in the tree (the
+          # top-level program body, and every nested block/def/class/etc.
+          # body), each kept as its own group so leading-comment ownership
+          # can be resolved against a node's real local siblings rather
+          # than a single flattened, cross-scope list. Built from the same
+          # ::Prism::ParseResult document.ast already parsed and memoizes,
+          # so node identity stays consistent with #statements and
+          # #parse_result.comments — no separate re-parse.
+          def statement_groups(document)
+            root = TreeHaver::Backends::Prism::Node.new(document.ast.parse_result.value, document.content)
+            groups = []
+            walk_statement_groups(root, groups)
+            groups
+          end
+
+          def walk_statement_groups(node, groups)
+            return unless node
+
+            if node.inner_node.is_a?(::Prism::StatementsNode)
+              groups << node.inner_node.body
+            end
+            node.children.each { |child| walk_statement_groups(child, groups) }
           end
         end
 
