@@ -556,6 +556,9 @@ patterns:
     strategy: raw_copy
   - path: ".github/workflows/**"
     strategy: accept_template
+  # Signature stub files are fully generated; there is nothing here to hand-edit.
+  - path: "sig/**/*.rbs"
+    strategy: accept_template
 
 # Per-file configuration (nested directory structure)
 # Only files that need overrides belong here. Everything else defaults to merge.

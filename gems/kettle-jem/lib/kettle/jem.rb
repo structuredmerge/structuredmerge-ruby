@@ -11667,8 +11667,8 @@ module Kettle
 
       case expression.receiver&.slice
       when "enumerate_package_files"
-        argument = Array(expression.arguments&.arguments).first
-        %w[lib exe certs sig].include?(ruby_static_string_value(argument))
+        arguments = Array(expression.arguments&.arguments)
+        arguments.length == 1 && !ruby_static_string_value(arguments.first).nil?
       when "enumerate_package_glob"
         generated_gemspec_package_glob_call?(expression)
       else

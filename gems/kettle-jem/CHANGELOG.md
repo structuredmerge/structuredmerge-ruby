@@ -28,6 +28,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated Ruby 4 extracted-stdlib Gemfiles now include `ostruct` so suites
+  that require it can run on Rubies where it is no longer bundled by default.
+- Regenerate `sig/*.rbs` signature stubs from the template instead of merging them, preventing a duplicate top-level declaration when the detected namespace kind (module vs. class) changes between runs.
+- Gemspec `spec.files` merging now preserves a destination-only `enumerate_package_files.call("...")` splat for any project-specific directory, matching how `enumerate_package_glob.call(...)` splats were already preserved regardless of the glob pattern, instead of raising an unsupported-assignment error.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

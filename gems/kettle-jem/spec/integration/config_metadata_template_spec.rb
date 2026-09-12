@@ -1040,6 +1040,39 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(merged.scan(/\*enumerate_package_files\.call\(["']lib["']\)/).size).to eq(1)
   end
 
+  it "preserves a project-specific enumerate_package_files splat the template does not know about" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "example"
+        spec.files = [
+          *enumerate_package_files.call("lib"),
+          *enumerate_package_files.call("exe"),
+          *enumerate_package_files.call("certs"),
+          *enumerate_package_files.call("sig")
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "example"
+        spec.files = [
+          *enumerate_package_files.call('lib'),
+          # Adapter implementations shipped alongside lib/
+          *enumerate_package_files.call('adapters'),
+          *enumerate_package_files.call('exe'),
+          *enumerate_package_files.call('certs'),
+          *enumerate_package_files.call('sig')
+        ]
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "example"}})
+
+    expect(Prism.parse(merged)).to be_success
+    expect(merged.scan(/^\s*spec\.files\s*=/).size).to eq(1)
+    expect(merged).to match(/\*enumerate_package_files\.call\(["']adapters["']\)/)
+  end
+
   it "normalizes the generated Dir plus Array gemspec files assignment shape" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
