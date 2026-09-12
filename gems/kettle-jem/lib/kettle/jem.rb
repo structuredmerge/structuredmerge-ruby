@@ -97,6 +97,42 @@ module Kettle
     # declaration. Kettle Dev owns release workflows.
     PROHIBITED_GEMSPEC_DEPENDENCIES = %w[gem-release].freeze
     PROHIBITED_GEMFILE_DEPENDENCIES = PROHIBITED_GEMSPEC_DEPENDENCIES.freeze
+    # Canonical resolutions for development-dependency gems whose handling is
+    # already known ahead of any specific destination project. Two
+    # categories today:
+    #
+    # :template_managed - the gem is always owned by a template modular
+    #   Gemfile; a direct declaration is always a stale duplicate. Detected
+    #   the same way as any other modular_dependency_conflicts entry (a
+    #   direct declaration plus a modular declaration of the same gem
+    #   name); when a newly surfaced conflict's gem matches one of these
+    #   (and force_review isn't set), the real decided entry is written
+    #   straight to dependency_conflicts.resolve instead of a placeholder
+    #   "review" entry.
+    #
+    # :engine_incompatible - the gem doesn't support every engine
+    #   DEFAULT_ENGINES lists and has no modular home (below the template's
+    #   inclusion threshold). It's detected by a separate,
+    #   engine-declaration-based check (Phase 4 / supported_engines) rather
+    #   than by modular_dependency_conflicts, so this entry alone doesn't
+    #   yet trigger anything. force_review: true here because there's no
+    #   single correct action across destinations - only the destination's
+    #   own declared engines: decide it.
+    KNOWN_GEM_CONFLICT_RESOLUTIONS = {
+      "debug" => {
+        category: :template_managed,
+        action: "remove_direct_gem",
+        reason: "debug is template-managed via gemfiles/modular/debug.gemfile (platform :mri); it ships a native C extension with no jruby/truffleruby release.",
+        force_review: false
+      }.freeze,
+      "sqlite3" => {
+        category: :engine_incompatible,
+        action: "review",
+        reason: "sqlite3 has no jruby-platform release on rubygems.org and is below the template-inclusion threshold, so it has no modular home; resolve per destination based on declared engines.",
+        supported_engines: %w[ruby].freeze,
+        force_review: true
+      }.freeze
+    }.freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion
@@ -9694,9 +9730,21 @@ module Kettle
         !modular_dependency_conflict_previously_surfaced?(surfaced_entries, conflict)
       end
 
+      # Among newly surfaced conflicts, gems with a canonical, pre-decided
+      # resolution (KNOWN_GEM_CONFLICT_RESOLUTIONS) don't need a human in
+      # the loop: write the real decided entry straight away instead of a
+      # placeholder "review" entry. Everything else still goes through the
+      # placeholder/review flow.
+      canonical_surfaced, review_needed_surfaced = newly_surfaced.partition do |conflict|
+        auto_resolvable_known_gem_conflict?(conflict)
+      end
+
       bootstrap_report = recipe_reports.find { |report| report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH }
       if bootstrap_report && newly_surfaced.any?
-        bootstrap_report[:final_content] = add_dependency_conflict_review_list(bootstrap_report.fetch(:final_content, ""), newly_surfaced)
+        content = bootstrap_report.fetch(:final_content, "")
+        content = add_dependency_conflict_resolved_entries(content, canonical_surfaced) if canonical_surfaced.any?
+        content = add_dependency_conflict_review_list(content, review_needed_surfaced) if review_needed_surfaced.any?
+        bootstrap_report[:final_content] = content
         return if previously_surfaced.empty?
       end
 
@@ -9848,6 +9896,32 @@ module Kettle
       false
     end
 
+    # A gem qualifies for automatic (no-human-review) resolution when it has
+    # a KNOWN_GEM_CONFLICT_RESOLUTIONS entry that's both :template_managed
+    # (the only category modular_dependency_conflicts can actually surface
+    # today; :engine_incompatible entries are inert here — see Phase 4) and
+    # not explicitly flagged force_review.
+    def known_gem_conflict_resolution(name)
+      KNOWN_GEM_CONFLICT_RESOLUTIONS[name.to_s]
+    end
+
+    def auto_resolvable_known_gem_conflict?(conflict)
+      resolution = known_gem_conflict_resolution(conflict.fetch(:name))
+      return false unless resolution
+
+      resolution.fetch(:category) == :template_managed && !resolution.fetch(:force_review, false)
+    end
+
+    def dependency_conflict_entry_lines(conflict, action:, reason:)
+      [
+        "    - gem: #{conflict.fetch(:name)}\n",
+        "      direct: #{conflict.fetch(:direct)}\n",
+        "      modular: #{conflict.fetch(:modular)}\n",
+        "      action: #{action}\n",
+        "      reason: #{reason.to_s.empty? ? "\"\"" : reason.to_s.inspect}\n"
+      ]
+    end
+
     # Writes a placeholder "action: review" entry for each newly surfaced
     # conflict. When dependency_conflicts: already exists, this only adds
     # entries for these specific conflicts and resets reviewed: to false
@@ -9858,15 +9932,32 @@ module Kettle
       return content if conflicts.empty?
 
       new_entry_lines = conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.flat_map do |conflict|
-        [
-          "    - gem: #{conflict.fetch(:name)}\n",
-          "      direct: #{conflict.fetch(:direct)}\n",
-          "      modular: #{conflict.fetch(:modular)}\n",
-          "      action: review\n",
-          "      reason: \"\"\n"
-        ]
+        dependency_conflict_entry_lines(conflict, action: "review", reason: "")
       end
 
+      insert_dependency_conflict_resolve_entries(content, new_entry_lines, reset_reviewed: true)
+    end
+
+    # Writes a fully decided entry (real action + reason, straight from
+    # KNOWN_GEM_CONFLICT_RESOLUTIONS) for each newly surfaced conflict whose
+    # gem is canonical. Unlike add_dependency_conflict_review_list, these
+    # need no human decision, so reviewed: is left exactly as it already is
+    # instead of being reset to false.
+    def add_dependency_conflict_resolved_entries(content, conflicts)
+      return content if conflicts.empty?
+
+      new_entry_lines = conflicts.sort_by { |conflict| conflict.values_at(:name, :direct, :modular) }.flat_map do |conflict|
+        resolution = known_gem_conflict_resolution(conflict.fetch(:name))
+        dependency_conflict_entry_lines(conflict, action: resolution.fetch(:action), reason: resolution.fetch(:reason))
+      end
+
+      insert_dependency_conflict_resolve_entries(content, new_entry_lines, reset_reviewed: false)
+    end
+
+    # Shared splicing logic behind both writers above: finds (or creates)
+    # the dependency_conflicts: block and appends new_entry_lines under
+    # resolve:, optionally resetting reviewed: to false along the way.
+    def insert_dependency_conflict_resolve_entries(content, new_entry_lines, reset_reviewed:)
       lines = content.to_s.lines
       index = lines.index { |line| line.match?(/\Adependency_conflicts:\s*\z/) }
       unless index
@@ -9885,13 +9976,15 @@ module Kettle
       block_end = (index + 1...lines.length).find { |line_index| lines[line_index].match?(/\A\S/) } || lines.length
       block_lines = lines[index...block_end]
 
-      reviewed_index = block_lines.index { |line| line.match?(/\A\s*reviewed:\s*\S/) }
-      if reviewed_index
-        block_lines[reviewed_index] = block_lines[reviewed_index].sub(/reviewed:\s*\S+/, "reviewed: false")
-      else
-        insert_at = 1
-        insert_at += 1 while block_lines[insert_at]&.match?(/\A\s*#/)
-        block_lines.insert(insert_at, "  reviewed: false\n")
+      if reset_reviewed
+        reviewed_index = block_lines.index { |line| line.match?(/\A\s*reviewed:\s*\S/) }
+        if reviewed_index
+          block_lines[reviewed_index] = block_lines[reviewed_index].sub(/reviewed:\s*\S+/, "reviewed: false")
+        else
+          insert_at = 1
+          insert_at += 1 while block_lines[insert_at]&.match?(/\A\s*#/)
+          block_lines.insert(insert_at, "  reviewed: false\n")
+        end
       end
 
       resolve_index = block_lines.index { |line| line.match?(/\A\s*resolve:\s*(\[\s*\])?\s*\z/) }

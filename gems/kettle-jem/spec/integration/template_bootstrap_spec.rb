@@ -240,6 +240,30 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "auto-resolves a canonical known-gem conflict (debug) without a review placeholder" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-direct-modular-dependency-canonical", tmp_root) do |root|
+      reports = [
+        {
+          relative_path: ".structuredmerge/kettle-jem.yml",
+          final_content: "dependency_conflicts:\n  resolve: []\n"
+        },
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("debug")\n)},
+        {relative_path: "gemfiles/modular/debug.gemfile", final_content: %(platform :mri do\n  gem "debug"\nend\n)}
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.not_to raise_error
+
+      config = reports.first.fetch(:final_content)
+      expect(config).to include("gem: debug")
+      expect(config).to include("action: remove_direct_gem")
+      expect(config).not_to include("action: review")
+    end
+  end
+
   it "raises on a second run when a surfaced conflict is still unreviewed" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
