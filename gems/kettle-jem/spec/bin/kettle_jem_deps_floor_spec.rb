@@ -112,8 +112,11 @@ RSpec.describe KettleJemDepsFloor do
     run_git("-C", project_root, "commit", "-m", "initial")
   end
 
+  # -c commit.gpgsign=false keeps fixture commits from ever consulting the
+  # developer's real signing key/config, even when a global gitconfig sets
+  # commit.gpgsign=true.
   def run_git(*args)
-    _stdout, stderr, status = Open3.capture3("git", *args)
+    _stdout, stderr, status = Open3.capture3("git", "-c", "commit.gpgsign=false", *args)
     raise stderr unless status.success?
   end
 

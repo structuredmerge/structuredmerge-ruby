@@ -1691,7 +1691,10 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
           "GIT_COMMITTER_EMAIL" => email,
           "GIT_COMMITTER_DATE" => "2024-01-02T00:00:00Z"
         }
-        expect(system(commit_env, "git", "-C", root, "commit", "-qm", name)).to be(true)
+        # -c commit.gpgsign=false keeps this fixture commit from ever
+        # consulting the developer's real signing key/config, even when a
+        # global gitconfig sets commit.gpgsign=true.
+        expect(system(commit_env, "git", "-C", root, "-c", "commit.gpgsign=false", "commit", "-qm", name)).to be(true)
       end
 
       commit.call("A. Lovelace", "ada.old@example.test", "first.txt")
