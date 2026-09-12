@@ -68,6 +68,115 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "keeps a remove_direct_gem decision stable across runs" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-remove-direct-gem-decision", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
+          dependency_conflicts:
+            resolve:
+              - gem: debug
+                direct: example.gemspec
+                modular: gemfiles/modular/debug.gemfile
+                action: remove_direct_gem
+                reason: "debug is template-managed and MRI-only; the modular file owns it."
+        YAML
+      })
+      reports = [
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("debug")\n)},
+        {relative_path: "gemfiles/modular/debug.gemfile", final_content: %(platform :mri do\n  gem "debug"\nend\n)}
+      ]
+
+      2.times do
+        expect {
+          described_class.validate_modular_dependency_conflicts!(root, reports)
+        }.not_to raise_error
+      end
+    end
+  end
+
+  it "applies remove_direct_gem by removing the direct declaration (with its leading comment) and keeping the modular one" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-remove-direct-gem-apply", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.add_development_dependency "appraisal"
+            # Debugging - Ensure ENV["DEBUG"] == "true" to use debuggers within spec suite
+            spec.add_development_dependency "debug"
+            spec.add_development_dependency "rspec"
+          end
+        RUBY
+        "gemfiles/modular/debug.gemfile" => <<~RUBY
+          platform :mri do
+            gem "debug", ">= 1.1"
+          end
+        RUBY
+      })
+
+      decisions = [
+        {
+          "gem" => "debug",
+          "direct" => "example.gemspec",
+          "modular" => "gemfiles/modular/debug.gemfile",
+          "action" => "remove_direct_gem",
+          "reason" => "debug is template-managed and MRI-only; the modular file owns it."
+        }
+      ]
+
+      changed_files = described_class.apply_modular_dependency_conflict_resolutions(root, decisions)
+
+      expect(changed_files).to eq(["example.gemspec"])
+      gemspec_content = File.read(File.join(root, "example.gemspec"))
+      expect(gemspec_content).not_to include("debug")
+      expect(gemspec_content).to include('spec.add_development_dependency "appraisal"')
+      expect(gemspec_content).to include('spec.add_development_dependency "rspec"')
+      modular_content = File.read(File.join(root, "gemfiles/modular/debug.gemfile"))
+      expect(modular_content).to include('gem "debug", ">= 1.1"')
+    end
+  end
+
+  it "applies remove_direct_gem against a root Gemfile direct declaration" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-remove-direct-gem-gemfile", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+          gem "appraisal"
+          gem "debug"
+          gem "rspec"
+        RUBY
+        "gemfiles/modular/debug.gemfile" => <<~RUBY
+          platform :mri do
+            gem "debug", ">= 1.1"
+          end
+        RUBY
+      })
+
+      decisions = [
+        {
+          "gem" => "debug",
+          "direct" => "Gemfile",
+          "modular" => "gemfiles/modular/debug.gemfile",
+          "action" => "remove_direct_gem",
+          "reason" => "debug is template-managed and MRI-only; the modular file owns it."
+        }
+      ]
+
+      changed_files = described_class.apply_modular_dependency_conflict_resolutions(root, decisions)
+
+      expect(changed_files).to eq(["Gemfile"])
+      gemfile_content = File.read(File.join(root, "Gemfile"))
+      expect(gemfile_content).not_to include('gem "debug"')
+      expect(gemfile_content).to include('gem "appraisal"')
+      expect(gemfile_content).to include('gem "rspec"')
+    end
+  end
+
   it "allows a broad direct requirement to coexist with a compatible modular narrowing" do
     expect(described_class.compatible_dependency_requirements?([">= 1.0"], ["~> 2.0"])).to be(true)
     expect(described_class.compatible_dependency_requirements?(["~> 0.5.0"], ["~> 0.6.0"])).to be(false)

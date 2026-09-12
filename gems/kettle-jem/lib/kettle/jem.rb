@@ -9706,7 +9706,7 @@ module Kettle
       raise Error,
         "direct dependencies also declared by templated modular Gemfiles: #{details}. " \
           "Review dependency_conflicts.resolve in #{KETTLE_CONFIG_PATH}; each entry needs gem, direct, modular, action, and reason. " \
-        "Supported actions: remove_modular_gem, remove_x_std_lib_eval, keep_both. " \
+        "Supported actions: remove_modular_gem, remove_x_std_lib_eval, remove_direct_gem, keep_both. " \
         "keep_both is valid only when the direct and modular requirements overlap."
     end
 
@@ -9818,7 +9818,7 @@ module Kettle
           decision.fetch("direct") == conflict.fetch(:direct) &&
           decision.fetch("modular") == conflict.fetch(:modular) &&
           case decision.fetch("action")
-          when "remove_modular_gem", "remove_x_std_lib_eval"
+          when "remove_modular_gem", "remove_x_std_lib_eval", "remove_direct_gem"
             true
           when "keep_both"
             compatible_dependency_requirements?(conflict.fetch(:direct_requirements), conflict.fetch(:modular_requirements))
@@ -9911,7 +9911,8 @@ module Kettle
 
     def apply_modular_dependency_conflict_resolutions(project_root, decisions)
       decisions.each_with_object([]) do |decision, changed_files|
-        path = File.join(project_root.to_s, decision.fetch("modular"))
+        relative_path = (decision.fetch("action") == "remove_direct_gem") ? decision.fetch("direct") : decision.fetch("modular")
+        path = File.join(project_root.to_s, relative_path)
         next unless File.file?(path)
 
         before = File.read(path)
@@ -9920,13 +9921,33 @@ module Kettle
           remove_gemfile_dependency_blocks(before, [decision.fetch("gem")])
         when "remove_x_std_lib_eval"
           remove_x_std_lib_eval_for_gem(before, decision.fetch("gem"))
+        when "remove_direct_gem"
+          remove_dependency_conflict_direct_declaration(before, relative_path, decision.fetch("gem"))
         when "keep_both"
           before
         end
         next if after == before
 
         File.write(path, after)
-        changed_files << decision.fetch("modular")
+        changed_files << relative_path
+      end
+    end
+
+    # The "direct" side of a dependency_conflicts entry is either a Gemfile
+    # (or a modular .gemfile) or a .gemspec, mirroring the same dispatch
+    # #dependency_records_for uses to detect the conflict in the first
+    # place. The gemspec branch has to discover its own receiver (the
+    # Gem::Specification.new block's parameter name) since, unlike the
+    # gemspec-merge pipeline, there's no already-known template_receiver
+    # here — this runs standalone, against whatever's on disk.
+    def remove_dependency_conflict_direct_declaration(content, relative_path, gem_name)
+      if relative_path == "Gemfile" || relative_path.end_with?(".gemfile")
+        remove_gemfile_dependency_blocks(content, [gem_name])
+      else
+        receiver = gemspec_block_param(content)
+        return content unless receiver
+
+        remove_gemspec_dependency_lines(content, receiver: receiver, names: [gem_name])
       end
     end
 
