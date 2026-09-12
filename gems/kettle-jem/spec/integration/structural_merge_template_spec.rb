@@ -609,7 +609,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
         "lib/oauth2/version.rb" => <<~RUBY,
           # frozen_string_literal: true
 
-          module OAuth2
+          module Oauth2
             module Version
               VERSION = "2.0.20"
             end
