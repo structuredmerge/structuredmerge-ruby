@@ -93,9 +93,13 @@ module Kettle
     # These tools remain active, but their dependency ownership belongs to the
     # generated modular Gemfiles rather than a destination gemspec.
     EXTERNALIZED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover rubocop-rspec yard-junk].freeze
-    # These legacy release tools must not be retained in any managed dependency
-    # declaration. Kettle Dev owns release workflows.
-    PROHIBITED_GEMSPEC_DEPENDENCIES = %w[gem-release].freeze
+    # Gems superseded by a template-provided replacement, wrong everywhere
+    # regardless of whether the template places a replacement anywhere for
+    # this destination (case 2 of the dev-dependency conflict policy):
+    # unconditional removal, no review needed. gem-release is a legacy
+    # release tool - Kettle Dev owns release workflows. appraisal and
+    # turbo_tests were replaced by appraisal2 and turbo_tests2.
+    PROHIBITED_GEMSPEC_DEPENDENCIES = %w[gem-release appraisal turbo_tests].freeze
     PROHIBITED_GEMFILE_DEPENDENCIES = PROHIBITED_GEMSPEC_DEPENDENCIES.freeze
     # Canonical resolutions for development-dependency gems whose handling is
     # already known ahead of any specific destination project. Two
@@ -459,7 +463,6 @@ module Kettle
     TEMPLATE_SOURCE_APPLICATION_RECIPE = /\Atemplate_source_application_/
     DECISION_NO_WRITE_ACTIONS = %w[keep skip].freeze
     RUBY_TEMPLATE_POLICY_FILE_TYPES = %i[gemfile gemspec appraisals].freeze
-    GEMFILE_POLICY_SELF_DEPENDENCIES = %w[appraisal].freeze
     TEMPLATE_CONTENT_PRIMITIVES = %w[
       supplied_kettle_config_bootstrap
       supplied_template_source_preference
@@ -6996,7 +6999,7 @@ module Kettle
     def gemfile_policy_operations(template_content, original, final, request)
       package_name = runtime_context_value(request, :package, :name).to_s
       deleted = gemfile_dependency_names("#{template_content}\n#{original}") - gemfile_dependency_names(final)
-      expected = GEMFILE_POLICY_SELF_DEPENDENCIES.dup
+      expected = PROHIBITED_GEMFILE_DEPENDENCIES.dup
       expected << package_name unless package_name.empty?
       [
         {
@@ -9450,7 +9453,7 @@ module Kettle
 
     def merge_gemfile_template_policy(content, facts:, template_content: nil, preserve_self_word_entries: false)
       package_name = facts.dig(:package, :name).to_s if facts
-      removable_gems = ["appraisal", *PROHIBITED_GEMFILE_DEPENDENCIES]
+      removable_gems = [*PROHIBITED_GEMFILE_DEPENDENCIES]
       removable_gems << package_name unless package_name.to_s.empty?
       removable_gems.concat(package_runtime_dependency_names(facts))
       removable_gems << "version_gem" unless version_gem_enabled?(facts)

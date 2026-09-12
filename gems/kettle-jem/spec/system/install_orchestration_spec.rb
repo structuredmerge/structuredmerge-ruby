@@ -2433,7 +2433,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-  it "externalizes active tooling and removes prohibited legacy release tooling during gemspec sync" do
+  it "externalizes active tooling and removes prohibited/superseded gems during gemspec sync" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-retired-gemspec-dev-dependency", tmp_root) do |root|
@@ -2447,6 +2447,8 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
             spec.add_development_dependency "yard-junk", "~> 0.0.10"
             spec.add_development_dependency "gem-release", "~> 2"
             spec.add_dependency "gem-release", "~> 2"
+            spec.add_development_dependency "appraisal"
+            spec.add_development_dependency "turbo_tests"
             spec.add_development_dependency "rake", "~> 13.0"
           end
         RUBY
@@ -2476,6 +2478,8 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(content).not_to include("rubocop-rspec")
       expect(content).not_to include("yard-junk")
       expect(content).not_to include("gem-release")
+      expect(content).not_to include("appraisal")
+      expect(content).not_to include("turbo_tests")
       expect(content).to include('spec.add_development_dependency "rake", "~> 13.0"')
     end
   end

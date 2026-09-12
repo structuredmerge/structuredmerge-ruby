@@ -1441,6 +1441,15 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(updated).not_to include('gem "gem-release"')
   end
 
+  it "removes gems superseded by a template-provided replacement from the managed root Gemfile" do
+    updated = described_class.ensure_monorepo_root_gemfile_dependencies(
+      "source \"https://gem.coop\"\ngem \"appraisal\"\ngem \"turbo_tests\"\n"
+    )
+
+    expect(updated).not_to include('gem "appraisal"')
+    expect(updated).not_to include('gem "turbo_tests"')
+  end
+
   it "replaces declared kettle-dev dependencies with local paths without duplicate declarations" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
     coverage_template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/coverage_local.gemfile.example", __dir__))

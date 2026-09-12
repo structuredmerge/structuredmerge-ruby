@@ -2133,6 +2133,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
           gemspec
           eval_gemfile "gemfiles/modular/style.gemfile" if ENV.fetch("K_JEM_STYLE", "false").casecmp("true").zero?
           gem "appraisal"
+          gem "turbo_tests"
           gem "example", path: "."
           gem "rake"
         RUBY
@@ -2191,11 +2192,12 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(gemfile_content).to include('gem "rspec"')
       expect(gemfile_content).to include('gem "rake"')
       expect(gemfile_content).not_to include('gem "appraisal"')
+      expect(gemfile_content).not_to include('gem "turbo_tests"')
       expect(gemfile_content).not_to include('gem "example"')
       expect(gemfile_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy)).to include(
         file_type: "gemfile",
         operations: include(
-          include(operation: "delete_dependency_declarations", deleted_gems: contain_exactly("appraisal", "example"))
+          include(operation: "delete_dependency_declarations", deleted_gems: contain_exactly("appraisal", "turbo_tests", "example"))
         )
       )
 
