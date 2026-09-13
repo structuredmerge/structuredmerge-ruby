@@ -264,6 +264,79 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "surfaces a review placeholder for an engine-incompatible gem with no modular home (sqlite3)" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-engine-incompatible-sqlite3", tmp_root) do |root|
+      reports = [
+        {
+          relative_path: ".structuredmerge/kettle-jem.yml",
+          final_content: "dependency_conflicts:\n  resolve: []\n"
+        },
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("sqlite3")\n)}
+      ]
+
+      # No engines: declared, so this exercises the DEFAULT_ENGINES fallback
+      # (ruby, jruby, truffleruby) — sqlite3 only supports ruby.
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.not_to raise_error
+
+      config = reports.first.fetch(:final_content)
+      expect(config).to include("gem: sqlite3")
+      expect(config).to include("direct: example.gemspec")
+      expect(config).to include("modular: (engine-incompatible; no modular home)")
+      expect(config).to include("action: review")
+    end
+  end
+
+  it "does not flag an engine-incompatible gem when the destination's declared engines are all supported" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-engine-incompatible-supported", tmp_root) do |root|
+      config_content = "engines:\n  - ruby\ndependency_conflicts:\n  resolve: []\n"
+      write_tree(root, {".structuredmerge/kettle-jem.yml" => config_content})
+
+      reports = [
+        {relative_path: ".structuredmerge/kettle-jem.yml", final_content: config_content},
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("sqlite3")\n)}
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.not_to raise_error
+
+      expect(reports.first.fetch(:final_content)).to eq(config_content)
+    end
+  end
+
+  it "raises on a second run when a surfaced engine-incompatible conflict is still unreviewed" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-engine-incompatible-unreviewed-blocks", tmp_root) do |root|
+      config_path = File.join(root, ".structuredmerge/kettle-jem.yml")
+      first_run_reports = [
+        {relative_path: ".structuredmerge/kettle-jem.yml", final_content: "dependency_conflicts:\n  resolve: []\n"},
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("sqlite3")\n)}
+      ]
+
+      expect { described_class.validate_modular_dependency_conflicts!(root, first_run_reports) }.not_to raise_error
+
+      # Simulate the completed first run: its placeholder-injected config is
+      # now what's actually on disk for the next templating run to see.
+      FileUtils.mkdir_p(File.dirname(config_path))
+      File.write(config_path, first_run_reports.first.fetch(:final_content))
+
+      second_run_reports = [
+        {relative_path: "example.gemspec", final_content: %(spec.add_development_dependency("sqlite3")\n)}
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, second_run_reports)
+      }.to raise_error(Kettle::Jem::Error, include("sqlite3"))
+    end
+  end
+
   it "raises on a second run when a surfaced conflict is still unreviewed" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
