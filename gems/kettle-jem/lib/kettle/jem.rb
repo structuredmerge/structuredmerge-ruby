@@ -3560,7 +3560,15 @@ module Kettle
       facts[:version_gem] = version_gem_facts unless version_gem_facts.empty?
       facts[:shim] = shim unless shim.empty?
       facts[:repository] = repository unless repository.empty?
-      generated_blocks = generated_blocks_facts(gemspec_metadata, facts.merge(project_root: File.expand_path(project_root)), run_options)
+      # facts[:ci] itself isn't assembled until later in this method, but
+      # shunted_gemfile_block needs the project's effective CI test floor
+      # (already resolved into project_runtime, above) rather than the
+      # gemspec's own, often much older, required_ruby_version.
+      generated_blocks = generated_blocks_facts(
+        gemspec_metadata,
+        facts.merge(project_root: File.expand_path(project_root), ci: {test_min_ruby: project_runtime.fetch(:test_min_ruby).to_s}),
+        run_options
+      )
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
       if bootstrap
@@ -3921,7 +3929,7 @@ module Kettle
       dependencies = extract_gemspec_development_dependencies(gemspec)
       return if dependencies.empty?
 
-      floor = shunted_effective_floor(facts.dig(:rubygems, :min_ruby))
+      floor = shunted_effective_floor(facts.dig(:ci, :test_min_ruby) || facts.dig(:rubygems, :min_ruby))
       project_root = facts[:project_root] || facts["project_root"] || run_options[:project_root] || run_options["project_root"]
       shunted = dependencies.filter_map do |dependency|
         next if shunted_dependency_has_modular_override?(project_root, dependency)
@@ -3990,11 +3998,11 @@ module Kettle
 
     def shunted_effective_floor(min_ruby)
       floor = minimum_ruby_token(min_ruby)
-      versions = [Gem::Version.new("2.3")]
+      versions = [DEFAULT_TEST_MINIMUM_RUBY]
       versions << Gem::Version.new(floor) unless floor.to_s.empty?
       versions.max
     rescue ArgumentError
-      Gem::Version.new("2.3")
+      DEFAULT_TEST_MINIMUM_RUBY
     end
 
     def shunted_gemfile_managed_block(dependencies)

@@ -2382,6 +2382,56 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "shunts against the CI test floor, not the gemspec's own (often much older) required_ruby_version" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    resolver = Class.new do
+      def versions(gem_name, requirements: nil)
+        (gem_name == "example-shunted-gem") ? [{number: "1.0.0", ruby_version: ">= 2.5"}] : []
+      end
+
+      def min_ruby_version(gem_name, version)
+        Gem::Version.new("2.5")
+      end
+
+      def parse_min_ruby(requirement)
+        Kettle::Jem::RubyGemsResolver.new.parse_min_ruby(requirement)
+      end
+    end.new
+
+    Dir.mktmpdir("kettle-jem-shunted-gemfile-ci-floor", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 1.8.7"
+            spec.add_development_dependency "example-shunted-gem", ">= 0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          ruby:
+            test_minimum: "2.6"
+        YAML
+        "gemfiles/modular/shunted.gemfile" => <<~RUBY
+          # frozen_string_literal: true
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {rubygems_resolver: resolver})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/shunted.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      # example-shunted-gem needs ruby >= 2.5. That's newer than the
+      # gemspec's own required_ruby_version (1.8.7) but not newer than the
+      # project's actual CI test floor (configured here as 2.6), so it must
+      # stay a normal gemspec dependency rather than get shunted out.
+      expect(content).not_to include("example-shunted-gem")
+    end
+  end
+
   it "wires shunted.gemfile into the unlocked_deps appraisal so shunted dependencies still get tested" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
