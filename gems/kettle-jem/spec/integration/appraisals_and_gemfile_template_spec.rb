@@ -2381,4 +2381,72 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(reapplied)
     end
   end
+
+  it "wires shunted.gemfile into the unlocked_deps appraisal so shunted dependencies still get tested" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    resolver = Class.new do
+      def versions(gem_name, requirements: nil)
+        (gem_name == "example-shunted-gem") ? [{number: "1.9.2", ruby_version: ">= 3.3"}] : []
+      end
+
+      def min_ruby_version(gem_name, version)
+        Gem::Version.new("3.3")
+      end
+
+      def parse_min_ruby(requirement)
+        Kettle::Jem::RubyGemsResolver.new.parse_min_ruby(requirement)
+      end
+    end.new
+
+    Dir.mktmpdir("kettle-jem-shunted-gemfile-unlocked-deps-wiring", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.2"
+            spec.add_development_dependency "example-shunted-gem", "~> 1.9"
+          end
+        RUBY
+        "gemfiles/modular/shunted.gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "unlocked_deps" do
+            eval_gemfile "modular/style.gemfile"
+          end
+        RUBY
+        "template/Appraisals.example" => <<~RUBY
+          appraise "unlocked_deps" do
+            eval_gemfile "modular/shunted.gemfile"
+            eval_gemfile "modular/style.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {rubygems_resolver: resolver})
+
+      shunted_report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/shunted.gemfile"
+      end
+      expect_gem_dependency_declared(shunted_report.fetch(:final_content), "example-shunted-gem")
+
+      appraisals_report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "Appraisals"
+      end
+      appraisals_content = appraisals_report.fetch(:final_content)
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "unlocked_deps")).to contain_exactly(
+        "modular/shunted.gemfile",
+        "modular/style.gemfile"
+      )
+    end
+  end
 end
