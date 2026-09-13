@@ -6032,6 +6032,7 @@ module Kettle
     def readme_template_tokens(facts)
       {
         "KJ|CB:USER" => "",
+        "KJ|DEFAULT_TEST_MINIMUM_RUBY" => DEFAULT_TEST_MINIMUM_RUBY.to_s,
         "KJ|FUNDING:BUYMEACOFFEE" => "",
         "KJ|FUNDING:KOFI" => "",
         "KJ|FUNDING:LIBERAPAY" => "",

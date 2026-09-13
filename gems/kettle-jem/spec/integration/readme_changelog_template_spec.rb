@@ -881,6 +881,14 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(plan.fetch(:final_content)).to include("Configuration shape")
       expect(plan.fetch(:final_content)).to include("K_JEM_TEMPLATING=true kettle-jem install")
       expect(plan.dig(:readme_style, :section_partials, "configuration", :source_root)).to eq("packaged")
+      # The packaged configuration partial documents ruby.test_minimum's
+      # default via {KJ|DEFAULT_TEST_MINIMUM_RUBY} rather than restating the
+      # value as a literal, so it can't drift out of sync with the
+      # DEFAULT_TEST_MINIMUM_RUBY constant it actually reads.
+      expect(plan.fetch(:final_content)).not_to include("{KJ|")
+      expect(plan.fetch(:final_content)).to include(
+        "It defaults to `#{Kettle::Jem::DEFAULT_TEST_MINIMUM_RUBY}`"
+      )
     end
   end
 
