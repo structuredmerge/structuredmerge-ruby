@@ -22,6 +22,17 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - appraisal2 (>= 3.2.3 -> >= 3.2.4)
+  - appraisal2-rubocop (>= 1.0.2 -> >= 1.0.3)
+  - gitmoji-regex (>= 2.0.12 -> >= 2.0.13)
+  - stone_checksums (>= 1.0.8 -> >= 1.0.9)
+  - turbo_tests2 (>= 3.2.7 -> >= 3.2.8)
+  - yaml-converter (>= 0.2.5 -> >= 0.2.6)
+  - yard-fence (>= 0.9.8 -> >= 0.9.9)
+  - yard-timekeeper (>= 0.2.6 -> >= 0.2.7)
+  - yard-yaml (>= 0.2.5 -> >= 0.2.6)
+
 ### Deprecated
 
 ### Removed
