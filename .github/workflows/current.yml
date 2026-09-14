@@ -190,10 +190,12 @@ jobs:
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772
         with:
           toolchain: stable
+      # Build exactly as structuredmerge-rust's release-ruby-host.yml does (including
+      # CARGO_FEATURE_LINK_RUBY), so Deps @ HEAD tests the gem end users will install.
       - name: Setup Ruby
         uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
         with:
-          ruby-version: ruby
+          ruby-version: "4.0"
           bundler-cache: false
       - name: Install Rust host package dependencies
         shell: bash
@@ -318,6 +320,22 @@ jobs:
           done
 
           exit 1
+      - name: Verify Rust host loads
+        working-directory: ${{ matrix.gem }}
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/dep_heads.gemfile
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Gems that declare the host must be able to load the release-built host on this
+          # standard rv Ruby; failing here keeps host specs from silently skipping.
+          if ! grep -q 'structuredmerge_host_prototype' Gemfile; then
+            echo "This gem does not declare structuredmerge_host_prototype; nothing to verify."
+            exit 0
+          fi
+          bundle exec ruby -e 'require "structuredmerge_host_prototype"; puts "structuredmerge_host_prototype #{StructuredmergeHostPrototype::VERSION} loaded"'
       - name: Run checks
         working-directory: ${{ matrix.gem }}
         env:
