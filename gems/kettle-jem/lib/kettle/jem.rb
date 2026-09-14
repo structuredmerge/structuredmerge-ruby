@@ -118,14 +118,22 @@ module Kettle
     #   straight to dependency_conflicts.resolve instead of a placeholder
     #   "review" entry.
     #
-    # :engine_incompatible - the gem doesn't support every engine
-    #   DEFAULT_ENGINES lists and has no modular home (below the template's
-    #   inclusion threshold). It's detected by a separate,
-    #   engine-declaration-based check (Phase 4 / supported_engines) rather
-    #   than by modular_dependency_conflicts, so this entry alone doesn't
-    #   yet trigger anything. force_review: true here because there's no
-    #   single correct action across destinations - only the destination's
-    #   own declared engines: decide it.
+    # :engine_incompatible - the gem doesn't support every engine the
+    #   destination declares (config["engines"], falling back to
+    #   DEFAULT_ENGINES) and has no modular home (below the template's
+    #   inclusion threshold). Detected by #engine_dependency_conflicts, a
+    #   separate engine-declaration-based check (comparing supported_engines
+    #   against the destination's declared engines) rather than by
+    #   modular_dependency_conflicts, since there's no modular-side
+    #   declaration to match against. sqlite3 (the pilot entry) sets
+    #   force_review: true because there's no single correct action across
+    #   destinations - only the destination's own declared engines: decide
+    #   it. A future entry in this category with force_review: false would
+    #   auto-resolve via #engine_dependency_conflicts the same way
+    #   :template_managed does via modular_dependency_conflicts (both
+    #   funnel into the same auto_resolvable_known_gem_conflict? gate); its
+    #   registry action would need to make sense with no modular
+    #   counterpart to defer to, e.g. an unconditional removal.
     KNOWN_GEM_CONFLICT_RESOLUTIONS = {
       "debug" => {
         category: :template_managed,
@@ -9739,11 +9747,17 @@ module Kettle
     # A dependency owned directly by the project must not also be introduced by
     # a generated modular Gemfile. On first bootstrap, write a reviewable
     # resolution list; later runs require an explicit removal operation.
+    #
+    # Also surfaces case 3 of the dev-dependency conflict policy (engine
+    # incompatibility, e.g. sqlite3 on jruby): see #engine_dependency_conflicts.
+    # Both conflict sources share the same dependency_conflicts.resolve list,
+    # decision-matching, and review gate.
     def validate_modular_dependency_conflicts!(project_root, recipe_reports)
-      conflicts = modular_dependency_conflicts(project_root, recipe_reports)
+      config = kettle_jem_config(project_root)
+      conflicts = modular_dependency_conflicts(project_root, recipe_reports) +
+        engine_dependency_conflicts(project_root, recipe_reports, config)
       return if conflicts.empty?
 
-      config = kettle_jem_config(project_root)
       decisions = modular_dependency_conflict_decisions(config)
       unresolved = conflicts.reject { |conflict| modular_dependency_conflict_decided?(decisions, conflict) }
       if unresolved.empty?
@@ -9792,9 +9806,17 @@ module Kettle
         "keep_both is valid only when the direct and modular requirements overlap."
     end
 
+    # Paths of a project's own directly-authored dependency manifests: the
+    # root Gemfile plus any gemspec, whether already on disk or only present
+    # as a pending recipe report (not yet written) for this templating run.
+    def direct_dependency_paths(project_root, recipe_reports)
+      report_paths = recipe_reports.map { |report| report.fetch(:relative_path, "").to_s }
+      ["Gemfile", *Dir.glob(File.join(project_root.to_s, "*.gemspec")).map { |path| File.basename(path) }, *report_paths.select { |path| path.end_with?(".gemspec") }]
+    end
+
     def modular_dependency_conflicts(project_root, recipe_reports)
       report_paths = recipe_reports.map { |report| report.fetch(:relative_path, "").to_s }
-      paths = ["Gemfile", *Dir.glob(File.join(project_root.to_s, "*.gemspec")).map { |path| File.basename(path) }, *report_paths.select { |path| path.end_with?(".gemspec") }]
+      paths = direct_dependency_paths(project_root, recipe_reports)
       direct = dependency_file_contents(project_root, recipe_reports, paths)
       modular_paths = [
         *Dir.glob(File.join(project_root.to_s, "gemfiles/modular/**/*.gemfile")).map do |path|
@@ -9834,6 +9856,41 @@ module Kettle
               }
             end
           end
+        end
+      end
+    end
+
+    # Case 3 of the dev-dependency conflict policy: a direct dependency whose
+    # KNOWN_GEM_CONFLICT_RESOLUTIONS entry is :engine_incompatible and
+    # doesn't support one or more of the destination's declared engines
+    # (config["engines"], falling back to DEFAULT_ENGINES — see
+    # #enabled_ruby_engines). Unlike #modular_dependency_conflicts, this
+    # needs no modular-side declaration to match against: these are gems
+    # below the template's inclusion threshold with no modular home at all
+    # (sqlite3 is the pilot; see KNOWN_GEM_CONFLICT_RESOLUTIONS), so the
+    # incompatibility itself — not a direct-vs-modular duplicate — is the
+    # conflict. The :modular field is a fixed, human-readable placeholder
+    # (there is no modular file to name) rather than the specific
+    # unsupported-engine list, so a decision stays matched across runs even
+    # if the destination's declared engines change without actually
+    # resolving the incompatibility.
+    def engine_dependency_conflicts(project_root, recipe_reports, config)
+      declared_engines = enabled_ruby_engines(config)
+      paths = direct_dependency_paths(project_root, recipe_reports)
+      direct = dependency_file_contents(project_root, recipe_reports, paths)
+      direct.flat_map do |direct_path, content|
+        dependency_records_for(direct_path, content).filter_map do |record|
+          resolution = known_gem_conflict_resolution(record.fetch(:name))
+          next unless resolution && resolution.fetch(:category) == :engine_incompatible
+          next if (declared_engines - resolution.fetch(:supported_engines, [])).empty?
+
+          {
+            name: record.fetch(:name),
+            direct: direct_path,
+            modular: "(engine-incompatible; no modular home)",
+            direct_requirements: record.fetch(:requirements, []),
+            modular_requirements: []
+          }
         end
       end
     end
@@ -9931,19 +9988,21 @@ module Kettle
     end
 
     # A gem qualifies for automatic (no-human-review) resolution when it has
-    # a KNOWN_GEM_CONFLICT_RESOLUTIONS entry that's both :template_managed
-    # (the only category modular_dependency_conflicts can actually surface
-    # today; :engine_incompatible entries are inert here — see Phase 4) and
-    # not explicitly flagged force_review.
+    # a KNOWN_GEM_CONFLICT_RESOLUTIONS entry in
+    # AUTO_RESOLVABLE_KNOWN_GEM_CONFLICT_CATEGORIES and not explicitly
+    # flagged force_review — see #auto_resolvable_known_gem_conflict? below.
     def known_gem_conflict_resolution(name)
       KNOWN_GEM_CONFLICT_RESOLUTIONS[name.to_s]
     end
+
+    AUTO_RESOLVABLE_KNOWN_GEM_CONFLICT_CATEGORIES = %i[template_managed engine_incompatible].freeze
 
     def auto_resolvable_known_gem_conflict?(conflict)
       resolution = known_gem_conflict_resolution(conflict.fetch(:name))
       return false unless resolution
 
-      resolution.fetch(:category) == :template_managed && !resolution.fetch(:force_review, false)
+      AUTO_RESOLVABLE_KNOWN_GEM_CONFLICT_CATEGORIES.include?(resolution.fetch(:category)) &&
+        !resolution.fetch(:force_review, false)
     end
 
     def dependency_conflict_entry_lines(conflict, action:, reason:)

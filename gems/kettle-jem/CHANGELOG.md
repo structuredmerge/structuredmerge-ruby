@@ -20,6 +20,18 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Engine-incompatible dev-dependency detection (case 3 of the dev-dependency
+  conflict policy, GEMSPEC_DEV_DEPENDENCY_PLAN.md Phase 4): a direct
+  development dependency with a `KNOWN_GEM_CONFLICT_RESOLUTIONS`
+  `:engine_incompatible` entry now surfaces a `dependency_conflicts.resolve`
+  review entry when it doesn't support one or more of the project's declared
+  `engines:` and has no template-managed modular home. Pilot registry entry:
+  `sqlite3` (no `jruby`-platform release ever published). Shares the same
+  `dependency_conflicts.resolve` list, decision-matching, and review gate as
+  the existing template-managed (case 1) conflicts, and the same
+  auto-resolution path for any future entry in this category with
+  `force_review: false`.
+
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:

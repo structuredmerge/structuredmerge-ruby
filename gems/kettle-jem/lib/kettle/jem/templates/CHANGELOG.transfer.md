@@ -40,6 +40,12 @@ the other fields accept `=` or `!=`.
 - kettle-jem-template-20260729-005 [if feature.rubyforum_project_tag=true] - Gemspec metadata now publishes this
   project's RubyForum tag as `mailing_list_uri`, and support docs link to the
   tagged RubyForum community alongside Discord.
+- kettle-jem-template-20260913-001 - Templating now also surfaces a review
+  entry in `dependency_conflicts.resolve` when a direct development
+  dependency doesn't support one or more of this project's declared
+  `engines:` and has no template-managed modular home (e.g. `sqlite3` on
+  `jruby`). Review each entry and pick a resolution per the project's own
+  engine support needs.
 
 ## Changed
 
