@@ -13,6 +13,12 @@ if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredme
   gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
 end
 
+# CI current and coverage jobs require the published Rust host gem; this fails until it is released.
+if ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero? &&
+   instance_variable_get(:@dependencies).none? { |dependency| dependency.name == 'structuredmerge_host_prototype' }
+  gem 'structuredmerge_host_prototype', '~> 0.2'
+end
+
 git_source(:codeberg) { |repo_name| "https://codeberg.org/#{repo_name}" }
 git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 
