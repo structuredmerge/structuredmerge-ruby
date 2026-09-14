@@ -42,6 +42,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - The packaged `Gemfile` no longer overrides `git_source(:github)` with an SSH
   URL. The override was recorded in `Gemfile.lock` as `git@github.com` remotes,
   which CI runners cannot clone; Bundler's built-in HTTPS source is used again.
+  Templating now also removes existing overrides of Bundler's built-in git
+  sources (`git_source(:github)`, `:gist`, `:bitbucket`) from destination
+  Gemfiles, including the managed monorepo root Gemfile.
 
 - Generated Ruby 4 extracted-stdlib Gemfiles now include `ostruct` so suites
   that require it can run on Rubies where it is no longer bundled by default.

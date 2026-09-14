@@ -101,6 +101,10 @@ module Kettle
     # turbo_tests were replaced by appraisal2 and turbo_tests2.
     PROHIBITED_GEMSPEC_DEPENDENCIES = %w[gem-release appraisal turbo_tests].freeze
     PROHIBITED_GEMFILE_DEPENDENCIES = PROHIBITED_GEMSPEC_DEPENDENCIES.freeze
+    # Git sources Bundler already defines. A Gemfile override (for example an
+    # SSH `git_source(:github)`) replaces Bundler's own HTTPS source and is
+    # recorded in Gemfile.lock, where CI cannot clone it: unconditional removal.
+    BUNDLER_BUILTIN_GIT_SOURCES = %w[github gist bitbucket].freeze
     # Canonical resolutions for development-dependency gems whose handling is
     # already known ahead of any specific destination project. Two
     # categories today:
@@ -5530,6 +5534,7 @@ module Kettle
         ensure_trailing_newline(content.to_s.empty? ? %(source "https://gem.coop"\n) : content.to_s).dup
       )
       updated = remove_gemfile_dependency_blocks(updated, PROHIBITED_GEMFILE_DEPENDENCIES)
+      updated = remove_gemfile_builtin_git_source_overrides(updated).dup
       monorepo_root_gemfile_dependency_lines.each do |line|
         next if gemfile_declares_gem?(updated, line.fetch(:name))
 
@@ -8123,6 +8128,7 @@ module Kettle
           preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
         )
       end
+      output = remove_gemfile_builtin_git_source_overrides(output)
       if recipe.fetch(:target_path).to_s == "Gemfile"
         # A merged Gemfile retains its project-specific source; an accepted
         # template owns the complete source declaration.
@@ -9698,6 +9704,22 @@ module Kettle
       return content if remove_indexes.empty?
 
       ensure_trailing_newline(lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    # Bundler already provides these git sources; see BUNDLER_BUILTIN_GIT_SOURCES.
+    def remove_gemfile_builtin_git_source_overrides(content)
+      remove_indexes = Set.new
+      ruby_call_records(content, :git_source).each do |call|
+        argument = call.arguments&.arguments&.first
+        next unless argument.is_a?(::Prism::SymbolNode)
+        next unless BUNDLER_BUILTIN_GIT_SOURCES.include?(argument.unescaped.to_s)
+
+        (call.location.start_line..ruby_node_source_end_line(call)).each { |line_number| remove_indexes << (line_number - 1) }
+      end
+      return content if remove_indexes.empty?
+
+      lines = content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first)
+      ensure_trailing_newline(lines.join.sub(/\A\n+/, "").gsub(/\n{3,}/, "\n\n"))
     end
 
     def gemfile_gem_call_records(content)
