@@ -2332,9 +2332,10 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-  it "uses SSH for GitHub shorthand dependencies in the packaged Gemfile" do
+  it "uses Bundler's built-in HTTPS source for GitHub shorthand dependencies in the packaged Gemfile" do
     packaged_gemfile = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Gemfile.example"))
 
-    expect(packaged_gemfile).to include("git_source(:github) { |repo_name| \"git@github.com:\#{repo_name}.git\" }")
+    # An SSH override is recorded in Gemfile.lock, and CI runners cannot clone SSH remotes.
+    expect(packaged_gemfile).not_to match(/^\s*git_source\(:github\)/)
   end
 end
