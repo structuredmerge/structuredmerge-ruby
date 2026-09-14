@@ -1450,6 +1450,86 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(updated).not_to include('gem "turbo_tests"')
   end
 
+  it "removes overrides of Bundler's built-in git sources and keeps other git sources" do
+    updated = described_class.remove_gemfile_builtin_git_source_overrides(<<~RUBY)
+      source "https://gem.coop"
+
+      git_source(:github) { |repo_name| "git@github.com:\#{repo_name}.git" }
+      git_source(:gist) { |repo_name| "https://gist.github.com/\#{repo_name}.git" }
+      git_source(:bitbucket) do |repo_name|
+        "https://bitbucket.org/\#{repo_name}.git"
+      end
+      git_source(:codeberg) { |repo_name| "https://codeberg.org/\#{repo_name}" }
+
+      gem "rubocop-packaging", github: "pboling/rubocop-packaging"
+    RUBY
+
+    expect(updated).not_to include("git_source(:github)")
+    expect(updated).not_to include("git_source(:gist)")
+    expect(updated).not_to include("git_source(:bitbucket)")
+    expect(updated).not_to include("bitbucket.org")
+    expect(updated).to include("git_source(:codeberg)")
+    expect(updated).to include('gem "rubocop-packaging", github: "pboling/rubocop-packaging"')
+  end
+
+  it "removes a git_source(:github) override from the managed root Gemfile" do
+    updated = described_class.ensure_monorepo_root_gemfile_dependencies(
+      "source \"https://gem.coop\"\ngit_source(:github) { |repo_name| \"https://github.com/\#{repo_name}\" }\n"
+    )
+
+    expect(updated).not_to include("git_source(:github)")
+  end
+
+  it "removes a destination git_source(:github) override when templating the main Gemfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-builtin-git-source", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example Gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          git_source(:github) { |repo_name| "git@github.com:\#{repo_name}.git" }
+          git_source(:codeberg) { |repo_name| "https://codeberg.org/\#{repo_name}" }
+
+          gem "destination-only"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          git_source(:codeberg) { |repo_name| "https://codeberg.org/\#{repo_name}" }
+
+          gem "shared-tool"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }
+      content = report.fetch(:final_content)
+
+      expect(content).not_to include("git_source(:github)")
+      expect(content).to include("git_source(:codeberg)")
+      expect(content).to include('gem "shared-tool"')
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
   it "replaces declared kettle-dev dependencies with local paths without duplicate declarations" do
     template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
     coverage_template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/coverage_local.gemfile.example", __dir__))
