@@ -13,7 +13,6 @@ if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredme
   gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
 end
 
-git_source(:github) { |repo_name| "git@github.com:#{repo_name}.git" }
 git_source(:codeberg) { |repo_name| "https://codeberg.org/#{repo_name}" }
 git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 
