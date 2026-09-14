@@ -34,6 +34,12 @@ if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredme
   gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
 end
 
+# CI current and coverage jobs require the published Rust host gem; this fails until it is released.
+if ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero? &&
+   instance_variable_get(:@dependencies).none? { |dependency| dependency.name == 'structuredmerge_host_prototype' }
+  gem 'structuredmerge_host_prototype', '~> 0.2'
+end
+
 # The default adapter registry is exercised by the release suite with local
 # sibling wiring disabled, so its released adapter dependencies must be present
 # in the ordinary development bundle as well as in the templating bundle.

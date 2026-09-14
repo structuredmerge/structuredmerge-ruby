@@ -23,6 +23,12 @@ unless structuredmerge_rust_dev.empty? || %w[false 0 no off].include?(structured
   gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
 end
 
+# CI current and coverage jobs require the published Rust host gem; this fails until it is released.
+if ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero? &&
+   instance_variable_get(:@dependencies).none? { |dependency| dependency.name == 'structuredmerge_host_prototype' }
+  gem 'structuredmerge_host_prototype', '~> 0.2'
+end
+
 gem 'kettle-family', '~> 1.2', '>= 1.2.100'
 
 # Local workspace dependency wiring for *_local.gemfile overrides

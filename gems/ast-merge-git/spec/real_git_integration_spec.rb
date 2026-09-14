@@ -556,6 +556,8 @@ RSpec.describe 'ast-merge-git executable' do
     }
   ].each do |provider|
     it "runs the explicit #{provider.fetch(:label)} selector through the installed Git-driver path" do
+      skip 'compiled Rust host is unavailable' unless Ast::Merge::Git::RustHostProvider.available?
+
       base = provider.fetch(:source)
       ours = provider.fetch(:ours)
       theirs = provider.fetch(:theirs)

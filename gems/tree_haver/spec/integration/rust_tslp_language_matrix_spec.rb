@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Rust TSLP language matrix' do
+  before { skip TreeHaver::Backends::RustTslp.unavailable_reason unless TreeHaver::Backends::RustTslp.available? }
+
   samples = {
     bash: "echo hi\n",
     go: "package main\nfunc main() {}\n",
