@@ -31,8 +31,20 @@ Please file a bug if you notice a violation of semantic versioning.
   the existing template-managed (case 1) conflicts, and the same
   auto-resolution path for any future entry in this category with
   `force_review: false`.
+- `workflows.framework_matrix` gemfiles for gems tracked by kettle-rb's
+  `Kettle::Rb::GemFloors` (activemodel, activerecord, activesupport, sqlite3)
+  require the minor series' security floor when the version's requirement
+  still admits the series' first release (e.g.
+  `gem "activerecord", "~> 7.1.0", ">= 7.1.6"`), and carry a `# kettle-rb:`
+  warning comment when no release in the series fixes an advisory.
 
 ### Changed
+
+- Require kettle-rb `>= 0.1.14` (security floor data).
+- The `sqlite3` `KNOWN_GEM_CONFLICT_RESOLUTIONS` reason now points at a
+  `platforms: [:ruby]` modular gemfile (kettle-jem-appraisals generates
+  `gemfiles/modular/activerecord_support/*.gemfile`) instead of saying sqlite3
+  has no modular home.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - appraisal2 (>= 3.2.3 -> >= 3.2.4)

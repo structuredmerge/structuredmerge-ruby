@@ -545,6 +545,42 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "adds kettle-rb security floors and unfixed advisories to tracked framework-matrix gemfiles" do
+    config = {
+      "workflows" => {
+        "preset" => "framework",
+        "framework_matrix" => {
+          "dimension" => "activerecord",
+          "gem" => "activerecord",
+          "gemfile_pattern" => "ar_{version}.gemfile",
+          "versions" => [
+            "7.0",
+            "7.1",
+            {"label" => "7.2", "slug" => "7_2", "requirement" => "~> 7.2.3"},
+            {"label" => "8.0+", "slug" => "8_0_plus", "requirement" => ">= 8.0"}
+          ]
+        }
+      }
+    }
+
+    framework_matrix = described_class.send(:github_actions_framework_matrix, config)
+    facts = {ci: {framework_matrix: framework_matrix}}
+    contents = framework_matrix.fetch(:gemfiles).map do |entry|
+      described_class.send(:synchronize_github_actions_framework_gemfile, entry.fetch(:path), facts)
+    end
+    unpatched = Kettle::Rb::GemFloors.unpatched_advisories("activerecord", "7.0")
+
+    expect(unpatched).to include("CVE-2025-55193")
+    expect(contents[0]).to include(
+      "# kettle-rb: no activerecord 7.0 release fixes #{unpatched.join(", ")}\n",
+      %(gem "activerecord", "~> 7.0.0", ">= #{Kettle::Rb::GemFloors.floor("activerecord", "7.0")}"\n)
+    )
+    expect(contents[1]).to include(%(gem "activerecord", "~> 7.1.0", ">= #{Kettle::Rb::GemFloors.floor("activerecord", "7.1")}"\n))
+    expect(contents[1]).not_to include("# kettle-rb:")
+    expect(contents[2]).to include(%(gem "activerecord", "~> 7.2.3"\n))
+    expect(contents[3]).to include(%(gem "activerecord", ">= 8.0"\n))
+  end
+
   it "uses one framework-matrix default version for the default local test bundle" do
     config = {
       "workflows" => {
