@@ -13,6 +13,10 @@ module Markdown
       'markly' => TreeHaver::BackendReference.new(id: 'markly', family: 'native').freeze,
       'kramdown' => TreeHaver::BackendReference.new(id: 'kramdown', family: 'native').freeze
     }.freeze
+    # Order in which an unspecified (:auto) backend is chosen from those available.
+    # Markly is the most capable Markdown parser; the language pack is the last
+    # resort. BACKEND_REFERENCES keeps the shared fixtures' reporting order.
+    BACKEND_PREFERENCE = %w[markly commonmarker kramdown kreuzberg-language-pack].freeze
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     class Error < Ast::Merge::Error; end
@@ -632,7 +636,7 @@ module Markdown
       current = TreeHaver.current_backend_id
       return current if BACKEND_REFERENCES.key?(current.to_s) && markdown_backend_available_for_analysis?(current)
 
-      BACKEND_REFERENCES.keys.find { |backend_id| markdown_backend_available_for_analysis?(backend_id) } ||
+      BACKEND_PREFERENCE.find { |backend_id| markdown_backend_available_for_analysis?(backend_id) } ||
         'kreuzberg-language-pack'
     end
 
@@ -713,9 +717,10 @@ end
 
 Markdown::Merge.register_provider!
 
+# Optional backends: loaded when their gems are installed, never required.
 %w[
-  commonmarker/merge/backend
   markly/merge/backend
+  commonmarker/merge/backend
 ].each do |feature|
   require feature
 rescue LoadError

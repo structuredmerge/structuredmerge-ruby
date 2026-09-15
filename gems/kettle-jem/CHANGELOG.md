@@ -49,6 +49,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Removed
 
+- The `commonmarker-merge` and `kramdown-merge` runtime dependencies, and their
+  entries in the local sibling and `templating_local.gemfile` path lists.
+  kettle-jem merges Markdown with markly (via `ast-crispr-markdown-markly` and
+  `markly-merge`); other Markdown backends are still used when a project installs
+  them, but are no longer forced on every bundle. This also stops `commonmarker`'s
+  native extension from being compiled, which fails on ruby-head.
+
 ### Fixed
 
 - The packaged `Gemfile` no longer overrides `git_source(:github)` with an SSH
