@@ -50,6 +50,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Extend the opt-in Rust Bash provider to preserve literal-title test_expect_success calls.
 
+- markdown-merge: an unspecified (`:auto`) Markdown backend now prefers markly, then commonmarker, then kramdown, and uses kreuzberg-language-pack only as the last resort; optional backend gems are loaded markly first. The reported `available_markdown_backends` order is unchanged.
+
 ### Deprecated
 
 ### Removed
