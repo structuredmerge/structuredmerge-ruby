@@ -32,11 +32,8 @@ direct_sibling_gems = %w[
 structuredmerge_rust_dev = ENV.fetch('STRUCTUREDMERGE_RUST_DEV', '').strip
 if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredmerge_rust_dev.downcase)
   gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
-end
-
-# CI current and coverage jobs require the published Rust host gem; this fails until it is released.
-if ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero? &&
-   instance_variable_get(:@dependencies).none? { |dependency| dependency.name == 'structuredmerge_host_prototype' }
+elsif ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero?
+  # CI current and coverage jobs require the published Rust host gem; this fails until it is released.
   gem 'structuredmerge_host_prototype', '~> 0.2'
 end
 
