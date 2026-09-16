@@ -7,6 +7,39 @@ RSpec.describe Ast::Crispr::RustHostProvider do
 
   before { skip 'compiled Rust host is unavailable' unless described_class.available? }
 
+  it 'uses the typed core without activating the prototype package' do
+    expect(defined?(StructuredmergeCore)).to eq('constant')
+    expect(Gem.loaded_specs.keys).not_to include('structuredmerge_host_prototype')
+  end
+
+  it 'preserves historical boundary keys and all profile report shapes' do
+    boundary = provider.report(kind: 'boundary')
+    expect(boundary.fetch('metadata').fetch('source')).to eq('legacy_crispr_reference')
+    ruby = boundary.fetch('implementations').find { |item| item.fetch('language') == 'ruby' }
+    expect(ruby).to eq('language' => 'ruby', 'package_name' => 'ast-crispr', 'require' => 'ast/crispr')
+    expect(provider.report(kind: 'match', start_boundary: 'future', end_boundary: 'owner_end_plus_trailing_gap', payload_kind: 'comment_owned_body')).to include(
+      'known_start_boundary' => false, 'trailing_gap_extended' => true, 'comment_anchored' => true)
+    expect(provider.report(kind: 'selection', owner_scope: '', owner_selector: '', selector_kind: '', selection_intent: '')).to include(
+      'owner_scope' => 'shared_default', 'comment_region' => nil)
+    expect(provider.report(kind: 'destination', resolution_kind: '', resolution_source: '', anchor_boundary: '')).to include(
+      'append_fallback' => true, 'used_if_missing' => false)
+  end
+
+  it 'normalizes supported limit inputs without changing default or empty conjunctions' do
+    expect(provider.report(kind: 'limit')).to eq('description' => '== 1')
+    expect(provider.report(kind: 'limit', spec: [])).to eq('description' => '')
+    expect(provider.report(kind: 'limit', spec: [{ at_least: 1, at_most: 3 }, '!= 2'])).to eq('description' => '<= 3 and >= 1 and != 2')
+    expect(provider.report(kind: 'limit', spec: { none_or_one: true })).to eq('description' => '<= 1')
+    expect { provider.report(kind: 'limit', spec: 'nonsense') }.to raise_error(RuntimeError)
+  end
+
+  it 'preserves BOM, Unicode, CRLF and missing final newline through explicit edits' do
+    source = "\uFEFFé: one\r\nlast"
+    report = provider.apply_source_edits(source: source, edits: [{ start_byte: 7, end_byte: 10, replacement: 'two' }])
+    expect(report.fetch('output')).to eq("\uFEFFé: two\r\nlast")
+    expect(source).to eq("\uFEFFé: one\r\nlast")
+  end
+
   it 'advertises profile reports and explicit source edits without claiming selection' do
     expect(provider.provider_id).to eq('rust.ast-crispr.profile')
     expect(provider.capabilities).to include(

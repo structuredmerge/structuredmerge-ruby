@@ -1,19 +1,21 @@
 # frozen_string_literal: true
 
-require 'json'
+require_relative 'typed_core_bridge'
 
 module Ast
   module Crispr
     # Explicit profile and source-projection bridge to the Rust ast-crispr
     # kernel. Structural node selection remains owned by Ruby.
     class RustHostProvider
+      include TypedCoreBridge
       PROVIDER_ID = 'rust.ast-crispr.profile'
 
       class << self
         def available?
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          ::StructuredmergeHostPrototype.respond_to?(:report_ast_crispr_json) &&
-            ::StructuredmergeHostPrototype.respond_to?(:apply_ast_crispr_source_edits_json)
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          %i[report_structural_boundary report_structural_limit report_structural_match
+            report_structural_selection report_structural_destination report_structural_operations
+            apply_explicit_source_edits].all? { |method| ::StructuredmergeCore.respond_to?(method) }
         rescue LoadError
           false
         end
@@ -34,17 +36,17 @@ module Ast
       def report(request)
         raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
 
-        JSON.parse(StructuredmergeHostPrototype.report_ast_crispr_json(JSON.generate(request)))
-      rescue JSON::ParserError => e
-        raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}", code: 'ast_crispr_rust_host_invalid_response')
+        core_report(request)
+      rescue KeyError, ArgumentError, TypeError => e
+        raise RuntimeError, e.message
       end
 
       def apply_source_edits(request)
         raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
 
-        JSON.parse(StructuredmergeHostPrototype.apply_ast_crispr_source_edits_json(JSON.generate(request)))
-      rescue JSON::ParserError => e
-        raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}", code: 'ast_crispr_rust_host_invalid_response')
+        core_source_edits(request)
+      rescue KeyError, ArgumentError, TypeError => e
+        raise RuntimeError, e.message
       end
     end
   end
