@@ -27,8 +27,20 @@ Invalid request normalization retains RuntimeError classification;
 exact historical error-message equivalence is not asserted for all malformed
 inputs.
 
-This is not the full downstream acceptance gate. Full applicable kettle-jem and
-other downstream suites, lint/coverage, registry installation and hosted CI still
-need validation. The normal released-package gate now names structuredmerge-core
+The full kettle-jem suite also passes locally: 681 examples, zero failures.
+Its temporary bundle is `gems/kettle-jem/tmp/typed_core.gemfile`, containing
+`eval_gemfile '../Gemfile'` and `gem 'structuredmerge-core', '= 0.2.0'`.
+Run through `mise exec -C <worktree>/gems/kettle-jem --`, with the same GEM_HOME,
+GEM_PATH and STRUCTUREDMERGE_DEV used above, BUNDLE_GEMFILE pointing at that file,
+and STRUCTUREDMERGE_RUST_DEV, STRUCTUREDMERGE_RUST_HOST_PUBLISHED,
+K_JEM_TEMPLATING and K_SOUP_COV_DO explicitly false. Run `bundle install`, then
+`bundle exec kettle-test`. Keeping the temporary Gemfile beneath kettle-jem is
+important: kettle-test derives its project root from BUNDLE_GEMFILE, so a bundle
+under the monorepo's tmp directory selects the wrong suite. This is regression
+evidence, not proof that each downstream operation invokes the typed core.
+
+This is not the full downstream acceptance gate. Other applicable downstream
+suites, lint/coverage, registry installation and hosted CI still need validation.
+The normal ast-crispr released-package gate now names structuredmerge-core
 but is not bypassed by the artifact bundle. No package publication, default
 authority change, or native selector replacement is implied.
