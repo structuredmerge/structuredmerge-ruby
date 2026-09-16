@@ -180,18 +180,18 @@ jobs:
     if: ${{ needs.detect.outputs.count != '0' && needs.detect.outputs.release_mode == '' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Clone structuredmerge-rust HEAD
-        shell: bash
-        run: |
-          set -euo pipefail
-          git clone --depth 1 https://github.com/structuredmerge/structuredmerge-rust.git "${RUNNER_TEMP}/structuredmerge-rust"
-          echo "structuredmerge-rust HEAD: $(git -C "${RUNNER_TEMP}/structuredmerge-rust" rev-parse HEAD)"
+      - name: Checkout StructuredMerge kernel HEAD
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: structuredmerge/structuredmerge
+          ref: main
+          path: kernel
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772
         with:
           toolchain: stable
-      # Build exactly as structuredmerge-rust's release-ruby-host.yml does (including
-      # CARGO_FEATURE_LINK_RUBY), so Deps @ HEAD tests the gem end users will install.
+      # Exercise the generated kernel artifact on the same static Ruby used by
+      # downstream suites; linking libruby would hide end-user load failures.
       - name: Setup Ruby
         uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
         with:
@@ -199,20 +199,18 @@ jobs:
           bundler-cache: false
       - name: Install Rust host package dependencies
         shell: bash
-        working-directory: ${{ runner.temp }}/structuredmerge-rust/packages/ruby
+        working-directory: kernel/packages/ruby
         run: bundle install --jobs 4 --retry 8
       - name: Install Alef
         shell: bash
-        working-directory: ${{ runner.temp }}/structuredmerge-rust
+        working-directory: kernel
         run: |
-          cargo install --git https://github.com/structuredmerge/alef.git \
-            --rev "$(cat workspace-scripts/alef-source-revision)" --locked
+          cargo install alef --version "=$(cat workspace-scripts/alef-version)" --locked
       - name: Build platform gem
         shell: bash
-        working-directory: ${{ runner.temp }}/structuredmerge-rust
+        working-directory: kernel
         env:
           CARGO_BUILD_TARGET: x86_64-unknown-linux-gnu
-          CARGO_FEATURE_LINK_RUBY: "1"
           PLATFORM: x86_64-linux
           RUST_TARGET: x86_64-unknown-linux-gnu
           TARGET: x86_64-unknown-linux-gnu
@@ -221,12 +219,13 @@ jobs:
           mkdir -p dist
           alef publish build --lang ruby
           alef publish package --lang ruby --target "${TARGET}" --output dist
+          ruby workspace-scripts/check_ruby_linkage.rb dist
           test "$(find dist -maxdepth 1 -name "*-${PLATFORM}.gem" -print | wc -l)" -eq 1
       - name: Upload Rust host gem
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: structuredmerge-host-prototype-head
-          path: ${{ runner.temp }}/structuredmerge-rust/dist/*-x86_64-linux.gem
+          path: kernel/dist/*-x86_64-linux.gem
           if-no-files-found: error
           retention-days: 7
 
@@ -287,7 +286,7 @@ jobs:
           cat > dep_heads.gemfile <<'RUBY'
           # frozen_string_literal: true
 
-          # CI-only dep-heads bundle: the Rust host built from structuredmerge-rust HEAD,
+          # CI-only dep-heads bundle: the Rust host built from structuredmerge/structuredmerge HEAD,
           # this gem's Gemfile, and the HEAD versions of its runtime dependencies.
           # Like the dep-heads appraisal, HEAD declarations replace the Gemfile's
           # released declarations of the same gems instead of conflicting with them.
