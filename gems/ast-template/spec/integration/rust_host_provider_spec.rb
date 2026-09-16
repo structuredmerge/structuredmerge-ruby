@@ -4,12 +4,13 @@ RSpec.describe Ast::Template::RustHostProvider do
   describe '.available?' do
     it 'reports the generated host bridge when loaded' do
       begin
-        require 'structuredmerge_host_prototype'
+        require 'structuredmerge_core'
       rescue LoadError
         skip 'compiled Rust host is unavailable'
       end
 
       expect(described_class).to be_available
+      expect(Gem.loaded_specs.keys.grep(/host_prototype/)).to be_empty
     end
   end
 

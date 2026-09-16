@@ -54,6 +54,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Use the generated structuredmerge-core typed API for Rust profile reports and explicit source edits instead of the host-prototype gem, retaining Ruby structural selection and Hash result compatibility.
 
+- Migrate the opt-in ast-template report and read-only planning adapter from the prototype facade to generated structuredmerge-core DTOs, retaining Ruby-owned template application.
+
 ### Deprecated
 
 ### Removed

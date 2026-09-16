@@ -1,18 +1,21 @@
 # frozen_string_literal: true
 
-require 'json'
+require_relative 'typed_core_bridge'
 
 module Ast
   module Template
     # Explicit report-only bridge for the portable Rust session contract.
     # Template execution and filesystem mutation remain Ruby-owned.
     class RustHostProvider
+      include TypedCoreBridge
       PROVIDER_ID = 'rust.ast-template.session-reports'
 
       class << self
         def available?
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          ::StructuredmergeHostPrototype.respond_to?(:report_ast_template_json)
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          %i[report_template_options report_template_profile plan_template_directory].all? do |name|
+            ::StructuredmergeCore.respond_to?(name)
+          end
         rescue LoadError
           false
         end
@@ -30,10 +33,9 @@ module Ast
       end
 
       def report(request)
-        raw = JSON.parse(host.report_ast_template_json(JSON.generate(request)))
-        raw.transform_keys(&:to_sym)
-      rescue KeyError, JSON::ParserError => e
-        raise ArgumentError, e.message
+        core_report(request)
+      rescue KeyError, ArgumentError, TypeError => e
+        raise RuntimeError, e.message
       end
 
       def plan(request)
@@ -43,8 +45,8 @@ module Ast
       private
 
       def host
-        require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-        ::StructuredmergeHostPrototype
+        require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+        ::StructuredmergeCore
       end
     end
   end
