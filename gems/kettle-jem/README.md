@@ -95,7 +95,7 @@ Merge analysis must enter parsing through `tree_haver`. Parser-specific gems reg
 [sm-family-fixtures]: https://github.com/structuredmerge/structuredmerge-fixtures
 [sm-family-go]: https://github.com/structuredmerge/structuredmerge-go
 [sm-family-ruby]: https://github.com/structuredmerge/structuredmerge-ruby
-[sm-family-rust]: https://github.com/structuredmerge/structuredmerge-rust
+[sm-family-rust]: https://github.com/structuredmerge/structuredmerge
 [sm-family-typescript]: https://github.com/structuredmerge/structuredmerge-typescript
 
 ### Federated DVCS

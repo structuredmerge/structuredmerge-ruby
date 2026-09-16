@@ -45,6 +45,11 @@ Please file a bug if you notice a violation of semantic versioning.
   - yard-timekeeper (>= 0.2.6 -> >= 0.2.7)
   - yard-yaml (>= 0.2.5 -> >= 0.2.6)
 
+- [kc] kettle-jem/template: updated 1 project file:
+  - documentation (1)
+
+- Point generated StructuredMerge family Rust links to the separated kernel repository.
+
 ### Deprecated
 
 ### Removed
