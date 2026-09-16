@@ -16,11 +16,14 @@ load-path changes are used. The existing fixture tests expect the fixtures
 checkout adjacent to the Ruby worktree; nested worktrees need that fixture path
 provided separately. The environment-specific lockfile is intentionally local.
 
-Verified locally on Ruby 4.0.6/Linux: 44 examples, zero failures, using core gem
+Verified locally on Ruby 4.0.6/Linux: 51 examples, zero failures, using core gem
 SHA-256 `f9978879f38b9f0f79f47a1480426bd336b655a4345fab72044a6df6694700f0`.
 Integration tests assert the prototype gem is not activated, cover every report
 kind, and preserve explicit-edit success/rejection and exact Unicode/BOM/CRLF
-output. Invalid request normalization retains RuntimeError classification;
+output. The shared-fixture integration suite also compares complete boundary,
+match, selection, destination, operation and ordered batch reports, plus every
+valid limit description and invalid limit rejection in slices 916–921 and 923.
+Invalid request normalization retains RuntimeError classification;
 exact historical error-message equivalence is not asserted for all malformed
 inputs.
 
