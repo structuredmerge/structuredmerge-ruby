@@ -321,7 +321,7 @@ module TreeHaver
           backend_type: backend_type,
           gem_name: gem_name
         )
-        backend_module.register_language_host(@language_name) if backend_type == :rust_tslp
+        backend_module.register_language_parser(@language_name) if backend_type == :rust_tslp
         return true
       end
 
@@ -381,7 +381,7 @@ module TreeHaver
 
     def language_pack_registration
       if TreeHaver.effective_backend == :rust_tslp
-        [TreeHaver::Backends::RustTslp, :rust_tslp, 'structuredmerge_host_prototype']
+        [TreeHaver::Backends::RustTslp, :rust_tslp, 'structuredmerge-core']
       else
         [TreeHaver::Backends::Tslp, :tslp, 'tree_sitter_language_pack']
       end

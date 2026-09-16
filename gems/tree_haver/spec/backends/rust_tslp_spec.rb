@@ -49,14 +49,46 @@ RSpec.describe TreeHaver::Backends::RustTslp do
   end
 
   before do
-    stub_const('StructuredmergeHostPrototype', Module.new)
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
-      .with('json', source, 'json')
-      .and_return(JSON.generate(result))
+    stub_const('StructuredmergeCore', Module.new)
+    %w[SourceDescriptor LineEndings SourceInput ParseRequest ParserSelection ParseOptions ParseLimits].each do |name|
+      klass = Class.new do
+        def self.new(**fields)
+          Struct.new(*fields.keys, keyword_init: true).new(**fields)
+        end
+      end
+      stub_const("StructuredmergeCore::#{name}", klass)
+    end
+    allow(StructuredmergeCore).to receive(:register_language_pack_parser)
+      .with('tree_haver.rust_tslp.json', 'json').and_return(record(id: 'tree_haver.rust_tslp.json'))
+    allow(StructuredmergeCore).to receive(:parse_sources).and_return([typed_result(result)])
     described_class.reset!
   end
 
   after { described_class.reset! }
+
+  def record(**fields)
+    Struct.new(*fields.keys, keyword_init: true).new(**fields)
+  end
+
+  # Test doubles for generated DTOs keep unit tests independent of an optional gem.
+  # Installed-artifact integration tests below exercise the real generated types.
+  def typed_result(value)
+    nodes = value.fetch('nodes').map do |node|
+      span = node.fetch('span')
+      record(id: node.fetch('id'), native_type: node.fetch('kind'), named: node.fetch('named'),
+        missing: node.fetch('backend_roles', []).include?('missing'),
+        has_error: node['role'] == 'error' || !value.fetch('ok', true),
+        parent_id: node['parent_id'],
+        children: node.fetch('child_ids', []).map { |id| record(node_id: id, field_name: nil) },
+        extensions: [record(schema: 'tree-haver.tree-sitter.node/v1', namespace: 'tree-sitter', payload: '{"extra":true}')],
+        span: record(range: record(**span.fetch('range').transform_keys(&:to_sym)),
+          start_point: record(**span.fetch('start_point').transform_keys(&:to_sym)),
+          end_point: record(**span.fetch('end_point').transform_keys(&:to_sym))))
+    end
+    record(parsed: record(nodes: nodes, root_id: value.fetch('root_id'),
+      diagnostics: value.fetch('diagnostics').map { |message| record(message: message) }),
+      backend: record(id: 'tree_haver.rust_tslp.json', runtime: 'rust', parser: 'tree-sitter-language-pack', parser_version: 'runtime'))
+  end
 
   it 'adapts the Rust normalized tree with source, topology, points, and provenance' do
     tree = TreeHaver.with_backend(:rust_tslp) do
@@ -65,7 +97,7 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     end
     root = tree.root_node
 
-    expect(tree.provenance.dig('backend_ref', 'id')).to eq('kreuzberg-language-pack')
+    expect(tree.provenance.dig('backend_ref', 'id')).to eq('tree_haver.rust_tslp.json')
     expect(root.type).to eq('document')
     expect(root.text).to eq(source)
     expect(root.start_point).to eq(row: 0, column: 0)
@@ -86,13 +118,6 @@ RSpec.describe TreeHaver::Backends::RustTslp do
 
   it 'uses a full parse for parse_string and does not retain incremental edit state' do
     next_source = "{\n  \"answer\": 43\n}\n"
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
-      .with('json', next_source, 'json')
-      .and_return(JSON.generate(result.merge(
-        'nodes' => result.fetch('nodes').map do |node|
-          node.merge('source_fragment' => node.fetch('source_fragment').sub('42', '43'))
-        end
-      )))
 
     parser = described_class::Parser.new
     parser.language = described_class::Language.new(:json)
@@ -146,9 +171,7 @@ RSpec.describe TreeHaver::Backends::RustTslp do
         node.merge('role' => node.fetch('kind') == 'object' ? 'error' : node.fetch('role'))
       end
     )
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
-      .with('json', source, 'json')
-      .and_return(JSON.generate(malformed))
+    allow(StructuredmergeCore).to receive(:parse_sources).and_return([typed_result(malformed)])
 
     tree = TreeHaver.with_backend(:rust_tslp) do
       TreeHaver::GrammarFinder.new(:json).register!(raise_on_missing: true)
@@ -185,9 +208,7 @@ RSpec.describe TreeHaver::Backends::RustTslp do
       ],
       'root_id' => 'tslp:json:0'
     )
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
-      .with('json', comment_source, 'json')
-      .and_return(JSON.generate(commented))
+    allow(StructuredmergeCore).to receive(:parse_sources).and_return([typed_result(commented)])
 
     tree = TreeHaver.with_backend(:rust_tslp) do
       TreeHaver::GrammarFinder.new(:json).register!(raise_on_missing: true)
@@ -195,7 +216,31 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     end
 
     expect(tree.root_node.children.first.native_type).to eq('line_comment')
+    expect(tree.root_node.children.first.extra?).to be(true)
     expect(tree.comments).to eq([])
+  end
+
+  it 'registers once and pins typed requests to the explicit provider' do
+    parser = described_class::Parser.new
+    parser.language = described_class::Language.new(:json)
+    2.times { parser.parse(source) }
+    expect(StructuredmergeCore).to have_received(:register_language_pack_parser).once
+    expect(StructuredmergeCore).to have_received(:parse_sources).twice do |requests, limits|
+      request = requests.fetch(0)
+      expect(request.selection.backend_id).to eq('tree_haver.rust_tslp.json')
+      expect(request.source.bytes.pack('C*')).to eq(source)
+      expect(request.source.descriptor.sha256).to eq(Digest::SHA256.hexdigest(source))
+      expect(request.options.native_extensions).to be(true)
+      expect(limits.max_batch_items).to eq(1)
+    end
+  end
+
+  it 'does not adopt foreign duplicate registrations' do
+    allow(StructuredmergeCore).to receive(:register_language_pack_parser).and_raise(RuntimeError, 'registration: DuplicateId')
+    parser = described_class::Parser.new
+    parser.language = described_class::Language.new(:json)
+    expect { parser.parse(source) }.to raise_error(RuntimeError, /DuplicateId/)
+    expect(StructuredmergeCore).not_to have_received(:parse_sources)
   end
 end
 # rubocop:enable Metrics/BlockLength

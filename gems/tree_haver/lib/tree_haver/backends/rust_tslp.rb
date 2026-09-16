@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'digest'
 
 module TreeHaver
   module Backends
@@ -39,16 +40,17 @@ module TreeHaver
           }
         end
 
-        def register_language_host(language)
+        def register_language_parser(language)
           return unless available?
-          return unless ::StructuredmergeHostPrototype.respond_to?(:registered_parser_hosts)
-          return unless ::StructuredmergeHostPrototype.respond_to?(:register_tslp_parser_host)
-
-          provider_name = "tree_haver.rust_tslp.#{language}"
-          return provider_name if ::StructuredmergeHostPrototype.registered_parser_hosts.include?(provider_name)
-
-          ::StructuredmergeHostPrototype.register_tslp_parser_host(provider_name, language.to_s)
-          provider_name
+          # Cache only registrations made by this adapter, never adopt a foreign
+          # duplicate ID. An external removal therefore fails closed on parse.
+          REGISTRATION_MUTEX.synchronize do
+            @registrations ||= {}
+            key = [::StructuredmergeCore, language.to_s]
+            @registrations[key] ||= ::StructuredmergeCore.register_language_pack_parser(
+              "tree_haver.rust_tslp.#{language}", language.to_s
+            ).id
+          end
         end
 
         private
@@ -60,9 +62,9 @@ module TreeHaver
             return false
           end
 
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          unless ::StructuredmergeHostPrototype.respond_to?(:parse_normalized_with_tslp)
-            @unavailable_reason = 'the Rust TreeHaver host does not expose normalized TSLP parsing'
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          unless ::StructuredmergeCore.respond_to?(:parse_sources) && ::StructuredmergeCore.respond_to?(:register_language_pack_parser)
+            @unavailable_reason = 'structuredmerge-core does not expose typed Rust parser registration'
             return false
           end
 
@@ -76,6 +78,8 @@ module TreeHaver
         end
         # rubocop:enable Metrics/MethodLength
       end
+
+      REGISTRATION_MUTEX = Mutex.new
 
       # Identifies a language parsed by the canonical Rust substrate.
       class Language < TreeHaver::Base::Language
@@ -98,26 +102,38 @@ module TreeHaver
           raise TreeHaver::NotAvailable, 'Rust TSLP language is not set' unless language
 
           normalized_source = normalize_source_encoding(source)
-          result = JSON.parse(
-            ::StructuredmergeHostPrototype.parse_normalized_with_tslp(
-              language.name.to_s,
-              normalized_source,
-              language.name.to_s
-            )
+          core = ::StructuredmergeCore
+          provider_id = RustTslp.register_language_parser(language.name)
+          crlf = normalized_source.scan("\r\n").length
+          descriptor = core::SourceDescriptor.new(
+            source_id: 'tree_haver.source', role: 'source', byte_length: normalized_source.bytesize,
+            sha256: Digest::SHA256.hexdigest(normalized_source), encoding: 'utf8',
+            bom: normalized_source.start_with?("\uFEFF"), final_newline: normalized_source.end_with?("\n", "\r"),
+            line_endings: core::LineEndings.new(lf: normalized_source.count("\n") - crlf,
+              crlf: crlf, bare_cr: normalized_source.count("\r") - crlf)
           )
+          request = core::ParseRequest.new(
+            schema: 'structuredmerge.parse-request/v1', request_id: 'tree_haver.parse',
+            source: core::SourceInput.new(descriptor: descriptor, bytes: normalized_source.bytes),
+            language: language.name.to_s, dialect: nil,
+            selection: core::ParserSelection.new(backend_id: provider_id, preference: [], required_capabilities: []),
+            options: core::ParseOptions.new(comments: true, diagnostics: true, tokens: false, native_extensions: true),
+            metadata: {}, extra: {}
+          )
+          limits = core::ParseLimits.new(max_batch_items: 1, max_input_bytes: 64 * 1024 * 1024,
+            max_nodes: 1_000_000, max_diagnostics: 1000)
+          result = core.parse_sources([request], limits).fetch(0)
           Tree.new(result, source: normalized_source, language: language.name)
-        rescue JSON::ParserError => e
-          raise TreeHaver::Error, "Rust TreeHaver returned invalid normalized JSON: #{e.message}"
         end
         # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
         private
 
         def normalize_source_encoding(source)
-          return source unless source.encoding == Encoding::BINARY
-
-          utf8 = source.dup.force_encoding(Encoding::UTF_8)
-          return utf8 if utf8.valid_encoding?
+          if [Encoding::UTF_8, Encoding::BINARY, Encoding::US_ASCII].include?(source.encoding)
+            utf8 = source.dup.force_encoding(Encoding::UTF_8)
+            return utf8.freeze if utf8.valid_encoding?
+          end
 
           raise TreeHaver::NotAvailable, 'Rust TreeHaver normalized parsing requires valid UTF-8 source bytes'
         end
@@ -137,10 +153,14 @@ module TreeHaver
           validate_result!(result)
           super(result, source: source)
           @language = language.to_s
-          @nodes_by_id = result.fetch('nodes').to_h { |node| [node.fetch('id'), node] }
-          @root_id = result.fetch('root_id')
-          @diagnostics = result.fetch('diagnostics', [])
-          @provenance = result.fetch('backend_capability', {})
+          @nodes_by_id = result.parsed.nodes.to_h { |node| [node.id, node] }
+          @root_id = result.parsed.root_id
+          @diagnostics = result.parsed.diagnostics.map(&:message)
+          @provenance = {
+            'backend_ref' => { 'id' => result.backend.id },
+            'language' => @language, 'runtime' => result.backend.runtime,
+            'parser' => result.backend.parser, 'parser_version' => result.backend.parser_version
+          }
         end
 
         def root_node
@@ -160,12 +180,9 @@ module TreeHaver
         private
 
         def validate_result!(result)
-          raise TreeHaver::Error, 'Rust TreeHaver returned a non-object normalized result' unless result.is_a?(Hash)
-
-          nodes = result['nodes']
-          root_id = result['root_id']
-          valid_root = nodes.is_a?(Array) && root_id.is_a?(String) &&
-                       nodes.any? { |node| node.is_a?(Hash) && node['id'] == root_id }
+          nodes = result.parsed.nodes
+          root_id = result.parsed.root_id
+          valid_root = root_id.is_a?(String) && nodes.any? { |node| node.id == root_id }
           return if valid_root
 
           raise TreeHaver::Error, 'Rust TreeHaver returned an invalid normalized tree'
@@ -196,42 +213,47 @@ module TreeHaver
           NODE_TYPE_ALIASES.fetch(language, {}).fetch(native_type, native_type)
         end
 
-        def native_type = inner_node.fetch('kind')
+        def native_type = inner_node.native_type
 
-        def start_byte = span.fetch('range').fetch('start_byte')
-        def end_byte = span.fetch('range').fetch('end_byte')
-        def start_point = symbolize_point(span.fetch('start_point'))
-        def end_point = symbolize_point(span.fetch('end_point'))
-        def child_count = inner_node.fetch('child_ids', []).length
-        def named? = inner_node.fetch('named', false)
+        def start_byte = span.range.start_byte
+        def end_byte = span.range.end_byte
+        def start_point = symbolize_point(span.start_point)
+        def end_point = symbolize_point(span.end_point)
+        def child_count = inner_node.children.length
+        def named? = inner_node.named
         def has_error? # rubocop:disable Naming/PredicatePrefix
-          role == 'error' || backend_roles.include?('error') || children.any?(&:has_error?)
+          inner_node.has_error
         end
         def error? = has_error?
-        def missing? = backend_roles.include?('missing')
-        def extra? = backend_roles.include?('extra')
+        def missing? = inner_node.missing
+        def extra?
+          extension = inner_node.extensions.find { |item| item.schema == 'tree-haver.tree-sitter.node/v1' && item.namespace == 'tree-sitter' }
+          raise TreeHaver::Error, 'Rust TreeHaver omitted native node flags' unless extension
+
+          # Alef transports only the open extension payload as JSON, not the tree.
+          JSON.parse(extension.payload).fetch('extra')
+        end
 
         def text
-          return inner_node.fetch('source_fragment') if inner_node.fetch('has_source_text', false)
-
-          raise TreeHaver::Error, "Rust TreeHaver has no source fragment for node #{inner_node.fetch('id')}"
+          source.byteslice(start_byte...end_byte)
         end
 
         def child(index)
-          child_id = inner_node.fetch('child_ids', [])[index]
-          child_id && wrap(@nodes_by_id.fetch(child_id))
+          edge = inner_node.children[index]
+          edge && wrap(@nodes_by_id.fetch(edge.node_id))
         end
 
         def children
-          inner_node.fetch('child_ids', []).map { |child_id| wrap(@nodes_by_id.fetch(child_id)) }
+          inner_node.children.map { |edge| wrap(@nodes_by_id.fetch(edge.node_id)) }
         end
 
         def child_by_field_name(name)
-          children.find { |child| child.inner_node['field_name'] == name.to_s }
+          edge = inner_node.children.find { |item| item.field_name == name.to_s }
+          edge && wrap(@nodes_by_id.fetch(edge.node_id))
         end
 
         def parent
-          parent_id = inner_node['parent_id']
+          parent_id = inner_node.parent_id
           parent_id && wrap(@nodes_by_id.fetch(parent_id))
         end
 
@@ -245,12 +267,10 @@ module TreeHaver
 
         private
 
-        def span = inner_node.fetch('span')
-        def role = inner_node.fetch('role', '')
-        def backend_roles = inner_node.fetch('backend_roles', [])
+        def span = inner_node.span
 
         def symbolize_point(point)
-          { row: point.fetch('row'), column: point.fetch('column') }
+          { row: point.row, column: point.column }
         end
 
         def wrap(node)
@@ -261,8 +281,8 @@ module TreeHaver
           parent_node = parent
           return unless parent_node
 
-          siblings = parent_node.inner_node.fetch('child_ids', [])
-          index = siblings.index(inner_node.fetch('id'))
+          siblings = parent_node.inner_node.children.map(&:node_id)
+          index = siblings.index(inner_node.id)
           sibling_index = index&.+(offset)
           return unless sibling_index&.between?(0, siblings.length - 1)
 

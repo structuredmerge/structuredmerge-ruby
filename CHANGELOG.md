@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate the opt-in ast-template report and read-only planning adapter from the prototype facade to generated structuredmerge-core DTOs, retaining Ruby-owned template application.
 
+- Migrate the explicit Rust TSLP backend from the host prototype to typed structuredmerge-core parsing, preserving native node flags and exact source bytes.
+
 ### Deprecated
 
 ### Removed

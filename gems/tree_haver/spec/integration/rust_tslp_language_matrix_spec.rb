@@ -28,7 +28,7 @@ RSpec.describe 'Rust TSLP language matrix' do
       expect(tree.root_node.end_byte).to eq(source.bytesize)
       expect(tree.has_error?).to be(false)
       expect(tree.provenance).to include(
-        'backend_ref' => include('id' => 'kreuzberg-language-pack'),
+        'backend_ref' => include('id' => "tree_haver.rust_tslp.#{language}"),
         'language' => language.to_s
       )
       expect(capabilities).to include(
@@ -37,8 +37,7 @@ RSpec.describe 'Rust TSLP language matrix' do
         incremental: false,
         provenance: :rust_tree_haver
       )
-      expect(StructuredmergeHostPrototype.registered_parser_hosts)
-        .to include("tree_haver.rust_tslp.#{language}")
+      expect(tree.provenance.fetch('runtime')).to eq('rust')
     end
   end
 end
