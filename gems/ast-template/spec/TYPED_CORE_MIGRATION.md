@@ -1,5 +1,21 @@
 # Typed template consumer verification
 
+## Current artifact revalidation (2026-09-16)
+
+This migration is now integrated into local Ruby main (fast-forward through
+`0a1f4ee32`). The consumer passes 78 examples via `kettle-test` against
+the latest installed core gem, SHA-256
+`96291c720058b22cc80d2992943f65878faf36808639ebfc06f52ec24b71209e`.
+The full kettle-jem downstream suite also passes 681 examples. Runs used the
+pre-publication bundles in `ruby/tmp/worktrees/typed-crispr-consumer`, whose
+committed consumer code is identical to the integrated revision. Test logs are
+under each gem's `tmp/kettle-test/`; the downstream run is
+`turbo_tests2-20260916-104302-1248551.log`.
+
+This refreshes the historical artifact evidence below. It does not close hosted,
+registry, full lint/coverage or remaining downstream gates, authorize prototype
+publication, or move structural selection/filesystem apply out of Ruby.
+
 The opt-in `RustHostProvider` now calls generated `structuredmerge-core` typed
 options, profile and read-only directory-plan operations. It retains its provider
 identity, top-level symbol keys, nested string keys, enum strings and historical
