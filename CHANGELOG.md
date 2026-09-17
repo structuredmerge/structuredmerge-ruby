@@ -58,6 +58,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate the explicit Rust TSLP backend from the host prototype to typed structuredmerge-core parsing, preserving native node flags and exact source bytes.
 
+- Move the opt-in Rust JSON provider to structuredmerge-core typed operations, using Rust-owned diff classifications and native byte spans; retain complete portable core evidence and JSON Pointer owner identities without the prototype dependency.
+
 ### Deprecated
 
 ### Removed
