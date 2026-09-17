@@ -48,7 +48,7 @@ Its temporary bundle is `gems/kettle-jem/tmp/typed_core.gemfile`, containing
 `eval_gemfile '../Gemfile'` and `gem 'structuredmerge-core', '= 0.2.0'`.
 Run through `mise exec -C <worktree>/gems/kettle-jem --`, with the same GEM_HOME,
 GEM_PATH and STRUCTUREDMERGE_DEV used above, BUNDLE_GEMFILE pointing at that file,
-and STRUCTUREDMERGE_RUST_DEV, STRUCTUREDMERGE_RUST_HOST_PUBLISHED,
+and STRUCTUREDMERGE_CORE_DEV, STRUCTUREDMERGE_CORE_PUBLISHED,
 K_JEM_TEMPLATING and K_SOUP_COV_DO explicitly false. Run `bundle install`, then
 `bundle exec kettle-test`. Keeping the temporary Gemfile beneath kettle-jem is
 important: kettle-test derives its project root from BUNDLE_GEMFILE, so a bundle

@@ -72,6 +72,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Replace prototype CI builds and publication switches with verified pre-publication structuredmerge-core artifacts for current, coverage, and dependency-HEAD jobs; verify installed payloads and retain per-gem test discovery.
 
+- Replace obsolete prototype development switches with explicit typed-core source and registry switches in migrated consumers, and remove unused prototype dependencies from YAML, Markdown, and Kettle Jem.
+
 ### Deprecated
 
 ### Removed

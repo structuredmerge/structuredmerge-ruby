@@ -8,10 +8,15 @@
 
 source 'https://gem.coop'
 
-structuredmerge_rust_dev = ENV.fetch('STRUCTUREDMERGE_RUST_DEV', '').strip
-if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredmerge_rust_dev.downcase)
-  gem 'structuredmerge-core', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
-elsif ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero?
+structuredmerge_core_dev = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', '').strip
+if !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
+  structuredmerge_core_root = if %w[true 1 yes on].include?(structuredmerge_core_dev.downcase)
+    File.join(Dir.home, 'src/my/structuredmerge/structuredmerge')
+  else
+    File.expand_path(structuredmerge_core_dev, Dir.home)
+  end
+  gem 'structuredmerge-core', path: File.join(structuredmerge_core_root, 'packages/ruby')
+elsif ENV.fetch('STRUCTUREDMERGE_CORE_PUBLISHED', 'false').casecmp('true').zero?
   # Released-package gates remain distinct from pre-publication artifact tests.
   gem 'structuredmerge-core', '~> 0.2'
 end
