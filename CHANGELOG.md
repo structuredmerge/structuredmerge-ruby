@@ -114,6 +114,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Restore Rust host declaration line ranges to exclude terminating separator newlines.
 
+- Require conflict markers or a categorized conflict diagnostic before benchmark exit status 1 can count as a conflict; startup failures remain reliability errors.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

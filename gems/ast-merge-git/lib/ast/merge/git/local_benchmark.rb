@@ -1049,7 +1049,8 @@ module Ast
             item,
             capture.fetch(:status),
             checks,
-            stderr: capture.fetch(:stderr, '')
+            stderr: capture.fetch(:stderr, ''),
+            conflict_regions: markers
           )
           eligible = item.dig('oracle', 'score_eligible') && !%w[unsupported excluded_ambiguous].include?(classified)
           {
@@ -1217,9 +1218,15 @@ module Ast
           'analyzed'
         end
 
-        def classify(item, status, checks, stderr: '')
+        def classify(item, status, checks, stderr: '', conflict_regions: [])
           expected = item.dig('expected', 'outcome')
           return 'excluded_ambiguous' if expected == 'excluded_ambiguous'
+          # Exit 1 alone also describes Ruby startup failures and other crashes.
+          # Require an emitted marker region or the portable conflict diagnostic;
+          # the expected oracle must never turn an unexplained failure into success.
+          if status == 1 && conflict_regions.empty? && !conflict_diagnostic?(stderr)
+            return 'error'
+          end
 
           if expected == 'error'
             return 'error' if status.nil?
@@ -1238,6 +1245,11 @@ module Ast
 
         def expected_error_diagnostic?(status, stderr)
           status >= 2 && /\A[^:\r\n]+: (?:destination_)?parse_error:/i.match?(stderr.to_s)
+        end
+
+        def conflict_diagnostic?(stderr)
+          # This parses a diagnostic transport header, not source syntax/ownership.
+          /\A[^:\r\n]+: merge_conflict: [^:\r\n]+: [^\r\n]+/i.match?(stderr.to_s)
         end
 
         def equivalence_checks(item, output)
@@ -1413,10 +1425,15 @@ module Ast
         def conflict_regions(output)
           ranges = []
           start_byte = nil
+          separator = false
           offset = 0
           output.each_line do |line|
-            start_byte = offset if line.start_with?('<<<<<<<')
-            if start_byte && line.start_with?('>>>>>>>')
+            if line.start_with?('<<<<<<<')
+              start_byte = offset
+              separator = false
+            end
+            separator = true if start_byte && line.start_with?('=======')
+            if start_byte && separator && line.start_with?('>>>>>>>')
               ranges << { 'start_byte' => start_byte, 'end_byte' => offset + line.bytesize }
               start_byte = nil
             end

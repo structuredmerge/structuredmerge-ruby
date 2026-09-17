@@ -211,6 +211,31 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     )
   end
 
+  it 'does not count a startup failure or an unexplained exit one as a conflict' do
+    item = benchmark.case_by_id('case.merge3.json.same-owner-conflict.v1')
+    checks = runner.send(:equivalence_checks, item, '')
+    ['', "cannot load such file -- nomono/bundler (LoadError)\n"].each do |stderr|
+      expect(runner.send(:classify, item, 1, checks, stderr: stderr)).to eq('error')
+    end
+  end
+
+  it 'requires conflict evidence independently of the expected outcome' do
+    conflict = benchmark.case_by_id('case.merge3.json.same-owner-conflict.v1')
+    clean = benchmark.case_by_id('case.merge3.json.independent-fields.v1')
+    stderr = 'typed-core: merge_conflict: merge.delete_edit: incompatible edits'
+    [conflict, clean].zip(%w[true_conflict false_conflict]).each do |item, outcome|
+      expect(runner.send(:classify, item, 1, {}, stderr: stderr)).to eq(outcome)
+      expect(runner.send(:classify, item, 1, {}, conflict_regions: [{ 'start_byte' => 0, 'end_byte' => 30 }])).to eq(outcome)
+    end
+    expect(runner.send(:classify, conflict, 2, {}, stderr: stderr)).to eq('error')
+  end
+
+  it 'does not treat incomplete marker pairs as emitted conflict regions' do
+    expect(runner.send(:conflict_regions, "<<<<<<< ours\n>>>>>>> theirs\n")).to be_empty
+    expect(runner.send(:conflict_regions, "<<<<<<< ours\n=======\n")).to be_empty
+    expect(runner.send(:conflict_regions, "<<<<<<< ours\na\n=======\nb\n>>>>>>> theirs\n").length).to eq(1)
+  end
+
   it 'does not use structural equality unless the ordered policy names the selected provider' do
     item = semantic_case('json', "{\"a\":1}\n")
     item['acceptable_equivalence'] = [{ 'class' => 'exact_bytes' }]
