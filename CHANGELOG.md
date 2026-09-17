@@ -66,6 +66,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate the opt-in Go Rust provider to typed structuredmerge-core operations with Rust-owned analysis/diffs, current-preferred source-preserving merge2, and canonical Go ownership-guard conflicts. Keep native Ruby defaults; document the intentional merge2 policy difference and test actual reordered declarations.
 
+- Migrate opt-in rust.rust to typed structuredmerge-core operations without the host prototype; expose native identities and canonical guard evidence, with explicit current-preferred directional semantics and unchanged native defaults.
+
 ### Deprecated
 
 ### Removed
