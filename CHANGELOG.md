@@ -68,6 +68,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate opt-in rust.rust to typed structuredmerge-core operations without the host prototype; expose native identities and canonical guard evidence, with explicit current-preferred directional semantics and unchanged native defaults.
 
+- Migrate opt-in rust.typescript and TSX to typed structuredmerge-core operations without the host prototype, retaining explicit grammar selection, native owner evidence and current-preferred directional semantics; native defaults remain unchanged.
+
 ### Deprecated
 
 ### Removed
