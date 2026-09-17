@@ -70,6 +70,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate opt-in rust.typescript and TSX to typed structuredmerge-core operations without the host prototype, retaining explicit grammar selection, native owner evidence and current-preferred directional semantics; native defaults remain unchanged.
 
+- Replace prototype CI builds and publication switches with verified pre-publication structuredmerge-core artifacts for current, coverage, and dependency-HEAD jobs; verify installed payloads and retain per-gem test discovery.
+
 ### Deprecated
 
 ### Removed

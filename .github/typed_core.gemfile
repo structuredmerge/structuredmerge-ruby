@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+# Pre-publication CI only. The archive is verified and installed before Bundler.
+# Published-registry installation is a separate release gate.
+gem_directory = ENV.fetch('STRUCTUREDMERGE_CI_GEM_DIR')
+eval_gemfile File.join(gem_directory, 'Gemfile')
+
+if ENV.fetch('STRUCTUREDMERGE_CI_DEP_HEADS', 'false') == 'true'
+  runtime_heads = File.join(gem_directory, 'gemfiles/modular/runtime_heads.gemfile')
+  head_names = Bundler::Dsl.new.tap { |dsl| dsl.eval_gemfile(runtime_heads) }.dependencies.map(&:name)
+  instance_variable_get(:@dependencies).reject! { |dependency| head_names.include?(dependency.name) }
+  eval_gemfile runtime_heads
+end
+
+# Core is always the exact installed artifact, never a runtime-head substitution.
+raise 'Prototype dependency is forbidden in typed-core CI' if dependencies.any? { |dependency| dependency.name == 'structuredmerge_host_prototype' }
+instance_variable_get(:@dependencies).reject! { |dependency| dependency.name == 'structuredmerge-core' }
+gem 'structuredmerge-core', "= #{ENV.fetch('STRUCTUREDMERGE_CORE_VERSION')}"
