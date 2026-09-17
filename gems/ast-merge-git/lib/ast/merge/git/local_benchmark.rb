@@ -1249,7 +1249,9 @@ module Ast
 
         def conflict_diagnostic?(stderr)
           # This parses a diagnostic transport header, not source syntax/ownership.
-          /\A[^:\r\n]+: merge_conflict: [^:\r\n]+: [^\r\n]+/i.match?(stderr.to_s)
+          # Older kernel adapters omit a separate code but still emit the
+          # explicit category. Do not reject that established wire format.
+          /\A[^:\r\n]+: merge_conflict: [^\s][^\r\n]*/i.match?(stderr.to_s)
         end
 
         def equivalence_checks(item, output)

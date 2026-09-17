@@ -116,6 +116,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Require conflict markers or a categorized conflict diagnostic before benchmark exit status 1 can count as a conflict; startup failures remain reliability errors.
 
+- Accept established categorized conflict diagnostics without a separate code field while still rejecting empty diagnostics and unexplained exit-one failures.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

@@ -225,6 +225,8 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     stderr = 'typed-core: merge_conflict: merge.delete_edit: incompatible edits'
     [conflict, clean].zip(%w[true_conflict false_conflict]).each do |item, outcome|
       expect(runner.send(:classify, item, 1, {}, stderr: stderr)).to eq(outcome)
+      expect(runner.send(:classify, item, 1, {}, stderr: 'smorg-rs: merge_conflict: both sides changed the same JSON value')).to eq(outcome)
+      expect(runner.send(:classify, item, 1, {}, stderr: "smorg-rs: merge_conflict: \n")).to eq('error')
       expect(runner.send(:classify, item, 1, {}, conflict_regions: [{ 'start_byte' => 0, 'end_byte' => 30 }])).to eq(outcome)
     end
     expect(runner.send(:classify, conflict, 2, {}, stderr: stderr)).to eq('error')
