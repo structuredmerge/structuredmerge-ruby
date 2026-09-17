@@ -72,6 +72,35 @@ The _amazing_ test matrix is powered by the kettle-dev stack.
 
 </details>
 
+## Opt-in typed Rust provider
+
+`Go::Merge::RustHostProvider` is a compatibility name for the optional
+`structuredmerge-core` adapter, not a prototype-gem dependency. It selects
+`kernel.go.owners.v1` through TreeHaver's parser registration. Rust owns analysis,
+matching, diff classification, merging and source verification. The native Ruby
+provider remains the default.
+
+The typed profile owns top-level functions. Analysis exposes kernel identities
+such as `/function:name` and native byte/line spans. Diffs include whole-document
+summaries so package/import/comment changes remain visible; these are not edit
+scripts. Full portable core records remain available under `typed_result`.
+
+Directional merge2 intentionally differs from the native Ruby incoming-preferred
+behavior: current functions and every current byte are retained, and incoming-only
+functions are inserted with native comment ranges. Additions require identical
+package/import declarations; mismatches reject rather than silently dropping
+dependencies. This is not import reconciliation, name resolution or type checking.
+Package-only directional targets are supported; unsupported declarations and
+ambiguous placement reject. Merge3 retains the existing Go membership/edit safety
+guard, with canonical whole-document conflict evidence rather than invented owner
+localization. All clean output is freshly parsed and verified.
+
+Neutral Git framing (path context, empty labels, default marker width 7) is
+accepted, but custom marker requests reject: this profile does not render markers.
+Pre-publication testing uses `gemfiles/typed_core.gemfile`, an installed core
+artifact and `STRUCTUREDMERGE_DEV` sibling wiring. Released-package CI, broader
+behavioral authority and downstream validation remain separate gates.
+
 ## ✨ Installation
 
 Install the gem and add to the application's Gemfile by executing:

@@ -64,6 +64,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate the opt-in Bash Rust provider from the prototype to typed structuredmerge-core operations, with Rust-owned analysis/diffs, current-preferred directional merge2, canonical conflicts, and source verification. Share family-aware transport projection with JSON and Git; native defaults remain unchanged.
 
+- Migrate the opt-in Go Rust provider to typed structuredmerge-core operations with Rust-owned analysis/diffs, current-preferred source-preserving merge2, and canonical Go ownership-guard conflicts. Keep native Ruby defaults; document the intentional merge2 policy difference and test actual reordered declarations.
+
 ### Deprecated
 
 ### Removed
