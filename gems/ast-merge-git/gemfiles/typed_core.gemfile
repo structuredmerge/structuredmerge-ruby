@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+source 'https://gem.coop'
+gem 'nomono', '~> 1.1', '>= 1.1.5', require: false
+require 'nomono/bundler'
+eval_nomono_gems(
+  gems: %w[ast-merge-git ast-merge tree_haver json-merge prism-merge bash-merge rbs-merge
+    rust-merge go-merge html-merge commonmarker-merge kramdown-merge markdown-merge
+    markly-merge typescript-merge zip-merge binary-merge plain-merge dotenv-merge
+    psych-merge yaml-merge citrus-toml-merge parslet-toml-merge toml-merge],
+  prefix: 'STRUCTUREDMERGE', path_env: 'STRUCTUREDMERGE_DEV',
+  root: %w[src my structuredmerge ruby gems]
+)
+gem 'structuredmerge-core', '= 0.2.0'
+gem 'tree_sitter_language_pack', '~> 1.16', '>= 1.16.2'
+gem 'kettle-test', '~> 2.0', '>= 2.0.21'
+gem 'turbo_tests2', '~> 3.2', '>= 3.2.7'
+gem 'rspec_junit_formatter'
+gem 'anonymous_loader', '~> 0.1', '>= 0.1.3'

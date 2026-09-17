@@ -1,112 +1,38 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'ast/merge'
+require 'ast/merge/typed_core_provider'
 
 module Ast
   module Merge
     module Git
-      # Explicit Git-driver provider backed by the Rust ast-merge-git crate.
-      # It is opt-in and intentionally does not replace format-native providers.
-      class RustHostProvider
+      # Compatibility name only: Rust owns merge decisions and marker rendering.
+      class RustHostProvider < Ast::Merge::TypedCoreProvider
         PROVIDER_ID = 'rust.git.json'
         FAMILY = 'json'
-        DIALECTS = %i[json jsonc json5].freeze
-
-        class << self
-          def available?
-            require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-            ::StructuredmergeHostPrototype.respond_to?(:merge_ast_merge_git_json)
-          rescue LoadError
-            false
-          end
-        end
-
-        def provider_id = PROVIDER_ID
-
-        def family = FAMILY
-
-        def capabilities
-          {
-            operations: Ast::Merge::ProviderContract::OPERATIONS,
-            dialects: DIALECTS,
-            backends: [:rust_tslp],
-            profiles: [:source_preserving],
-            role: :workflow,
-            source_preservation: %i[exact_source declaration_fragments line_provenance reparse]
-          }.freeze
-        end
-
-        def analyze(request)
-          unsupported(:analyze, request, 'Rust ast-merge-git exposes Git merge3 only.')
-        end
-
-        def diff2(request)
-          unsupported(:diff2, request, 'Rust ast-merge-git exposes Git merge3 only.')
-        end
-
-        def merge2(request)
-          unsupported(:merge2, request, 'Rust ast-merge-git exposes Git merge3 only.')
-        end
-
-        def merge3(request)
-          raw = JSON.parse(
-            host.merge_ast_merge_git_json(
-              request.fetch(:base_source),
-              request.fetch(:ours_source),
-              request.fetch(:theirs_source),
-              request.fetch(:dialect).to_s
-            )
-          )
-          conflicts = Array(raw['conflicts']).map do |conflict|
-            conflict.transform_keys(&:to_sym)
-          end
-          diagnostics = Array(raw['diagnostics']).map { |diagnostic| normalize_diagnostic(diagnostic) }
-          clean = raw['ok'] == true
-          Ast::Merge::ProviderResult.build(
-            operation: :merge3,
-            success: clean,
-            envelope: {
-              provider: { provider_id: PROVIDER_ID, family: FAMILY, backend: :rust_tslp },
-              profile: { profile_id: request[:profile_id] || :source_preserving },
-              diagnostics: diagnostics,
-              conflicts: conflicts,
-              changes: Array(raw['change_classifications']),
-              render_report: raw['render_report'] || {},
-              verification: { rust_host: true, source_preserving: true, base_participated: true }
-            },
-            output: clean ? raw['merged_source'] : nil,
-            conflicted_output: clean ? nil : raw['conflicted_source']
-          )
-        rescue KeyError, JSON::ParserError => e
-          unsupported(:merge3, request, e.message)
-        end
+        OPERATIONS = [:merge3].freeze
+        CORE_PROVIDER = 'kernel.git.json'
+        CORE_PROFILE = 'kernel.git.json.v1'
+        PACKAGE = 'ast-merge-git'
 
         private
 
-        def host
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          ::StructuredmergeHostPrototype
-        end
+        def package_version = Ast::Merge::Git::Version::VERSION
 
-        def unsupported(operation, request, message)
-          Ast::Merge::ProviderResult.build(
-            operation: operation,
-            success: false,
-            envelope: {
-              provider: { provider_id: PROVIDER_ID, family: FAMILY, backend: :rust_tslp },
-              profile: { profile_id: request[:profile_id] || :source_preserving },
-              diagnostics: [{ category: :unsupported_capability, severity: :error, message: message, blocking: true }]
-            }
-          )
-        end
+        # path_name is context, never a substitute for the explicit dialect.
+        def additional_fields = %i[path_name labels conflict_marker_size]
 
-        def normalize_diagnostic(diagnostic)
-          diagnostic.transform_keys(&:to_sym).merge(
-            category: diagnostic.fetch('category', 'unknown').to_sym,
-            severity: diagnostic.fetch('severity', 'error').to_sym,
-            blocking: diagnostic.fetch('severity', 'error') == 'error'
-          )
+        def policy(_operation, request)
+          labels = request.fetch(:labels, {})
+          raise ArgumentError, 'Git labels must be a Hash of text values' unless labels.is_a?(Hash) && labels.values.all? { |label| label.is_a?(String) }
+
+          width = request[:conflict_marker_size]
+          width = Integer(width, 10) if width.is_a?(String) # Git argv is textual.
+          raise ArgumentError, 'Git marker width must be an Integer' unless width.nil? || width.is_a?(Integer)
+
+          core::OperationPolicy.from_merge3(core::ThreeWayMergePolicy.new(
+            render_policy: 'source-preserving', fallback_policy: 'none',
+            labels: labels.transform_keys(&:to_s), conflict_marker_size: width, extra: {}))
         end
       end
     end
