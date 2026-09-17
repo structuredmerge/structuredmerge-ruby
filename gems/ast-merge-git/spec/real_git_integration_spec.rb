@@ -557,7 +557,7 @@ RSpec.describe 'ast-merge-git executable' do
   ].each do |provider|
     it "runs the explicit #{provider.fetch(:label)} selector through the installed Git-driver path" do
       # Git JSON has migrated independently; its availability proves nothing
-      # about the still-unmigrated Go/Rust/TypeScript/Bash providers.
+      # about other family providers, each of which has its own migration gate.
       family_module = Object.const_get(Ast::Merge::Git::RUST_PROVIDER_FAMILIES.fetch(provider.fetch(:family)))
       skip 'this family Rust provider is unavailable' unless family_module.const_get(:RustHostProvider).available?
 
@@ -584,6 +584,21 @@ RSpec.describe 'ast-merge-git executable' do
     end
 
     it "returns a conflict status for the explicit #{provider.fetch(:label)} selector" do
+      family_module = Object.const_get(Ast::Merge::Git::RUST_PROVIDER_FAMILIES.fetch(provider.fetch(:family)))
+      implementation = family_module.const_get(:RustHostProvider)
+      skip 'this family Rust provider is unavailable' unless implementation.available?
+
+      # Git exits 1 for both a reported conflict and a failed external driver.
+      # Prove the provider actually classified a conflict before asserting exit.
+      report = implementation.new.merge3(
+        dialect: provider.fetch(:dialect), backend: :rust_tslp,
+        base_source: provider.fetch(:conflict_base),
+        ours_source: provider.fetch(:conflict_ours),
+        theirs_source: provider.fetch(:conflict_theirs)
+      )
+      expect(report).to include(ok: false)
+      expect(report.fetch(:conflicts)).not_to be_empty
+
       path = configure_opaque_repository(
         extension: provider.fetch(:extension),
         base: provider.fetch(:conflict_base),

@@ -20,10 +20,10 @@ gemspec
 
 structuredmerge_rust_dev = ENV.fetch('STRUCTUREDMERGE_RUST_DEV', '').strip
 if !structuredmerge_rust_dev.empty? && !%w[false 0 no off].include?(structuredmerge_rust_dev.downcase)
-  gem 'structuredmerge_host_prototype', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
+  gem 'structuredmerge-core', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
 elsif ENV.fetch('STRUCTUREDMERGE_RUST_HOST_PUBLISHED', 'false').casecmp('true').zero?
-  # CI current and coverage jobs require the published Rust host gem; this fails until it is released.
-  gem 'structuredmerge_host_prototype', '~> 0.2'
+  # Released-package gate; pre-publication tests use gemfiles/typed_core.gemfile.
+  gem 'structuredmerge-core', '~> 0.2'
 end
 
 gem 'kettle-family', '~> 1.2', '>= 1.2.100'

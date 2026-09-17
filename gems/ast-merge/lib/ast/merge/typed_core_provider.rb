@@ -30,7 +30,7 @@ module Ast
       def family = self.class::FAMILY
 
       def capabilities
-        { operations: self.class::OPERATIONS, dialects: DIALECTS, backends: [:rust_tslp],
+        { operations: self.class::OPERATIONS, dialects: self.class::DIALECTS, backends: [:rust_tslp],
           profiles: [:source_preserving], role: :workflow,
           source_preservation: %i[exact_source byte_spans reparse] }.freeze
       end
@@ -50,23 +50,23 @@ module Ast
         fields = ROLES.fetch(operation).map { |role| role == :source ? :source : :"#{role}_source" }
         allowed = fields + %i[dialect provider_id family backend profile_id request_id] + additional_fields
         unless (request.keys - allowed).empty? &&
-            DIALECTS.include?(request.fetch(:dialect, :json).to_s.to_sym) &&
+            self.class::DIALECTS.include?(request.fetch(:dialect, default_dialect).to_s.to_sym) &&
             [nil, 'rust_tslp'].include?(request[:backend]&.to_s) &&
             [nil, 'source_preserving'].include?(request[:profile_id]&.to_s) &&
             [nil, provider_id].include?(request[:provider_id]) && [nil, family].include?(request[:family]&.to_s)
-          return Ast::Merge::ProviderResult.unsupported(operation: operation, message: 'Typed JSON provider cannot honor the requested fields or selectors')
+          return Ast::Merge::ProviderResult.unsupported(operation: operation, message: 'Typed provider cannot honor the requested fields or selectors')
         end
         return Ast::Merge::ProviderResult.unsupported(operation: operation, message: 'structuredmerge-core is unavailable') unless self.class.available?
 
-        dialect = request.fetch(:dialect, :json).to_s
-        parser_id = TreeHaver::Backends::RustTslp.register_language_parser(dialect == 'json' ? 'json' : 'json5')
+        dialect = request.fetch(:dialect, default_dialect).to_s
+        parser_id = TreeHaver::Backends::RustTslp.register_language_parser(parser_language(dialect))
         sources = ROLES.fetch(operation).zip(fields).to_h do |role, field|
           text = request.fetch(field)
           unless text.is_a?(String) && [Encoding::UTF_8, Encoding::US_ASCII, Encoding::ASCII_8BIT].include?(text.encoding)
-            raise ArgumentError, 'JSON source must contain UTF-8 bytes'
+            raise ArgumentError, 'Source must contain UTF-8 bytes'
           end
           text = text.dup.force_encoding(Encoding::UTF_8)
-          raise ArgumentError, 'JSON source must be valid UTF-8' unless text.valid_encoding?
+          raise ArgumentError, 'Source must be valid UTF-8' unless text.valid_encoding?
 
           text.freeze
           [role, core::OperationSource.new(source_id: role.to_s, role: role, content: text,
@@ -89,6 +89,9 @@ module Ast
       end
 
       def additional_fields = []
+      def default_dialect = self.class::DIALECTS.first
+      def parser_language(dialect) = dialect == 'json' ? 'json' : 'json5'
+      def owner_path(owner) = owner.fetch('path')
 
       def policy(operation, _request)
         case operation
@@ -113,7 +116,7 @@ module Ast
         changes = result.changes.map do |change|
           states = metadata(change.role_states)
           { id: change.id, path: change.path, subject_ref: change.subject_ref, change: change.classification.to_sym,
-            before: revision(states['before'], :before), after: revision(states['after'], :after),
+            before: revision(states['before'], :before, change.source_spans), after: revision(states['after'], :after, change.source_spans),
             source_spans: change.source_spans, metadata: metadata(change.metadata) }
         end
         diagnostics = result.diagnostics.map do |record|
@@ -133,13 +136,13 @@ module Ast
           facts = metadata(result.analysis.extra)
           payload[:analysis] = { backend: :rust_tslp, valid: true, facts: facts,
             declarations: facts.fetch('owners').map do |owner|
-              { path: owner.fetch('path'), signature: owner.fetch('path'), source_role: :source,
+              { path: owner_path(owner), signature: owner_path(owner), source_role: :source,
                 line_range: line_range(owner.fetch('span')), byte_range: owner.fetch('span').fetch('range') }
             end }
         end
         payload[:diff] = { changes: changes } if result.diff
         projected = Ast::Merge::ProviderResult.build(operation: operation, success: result.ok,
-          envelope: { provider: { provider_id: provider_id, family: family, dialect: request.fetch(:dialect, :json),
+          envelope: { provider: { provider_id: provider_id, family: family, dialect: request.fetch(:dialect, default_dialect),
             backend: :rust_tslp, package: self.class::PACKAGE, package_version: package_version },
             profile: { profile_id: :source_preserving, core_profile_id: result.profile.profile_id },
             diagnostics: diagnostics, changes: changes, conflicts: conflicts,
@@ -169,10 +172,18 @@ module Ast
         end
       end
 
-      def revision(state, role)
+      def revision(state, role, source_spans)
         return { present: false, source_role: role, line_range: [nil, nil] } unless state
 
-        span = state.fetch('owner', state).fetch('span')
+        span = state.fetch('owner', state)['span']
+        unless span
+          # Native-owner diffs carry regions rather than JSON owner records.
+          # Line points come from the kernel's typed span, never host text scans.
+          typed = source_spans.fetch(role)
+          span = { 'range' => { 'start_byte' => typed.range.start_byte, 'end_byte' => typed.range.end_byte },
+            'start_point' => { 'row' => typed.start_point.row, 'column' => typed.start_point.column },
+            'end_point' => { 'row' => typed.end_point.row, 'column' => typed.end_point.column } }
+        end
         { present: true, source_role: role, line_range: line_range(span), byte_range: span.fetch('range') }
       end
 

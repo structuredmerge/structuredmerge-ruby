@@ -111,6 +111,30 @@ The _amazing_ test matrix is powered by the kettle-dev stack.
 
 </details>
 
+## Opt-in typed Rust provider
+
+`Bash::Merge::RustHostProvider` is a compatibility name for the optional
+`structuredmerge-core` adapter, not a dependency on the old prototype gem.
+It selects `kernel.bash.owners.v1` through TreeHaver's Rust TSLP registration.
+Rust owns analysis, owner matching, diff classification and merge decisions.
+The existing native Ruby provider remains the default.
+
+The typed subset covers top-level functions, assignments and literal-title
+test-harness commands. Analysis exposes kernel owner identities and native spans;
+diffs include whole-document summaries for trivia changes (not edit scripts).
+Directional merge2 retains current owners and inserts incoming-only owners;
+it no longer fabricates a base or replaces current edits with template edits.
+Unsupported syntax or ambiguous insertion placement fails closed. Merge3 retains
+canonical conflict evidence, and clean output is freshly parsed and verified.
+Complete typed records remain available under `typed_result`; semantic comment
+attachment and full Bash-language authority are not claimed.
+
+Git path context, empty labels and default marker width 7 are accepted. This
+profile does not render conflict markers; custom labels or widths are rejected.
+Pre-publication tests use `gemfiles/typed_core.gemfile` with an installed core
+artifact and `STRUCTUREDMERGE_DEV` sibling wiring. Released-package CI remains
+a separate gate; do not install or publish the prototype to satisfy it.
+
 ## ✨ Installation
 
 Install the gem and add to the application's Gemfile by executing:

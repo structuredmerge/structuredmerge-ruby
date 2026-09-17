@@ -62,6 +62,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Migrate the opt-in Ruby Git JSON provider to typed structuredmerge-core operations, preserve canonical conflict/render evidence and Git write policies, and advertise only implemented operations through the shared provider contract.
 
+- Migrate the opt-in Bash Rust provider from the prototype to typed structuredmerge-core operations, with Rust-owned analysis/diffs, current-preferred directional merge2, canonical conflicts, and source verification. Share family-aware transport projection with JSON and Git; native defaults remain unchanged.
+
 ### Deprecated
 
 ### Removed
