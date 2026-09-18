@@ -76,6 +76,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Replace obsolete prototype development switches with explicit typed-core source and registry switches in migrated consumers, and remove unused prototype dependencies from YAML, Markdown, and Kettle Jem.
 
+- Require the independently packaged Psych provider to pass installed Ruby kernel gates before exporting the CI core artifact; retain evidence and clean disposable compiler output.
+
 ### Deprecated
 
 ### Removed

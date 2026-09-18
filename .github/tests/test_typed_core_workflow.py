@@ -45,6 +45,43 @@ class TypedCoreWorkflowTest(unittest.TestCase):
                 self.assertIn("${{ matrix.gem }}/ci_core.gemfile", job["env"]["BUNDLE_GEMFILE"])
                 self.assertEqual(job["env"]["STRUCTUREDMERGE_CI_DEP_HEADS"], str(name == "dep-heads").lower())
 
+    def test_native_provider_is_packaged_from_candidate_and_required_before_export(self):
+        job = self.workflow["jobs"]["typed-core"]
+        steps = job["steps"]
+        candidate = next(i for i, step in enumerate(steps) if step["name"] == "Checkout Ruby provider candidate")
+        self.assertEqual(steps[candidate]["with"]["path"], "native-ruby")
+        self.assertNotIn("ref", steps[candidate]["with"])
+        build = next(i for i, step in enumerate(steps) if "rake compile" in step.get("run", ""))
+        package = next(i for i, step in enumerate(steps) if "Gem::Package.build" in step.get("run", ""))
+        verify = next(i for i, step in enumerate(steps) if "--provider-gem" in step.get("run", ""))
+        export = next(i for i, step in enumerate(steps) if step["name"] == "Upload typed core export")
+        self.assertLess(candidate, package)
+        self.assertLess(build, verify)
+        self.assertLess(package, verify)
+        self.assertLess(verify, export)
+        self.assertEqual(steps[package]["working-directory"], "native-ruby/gems/psych-merge")
+        self.assertIn("core_parser_host.rb", steps[package]["run"])
+        self.assertEqual(steps[verify]["working-directory"], "kernel")
+        self.assertNotIn("if", steps[verify])
+        self.assertNotIn("continue-on-error", steps[verify])
+        self.assertIn("set -euo pipefail", steps[verify]["run"])
+        self.assertIn("ulimit -c 0", steps[verify]["run"])
+        self.assertNotIn("gem push", json.dumps(job))
+
+    def test_native_job_preserves_evidence_and_cleans_only_its_compiler_target(self):
+        job = self.workflow["jobs"]["typed-core"]
+        self.assertEqual(job["env"]["CARGO_BUILD_JOBS"], "1")
+        self.assertEqual(job["env"]["CARGO_INCREMENTAL"], "0")
+        self.assertEqual(job["env"]["CARGO_PROFILE_DEV_DEBUG"], "0")
+        self.assertTrue(job["env"]["CARGO_TARGET_DIR"].endswith("/kernel/tmp/typed-core-target"))
+        evidence = next(step for step in job["steps"] if step["name"] == "Upload native-provider evidence")
+        self.assertEqual(evidence["if"], "always()")
+        self.assertIn("failure.json", evidence["with"]["path"])
+        cleanup = job["steps"][-1]
+        self.assertEqual(cleanup["if"], "always()")
+        self.assertEqual(cleanup["run"].count("rm -r --"), 1)
+        self.assertIn("rm -r -- kernel/tmp/typed-core-target", cleanup["run"])
+
     def test_obsolete_producer_and_publication_switch_are_absent(self):
         text = json.dumps(self.workflow)
         for obsolete in ["rust-host", "structuredmerge-rust", "structuredmerge_host_prototype",

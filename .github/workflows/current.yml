@@ -189,7 +189,19 @@ jobs:
     needs: detect
     if: ${{ needs.detect.outputs.count != '0' && needs.detect.outputs.release_mode == '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CARGO_BUILD_JOBS: "1"
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_PROFILE_TEST_DEBUG: "0"
+      CARGO_TARGET_DIR: ${{ github.workspace }}/kernel/tmp/typed-core-target
     steps:
+      - name: Checkout Ruby provider candidate
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          path: native-ruby
+          persist-credentials: false
       - name: Checkout kernel HEAD
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -214,11 +226,51 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          ulimit -c 0
+          mkdir -p ../../tmp
+          export TMPDIR="${GITHUB_WORKSPACE}/kernel/tmp"
           bundle install --jobs 4 --retry 8
           bundle exec rake compile
           bundle exec ruby ../../workspace-scripts/check_core_ruby_artifact.rb --package-only ../../tmp/core-export
           cp ../../workspace-scripts/verify_core_ruby_export.rb ../../tmp/core-export/
           git -C ../.. rev-parse HEAD > ../../tmp/core-export/kernel-revision.txt
+      - name: Package candidate Psych provider without publication
+        working-directory: native-ruby/gems/psych-merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          mkdir -p "${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+          ruby -rrubygems/package -e '
+            spec = Gem::Specification.load("psych-merge.gemspec")
+            abort "unexpected provider gem" unless spec && spec.name == "psych-merge"
+            abort "typed parser host missing" unless spec.files.include?("lib/psych/merge/core_parser_host.rb")
+            destination = File.join(ARGV.fetch(0), "#{spec.full_name}.gem")
+            abort "refusing to overwrite provider archive" if File.exist?(destination)
+            Gem::Package.build(spec, false, false, destination)
+          ' "${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+      - name: Verify candidate through full installed Ruby kernel gates
+        working-directory: kernel
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          export TMPDIR="${GITHUB_WORKSPACE}/kernel/tmp"
+          mapfile -t providers < <(find tmp/psych-provider -maxdepth 1 -name '*.gem' -print)
+          test "${#providers[@]}" -eq 1
+          ruby workspace-scripts/check_core_ruby_artifact.rb --provider-gem "${providers[0]}" 2>&1 | tee tmp/psych-native-provider.log
+      - name: Upload native-provider evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: psych-native-provider-head
+          path: |
+            kernel/tmp/psych-native-provider.log
+            kernel/tmp/core-ruby-artifact-*/report.json
+            kernel/tmp/core-ruby-artifact-*/failure.json
+            kernel/tmp/core-ruby-artifact-*/Gemfile.lock
+          if-no-files-found: warn
+          retention-days: 7
       - name: Upload typed core export
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -226,6 +278,13 @@ jobs:
           path: kernel/tmp/core-export/*
           if-no-files-found: error
           retention-days: 7
+      - name: Remove disposable compiler output
+        if: always()
+        shell: bash
+        run: |
+          if [ -d kernel/tmp/typed-core-target ]; then
+            rm -r -- kernel/tmp/typed-core-target
+          fi
 
   dep-heads:
     name: Deps @ HEAD (${{ matrix.gem }})
