@@ -119,6 +119,43 @@ The _amazing_ test matrix is powered by the kettle-dev stack.
 
 </details>
 
+## Optional typed-kernel parser host (development)
+
+The explicit `psych/merge/core_parser_host` entry point supplies native syntax
+facts to the generated `structuredmerge-core` 0.2.0 development artifact. It does
+not load a kernel test helper or implement merge semantics. This integration is
+not yet published. Declare the separately installed core and `psych ~> 5.5.0`
+in the application's bundle; requiring the ordinary `psych/merge` entry point
+does not load the core or register this host.
+
+```ruby
+require 'psych/merge/core_parser_host'
+
+core = StructuredmergeCore
+host = Psych::Merge::CoreParserHost.new
+core.register_parser_host(host)
+# Select parser backend ruby.psych and provider kernel.yaml explicitly in a
+# typed OperationRequest, using profile kernel.yaml.native_mapping.v1.
+# Rust owns analysis, diff2, merge3, conflicts and source-preserving rendering.
+# The application owns registration lifetime:
+core.unregister_parser_host('ruby.psych')
+```
+
+Only the tested Psych 5.5.x series is accepted by this optional provider. Psych
+5.3.1 rejects the valid BOM/Unicode fixture even without the kernel loaded; an
+unverified version is reported unavailable rather than rewriting the input or
+silently selecting another parser. Native extensions are opt-in. Original UTF-8
+bytes, optional BOM, LF/CRLF, multibyte positions and absent final newline are
+retained. Bare CR, invalid UTF-8, comments/token-stream requests and unsupported
+languages/dialects fail explicitly. Syntax error messages do not copy source.
+The kernel's profile still determines which YAML structures are supported;
+this adapter does not add merge2, automatic discovery or default authority.
+
+The installed-artifact spec is `spec/integration/core_parser_host_spec.rb`.
+Set `STRUCTUREDMERGE_TYPED_PSYCH_TEST=true` in its artifact bundle to make missing
+core/Psych prerequisites fail instead of skipping this optional integration.
+It verifies that both provider and core came from that job's installed gem home.
+
 ## ✨ Installation
 
 Install the gem and add to the application's Gemfile by executing:

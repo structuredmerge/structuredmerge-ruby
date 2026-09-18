@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an opt-in Rust-backed Bash provider for top-level function merges.
 
+- Add an explicitly registered typed ParserHost for the optional generated kernel integration, using Psych 5.5.x native facts while retaining Rust-owned YAML semantics and exact source bytes.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.
