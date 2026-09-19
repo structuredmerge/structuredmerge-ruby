@@ -78,6 +78,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Require the independently packaged Psych provider to pass installed Ruby kernel gates before exporting the CI core artifact; retain evidence and clean disposable compiler output.
 
+- Align typed Git integration coverage with source-backed absent-owner conflict review: write review markers with conflict status while preserving leave-ours and invalid-input behavior.
+
 ### Deprecated
 
 ### Removed

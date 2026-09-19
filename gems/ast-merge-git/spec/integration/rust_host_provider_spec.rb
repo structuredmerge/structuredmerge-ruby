@@ -105,7 +105,7 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
     end
   end
 
-  it 'keeps ours untouched for leave-ours, unrenderable conflicts, and invalid input' do
+  it 'keeps ours untouched for leave-ours and invalid input' do
     require 'tmpdir'
     scratch = Pathname(__dir__).join('../../tmp')
     FileUtils.mkdir_p(scratch)
@@ -113,7 +113,6 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
       paths = %w[base ours theirs].map { |role| Pathname(directory).join("#{role}.json") }
       [
         ['{"x":0}', '{"x":1}', '{"x":2}', :leave_ours, 1],
-        ['{"x":0}', '{}', '{"x":2}', :write, 2],
         ['{"x":0}', '{}', '{"x":2}', :leave_ours, 1],
         ['{}', '{', '{}', :write, 2]
       ].each do |base, ours, theirs, policy, exit_code|
@@ -123,6 +122,26 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
         expect(result.fetch(:git)).to include(exit_code: exit_code, output_written: false)
         expect(paths[1].binread).to eq(ours)
       end
+    end
+  end
+
+  it 'writes an absent-owner review block without claiming a resolved merge' do
+    require 'tmpdir'
+    scratch = Pathname(__dir__).join('../../tmp')
+    FileUtils.mkdir_p(scratch)
+    Dir.mktmpdir('typed-git-absent-owner-', scratch) do |directory|
+      paths = %w[base ours theirs].map { |role| Pathname(directory).join("#{role}.json") }
+      paths.zip(['{"x":0}', '{}', '{"x":2}']).each { |path, text| path.binwrite(text) }
+      result = Ast::Merge::Git.merge_files(**request_base, provider_id: 'rust.git.json',
+        base_path: paths[0], ours_path: paths[1], theirs_path: paths[2], conflict_policy: :write)
+
+      expect(result.fetch(:git)).to include(exit_code: 1, output_written: true)
+      expect(result[:ok]).to be(false)
+      expect(result[:output]).to be_nil
+      expect(result.fetch(:verification)[:output_reparsed]).to be_nil
+      expect(result.fetch(:render_report)).to include('artifact_kind' => 'unresolved-conflict-review')
+      expect(paths[1].binread).to eq("{}\n<<<<<<< ours\n||||||| base\n{\"x\":0}\n=======\n{\"x\":2}\n>>>>>>> theirs\n")
+      expect(paths[1].binread).to eq(result.fetch(:conflicted_output))
     end
   end
 
