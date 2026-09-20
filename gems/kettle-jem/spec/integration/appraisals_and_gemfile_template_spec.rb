@@ -949,6 +949,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     framework_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/framework-ci.yml.example"))
 
     expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(current_workflow).to include("runs-on: ${{ matrix.os }}")
+    expect(current_workflow).to include("appraisal: \"current\"\n            os: ubuntu-latest")
+    expect(current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
+    expect(current_workflow).to include("appraisal: \"current\"\n            os: windows-latest")
+    expect(current_workflow).not_to include("appraisal: \"unlocked_deps\"\n            os: windows-latest")
+    expect(current_workflow).not_to include("runner.os != 'Windows'")
     expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'feature/release')")
