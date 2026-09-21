@@ -41,13 +41,13 @@ module TreeHaver
 
         def register_language_host(language)
           return unless available?
-          return unless ::StructuredmergeHostPrototype.respond_to?(:registered_parser_hosts)
-          return unless ::StructuredmergeHostPrototype.respond_to?(:register_tslp_parser_host)
+          return unless ::StructuredmergeCore.respond_to?(:registered_parser_hosts)
+          return unless ::StructuredmergeCore.respond_to?(:register_tslp_parser_host)
 
           provider_name = "tree_haver.rust_tslp.#{language}"
-          return provider_name if ::StructuredmergeHostPrototype.registered_parser_hosts.include?(provider_name)
+          return provider_name if ::StructuredmergeCore.registered_parser_hosts.include?(provider_name)
 
-          ::StructuredmergeHostPrototype.register_tslp_parser_host(provider_name, language.to_s)
+          ::StructuredmergeCore.register_tslp_parser_host(provider_name, language.to_s)
           provider_name
         end
 
@@ -60,8 +60,8 @@ module TreeHaver
             return false
           end
 
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          unless ::StructuredmergeHostPrototype.respond_to?(:parse_normalized_with_tslp)
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          unless ::StructuredmergeCore.respond_to?(:parse_normalized_with_tslp)
             @unavailable_reason = 'the Rust TreeHaver host does not expose normalized TSLP parsing'
             return false
           end
@@ -99,7 +99,7 @@ module TreeHaver
 
           normalized_source = normalize_source_encoding(source)
           result = JSON.parse(
-            ::StructuredmergeHostPrototype.parse_normalized_with_tslp(
+            ::StructuredmergeCore.parse_normalized_with_tslp(
               language.name.to_s,
               normalized_source,
               language.name.to_s

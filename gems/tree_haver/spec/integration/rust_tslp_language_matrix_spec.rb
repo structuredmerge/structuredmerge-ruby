@@ -35,7 +35,7 @@ RSpec.describe 'Rust TSLP language matrix' do
         incremental: false,
         provenance: :rust_tree_haver
       )
-      expect(StructuredmergeHostPrototype.registered_parser_hosts)
+      expect(StructuredmergeCore.registered_parser_hosts)
         .to include("tree_haver.rust_tslp.#{language}")
     end
   end

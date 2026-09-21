@@ -49,8 +49,8 @@ RSpec.describe TreeHaver::Backends::RustTslp do
   end
 
   before do
-    stub_const('StructuredmergeHostPrototype', Module.new)
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
+    stub_const('StructuredmergeCore', Module.new)
+    allow(StructuredmergeCore).to receive(:parse_normalized_with_tslp)
       .with('json', source, 'json')
       .and_return(JSON.generate(result))
     described_class.reset!
@@ -86,7 +86,7 @@ RSpec.describe TreeHaver::Backends::RustTslp do
 
   it 'uses a full parse for parse_string and does not retain incremental edit state' do
     next_source = "{\n  \"answer\": 43\n}\n"
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
+    allow(StructuredmergeCore).to receive(:parse_normalized_with_tslp)
       .with('json', next_source, 'json')
       .and_return(JSON.generate(result.merge(
         'nodes' => result.fetch('nodes').map do |node|
@@ -146,7 +146,7 @@ RSpec.describe TreeHaver::Backends::RustTslp do
         node.merge('role' => node.fetch('kind') == 'object' ? 'error' : node.fetch('role'))
       end
     )
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
+    allow(StructuredmergeCore).to receive(:parse_normalized_with_tslp)
       .with('json', source, 'json')
       .and_return(JSON.generate(malformed))
 
@@ -185,7 +185,7 @@ RSpec.describe TreeHaver::Backends::RustTslp do
       ],
       'root_id' => 'tslp:json:0'
     )
-    allow(StructuredmergeHostPrototype).to receive(:parse_normalized_with_tslp)
+    allow(StructuredmergeCore).to receive(:parse_normalized_with_tslp)
       .with('json', comment_source, 'json')
       .and_return(JSON.generate(commented))
 

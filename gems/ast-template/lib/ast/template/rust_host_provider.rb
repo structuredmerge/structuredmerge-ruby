@@ -11,8 +11,8 @@ module Ast
 
       class << self
         def available?
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          ::StructuredmergeHostPrototype.respond_to?(:report_ast_template_json)
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          ::StructuredmergeCore.respond_to?(:report_ast_template_json)
         rescue LoadError
           false
         end
@@ -43,8 +43,8 @@ module Ast
       private
 
       def host
-        require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-        ::StructuredmergeHostPrototype
+        require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+        ::StructuredmergeCore
       end
     end
   end

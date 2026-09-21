@@ -11,9 +11,9 @@ module Ast
 
       class << self
         def available?
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          ::StructuredmergeHostPrototype.respond_to?(:report_ast_crispr_json) &&
-            ::StructuredmergeHostPrototype.respond_to?(:apply_ast_crispr_source_edits_json)
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          ::StructuredmergeCore.respond_to?(:report_ast_crispr_json) &&
+            ::StructuredmergeCore.respond_to?(:apply_ast_crispr_source_edits_json)
         rescue LoadError
           false
         end
@@ -34,7 +34,7 @@ module Ast
       def report(request)
         raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
 
-        JSON.parse(StructuredmergeHostPrototype.report_ast_crispr_json(JSON.generate(request)))
+        JSON.parse(StructuredmergeCore.report_ast_crispr_json(JSON.generate(request)))
       rescue JSON::ParserError => e
         raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}", code: 'ast_crispr_rust_host_invalid_response')
       end
@@ -42,7 +42,7 @@ module Ast
       def apply_source_edits(request)
         raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
 
-        JSON.parse(StructuredmergeHostPrototype.apply_ast_crispr_source_edits_json(JSON.generate(request)))
+        JSON.parse(StructuredmergeCore.apply_ast_crispr_source_edits_json(JSON.generate(request)))
       rescue JSON::ParserError => e
         raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}", code: 'ast_crispr_rust_host_invalid_response')
       end

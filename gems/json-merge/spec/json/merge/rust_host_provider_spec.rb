@@ -45,8 +45,8 @@ RSpec.describe Json::Merge::RustHostProvider do
   end
 
   it 'maps the Rust host analysis and source-preserving merge envelopes' do
-    stub_const('StructuredmergeHostPrototype', Module.new)
-    allow(StructuredmergeHostPrototype).to receive(:parse_json_analysis)
+    stub_const('StructuredmergeCore', Module.new)
+    allow(StructuredmergeCore).to receive(:parse_json_analysis)
       .and_return(JSON.generate(
                     'ok' => true,
                     'analysis' => {
@@ -60,9 +60,9 @@ RSpec.describe Json::Merge::RustHostProvider do
                     },
                     'diagnostics' => []
                   ))
-    allow(StructuredmergeHostPrototype).to receive(:merge_json_two_way)
+    allow(StructuredmergeCore).to receive(:merge_json_two_way)
       .and_return(JSON.generate('ok' => true, 'output' => '{"answer": 42}\n', 'diagnostics' => []))
-    allow(StructuredmergeHostPrototype).to receive(:merge_json_three_way)
+    allow(StructuredmergeCore).to receive(:merge_json_three_way)
       .and_return(JSON.generate('outcome' => 'clean', 'output' => '{"answer": 42}\n', 'diagnostics' => []))
 
     analysis = provider.analyze(source: '{"answer": 42}\n', dialect: :json)

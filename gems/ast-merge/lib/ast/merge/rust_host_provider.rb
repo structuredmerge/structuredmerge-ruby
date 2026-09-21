@@ -11,8 +11,8 @@ module Ast
     class RustHostProvider
       class << self
         def available?(required_methods = [])
-          require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-          required_methods.all? { |method_name| ::StructuredmergeHostPrototype.respond_to?(method_name) }
+          require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+          required_methods.all? { |method_name| ::StructuredmergeCore.respond_to?(method_name) }
         rescue LoadError
           false
         end
@@ -143,8 +143,8 @@ module Ast
       private
 
       def host
-        require 'structuredmerge_host_prototype' unless defined?(::StructuredmergeHostPrototype)
-        ::StructuredmergeHostPrototype
+        require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+        ::StructuredmergeCore
       end
 
       def call_host(operation, *args)

@@ -381,7 +381,7 @@ module TreeHaver
 
     def language_pack_registration
       if TreeHaver.effective_backend == :rust_tslp
-        [TreeHaver::Backends::RustTslp, :rust_tslp, 'structuredmerge_host_prototype']
+        [TreeHaver::Backends::RustTslp, :rust_tslp, 'structuredmerge_core']
       else
         [TreeHaver::Backends::Tslp, :tslp, 'tree_sitter_language_pack']
       end
