@@ -20034,7 +20034,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: appraisal-rb/setup-ruby-flash@f15d6abac61046b9b66778f8b5e96ee0d8917353 # v2.2
+          uses: appraisal-rb/setup-ruby-flash@b641b47cb7dfc09b0c2ee87284f9b4e31aa7d58f # v2.6
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -20146,7 +20146,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: appraisal-rb/setup-ruby-flash@f15d6abac61046b9b66778f8b5e96ee0d8917353 # v2.2",
+        "        uses: appraisal-rb/setup-ruby-flash@b641b47cb7dfc09b0c2ee87284f9b4e31aa7d58f # v2.6",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -20309,7 +20309,7 @@ module Kettle
         steps << <<~YAML
           - name: Upload coverage to CodeCov
             if: ${{ !env.ACT }}
-            uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+            uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
             with:
               use_oidc: true
               disable_search: true
@@ -20589,19 +20589,19 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@f15d6abac61046b9b66778f8b5e96ee0d8917353 # v2.2",
-        "ruby/setup-ruby" => "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
+        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@b641b47cb7dfc09b0c2ee87284f9b4e31aa7d58f # v2.6",
+        "ruby/setup-ruby" => "ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
-        "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0",
+        "codecov/codecov-action" => "codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5",
         "actions/upload-artifact" => "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1",
         "amancevice/setup-code-climate" => "amancevice/setup-code-climate@0daf2985a225e8ac15975b4d233010e94d65b76a # v2",
         "actions/dependency-review-action" => "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0",
-        "github/codeql-action/init" => "github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0",
-        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0",
-        "github/codeql-action/analyze" => "github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0",
+        "github/codeql-action/init" => "github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1",
+        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1",
+        "github/codeql-action/analyze" => "github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1",
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@af6beea6bdf1e8eb373f061c5bc168681fc6d011 # v4.0.1",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@a196742f472feaffafea537ce5a2a4c3c53a8de4 # v0.9.0",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0"
