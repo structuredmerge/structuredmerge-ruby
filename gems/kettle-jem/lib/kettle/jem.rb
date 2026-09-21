@@ -58,7 +58,7 @@ module Kettle
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.5"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.0"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.1"], bootstrap: true},
       {
         name: "kettle-changelog",
         requirements: ["~> 1.0", ">= 1.0.7"],
@@ -5556,15 +5556,15 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.4"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.0"\n)},
-        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.1"\n)},
+        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.14"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.1"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.22"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.9"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.9"\n)}
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.10"\n)}
       ].freeze
     end
 
