@@ -363,7 +363,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
           K_SOUP_COV_MIN_LINE = "92"
 
           [tools]
-          ruby = "4.0.6"
+          ruby = "4.0.7"
         TOML
       })
 

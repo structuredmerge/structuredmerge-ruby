@@ -277,7 +277,7 @@ RSpec.describe Toml::Merge do
       path = ["exe", "bin"]
 
       [tools]
-      ruby = "4.0.6"
+      ruby = "4.0.7"
     TOML
 
     analysis = described_class::FileAnalysis.new(source)
@@ -296,7 +296,7 @@ RSpec.describe Toml::Merge do
     )
     expect(table_fragments).to eq(
       'env' => "[env]\nproject = \"kettle-jem\"\npath = [\"exe\", \"bin\"]",
-      'tools' => "[tools]\nruby = \"4.0.6\""
+      'tools' => "[tools]\nruby = \"4.0.7\""
     )
   end
 
