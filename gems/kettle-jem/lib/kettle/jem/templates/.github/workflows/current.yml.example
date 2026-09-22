@@ -40,19 +40,19 @@ jobs:
           - ruby: "ruby"
             appraisal: "current"
             os: ubuntu-latest
-            exec_cmd: "{KJ|CI:EXEC_CMD}"
+            exec_cmd: "ruby -S {KJ|CI:EXEC_CMD}"
             rubygems: latest
             bundler: latest
           - ruby: "ruby"
             appraisal: "current"
             os: macos-latest
-            exec_cmd: "{KJ|CI:EXEC_CMD}"
+            exec_cmd: "ruby -S {KJ|CI:EXEC_CMD}"
             rubygems: latest
             bundler: latest
           - ruby: "ruby"
             appraisal: "current"
             os: windows-latest
-            exec_cmd: "{KJ|CI:EXEC_CMD}"
+            exec_cmd: "ruby -S {KJ|CI:EXEC_CMD}"
             rubygems: latest
             bundler: latest
 
