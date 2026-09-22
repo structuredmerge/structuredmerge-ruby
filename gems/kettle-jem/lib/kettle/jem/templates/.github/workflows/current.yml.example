@@ -96,4 +96,4 @@ jobs:
             rspec-status-current-${{matrix.os}}-${{matrix.ruby}}-${{matrix.appraisal}}-
 
       - name: Tests for ${{ matrix.os }} ${{ matrix.ruby }} via ${{ matrix.exec_cmd }}
-        run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
+        run: bundle exec appraisal ${{ matrix.appraisal }} ${{ matrix.exec_cmd }}
