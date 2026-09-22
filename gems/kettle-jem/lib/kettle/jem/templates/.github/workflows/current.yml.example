@@ -96,4 +96,11 @@ jobs:
             rspec-status-current-${{matrix.os}}-${{matrix.ruby}}-${{matrix.appraisal}}-
 
       - name: Tests for ${{ matrix.os }} ${{ matrix.ruby }} via ${{ matrix.exec_cmd }}
+        if: matrix.os != 'windows-latest'
         run: bundle exec appraisal ${{ matrix.appraisal }} ${{ matrix.exec_cmd }}
+
+      - name: Tests for windows-latest ${{ matrix.ruby }} via ruby bin/kettle-test
+        if: matrix.os == 'windows-latest'
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/current.gemfile
+        run: ruby bin/kettle-test
