@@ -40,12 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - turbo_tests2 (>= 3.2.9 -> >= 3.2.10)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - appraisal-rb/setup-ruby-flash v2.1 (925395edf973d2dc0a629919f407f3547a03d4b5) -> v2.6 (b641b47cb7dfc09b0c2ee87284f9b4e31aa7d58f)
-  - codecov/codecov-action v7.0.0 (fb8b3582c8e4def4969c97caa2f19720cb33a72f) -> v7.1.1 (303a32d7a59b442fa8d48b6a1cc6825c09c847a5)
-  - github/codeql-action/analyze v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63) -> v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd)
-  - github/codeql-action/autobuild v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63) -> v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd)
-  - github/codeql-action/init v4.38.0 (b96794f015dfd88f77b49b1c93e0fa7110f94c63) -> v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd)
-  - ruby/setup-ruby v1.321.0 (95ef2b042f9d7a56d8268cba8559e2842e2ad01b) -> v1.324.0 (a0102e0972be65f351c307e2d64b9314a57c8073)
+  - appraisal-rb/setup-ruby-flash v2.1 (925395edf973d2dc0a629919f407f3547a03d4b5) -> v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a)
+  - ruby/setup-ruby v1.321.0 (95ef2b042f9d7a56d8268cba8559e2842e2ad01b) -> v1.325.0 (e8944e80fb94b20106697132f8c20c665fab29e9)
 
 ### Deprecated
 
