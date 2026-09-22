@@ -52,7 +52,7 @@ jobs:
           - ruby: "ruby"
             appraisal: "current"
             os: windows-latest
-            exec_cmd: "ruby -e \"load Gem.bin_path('kettle-test', 'kettle-test')\""
+            exec_cmd: "ruby bin/kettle-test"
             rubygems: latest
             bundler: latest
 
