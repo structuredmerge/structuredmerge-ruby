@@ -2,16 +2,17 @@
   ".simplecov:852812133": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:4140725214": [
+  "Rakefile:723149272": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
     [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "ast-crispr-ruby-prism.gemspec:828317446": [
-    [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
-    [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
-    [149, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
+  "ast-crispr-ruby-prism.gemspec:138228998": [
+    [138, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
+    [140, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 2105564149],
+    [149, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
+    [150, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -56,6 +57,9 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/ostruct/r4/v0.6.gemfile:2083919651": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
+  ],
   "gemfiles/modular/rspec.gemfile:2263543889": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
@@ -79,7 +83,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/x_std_libs.gemfile:2324400122": [
+  "gemfiles/modular/x_std_libs.gemfile:3163909001": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
@@ -88,7 +92,7 @@
   "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/r4/libs.gemfile:732451732": [
+  "gemfiles/modular/x_std_libs/r4/libs.gemfile:1427643281": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
   "gemfiles/modular/x_std_libs/vHEAD.gemfile:2390363993": [
@@ -98,28 +102,35 @@
   "lib/ast-crispr-ruby-prism.rb:327894621": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`ast-crispr-ruby-prism.rb`) should use snake_case.", 5381]
   ],
-  "lib/ast/crispr/ruby/prism.rb:3526659119": [
-    [10, 7, 12, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Ruby::Prism`.", 2860768938],
-    [13, 9, 12, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Ruby::Prism::Utils`.", 2857494984],
-    [25, 9, 13, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Ruby::Prism::Adapter`.", 2579377404],
-    [62, 11, 901, "Metrics/MethodLength: Method has too many lines. [18/10]", 3779252009],
-    [84, 9, 16, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Ruby::Prism::Selectors`.", 2133324825],
-    [100, 11, 640, "Metrics/MethodLength: Method has too many lines. [11/10]", 2463541954],
-    [100, 41, 180, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 4151508598],
-    [115, 11, 3285, "Metrics/AbcSize: Assignment Branch Condition size for `comment_line_block` is too high. [<14, 47, 23> 54.17/17]", 880218168],
-    [115, 11, 3285, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `comment_line_block` is too high. [18/7]", 880218168],
-    [115, 11, 3285, "Metrics/MethodLength: Method has too many lines. [62/10]", 880218168],
-    [115, 11, 3285, "Metrics/PerceivedComplexity: Perceived complexity for `comment_line_block` is too high. [18/8]", 880218168],
-    [115, 33, 148, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 4247948333],
-    [127, 23, 2581, "Metrics/BlockLength: Block has too many lines. [49/25]", 2576202082]
+  "lib/ast/crispr/ruby/prism.rb:1436264249": [
+    [11, 7, 12, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Ruby::Prism`.", 2860768938],
+    [14, 9, 12, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Ruby::Prism::Utils`.", 2857494984],
+    [26, 9, 13, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Ruby::Prism::Adapter`.", 2579377404],
+    [35, 11, 565, "Metrics/MethodLength: Method has too many lines. [11/10]", 4229228195],
+    [49, 11, 707, "Metrics/MethodLength: Method has too many lines. [13/10]", 3022584938],
+    [70, 11, 1225, "Metrics/MethodLength: Method has too many lines. [25/10]", 2223298771],
+    [123, 9, 16, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Ruby::Prism::Selectors`.", 2133324825],
+    [139, 11, 640, "Metrics/MethodLength: Method has too many lines. [11/10]", 2463541954],
+    [139, 41, 180, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 4151508598],
+    [154, 11, 3285, "Metrics/AbcSize: Assignment Branch Condition size for `comment_line_block` is too high. [<14, 47, 23> 54.17/17]", 880218168],
+    [154, 11, 3285, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `comment_line_block` is too high. [18/7]", 880218168],
+    [154, 11, 3285, "Metrics/MethodLength: Method has too many lines. [62/10]", 880218168],
+    [154, 11, 3285, "Metrics/PerceivedComplexity: Perceived complexity for `comment_line_block` is too high. [18/8]", 880218168],
+    [154, 33, 148, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 4247948333],
+    [166, 23, 2581, "Metrics/BlockLength: Block has too many lines. [49/25]", 2576202082]
   ],
-  "spec/ast/crispr/ruby/prism_spec.rb:2051561249": [
-    [3, 1, 11519, "Metrics/BlockLength: Block has too many lines. [249/25]", 1483165423],
+  "spec/ast/crispr/ruby/prism_spec.rb:312402670": [
+    [3, 1, 14455, "Metrics/BlockLength: Block has too many lines. [307/25]", 2340182905],
     [41, 3, 4284, "Metrics/BlockLength: Block has too many lines. [87/25]", 1755930986],
-    [195, 3, 4456, "Metrics/BlockLength: Block has too many lines. [98/25]", 451830228],
-    [214, 5, 1855, "Metrics/BlockLength: Block has too many lines. [42/25]", 3479234350],
-    [265, 5, 1717, "Metrics/BlockLength: Block has too many lines. [36/25]", 3873040073],
-    [307, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2088544858],
-    [308, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2089183955]
+    [195, 3, 2932, "Metrics/BlockLength: Block has too many lines. [56/25]", 459736752],
+    [211, 5, 1041, "Metrics/AbcSize: Assignment Branch Condition size for `debug_dependency_target` is too high. [<6, 21, 12> 24.92/17]", 743765151],
+    [211, 5, 1041, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `debug_dependency_target` is too high. [11/7]", 743765151],
+    [211, 5, 1041, "Metrics/MethodLength: Method has too many lines. [21/10]", 743765151],
+    [211, 5, 1041, "Metrics/PerceivedComplexity: Perceived complexity for `debug_dependency_target` is too high. [11/8]", 743765151],
+    [264, 3, 4456, "Metrics/BlockLength: Block has too many lines. [98/25]", 451830228],
+    [283, 5, 1855, "Metrics/BlockLength: Block has too many lines. [42/25]", 3479234350],
+    [334, 5, 1717, "Metrics/BlockLength: Block has too many lines. [36/25]", 3873040073],
+    [376, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2088544858],
+    [377, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2089183955]
   ]
 }

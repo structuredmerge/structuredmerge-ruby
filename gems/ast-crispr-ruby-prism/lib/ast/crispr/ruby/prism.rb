@@ -49,11 +49,11 @@ module Ast
           def comment_regions_for(document, owner, region: :leading, owner_scope: :shared_default)
             analysis = document.ast
             owners = case owner_scope
-            when :all_statements
-              statement_groups(document).find { |group| group.include?(owner) } || []
-            else
-              structural_owners(document, owner_scope: owner_scope)
-            end
+                     when :all_statements
+                       statement_groups(document).find { |group| group.include?(owner) } || []
+                     else
+                       structural_owners(document, owner_scope: owner_scope)
+                     end
 
             case region
             when :leading
@@ -115,9 +115,7 @@ module Ast
           def walk_statement_groups(node, groups)
             return unless node
 
-            if node.inner_node.is_a?(::Prism::StatementsNode)
-              groups << node.inner_node.body
-            end
+            groups << node.inner_node.body if node.inner_node.is_a?(::Prism::StatementsNode)
             node.children.each { |child| walk_statement_groups(child, groups) }
           end
         end
