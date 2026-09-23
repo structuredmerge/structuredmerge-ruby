@@ -8359,7 +8359,7 @@ module Kettle
         nodes = []
         result.value.breadth_first_search_all { |node| nodes << node }
         anchor = nodes.find do |node|
-          gemfile_conditional_node?(node) && prism_subtree_contains_string?(node, "Gem::Version")
+          gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
         end
         return content unless anchor
 
