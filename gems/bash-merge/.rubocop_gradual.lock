@@ -2,14 +2,15 @@
   ".simplecov:3811430533": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:3736672062": [
+  "Rakefile:4024984312": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
     [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "bash-merge.gemspec:1387980994": [
+  "bash-merge.gemspec:3194161222": [
     [130, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
+    [132, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 2105564149],
     [141, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
     [142, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
   ],
@@ -56,6 +57,9 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/ostruct/r4/v0.6.gemfile:2083919651": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
+  ],
   "gemfiles/modular/rspec.gemfile:2263543889": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
@@ -79,7 +83,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/x_std_libs.gemfile:2324400122": [
+  "gemfiles/modular/x_std_libs.gemfile:3163909001": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
@@ -88,7 +92,7 @@
   "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/r4/libs.gemfile:732451732": [
+  "gemfiles/modular/x_std_libs/r4/libs.gemfile:1427643281": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
   "gemfiles/modular/x_std_libs/vHEAD.gemfile:2390363993": [
@@ -98,25 +102,28 @@
   "lib/bash-merge.rb:861990780": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`bash-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/bash/merge.rb:1584397584": [
-    [166, 7, 913, "Metrics/MethodLength: Method has too many lines. [19/10]", 3225777100]
+  "lib/bash/merge.rb:2144216422": [
+    [175, 7, 913, "Metrics/MethodLength: Method has too many lines. [19/10]", 3225777100]
   ],
   "lib/bash/merge/comment_tracker.rb:2891158123": [
     [54, 7, 773, "Metrics/MethodLength: Method has too many lines. [25/10]", 729186432]
   ],
-  "lib/bash/merge/file_analysis.rb:2574835244": [
-    [13, 5, 11335, "Metrics/ClassLength: Class has too many lines. [194/100]", 582917352],
+  "lib/bash/merge/file_analysis.rb:2858774261": [
+    [13, 5, 11558, "Metrics/ClassLength: Class has too many lines. [197/100]", 582917352],
     [45, 7, 1125, "Metrics/MethodLength: Method has too many lines. [16/10]", 3123023090],
     [208, 7, 478, "Metrics/MethodLength: Method has too many lines. [14/10]", 3606020460],
-    [229, 7, 1173, "Metrics/MethodLength: Method has too many lines. [18/10]", 3957755541],
-    [271, 7, 1331, "Metrics/AbcSize: Assignment Branch Condition size for `extract_freeze_blocks` is too high. [<12, 19, 11> 25.02/17]", 2209896179],
-    [271, 7, 1331, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_freeze_blocks` is too high. [9/7]", 2209896179],
-    [271, 7, 1331, "Metrics/MethodLength: Method has too many lines. [27/10]", 2209896179],
-    [271, 7, 1331, "Metrics/PerceivedComplexity: Perceived complexity for `extract_freeze_blocks` is too high. [10/8]", 2209896179],
-    [312, 7, 835, "Metrics/AbcSize: Assignment Branch Condition size for `integrate_nodes_and_freeze_blocks` is too high. [<8, 21, 10> 24.6/17]", 1332923118],
-    [312, 7, 835, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/7]", 1332923118],
-    [312, 7, 835, "Metrics/MethodLength: Method has too many lines. [14/10]", 1332923118],
-    [312, 7, 835, "Metrics/PerceivedComplexity: Perceived complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/8]", 1332923118]
+    [229, 7, 1396, "Metrics/AbcSize: Assignment Branch Condition size for `parse_bash` is too high. [<6, 18, 10> 21.45/17]", 3080941643],
+    [229, 7, 1396, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parse_bash` is too high. [9/7]", 3080941643],
+    [229, 7, 1396, "Metrics/MethodLength: Method has too many lines. [21/10]", 3080941643],
+    [229, 7, 1396, "Metrics/PerceivedComplexity: Perceived complexity for `parse_bash` is too high. [10/8]", 3080941643],
+    [275, 7, 1331, "Metrics/AbcSize: Assignment Branch Condition size for `extract_freeze_blocks` is too high. [<12, 19, 11> 25.02/17]", 2209896179],
+    [275, 7, 1331, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_freeze_blocks` is too high. [9/7]", 2209896179],
+    [275, 7, 1331, "Metrics/MethodLength: Method has too many lines. [27/10]", 2209896179],
+    [275, 7, 1331, "Metrics/PerceivedComplexity: Perceived complexity for `extract_freeze_blocks` is too high. [10/8]", 2209896179],
+    [316, 7, 835, "Metrics/AbcSize: Assignment Branch Condition size for `integrate_nodes_and_freeze_blocks` is too high. [<8, 21, 10> 24.6/17]", 1332923118],
+    [316, 7, 835, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/7]", 1332923118],
+    [316, 7, 835, "Metrics/MethodLength: Method has too many lines. [14/10]", 1332923118],
+    [316, 7, 835, "Metrics/PerceivedComplexity: Perceived complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/8]", 1332923118]
   ],
   "lib/bash/merge/freeze_node.rb:3178614316": [
     [32, 21, 127, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 1948779238]
@@ -130,6 +137,9 @@
     [152, 7, 2413, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `compute_signature` is too high. [13/7]", 152834448],
     [152, 7, 2413, "Metrics/MethodLength: Method has too many lines. [37/10]", 152834448],
     [237, 7, 661, "Metrics/MethodLength: Method has too many lines. [12/10]", 3160634112]
+  ],
+  "lib/bash/merge/rust_host_provider.rb:3481583356": [
+    [14, 7, 392, "Metrics/MethodLength: Method has too many lines. [12/10]", 3478937743]
   ],
   "lib/bash/merge/smart_merger.rb:2729830935": [
     [37, 5, 29939, "Metrics/ClassLength: Class has too many lines. [557/100]", 599912827],
@@ -215,6 +225,9 @@
   "spec/bash/merge_spec.rb:2513735456": [
     [5, 1, 4411, "Metrics/BlockLength: Block has too many lines. [113/25]", 2384192474],
     [91, 3, 1146, "Metrics/BlockLength: Block has too many lines. [26/25]", 3618532423]
+  ],
+  "spec/integration/rust_host_provider_spec.rb:3027395475": [
+    [5, 1, 6015, "Metrics/BlockLength: Block has too many lines. [113/25]", 3528632741]
   ],
   "spec/support/shared_examples/file_analysis_examples.rb:3241761804": [
     [8, 1, 1573, "Metrics/BlockLength: Block has too many lines. [36/25]", 1729754427],
