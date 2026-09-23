@@ -8353,14 +8353,40 @@ module Kettle
       if has_structuredmerge_dependency
         return content if content.include?('eval_gemfile "gemfiles/modular/templating.gemfile"')
 
-        insert_before = content.index(/\nif Gem::Version\.new\(RUBY_VERSION\)/)
-        return content unless insert_before
+        result = prism_parse_success(content)
+        return content unless result
 
-        content.dup.insert(insert_before, gate)
+        anchor = result.value.breadth_first_search_all.find do |node|
+          gemfile_conditional_node?(node) && prism_subtree_contains_string?(node, "Gem::Version")
+        end
+        return content unless anchor
+
+        replace_source_offsets(content, [{
+          start_offset: anchor.location.start_offset,
+          end_offset: anchor.location.start_offset,
+          replacement: gate
+        }])
       else
-        content.gsub(
-          /\n# Local template runs must resolve the same StructuredMerge dependency\n# graph as the project Gemfile before appraisal lockfiles are generated\.\nif ENV\.fetch\("K_JEM_TEMPLATING", "false"\)\.casecmp\("true"\)\.zero\?\n  eval_gemfile "gemfiles\/modular\/templating\.gemfile"\nend\n/m,
-          "\n"
+        result = prism_parse_success(content)
+        return content unless result
+
+        target = result.value.breadth_first_search_all.find do |node|
+          next false unless gemfile_conditional_node?(node)
+          next false unless prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
+
+          node.breadth_first_search_all.any? do |child|
+            child.is_a?(::Prism::CallNode) &&
+              child.name == :eval_gemfile &&
+              ruby_string_argument(child) == "gemfiles/modular/templating.gemfile"
+          end
+        end
+        return content unless target
+
+        replace_source_range_lines(
+          content,
+          target.location.start_line,
+          expand_line_range_through_following_blanks(content, ruby_node_source_end_line(target)),
+          ""
         )
       end
     end
