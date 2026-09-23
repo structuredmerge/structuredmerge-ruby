@@ -23,7 +23,7 @@ unless structuredmerge_rust_dev.empty? || %w[false 0 no off].include?(structured
   gem 'structuredmerge_core', path: File.join(structuredmerge_rust_dev, 'packages/ruby')
 end
 
-gem 'kettle-family', '~> 1.2', '>= 1.2.100'
+gem 'kettle-family', '~> 1.3', '>= 1.3.1'
 
 # Local workspace dependency wiring for *_local.gemfile overrides
 gem 'nomono', '~> 1.1', '>= 1.1.5', require: false # ruby >= 3.2.0
