@@ -51,7 +51,8 @@ module TreeHaver
   RUBY_BACKENDS = %i[citrus parslet prism psych commonmarker markly rbs].freeze
   VALID_NATIVE_BACKENDS = NATIVE_BACKENDS.map(&:to_s).freeze
   VALID_RUBY_BACKENDS = RUBY_BACKENDS.map(&:to_s).freeze
-  VALID_BACKENDS = (VALID_NATIVE_BACKENDS + VALID_RUBY_BACKENDS + %w[auto none tslp rust_tslp kreuzberg-language-pack]).freeze
+  VALID_BACKENDS = (VALID_NATIVE_BACKENDS + VALID_RUBY_BACKENDS + %w[auto none tslp rust_tslp
+                                                                     kreuzberg-language-pack]).freeze
   DEFAULT_BACKEND_ID = 'tslp'
   NATIVE_BACKEND_REFERENCES = NATIVE_BACKENDS.to_h do |backend_name|
     [

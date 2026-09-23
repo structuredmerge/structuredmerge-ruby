@@ -89,10 +89,10 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     allow(StructuredmergeCore).to receive(:parse_normalized_with_tslp)
       .with('json', next_source, 'json')
       .and_return(JSON.generate(result.merge(
-        'nodes' => result.fetch('nodes').map do |node|
-          node.merge('source_fragment' => node.fetch('source_fragment').sub('42', '43'))
-        end
-      )))
+                                  'nodes' => result.fetch('nodes').map do |node|
+                                    node.merge('source_fragment' => node.fetch('source_fragment').sub('42', '43'))
+                                  end
+                                )))
 
     parser = described_class::Parser.new
     parser.language = described_class::Language.new(:json)
@@ -101,13 +101,13 @@ RSpec.describe TreeHaver::Backends::RustTslp do
 
     expect(reparsed.root_node.text).to eq(next_source)
     expect(tree.edit(
-      start_byte: 0,
-      old_end_byte: 1,
-      new_end_byte: 1,
-      start_point: { row: 0, column: 0 },
-      old_end_point: { row: 0, column: 1 },
-      new_end_point: { row: 0, column: 1 }
-    )).to be_nil
+             start_byte: 0,
+             old_end_byte: 1,
+             new_end_byte: 1,
+             start_point: { row: 0, column: 0 },
+             old_end_point: { row: 0, column: 1 },
+             new_end_point: { row: 0, column: 1 }
+           )).to be_nil
     expect(tree.root_node.text).to eq(source)
   end
 
