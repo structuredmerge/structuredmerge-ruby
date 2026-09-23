@@ -20668,7 +20668,7 @@ module Kettle
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
         "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@b7ed1caf57f7986cedd2acca8624960b0820bc9a # v2.7",
-        "ruby/setup-ruby" => "ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0",
+        "ruby/setup-ruby" => "ruby/setup-ruby@762794c140bbeda0f1224786aa33b4b46783a6c1 # v1.326.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
         "codecov/codecov-action" => "codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1",
