@@ -32,6 +32,13 @@ Please file a bug if you notice a violation of semantic versioning.
   auto-resolution path for any future entry in this category with
   `force_review: false`.
 
+- kettle-jem-template-20260913-001 - Templating now also surfaces a review
+  entry in `dependency_conflicts.resolve` when a direct development
+  dependency doesn't support one or more of this project's declared
+  `engines:` and has no template-managed modular home (e.g. `sqlite3` on
+  `jruby`). Review each entry and pick a resolution per the project's own
+  engine support needs.
+
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -42,6 +49,14 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - appraisal-rb/setup-ruby-flash v2.1 (925395edf973d2dc0a629919f407f3547a03d4b5) -> v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a)
   - ruby/setup-ruby v1.321.0 (95ef2b042f9d7a56d8268cba8559e2842e2ad01b) -> v1.325.0 (e8944e80fb94b20106697132f8c20c665fab29e9)
+
+- [kc] kettle-jem/prepare: updated 4 project files:
+  - dependencies (4)
+
+- [kc] kettle-jem/template: updated 12 project files:
+  - code and tests (1)
+  - other (1)
+  - workflows (10)
 
 ### Deprecated
 
