@@ -32,19 +32,27 @@ module Ast
       end
 
       def report(request)
-        raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
+        unless self.class.available?
+          raise Error.new('Rust ast-crispr host is unavailable',
+                          code: 'ast_crispr_rust_host_unavailable')
+        end
 
         JSON.parse(StructuredmergeCore.report_ast_crispr_json(JSON.generate(request)))
       rescue JSON::ParserError => e
-        raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}", code: 'ast_crispr_rust_host_invalid_response')
+        raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}",
+                        code: 'ast_crispr_rust_host_invalid_response')
       end
 
       def apply_source_edits(request)
-        raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
+        unless self.class.available?
+          raise Error.new('Rust ast-crispr host is unavailable',
+                          code: 'ast_crispr_rust_host_unavailable')
+        end
 
         JSON.parse(StructuredmergeCore.apply_ast_crispr_source_edits_json(JSON.generate(request)))
       rescue JSON::ParserError => e
-        raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}", code: 'ast_crispr_rust_host_invalid_response')
+        raise Error.new("Rust ast-crispr returned invalid JSON: #{e.message}",
+                        code: 'ast_crispr_rust_host_invalid_response')
       end
     end
   end
