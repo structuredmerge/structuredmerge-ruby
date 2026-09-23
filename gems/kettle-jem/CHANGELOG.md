@@ -42,9 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-dev (>= 3.1.0 -> >= 3.1.1)
-  - kettle-drift (>= 1.0.13 -> >= 1.0.14)
-  - turbo_tests2 (>= 3.2.9 -> >= 3.2.10)
+  - turbo_tests2 (>= 3.2.9 -> >= 3.2.11)
+  - yard-lint (>= 1.11.0 -> >= 1.12.0)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - appraisal-rb/setup-ruby-flash v2.1 (925395edf973d2dc0a629919f407f3547a03d4b5) -> v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a)
