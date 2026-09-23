@@ -8356,9 +8356,9 @@ module Kettle
         result = prism_parse_success(content)
         return content unless result
 
-        anchor = result.value.breadth_first_search_all.find do |node|
+        anchor = result.value.breadth_first_search_all { |node|
           gemfile_conditional_node?(node) && prism_subtree_contains_string?(node, "Gem::Version")
-        end
+        }.find
         return content unless anchor
 
         replace_source_offsets(content, [{
@@ -8370,16 +8370,16 @@ module Kettle
         result = prism_parse_success(content)
         return content unless result
 
-        target = result.value.breadth_first_search_all.find do |node|
+        target = result.value.breadth_first_search_all { |node|
           next false unless gemfile_conditional_node?(node)
           next false unless prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
 
-          node.breadth_first_search_all do |child|
+          node.breadth_first_search_all { |child|
             child.is_a?(::Prism::CallNode) &&
               child.name == :eval_gemfile &&
               ruby_string_argument(child) == "gemfiles/modular/templating.gemfile"
-          end.any?
-        end
+          }.any?
+        }.find
         return content unless target
 
         replace_source_range_lines(
