@@ -105,6 +105,13 @@ module Kettle
     # SSH `git_source(:github)`) replaces Bundler's own HTTPS source and is
     # recorded in Gemfile.lock, where CI cannot clone it: unconditional removal.
     BUNDLER_BUILTIN_GIT_SOURCES = %w[github gist bitbucket].freeze
+    STRUCTUREDMERGE_GEMS = %w[
+      ast-crispr ast-crispr-markdown-markly ast-crispr-ruby-prism ast-merge ast-merge-git
+      ast-template bash-merge binary-merge citrus-toml-merge commonmarker-merge dotenv-merge
+      go-merge html-merge json-merge kettle-jem kramdown-merge markdown-merge markly-merge
+      parslet-toml-merge plain-merge prism-merge psych-merge rbs-merge ruby-merge rust-merge
+      smorg-rb toml-merge tree_haver typescript-merge yaml-merge zip-merge
+    ].freeze
     # Canonical resolutions for development-dependency gems whose handling is
     # already known ahead of any specific destination project. Two
     # categories today:
@@ -8137,6 +8144,9 @@ module Kettle
         )
       end
       output = remove_gemfile_builtin_git_source_overrides(output)
+      if recipe.fetch(:target_path).to_s == "Appraisal.root.gemfile"
+        output = normalize_appraisal_root_templating_gate(output, facts)
+      end
       if recipe.fetch(:target_path).to_s == "Gemfile"
         # A merged Gemfile retains its project-specific source; an accepted
         # template owns the complete source declaration.
@@ -8326,6 +8336,33 @@ module Kettle
         output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), guarded)
       end
       output
+    end
+
+    def normalize_appraisal_root_templating_gate(content, facts)
+      has_structuredmerge_dependency = package_runtime_dependency_names(facts).any? do |name|
+        STRUCTUREDMERGE_GEMS.include?(name.to_s)
+      end
+      gate = <<~RUBY
+
+        # Local template runs must resolve the same StructuredMerge dependency
+        # graph as the project Gemfile before appraisal lockfiles are generated.
+        if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile"
+        end
+      RUBY
+      if has_structuredmerge_dependency
+        return content if content.include?('eval_gemfile "gemfiles/modular/templating.gemfile"')
+
+        insert_before = content.index(/\nif Gem::Version\.new\(RUBY_VERSION\)/)
+        return content unless insert_before
+
+        content.dup.insert(insert_before, gate)
+      else
+        content.gsub(
+          /\n# Local template runs must resolve the same StructuredMerge dependency\n# graph as the project Gemfile before appraisal lockfiles are generated\.\nif ENV\.fetch\("K_JEM_TEMPLATING", "false"\)\.casecmp\("true"\)\.zero\?\n  eval_gemfile "gemfiles\/modular\/templating\.gemfile"\nend\n/m,
+          "\n"
+        )
+      end
     end
 
     def ensure_main_gemfile_nomono_bootstrap(content, template_content)
