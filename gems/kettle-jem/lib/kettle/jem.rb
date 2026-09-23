@@ -8374,11 +8374,11 @@ module Kettle
           next false unless gemfile_conditional_node?(node)
           next false unless prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
 
-          node.breadth_first_search_all.any? do |child|
+          node.breadth_first_search_all do |child|
             child.is_a?(::Prism::CallNode) &&
               child.name == :eval_gemfile &&
               ruby_string_argument(child) == "gemfiles/modular/templating.gemfile"
-          end
+          end.any?
         end
         return content unless target
 
