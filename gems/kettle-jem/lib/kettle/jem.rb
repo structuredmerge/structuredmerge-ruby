@@ -9562,7 +9562,16 @@ module Kettle
 
     def package_runtime_dependency_names(facts)
       dependencies = facts.to_h.dig(:package, :runtime_dependencies)
-      Array(dependencies).map(&:to_s).reject(&:empty?).uniq
+      Array(dependencies).filter_map do |dependency|
+        name = if dependency.respond_to?(:name)
+          dependency.name
+        elsif dependency.is_a?(Hash)
+          dependency[:name] || dependency["name"]
+        else
+          dependency
+        end
+        name.to_s unless name.to_s.empty?
+      end.uniq
     end
 
     def inject_main_gemfile_recording_eval(content, facts)
