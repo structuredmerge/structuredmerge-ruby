@@ -954,6 +954,15 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
     expect(current_workflow).to include("appraisal: \"current\"\n            os: windows-latest")
     expect(current_workflow).not_to include("appraisal: \"unlocked_deps\"\n            os: windows-latest")
+    expect(current_workflow).to include("run: ruby -rbundler/setup bin/turbo_tests2")
+    turbo_tests2_launcher = File.read(project_root.join("lib/kettle/jem/templates/bin/turbo_tests2.example"))
+    expect(turbo_tests2_launcher).to include('load Gem.bin_path("turbo_tests2", "turbo_tests2")')
+    template_entries = described_class.send(
+      :template_inventory_entries,
+      project_root.to_s,
+      project_root.join("lib/kettle/jem/templates").to_s
+    )
+    expect(template_entries).to include("bin/turbo_tests2")
     expect(current_workflow).not_to include("runner.os != 'Windows'")
     expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")

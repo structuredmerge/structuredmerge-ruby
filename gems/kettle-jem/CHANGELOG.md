@@ -80,6 +80,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Run duplicate drift detection after all template orchestration mutations, and generate shared nomono resolver options only once in local Gemfiles.
 
+- Template the bin/turbo_tests2 launcher required by Windows current-workflow tests.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10
