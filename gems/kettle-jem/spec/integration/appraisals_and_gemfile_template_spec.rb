@@ -1598,9 +1598,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       "local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
     )
     [template, coverage_template].each do |gemfile_template|
-      expect(gemfile_template.scan("kettle_dev_nomono_options = {").length).to eq(1)
+      expect(gemfile_template.scan("kettle_dev_nomono_options =").length).to eq(1)
       expect(gemfile_template.scan("**kettle_dev_nomono_options").length).to eq(2)
     end
+    expect(template.scan('vendored_gems_env: "VENDORED_GEMS"').length).to eq(1)
+    expect(template.scan('vendor_gem_dir_env: "VENDOR_GEM_DIR"').length).to eq(1)
+    expect(template).to include("**structuredmerge_nomono_options")
     expect(template).not_to include("platform :mri do")
   end
 
