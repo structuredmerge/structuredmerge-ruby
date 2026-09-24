@@ -1554,17 +1554,28 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         "BUNDLER_VERSION" => "4.0.12"
       }
       commands = []
+      drift_checks = 0
       command_runner = lambda do |command, chdir:, env:, quiet:|
         commands << {command: command, chdir: chdir, env: env, quiet: quiet}
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+      duplicate_drift_runner = lambda do |project_root:, template_dir:|
+        drift_checks += 1
+        expect(project_root).to eq(root)
+        expect(template_dir).to be_a(String)
+        expect(commands.any? { |entry| entry.fetch(:command).first(2) == %w[bundle lock] }).to be(true)
+        {warning_count: 0, json_path: nil, lock_path: nil, exit_code: 0}
       end
 
       report = Kettle::Jem::Tasks::TemplateTask.run(
         project_root: root,
         env: env,
-        run_options: {quiet: true},
+        run_options: {quiet: true, duplicate_drift_runner: duplicate_drift_runner},
         command_runner: command_runner
       )
+
+      expect(drift_checks).to eq(1)
+      expect(report.fetch(:duplicate_drift)).to include(available: true, warning_count: 0)
 
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "lockfile_platform_normalization",

@@ -78,6 +78,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Local template runs retain the released kettle-jem floor in remote templating Gemfiles.
 
+- Run duplicate drift detection after all template orchestration mutations, and generate shared nomono resolver options only once in local Gemfiles.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

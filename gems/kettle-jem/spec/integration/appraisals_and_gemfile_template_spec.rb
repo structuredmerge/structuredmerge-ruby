@@ -1597,6 +1597,10 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(coverage_template).to include(
       "local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
     )
+    [template, coverage_template].each do |gemfile_template|
+      expect(gemfile_template.scan("kettle_dev_nomono_options = {").length).to eq(1)
+      expect(gemfile_template.scan("**kettle_dev_nomono_options").length).to eq(2)
+    end
     expect(template).not_to include("platform :mri do")
   end
 

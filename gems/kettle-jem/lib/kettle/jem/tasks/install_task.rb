@@ -28,6 +28,7 @@ module Kettle
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))
           effective_run_options = install_run_options(env, run_options)
           config_migration_step = kettle_config_migration_step(project_root)
+          effective_run_options = effective_run_options.merge(defer_drift_check: true)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           report = followup_apply_after_config_bootstrap(project_root, env: env, run_options: effective_run_options, report: report)
           install_steps = []
@@ -64,6 +65,11 @@ module Kettle
             }]
           )
           final_report = Kettle::Jem::MaintenanceChangelog.record_template_run(
+            project_root: project_root,
+            report: final_report,
+            run_options: effective_run_options
+          )
+          final_report = Kettle::Jem.finalize_duplicate_drift(
             project_root: project_root,
             report: final_report,
             run_options: effective_run_options

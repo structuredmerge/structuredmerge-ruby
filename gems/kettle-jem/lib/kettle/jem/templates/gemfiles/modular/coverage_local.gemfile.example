@@ -6,6 +6,14 @@
 {KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP}
 
 local_gems = %w[{KJ|KETTLE_DEV_LOCAL_GEMS}]
+kettle_dev_nomono_options = {
+  prefix: "KETTLE_DEV",
+  path_env: "KETTLE_DEV_DEV",
+  vendored_gems_env: "VENDORED_GEMS",
+  vendor_gem_dir_env: "VENDOR_GEM_DIR",
+  debug_env: "KETTLE_DEV_DEBUG",
+  root: ["src", "my", "kettle-dev"]
+}
 
 # export KETTLE_DEV_DEV=/path/to/my
 platform :mri do
@@ -14,12 +22,7 @@ platform :mri do
   kettle_dev_dependency = instance_variable_get(:@dependencies).to_a.find { |dependency| dependency.name == "kettle-dev" }
   kettle_dev_local_path = nomono_gems(
     gems: %w[kettle-dev],
-    prefix: "KETTLE_DEV",
-    path_env: "KETTLE_DEV_DEV",
-    vendored_gems_env: "VENDORED_GEMS",
-    vendor_gem_dir_env: "VENDOR_GEM_DIR",
-    debug_env: "KETTLE_DEV_DEBUG",
-    root: ["src", "my", "kettle-dev"]
+    **kettle_dev_nomono_options
   ).fetch("kettle-dev", nil)
   if kettle_dev_dependency && kettle_dev_local_path
     instance_variable_get(:@dependencies).delete(kettle_dev_dependency)
@@ -31,12 +34,7 @@ platform :mri do
 
   eval_nomono_gems(
     gems: local_gems_to_eval,
-    prefix: "KETTLE_DEV",
-    path_env: "KETTLE_DEV_DEV",
-    vendored_gems_env: "VENDORED_GEMS",
-    vendor_gem_dir_env: "VENDOR_GEM_DIR",
-    debug_env: "KETTLE_DEV_DEBUG",
-    root: ["src", "my", "kettle-dev"]
+    **kettle_dev_nomono_options
   )
 
   if ENV.fetch("GALTZO_FLOSS_DEV", "false").casecmp("false") != 0

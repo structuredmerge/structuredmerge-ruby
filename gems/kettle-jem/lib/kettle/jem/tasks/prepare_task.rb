@@ -28,7 +28,8 @@ module Kettle
           effective_run_options = Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
           prepare_run_options = effective_run_options.merge(
             only: PREPARE_ONLY_PATHS,
-            skip_lock_normalization: true
+            skip_lock_normalization: true,
+            defer_drift_check: true
           )
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
@@ -97,6 +98,11 @@ module Kettle
               message: "kettle:jem:prepare applied the templating dependency bootstrap payload, " \
                 "updated critical templating gems, and ran bundle install."
             }]
+          )
+          final_report = Kettle::Jem.finalize_duplicate_drift(
+            project_root: project_root,
+            report: final_report,
+            run_options: effective_run_options
           )
           Kettle::Jem.emit_summary_event(events, final_report)
           final_report

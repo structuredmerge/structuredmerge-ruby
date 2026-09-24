@@ -4788,24 +4788,35 @@ module Kettle
       report[:changed_files] = (report.fetch(:changed_files, []) + report.fetch(:post_apply_steps).flat_map do |step|
         reported_post_apply_changed_files(step)
       end).uniq.sort
-      report[:duplicate_drift] = with_event_phase(events, "duplicate_drift") do
-        if DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
-          {
-            available: false,
-            skipped: true,
-            reason: "skip_drift_check"
-          }
-        else
-          duplicate_drift_report(
-            project_root: project_root,
-            template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
-            run_options: run_options
-          )
+      report[:duplicate_drift] = if DecisionPolicy.value_to_boolean((run_options || {})[:defer_drift_check])
+        {available: false, skipped: true, reason: "deferred_until_postprocessing"}
+      else
+        with_event_phase(events, "duplicate_drift") do
+          duplicate_drift_check_result(project_root: project_root, run_options: run_options)
         end
       end
       report[:phase_timings] = events.phase_timings if events.respond_to?(:phase_timings)
       emit_summary_event(events, report)
       report
+    end
+
+    def finalize_duplicate_drift(project_root:, report:, run_options: {})
+      events = event_stream_from_options(run_options)
+      drift = with_event_phase(events, "duplicate_drift") do
+        duplicate_drift_check_result(project_root: project_root, run_options: run_options)
+      end
+      report.merge(duplicate_drift: drift, phase_timings: events.phase_timings)
+    end
+
+    def duplicate_drift_check_result(project_root:, run_options: {})
+      return {available: false, skipped: true, reason: "skip_drift_check"} if
+        DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
+
+      duplicate_drift_report(
+        project_root: project_root,
+        template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
+        run_options: run_options
+      )
     end
 
     def event_stream(io, types: nil)
