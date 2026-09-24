@@ -37,7 +37,7 @@ module Kettle
             Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           end
           report = merge_supplemental_prepare_report(report, supplemental_report)
-          transition_step = reconcile_template_managed_dependencies_step(project_root, events: events)
+          transition_step = reconcile_template_managed_dependencies_step(project_root, env: env, events: events)
           nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
@@ -139,7 +139,7 @@ module Kettle
           step
         end
 
-        def reconcile_template_managed_dependencies_step(project_root, events:)
+        def reconcile_template_managed_dependencies_step(project_root, events:, env: ENV)
           paths = [
             File.join(project_root.to_s, "Gemfile"),
             *Dir.glob(File.join(project_root.to_s, "*.gemfile")),
@@ -148,11 +148,12 @@ module Kettle
           ].select { |path| File.file?(path) }.sort
           changed_files = paths.filter_map do |path|
             before = File.read(path)
-            after = Kettle::Jem.reconcile_template_managed_dependencies(before)
+            relative_path = Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
+            after = Kettle::Jem.reconcile_template_managed_dependencies(before, env: env, relative_path: relative_path)
             next if after == before
 
             File.write(path, after)
-            Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
+            relative_path
           end
           step = {
             name: "reconcile_template_managed_dependencies",

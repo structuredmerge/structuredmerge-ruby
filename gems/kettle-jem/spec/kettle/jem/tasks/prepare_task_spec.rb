@@ -302,6 +302,32 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "preserves the released kettle-jem floor in the remote templating Gemfile during local templating" do
+    Dir.mktmpdir("kettle-jem-prepare-local-floor", tmp_root) do |root|
+      templating_gemfile = File.join(root, "gemfiles/modular/templating.gemfile")
+      gemspec = File.join(root, "example.gemspec")
+      FileUtils.mkdir_p(File.dirname(templating_gemfile))
+      File.write(templating_gemfile, <<~RUBY)
+        gem "kettle-jem", "~> 7.1", ">= 7.1.27"
+      RUBY
+      File.write(gemspec, <<~RUBY)
+        Gem::Specification.new { |spec| spec.add_development_dependency("kettle-jem", ">= 7.0") }
+      RUBY
+
+      step = described_class.reconcile_template_managed_dependencies_step(
+        root,
+        env: {"STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"},
+        events: Kettle::Jem.event_stream_from_options({})
+      )
+
+      expect(step.fetch(:changed_files)).to contain_exactly("example.gemspec", "gemfiles/modular/templating.gemfile")
+      expect(File.read(templating_gemfile)).to include('gem "kettle-jem", "~> 7.1", ">= 7.1.28"')
+      expect(File.read(gemspec)).to include(
+        %(spec.add_development_dependency("kettle-jem", "~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}", ">= #{Kettle::Jem::Version::VERSION}"))
+      )
+    end
+  end
+
   it "rejects a managed dependency without static version requirements" do
     source = "gem \"kettle-dev\", ENV.fetch(\"KETTLE_DEV_REQUIREMENT\")\n"
 

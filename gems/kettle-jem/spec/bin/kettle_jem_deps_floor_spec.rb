@@ -15,6 +15,7 @@ RSpec.describe KettleJemDepsFloor do
       "embedded_dep" => %w[4.5.6 4.5.7],
       "other_dep" => %w[3.0.0 3.0.1 3.1.0],
       "kettle-dev" => %w[2.3.7 2.5.8],
+      "kettle-jem" => %w[7.1.28 7.1.29],
       "managed_dep" => %w[1.0.0 1.1.0],
       "nomono" => %w[1.0.8 1.0.9],
       "yard-timekeeper" => %w[0.2.3 0.2.4]
@@ -401,6 +402,7 @@ RSpec.describe KettleJemDepsFloor do
     stub_const("#{described_class}::EXTRA_SOURCE_FILES", ["lib/kettle/jem.rb"])
     write_file("lib/kettle/jem.rb", <<~RUBY)
       TEMPLATE_MANAGED_DEPENDENCIES = [
+        {name: "kettle-jem", requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
         {name: "managed_dep", requirements: ["~> 1.0", ">= 1.0.0"], bootstrap: true}
       ].freeze
     RUBY
@@ -412,8 +414,10 @@ RSpec.describe KettleJemDepsFloor do
     ).run
 
     expect(result.fetch(:planned_changes)).to include(
+      hash_including(name: "kettle-jem", relative_path: "lib/kettle/jem.rb", new_floor: "7.1.29"),
       hash_including(name: "managed_dep", relative_path: "lib/kettle/jem.rb", new_floor: "1.1.0")
     )
+    expect(read_file("lib/kettle/jem.rb")).to include('name: "kettle-jem", requirements: ["~> 7.1", ">= 7.1.29"]')
     expect(read_file("lib/kettle/jem.rb")).to include('requirements: ["~> 1.1", ">= 1.1.0"]')
   end
 

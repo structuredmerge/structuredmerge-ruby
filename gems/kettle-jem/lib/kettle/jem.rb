@@ -57,6 +57,7 @@ module Kettle
     # declarations in the destination and reconciles their complete requirement
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
+      {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.5"], bootstrap: true},
       {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.1"], bootstrap: true},
       {
@@ -10322,6 +10323,17 @@ module Kettle
       template_managed_dependency(name)&.fetch(:requirements)
     end
 
+    def kettle_jem_template_dependency_requirements(env: ENV, version_module: Version)
+      return kettle_jem_dependency_requirements(version_module: version_module) unless local_structuredmerge_path_mode?(env)
+
+      template_managed_dependency(PACKAGE_NAME).fetch(:requirements)
+    end
+
+    def local_structuredmerge_path_mode?(env)
+      value = (env || {}).fetch("STRUCTUREDMERGE_DEV", "false").to_s.strip
+      value != "" && !DecisionPolicy.falsey?(value)
+    end
+
     def template_managed_dependency_names(bootstrap: nil, ruby_version: RUBY_VERSION)
       TEMPLATE_MANAGED_DEPENDENCIES.filter_map do |dependency|
         next if !bootstrap.nil? && dependency.fetch(:bootstrap) != bootstrap
@@ -10342,12 +10354,15 @@ module Kettle
       Gem::Requirement.new(requirement).satisfied_by?(Gem::Version.new(ruby_version))
     end
 
-    def reconcile_template_managed_dependencies(source)
+    def reconcile_template_managed_dependencies(source, env: ENV, relative_path: nil)
       replacements = ruby_call_records(source, nil).filter_map do |call|
         next unless template_managed_dependency_call?(call)
 
         name = ruby_string_argument(call)
         requirements = template_managed_dependency_requirements(name)
+        if name == PACKAGE_NAME && local_structuredmerge_path_mode?(env) && relative_path == "gemfiles/modular/templating.gemfile"
+          requirements = kettle_jem_template_dependency_requirements(env: env)
+        end
         next unless requirements
 
         requirement_nodes = Array(call.arguments&.arguments).drop(1).reject do |argument|
@@ -15573,7 +15588,7 @@ module Kettle
       compact_hash(
         freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
         kettle_jem_version: VERSION,
-        kettle_jem_dependency_arguments: kettle_jem_dependency_requirements.map(&:inspect).join(", "),
+        kettle_jem_dependency_arguments: kettle_jem_template_dependency_requirements(env: env).map(&:inspect).join(", "),
         template_run_date: run_timestamp.strftime("%Y-%m-%d"),
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_local_gems: kettle_dev_local_gems(config),

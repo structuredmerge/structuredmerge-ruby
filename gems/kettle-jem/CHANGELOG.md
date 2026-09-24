@@ -76,6 +76,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated current-MRI workflows now use setup-ruby-flash v2.7, which validates rv-installed bundles before Appraisal and repairs incomplete native-extension installs through Bundler.
 
+- Local template runs retain the released kettle-jem floor in remote templating Gemfiles.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

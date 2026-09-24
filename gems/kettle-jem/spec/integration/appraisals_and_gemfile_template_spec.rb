@@ -948,7 +948,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     truffleruby_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"))
     framework_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/framework-ci.yml.example"))
 
-    expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(current_workflow).to include("rspec-status-current-${{matrix.os}}-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(current_workflow).to include("runs-on: ${{ matrix.os }}")
     expect(current_workflow).to include("appraisal: \"current\"\n            os: ubuntu-latest")
     expect(current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
@@ -1426,6 +1426,44 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(described_class.kettle_jem_dependency_source(version_module: version_module)).to eq(
       "gem \"kettle-jem\", \"~> 8.0\", \">= 8.0.0\"\n"
     )
+  end
+
+  it "keeps local template runs on the latest released kettle-jem floor for remote Gemfiles" do
+    runtime = described_class.send(
+      :project_runtime_facts,
+      {},
+      {"STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"},
+      package_name: "example",
+      source_url: "https://github.com/example/example",
+      author_domain: "example.test",
+      min_ruby: ">= 3.2",
+      test_min_ruby: Gem::Version.new("3.2"),
+      version: "0.1.0"
+    )
+    tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+    expect(tokens.fetch("KJ|KETTLE_JEM_DEPENDENCY_ARGUMENTS")).to eq('"~> 7.1", ">= 7.1.28"')
+  end
+
+  it "uses the running released kettle-jem version when not in local path mode" do
+    ["false", "0", "no", "off"].each do |value|
+      runtime = described_class.send(
+        :project_runtime_facts,
+        {},
+        {"STRUCTUREDMERGE_DEV" => value},
+        package_name: "example",
+        source_url: "https://github.com/example/example",
+        author_domain: "example.test",
+        min_ruby: ">= 3.2",
+        test_min_ruby: Gem::Version.new("3.2"),
+        version: "0.1.0"
+      )
+      tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+      expect(tokens.fetch("KJ|KETTLE_JEM_DEPENDENCY_ARGUMENTS")).to eq(
+        %("~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}", ">= #{Kettle::Jem::Version::VERSION}")
+      )
+    end
   end
 
   it "converges an existing injected kettle-jem dependency to the running version" do
