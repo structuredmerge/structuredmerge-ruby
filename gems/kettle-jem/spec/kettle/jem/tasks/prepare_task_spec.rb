@@ -494,6 +494,27 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
+  it "updates locked StructuredMerge siblings before local templating" do
+    Dir.mktmpdir("kettle-jem-prepare-local-structuredmerge", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            nomono (1.1.5)
+            ast-crispr-ruby-prism (7.1.9)
+            ast-crispr (7.1.9)
+            rake (13.2.1)
+      LOCK
+
+      command = described_class.bundle_update_templating_bootstrap_command(
+        root,
+        env: {"STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"}
+      )
+
+      expect(command).to include("ast-crispr", "ast-crispr-ruby-prism")
+      expect(command).not_to include("rake")
+    end
+  end
+
   it "does not explicitly update parser gems before they are present in the lockfile" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile.lock"), <<~LOCK)

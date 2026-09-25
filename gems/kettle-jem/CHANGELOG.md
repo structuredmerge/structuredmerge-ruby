@@ -82,6 +82,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Template the bin/turbo_tests2 launcher required by Windows current-workflow tests.
 
+- Refresh locked StructuredMerge sibling gems during local template preparation so Bundler cannot retain stale registry versions.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

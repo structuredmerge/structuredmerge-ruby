@@ -90,6 +90,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Restore Rust host declaration line ranges to exclude terminating separator newlines.
 
+- Require the release containing the Prism all-statements owner scope used by StructuredMerge templating.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

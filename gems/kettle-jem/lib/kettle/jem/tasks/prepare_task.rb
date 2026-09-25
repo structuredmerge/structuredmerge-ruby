@@ -52,7 +52,7 @@ module Kettle
           )
           Kettle::Jem.emit_step_event(events, "command_step", reset_step, phase: "prepare")
           bootstrap_name = templating_bootstrap_step_name(project_root)
-          bootstrap_command = templating_bootstrap_command(project_root)
+          bootstrap_command = templating_bootstrap_command(project_root, env: setup_env)
           Kettle::Jem.emit_step_event(
             events,
             "command_step",
@@ -224,14 +224,26 @@ module Kettle
           end
         end
 
-        def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)
-          %w[bundle update] + managed_bootstrap_gems(project_root) + locked_templating_gems(project_root)
+        def bundle_update_templating_bootstrap_command(project_root = Dir.pwd, env: ENV)
+          # Bundler can retain registry resolutions for sibling gems even when
+          # the local path Gemfile is active; refresh the locked family graph.
+          local_structuredmerge_gems = if Kettle::Jem.local_structuredmerge_path_mode?(env)
+            Kettle::Jem::STRUCTUREDMERGE_GEMS & locked_gem_names(project_root)
+          else
+            []
+          end
+          (
+            %w[bundle update] +
+              managed_bootstrap_gems(project_root) +
+              locked_templating_gems(project_root) +
+              local_structuredmerge_gems
+          ).uniq
         end
 
-        def templating_bootstrap_command(project_root = Dir.pwd)
+        def templating_bootstrap_command(project_root = Dir.pwd, env: ENV)
           return %w[bundle install] unless templating_bootstrap_lockfile_ready?(project_root)
 
-          bundle_update_templating_bootstrap_command(project_root)
+          bundle_update_templating_bootstrap_command(project_root, env: env)
         end
 
         def templating_bootstrap_step_name(project_root = Dir.pwd)
