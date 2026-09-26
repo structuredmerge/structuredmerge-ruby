@@ -46,7 +46,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - yard-lint (>= 1.11.0 -> >= 1.12.0)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.8 (2b9fb5108494982e63b137df234521f139605e77)
+  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.11 (e7af663f8c588f1fe44fb7599d8535099ca27142)
 
 - [kc] kettle-jem/prepare: updated 4 project files:
   - dependencies (4)
