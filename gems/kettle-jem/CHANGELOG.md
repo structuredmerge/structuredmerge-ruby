@@ -42,8 +42,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - turbo_tests2 (>= 3.2.9 -> >= 3.2.11)
-  - yard-lint (>= 1.11.0 -> >= 1.12.0)
+  - turbo_tests2 (>= 3.2.9 -> >= 3.2.12)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.11 (e7af663f8c588f1fe44fb7599d8535099ca27142)
