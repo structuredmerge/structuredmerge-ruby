@@ -84,6 +84,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Refresh locked StructuredMerge sibling gems during local template preparation so Bundler cannot retain stale registry versions.
 
+- Local template runs now preserve the released kettle-jem floor in gemspecs as well as remote Gemfiles.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

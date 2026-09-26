@@ -323,7 +323,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       expect(step.fetch(:changed_files)).to contain_exactly("example.gemspec", "gemfiles/modular/templating.gemfile")
       expect(File.read(templating_gemfile)).to include('gem "kettle-jem", "~> 7.1", ">= 7.1.28"')
       expect(File.read(gemspec)).to include(
-        %(spec.add_development_dependency("kettle-jem", "~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}", ">= #{Kettle::Jem::Version::VERSION}"))
+        'spec.add_development_dependency("kettle-jem", "~> 7.1", ">= 7.1.28")'
       )
     end
   end

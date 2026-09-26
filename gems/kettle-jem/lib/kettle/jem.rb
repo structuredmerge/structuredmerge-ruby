@@ -10328,8 +10328,8 @@ module Kettle
       TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == name.to_s }
     end
 
-    def template_managed_dependency_requirements(name, version_module: Version)
-      return kettle_jem_dependency_requirements(version_module: version_module) if name.to_s == PACKAGE_NAME
+    def template_managed_dependency_requirements(name, env: ENV, version_module: Version)
+      return kettle_jem_template_dependency_requirements(env: env, version_module: version_module) if name.to_s == PACKAGE_NAME
 
       template_managed_dependency(name)&.fetch(:requirements)
     end
@@ -10370,10 +10370,7 @@ module Kettle
         next unless template_managed_dependency_call?(call)
 
         name = ruby_string_argument(call)
-        requirements = template_managed_dependency_requirements(name)
-        if name == PACKAGE_NAME && local_structuredmerge_path_mode?(env) && relative_path == "gemfiles/modular/templating.gemfile"
-          requirements = kettle_jem_template_dependency_requirements(env: env)
-        end
+        requirements = template_managed_dependency_requirements(name, env: env)
         next unless requirements
 
         requirement_nodes = Array(call.arguments&.arguments).drop(1).reject do |argument|
