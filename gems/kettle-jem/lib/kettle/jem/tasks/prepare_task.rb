@@ -155,7 +155,7 @@ module Kettle
           changed_files = paths.filter_map do |path|
             before = File.read(path)
             relative_path = Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
-            after = Kettle::Jem.reconcile_template_managed_dependencies(before, env: env, relative_path: relative_path)
+            after = Kettle::Jem.reconcile_template_managed_dependencies(before, env: env)
             next if after == before
 
             File.write(path, after)

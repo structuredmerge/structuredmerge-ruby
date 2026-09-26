@@ -10365,7 +10365,7 @@ module Kettle
       Gem::Requirement.new(requirement).satisfied_by?(Gem::Version.new(ruby_version))
     end
 
-    def reconcile_template_managed_dependencies(source, env: ENV, relative_path: nil)
+    def reconcile_template_managed_dependencies(source, env: ENV)
       replacements = ruby_call_records(source, nil).filter_map do |call|
         next unless template_managed_dependency_call?(call)
 
