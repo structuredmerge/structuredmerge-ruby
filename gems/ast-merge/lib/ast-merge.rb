@@ -2,7 +2,7 @@
 
 require 'ast/merge'
 require 'version_gem'
-require_relative "ast/merge/version"
+require_relative 'ast/merge/version'
 
 Ast::Merge::Version.class_eval do
   extend VersionGem::Basic
