@@ -46,10 +46,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - yard-lint (>= 1.11.0 -> >= 1.12.0)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - github/codeql-action/analyze v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd) -> v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2)
-  - github/codeql-action/autobuild v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd) -> v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2)
-  - github/codeql-action/init v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd) -> v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2)
-  - qltysh/qlty-action/coverage v2.3.0 (08a0a862c159eae9b9003081da6663d96efef637) -> v2.4.0 (c9b09987143d1e4ac955f4803c7bea742102feb5)
+  - ruby/setup-ruby v1.326.0 (762794c140bbeda0f1224786aa33b4b46783a6c1) -> v1.327.0 (14594264cd68ce8a2345dd349bc3d138a4ef85c8)
 
 - [kc] kettle-jem/prepare: updated 4 project files:
   - dependencies (4)
