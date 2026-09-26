@@ -15,6 +15,43 @@ PATH
       version_gem (~> 1.1, >= 1.1.15)
 
 PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-changelog
+  specs:
+    kettle-changelog (1.0.7)
+      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
+      kettle-dev (>= 3.0.19, < 4.0.0)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-dev
+  specs:
+    kettle-dev (3.1.1)
+      emoji_regex (>= 15.0)
+      kettle-gha-pins (~> 0.3, >= 0.3.15)
+      kettle-ndjson (~> 0.1, >= 0.1.16)
+      kettle-rb (~> 0.1, >= 0.1.13)
+      kettle-test (~> 2.0, >= 2.0.22)
+      ruby-progressbar (~> 1.13)
+      tty-progressbar (~> 0.18)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-drift
+  specs:
+    kettle-drift (1.0.14)
+      version_gem (~> 1.1, >= 1.1.15)
+
+PATH
+  remote: /var/home/pboling/src/my/kettle-dev/kettle-soup-cover
+  specs:
+    kettle-soup-cover (3.0.10)
+      kettle-wash (~> 0.1, >= 0.1.6)
+      simplecov (>= 1.0)
+      simplecov-cobertura (>= 4.0)
+      simplecov-console (~> 0.9, >= 0.9.5)
+      simplecov-rcov (~> 0.3, >= 0.3.7)
+      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
+
+PATH
   remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.10)
@@ -407,20 +444,6 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.21.2)
-    kettle-changelog (1.0.7)
-      ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
-      kettle-dev (>= 3.0.19, < 4.0.0)
-      version_gem (~> 1.1, >= 1.1.15)
-    kettle-dev (3.1.1)
-      emoji_regex (>= 15.0)
-      kettle-gha-pins (~> 0.3, >= 0.3.15)
-      kettle-ndjson (~> 0.1, >= 0.1.16)
-      kettle-rb (~> 0.1, >= 0.1.13)
-      kettle-test (~> 2.0, >= 2.0.22)
-      ruby-progressbar (~> 1.13)
-      tty-progressbar (~> 0.18)
-    kettle-drift (1.0.14)
-      version_gem (~> 1.1, >= 1.1.15)
     kettle-family (1.3.1)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
@@ -440,13 +463,6 @@ GEM
     kettle-ndjson (0.1.16)
       version_gem (~> 1.1, >= 1.1.15)
     kettle-rb (0.1.14)
-    kettle-soup-cover (3.0.10)
-      kettle-wash (~> 0.1, >= 0.1.6)
-      simplecov (>= 1.0)
-      simplecov-cobertura (>= 4.0)
-      simplecov-console (~> 0.9, >= 0.9.5)
-      simplecov-rcov (~> 0.3, >= 0.3.7)
-      simplecov_lcov_formatter (~> 0.9, >= 0.9.0)
     kettle-test (2.0.22)
       appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
@@ -797,12 +813,12 @@ DEPENDENCIES
   html-merge!
   irb (~> 1.17)
   json-merge!
-  kettle-changelog (~> 1.0, >= 1.0.7)
-  kettle-dev (~> 3.1, >= 3.1.1)
-  kettle-drift (~> 1.0, >= 1.0.14)
+  kettle-changelog!
+  kettle-dev (~> 3.1, >= 3.1.1)!
+  kettle-drift!
   kettle-family (~> 1.3, >= 1.3.1)
   kettle-jem!
-  kettle-soup-cover (~> 3.0, >= 3.0.10)
+  kettle-soup-cover!
   kettle-test (~> 2.0, >= 2.0.22)
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-merge!
@@ -837,7 +853,7 @@ DEPENDENCIES
   stringio (>= 3.0)
   toml-merge!
   tree_haver!
-  turbo_tests2 (~> 3.2, >= 3.2.10)
+  turbo_tests2 (~> 3.2, >= 3.2.11)
   typescript-merge!
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.6)
@@ -845,7 +861,7 @@ DEPENDENCIES
   yard (~> 0.9, >= 0.9.45)
   yard-fence (~> 0.9, >= 0.9.9)
   yard-junk (~> 0.1, >= 0.1.0)
-  yard-lint (~> 1.11, >= 1.11.0)
+  yard-lint (~> 1.12, >= 1.12.0)
   yard-relative_markdown_links (~> 0.6)
   yard-timekeeper (~> 0.2, >= 0.2.7)
   yard-yaml (~> 0.2, >= 0.2.6)
@@ -878,7 +894,7 @@ CHECKSUMS
   colsole (1.0.1) sha256=7632a300ace2db877c024ffe413c684954cf37e41264b75ace9f456c9d657b02
   command_kit (0.6.0) sha256=e57f29cf5aee4f571c210041d910ff87f85749e42dfe75139c57cc93d84afa90
   command_kit-completion (0.3.0) sha256=d9c498555125bcdd0c9d869f2a64a25a2f0205102a7f28c81c7937ae633ea737
-  commonmarker (2.10.0) sha256=1884529957bf59bcd4f19fcc29e931f2042760ced273353e8010a20fe4ae68cb
+  commonmarker (2.10.0)
   commonmarker (2.10.0-aarch64-linux) sha256=eeb167dea203dee066eb0dd99b3fd2deb526c8b5e7297ad385f7a5d60f869478
   commonmarker (2.10.0-aarch64-linux-musl) sha256=e95d9e87ea6306e21ffa11855a7bb55518538143b23a227fe3bb00b41873ce25
   commonmarker (2.10.0-arm64-darwin) sha256=39ecc891d1e4308b5233cc28b40383de854a2bfbefe17d68e49174347a8aa79e
@@ -914,15 +930,15 @@ CHECKSUMS
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   json-merge (7.1.10)
-  kettle-changelog (1.0.7) sha256=42b9307e46e1e551434e8054ca4f467e8b13b69bd65e5dea4544b279179a50ff
-  kettle-dev (3.1.1) sha256=9ac5992f5842f2ec218dc5048814e57c7260cdc6069ad1d3c3581334c94f1459
-  kettle-drift (1.0.14) sha256=cf905abbe3f7e60c3f7ad1ef2248b01d8f3fa69d3d91d2c3a6fe19f4f1ad1a8f
+  kettle-changelog (1.0.7)
+  kettle-dev (3.1.1)
+  kettle-drift (1.0.14)
   kettle-family (1.3.1) sha256=0e77fb67d8e989a806ae453fdcac43a44e3dd43e1d2dae7a51418504309e27d6
   kettle-gha-pins (0.3.15) sha256=0607ef5952dc2de9d47618307f89e4a1f176f78ee540aaf8ee9e537633ad0b17
   kettle-jem (7.1.29)
   kettle-ndjson (0.1.16) sha256=a8653859eece3eba5a40f9d735e5a0720b115ed88d0e9354d242136e57823653
   kettle-rb (0.1.14) sha256=22b124f56d4c45a6ccebb686e9c7a802bc23a6636f572b2f07d5b9365bcc03d1
-  kettle-soup-cover (3.0.10) sha256=579e09d382d5c46b2a4787df492fdf598c774545d4ab1b7bd8cfaf6104424edd
+  kettle-soup-cover (3.0.10)
   kettle-test (2.0.22) sha256=2c6a63974c29ffd0c459c830c8b06057dd33d5a70185433fe8a689378fd6062d
   kettle-wash (0.1.7) sha256=ceb7ad5975c7a6353052f564ca2068e7e612d4042441ddee19de830b079e4f9a
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
@@ -934,10 +950,10 @@ CHECKSUMS
   markdown-merge (7.1.10)
   markly (0.19.0) sha256=cd2c0e86eaf3660ed2a3a94104877f8bd41adda78e7c295c017d03de0d4044ca
   markly-merge (7.1.10)
-  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
+  mini_portile2 (2.8.9)
   mister_bin (0.9.0) sha256=624fe401db4faf1978e84c17e0b320827697a13a6cba4fe656001269079be7d3
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
-  nokogiri (1.19.4) sha256=50c951611c92bca05c51411aef45f1cbc50f2821c4802758c5c6d34696533ab5
+  nokogiri (1.19.4)
   nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
   nokogiri (1.19.4-aarch64-linux-musl) sha256=35c65b9ce72b3bb03207bdbe7067915019dc18c1b9b59139684bd6690fdd01af
   nokogiri (1.19.4-arm64-darwin) sha256=a46db9853286e6597b36ebc6953817d15acf3a299583eb3f89fdc6f91dd63527
@@ -963,8 +979,8 @@ CHECKSUMS
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
-  rake-compiler-dock (1.12.0) sha256=f13205c2738f3d2053afcd03491a9e4541b22a59a0bfc53fc8bc883bd8188023
-  rb_sys (0.9.130) sha256=7d486d99c1da02635515deaf9860fc5aea90bb4ab2589b2deec7fdc7d3548615
+  rake-compiler-dock (1.12.0)
+  rb_sys (0.9.130)
   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
   rbs-merge (7.1.10)
   rdoc (7.2.0) sha256=8650f76cd4009c3b54955eb5d7e3a075c60a57276766ebf36f9085e8c9f23192
@@ -1034,7 +1050,7 @@ CHECKSUMS
   toml-merge (7.1.10)
   toml-rb (4.2.1) sha256=e6c40e27905e86a7d38cc252eb4bc12d72c61576c826a358390c30f5de0b9dbb
   tree_haver (7.1.10)
-  tree_sitter_language_pack (1.20.0) sha256=2ab298478a2390f0fba2f05e32325bb5b7c2f5f9674019d209de582446329d7d
+  tree_sitter_language_pack (1.20.0)
   tree_sitter_language_pack (1.20.0-aarch64-linux) sha256=8b43f4c3d18705d4211a5dc0d9281f5e68616c8dd6b323df411b9ee026894f6f
   tree_sitter_language_pack (1.20.0-arm64-darwin) sha256=b5e6899bedaa750f030a12bfd5db96fe9ed6a0617eee37119c0ffafd49d5baae
   tree_sitter_language_pack (1.20.0-x86_64-darwin) sha256=8c33f147b46b768a8c333fe8ee3924279feed0c39819232cd92a73f8d34826d6
