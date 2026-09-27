@@ -14981,7 +14981,7 @@ module Kettle
         "kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)",
         "unless kettle_changelog_skip",
         "  if kettle_changelog_local",
-        indent_source(nomono_bundler_bootstrap("Gemfile.lock"), 4),
+        indent_source(nomono_bundler_bootstrap("../../Gemfile.lock"), 4),
         "    eval_nomono_gems(",
         "      gems: [\"kettle-changelog\"],",
         "      prefix: \"KETTLE_DEV\",",
