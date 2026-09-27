@@ -85,6 +85,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Local template runs now preserve the released kettle-jem floor in gemspecs as well as remote Gemfiles.
 
+- Local Gemfile bootstraps now load nomono's Bundler DSL from the path source recorded in Gemfile.lock, avoiding activation of an older installed release during local templating.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

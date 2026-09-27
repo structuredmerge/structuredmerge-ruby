@@ -1616,6 +1616,66 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(template).not_to include("platform :mri do")
   end
 
+  it "loads nomono's Bundler DSL from a path-locked checkout" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    bootstrap = described_class.send(:local_gemfile_nomono_bootstrap, "example")
+    marker_env = "KETTLE_JEM_TEST_NOMONO_BOOTSTRAP_MARKER"
+    allow(ENV).to receive(:fetch).and_call_original
+
+    [
+      {project: "nomono", lock_path: "."},
+      {project: "example", lock_path: "../nomono"}
+    ].each do |shape|
+      Dir.mktmpdir("kettle-jem-nomono-path-bootstrap", tmp_root) do |workspace|
+        project_root = File.join(workspace, shape.fetch(:project))
+        nomono_root = File.join(workspace, "nomono")
+        marker_path = File.join(workspace, "loaded-nomono-source")
+        project_relative_path = shape.fetch(:lock_path)
+        gemfile_entry = if shape.fetch(:project) == "nomono"
+          %(gem "nomono", path: ".")
+        else
+          %(gem "nomono", path: "../nomono")
+        end
+
+        write_tree(workspace, {
+          "#{shape.fetch(:project)}/Gemfile" => <<~RUBY,
+            source "https://gem.coop"
+            #{gemfile_entry}
+            eval_gemfile "gemfiles/modular/bootstrap.gemfile"
+          RUBY
+          "#{shape.fetch(:project)}/gemfiles/modular/bootstrap.gemfile" => bootstrap,
+          "#{shape.fetch(:project)}/Gemfile.lock" => <<~LOCK,
+            PATH
+              remote: #{project_relative_path}
+              specs:
+                nomono (1.1.6)
+
+            DEPENDENCIES
+              nomono!
+          LOCK
+          "nomono/nomono.gemspec" => <<~RUBY,
+            Gem::Specification.new do |spec|
+              spec.name = "nomono"
+              spec.version = "1.1.6"
+              spec.summary = "Nomono"
+              spec.authors = ["Example"]
+              spec.files = []
+            end
+          RUBY
+          "nomono/lib/nomono/bundler.rb" => <<~RUBY
+            File.write(ENV.fetch("KETTLE_JEM_TEST_NOMONO_BOOTSTRAP_MARKER"), __FILE__)
+          RUBY
+        })
+
+        allow(ENV).to receive(:fetch).with(marker_env).and_return(marker_path)
+        Bundler::Dsl.evaluate(File.join(project_root, "Gemfile"), nil, {})
+
+        expect(File.read(marker_path)).to eq(File.join(nomono_root, "lib/nomono/bundler.rb"))
+      end
+    end
+  end
+
   it "evaluates a generated local coverage Gemfile with a declared kettle-dev path override" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1951,6 +2011,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include("nomono_activation_requirements")
       expect(content).to include("nomono_lockfile")
       expect(content).to include("Bundler::LockfileParser")
+      expect(content).to include("Bundler::Source::Path")
+      expect(content).to include("nomono_local_loader")
+      expect(content).to include('File.join(nomono_locked_spec.source.path, "lib", "nomono", "bundler")')
       expect(content).not_to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
     end
@@ -2014,7 +2077,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
+      expect(content.scan(/^[ \t]*require "nomono\/bundler"$/).size).to eq(1)
       expect(content).to match(/nomono_activation_requirements = \["~> 1\.1", ">= 1\.1\.\d+"\]/)
       expect(content).to include('nomono_already_activated = Gem.loaded_specs["nomono"]')
       expect(content).to include("!nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)")

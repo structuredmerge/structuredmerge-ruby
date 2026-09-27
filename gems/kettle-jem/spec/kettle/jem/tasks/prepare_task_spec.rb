@@ -69,7 +69,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       content = File.read(path)
       expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.5"]')
       expect(content).to include('Gem::Specification.find_all_by_name("nomono")')
-      expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
+      expect(content.scan(/^[ \t]*require "nomono\/bundler"$/).size).to eq(1)
     end
   end
 
