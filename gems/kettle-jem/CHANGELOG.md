@@ -45,7 +45,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - turbo_tests2 (>= 3.2.9 -> >= 3.2.12)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.11 (e7af663f8c588f1fe44fb7599d8535099ca27142)
+  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.12 (643b5a1f21af52a180b132cd8cb2ce8b5e7972b6)
 
 - [kc] kettle-jem/prepare: updated 4 project files:
   - dependencies (4)

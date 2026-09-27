@@ -20262,7 +20262,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: appraisal-rb/setup-ruby-flash@e7af663f8c588f1fe44fb7599d8535099ca27142 # v2.11
+          uses: appraisal-rb/setup-ruby-flash@643b5a1f21af52a180b132cd8cb2ce8b5e7972b6 # v2.12
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -20374,7 +20374,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: appraisal-rb/setup-ruby-flash@e7af663f8c588f1fe44fb7599d8535099ca27142 # v2.11",
+        "        uses: appraisal-rb/setup-ruby-flash@643b5a1f21af52a180b132cd8cb2ce8b5e7972b6 # v2.12",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -20817,7 +20817,7 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@e7af663f8c588f1fe44fb7599d8535099ca27142 # v2.11",
+        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@643b5a1f21af52a180b132cd8cb2ce8b5e7972b6 # v2.12",
         "ruby/setup-ruby" => "ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@c9b09987143d1e4ac955f4803c7bea742102feb5 # v2.4.0",
