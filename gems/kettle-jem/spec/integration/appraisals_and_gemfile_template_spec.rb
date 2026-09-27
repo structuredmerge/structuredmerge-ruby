@@ -2086,6 +2086,30 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include('Gem::Specification.find_all_by_name("nomono")')
       expect(content).to include('Kernel.send(:gem, "nomono"')
       expect(content).to include('root: ["src", "my", "kettle-dev"]')
+
+      normalized_again = described_class.normalize_local_gemfile_nomono_bootstrap(content)
+      expect(normalized_again).to eq(content)
+      expect(content.scan(/^nomono_local_loader =/).size).to eq(1)
+      expect(content.scan(/^nomono_activation_requirements =/).size).to eq(1)
+
+      lines = content.lines
+      marker_index = lines.index { |line| line.start_with?("local_gems =") }
+      bootstrap_lines = lines[0...marker_index]
+      nested_duplicate = [
+        *lines[0...marker_index],
+        "if true\n",
+        *bootstrap_lines.drop_while { |line| line.start_with?("#") },
+        "end\n",
+        *lines[marker_index..]
+      ].join
+      duplicated = [nested_duplicate, bootstrap_lines.join].join("\n")
+      repaired = described_class.normalize_local_gemfile_nomono_bootstrap(duplicated)
+
+      expect(repaired.scan(/^nomono_local_loader =/).size).to eq(1)
+      expect(repaired.scan(/^nomono_activation_requirements =/).size).to eq(1)
+      expect(Prism.parse(repaired)).to be_success
+      expect(repaired).not_to end_with("\n\n")
+      expect(described_class.normalize_local_gemfile_nomono_bootstrap(repaired)).to eq(repaired)
     end
   end
 

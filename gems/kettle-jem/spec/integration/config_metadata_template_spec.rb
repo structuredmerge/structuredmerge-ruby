@@ -2822,11 +2822,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(gemfile).to include('gem "nomono"')
       expect(gemfile).not_to include("nomono_requirements")
       expect(direct_block).to include('require "nomono/bundler"')
-      expect(direct_block).not_to include("nomono_activation_requirements")
-      expect(direct_block).not_to include("nomono_lockfile")
-      expect(direct_block).not_to include("Bundler::LockfileParser")
-      expect(direct_block).not_to include('Kernel.send(:gem, "nomono"')
-      expect(direct_block).not_to include('Gem::Specification.find_all_by_name("nomono")')
+      expect(direct_block).to include("nomono_activation_requirements")
+      expect(direct_block).to include("Bundler::Source::Path")
+      expect(direct_block).to include("require nomono_local_loader")
       expect(direct_block).not_to include(
         'unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )

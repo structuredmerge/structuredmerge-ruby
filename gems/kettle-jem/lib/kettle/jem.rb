@@ -9119,6 +9119,23 @@ module Kettle
     def normalize_local_gemfile_nomono_bootstrap(content)
       output = remove_obsolete_local_gemfile_nomono_activation(content)
       bootstrap = "#{local_gemfile_nomono_bootstrap(nil)}\n\n"
+      marker = local_gemfile_nomono_bootstrap_marker(output)
+      loader_assignments = prism_descendants(output).select do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_local_loader
+      end
+      if marker && loader_assignments.any?
+        if loader_assignments.length > 1
+          activation_assignments = prism_descendants(output).select do |node|
+            node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_activation_requirements
+          end
+          first_line = activation_assignments.map { |node| node.location.start_line }.min
+          output = replace_source_range_lines(output, first_line, marker.fetch(:start_line) - 1, bootstrap) if first_line
+        end
+        output = remove_local_gemfile_nomono_loader_blocks_after_marker(output)
+        output = remove_redundant_nomono_bundler_requires_after_marker(output)
+        return ensure_trailing_newline(output.rstrip)
+      end
+
       require_records = ruby_call_records(output, :require).filter_map do |call|
         next unless ruby_string_argument(call) == "nomono/bundler"
 
@@ -9140,6 +9157,76 @@ module Kettle
       else
         ensure_trailing_newline([output.to_s.rstrip, bootstrap.rstrip].reject(&:empty?).join("\n\n"))
       end
+    end
+
+    def local_gemfile_nomono_bootstrap_marker(content)
+      [
+        local_gems_assignment_record(content),
+        word_array_assignment_record(content, :structuredmerge_local_gems)
+      ].compact.min_by { |record| record.fetch(:start_line) }
+    end
+
+    def remove_local_gemfile_nomono_loader_blocks_after_marker(content)
+      marker = local_gemfile_nomono_bootstrap_marker(content)
+      return content unless marker
+
+      result = prism_parse_success(content)
+      body = result&.value&.statements&.body || []
+      ranges = body.each_with_index.filter_map do |node, index|
+        next unless node.is_a?(::Prism::LocalVariableWriteNode) && %i[nomono_activation_requirements nomono_local_loader].include?(node.name)
+        next unless node.location.start_line > marker.fetch(:start_line)
+
+        loader = if node.name == :nomono_local_loader
+          node
+        else
+          loader_index = (index + 1...body.length).find do |candidate_index|
+            candidate = body[candidate_index]
+            candidate.is_a?(::Prism::LocalVariableWriteNode) && candidate.name == :nomono_local_loader
+          end
+          loader_index && body[loader_index]
+        end
+        next unless loader
+        next if node.name == :nomono_local_loader && body[0...index].any? do |candidate|
+          candidate.is_a?(::Prism::LocalVariableWriteNode) && candidate.name == :nomono_activation_requirements &&
+            candidate.location.start_line > marker.fetch(:start_line)
+        end
+
+        following = body[(body.index(loader) + 1)..].to_a.find do |candidate|
+          candidate.is_a?(::Prism::IfNode) && prism_descendants(candidate.slice).any? do |descendant|
+            descendant.is_a?(::Prism::CallNode) && descendant.name == :require
+          end
+        end
+        {
+          start_line: (node.name == :nomono_activation_requirements) ?
+            preceding_comment_block_start_line(content.to_s.lines, node.location.start_line) : node.location.start_line,
+          end_line: ruby_node_source_end_line(following || loader)
+        }
+      end
+      ranges.sort_by { |range| -range.fetch(:start_line) }.reduce(content.to_s) do |output, range|
+        replace_source_range_lines(output, range.fetch(:start_line), range.fetch(:end_line), "")
+      end
+    end
+
+    def remove_redundant_nomono_bundler_requires_after_marker(content)
+      marker = local_gemfile_nomono_bootstrap_marker(content)
+      return content unless marker
+
+      records = ruby_call_records(content, :require).filter_map do |call|
+        next unless ruby_string_argument(call) == "nomono/bundler"
+        next unless call.location.start_line > marker.fetch(:start_line)
+
+        {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
+      end
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), "")
+      end
+    end
+
+    def prism_descendants(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all { true }
     end
 
     def remove_obsolete_local_gemfile_nomono_activation(content)
@@ -14885,27 +14972,27 @@ module Kettle
     def kettle_changelog_gemfile_dependency_token(package_name)
       return "" if package_name == "kettle-changelog"
 
-      <<~RUBY.chomp
-        # Release lockfile/build commands set this dependency-specific switch so
-        # the development tool cannot pull unpublished family gems into resolution.
-        kettle_changelog_skip = ENV.fetch("KETTLE_DEV_SKIP_CHANGELOG_DEPENDENCY", "false").downcase
-        kettle_changelog_skip = %w[true 1 yes on].include?(kettle_changelog_skip)
-        kettle_changelog_local = ENV.fetch("KETTLE_DEV_DEV", "false").downcase
-        kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)
-        unless kettle_changelog_skip
-          if kettle_changelog_local
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: ["kettle-changelog"],
-              prefix: "KETTLE_DEV",
-              path_env: "KETTLE_DEV_DEV",
-              root: ["src", "my", "kettle-dev"]
-            )
-          elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", #{template_managed_dependency("kettle-changelog").fetch(:requirements).map(&:inspect).join(", ")}
-          end
-        end
-      RUBY
+      [
+        "# Release lockfile/build commands set this dependency-specific switch so",
+        "# the development tool cannot pull unpublished family gems into resolution.",
+        "kettle_changelog_skip = ENV.fetch(\"KETTLE_DEV_SKIP_CHANGELOG_DEPENDENCY\", \"false\").downcase",
+        "kettle_changelog_skip = %w[true 1 yes on].include?(kettle_changelog_skip)",
+        "kettle_changelog_local = ENV.fetch(\"KETTLE_DEV_DEV\", \"false\").downcase",
+        "kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)",
+        "unless kettle_changelog_skip",
+        "  if kettle_changelog_local",
+        indent_source(nomono_bundler_bootstrap("Gemfile.lock"), 4),
+        "    eval_nomono_gems(",
+        "      gems: [\"kettle-changelog\"],",
+        "      prefix: \"KETTLE_DEV\",",
+        "      path_env: \"KETTLE_DEV_DEV\",",
+        "      root: [\"src\", \"my\", \"kettle-dev\"]",
+        "    )",
+        "  elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new(\"4.0.0\")",
+        %(    gem "kettle-changelog", #{template_managed_dependency("kettle-changelog").fetch(:requirements).map(&:inspect).join(", ")}),
+        "  end",
+        "end"
+      ].join("\n")
     end
 
     def readme_title_token(package, rubygems)
@@ -15740,7 +15827,7 @@ module Kettle
       dev_env = "#{prefix}_DEV"
       root_literal = ruby_array_literal(direct_sibling_nomono_root_parts(workspace_slug, repository))
       word_array = names.map { |name| "  #{name}" }.join("\n")
-      nomono_loader = %(require "nomono/bundler")
+      nomono_bootstrap = nomono_bundler_bootstrap("Gemfile.lock")
 
       blocks << <<~RUBY.rstrip
         # Direct sibling dependencies (env-switched via #{dev_env})
@@ -15757,7 +15844,7 @@ module Kettle
               ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
           direct_sibling_dev_was_set = ENV.key?("#{dev_env}")
           direct_sibling_dev_original = ENV.fetch("#{dev_env}", nil)
-          #{nomono_loader}
+          #{nomono_bootstrap}
           begin
             ENV["#{dev_env}"] = File.expand_path("..", __dir__) if direct_sibling_templating && !direct_sibling_local
 
@@ -15970,6 +16057,10 @@ module Kettle
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
+      nomono_bundler_bootstrap("../../Gemfile.lock")
+    end
+
+    def nomono_bundler_bootstrap(lockfile_path)
       <<~RUBY.rstrip
         # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
         # Bundler records that dependency during Gemfile evaluation, but it does not
@@ -15977,7 +16068,7 @@ module Kettle
         nomono_activation_requirements = ["~> 1.1", ">= 1.1.5"]
         nomono_requirement = Gem::Requirement.new(nomono_activation_requirements)
         nomono_already_activated = Gem.loaded_specs["nomono"]
-        nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
+        nomono_lockfile = File.expand_path(#{lockfile_path.inspect}, __dir__)
         nomono_locked_spec = nil
         if File.file?(nomono_lockfile)
           require "bundler"

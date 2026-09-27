@@ -87,6 +87,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Local Gemfile bootstraps now load nomono's Bundler DSL from the path source recorded in Gemfile.lock, avoiding activation of an older installed release during local templating.
 
+- Root and Kettle Changelog Gemfile bootstraps now load Nomono's Bundler DSL from a path-locked checkout instead of activating an installed Nomono release.
+
+- Nomono bootstrap normalization is now idempotent and removes duplicate generated loader blocks after repeated template preparation.
+
+- Kettle Changelog local Gemfile bootstraps now preserve their conditional block indentation when loading Nomono from a path-locked checkout.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

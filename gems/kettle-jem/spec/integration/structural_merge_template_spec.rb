@@ -681,6 +681,9 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(tokens.fetch("KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY")).to include(
         'ENV.fetch("KETTLE_DEV_DEV", "false")',
         'ENV.fetch("KETTLE_DEV_SKIP_CHANGELOG_DEPENDENCY", "false")',
+        "Bundler::Source::Path",
+        "require nomono_local_loader",
+        "\n    nomono_activation_requirements =",
         'Gem::Version.new("4.0.0")',
         'gem "kettle-changelog", "~> 1.0"'
       )
