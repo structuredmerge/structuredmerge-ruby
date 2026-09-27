@@ -315,6 +315,11 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       end
     end
 
+    prepare_commit_msg = File.read(File.join(gem_root, ".git-hooks", "prepare-commit-msg"))
+    expect(prepare_commit_msg).to include(
+      "exec env RUBYOPT= ruby -e 'require \"rubygems\"; load Gem.bin_path(\"kettle-dev\", \"kettle-commit-msg\")' \"$@\""
+    )
+
     selected_template_paths = [
       ".github/copilot_instructions.md",
       ".github/dependabot.yml",

@@ -95,6 +95,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Kettle Changelog's modular bootstrap now reads the project-root Gemfile.lock, so path-locked Nomono is not mistaken for an installed release.
 
+- Prevent commit hooks from resolving repository-local Bundler binstubs when checking commit messages.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10
