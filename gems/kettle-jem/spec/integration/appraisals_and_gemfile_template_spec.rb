@@ -1475,6 +1475,39 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "loads local template dependencies only while generating Appraisal gemfiles" do
+    facts = {
+      package: {
+        runtime_dependencies: [{name: "kettle-jem"}]
+      }
+    }
+    root_gemfile = <<~RUBY
+      # Local template runs must resolve the same StructuredMerge dependency
+      # graph as the project Gemfile before appraisal lockfiles are generated.
+      if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        eval_gemfile "gemfiles/modular/templating.gemfile"
+      end
+
+      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")
+        if respond_to?(:generator_only)
+          generator_only do
+            eval_gemfile "gemfiles/modular/style.gemfile"
+          end
+        end
+      end
+    RUBY
+
+    updated = described_class.send(:normalize_appraisal_root_templating_gate, root_gemfile, facts)
+
+    expect(updated).to include("generator_only do")
+    expect(updated).to include('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated).to include('ENV.fetch("K_JEM_TEMPLATING", "false")')
+    expect(updated.index("generator_only do")).to be < updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+    expect(updated.scan('eval_gemfile "gemfiles/modular/templating.gemfile"').length).to eq(1)
+    expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
+  end
+
   it "converges an existing injected kettle-jem dependency to the running version" do
     updated = described_class.ensure_monorepo_root_gemfile_dependencies(
       "source \"https://gem.coop\"\ngem \"kettle-jem\", \">= 7.0\"\n"

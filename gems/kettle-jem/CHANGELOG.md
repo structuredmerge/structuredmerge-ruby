@@ -97,6 +97,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Prevent commit hooks from resolving repository-local Bundler binstubs when checking commit messages.
 
+- Keep local template dependencies out of generated Appraisal bundles.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

@@ -8354,22 +8354,64 @@ module Kettle
       has_structuredmerge_dependency = package_runtime_dependency_names(facts).any? do |name|
         STRUCTUREDMERGE_GEMS.include?(name.to_s)
       end
-      gate = <<~RUBY
+      result = prism_parse_success(content)
+      return content unless result
 
-        # Local template runs must resolve the same StructuredMerge dependency
-        # graph as the project Gemfile before appraisal lockfiles are generated.
-        if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
-          eval_gemfile "gemfiles/modular/templating.gemfile"
-        end
-      RUBY
+      nodes = []
+      result.value.breadth_first_search_all { |node| nodes << node }
+      template_eval = nodes.find do |node|
+        node.is_a?(::Prism::CallNode) &&
+          node.name == :eval_gemfile &&
+          ruby_string_argument(node) == "gemfiles/modular/templating.gemfile"
+      end
+      template_gate = nodes.find do |node|
+        node.is_a?(::Prism::IfNode) &&
+          node.location.slice.to_s.include?("K_JEM_TEMPLATING") &&
+          template_eval &&
+          template_eval.location.start_offset > node.location.start_offset &&
+          template_eval.location.end_offset < node.location.end_offset
+      end
+      generator_only = nodes.find do |node|
+        node.is_a?(::Prism::CallNode) && node.name == :generator_only && node.block
+      end
+
       if has_structuredmerge_dependency
-        return content if content.include?('eval_gemfile "gemfiles/modular/templating.gemfile"')
+        if template_gate && generator_only &&
+            template_gate.location.start_offset > generator_only.block.location.start_offset &&
+            template_gate.location.end_offset < generator_only.block.location.end_offset
+          return content
+        end
+
+        if template_gate
+          content = replace_source_range_lines(
+            content,
+            template_gate.location.start_line,
+            expand_line_range_through_following_blanks(content, ruby_node_source_end_line(template_gate)),
+            ""
+          )
+        elsif template_eval
+          content = replace_source_range_lines(
+            content,
+            template_eval.location.start_line,
+            ruby_node_source_end_line(template_eval),
+            ""
+          )
+        end
 
         result = prism_parse_success(content)
         return content unless result
 
         nodes = []
         result.value.breadth_first_search_all { |node| nodes << node }
+        gate = <<~RUBY
+          if respond_to?(:generator_only)
+            generator_only do
+              if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+                eval_gemfile "gemfiles/modular/templating.gemfile"
+              end
+            end
+          end
+        RUBY
         anchor = nodes.find do |node|
           gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
         end
@@ -8381,29 +8423,12 @@ module Kettle
           replacement: gate
         }])
       else
-        result = prism_parse_success(content)
-        return content unless result
-
-        nodes = []
-        result.value.breadth_first_search_all { |node| nodes << node }
-        target = nodes.find do |node|
-          next false unless gemfile_conditional_node?(node)
-          next false unless prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
-
-          children = []
-          node.breadth_first_search_all { |child| children << child }
-          children.any? do |child|
-            child.is_a?(::Prism::CallNode) &&
-              child.name == :eval_gemfile &&
-              ruby_string_argument(child) == "gemfiles/modular/templating.gemfile"
-          end
-        end
-        return content unless target
+        return content unless template_gate
 
         replace_source_range_lines(
           content,
-          target.location.start_line,
-          expand_line_range_through_following_blanks(content, ruby_node_source_end_line(target)),
+          template_gate.location.start_line,
+          expand_line_range_through_following_blanks(content, ruby_node_source_end_line(template_gate)),
           ""
         )
       end
