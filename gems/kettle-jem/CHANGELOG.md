@@ -42,10 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-changelog (>= 1.0.7 -> >= 1.0.8)
-  - kettle-dev (>= 3.1.1 -> >= 3.1.3)
-  - kettle-test (>= 2.0.22 -> >= 2.0.23)
-  - rubocop-on-rbs (>= 2.0.0 -> >= 2.1.0)
+  - kettle-dev (>= 3.1.1 -> >= 3.1.4)
+  - kettle-family (>= 1.3.1 -> >= 1.3.2)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.12 (643b5a1f21af52a180b132cd8cb2ce8b5e7972b6)
@@ -101,6 +99,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Prevent commit hooks from resolving repository-local Bundler binstubs when checking commit messages.
 
 - Keep local template dependencies out of generated Appraisal bundles.
+
+- Use Kettle Dev's shared path identity logic when reconciling template and project paths.
 
 ### Security
 

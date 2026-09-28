@@ -960,9 +960,7 @@ module Kettle
         end
 
         def same_path?(left, right)
-          File.realpath(left.to_s) == File.realpath(right.to_s)
-        rescue Errno::ENOENT
-          File.expand_path(left.to_s) == File.expand_path(right.to_s)
+          Kettle::Dev::Paths.same?(left.to_s, right.to_s)
         end
 
         def rubocop_lts_local_root(env)
@@ -1031,7 +1029,7 @@ module Kettle
           destination_bin = File.join(project_root.to_s, "bin")
           destination_binstubs = binstub_files(destination_bin)
           parent_root = git_toplevel(project_root)
-          parent_binstubs = if parent_root && File.expand_path(parent_root) != File.expand_path(project_root.to_s)
+          parent_binstubs = if parent_root && !same_path?(parent_root, project_root)
             binstub_files(File.join(parent_root, "bin"))
           else
             []
@@ -1794,7 +1792,7 @@ module Kettle
 
           bundle_gemfile = (env || {})["BUNDLE_GEMFILE"].to_s.strip
           project_gemfile = File.expand_path(File.join(project_root.to_s, "Gemfile"))
-          if !bundle_gemfile.empty? && File.expand_path(bundle_gemfile) == project_gemfile
+          if !bundle_gemfile.empty? && same_path?(bundle_gemfile, project_gemfile)
             return {
               name: "bundled_handoff",
               status: "already_bundled",

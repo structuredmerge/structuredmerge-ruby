@@ -105,7 +105,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.8")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
   spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.7")          # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", "~> 3.1", ">= 3.1.1")               # ruby >= 2.3.0
+  spec.add_dependency("kettle-dev", "~> 3.1", ">= 3.1.4")               # ruby >= 2.4.0
   spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.14")          # ruby >= 2.4.0
   spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.13")            # ruby >= 2.4.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.11")                 # ruby >= 1.8.7
