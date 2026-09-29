@@ -1664,6 +1664,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         status: "succeeded",
         reason: "executed"
       ))
+      expect(report.fetch(:changed_files)).to include(".gitattributes")
       expect(commands.map { |entry| entry.fetch(:command) }).to include(%w[git config core.hooksPath .git-hooks])
       expect(File.stat(File.join(root, ".git-hooks", "commit-msg")).mode & 0o111).not_to eq(0)
       expect(File.stat(File.join(root, ".git-hooks", "prepare-commit-msg")).mode & 0o111).not_to eq(0)

@@ -112,6 +112,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Preserve destination Markdown link definitions referenced by README sections retained during templating.
 
+- Include files created by template orchestration steps in change accounting and maintenance changelog entries.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10
