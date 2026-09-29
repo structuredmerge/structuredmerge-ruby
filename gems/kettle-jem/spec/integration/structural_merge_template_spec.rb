@@ -1585,6 +1585,81 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "retains destination link definitions used by preserved README sections" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-destination-link-definition", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          readme:
+            preserve_sections:
+              - custom section
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "README.md" => <<~MARKDOWN,
+          # Example
+
+          ## Synopsis
+
+          Destination synopsis.
+
+          ## Custom Section
+
+          Uses [kettle-rb][kettle-rb].
+
+          ## Installation
+
+          Destination installation.
+
+          [kettle-rb]: https://github.com/kettle-dev/kettle-rb
+        MARKDOWN
+        "template/README.md.example" => <<~MARKDOWN
+          # Example
+
+          ## Synopsis
+
+          Template synopsis.
+
+          ## Custom Section
+
+          Template custom section.
+
+          ## Installation
+
+          Template installation.
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = report.fetch(:final_content)
+
+      expect(final_content).to include("Uses [kettle-rb][kettle-rb].")
+      expect(final_content).to include("[kettle-rb]: https://github.com/kettle-dev/kettle-rb")
+
+      conflicting_template_definition = described_class.send(
+        :append_used_markdown_link_definitions,
+        "Uses [kettle-rb][kettle-rb].\n",
+        "[kettle-rb]: https://template.example/kettle-rb\n",
+        fallback_definition_source: "[kettle-rb]: https://destination.example/kettle-rb\n"
+      )
+      expect(conflicting_template_definition).to include("https://template.example/kettle-rb")
+      expect(conflicting_template_definition).not_to include("https://destination.example/kettle-rb")
+    end
+  end
+
   it "does not duplicate destination-only README sections already inside a preserved parent section" do
     template = <<~MARKDOWN
       # Example

@@ -110,6 +110,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Normalize local nomono bootstrap blocks as a single AST-bounded region, including Gemfiles whose local_gems assignment uses an array literal; keep appraisal style-gate comments attached to their Ruby-version condition.
 
+- Preserve destination Markdown link definitions referenced by README sections retained during templating.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

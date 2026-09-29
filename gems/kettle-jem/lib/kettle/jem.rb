@@ -7297,7 +7297,11 @@ module Kettle
           destination_content: original
         )
         return with_readme_timing("readme.append_used_link_definitions") do
-          appended = append_used_markdown_link_definitions(processed, resolved)
+          appended = append_used_markdown_link_definitions(
+            processed,
+            resolved,
+            fallback_definition_source: original
+          )
           postprocess_readme_content(
             appended,
             facts,
@@ -7877,12 +7881,14 @@ module Kettle
       [content.to_s.rstrip, "", missing_sources.join.rstrip, ""].join("\n")
     end
 
-    def append_used_markdown_link_definitions(content, definition_source)
+    def append_used_markdown_link_definitions(content, definition_source, fallback_definition_source: nil)
       owners = ReadmePostProcessor.markdown_structural_owners(content, :link_definitions, :inline_references)
       existing = owners.fetch(:link_definitions).map { |owner| owner.label.to_s }.to_set
       referenced = owners.fetch(:inline_references).flat_map(&:labels).map(&:to_s).to_set
-      available = ReadmePostProcessor.markdown_link_definition_owners(definition_source).to_h do |owner|
-        [owner.label.to_s, owner]
+      available = [fallback_definition_source, definition_source].compact.each_with_object({}) do |source, definitions|
+        ReadmePostProcessor.markdown_link_definition_owners(source).each do |owner|
+          definitions[owner.label.to_s] = owner
+        end
       end
       missing = referenced.filter_map do |label|
         next if existing.include?(label)
