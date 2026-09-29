@@ -108,6 +108,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Update the generated appraisal style-toolchain gate to Ruby 3.3 so Ruby 3.2 builds do not resolve unsupported lint dependencies.
 
+- Normalize local nomono bootstrap blocks as a single AST-bounded region, including Gemfiles whose local_gems assignment uses an array literal; keep appraisal style-gate comments attached to their Ruby-version condition.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

@@ -1488,6 +1488,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         eval_gemfile "gemfiles/modular/templating.gemfile"
       end
 
+      # The style toolchain includes dependencies that require Ruby 3.3 or newer.
       if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")
         if respond_to?(:generator_only)
           generator_only do
@@ -1497,15 +1498,61 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
     RUBY
 
-    updated = described_class.send(:normalize_appraisal_root_templating_gate, root_gemfile, facts)
+    recipe = {
+      target_path: "Appraisal.root.gemfile",
+      template_preference: {strategy: "accept_template"}
+    }
+    updated = described_class.send(
+      :finalize_accepted_template_source,
+      recipe,
+      root_gemfile,
+      root_gemfile,
+      facts: facts
+    )
 
     expect(updated).to include("generator_only do")
     expect(updated).to include('eval_gemfile "gemfiles/modular/templating.gemfile"')
     expect(updated).to include('ENV.fetch("K_JEM_TEMPLATING", "false")')
     expect(updated.index("generator_only do")).to be < updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
     expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("# The style toolchain includes dependencies that require Ruby 3.3 or newer.")
+    expect(updated.index("# The style toolchain includes dependencies that require Ruby 3.3 or newer.")).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
     expect(updated.scan('eval_gemfile "gemfiles/modular/templating.gemfile"').length).to eq(1)
     expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
+  end
+
+  it "reattaches the style-gate comment when a generator gate already exists" do
+    facts = {package: {runtime_dependencies: [{name: "kettle-jem"}]}}
+    root_gemfile = <<~RUBY
+      # The style toolchain includes dependencies that require Ruby 3.3 or newer.
+      if respond_to?(:generator_only)
+        generator_only do
+          if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+            eval_gemfile "gemfiles/modular/templating.gemfile"
+          end
+        end
+      end
+      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")
+        eval_gemfile "gemfiles/modular/style.gemfile"
+      end
+    RUBY
+
+    updated = described_class.send(:normalize_appraisal_root_templating_gate, root_gemfile, facts)
+    comment = "# The style toolchain includes dependencies that require Ruby 3.3 or newer."
+
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index(comment)
+    expect(updated.index(comment)).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+    expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
+  end
+
+  it "does not checksum-skip Appraisal root finalization" do
+    report = {
+      relative_path: "Appraisal.root.gemfile",
+      metadata: {template_source_preference: {strategy: "accept_template"}},
+      request_envelope: {request: {recipe_name: "supplied_template_source_application"}}
+    }
+
+    expect(described_class.send(:checksum_cache_safe_report?, report)).to be(false)
   end
 
   it "gates the appraisal style toolchain on Ruby 3.3" do
@@ -2106,9 +2153,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
           Kernel.send(:gem, "nomono", *nomono_activation_requirements)
           require "nomono/bundler"
 
-          local_gems = %w[
-            custom-local
-          ]
+          local_gems = ["custom-local"]
         RUBY
       })
 
@@ -2148,9 +2193,26 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
       expect(repaired.scan(/^nomono_local_loader =/).size).to eq(1)
       expect(repaired.scan(/^nomono_activation_requirements =/).size).to eq(1)
+      expect(repaired.scan(/^# Bootstrapping nomono here/).size).to eq(1)
       expect(Prism.parse(repaired)).to be_success
       expect(repaired).not_to end_with("\n\n")
       expect(described_class.normalize_local_gemfile_nomono_bootstrap(repaired)).to eq(repaired)
+
+      bootstrap = described_class.send(:local_gemfile_nomono_bootstrap, nil)
+      nested_bootstrap = described_class.send(:indent_source, bootstrap, 2)
+      structuredmerge_duplicate = [
+        "#{bootstrap}\n",
+        "if true\n",
+        "#{nested_bootstrap}\n",
+        "end\n",
+        "structuredmerge_local_gems = [\"local\"]\n"
+      ].join
+      structuredmerge_repaired = described_class.normalize_local_gemfile_nomono_bootstrap(structuredmerge_duplicate)
+
+      expect(structuredmerge_repaired.scan(/^  nomono_local_loader =/)).to be_empty
+      expect(structuredmerge_repaired.scan(/^nomono_local_loader =/).size).to eq(1)
+      expect(structuredmerge_repaired.scan(/^# Bootstrapping nomono here/).size).to eq(1)
+      expect(Prism.parse(structuredmerge_repaired)).to be_success
     end
   end
 

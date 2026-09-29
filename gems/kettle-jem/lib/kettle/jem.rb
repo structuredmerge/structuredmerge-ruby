@@ -4261,6 +4261,10 @@ module Kettle
       # Config migrations are implemented during template application. They must
       # run even when the template source and destination checksums still match.
       return false if report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH
+      # Appraisal.root.gemfile has facts-dependent structural normalization in
+      # its accepted-template finalizer, so matching source/destination hashes
+      # do not prove that the final output is already normalized.
+      return false if report.fetch(:relative_path, "").to_s == "Appraisal.root.gemfile"
 
       primitive = report.dig(:request_envelope, :request, :recipe_name).to_s
       primitive == "supplied_template_source_application"
@@ -7377,7 +7381,12 @@ module Kettle
       when :gemfile
         finalize_gemfile_template_source(recipe, content, destination_content, facts: facts, template_content: content)
       when :appraisals
-        merge_appraisals_template_policy(content, facts: facts)
+        merged = merge_appraisals_template_policy(content, facts: facts)
+        if recipe.fetch(:target_path).to_s == "Appraisal.root.gemfile"
+          normalize_appraisal_root_templating_gate(merged, facts)
+        else
+          merged
+        end
       when :gemspec
         package_name = facts.dig(:package, :name).to_s if facts
         receiver = gemspec_block_param(content) || "spec"
@@ -8374,12 +8383,36 @@ module Kettle
       generator_only = nodes.find do |node|
         node.is_a?(::Prism::CallNode) && node.name == :generator_only && node.block
       end
+      style_comment = "# The style toolchain includes dependencies that require Ruby 3.3 or newer."
+      style_gate_anchor = nodes.find do |node|
+        gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
+      end
+      style_comment_attached = if style_gate_anchor
+        content.lines[style_gate_anchor.location.start_line - 2].to_s.strip == style_comment
+      else
+        false
+      end
 
       if has_structuredmerge_dependency
-        if template_gate && generator_only &&
-            template_gate.location.start_offset > generator_only.block.location.start_offset &&
-            template_gate.location.end_offset < generator_only.block.location.end_offset
-          return content
+        template_gate_is_nested = template_gate && generator_only &&
+          template_gate.location.start_offset > generator_only.block.location.start_offset &&
+          template_gate.location.end_offset < generator_only.block.location.end_offset
+        if template_gate_is_nested
+          return content if style_comment_attached
+
+          comment_line_index = content.lines.index { |line| line.strip == style_comment }
+          return content unless comment_line_index
+
+          content = replace_source_range_lines(content, comment_line_index + 1, comment_line_index + 1, "")
+          result = prism_parse_success(content)
+          nodes = []
+          result&.value&.breadth_first_search_all { |node| nodes << node }
+          anchor = nodes.find do |node|
+            gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
+          end
+          return content unless anchor
+
+          return insert_lines_before(content, anchor.location.start_line, "#{style_comment}\n")
         end
 
         if template_gate
@@ -8417,11 +8450,23 @@ module Kettle
         end
         return content unless anchor
 
-        replace_source_offsets(content, [{
-          start_offset: anchor.location.start_offset,
-          end_offset: anchor.location.start_offset,
-          replacement: gate
-        }])
+        lines = content.lines
+        anchor_line_index = anchor.location.start_line - 1
+        preceding_line = lines[anchor_line_index - 1]
+        if preceding_line&.strip == style_comment
+          comment_start = lines.take(anchor_line_index - 1).sum(&:bytesize)
+          replace_source_offsets(content, [{
+            start_offset: comment_start,
+            end_offset: anchor.location.start_offset,
+            replacement: "#{gate}#{preceding_line}"
+          }])
+        else
+          replace_source_offsets(content, [{
+            start_offset: anchor.location.start_offset,
+            end_offset: anchor.location.start_offset,
+            replacement: gate
+          }])
+        end
       else
         return content unless template_gate
 
@@ -9145,17 +9190,13 @@ module Kettle
       output = remove_obsolete_local_gemfile_nomono_activation(content)
       bootstrap = "#{local_gemfile_nomono_bootstrap(nil)}\n\n"
       marker = local_gemfile_nomono_bootstrap_marker(output)
-      loader_assignments = prism_descendants(output).select do |node|
-        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_local_loader
+      activation_assignments = prism_descendants(output).select do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_activation_requirements
       end
-      if marker && loader_assignments.any?
-        if loader_assignments.length > 1
-          activation_assignments = prism_descendants(output).select do |node|
-            node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_activation_requirements
-          end
-          first_line = activation_assignments.map { |node| node.location.start_line }.min
-          output = replace_source_range_lines(output, first_line, marker.fetch(:start_line) - 1, bootstrap) if first_line
-        end
+      if marker && activation_assignments.any?
+        first_line = activation_assignments.map { |node| node.location.start_line }.min
+        first_line = preceding_comment_block_start_line(output.lines, first_line)
+        output = replace_source_range_lines(output, first_line, marker.fetch(:start_line) - 1, bootstrap) if first_line < marker.fetch(:start_line)
         output = remove_local_gemfile_nomono_loader_blocks_after_marker(output)
         output = remove_redundant_nomono_bundler_requires_after_marker(output)
         return ensure_trailing_newline(output.rstrip)
@@ -9185,8 +9226,14 @@ module Kettle
     end
 
     def local_gemfile_nomono_bootstrap_marker(content)
+      result = prism_parse_success(content)
+      body = result&.value&.statements&.body || []
+      local_gems_assignment = body.find do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && %i[local_gems structuredmerge_local_gems].include?(node.name)
+      end
       [
         local_gems_assignment_record(content),
+        local_gems_assignment && {start_line: local_gems_assignment.location.start_line},
         word_array_assignment_record(content, :structuredmerge_local_gems)
       ].compact.min_by { |record| record.fetch(:start_line) }
     end
