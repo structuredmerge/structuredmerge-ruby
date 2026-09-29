@@ -42,12 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-dev (>= 3.1.1 -> >= 3.1.5)
-  - kettle-drift (>= 1.0.14 -> >= 1.0.15)
-  - kettle-family (>= 1.3.1 -> >= 1.3.3)
-  - kettle-soup-cover (>= 3.0.10 -> >= 3.0.11)
-  - nomono (>= 1.1.5 -> >= 1.1.6)
-  - rubocop-on-rbs (>= 2.1.0 -> >= 2.2.0)
+  - appraisal2 (>= 3.2.4 -> >= 3.2.5)
+  - appraisal2-rubocop (>= 1.0.3 -> >= 1.0.4)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.12 (643b5a1f21af52a180b132cd8cb2ce8b5e7972b6)
