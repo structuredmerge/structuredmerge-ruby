@@ -106,6 +106,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Use Kettle Dev's shared path identity logic when reconciling template and project paths.
 
+- Update the generated appraisal style-toolchain gate to Ruby 3.3 so Ruby 3.2 builds do not resolve unsupported lint dependencies.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

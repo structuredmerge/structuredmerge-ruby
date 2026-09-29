@@ -1508,6 +1508,14 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
   end
 
+  it "gates the appraisal style toolchain on Ruby 3.3" do
+    template_path = File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Appraisal.root.gemfile.example")
+    template = File.read(template_path)
+
+    expect(template).to include("# The style toolchain includes dependencies that require Ruby 3.3 or newer.")
+    expect(template).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")')
+  end
+
   it "converges an existing injected kettle-jem dependency to the running version" do
     updated = described_class.ensure_monorepo_root_gemfile_dependencies(
       "source \"https://gem.coop\"\ngem \"kettle-jem\", \">= 7.0\"\n"
