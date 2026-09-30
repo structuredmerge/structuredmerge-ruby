@@ -112,6 +112,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Local style Gemfiles now include the configured rubocop-packaging plugin, matching the generated RuboCop configuration.
 
+- Generated Gemfiles now include extracted standard-library dependencies on Windows, and only include rubocop-on-rbs on Ruby 3.3 and newer.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10
