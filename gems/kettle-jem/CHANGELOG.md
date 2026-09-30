@@ -110,6 +110,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Include files created by template orchestration steps in change accounting and maintenance changelog entries.
 
+- Local style Gemfiles now include the configured rubocop-packaging plugin, matching the generated RuboCop configuration.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

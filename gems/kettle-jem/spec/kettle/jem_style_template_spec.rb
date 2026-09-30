@@ -122,6 +122,17 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "provides the configured RuboCop packaging plugin in local style bundles" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    local_style = File.read(File.join(template_root, "gemfiles/modular/style_local.gemfile.example"))
+
+    expect(local_style).to include(
+      'gem "rubocop-packaging",',
+      '  github: "pboling/rubocop-packaging",',
+      '  ref: "3539ba858d379740d638566faee9e56b2b854145"'
+    )
+  end
+
   it "renders README dev and test stack table with self-exclusion" do
     example_table = described_class.send(:readme_dev_test_stack_table, "example")
     turbo_table = described_class.send(:readme_dev_test_stack_table, "turbo_tests2")
