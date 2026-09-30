@@ -114,6 +114,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated Gemfiles now include extracted standard-library dependencies on Windows, and only include rubocop-on-rbs on Ruby 3.3 and newer.
 
+- Generated GitHub Actions workflows now pin setup-ruby-flash v2.13 so Windows native gems receive the MSYS2 dependency prefixes required by Psych and OpenSSL.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10
