@@ -118,6 +118,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated GitHub Actions workflows now pin setup-ruby-flash v2.14, which passes Windows-native MSYS2 prefixes and installs the CA trust bundle for OpenSSL.
 
+- Avoid duplicate rubocop-packaging declarations when local style Gemfiles are evaluated.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

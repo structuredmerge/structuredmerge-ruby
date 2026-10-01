@@ -124,8 +124,11 @@ RSpec.describe Kettle::Jem do
 
   it "provides the configured RuboCop packaging plugin in local style bundles" do
     template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    style = File.read(File.join(template_root, "gemfiles/modular/style.gemfile.example"))
     local_style = File.read(File.join(template_root, "gemfiles/modular/style_local.gemfile.example"))
 
+    expect(style.index('if ENV.fetch("RUBOCOP_LTS_DEV"')).to be <
+      style.index('gem "rubocop-packaging"')
     expect(local_style).to include(
       'gem "rubocop-packaging",',
       '  github: "pboling/rubocop-packaging",',
