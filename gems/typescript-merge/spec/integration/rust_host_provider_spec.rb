@@ -263,9 +263,11 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     incoming = "import { x } from 'x';\n/** é added */\nexport class Added {}\n"
     current = "// @ts-nocheck\nimport { x } from 'x';\n// footer\n"
     result = provider.merge2(incoming_source: incoming, current_source: current)
-    expect(result).to include(ok: true, output: "// @ts-nocheck\nimport { x } from 'x';\n/** é added */\nexport class Added {}\n// footer\n")
+    expect(result).to include(ok: true,
+                              output: "// @ts-nocheck\nimport { x } from 'x';\n/** é added */\nexport class Added {}\n// footer\n")
     expect(result.fetch(:verification)).to include(output_reparsed: true, directional_roles_preserved: true)
-    expect(provider.merge2(incoming_source: incoming.sub("'x'", "'y'"), current_source: current)).to include(ok: false, output: nil)
+    expect(provider.merge2(incoming_source: incoming.sub("'x'", "'y'"),
+                           current_source: current)).to include(ok: false, output: nil)
   end
 
   it 'reports import layout changes and deterministically reparses unchanged source' do
@@ -285,7 +287,8 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     expect(provider.analyze(source: base_source, comments: true)).to include(ok: false)
     expect(provider.analyze(source: 'export const a = 1;')).to include(ok: false)
     request = { base_source: base_source, ours_source: base_source, theirs_source: base_source }
-    expect(provider.merge3(request.merge(path_name: 'file.ts', labels: {}, conflict_marker_size: '7'))).to include(ok: true)
+    expect(provider.merge3(request.merge(path_name: 'file.ts', labels: {},
+                                         conflict_marker_size: '7'))).to include(ok: true)
     expect(provider.merge3(request.merge(conflict_marker_size: 8))).to include(ok: false)
     expect(provider.merge3(request.merge(labels: { ours: 'custom' }))).to include(ok: false)
     expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
