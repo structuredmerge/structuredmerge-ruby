@@ -18,6 +18,7 @@ RSpec.describe KettleJemDepsFloor do
       "kettle-jem" => %w[7.1.28 7.1.29],
       "managed_dep" => %w[1.0.0 1.1.0],
       "nomono" => %w[1.0.8 1.0.9],
+      "rubocop-minitest" => %w[0.40.0 0.41.0],
       "yard-timekeeper" => %w[0.2.3 0.2.4]
     )
   end
@@ -61,6 +62,7 @@ RSpec.describe KettleJemDepsFloor do
       # frozen_string_literal: true
 
       gem "example_dep", "~> 1.2", ">= 1.2.3", require: false
+      gem "rubocop-minitest", "~> 0.40", ">= 0.40.0"
       spec.add_development_dependency("other_dep", "~> 3.0", ">= 3.0.0")
       spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.7")
       # gem "ignored_dep", "~> 1.0", ">= 1.0.0"
@@ -253,6 +255,29 @@ RSpec.describe KettleJemDepsFloor do
     expect(read_file("template/valid.gemfile.example")).to include('gem "example_dep", "~> 1.2", ">= 1.2.3"')
   end
 
+  it "holds FLOOR_HOLDS gems out of planned changes and reports them separately" do
+    result = described_class.new(project_root: project_root, resolver: resolver, options: {upgrade: "major"}).run
+
+    expect(described_class.held_floor?("rubocop-minitest")).to be(true)
+    expect(result[:updated_dependencies]).not_to include("rubocop-minitest")
+    expect(result[:planned_changes].map { |change| change.fetch(:name) }).not_to include("rubocop-minitest")
+    expect(result[:held_floors]).to include(
+      hash_including(
+        name: "rubocop-minitest",
+        relative_path: "template/valid.gemfile.example",
+        current_floor: "0.40.0",
+        available_floor: "0.41.0",
+        reason: kind_of(String)
+      )
+    )
+  end
+
+  it "keeps a held floor untouched when writing" do
+    described_class.new(project_root: project_root, resolver: resolver, options: {write: true, commit: false, upgrade: "major"}).run
+
+    expect(read_file("template/valid.gemfile.example")).to include('gem "rubocop-minitest", "~> 0.40", ">= 0.40.0"')
+  end
+
   it "prints dry-run mode and a write hint when stale floors are found" do
     out = StringIO.new
     err = StringIO.new
@@ -395,7 +420,7 @@ RSpec.describe KettleJemDepsFloor do
   it "reports discovered dependencies without requiring an allow-list" do
     result = described_class.new(project_root: project_root, resolver: resolver, options: {upgrade: "patch"}).run
 
-    expect(result[:discovered_dependencies]).to eq(%w[bare_embedded_dep embedded_dep example_dep kettle-dev nomono other_dep yard-timekeeper])
+    expect(result[:discovered_dependencies]).to eq(%w[bare_embedded_dep embedded_dep example_dep kettle-dev nomono other_dep rubocop-minitest yard-timekeeper])
   end
 
   it "updates managed dependency registry floors in the same source file" do

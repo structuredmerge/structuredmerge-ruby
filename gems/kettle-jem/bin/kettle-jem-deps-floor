@@ -44,6 +44,23 @@ class KettleJemDepsFloor
   RUBYGEMS_REFRESH_ENV_KEY = "KETTLE_RUBYGEMS_REFRESH"
   RELEASE_MARKER_ENV_KEY = "KETTLE_RUBYGEMS_CACHE_BUST_PATH"
 
+  # Dependency floors that must NOT be auto-raised by this tool, even when a
+  # newer version exists. Each entry maps a gem name to the reason it is held.
+  # A hold exists because bumping the floor would produce an unresolvable
+  # dependency set in generated projects (or otherwise break them). Held gems
+  # are skipped during planning and reported separately so the hold is visible
+  # and auditable rather than silently ignored. Remove an entry once the
+  # upstream incompatibility it guards against is resolved, then re-run
+  # --write to let the floor catch up.
+  FLOOR_HOLDS = {
+    "rubocop-minitest" => "0.41.0 requires rubocop >= 1.89.0, but standard (~> 1.56) caps rubocop at ~> 1.88.0; the pair is unresolvable. Raise once standard supports rubocop >= 1.89."
+  }.freeze
+
+  # True when a gem name has a registered floor hold.
+  def self.held_floor?(name)
+    FLOOR_HOLDS.key?(name.to_s)
+  end
+
   SOURCE_GLOBS = [
     "lib/kettle/jem/templates/Appraisal.root.gemfile.example",
     "lib/kettle/jem/templates/Appraisals.example",
@@ -196,6 +213,12 @@ class KettleJemDepsFloor
       if result[:changelog]
         out.puts("changelog: #{result.fetch(:changelog).fetch(:status)}")
       end
+      result.fetch(:held_floors, []).each do |held|
+        out.puts(
+          "  held #{held.fetch(:name)} #{held.fetch(:relative_path)} " \
+            ">= #{held.fetch(:current_floor)} (available #{held.fetch(:available_floor)}): #{held.fetch(:reason)}"
+        )
+      end
       if result[:commit]
         out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
       elsif !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
@@ -272,6 +295,7 @@ class KettleJemDepsFloor
 
     records = dependency_records
     planned_changes = planned_dependency_changes(records, upgrade)
+    held_updates = held_floor_updates(records, upgrade)
     target_paths = changed_relative_paths(planned_changes)
     target_paths << changelog_path if changelog_needed?(planned_changes)
     preexisting_dirty_paths = preexisting_dirty_target_paths(target_paths)
@@ -290,6 +314,7 @@ class KettleJemDepsFloor
       discovered_dependencies: records.map { |record| record.fetch(:name) }.uniq.sort,
       updates: planned_changes.length,
       updated_dependencies: planned_changes.map { |change| change.fetch(:name) }.uniq.sort,
+      held_floors: held_updates,
       commit: commit_result,
       changelog: changelog_result,
       planned_changes: planned_changes.map { |change| serializable_change(change) }
@@ -490,6 +515,8 @@ class KettleJemDepsFloor
 
   def planned_dependency_changes(records, upgrade)
     records.filter_map do |record|
+      next if self.class.held_floor?(record.fetch(:name))
+
       current_floor = floor_version(record.fetch(:current_floor))
       latest = latest_version_for(record.fetch(:name), current_floor, upgrade)
       next unless latest && latest > current_floor
@@ -501,6 +528,27 @@ class KettleJemDepsFloor
         new_pessimistic: pessimistic_requirement_for(latest)
       }
     end
+  end
+
+  # Held floors that a newer release exists for, so the hold is reported
+  # instead of being silently skipped.
+  def held_floor_updates(records, upgrade)
+    records.filter_map do |record|
+      name = record.fetch(:name)
+      next unless self.class.held_floor?(name)
+
+      current_floor = floor_version(record.fetch(:current_floor))
+      latest = latest_version_for(name, current_floor, upgrade)
+      next unless latest && latest > current_floor
+
+      {
+        name: name,
+        relative_path: record.fetch(:relative_path),
+        current_floor: current_floor.to_s,
+        available_floor: latest.to_s,
+        reason: self.class::FLOOR_HOLDS.fetch(name)
+      }
+    end.uniq { |held| held.fetch(:name) }
   end
 
   def latest_version_for(name, current_floor, upgrade)

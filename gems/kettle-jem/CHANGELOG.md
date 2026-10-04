@@ -47,6 +47,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Templating plan phases now prefetch the tree-sitter-language-pack grammars used by template merges (bash, go, html, json, json5, markdown, rbs, ruby, rust, toml, tsx, typescript, yaml) through the language pack's hot-load API before recipes run, so on-demand grammar downloads happen up front with attributable diagnostics instead of failing inside a merge. Configure via KJ_TSLP_PREFETCH_LANGUAGES (space/comma list, or false to disable).
 
+- kettle-jem-deps-floor: add FLOOR_HOLDS registry to exclude a dependency floor from automatic raising when a newer release would produce an unresolvable dependency set in generated projects. Held floors are skipped during planning and reported separately (held_floors in JSON, a 'held' line in text output) so the exclusion is auditable rather than silent. First entry: rubocop-minitest (0.41.0 needs rubocop >= 1.89, but standard ~> 1.56 caps rubocop at ~> 1.88).
+
 ### Changed
 
 - Require kettle-rb `>= 0.1.14` (security floor data).
