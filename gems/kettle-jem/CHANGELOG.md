@@ -70,8 +70,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.14 (6f8ad36ba7488db591541483afb5464d01e8861b)
 
-- [kc] kettle-jem/prepare: updated 4 project files:
-  - dependencies (4)
+- [kc] kettle-jem/prepare: updated 13 project files:
+  - dependencies (13)
 
 - [kc] kettle-jem/template: updated 12 project files:
   - code and tests (1)

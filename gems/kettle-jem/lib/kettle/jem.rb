@@ -2677,18 +2677,22 @@ module Kettle
       languages = tslp_prefetch_languages(env)
       report = TreeHaver.prefetch_languages(languages)
       report[:languages] = languages
-      emit_event(events, "diagnostic", {
-        severity: report.fetch(:failures, {}).empty? ? "advisory" : "warning",
-        category: "tslp_prefetch",
-        message: tslp_prefetch_message(report)
-      }) if events
+      if events
+        emit_event(events, "diagnostic", {
+          severity: report.fetch(:failures, {}).empty? ? "advisory" : "warning",
+          category: "tslp_prefetch",
+          message: tslp_prefetch_message(report)
+        })
+      end
       report
-    rescue StandardError => error
-      emit_event(events, "diagnostic", {
-        severity: "warning",
-        category: "tslp_prefetch",
-        message: "TSLP grammar prefetch failed: #{error.class}: #{error.message}"
-      }) if events
+    rescue => error
+      if events
+        emit_event(events, "diagnostic", {
+          severity: "warning",
+          category: "tslp_prefetch",
+          message: "TSLP grammar prefetch failed: #{error.class}: #{error.message}"
+        })
+      end
       {attempted: false, reason: "#{error.class}: #{error.message}"}
     end
 
