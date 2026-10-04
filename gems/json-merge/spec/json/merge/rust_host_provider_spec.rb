@@ -84,7 +84,8 @@ RSpec.describe Json::Merge::RustHostProvider do
     result = provider.diff2(before_source: before, after_source: after, dialect: :json)
     expect(result).to include(ok: true)
     change = result.fetch(:changes).find { |entry| entry[:path] == '/b/x' }
-    expect(change).to include(change: :edited, before: hash_including(line_range: [3, 3]), after: hash_including(line_range: [3, 3]))
+    expect(change).to include(change: :edited, before: hash_including(line_range: [3, 3]),
+                              after: hash_including(line_range: [3, 3]))
     expect(result.fetch(:changes).map { |entry| entry[:path] }).not_to include('/a/x')
     expect(Ast::Merge::ProviderContract.validate_result!(:diff2, result)).to include(ok: true)
     expect(Gem.loaded_specs.keys).not_to include('structuredmerge_host_prototype')
