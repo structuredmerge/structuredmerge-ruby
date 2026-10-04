@@ -553,24 +553,24 @@ module Markdown
       lines = normalize_source(source).split("\n")
       starts = markdown_owner_start_indices(source)
       link_definitions = FileAnalysis.new(source, backend: backend || :auto).statements
-        .grep(LinkDefinitionNode)
-        .each_with_object({}) do |owner, definitions|
-          label = owner.signature.last
-          path = "/link_definition/#{label}"
-          definitions[path] ||= {
-            path: path,
-            owner_kind: "link_definition",
-            match_key: label,
-            start_line: owner.location.start_line
-          }
-        end
+                                     .grep(LinkDefinitionNode)
+                                     .each_with_object({}) do |owner, definitions|
+                                       label = owner.signature.last
+                                       path = "/link_definition/#{label}"
+                                       definitions[path] ||= {
+                                         path: path,
+                                         owner_kind: 'link_definition',
+                                         match_key: label,
+                                         start_line: owner.location.start_line
+                                       }
+                                     end
       all_owners = owners + link_definitions.values
       ordered = all_owners.filter_map do |owner|
         start = if owner.key?(:start_line)
-          owner[:start_line] - 1
-        else
-          starts[owner[:path]]
-        end
+                  owner[:start_line] - 1
+                else
+                  starts[owner[:path]]
+                end
         next if start.nil?
 
         { owner: owner, start: start }
