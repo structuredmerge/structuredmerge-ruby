@@ -14,7 +14,12 @@ gem "reek", "~> 6.6", ">= 6.6.0"
 platform :mri do
   gem "appraisal2-rubocop", "~> 1.0", ">= 1.0.4", require: false
   gem "rubocop-gradual", "~> 0.4", ">= 0.4.0"
-  gem "rubocop-minitest", "~> 0.41", ">= 0.41.0"
+  # rubocop-minitest floor held at 0.40: 0.41.0 requires rubocop >= 1.89.0,
+  # but standard (~> 1.56) caps rubocop at ~> 1.88.0, making the pair
+  # unsatisfiable. Raise to 0.41 when standard releases support rubocop 1.89.
+  # NOTE: kettle-jem-deps-floor --write will re-raise this floor; keep it
+  # pinned at 0.40 until the standard constraint moves.
+  gem "rubocop-minitest", "~> 0.40", ">= 0.40.0"
   if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3.0")
     gem "rubocop-on-rbs", "~> 2.2", ">= 2.2.0"      # ruby >= 3.3.0
   end
