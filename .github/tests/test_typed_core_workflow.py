@@ -59,9 +59,16 @@ class TypedCoreWorkflowTest(unittest.TestCase):
         self.assertLess(build, verify)
         self.assertLess(package, verify)
         self.assertLess(verify, export)
-        self.assertEqual(steps[package]["working-directory"], "native-ruby/gems/psych-merge")
+        # Packaging walks the sibling closure from the candidate root, not from
+        # the single psych-merge directory: release-bumped checkouts pin sibling
+        # gems to versions the registry does not have yet.
+        self.assertEqual(steps[package]["working-directory"], "native-ruby")
+        self.assertIn("gems/psych-merge", steps[package]["run"])
         self.assertIn("core_parser_host.rb", steps[package]["run"])
+        self.assertIn("psych-provider-support", steps[package]["run"])
+        self.assertIn("dependency.type == :runtime", steps[package]["run"])
         self.assertEqual(steps[verify]["working-directory"], "kernel")
+        self.assertIn("--provider-support-dir tmp/psych-provider-support", steps[verify]["run"])
         self.assertNotIn("if", steps[verify])
         self.assertNotIn("continue-on-error", steps[verify])
         self.assertIn("set -euo pipefail", steps[verify]["run"])
