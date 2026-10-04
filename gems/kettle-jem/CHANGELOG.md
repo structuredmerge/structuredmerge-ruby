@@ -58,6 +58,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
   - workflows (10)
 
+- The templating workflow template now restores tree-sitter-language-pack grammar downloads from actions/cache keyed by the templating lockfiles, keeping the self-test off the network in the common case; a cache miss falls back to the in-run tslp_prefetch phase.
+
 ### Deprecated
 
 ### Removed
