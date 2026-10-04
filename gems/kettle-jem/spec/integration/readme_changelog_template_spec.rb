@@ -1341,7 +1341,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(funding).not_to include("opencollective")
       expect(readme).not_to include("Apache SkyWalking Eyes License Compatibility Check")
       expect(readme).to include("https://github.com/structuredmerge/structuredmerge-ruby#package-family")
-      expect(readme).to include("https://github.com/structuredmerge/structuredmerge")
+      expect(readme).to include("[sm-family-rust]: https://github.com/structuredmerge/structuredmerge")
       expect(readme).to include("root package-family guide")
       expect(readme).to include("https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml")
       expect(readme).not_to include("https://github.com/structuredmerge/ast-merge/actions/workflows/current.yml")
