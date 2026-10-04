@@ -35,7 +35,7 @@ module Ast
       def report(request)
         core_report(request)
       rescue KeyError, ArgumentError, TypeError => e
-        raise RuntimeError, e.message
+        raise e.message.to_s
       end
 
       def plan(request)

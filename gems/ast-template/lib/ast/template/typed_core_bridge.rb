@@ -7,7 +7,8 @@ module Ast
     module TypedCoreBridge
       REPORT_FIELDS = {
         'TemplateSessionRequestReport' => %w[request_kind profile_name mode ready diagnostics resolved_options],
-        'TemplateSessionOptions' => %w[mode template_root destination_root context default_strategy overrides replacements allowed_families config],
+        'TemplateSessionOptions' => %w[mode template_root destination_root context default_strategy overrides
+                                       replacements allowed_families config],
         'TemplateDestinationContext' => %w[project_name],
         'TemplateStrategyOverride' => %w[path strategy],
         'TemplateTokenConfig' => %w[pre post separators min_segments max_segments segment_pattern],
@@ -15,7 +16,8 @@ module Ast
         'TemplateSessionPlanReport' => %w[mode runner_report],
         'TemplateDirectoryRunnerReport' => %w[plan_report preview run_report apply_report],
         'TemplateDirectoryPlanReport' => %w[entries summary],
-        'TemplateDirectoryPlanReportEntry' => %w[template_source_path logical_destination_path destination_path execution_action write_action status previewable],
+        'TemplateDirectoryPlanReportEntry' => %w[template_source_path logical_destination_path destination_path
+                                                 execution_action write_action status previewable],
         'TemplateDirectoryPlanReportSummary' => %w[create update keep blocked omitted],
         'TemplatePreviewResult' => %w[result_files created_paths updated_paths kept_paths blocked_paths omitted_paths]
       }.freeze
@@ -36,9 +38,12 @@ module Ast
                  when 'options'
                    host.report_template_options(options)
                  when 'profile'
-                   profiles = require_hash(request.fetch('profiles', {})).transform_values { |profile| template_profile(profile) }
+                   profiles = require_hash(request.fetch('profiles', {})).transform_values do |profile|
+                     template_profile(profile)
+                   end
                    host.report_template_profile(host::TemplateProfileRequest.new(
-                     profile_name: request.fetch('profile_name'), profiles: profiles, options: options))
+                                                  profile_name: request.fetch('profile_name'), profiles: profiles, options: options
+                                                ))
                  when 'plan'
                    host.plan_template_directory(options)
                  else
@@ -60,7 +65,8 @@ module Ast
         value = require_hash(value)
         fields = %w[mode default_strategy replacements].to_h { |field| [field.to_sym, value.fetch(field)] }
         fields[:replacements] = require_hash(fields[:replacements])
-        fields[:context] = host::TemplateDestinationContext.new(project_name: require_hash(value.fetch('context'))['project_name'])
+        fields[:context] =
+          host::TemplateDestinationContext.new(project_name: require_hash(value.fetch('context'))['project_name'])
         overrides = value.fetch('overrides')
         raise TypeError, 'template overrides must be an array' unless overrides.is_a?(Array)
 
@@ -71,7 +77,9 @@ module Ast
         fields[:allowed_families] = value['allowed_families']
         fields[:config] = unless value['config'].nil?
                             config = require_hash(value['config'])
-                            args = %w[pre post separators min_segments segment_pattern].to_h { |key| [key.to_sym, config.fetch(key)] }
+                            args = %w[pre post separators min_segments segment_pattern].to_h do |key|
+                              [key.to_sym, config.fetch(key)]
+                            end
                             host::TemplateTokenConfig.new(**args, max_segments: config['max_segments'])
                           end
         fields

@@ -2,13 +2,13 @@
   ".simplecov:470547781": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:3050540927": [
+  "Rakefile:4232043700": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
     [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "ast-template.gemspec:280028549": [
+  "ast-template.gemspec:3124740646": [
     [136, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [138, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 2105564149],
     [147, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
@@ -28,8 +28,11 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/coverage_local.gemfile:3080699222": [
-    [42, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
+  "gemfiles/modular/changelog.gemfile:2477451209": [
+    [38, 7, 580, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 393701499]
+  ],
+  "gemfiles/modular/coverage_local.gemfile:1246000888": [
+    [53, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
   ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
@@ -83,7 +86,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/x_std_libs.gemfile:3163909001": [
+  "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
@@ -241,8 +244,22 @@
     [1497, 7, 456, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `readme_family_section_insert_index` is too high. [8/7]", 252997882],
     [1497, 7, 456, "Metrics/MethodLength: Method has too many lines. [13/10]", 252997882]
   ],
-  "spec/integration/rust_host_provider_spec.rb:474907338": [
-    [3, 1, 2777, "Metrics/BlockLength: Block has too many lines. [76/25]", 431892732]
+  "lib/ast/template/typed_core_bridge.rb:633980720": [
+    [34, 7, 1051, "Metrics/AbcSize: Assignment Branch Condition size for `core_report` is too high. [<5, 23, 5> 24.06/17]", 15817879],
+    [34, 7, 1051, "Metrics/MethodLength: Method has too many lines. [18/10]", 15817879],
+    [45, 121, 11, "Layout/LineLength: Line is too long. [131/120]", 4161654418],
+    [64, 7, 1268, "Metrics/AbcSize: Assignment Branch Condition size for `template_fields` is too high. [<14, 36, 5> 38.95/17]", 436181676],
+    [64, 7, 1268, "Metrics/MethodLength: Method has too many lines. [20/10]", 436181676],
+    [103, 7, 663, "Metrics/AbcSize: Assignment Branch Condition size for `project_report` is too high. [<7, 16, 9> 19.65/17]", 164268797],
+    [103, 7, 663, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `project_report` is too high. [10/7]", 164268797],
+    [103, 7, 663, "Metrics/MethodLength: Method has too many lines. [13/10]", 164268797]
+  ],
+  "spec/integration/rust_host_provider_spec.rb:1161021684": [
+    [3, 1, 3250, "Metrics/BlockLength: Block has too many lines. [85/25]", 3367560176],
+    [25, 3, 2547, "Metrics/BlockLength: Block has too many lines. [65/25]", 3458567462]
+  ],
+  "spec/integration/typed_core_fixture_spec.rb:3363080342": [
+    [5, 1, 4097, "Metrics/BlockLength: Block has too many lines. [71/25]", 656242507]
   ],
   "spec/session_integration_spec.rb:1063469608": [
     [5, 1, 89793, "Metrics/BlockLength: Block has too many lines. [1761/25]", 3162725061],
