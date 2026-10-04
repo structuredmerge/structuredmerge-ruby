@@ -94,6 +94,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Markdown merging now deduplicates template link-reference definitions against destination labels.
 
+- TreeHaver's TSLP backend now retries transient tree-sitter-language-pack grammar hot-load (on-demand download) failures up to a bounded budget instead of latching unavailability for the process lifetime, so one flaky grammar download no longer fails every later parse.
+
+- TreeHaver's "No parser registered" errors now include the tree-sitter-language-pack unavailability reason, so a failed on-demand grammar download surfaces as an attributable download error instead of a misleading registration message.
+
+- json-merge backend registration now only treats registration as complete when a JSON grammar actually registered, so a transient TSLP hot-load failure stays retryable instead of latching for the process lifetime.
+
+- TreeHaver exposes prefetch_languages to pre-download and pre-load language-pack grammars through their hot-load API before parsing.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
