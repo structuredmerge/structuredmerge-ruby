@@ -160,7 +160,8 @@ RSpec.describe Bash::Merge::RustHostProvider do
     diff = provider.diff2(before_source: source, after_source: source.sub('x=1', 'x=2'))
     expect(diff).to include(ok: true)
     owner = diff.fetch(:changes).find { |change| change[:path] == '/variable:x' }
-    expect(owner).to include(change: :edited, before: hash_including(line_range: [2, 2]), after: hash_including(line_range: [2, 2]))
+    expect(owner).to include(change: :edited, before: hash_including(line_range: [2, 2]),
+                             after: hash_including(line_range: [2, 2]))
     expect(owner.dig(:before, :byte_range)).to eq('start_byte' => 5, 'end_byte' => 8)
     expect(diff.fetch(:changes)).to include(hash_including(subject_ref: 'document'))
     expect(JSON.generate(diff)).not_to include('#<StructuredmergeCore::')
@@ -174,7 +175,7 @@ RSpec.describe Bash::Merge::RustHostProvider do
 
   it 'keeps current edits and imports only incoming additions with native comments' do
     result = provider.merge2(incoming_source: "x=1\n# é new\ny=2 # incoming\n",
-      current_source: "x=9 # current\nz=3\n# footer\n")
+                             current_source: "x=9 # current\nz=3\n# footer\n")
     expect(result).to include(ok: true, output: "x=9 # current\nz=3\n# é new\ny=2 # incoming\n# footer\n")
     expect(result.fetch(:verification)).to include(directional_roles_preserved: true, output_reparsed: true)
     empty = provider.merge2(incoming_source: "x=1\n", current_source: '')
@@ -189,7 +190,8 @@ RSpec.describe Bash::Merge::RustHostProvider do
     result = provider.merge3(base_source: source, ours_source: source, theirs_source: source)
     expect(result).to include(ok: true, output: source)
     expect(result.fetch(:verification)).to include(output_reparsed: true, base_participated: true)
-    expect(JSON.generate(result)).to eq(JSON.generate(provider.merge3(base_source: source, ours_source: source, theirs_source: source)))
+    expect(JSON.generate(result)).to eq(JSON.generate(provider.merge3(base_source: source, ours_source: source,
+                                                                      theirs_source: source)))
   end
 
   it 'preserves canonical conflicts and rejects unsupported syntax and selectors' do
@@ -202,12 +204,13 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(provider.analyze(source: "x=1\n", dialect: :json)).to include(ok: false)
     expect(provider.analyze(source: "x=1\n", comments: true)).to include(ok: false)
     expect(provider.merge3(base_source: "x=1\n", ours_source: "x=1\n", theirs_source: "x=1\n",
-      path_name: 'script.sh', labels: {}, conflict_marker_size: '7')).to include(ok: true)
+                           path_name: 'script.sh', labels: {}, conflict_marker_size: '7')).to include(ok: true)
     expect(provider.merge3(base_source: "x=1\n", ours_source: "x=1\n", theirs_source: "x=1\n",
-      conflict_marker_size: 8)).to include(ok: false)
+                           conflict_marker_size: 8)).to include(ok: false)
     expect(provider.merge3(base_source: "x=1\n", ours_source: "x=1\n", theirs_source: "x=1\n",
-      labels: { ours: 'custom' })).to include(ok: false)
-    expect(provider.merge2(incoming_source: "b=2\nnew=3\na=1\n", current_source: "a=9\nb=9\n")).to include(ok: false, output: nil)
+                           labels: { ours: 'custom' })).to include(ok: false)
+    expect(provider.merge2(incoming_source: "b=2\nnew=3\na=1\n",
+                           current_source: "a=9\nb=9\n")).to include(ok: false, output: nil)
     expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
     bytes = "# é\nx=1\n".b
     expect(provider.analyze(source: bytes)).to include(ok: true)
