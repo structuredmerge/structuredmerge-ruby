@@ -56,11 +56,19 @@ Please file a bug if you notice a violation of semantic versioning.
   has no modular home.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - appraisal2 (>= 3.2.4 -> >= 3.2.5)
-  - appraisal2-rubocop (>= 1.0.3 -> >= 1.0.4)
+  - gitmoji-regex (>= 2.0.13 -> >= 2.0.15)
+  - kettle-dev (>= 3.1.5 -> >= 3.1.6)
+  - kettle-family (>= 1.3.3 -> >= 1.3.4)
+  - reek (>= 6.5.0 -> >= 6.6.0)
+  - rubocop-lts-rspec (>= 1.0.6 -> >= 1.0.7)
+  - rubocop-minitest (>= 0.40.0 -> >= 0.41.0)
+  - turbo_tests2 (>= 3.2.12 -> >= 3.2.13)
+  - yaml-converter (>= 0.2.6 -> >= 0.2.7)
+  - yard-fence (>= 0.9.9 -> >= 0.9.10)
+  - yard-timekeeper (>= 0.2.7 -> >= 0.2.9)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
-  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.12 (643b5a1f21af52a180b132cd8cb2ce8b5e7972b6)
+  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.14 (6f8ad36ba7488db591541483afb5464d01e8861b)
 
 - [kc] kettle-jem/prepare: updated 4 project files:
   - dependencies (4)
