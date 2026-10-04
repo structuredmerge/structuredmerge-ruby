@@ -244,15 +244,20 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
   it 'retains module docs and imports while inserting outer docs and new declarations' do
     result = provider.merge2(incoming_source: "//! incoming module\nuse std::fmt;\n/// é added\nfn f() {}\n",
-      current_source: "//! current module\nuse std::fmt;\n// footer\n")
-    expect(result).to include(ok: true, output: "//! current module\nuse std::fmt;\n/// é added\nfn f() {}\n// footer\n")
+                             current_source: "//! current module\nuse std::fmt;\n// footer\n")
+    expect(result).to include(ok: true,
+                              output: "//! current module\nuse std::fmt;\n/// é added\nfn f() {}\n// footer\n")
     expect(result.fetch(:verification)).to include(output_reparsed: true, directional_roles_preserved: true)
-    expect(provider.merge2(incoming_source: "use std::io;\nfn f() {}\n", current_source: "use std::fmt;\n")).to include(ok: false, output: nil)
-    expect(provider.merge2(incoming_source: "struct T;\n", current_source: '')).to include(ok: true, output: "struct T;\n")
+    expect(provider.merge2(incoming_source: "use std::io;\nfn f() {}\n",
+                           current_source: "use std::fmt;\n")).to include(ok: false,
+                                                                          output: nil)
+    expect(provider.merge2(incoming_source: "struct T;\n",
+                           current_source: '')).to include(ok: true, output: "struct T;\n")
   end
 
   it 'retains canonical guard evidence before whole-source shortcuts without inventing owner decisions' do
-    result = provider.merge3(base_source: base_source, ours_source: ours_source + "fn added() {}\n", theirs_source: base_source)
+    result = provider.merge3(base_source: base_source, ours_source: ours_source + "fn added() {}\n",
+                             theirs_source: base_source)
     expect(result).to include(ok: false, output: nil)
     conflict = result.dig(:typed_result, :conflicts, 0, :canonical)
     expect(conflict).to include(code: 'rust.membership_with_owner_edit', decision_ids: [])
@@ -280,7 +285,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(provider.analyze(source: base_source, comments: true)).to include(ok: false)
     expect(provider.analyze(source: "#[test]\nfn f() {}\n")).to include(ok: false)
     request = { base_source: base_source, ours_source: base_source, theirs_source: base_source }
-    expect(provider.merge3(request.merge(path_name: 'file.rs', labels: {}, conflict_marker_size: '7'))).to include(ok: true)
+    expect(provider.merge3(request.merge(path_name: 'file.rs', labels: {},
+                                         conflict_marker_size: '7'))).to include(ok: true)
     expect(provider.merge3(request.merge(conflict_marker_size: 8))).to include(ok: false)
     expect(provider.merge3(request.merge(labels: { ours: 'custom' }))).to include(ok: false)
     expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
