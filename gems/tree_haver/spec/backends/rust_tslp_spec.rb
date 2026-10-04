@@ -76,18 +76,21 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     nodes = value.fetch('nodes').map do |node|
       span = node.fetch('span')
       record(id: node.fetch('id'), native_type: node.fetch('kind'), named: node.fetch('named'),
-        missing: node.fetch('backend_roles', []).include?('missing'),
-        has_error: node['role'] == 'error' || !value.fetch('ok', true),
-        parent_id: node['parent_id'],
-        children: node.fetch('child_ids', []).map { |id| record(node_id: id, field_name: nil) },
-        extensions: [record(schema: 'tree-haver.tree-sitter.node/v1', namespace: 'tree-sitter', payload: '{"extra":true}')],
-        span: record(range: record(**span.fetch('range').transform_keys(&:to_sym)),
-          start_point: record(**span.fetch('start_point').transform_keys(&:to_sym)),
-          end_point: record(**span.fetch('end_point').transform_keys(&:to_sym))))
+             missing: node.fetch('backend_roles', []).include?('missing'),
+             has_error: node['role'] == 'error' || !value.fetch('ok', true),
+             parent_id: node['parent_id'],
+             children: node.fetch('child_ids', []).map { |id| record(node_id: id, field_name: nil) },
+             extensions: [record(schema: 'tree-haver.tree-sitter.node/v1', namespace: 'tree-sitter', payload: '{"extra":true}')],
+             span: record(range: record(**span.fetch('range').transform_keys(&:to_sym)),
+                          start_point: record(**span.fetch('start_point').transform_keys(&:to_sym)),
+                          end_point: record(**span.fetch('end_point').transform_keys(&:to_sym))))
     end
     record(parsed: record(nodes: nodes, root_id: value.fetch('root_id'),
-      diagnostics: value.fetch('diagnostics').map { |message| record(message: message) }),
-      backend: record(id: 'tree_haver.rust_tslp.json', runtime: 'rust', parser: 'tree-sitter-language-pack', parser_version: 'runtime'))
+                          diagnostics: value.fetch('diagnostics').map do |message|
+                            record(message: message)
+                          end),
+           backend: record(id: 'tree_haver.rust_tslp.json', runtime: 'rust', parser: 'tree-sitter-language-pack',
+                           parser_version: 'runtime'))
   end
 
   it 'adapts the Rust normalized tree with source, topology, points, and provenance' do
@@ -236,7 +239,8 @@ RSpec.describe TreeHaver::Backends::RustTslp do
   end
 
   it 'does not adopt foreign duplicate registrations' do
-    allow(StructuredmergeCore).to receive(:register_language_pack_parser).and_raise(RuntimeError, 'registration: DuplicateId')
+    allow(StructuredmergeCore).to receive(:register_language_pack_parser).and_raise(RuntimeError,
+                                                                                    'registration: DuplicateId')
     parser = described_class::Parser.new
     parser.language = described_class::Language.new(:json)
     expect { parser.parse(source) }.to raise_error(RuntimeError, /DuplicateId/)

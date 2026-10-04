@@ -50,7 +50,7 @@ module TreeHaver
         | timed?\ out
         | timeout
         | temporarily
-      /xi.freeze
+      /xi
 
       class << self
         attr_reader :unavailable_reason
@@ -107,7 +107,7 @@ module TreeHaver
             failures[name] = e.message
             false
           end
-          {attempted: true, prefetched: prefetched, failures: failures}
+          { attempted: true, prefetched: prefetched, failures: failures }
         end
 
         def transient_reason?(reason)

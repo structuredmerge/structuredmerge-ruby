@@ -372,7 +372,7 @@ module TreeHaver
     reasons = [language_reason, backend_reason].map(&:to_s).reject(&:empty?).uniq
     return message if reasons.empty?
 
-    "#{message} (tree_sitter_language_pack: #{reasons.join("; ")})"
+    "#{message} (tree_sitter_language_pack: #{reasons.join('; ')})"
   end
 
   def ruby_reference_parser_backend_contract_report

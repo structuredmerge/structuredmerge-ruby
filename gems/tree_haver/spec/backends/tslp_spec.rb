@@ -117,8 +117,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     probe_attempts = 0
     allow(TreeSitterLanguagePack).to receive(:get_parser).with('json') do
       probe_attempts += 1
-      raise RuntimeError,
-            'Download error: Failed to fetch manifest from https://example/manifest.json: io: Connection refused' if probe_attempts == 1
+      if probe_attempts == 1
+        raise 'Download error: Failed to fetch manifest from https://example/manifest.json: io: Connection refused'
+      end
 
       parser
     end
@@ -188,7 +189,8 @@ RSpec.describe TreeHaver::Backends::Tslp do
 
     it 'reports skipped when the language pack is not installed' do
       hide_const('TreeSitterLanguagePack') if defined?(::TreeSitterLanguagePack)
-      allow(described_class).to receive(:require).and_raise(LoadError, 'cannot load such file -- tree_sitter_language_pack')
+      allow(described_class).to receive(:require).and_raise(LoadError,
+                                                            'cannot load such file -- tree_sitter_language_pack')
 
       report = described_class.prefetch(%w[json])
 

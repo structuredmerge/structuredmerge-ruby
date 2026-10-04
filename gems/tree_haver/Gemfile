@@ -21,20 +21,20 @@ gemspec
 structuredmerge_core_dev = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', '').strip
 if !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
   structuredmerge_core_root = if %w[true 1 yes on].include?(structuredmerge_core_dev.downcase)
-    File.join(Dir.home, 'src/my/structuredmerge/structuredmerge')
-  else
-    File.expand_path(structuredmerge_core_dev, Dir.home)
-  end
+                                File.join(Dir.home, 'src/my/structuredmerge/structuredmerge')
+                              else
+                                File.expand_path(structuredmerge_core_dev, Dir.home)
+                              end
   gem 'structuredmerge-core', path: File.join(structuredmerge_core_root, 'packages/ruby')
 elsif ENV.fetch('STRUCTUREDMERGE_CORE_PUBLISHED', 'false').casecmp('true').zero?
   # Registry-install checks remain separate from pre-publication artifact tests.
   gem 'structuredmerge-core', '~> 0.2'
 end
 
-gem 'kettle-family', '~> 1.3', '>= 1.3.1'
+gem 'kettle-family', '~> 1.3', '>= 1.3.4'
 
 # Local workspace dependency wiring for *_local.gemfile overrides
-gem 'nomono', '~> 1.1', '>= 1.1.5', require: false # ruby >= 3.2.0
+gem 'nomono', '~> 1.1', '>= 1.1.6', require: false # ruby >= 3.2.0
 
 # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
 eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?

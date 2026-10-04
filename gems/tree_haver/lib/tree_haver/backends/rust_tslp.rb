@@ -42,6 +42,7 @@ module TreeHaver
 
         def register_language_parser(language)
           return unless available?
+
           # Cache only registrations made by this adapter, never adopt a foreign
           # duplicate ID. An external removal therefore fails closed on parse.
           REGISTRATION_MUTEX.synchronize do
@@ -110,7 +111,7 @@ module TreeHaver
             sha256: Digest::SHA256.hexdigest(normalized_source), encoding: 'utf8',
             bom: normalized_source.start_with?("\uFEFF"), final_newline: normalized_source.end_with?("\n", "\r"),
             line_endings: core::LineEndings.new(lf: normalized_source.count("\n") - crlf,
-              crlf: crlf, bare_cr: normalized_source.count("\r") - crlf)
+                                                crlf: crlf, bare_cr: normalized_source.count("\r") - crlf)
           )
           request = core::ParseRequest.new(
             schema: 'structuredmerge.parse-request/v1', request_id: 'tree_haver.parse',
@@ -121,7 +122,7 @@ module TreeHaver
             metadata: {}, extra: {}
           )
           limits = core::ParseLimits.new(max_batch_items: 1, max_input_bytes: 64 * 1024 * 1024,
-            max_nodes: 1_000_000, max_diagnostics: 1000)
+                                         max_nodes: 1_000_000, max_diagnostics: 1000)
           result = core.parse_sources([request], limits).fetch(0)
           Tree.new(result, source: normalized_source, language: language.name)
         end
@@ -221,14 +222,18 @@ module TreeHaver
         def end_point = symbolize_point(span.end_point)
         def child_count = inner_node.children.length
         def named? = inner_node.named
+
         def has_error? # rubocop:disable Naming/PredicatePrefix
           inner_node.has_error
         end
 
         def error? = has_error?
         def missing? = inner_node.missing
+
         def extra?
-          extension = inner_node.extensions.find { |item| item.schema == 'tree-haver.tree-sitter.node/v1' && item.namespace == 'tree-sitter' }
+          extension = inner_node.extensions.find do |item|
+            item.schema == 'tree-haver.tree-sitter.node/v1' && item.namespace == 'tree-sitter'
+          end
           raise TreeHaver::Error, 'Rust TreeHaver omitted native node flags' unless extension
 
           # Alef transports only the open extension payload as JSON, not the tree.

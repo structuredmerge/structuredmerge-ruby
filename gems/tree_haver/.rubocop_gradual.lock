@@ -2,7 +2,7 @@
   ".simplecov:2169141317": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:4283866239": [
+  "Rakefile:1716854580": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
@@ -22,8 +22,11 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/coverage_local.gemfile:3080699222": [
-    [42, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
+  "gemfiles/modular/changelog.gemfile:2477451209": [
+    [38, 7, 580, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 393701499]
+  ],
+  "gemfiles/modular/coverage_local.gemfile:1246000888": [
+    [53, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
   ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
@@ -77,7 +80,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/x_std_libs.gemfile:3163909001": [
+  "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
@@ -93,34 +96,34 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "lib/tree_haver.rb:2119207857": [
+  "lib/tree_haver.rb:1898075047": [
     [49, 1, 16, "Style/Documentation: Missing top-level documentation comment for `module TreeHaver`.", 3627168465],
-    [49, 1, 18241, "Metrics/ModuleLength: Module has too many lines. [470/100]", 1473017236],
+    [49, 1, 19461, "Metrics/ModuleLength: Module has too many lines. [481/100]", 3438059537],
     [68, 3, 712, "Metrics/MethodLength: Method has too many lines. [15/10]", 1755103980],
     [128, 3, 272, "Metrics/MethodLength: Method has too many lines. [11/10]", 505877912],
     [160, 3, 543, "Metrics/MethodLength: Method has too many lines. [14/10]", 3733215372],
     [225, 3, 458, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `backend_module` is too high. [9/7]", 73937708],
     [225, 3, 458, "Metrics/MethodLength: Method has too many lines. [12/10]", 73937708],
     [225, 3, 458, "Metrics/PerceivedComplexity: Perceived complexity for `backend_module` is too high. [9/8]", 73937708],
-    [261, 3, 1147, "Metrics/AbcSize: Assignment Branch Condition size for `register_language` is too high. [<0, 20, 10> 22.36/17]", 738075279],
-    [261, 3, 1147, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `register_language` is too high. [11/7]", 738075279],
-    [261, 3, 1147, "Metrics/MethodLength: Method has too many lines. [16/10]", 738075279],
-    [261, 3, 1147, "Metrics/PerceivedComplexity: Perceived complexity for `register_language` is too high. [11/8]", 738075279],
-    [261, 24, 165, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 2985413937],
-    [296, 3, 1969, "Metrics/AbcSize: Assignment Branch Condition size for `parser_for` is too high. [<14, 35, 18> 41.77/17]", 3351435495],
-    [296, 3, 1969, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parser_for` is too high. [19/7]", 3351435495],
-    [296, 3, 1969, "Metrics/MethodLength: Method has too many lines. [39/10]", 3351435495],
-    [296, 3, 1969, "Metrics/PerceivedComplexity: Perceived complexity for `parser_for` is too high. [19/8]", 3351435495],
-    [296, 17, 155, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 1417642817],
-    [351, 3, 2089, "Metrics/MethodLength: Method has too many lines. [51/10]", 2791676388],
-    [405, 3, 857, "Metrics/AbcSize: Assignment Branch Condition size for `requested_backend_type` is too high. [<6, 20, 13> 24.6/17]", 3087691662],
-    [405, 3, 857, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `requested_backend_type` is too high. [11/7]", 3087691662],
-    [405, 3, 857, "Metrics/MethodLength: Method has too many lines. [16/10]", 3087691662],
-    [405, 3, 857, "Metrics/PerceivedComplexity: Perceived complexity for `requested_backend_type` is too high. [12/8]", 3087691662],
-    [459, 3, 708, "Metrics/MethodLength: Method has too many lines. [14/10]", 2559620787],
-    [490, 3, 422, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `registered_backend_type_available?` is too high. [8/7]", 1544952013],
-    [560, 3, 534, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `backend_module_for` is too high. [11/7]", 3448932255],
-    [560, 3, 534, "Metrics/MethodLength: Method has too many lines. [24/10]", 3448932255]
+    [274, 3, 1147, "Metrics/AbcSize: Assignment Branch Condition size for `register_language` is too high. [<0, 20, 10> 22.36/17]", 738075279],
+    [274, 3, 1147, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `register_language` is too high. [11/7]", 738075279],
+    [274, 3, 1147, "Metrics/MethodLength: Method has too many lines. [16/10]", 738075279],
+    [274, 3, 1147, "Metrics/PerceivedComplexity: Perceived complexity for `register_language` is too high. [11/8]", 738075279],
+    [274, 24, 165, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 2985413937],
+    [309, 3, 1969, "Metrics/AbcSize: Assignment Branch Condition size for `parser_for` is too high. [<14, 36, 18> 42.61/17]", 3351435495],
+    [309, 3, 1969, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parser_for` is too high. [19/7]", 3351435495],
+    [309, 3, 1969, "Metrics/MethodLength: Method has too many lines. [39/10]", 3351435495],
+    [309, 3, 1969, "Metrics/PerceivedComplexity: Perceived complexity for `parser_for` is too high. [19/8]", 3351435495],
+    [309, 17, 155, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 1417642817],
+    [378, 3, 2089, "Metrics/MethodLength: Method has too many lines. [51/10]", 2791676388],
+    [432, 3, 857, "Metrics/AbcSize: Assignment Branch Condition size for `requested_backend_type` is too high. [<6, 20, 13> 24.6/17]", 3087691662],
+    [432, 3, 857, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `requested_backend_type` is too high. [11/7]", 3087691662],
+    [432, 3, 857, "Metrics/MethodLength: Method has too many lines. [16/10]", 3087691662],
+    [432, 3, 857, "Metrics/PerceivedComplexity: Perceived complexity for `requested_backend_type` is too high. [12/8]", 3087691662],
+    [486, 3, 708, "Metrics/MethodLength: Method has too many lines. [14/10]", 2559620787],
+    [517, 3, 422, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `registered_backend_type_available?` is too high. [8/7]", 1544952013],
+    [587, 3, 534, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `backend_module_for` is too high. [11/7]", 3448932255],
+    [587, 3, 534, "Metrics/MethodLength: Method has too many lines. [24/10]", 3448932255]
   ],
   "lib/tree_haver/backend_api.rb:3354059061": [
     [30, 3, 12181, "Metrics/ModuleLength: Module has too many lines. [243/100]", 205645546],
@@ -258,16 +261,26 @@
     [52, 9, 548, "Metrics/MethodLength: Method has too many lines. [15/10]", 3791803966],
     [156, 121, 1, "Layout/LineLength: Line is too long. [121/120]", 177548]
   ],
-  "lib/tree_haver/backends/tslp.rb:356373573": [
-    [10, 5, 8421, "Metrics/ModuleLength: Module has too many lines. [117/100]", 3469901771],
-    [34, 9, 663, "Metrics/MethodLength: Method has too many lines. [16/10]", 2812178140],
-    [113, 9, 651, "Metrics/MethodLength: Method has too many lines. [12/10]", 3907686821],
-    [146, 7, 14, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Language`.", 3674592793],
-    [158, 7, 12, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Parser`.", 2485220908],
-    [159, 9, 693, "Metrics/AbcSize: Assignment Branch Condition size for `parse` is too high. [<3, 20, 4> 20.62/17]", 103430155],
-    [189, 7, 10, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Tree`.", 3516465773],
-    [202, 7, 10, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Node`.", 3515419275],
-    [264, 13, 10, "Naming/PredicatePrefix: Rename `has_error?` to `error?`.", 946854183]
+  "lib/tree_haver/backends/rust_tslp.rb:3943901861": [
+    [67, 121, 15, "Layout/LineLength: Line is too long. [135/120]", 42481712],
+    [153, 9, 620, "Metrics/AbcSize: Assignment Branch Condition size for `initialize` is too high. [<6, 19, 2> 20.02/17]", 837463227],
+    [153, 9, 620, "Metrics/MethodLength: Method has too many lines. [11/10]", 837463227]
+  ],
+  "lib/tree_haver/backends/tslp.rb:1061391355": [
+    [10, 5, 12862, "Metrics/ModuleLength: Module has too many lines. [191/100]", 2834700691],
+    [55, 7, 7121, "Metrics/ClassLength: Class has too many lines. [152/100]", 2059126065],
+    [90, 9, 845, "Metrics/MethodLength: Method has too many lines. [18/10]", 613499560],
+    [140, 9, 1378, "Metrics/AbcSize: Assignment Branch Condition size for `parser_available_for?` is too high. [<15, 21, 9> 27.33/17]", 2228938872],
+    [140, 9, 1378, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parser_available_for?` is too high. [8/7]", 2228938872],
+    [140, 9, 1378, "Metrics/MethodLength: Method has too many lines. [23/10]", 2228938872],
+    [185, 9, 625, "Metrics/MethodLength: Method has too many lines. [13/10]", 1720369990],
+    [223, 9, 651, "Metrics/MethodLength: Method has too many lines. [12/10]", 3907686821],
+    [256, 7, 14, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Language`.", 3674592793],
+    [268, 7, 12, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Parser`.", 2485220908],
+    [269, 9, 693, "Metrics/AbcSize: Assignment Branch Condition size for `parse` is too high. [<3, 20, 4> 20.62/17]", 103430155],
+    [299, 7, 10, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Tree`.", 3516465773],
+    [312, 7, 10, "Style/Documentation: Missing top-level documentation comment for `class TreeHaver::Backends::Tslp::Node`.", 3515419275],
+    [374, 13, 10, "Naming/PredicatePrefix: Rename `has_error?` to `error?`.", 946854183]
   ],
   "lib/tree_haver/base/comment.rb:699160654": [
     [10, 5, 8183, "Metrics/ClassLength: Class has too many lines. [152/100]", 4001235397]
@@ -322,12 +335,12 @@
     [958, 3, 655, "Metrics/MethodLength: Method has too many lines. [17/10]", 1278853347],
     [958, 3, 655, "Metrics/PerceivedComplexity: Perceived complexity for `byte_offset_for_point` is too high. [10/8]", 1278853347]
   ],
-  "lib/tree_haver/grammar_finder.rb:1597180172": [
-    [55, 3, 14285, "Metrics/ClassLength: Class has too many lines. [214/100]", 842233610],
+  "lib/tree_haver/grammar_finder.rb:2672526201": [
+    [55, 3, 14287, "Metrics/ClassLength: Class has too many lines. [214/100]", 842233610],
     [155, 5, 1710, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `find_library_path` is too high. [8/7]", 4164717952],
     [155, 5, 1710, "Metrics/MethodLength: Method has too many lines. [25/10]", 4164717952],
     [269, 7, 845, "Metrics/MethodLength: Method has too many lines. [12/10]", 916567473],
-    [315, 5, 722, "Metrics/MethodLength: Method has too many lines. [18/10]", 4291316966],
+    [315, 5, 724, "Metrics/MethodLength: Method has too many lines. [18/10]", 4291316966],
     [342, 5, 623, "Metrics/MethodLength: Method has too many lines. [14/10]", 1438381615],
     [362, 5, 846, "Metrics/MethodLength: Method has too many lines. [12/10]", 667615068],
     [408, 5, 869, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `tree_sitter_language_pack_parser_available?` is too high. [8/7]", 2044118800],
@@ -438,6 +451,15 @@
   "spec/backend_registry_spec.rb:229950927": [
     [5, 1, 3102, "Metrics/BlockLength: Block has too many lines. [62/25]", 3416335650]
   ],
+  "spec/backends/rust_tslp_spec.rb:1256875775": [
+    [75, 3, 1337, "Metrics/AbcSize: Assignment Branch Condition size for `typed_result` is too high. [<5, 34, 8> 35.28/17]", 2922185245],
+    [75, 3, 1337, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `typed_result` is too high. [8/7]", 2922185245],
+    [75, 3, 1337, "Metrics/MethodLength: Method has too many lines. [18/10]", 2922185245],
+    [83, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 10974033]
+  ],
+  "spec/backends/tslp_spec.rb:1579606064": [
+    [142, 121, 1, "Layout/LineLength: Line is too long. [121/120]", 177538]
+  ],
   "spec/fixtures_integration_spec.rb:1107009509": [
     [3, 1, 52012, "Metrics/BlockLength: Block has too many lines. [1116/25]", 592858895],
     [108, 3, 1282, "Metrics/BlockLength: Block has too many lines. [29/25]", 505243730],
@@ -480,13 +502,13 @@
     [5, 1, 3065, "Metrics/BlockLength: Block has too many lines. [51/25]", 4150338550],
     [19, 3, 2446, "Metrics/BlockLength: Block has too many lines. [39/25]", 552612354]
   ],
-  "spec/integration/rust_tslp_host_spec.rb:4010709336": [
-    [5, 1, 1677, "Metrics/BlockLength: Block has too many lines. [30/25]", 3488270828]
+  "spec/integration/rust_tslp_host_spec.rb:457405539": [
+    [5, 1, 2534, "Metrics/BlockLength: Block has too many lines. [45/25]", 978607492]
   ],
-  "spec/integration/rust_tslp_language_matrix_spec.rb:2824721567": [
-    [3, 1, 1370, "Metrics/BlockLength: Block has too many lines. [36/25]", 4028564637]
+  "spec/integration/rust_tslp_language_matrix_spec.rb:350552986": [
+    [3, 1, 1442, "Metrics/BlockLength: Block has too many lines. [36/25]", 59865618]
   ],
-  "tree_haver.gemspec:3719593032": [
+  "tree_haver.gemspec:2241657035": [
     [16, 121, 19, "Layout/LineLength: Line is too long. [139/120]", 1512975621],
     [138, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [140, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 2105564149],
