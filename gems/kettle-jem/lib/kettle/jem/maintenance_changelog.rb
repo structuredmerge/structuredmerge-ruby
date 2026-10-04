@@ -20,7 +20,7 @@ module Kettle
             path.start_with?("gemfiles/")
         },
         documentation: ->(path) { %w[README.md CONTRIBUTING.md SECURITY.md].include?(path) || path.start_with?("docs/") },
-        configuration: ->(path) { path.start_with?(".structuredmerge/") || path == "mise.toml" || path == ".gitignore" },
+        configuration: ->(path) { path.start_with?(".structuredmerge/") || %w[.gitattributes .gitignore mise.toml].include?(path) },
         code_and_tests: ->(path) { path.start_with?("lib/", "spec/", "test/", "bin/") || path == "Rakefile" }
       }.freeze
       TEMPLATE_CHANGELOG_KEYS = {

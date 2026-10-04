@@ -3,7 +3,6 @@
 require 'spec_helper'
 require 'ast/merge/git/rust_host_provider'
 require 'fileutils'
-require 'pathname'
 
 RSpec.describe Ast::Merge::Git::RustHostProvider do
   subject(:provider) { described_class.new }

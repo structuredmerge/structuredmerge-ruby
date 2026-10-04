@@ -126,13 +126,13 @@ RSpec.describe TreeHaver::Backends::RustTslp do
 
     expect(reparsed.root_node.text).to eq(next_source)
     expect(tree.edit(
-      start_byte: 0,
-      old_end_byte: 1,
-      new_end_byte: 1,
-      start_point: { row: 0, column: 0 },
-      old_end_point: { row: 0, column: 1 },
-      new_end_point: { row: 0, column: 1 }
-    )).to be_nil
+             start_byte: 0,
+             old_end_byte: 1,
+             new_end_byte: 1,
+             start_point: { row: 0, column: 0 },
+             old_end_point: { row: 0, column: 1 },
+             new_end_point: { row: 0, column: 1 }
+           )).to be_nil
     expect(tree.root_node.text).to eq(source)
   end
 

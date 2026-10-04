@@ -178,7 +178,8 @@ RSpec.describe Go::Merge::RustHostProvider do
   it 'matches native behavior for one-sided owner addition' do
     base = "package main\n\nfunc left() int { return 1 }\n\nfunc right() int { return 1 }\n"
     ours = base.sub('func left() int { return 1 }', 'func left() int { return 2 }')
-    theirs = base.sub("func right() int { return 1 }\n", "func right() int { return 1 }\n\nfunc added() int { return 3 }\n")
+    theirs = base.sub("func right() int { return 1 }\n",
+                      "func right() int { return 1 }\n\nfunc added() int { return 3 }\n")
     request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
 
     native = Go::Merge::Provider.new.merge3(request)

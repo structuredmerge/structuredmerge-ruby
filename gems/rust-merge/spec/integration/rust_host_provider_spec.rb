@@ -146,7 +146,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
   end
 
   it 'fails closed on malformed source with a normalized parse diagnostic' do
-    request = request_base.merge(source: "fn {")
+    request = request_base.merge(source: 'fn {')
     result = provider.analyze(request)
 
     expect(result.fetch(:ok)).to be(false)

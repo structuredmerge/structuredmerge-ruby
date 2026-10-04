@@ -122,6 +122,20 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "provides the configured RuboCop packaging plugin in local style bundles" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    style = File.read(File.join(template_root, "gemfiles/modular/style.gemfile.example"))
+    local_style = File.read(File.join(template_root, "gemfiles/modular/style_local.gemfile.example"))
+
+    expect(style.index('if ENV.fetch("RUBOCOP_LTS_DEV"')).to be <
+      style.index('gem "rubocop-packaging"')
+    expect(local_style).to include(
+      'gem "rubocop-packaging",',
+      '  github: "pboling/rubocop-packaging",',
+      '  ref: "3539ba858d379740d638566faee9e56b2b854145"'
+    )
+  end
+
   it "renders README dev and test stack table with self-exclusion" do
     example_table = described_class.send(:readme_dev_test_stack_table, "example")
     turbo_table = described_class.send(:readme_dev_test_stack_table, "turbo_tests2")
@@ -239,7 +253,7 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_report.fetch(:final_content)).not_to include("respond_to?(:plugin)")
       expect(appraisals_report.fetch(:final_content)).not_to include('require "appraisal2/rubocop"')
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")'
+        'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")'
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
         "if respond_to?(:generator_only)"

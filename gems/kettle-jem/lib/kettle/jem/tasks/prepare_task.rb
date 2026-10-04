@@ -28,7 +28,8 @@ module Kettle
           effective_run_options = Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
           prepare_run_options = effective_run_options.merge(
             only: PREPARE_ONLY_PATHS,
-            skip_lock_normalization: true
+            skip_lock_normalization: true,
+            defer_drift_check: true
           )
           events = Kettle::Jem.event_stream_from_options(effective_run_options)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
@@ -37,7 +38,7 @@ module Kettle
             Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           end
           report = merge_supplemental_prepare_report(report, supplemental_report)
-          transition_step = reconcile_template_managed_dependencies_step(project_root, events: events)
+          transition_step = reconcile_template_managed_dependencies_step(project_root, env: env, events: events)
           nomono_bootstrap_step = normalize_existing_local_gemfile_bootstraps_step(project_root, events: events)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           setup_env["BUNDLE_DISABLE_CHECKSUM_VALIDATION"] = "true"
@@ -51,7 +52,7 @@ module Kettle
           )
           Kettle::Jem.emit_step_event(events, "command_step", reset_step, phase: "prepare")
           bootstrap_name = templating_bootstrap_step_name(project_root)
-          bootstrap_command = templating_bootstrap_command(project_root)
+          bootstrap_command = templating_bootstrap_command(project_root, env: setup_env)
           Kettle::Jem.emit_step_event(
             events,
             "command_step",
@@ -98,6 +99,11 @@ module Kettle
                 "updated critical templating gems, and ran bundle install."
             }]
           )
+          final_report = Kettle::Jem.finalize_duplicate_drift(
+            project_root: project_root,
+            report: final_report,
+            run_options: effective_run_options
+          )
           Kettle::Jem.emit_summary_event(events, final_report)
           final_report
         end
@@ -139,7 +145,7 @@ module Kettle
           step
         end
 
-        def reconcile_template_managed_dependencies_step(project_root, events:)
+        def reconcile_template_managed_dependencies_step(project_root, events:, env: ENV)
           paths = [
             File.join(project_root.to_s, "Gemfile"),
             *Dir.glob(File.join(project_root.to_s, "*.gemfile")),
@@ -148,11 +154,12 @@ module Kettle
           ].select { |path| File.file?(path) }.sort
           changed_files = paths.filter_map do |path|
             before = File.read(path)
-            after = Kettle::Jem.reconcile_template_managed_dependencies(before)
+            relative_path = Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
+            after = Kettle::Jem.reconcile_template_managed_dependencies(before, env: env)
             next if after == before
 
             File.write(path, after)
-            Pathname.new(path).relative_path_from(Pathname.new(project_root.to_s)).to_s
+            relative_path
           end
           step = {
             name: "reconcile_template_managed_dependencies",
@@ -217,14 +224,26 @@ module Kettle
           end
         end
 
-        def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)
-          %w[bundle update] + managed_bootstrap_gems(project_root) + locked_templating_gems(project_root)
+        def bundle_update_templating_bootstrap_command(project_root = Dir.pwd, env: ENV)
+          # Bundler can retain registry resolutions for sibling gems even when
+          # the local path Gemfile is active; refresh the locked family graph.
+          local_structuredmerge_gems = if Kettle::Jem.local_structuredmerge_path_mode?(env)
+            Kettle::Jem::STRUCTUREDMERGE_GEMS & locked_gem_names(project_root)
+          else
+            []
+          end
+          (
+            %w[bundle update] +
+              managed_bootstrap_gems(project_root) +
+              locked_templating_gems(project_root) +
+              local_structuredmerge_gems
+          ).uniq
         end
 
-        def templating_bootstrap_command(project_root = Dir.pwd)
+        def templating_bootstrap_command(project_root = Dir.pwd, env: ENV)
           return %w[bundle install] unless templating_bootstrap_lockfile_ready?(project_root)
 
-          bundle_update_templating_bootstrap_command(project_root)
+          bundle_update_templating_bootstrap_command(project_root, env: env)
         end
 
         def templating_bootstrap_step_name(project_root = Dir.pwd)

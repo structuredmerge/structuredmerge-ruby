@@ -28,6 +28,7 @@ module Kettle
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))
           effective_run_options = install_run_options(env, run_options)
           config_migration_step = kettle_config_migration_step(project_root)
+          effective_run_options = effective_run_options.merge(defer_drift_check: true)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           report = followup_apply_after_config_bootstrap(project_root, env: env, run_options: effective_run_options, report: report)
           install_steps = []
@@ -64,6 +65,11 @@ module Kettle
             }]
           )
           final_report = Kettle::Jem::MaintenanceChangelog.record_template_run(
+            project_root: project_root,
+            report: final_report,
+            run_options: effective_run_options
+          )
+          final_report = Kettle::Jem.finalize_duplicate_drift(
             project_root: project_root,
             report: final_report,
             run_options: effective_run_options
@@ -954,9 +960,7 @@ module Kettle
         end
 
         def same_path?(left, right)
-          File.realpath(left.to_s) == File.realpath(right.to_s)
-        rescue Errno::ENOENT
-          File.expand_path(left.to_s) == File.expand_path(right.to_s)
+          Kettle::Dev::Paths.same?(left.to_s, right.to_s)
         end
 
         def rubocop_lts_local_root(env)
@@ -1025,7 +1029,7 @@ module Kettle
           destination_bin = File.join(project_root.to_s, "bin")
           destination_binstubs = binstub_files(destination_bin)
           parent_root = git_toplevel(project_root)
-          parent_binstubs = if parent_root && File.expand_path(parent_root) != File.expand_path(project_root.to_s)
+          parent_binstubs = if parent_root && !same_path?(parent_root, project_root)
             binstub_files(File.join(parent_root, "bin"))
           else
             []
@@ -1788,7 +1792,7 @@ module Kettle
 
           bundle_gemfile = (env || {})["BUNDLE_GEMFILE"].to_s.strip
           project_gemfile = File.expand_path(File.join(project_root.to_s, "Gemfile"))
-          if !bundle_gemfile.empty? && File.expand_path(bundle_gemfile) == project_gemfile
+          if !bundle_gemfile.empty? && same_path?(bundle_gemfile, project_gemfile)
             return {
               name: "bundled_handoff",
               status: "already_bundled",

@@ -18,7 +18,7 @@ module Kettle
               recipe_reports: []
             }
           else
-            Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
+            Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options.merge(defer_drift_check: true))
           end
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           hook_step = Kettle::Jem::Tasks::InstallTask.hook_templates_step(project_root, effective_run_options)
@@ -33,7 +33,22 @@ module Kettle
             command_runner: command_runner,
             event_phase: "template"
           )
-          final_report = report.merge(mode: "template", template_steps: template_steps)
+          orchestration_changed_files = template_steps.flat_map do |step|
+            Array(step[:changed_files] || step["changed_files"])
+          end
+          changed_files = (Array(report[:changed_files]) + orchestration_changed_files).map(&:to_s).uniq.sort
+          final_report = report.merge(
+            mode: "template",
+            template_steps: template_steps,
+            changed_files: changed_files
+          )
+          if report.key?(:duplicate_drift)
+            final_report = Kettle::Jem.finalize_duplicate_drift(
+              project_root: project_root,
+              report: final_report,
+              run_options: effective_run_options
+            )
+          end
           Kettle::Jem.emit_summary_event(Kettle::Jem.event_stream_from_options(effective_run_options), final_report)
           final_report
         end
@@ -90,7 +105,7 @@ module Kettle
           return standalone_limit unless wave_jobs
 
           available_per_member = (cpu_count - wave_jobs) / wave_jobs
-          [standalone_limit, [available_per_member, 1].max].min
+          available_per_member.clamp(1, standalone_limit)
         end
 
         def family_wave_jobs(env)

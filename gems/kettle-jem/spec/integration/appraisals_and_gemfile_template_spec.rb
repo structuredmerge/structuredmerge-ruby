@@ -980,11 +980,33 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(workflows).to all(include("${{github.run_id}}-${{github.run_attempt}}"))
 
     current_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/current.yml.example"))
+    style_gemfile = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/style.gemfile.example"))
+    x_std_libs_gemfile = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/x_std_libs.gemfile.example"))
     jruby_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby.yml.example"))
     truffleruby_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"))
     framework_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/framework-ci.yml.example"))
 
-    expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(current_workflow).to include("rspec-status-current-${{matrix.os}}-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(current_workflow).to include("runs-on: ${{ matrix.os }}")
+    expect(current_workflow).to include("appraisal: \"current\"\n            os: ubuntu-latest")
+    expect(current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
+    expect(current_workflow).to include("appraisal: \"current\"\n            os: windows-latest")
+    expect(current_workflow).not_to include("appraisal: \"unlocked_deps\"\n            os: windows-latest")
+    expect(current_workflow).to include("run: ruby -rbundler/setup bin/turbo_tests2")
+    turbo_tests2_launcher = File.read(project_root.join("lib/kettle/jem/templates/bin/turbo_tests2.example"))
+    expect(turbo_tests2_launcher).to include('load Gem.bin_path("turbo_tests2", "turbo_tests2")')
+    template_entries = described_class.send(
+      :template_inventory_entries,
+      project_root.to_s,
+      project_root.join("lib/kettle/jem/templates").to_s
+    )
+    expect(template_entries).to include("bin/turbo_tests2")
+    expect(current_workflow).not_to include("runner.os != 'Windows'")
+    expect(style_gemfile).to include('Gem::Version.new("3.3.0")')
+    expect(style_gemfile).to include('gem "rubocop-on-rbs", "~> 2.2", ">= 2.2.0"')
+    expect(style_gemfile).not_to include('Gem::Version.new("3.2.0")')
+    expect(x_std_libs_gemfile).not_to include("Gem.win_platform?")
+    expect(x_std_libs_gemfile).to include('eval_gemfile "x_std_libs/r4/libs.gemfile"')
     expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'feature/release')")
@@ -1458,7 +1480,136 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
   end
 
+  it "keeps local template runs on the latest released kettle-jem floor for remote Gemfiles" do
+    runtime = described_class.send(
+      :project_runtime_facts,
+      {},
+      {"STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"},
+      package_name: "example",
+      source_url: "https://github.com/example/example",
+      author_domain: "example.test",
+      min_ruby: ">= 3.2",
+      test_min_ruby: Gem::Version.new("3.2"),
+      version: "0.1.0"
+    )
+    tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+    expect(tokens.fetch("KJ|KETTLE_JEM_DEPENDENCY_ARGUMENTS")).to eq('"~> 7.1", ">= 7.1.28"')
+  end
+
+  it "uses the running released kettle-jem version when not in local path mode" do
+    ["false", "0", "no", "off"].each do |value|
+      runtime = described_class.send(
+        :project_runtime_facts,
+        {},
+        {"STRUCTUREDMERGE_DEV" => value},
+        package_name: "example",
+        source_url: "https://github.com/example/example",
+        author_domain: "example.test",
+        min_ruby: ">= 3.2",
+        test_min_ruby: Gem::Version.new("3.2"),
+        version: "0.1.0"
+      )
+      tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+      expect(tokens.fetch("KJ|KETTLE_JEM_DEPENDENCY_ARGUMENTS")).to eq(
+        %("~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}", ">= #{Kettle::Jem::Version::VERSION}")
+      )
+    end
+  end
+
+  it "loads local template dependencies only while generating Appraisal gemfiles" do
+    facts = {
+      package: {
+        runtime_dependencies: [{name: "kettle-jem"}]
+      }
+    }
+    root_gemfile = <<~RUBY
+      # Local template runs must resolve the same StructuredMerge dependency
+      # graph as the project Gemfile before appraisal lockfiles are generated.
+      if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        eval_gemfile "gemfiles/modular/templating.gemfile"
+      end
+
+      # The style toolchain includes dependencies that require Ruby 3.3 or newer.
+      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")
+        if respond_to?(:generator_only)
+          generator_only do
+            eval_gemfile "gemfiles/modular/style.gemfile"
+          end
+        end
+      end
+    RUBY
+
+    recipe = {
+      target_path: "Appraisal.root.gemfile",
+      template_preference: {strategy: "accept_template"}
+    }
+    updated = described_class.send(
+      :finalize_accepted_template_source,
+      recipe,
+      root_gemfile,
+      root_gemfile,
+      facts: facts
+    )
+
+    expect(updated).to include("generator_only do")
+    expect(updated).to include('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated).to include('ENV.fetch("K_JEM_TEMPLATING", "false")')
+    expect(updated.index("generator_only do")).to be < updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("# The style toolchain includes dependencies that require Ruby 3.3 or newer.")
+    expect(updated.index("# The style toolchain includes dependencies that require Ruby 3.3 or newer.")).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+    expect(updated.scan('eval_gemfile "gemfiles/modular/templating.gemfile"').length).to eq(1)
+    expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
+  end
+
+  it "reattaches the style-gate comment when a generator gate already exists" do
+    facts = {package: {runtime_dependencies: [{name: "kettle-jem"}]}}
+    root_gemfile = <<~RUBY
+      # The style toolchain includes dependencies that require Ruby 3.3 or newer.
+      if respond_to?(:generator_only)
+        generator_only do
+          if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+            eval_gemfile "gemfiles/modular/templating.gemfile"
+          end
+        end
+      end
+      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")
+        eval_gemfile "gemfiles/modular/style.gemfile"
+      end
+    RUBY
+
+    updated = described_class.send(:normalize_appraisal_root_templating_gate, root_gemfile, facts)
+    comment = "# The style toolchain includes dependencies that require Ruby 3.3 or newer."
+
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index(comment)
+    expect(updated.index(comment)).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+    expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
+  end
+
+  it "does not checksum-skip Appraisal root finalization" do
+    report = {
+      relative_path: "Appraisal.root.gemfile",
+      metadata: {template_source_preference: {strategy: "accept_template"}},
+      request_envelope: {request: {recipe_name: "supplied_template_source_application"}}
+    }
+
+    expect(described_class.send(:checksum_cache_safe_report?, report)).to be(false)
+  end
+
+  it "gates the appraisal style toolchain on Ruby 3.3" do
+    template_path = File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Appraisal.root.gemfile.example")
+    template = File.read(template_path)
+
+    expect(template).to include("# The style toolchain includes dependencies that require Ruby 3.3 or newer.")
+    expect(template).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")')
+  end
+
   it "converges an existing injected kettle-jem dependency to the running version" do
+    # Non-path mode: the running version, not the static released floor. Pin
+    # the env so a job-level STRUCTUREDMERGE_DEV cannot flip the assertion.
+    stub_env("STRUCTUREDMERGE_DEV" => "false")
     updated = described_class.ensure_monorepo_root_gemfile_dependencies(
       "source \"https://gem.coop\"\ngem \"kettle-jem\", \">= 7.0\"\n"
     )
@@ -1589,7 +1740,74 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(coverage_template).to include(
       "local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems"
     )
+    [template, coverage_template].each do |gemfile_template|
+      expect(gemfile_template.scan("kettle_dev_nomono_options =").length).to eq(1)
+      expect(gemfile_template.scan("**kettle_dev_nomono_options").length).to eq(2)
+    end
+    expect(template.scan('vendored_gems_env: "VENDORED_GEMS"').length).to eq(1)
+    expect(template.scan('vendor_gem_dir_env: "VENDOR_GEM_DIR"').length).to eq(1)
+    expect(template).to include("**structuredmerge_nomono_options")
     expect(template).not_to include("platform :mri do")
+  end
+
+  it "loads nomono's Bundler DSL from a path-locked checkout" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    bootstrap = described_class.send(:local_gemfile_nomono_bootstrap, "example")
+    marker_env = "KETTLE_JEM_TEST_NOMONO_BOOTSTRAP_MARKER"
+    allow(ENV).to receive(:fetch).and_call_original
+
+    [
+      {project: "nomono", lock_path: "."},
+      {project: "example", lock_path: "../nomono"}
+    ].each do |shape|
+      Dir.mktmpdir("kettle-jem-nomono-path-bootstrap", tmp_root) do |workspace|
+        project_root = File.join(workspace, shape.fetch(:project))
+        nomono_root = File.join(workspace, "nomono")
+        marker_path = File.join(workspace, "loaded-nomono-source")
+        project_relative_path = shape.fetch(:lock_path)
+        gemfile_entry = if shape.fetch(:project) == "nomono"
+          %(gem "nomono", path: ".")
+        else
+          %(gem "nomono", path: "../nomono")
+        end
+
+        write_tree(workspace, {
+          "#{shape.fetch(:project)}/Gemfile" => <<~RUBY,
+            source "https://gem.coop"
+            #{gemfile_entry}
+            eval_gemfile "gemfiles/modular/bootstrap.gemfile"
+          RUBY
+          "#{shape.fetch(:project)}/gemfiles/modular/bootstrap.gemfile" => bootstrap,
+          "#{shape.fetch(:project)}/Gemfile.lock" => <<~LOCK,
+            PATH
+              remote: #{project_relative_path}
+              specs:
+                nomono (1.1.6)
+
+            DEPENDENCIES
+              nomono!
+          LOCK
+          "nomono/nomono.gemspec" => <<~RUBY,
+            Gem::Specification.new do |spec|
+              spec.name = "nomono"
+              spec.version = "1.1.6"
+              spec.summary = "Nomono"
+              spec.authors = ["Example"]
+              spec.files = []
+            end
+          RUBY
+          "nomono/lib/nomono/bundler.rb" => <<~RUBY
+            File.write(ENV.fetch("KETTLE_JEM_TEST_NOMONO_BOOTSTRAP_MARKER"), __FILE__)
+          RUBY
+        })
+
+        allow(ENV).to receive(:fetch).with(marker_env).and_return(marker_path)
+        Bundler::Dsl.evaluate(File.join(project_root, "Gemfile"), nil, {})
+
+        expect(File.read(marker_path)).to eq(File.join(nomono_root, "lib/nomono/bundler.rb"))
+      end
+    end
   end
 
   it "evaluates a generated local coverage Gemfile with a declared kettle-dev path override" do
@@ -1927,6 +2145,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include("nomono_activation_requirements")
       expect(content).to include("nomono_lockfile")
       expect(content).to include("Bundler::LockfileParser")
+      expect(content).to include("Bundler::Source::Path")
+      expect(content).to include("nomono_local_loader")
+      expect(content).to include('File.join(nomono_locked_spec.source.path, "lib", "nomono", "bundler")')
       expect(content).not_to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
     end
@@ -1978,9 +2199,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
           Kernel.send(:gem, "nomono", *nomono_activation_requirements)
           require "nomono/bundler"
 
-          local_gems = %w[
-            custom-local
-          ]
+          local_gems = ["custom-local"]
         RUBY
       })
 
@@ -1990,7 +2209,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
+      expect(content.scan(/^[ \t]*require "nomono\/bundler"$/).size).to eq(1)
       expect(content).to match(/nomono_activation_requirements = \["~> 1\.1", ">= 1\.1\.\d+"\]/)
       expect(content).to include('nomono_already_activated = Gem.loaded_specs["nomono"]')
       expect(content).to include("!nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)")
@@ -1999,6 +2218,47 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include('Gem::Specification.find_all_by_name("nomono")')
       expect(content).to include('Kernel.send(:gem, "nomono"')
       expect(content).to include('root: ["src", "my", "kettle-dev"]')
+
+      normalized_again = described_class.normalize_local_gemfile_nomono_bootstrap(content)
+      expect(normalized_again).to eq(content)
+      expect(content.scan(/^nomono_local_loader =/).size).to eq(1)
+      expect(content.scan(/^nomono_activation_requirements =/).size).to eq(1)
+
+      lines = content.lines
+      marker_index = lines.index { |line| line.start_with?("local_gems =") }
+      bootstrap_lines = lines[0...marker_index]
+      nested_duplicate = [
+        *lines[0...marker_index],
+        "if true\n",
+        *bootstrap_lines.drop_while { |line| line.start_with?("#") },
+        "end\n",
+        *lines[marker_index..]
+      ].join
+      duplicated = [nested_duplicate, bootstrap_lines.join].join("\n")
+      repaired = described_class.normalize_local_gemfile_nomono_bootstrap(duplicated)
+
+      expect(repaired.scan(/^nomono_local_loader =/).size).to eq(1)
+      expect(repaired.scan(/^nomono_activation_requirements =/).size).to eq(1)
+      expect(repaired.scan(/^# Bootstrapping nomono here/).size).to eq(1)
+      expect(Prism.parse(repaired)).to be_success
+      expect(repaired).not_to end_with("\n\n")
+      expect(described_class.normalize_local_gemfile_nomono_bootstrap(repaired)).to eq(repaired)
+
+      bootstrap = described_class.send(:local_gemfile_nomono_bootstrap, nil)
+      nested_bootstrap = described_class.send(:indent_source, bootstrap, 2)
+      structuredmerge_duplicate = [
+        "#{bootstrap}\n",
+        "if true\n",
+        "#{nested_bootstrap}\n",
+        "end\n",
+        "structuredmerge_local_gems = [\"local\"]\n"
+      ].join
+      structuredmerge_repaired = described_class.normalize_local_gemfile_nomono_bootstrap(structuredmerge_duplicate)
+
+      expect(structuredmerge_repaired.scan(/^  nomono_local_loader =/)).to be_empty
+      expect(structuredmerge_repaired.scan(/^nomono_local_loader =/).size).to eq(1)
+      expect(structuredmerge_repaired.scan(/^# Bootstrapping nomono here/).size).to eq(1)
+      expect(Prism.parse(structuredmerge_repaired)).to be_success
     end
   end
 

@@ -58,11 +58,12 @@ module Kettle
     # declarations in the destination and reconciles their complete requirement
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
-      {name: "nomono", requirements: ["~> 1.1", ">= 1.1.5"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.0"], bootstrap: true},
+      {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
+      {name: "nomono", requirements: ["~> 1.1", ">= 1.1.6"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.6"], bootstrap: true},
       {
         name: "kettle-changelog",
-        requirements: ["~> 1.0", ">= 1.0.7"],
+        requirements: ["~> 1.0", ">= 1.0.8"],
         bootstrap: true,
         ruby_requirement: ">= 4.0.0"
       }
@@ -106,6 +107,13 @@ module Kettle
     # SSH `git_source(:github)`) replaces Bundler's own HTTPS source and is
     # recorded in Gemfile.lock, where CI cannot clone it: unconditional removal.
     BUNDLER_BUILTIN_GIT_SOURCES = %w[github gist bitbucket].freeze
+    STRUCTUREDMERGE_GEMS = %w[
+      ast-crispr ast-crispr-markdown-markly ast-crispr-ruby-prism ast-merge ast-merge-git
+      ast-template bash-merge binary-merge citrus-toml-merge commonmarker-merge dotenv-merge
+      go-merge html-merge json-merge kettle-jem kramdown-merge markdown-merge markly-merge
+      parslet-toml-merge plain-merge prism-merge psych-merge rbs-merge ruby-merge rust-merge
+      smorg-rb toml-merge tree_haver typescript-merge yaml-merge zip-merge
+    ].freeze
     # Canonical resolutions for development-dependency gems whose handling is
     # already known ahead of any specific destination project. Two
     # categories today:
@@ -2632,6 +2640,70 @@ module Kettle
       require "ast/crispr/ruby/prism"
       @runtime_dependencies_loaded = true
     end
+
+    # Grammars templating merges through tree_sitter_language_pack. Prefetching
+    # them through TSLP's hot-load API downloads and loads the grammars up
+    # front so the on-demand download cannot transiently fail inside a merge
+    # and surface as a misleading "No parser registered" abort.
+    TSLP_PREFETCH_LANGUAGES = %w[
+      bash
+      go
+      html
+      json
+      json5
+      markdown
+      rbs
+      ruby
+      rust
+      toml
+      tsx
+      typescript
+      yaml
+    ].freeze
+
+    def tslp_prefetch_languages(env)
+      override = env["KJ_TSLP_PREFETCH_LANGUAGES"]
+      return TSLP_PREFETCH_LANGUAGES if override.nil? || override.to_s.strip.empty?
+
+      override.to_s.split(/[\s,]+/).map(&:downcase).uniq
+    end
+
+    def prefetch_tslp_grammars(env: ENV, events: nil)
+      override = env["KJ_TSLP_PREFETCH_LANGUAGES"]
+      if DecisionPolicy.value_to_boolean(override) == false
+        return {attempted: false, reason: "disabled via KJ_TSLP_PREFETCH_LANGUAGES"}
+      end
+
+      languages = tslp_prefetch_languages(env)
+      report = TreeHaver.prefetch_languages(languages)
+      report[:languages] = languages
+      emit_event(events, "diagnostic", {
+        severity: report.fetch(:failures, {}).empty? ? "advisory" : "warning",
+        category: "tslp_prefetch",
+        message: tslp_prefetch_message(report)
+      }) if events
+      report
+    rescue StandardError => error
+      emit_event(events, "diagnostic", {
+        severity: "warning",
+        category: "tslp_prefetch",
+        message: "TSLP grammar prefetch failed: #{error.class}: #{error.message}"
+      }) if events
+      {attempted: false, reason: "#{error.class}: #{error.message}"}
+    end
+
+    def tslp_prefetch_message(report)
+      return "TSLP grammar prefetch skipped: #{report[:reason]}" unless report.fetch(:attempted, false)
+
+      prefetched = Array(report[:prefetched])
+      failures = report.fetch(:failures, {})
+      message = "TSLP grammar prefetch loaded #{prefetched.length} grammar(s): #{prefetched.sort.join(", ")}"
+      unless failures.empty?
+        detail = failures.sort.map { |name, reason| "#{name}: #{reason}" }.join("; ")
+        message += "; #{failures.length} failure(s): #{detail}"
+      end
+      message
+    end
     # rubocop:enable ThreadSafety/ClassInstanceVariable
 
     def display_path(path)
@@ -3469,6 +3541,7 @@ module Kettle
       events = event_stream_from_options(run_options)
       emit_event(events, "run_start", mode: "plan", project_root: project_root.to_s)
       with_event_phase(events, "runtime_dependencies") { ensure_runtime_dependencies! }
+      with_event_phase(events, "tslp_prefetch") { prefetch_tslp_grammars(env: env, events: events) }
       with_event_phase(events, "preflight") { preflight_project!(project_root) }
       template_selection = with_event_phase(events, "template_selection") { template_selection_for(env, run_options) }
       checksum_mode = with_event_phase(events, "checksum_mode") { checksum_mode_for(env, run_options) }
@@ -3685,6 +3758,10 @@ module Kettle
       # Config migrations are implemented during template application. They must
       # run even when the template source and destination checksums still match.
       return false if report.fetch(:relative_path, "").to_s == KETTLE_CONFIG_PATH
+      # Appraisal.root.gemfile has facts-dependent structural normalization in
+      # its accepted-template finalizer, so matching source/destination hashes
+      # do not prove that the final output is already normalized.
+      return false if report.fetch(:relative_path, "").to_s == "Appraisal.root.gemfile"
 
       primitive = report.dig(:request_envelope, :request, :recipe_name).to_s
       primitive == "supplied_template_source_application"
@@ -4212,24 +4289,35 @@ module Kettle
       report[:changed_files] = (report.fetch(:changed_files, []) + report.fetch(:post_apply_steps).flat_map do |step|
         reported_post_apply_changed_files(step)
       end).uniq.sort
-      report[:duplicate_drift] = with_event_phase(events, "duplicate_drift") do
-        if DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
-          {
-            available: false,
-            skipped: true,
-            reason: "skip_drift_check"
-          }
-        else
-          duplicate_drift_report(
-            project_root: project_root,
-            template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
-            run_options: run_options
-          )
+      report[:duplicate_drift] = if DecisionPolicy.value_to_boolean((run_options || {})[:defer_drift_check])
+        {available: false, skipped: true, reason: "deferred_until_postprocessing"}
+      else
+        with_event_phase(events, "duplicate_drift") do
+          duplicate_drift_check_result(project_root: project_root, run_options: run_options)
         end
       end
       report[:phase_timings] = events.phase_timings if events.respond_to?(:phase_timings)
       emit_summary_event(events, report)
       report
+    end
+
+    def finalize_duplicate_drift(project_root:, report:, run_options: {})
+      events = event_stream_from_options(run_options)
+      drift = with_event_phase(events, "duplicate_drift") do
+        duplicate_drift_check_result(project_root: project_root, run_options: run_options)
+      end
+      report.merge(duplicate_drift: drift, phase_timings: events.phase_timings)
+    end
+
+    def duplicate_drift_check_result(project_root:, run_options: {})
+      return {available: false, skipped: true, reason: "skip_drift_check"} if
+        DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
+
+      duplicate_drift_report(
+        project_root: project_root,
+        template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
+        run_options: run_options
+      )
     end
 
     def event_stream(io, types: nil)
@@ -4986,17 +5074,17 @@ module Kettle
 
     def monorepo_root_gemfile_dependency_lines
       [
-        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.4"\n)},
+        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.5"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.0"\n)},
-        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.13"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.1"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.6"\n)},
+        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.15"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.4"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
-        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.21"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.23"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.9"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.8"\n)}
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.13"\n)}
       ].freeze
     end
 
@@ -6706,7 +6794,11 @@ module Kettle
           destination_content: original
         )
         return with_readme_timing("readme.append_used_link_definitions") do
-          appended = append_used_markdown_link_definitions(processed, resolved)
+          appended = append_used_markdown_link_definitions(
+            processed,
+            resolved,
+            fallback_definition_source: original
+          )
           postprocess_readme_content(
             appended,
             facts,
@@ -6790,7 +6882,12 @@ module Kettle
       when :gemfile
         finalize_gemfile_template_source(recipe, content, destination_content, facts: facts, template_content: content)
       when :appraisals
-        merge_appraisals_template_policy(content, facts: facts)
+        merged = merge_appraisals_template_policy(content, facts: facts)
+        if recipe.fetch(:target_path).to_s == "Appraisal.root.gemfile"
+          normalize_appraisal_root_templating_gate(merged, facts)
+        else
+          merged
+        end
       when :gemspec
         package_name = facts.dig(:package, :name).to_s if facts
         receiver = gemspec_block_param(content) || "spec"
@@ -7281,12 +7378,14 @@ module Kettle
       [content.to_s.rstrip, "", missing_sources.join.rstrip, ""].join("\n")
     end
 
-    def append_used_markdown_link_definitions(content, definition_source)
+    def append_used_markdown_link_definitions(content, definition_source, fallback_definition_source: nil)
       owners = ReadmePostProcessor.markdown_structural_owners(content, :link_definitions, :inline_references)
       existing = owners.fetch(:link_definitions).map { |owner| owner.label.to_s }.to_set
       referenced = owners.fetch(:inline_references).flat_map(&:labels).map(&:to_s).to_set
-      available = ReadmePostProcessor.markdown_link_definition_owners(definition_source).to_h do |owner|
-        [owner.label.to_s, owner]
+      available = [fallback_definition_source, definition_source].compact.each_with_object({}) do |source, definitions|
+        ReadmePostProcessor.markdown_link_definition_owners(source).each do |owner|
+          definitions[owner.label.to_s] = owner
+        end
       end
       missing = referenced.filter_map do |label|
         next if existing.include?(label)
@@ -7569,6 +7668,9 @@ module Kettle
         )
       end
       output = remove_gemfile_builtin_git_source_overrides(output)
+      if recipe.fetch(:target_path).to_s == "Appraisal.root.gemfile"
+        output = normalize_appraisal_root_templating_gate(output, facts)
+      end
       if recipe.fetch(:target_path).to_s == "Gemfile"
         # A merged Gemfile retains its project-specific source; an accepted
         # template owns the complete source declaration.
@@ -7758,6 +7860,126 @@ module Kettle
         output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), guarded)
       end
       output
+    end
+
+    def normalize_appraisal_root_templating_gate(content, facts)
+      has_structuredmerge_dependency = package_runtime_dependency_names(facts).any? do |name|
+        STRUCTUREDMERGE_GEMS.include?(name.to_s)
+      end
+      result = prism_parse_success(content)
+      return content unless result
+
+      nodes = []
+      result.value.breadth_first_search_all { |node| nodes << node }
+      template_eval = nodes.find do |node|
+        node.is_a?(::Prism::CallNode) &&
+          node.name == :eval_gemfile &&
+          ruby_string_argument(node) == "gemfiles/modular/templating.gemfile"
+      end
+      template_gate = nodes.find do |node|
+        node.is_a?(::Prism::IfNode) &&
+          node.location.slice.to_s.include?("K_JEM_TEMPLATING") &&
+          template_eval &&
+          template_eval.location.start_offset > node.location.start_offset &&
+          template_eval.location.end_offset < node.location.end_offset
+      end
+      generator_only = nodes.find do |node|
+        node.is_a?(::Prism::CallNode) && node.name == :generator_only && node.block
+      end
+      style_comment = "# The style toolchain includes dependencies that require Ruby 3.3 or newer."
+      style_gate_anchor = nodes.find do |node|
+        gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
+      end
+      style_comment_attached = if style_gate_anchor
+        content.lines[style_gate_anchor.location.start_line - 2].to_s.strip == style_comment
+      else
+        false
+      end
+
+      if has_structuredmerge_dependency
+        template_gate_is_nested = template_gate && generator_only &&
+          template_gate.location.start_offset > generator_only.block.location.start_offset &&
+          template_gate.location.end_offset < generator_only.block.location.end_offset
+        if template_gate_is_nested
+          return content if style_comment_attached
+
+          comment_line_index = content.lines.index { |line| line.strip == style_comment }
+          return content unless comment_line_index
+
+          content = replace_source_range_lines(content, comment_line_index + 1, comment_line_index + 1, "")
+          result = prism_parse_success(content)
+          nodes = []
+          result&.value&.breadth_first_search_all { |node| nodes << node }
+          anchor = nodes.find do |node|
+            gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
+          end
+          return content unless anchor
+
+          return insert_lines_before(content, anchor.location.start_line, "#{style_comment}\n")
+        end
+
+        if template_gate
+          content = replace_source_range_lines(
+            content,
+            template_gate.location.start_line,
+            expand_line_range_through_following_blanks(content, ruby_node_source_end_line(template_gate)),
+            ""
+          )
+        elsif template_eval
+          content = replace_source_range_lines(
+            content,
+            template_eval.location.start_line,
+            ruby_node_source_end_line(template_eval),
+            ""
+          )
+        end
+
+        result = prism_parse_success(content)
+        return content unless result
+
+        nodes = []
+        result.value.breadth_first_search_all { |node| nodes << node }
+        gate = <<~RUBY
+          if respond_to?(:generator_only)
+            generator_only do
+              if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+                eval_gemfile "gemfiles/modular/templating.gemfile"
+              end
+            end
+          end
+        RUBY
+        anchor = nodes.find do |node|
+          gemfile_conditional_node?(node) && node.location.slice.to_s.include?("Gem::Version")
+        end
+        return content unless anchor
+
+        lines = content.lines
+        anchor_line_index = anchor.location.start_line - 1
+        preceding_line = lines[anchor_line_index - 1]
+        if preceding_line&.strip == style_comment
+          comment_start = lines.take(anchor_line_index - 1).sum(&:bytesize)
+          replace_source_offsets(content, [{
+            start_offset: comment_start,
+            end_offset: anchor.location.start_offset,
+            replacement: "#{gate}#{preceding_line}"
+          }])
+        else
+          replace_source_offsets(content, [{
+            start_offset: anchor.location.start_offset,
+            end_offset: anchor.location.start_offset,
+            replacement: gate
+          }])
+        end
+      else
+        return content unless template_gate
+
+        replace_source_range_lines(
+          content,
+          template_gate.location.start_line,
+          expand_line_range_through_following_blanks(content, ruby_node_source_end_line(template_gate)),
+          ""
+        )
+      end
     end
 
     def ensure_main_gemfile_nomono_bootstrap(content, template_content)
@@ -8470,6 +8692,19 @@ module Kettle
     def normalize_local_gemfile_nomono_bootstrap(content)
       output = remove_obsolete_local_gemfile_nomono_activation(content)
       bootstrap = "#{local_gemfile_nomono_bootstrap(nil)}\n\n"
+      marker = local_gemfile_nomono_bootstrap_marker(output)
+      activation_assignments = prism_descendants(output).select do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_activation_requirements
+      end
+      if marker && activation_assignments.any?
+        first_line = activation_assignments.map { |node| node.location.start_line }.min
+        first_line = preceding_comment_block_start_line(output.lines, first_line)
+        output = replace_source_range_lines(output, first_line, marker.fetch(:start_line) - 1, bootstrap) if first_line < marker.fetch(:start_line)
+        output = remove_local_gemfile_nomono_loader_blocks_after_marker(output)
+        output = remove_redundant_nomono_bundler_requires_after_marker(output)
+        return ensure_trailing_newline(output.rstrip)
+      end
+
       require_records = ruby_call_records(output, :require).filter_map do |call|
         next unless ruby_string_argument(call) == "nomono/bundler"
 
@@ -8491,6 +8726,82 @@ module Kettle
       else
         ensure_trailing_newline([output.to_s.rstrip, bootstrap.rstrip].reject(&:empty?).join("\n\n"))
       end
+    end
+
+    def local_gemfile_nomono_bootstrap_marker(content)
+      result = prism_parse_success(content)
+      body = result&.value&.statements&.body || []
+      local_gems_assignment = body.find do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && %i[local_gems structuredmerge_local_gems].include?(node.name)
+      end
+      [
+        local_gems_assignment_record(content),
+        local_gems_assignment && {start_line: local_gems_assignment.location.start_line},
+        word_array_assignment_record(content, :structuredmerge_local_gems)
+      ].compact.min_by { |record| record.fetch(:start_line) }
+    end
+
+    def remove_local_gemfile_nomono_loader_blocks_after_marker(content)
+      marker = local_gemfile_nomono_bootstrap_marker(content)
+      return content unless marker
+
+      result = prism_parse_success(content)
+      body = result&.value&.statements&.body || []
+      ranges = body.each_with_index.filter_map do |node, index|
+        next unless node.is_a?(::Prism::LocalVariableWriteNode) && %i[nomono_activation_requirements nomono_local_loader].include?(node.name)
+        next unless node.location.start_line > marker.fetch(:start_line)
+
+        loader = if node.name == :nomono_local_loader
+          node
+        else
+          loader_index = (index + 1...body.length).find do |candidate_index|
+            candidate = body[candidate_index]
+            candidate.is_a?(::Prism::LocalVariableWriteNode) && candidate.name == :nomono_local_loader
+          end
+          loader_index && body[loader_index]
+        end
+        next unless loader
+        next if node.name == :nomono_local_loader && body[0...index].any? do |candidate|
+          candidate.is_a?(::Prism::LocalVariableWriteNode) && candidate.name == :nomono_activation_requirements &&
+            candidate.location.start_line > marker.fetch(:start_line)
+        end
+
+        following = body[(body.index(loader) + 1)..].to_a.find do |candidate|
+          candidate.is_a?(::Prism::IfNode) && prism_descendants(candidate.slice).any? do |descendant|
+            descendant.is_a?(::Prism::CallNode) && descendant.name == :require
+          end
+        end
+        {
+          start_line: (node.name == :nomono_activation_requirements) ?
+            preceding_comment_block_start_line(content.to_s.lines, node.location.start_line) : node.location.start_line,
+          end_line: ruby_node_source_end_line(following || loader)
+        }
+      end
+      ranges.sort_by { |range| -range.fetch(:start_line) }.reduce(content.to_s) do |output, range|
+        replace_source_range_lines(output, range.fetch(:start_line), range.fetch(:end_line), "")
+      end
+    end
+
+    def remove_redundant_nomono_bundler_requires_after_marker(content)
+      marker = local_gemfile_nomono_bootstrap_marker(content)
+      return content unless marker
+
+      records = ruby_call_records(content, :require).filter_map do |call|
+        next unless ruby_string_argument(call) == "nomono/bundler"
+        next unless call.location.start_line > marker.fetch(:start_line)
+
+        {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
+      end
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), "")
+      end
+    end
+
+    def prism_descendants(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all { true }
     end
 
     def remove_obsolete_local_gemfile_nomono_activation(content)
@@ -8925,7 +9236,16 @@ module Kettle
 
     def package_runtime_dependency_names(facts)
       dependencies = facts.to_h.dig(:package, :runtime_dependencies)
-      Array(dependencies).map(&:to_s).reject(&:empty?).uniq
+      Array(dependencies).filter_map do |dependency|
+        name = if dependency.respond_to?(:name)
+          dependency.name
+        elsif dependency.is_a?(Hash)
+          dependency[:name] || dependency["name"]
+        else
+          dependency
+        end
+        name.to_s unless name.to_s.empty?
+      end.uniq
     end
 
     def inject_main_gemfile_recording_eval(content, facts)
@@ -9670,10 +9990,21 @@ module Kettle
       TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == name.to_s }
     end
 
-    def template_managed_dependency_requirements(name, version_module: Version)
-      return kettle_jem_dependency_requirements(version_module: version_module) if name.to_s == PACKAGE_NAME
+    def template_managed_dependency_requirements(name, env: ENV, version_module: Version)
+      return kettle_jem_template_dependency_requirements(env: env, version_module: version_module) if name.to_s == PACKAGE_NAME
 
       template_managed_dependency(name)&.fetch(:requirements)
+    end
+
+    def kettle_jem_template_dependency_requirements(env: ENV, version_module: Version)
+      return kettle_jem_dependency_requirements(version_module: version_module) unless local_structuredmerge_path_mode?(env)
+
+      template_managed_dependency(PACKAGE_NAME).fetch(:requirements)
+    end
+
+    def local_structuredmerge_path_mode?(env)
+      value = (env || {}).fetch("STRUCTUREDMERGE_DEV", "false").to_s.strip
+      value != "" && !DecisionPolicy.falsey?(value)
     end
 
     def template_managed_dependency_names(bootstrap: nil, ruby_version: RUBY_VERSION)
@@ -9696,12 +10027,12 @@ module Kettle
       Gem::Requirement.new(requirement).satisfied_by?(Gem::Version.new(ruby_version))
     end
 
-    def reconcile_template_managed_dependencies(source)
+    def reconcile_template_managed_dependencies(source, env: ENV)
       replacements = ruby_call_records(source, nil).filter_map do |call|
         next unless template_managed_dependency_call?(call)
 
         name = ruby_string_argument(call)
-        requirements = template_managed_dependency_requirements(name)
+        requirements = template_managed_dependency_requirements(name, env: env)
         next unless requirements
 
         requirement_nodes = Array(call.arguments&.arguments).drop(1).reject do |argument|
@@ -14216,27 +14547,27 @@ module Kettle
     def kettle_changelog_gemfile_dependency_token(package_name)
       return "" if package_name == "kettle-changelog"
 
-      <<~RUBY.chomp
-        # Release lockfile/build commands set this dependency-specific switch so
-        # the development tool cannot pull unpublished family gems into resolution.
-        kettle_changelog_skip = ENV.fetch("KETTLE_DEV_SKIP_CHANGELOG_DEPENDENCY", "false").downcase
-        kettle_changelog_skip = %w[true 1 yes on].include?(kettle_changelog_skip)
-        kettle_changelog_local = ENV.fetch("KETTLE_DEV_DEV", "false").downcase
-        kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)
-        unless kettle_changelog_skip
-          if kettle_changelog_local
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: ["kettle-changelog"],
-              prefix: "KETTLE_DEV",
-              path_env: "KETTLE_DEV_DEV",
-              root: ["src", "my", "kettle-dev"]
-            )
-          elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("4.0.0")
-            gem "kettle-changelog", #{template_managed_dependency("kettle-changelog").fetch(:requirements).map(&:inspect).join(", ")}
-          end
-        end
-      RUBY
+      [
+        "# Release lockfile/build commands set this dependency-specific switch so",
+        "# the development tool cannot pull unpublished family gems into resolution.",
+        "kettle_changelog_skip = ENV.fetch(\"KETTLE_DEV_SKIP_CHANGELOG_DEPENDENCY\", \"false\").downcase",
+        "kettle_changelog_skip = %w[true 1 yes on].include?(kettle_changelog_skip)",
+        "kettle_changelog_local = ENV.fetch(\"KETTLE_DEV_DEV\", \"false\").downcase",
+        "kettle_changelog_local = !%w[false 0 no off].include?(kettle_changelog_local)",
+        "unless kettle_changelog_skip",
+        "  if kettle_changelog_local",
+        indent_source(nomono_bundler_bootstrap("../../Gemfile.lock"), 4),
+        "    eval_nomono_gems(",
+        "      gems: [\"kettle-changelog\"],",
+        "      prefix: \"KETTLE_DEV\",",
+        "      path_env: \"KETTLE_DEV_DEV\",",
+        "      root: [\"src\", \"my\", \"kettle-dev\"]",
+        "    )",
+        "  elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new(\"4.0.0\")",
+        %(    gem "kettle-changelog", #{template_managed_dependency("kettle-changelog").fetch(:requirements).map(&:inspect).join(", ")}),
+        "  end",
+        "end"
+      ].join("\n")
     end
 
     def readme_title_token(package, rubygems)
@@ -14927,7 +15258,7 @@ module Kettle
       compact_hash(
         freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
         kettle_jem_version: VERSION,
-        kettle_jem_dependency_arguments: kettle_jem_dependency_requirements.map(&:inspect).join(", "),
+        kettle_jem_dependency_arguments: kettle_jem_template_dependency_requirements(env: env).map(&:inspect).join(", "),
         template_run_date: run_timestamp.strftime("%Y-%m-%d"),
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_local_gems: kettle_dev_local_gems(config),
@@ -15071,7 +15402,7 @@ module Kettle
       dev_env = "#{prefix}_DEV"
       root_literal = ruby_array_literal(direct_sibling_nomono_root_parts(workspace_slug, repository))
       word_array = names.map { |name| "  #{name}" }.join("\n")
-      nomono_loader = %(require "nomono/bundler")
+      nomono_bootstrap = nomono_bundler_bootstrap("Gemfile.lock")
 
       blocks << <<~RUBY.rstrip
         # Direct sibling dependencies (env-switched via #{dev_env})
@@ -15088,7 +15419,7 @@ module Kettle
               ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
           direct_sibling_dev_was_set = ENV.key?("#{dev_env}")
           direct_sibling_dev_original = ENV.fetch("#{dev_env}", nil)
-          #{nomono_loader}
+          #{nomono_bootstrap}
           begin
             ENV["#{dev_env}"] = File.expand_path("..", __dir__) if direct_sibling_templating && !direct_sibling_local
 
@@ -15284,7 +15615,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.3", ">= 1.3.1"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.4"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -15297,25 +15628,40 @@ module Kettle
     end
 
     def nomono_gemfile_declaration
-      %(gem "nomono", "~> 1.1", ">= 1.1.5", require: false # ruby >= 3.2.0)
+      %(gem "nomono", "~> 1.1", ">= 1.1.6", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
+      nomono_bundler_bootstrap("../../Gemfile.lock")
+    end
+
+    def nomono_bundler_bootstrap(lockfile_path)
       <<~RUBY.rstrip
         # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
         # Bundler records that dependency during Gemfile evaluation, but it does not
         # activate that exact version before the immediate `require "nomono/bundler"`.
-        nomono_activation_requirements = ["~> 1.1", ">= 1.1.5"]
+        nomono_activation_requirements = ["~> 1.1", ">= 1.1.6"]
         nomono_requirement = Gem::Requirement.new(nomono_activation_requirements)
         nomono_already_activated = Gem.loaded_specs["nomono"]
-        nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
-        if !nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)
+        nomono_lockfile = File.expand_path(#{lockfile_path.inspect}, __dir__)
+        nomono_locked_spec = nil
+        if File.file?(nomono_lockfile)
           require "bundler"
-          if File.file?(nomono_lockfile)
-            nomono_locked_spec = Bundler::LockfileParser
-              .new(Bundler.read_file(nomono_lockfile))
-              .specs
-              .find { |spec| spec.name == "nomono" }
+          nomono_locked_spec = Bundler::LockfileParser
+            .new(Bundler.read_file(nomono_lockfile))
+            .specs
+            .find { |spec| spec.name == "nomono" }
+        end
+        nomono_local_loader = if nomono_locked_spec && nomono_locked_spec.source.is_a?(Bundler::Source::Path)
+          File.expand_path(
+            File.join(nomono_locked_spec.source.path, "lib", "nomono", "bundler"),
+            File.dirname(nomono_lockfile)
+          )
+        end
+        if nomono_local_loader && File.file?("\#{nomono_local_loader}.rb")
+          require nomono_local_loader
+        else
+          if !nomono_already_activated || !nomono_requirement.satisfied_by?(nomono_already_activated.version)
             nomono_locked_installed = nomono_locked_spec &&
               Gem::Specification.find_all_by_name("nomono").any? { |spec| spec.version == nomono_locked_spec.version }
             nomono_locked = nomono_locked_spec &&
@@ -15323,9 +15669,9 @@ module Kettle
               nomono_requirement.satisfied_by?(nomono_locked_spec.version)
             nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"] if nomono_locked
           end
+          Kernel.send(:gem, "nomono", *nomono_activation_requirements)
+          require "nomono/bundler"
         end
-        Kernel.send(:gem, "nomono", *nomono_activation_requirements)
-        require "nomono/bundler"
       RUBY
     end
 
@@ -15548,7 +15894,10 @@ module Kettle
         next false if argument.to_s.empty?
 
         if call.name == :require_relative
-          File.expand_path(File.join(project_root, File.dirname(entrypoint_path), "#{argument}.rb")) == version_absolute_path
+          Kettle::Dev::Paths.same?(
+            File.join(project_root, File.dirname(entrypoint_path), "#{argument}.rb"),
+            version_absolute_path
+          )
         else
           argument == version_require_path
         end
@@ -19493,7 +19842,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
+          uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -19611,7 +19960,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1",
+        "        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -19760,7 +20109,7 @@ module Kettle
         steps << <<~YAML
           - name: Upload coverage to QLTY
             if: ${{ !env.ACT }}
-            uses: qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0
+            uses: qltysh/qlty-action/coverage@c9b09987143d1e4ac955f4803c7bea742102feb5 # v2.4.0
             with:
               oidc: true
               files: coverage/lcov.info
@@ -19774,7 +20123,7 @@ module Kettle
         steps << <<~YAML
           - name: Upload coverage to CodeCov
             if: ${{ !env.ACT }}
-            uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+            uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
             with:
               use_oidc: true
               disable_search: true
@@ -20054,19 +20403,19 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1",
-        "ruby/setup-ruby" => "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
+        "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14",
+        "ruby/setup-ruby" => "ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
-        "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
-        "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0",
+        "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@c9b09987143d1e4ac955f4803c7bea742102feb5 # v2.4.0",
+        "codecov/codecov-action" => "codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5",
         "actions/upload-artifact" => "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1",
         "amancevice/setup-code-climate" => "amancevice/setup-code-climate@0daf2985a225e8ac15975b4d233010e94d65b76a # v2",
         "actions/dependency-review-action" => "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0",
-        "github/codeql-action/init" => "github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0",
-        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0",
-        "github/codeql-action/analyze" => "github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0",
+        "github/codeql-action/init" => "github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2",
+        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2",
+        "github/codeql-action/analyze" => "github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2",
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@af6beea6bdf1e8eb373f061c5bc168681fc6d011 # v4.0.1",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@a196742f472feaffafea537ce5a2a4c3c53a8de4 # v0.9.0",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0"

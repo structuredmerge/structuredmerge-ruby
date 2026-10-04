@@ -224,6 +224,7 @@ module TreeHaver
         def has_error? # rubocop:disable Naming/PredicatePrefix
           inner_node.has_error
         end
+
         def error? = has_error?
         def missing? = inner_node.missing
         def extra?

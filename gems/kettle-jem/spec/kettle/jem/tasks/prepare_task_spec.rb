@@ -67,9 +67,9 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       expect(step.fetch(:status)).to eq("applied")
       expect(step.fetch(:changed_files)).to eq(["gemfiles/modular/coverage_local.gemfile"])
       content = File.read(path)
-      expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.5"]')
+      expect(content).to include('nomono_activation_requirements = ["~> 1.1", ">= 1.1.6"]')
       expect(content).to include('Gem::Specification.find_all_by_name("nomono")')
-      expect(content.scan(/^require "nomono\/bundler"$/).size).to eq(1)
+      expect(content.scan(/^[ \t]*require "nomono\/bundler"$/).size).to eq(1)
     end
   end
 
@@ -297,8 +297,34 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       requirements = kettle_dev.fetch(:requirements)
       expect(step.fetch(:changed_files)).to contain_exactly("Gemfile", "gemfiles/modular/templating_local.gemfile")
       expect(File.read(gemfile)).to include(%(gem "kettle-dev", "#{requirements[0]}", "#{requirements[1]}", require: false))
-      expect(File.read(local_gemfile)).to include('gem "nomono", "~> 1.1", ">= 1.1.5"')
+      expect(File.read(local_gemfile)).to include('gem "nomono", "~> 1.1", ">= 1.1.6"')
       expect(File).not_to exist(File.join(root, "example.gemspec"))
+    end
+  end
+
+  it "preserves the released kettle-jem floor in the remote templating Gemfile during local templating" do
+    Dir.mktmpdir("kettle-jem-prepare-local-floor", tmp_root) do |root|
+      templating_gemfile = File.join(root, "gemfiles/modular/templating.gemfile")
+      gemspec = File.join(root, "example.gemspec")
+      FileUtils.mkdir_p(File.dirname(templating_gemfile))
+      File.write(templating_gemfile, <<~RUBY)
+        gem "kettle-jem", "~> 7.1", ">= 7.1.27"
+      RUBY
+      File.write(gemspec, <<~RUBY)
+        Gem::Specification.new { |spec| spec.add_development_dependency("kettle-jem", ">= 7.0") }
+      RUBY
+
+      step = described_class.reconcile_template_managed_dependencies_step(
+        root,
+        env: {"STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"},
+        events: Kettle::Jem.event_stream_from_options({})
+      )
+
+      expect(step.fetch(:changed_files)).to contain_exactly("example.gemspec", "gemfiles/modular/templating.gemfile")
+      expect(File.read(templating_gemfile)).to include('gem "kettle-jem", "~> 7.1", ">= 7.1.28"')
+      expect(File.read(gemspec)).to include(
+        'spec.add_development_dependency("kettle-jem", "~> 7.1", ">= 7.1.28")'
+      )
     end
   end
 
@@ -326,10 +352,14 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
   end
 
   it "reconciles an injected kettle-jem dependency to the running template version" do
+    # Non-path mode: convergence targets the running version, not the static
+    # released floor. Pin the env so a job-level STRUCTUREDMERGE_DEV (e.g. the
+    # CI gem-suite) cannot silently flip this into path-mode floor behavior.
+    stub_env("STRUCTUREDMERGE_DEV" => "false")
     source = "gem \"kettle-jem\", \">= 7.0\"\n"
 
     expect(Kettle::Jem.reconcile_template_managed_dependencies(source)).to eq(
-      "gem \"kettle-jem\", \"~> #{Kettle::Jem::Version.major}.#{Kettle::Jem::Version.minor}\", \">= #{Kettle::Jem::Version::VERSION}\"\n"
+      Kettle::Jem.kettle_jem_dependency_source
     )
   end
 
@@ -465,6 +495,27 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
         %w[bundle update nomono tree_sitter_language_pack]
       )
+    end
+  end
+
+  it "updates locked StructuredMerge siblings before local templating" do
+    Dir.mktmpdir("kettle-jem-prepare-local-structuredmerge", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            nomono (1.1.5)
+            ast-crispr-ruby-prism (7.1.9)
+            ast-crispr (7.1.9)
+            rake (13.2.1)
+      LOCK
+
+      command = described_class.bundle_update_templating_bootstrap_command(
+        root,
+        env: {"STRUCTUREDMERGE_DEV" => "/workspace/structuredmerge/ruby/gems"}
+      )
+
+      expect(command).to include("ast-crispr", "ast-crispr-ruby-prism")
+      expect(command).not_to include("rake")
     end
   end
 

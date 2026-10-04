@@ -2198,6 +2198,45 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "defers duplicate drift checks until an orchestrated template run is finalized" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-deferred-duplicate-drift", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+      calls = []
+      runner = lambda do |project_root:, template_dir:|
+        calls << {project_root: project_root, template_dir: template_dir}
+        {warning_count: 0, json_path: nil, lock_path: nil, exit_code: 0}
+      end
+      options = {defer_drift_check: true, duplicate_drift_runner: runner}
+
+      applied = described_class.apply_project(root, env: {}, run_options: options)
+
+      expect(calls).to be_empty
+      expect(applied.fetch(:duplicate_drift)).to include(
+        available: false,
+        skipped: true,
+        reason: "deferred_until_postprocessing"
+      )
+
+      finalized = described_class.finalize_duplicate_drift(
+        project_root: root,
+        report: applied,
+        run_options: options
+      )
+
+      expect(calls.length).to eq(1)
+      expect(finalized.fetch(:duplicate_drift)).to include(available: true, warning_count: 0, exit_code: 0)
+    end
+  end
+
   it "exposes template root and manifest metadata for adjacent tools" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -2783,11 +2822,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(gemfile).to include('gem "nomono"')
       expect(gemfile).not_to include("nomono_requirements")
       expect(direct_block).to include('require "nomono/bundler"')
-      expect(direct_block).not_to include("nomono_activation_requirements")
-      expect(direct_block).not_to include("nomono_lockfile")
-      expect(direct_block).not_to include("Bundler::LockfileParser")
-      expect(direct_block).not_to include('Kernel.send(:gem, "nomono"')
-      expect(direct_block).not_to include('Gem::Specification.find_all_by_name("nomono")')
+      expect(direct_block).to include("nomono_activation_requirements")
+      expect(direct_block).to include("Bundler::Source::Path")
+      expect(direct_block).to include("require nomono_local_loader")
       expect(direct_block).not_to include(
         'unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )

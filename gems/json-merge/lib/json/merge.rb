@@ -46,7 +46,12 @@ module Json
     class << self
       def register_backend!
         BACKEND_REGISTRY.mutex.synchronize do
-          return if BACKEND_REGISTRY.registered
+          # Only treat registration as complete when a JSON grammar actually
+          # registered; a transient TSLP hot-load failure (e.g. a failed
+          # on-demand grammar download) must stay retryable on later calls
+          # instead of latching "No parser registered for json" for the
+          # lifetime of the process.
+          return if BACKEND_REGISTRY.registered && TreeHaver.registered_languages(:json).any?
 
           TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
 

@@ -38,6 +38,15 @@ Please file a bug if you notice a violation of semantic versioning.
   `gem "activerecord", "~> 7.1.0", ">= 7.1.6"`), and carry a `# kettle-rb:`
   warning comment when no release in the series fixes an advisory.
 
+- kettle-jem-template-20260913-001 - Templating now also surfaces a review
+  entry in `dependency_conflicts.resolve` when a direct development
+  dependency doesn't support one or more of this project's declared
+  `engines:` and has no template-managed modular home (e.g. `sqlite3` on
+  `jruby`). Review each entry and pick a resolution per the project's own
+  engine support needs.
+
+- Templating plan phases now prefetch the tree-sitter-language-pack grammars used by template merges (bash, go, html, json, json5, markdown, rbs, ruby, rust, toml, tsx, typescript, yaml) through the language pack's hot-load API before recipes run, so on-demand grammar downloads happen up front with attributable diagnostics instead of failing inside a merge. Configure via KJ_TSLP_PREFETCH_LANGUAGES (space/comma list, or false to disable).
+
 ### Changed
 
 - Require kettle-rb `>= 0.1.14` (security floor data).
@@ -47,15 +56,29 @@ Please file a bug if you notice a violation of semantic versioning.
   has no modular home.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - appraisal2 (>= 3.2.3 -> >= 3.2.4)
-  - appraisal2-rubocop (>= 1.0.2 -> >= 1.0.3)
-  - gitmoji-regex (>= 2.0.12 -> >= 2.0.13)
-  - stone_checksums (>= 1.0.8 -> >= 1.0.9)
-  - turbo_tests2 (>= 3.2.7 -> >= 3.2.8)
-  - yaml-converter (>= 0.2.5 -> >= 0.2.6)
-  - yard-fence (>= 0.9.8 -> >= 0.9.9)
-  - yard-timekeeper (>= 0.2.6 -> >= 0.2.7)
-  - yard-yaml (>= 0.2.5 -> >= 0.2.6)
+  - gitmoji-regex (>= 2.0.13 -> >= 2.0.15)
+  - kettle-dev (>= 3.1.5 -> >= 3.1.6)
+  - kettle-family (>= 1.3.3 -> >= 1.3.4)
+  - reek (>= 6.5.0 -> >= 6.6.0)
+  - rubocop-lts-rspec (>= 1.0.6 -> >= 1.0.7)
+  - rubocop-minitest (>= 0.40.0 -> >= 0.41.0)
+  - turbo_tests2 (>= 3.2.12 -> >= 3.2.13)
+  - yaml-converter (>= 0.2.6 -> >= 0.2.7)
+  - yard-fence (>= 0.9.9 -> >= 0.9.10)
+  - yard-timekeeper (>= 0.2.7 -> >= 0.2.9)
+
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.14 (6f8ad36ba7488db591541483afb5464d01e8861b)
+
+- [kc] kettle-jem/prepare: updated 4 project files:
+  - dependencies (4)
+
+- [kc] kettle-jem/template: updated 12 project files:
+  - code and tests (1)
+  - other (1)
+  - workflows (10)
+
+- The templating workflow template now restores tree-sitter-language-pack grammar downloads from actions/cache keyed by the templating lockfiles, keeping the self-test off the network in the common case; a cache miss falls back to the in-run tslp_prefetch phase.
 
 ### Deprecated
 
@@ -81,6 +104,52 @@ Please file a bug if you notice a violation of semantic versioning.
   that require it can run on Rubies where it is no longer bundled by default.
 - Regenerate `sig/*.rbs` signature stubs from the template instead of merging them, preventing a duplicate top-level declaration when the detected namespace kind (module vs. class) changes between runs.
 - Gemspec `spec.files` merging now preserves a destination-only `enumerate_package_files.call("...")` splat for any project-specific directory, matching how `enumerate_package_glob.call(...)` splats were already preserved regardless of the glob pattern, instead of raising an unsupported-assignment error.
+
+- Generated current-MRI workflows now use setup-ruby-flash v2.7, which validates rv-installed bundles before Appraisal and repairs incomplete native-extension installs through Bundler.
+
+- Local template runs retain the released kettle-jem floor in remote templating Gemfiles.
+
+- Run duplicate drift detection after all template orchestration mutations, and generate shared nomono resolver options only once in local Gemfiles.
+
+- Template the bin/turbo_tests2 launcher required by Windows current-workflow tests.
+
+- Refresh locked StructuredMerge sibling gems during local template preparation so Bundler cannot retain stale registry versions.
+
+- Local template runs now preserve the released kettle-jem floor in gemspecs as well as remote Gemfiles.
+
+- Local Gemfile bootstraps now load nomono's Bundler DSL from the path source recorded in Gemfile.lock, avoiding activation of an older installed release during local templating.
+
+- Root and Kettle Changelog Gemfile bootstraps now load Nomono's Bundler DSL from a path-locked checkout instead of activating an installed Nomono release.
+
+- Nomono bootstrap normalization is now idempotent and removes duplicate generated loader blocks after repeated template preparation.
+
+- Kettle Changelog local Gemfile bootstraps now preserve their conditional block indentation when loading Nomono from a path-locked checkout.
+
+- Kettle Changelog's modular bootstrap now reads the project-root Gemfile.lock, so path-locked Nomono is not mistaken for an installed release.
+
+- Prevent commit hooks from resolving repository-local Bundler binstubs when checking commit messages.
+
+- Keep local template dependencies out of generated Appraisal bundles.
+
+- Use Kettle Dev's shared path identity logic when reconciling template and project paths.
+
+- Update the generated appraisal style-toolchain gate to Ruby 3.3 so Ruby 3.2 builds do not resolve unsupported lint dependencies.
+
+- Normalize local nomono bootstrap blocks as a single AST-bounded region, including Gemfiles whose local_gems assignment uses an array literal; keep appraisal style-gate comments attached to their Ruby-version condition.
+
+- Preserve destination Markdown link definitions referenced by README sections retained during templating.
+
+- Include files created by template orchestration steps in change accounting and maintenance changelog entries.
+
+- Local style Gemfiles now include the configured rubocop-packaging plugin, matching the generated RuboCop configuration.
+
+- Generated Gemfiles now include extracted standard-library dependencies on Windows, and only include rubocop-on-rbs on Ruby 3.3 and newer.
+
+- Generated GitHub Actions workflows now pin setup-ruby-flash v2.13 so Windows native gems receive the MSYS2 dependency prefixes required by Psych and OpenSSL.
+
+- Generated GitHub Actions workflows now pin setup-ruby-flash v2.14, which passes Windows-native MSYS2 prefixes and installs the CA trust bundle for OpenSSL.
+
+- Avoid duplicate rubocop-packaging declarations when local style Gemfiles are evaluated.
 
 ### Security
 

@@ -241,11 +241,14 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
 
       expect(owners.any? { |owner| owner.respond_to?(:name) && owner.name == :add_development_dependency }).to be(true)
       top_level_owners = context.structural_owners(owner_scope: :shared_default)
-      expect(top_level_owners.any? { |owner| owner.respond_to?(:name) && owner.name == :add_development_dependency }).to be(false)
+      expect(top_level_owners.any? do |owner|
+        owner.respond_to?(:name) && owner.name == :add_development_dependency
+      end).to be(false)
     end
 
     it 'deletes a nested dependency call along with its leading and trailing comments only' do
-      actor = Ast::Crispr::DeleteBatch.call(content: content, targets: [debug_dependency_target], source_label: 'example.gemspec')
+      actor = Ast::Crispr::DeleteBatch.call(content: content, targets: [debug_dependency_target],
+                                            source_label: 'example.gemspec')
 
       expect(actor.changed).to be(true)
       expect(actor.match_count).to eq(1)

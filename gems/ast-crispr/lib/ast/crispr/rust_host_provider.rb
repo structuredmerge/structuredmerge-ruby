@@ -34,7 +34,10 @@ module Ast
       end
 
       def report(request)
-        raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
+        unless self.class.available?
+          raise Error.new('Rust ast-crispr host is unavailable',
+                          code: 'ast_crispr_rust_host_unavailable')
+        end
 
         core_report(request)
       rescue KeyError, ArgumentError, TypeError => e
@@ -42,7 +45,10 @@ module Ast
       end
 
       def apply_source_edits(request)
-        raise Error.new('Rust ast-crispr host is unavailable', code: 'ast_crispr_rust_host_unavailable') unless self.class.available?
+        unless self.class.available?
+          raise Error.new('Rust ast-crispr host is unavailable',
+                          code: 'ast_crispr_rust_host_unavailable')
+        end
 
         core_source_edits(request)
       rescue KeyError, ArgumentError, TypeError => e

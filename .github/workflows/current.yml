@@ -235,20 +235,51 @@ jobs:
           cp ../../workspace-scripts/verify_core_ruby_export.rb ../../tmp/core-export/
           git -C ../.. rev-parse HEAD > ../../tmp/core-export/kernel-revision.txt
       - name: Package candidate Psych provider without publication
-        working-directory: native-ruby/gems/psych-merge
+        working-directory: native-ruby
         shell: bash
         run: |
           set -euo pipefail
           ulimit -c 0
-          mkdir -p "${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+          provider_dir="${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+          support_dir="${GITHUB_WORKSPACE}/kernel/tmp/psych-provider-support"
+          mkdir -p "${provider_dir}" "${support_dir}"
+          # Package the provider plus its candidate sibling closure. Sibling gems
+          # pin each other to the exact checkout version, which a release-bumped
+          # branch has not published yet; the kernel gate installs the closure
+          # from these archives into its isolated gem home and validates that it
+          # satisfies the provider's runtime requirements.
           ruby -rrubygems/package -e '
-            spec = Gem::Specification.load("psych-merge.gemspec")
-            abort "unexpected provider gem" unless spec && spec.name == "psych-merge"
-            abort "typed parser host missing" unless spec.files.include?("lib/psych/merge/core_parser_host.rb")
-            destination = File.join(ARGV.fetch(0), "#{spec.full_name}.gem")
-            abort "refusing to overwrite provider archive" if File.exist?(destination)
-            Gem::Package.build(spec, false, false, destination)
-          ' "${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+            provider_root, provider_dir, support_dir = ARGV
+            gems_root = File.expand_path("..", provider_root)
+            load_spec = lambda do |dir|
+              Dir.chdir(dir) { Gem::Specification.load("#{File.basename(dir)}.gemspec") }
+            end
+            build_archive = lambda do |spec, dir, dest|
+              Dir.chdir(dir) do
+                target = File.join(dest, "#{spec.full_name}.gem")
+                abort "refusing to overwrite provider archive #{target}" if File.exist?(target)
+                Gem::Package.build(spec, false, false, target)
+              end
+            end
+            provider = load_spec.call(provider_root)
+            abort "unexpected provider gem" unless provider && provider.name == "psych-merge"
+            abort "typed parser host missing" unless provider.files.include?("lib/psych/merge/core_parser_host.rb")
+            build_archive.call(provider, provider_root, provider_dir)
+            packaged = { provider.name => true }
+            queue = provider.dependencies.select { |dependency| dependency.type == :runtime }.map(&:name)
+            until queue.empty?
+              name = queue.shift
+              next if packaged[name]
+
+              packaged[name] = true
+              sibling = File.join(gems_root, name)
+              next unless File.file?(File.join(sibling, "#{name}.gemspec"))
+
+              spec = load_spec.call(sibling)
+              build_archive.call(spec, sibling, support_dir)
+              queue.concat(spec.dependencies.select { |dependency| dependency.type == :runtime }.map(&:name))
+            end
+          ' "${GITHUB_WORKSPACE}/native-ruby/gems/psych-merge" "${provider_dir}" "${support_dir}"
       - name: Verify candidate through full installed Ruby kernel gates
         working-directory: kernel
         shell: bash
@@ -258,7 +289,10 @@ jobs:
           export TMPDIR="${GITHUB_WORKSPACE}/kernel/tmp"
           mapfile -t providers < <(find tmp/psych-provider -maxdepth 1 -name '*.gem' -print)
           test "${#providers[@]}" -eq 1
-          ruby workspace-scripts/check_core_ruby_artifact.rb --provider-gem "${providers[0]}" 2>&1 | tee tmp/psych-native-provider.log
+          test -d tmp/psych-provider-support
+          ruby workspace-scripts/check_core_ruby_artifact.rb \
+            --provider-gem "${providers[0]}" \
+            --provider-support-dir tmp/psych-provider-support 2>&1 | tee tmp/psych-native-provider.log
       - name: Upload native-provider evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

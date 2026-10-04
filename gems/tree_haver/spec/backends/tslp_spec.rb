@@ -96,6 +96,117 @@ RSpec.describe TreeHaver::Backends::Tslp do
     expect(described_class.unavailable_reason).to eq('tree_sitter_language_pack parser API is not exposed')
   end
 
+  it 'retries availability after a transient grammar download failure instead of latching' do
+    stub_const('TreeSitterLanguagePack', Module.new)
+    parser_class = Class.new do
+      def parse(_source)
+        :tree
+      end
+    end
+    TreeSitterLanguagePack.const_set(:Parser, parser_class)
+    parser = instance_double(
+      'TreeSitterLanguagePack::Parser',
+      parse: instance_double(
+        'TreeSitterLanguagePack::Tree',
+        root_node: instance_double('TreeSitterLanguagePack::Node', has_error: false)
+      )
+    )
+    allow(TreeSitterLanguagePack).to receive(:has_language).with('json').and_return(true)
+    # First probe fails with the download error TSLP raises when the on-demand
+    # grammar fetch flakes; the retry sees a healthy pack.
+    probe_attempts = 0
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('json') do
+      probe_attempts += 1
+      raise RuntimeError,
+            'Download error: Failed to fetch manifest from https://example/manifest.json: io: Connection refused' if probe_attempts == 1
+
+      parser
+    end
+
+    expect(described_class.available?).to be(false)
+    expect(described_class.unavailable_reason).to include('Download error')
+    expect(described_class.available?).to be(true)
+  end
+
+  it 'latches unavailable after exhausting the transient retry budget' do
+    stub_const('TreeSitterLanguagePack', Module.new)
+    parser_class = Class.new do
+      def parse(_source)
+        :tree
+      end
+    end
+    TreeSitterLanguagePack.const_set(:Parser, parser_class)
+    allow(TreeSitterLanguagePack).to receive(:has_language).with('json').and_return(true)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).and_raise(
+      RuntimeError, 'Download error: Failed to fetch manifest from https://example/manifest.json: io: Connection refused'
+    )
+
+    limit = described_class::TRANSIENT_FAILURE_RETRY_LIMIT
+    limit.times { expect(described_class.available?).to be(false) }
+    expect(described_class.available?).to be(false)
+    # Permanently unavailable now; the probe must not hit the pack again.
+    allow(TreeSitterLanguagePack).to receive(:get_parser).and_raise('should not be probed again')
+    expect(described_class.available?).to be(false)
+  end
+
+  it 'does not retry permanent parser API absence' do
+    stub_const('TreeSitterLanguagePack', Module.new)
+    # No get_parser, no Parser constant: the parser API is simply not exposed.
+    expect(described_class.available?).to be(false)
+    expect(described_class.unavailable_reason).to eq('tree_sitter_language_pack parser API is not exposed')
+    expect(described_class.available?).to be(false)
+  end
+
+  describe '.prefetch' do
+    it 'downloads and loads grammars through the language-pack hot-load API' do
+      stub_const('TreeSitterLanguagePack', Module.new)
+      allow(TreeSitterLanguagePack).to receive(:prefetch)
+
+      report = described_class.prefetch(%i[json json5])
+
+      expect(report[:attempted]).to be(true)
+      expect(report[:prefetched]).to eq(%w[json json5])
+      expect(report[:failures]).to eq({})
+      expect(TreeSitterLanguagePack).to have_received(:prefetch).with(['json'])
+      expect(TreeSitterLanguagePack).to have_received(:prefetch).with(['json5'])
+    end
+
+    it 'reports per-language prefetch failures without raising' do
+      stub_const('TreeSitterLanguagePack', Module.new)
+      allow(TreeSitterLanguagePack).to receive(:prefetch).with(['json']).and_raise(
+        RuntimeError, 'Download error: Failed to download https://example/bundle.so'
+      )
+      allow(TreeSitterLanguagePack).to receive(:prefetch).with(['yaml'])
+
+      report = described_class.prefetch(%w[json yaml])
+
+      expect(report[:attempted]).to be(true)
+      expect(report[:prefetched]).to eq(%w[yaml])
+      expect(report[:failures].keys).to eq(%w[json])
+      expect(report[:failures]['json']).to include('Download error')
+    end
+
+    it 'reports skipped when the language pack is not installed' do
+      hide_const('TreeSitterLanguagePack') if defined?(::TreeSitterLanguagePack)
+      allow(described_class).to receive(:require).and_raise(LoadError, 'cannot load such file -- tree_sitter_language_pack')
+
+      report = described_class.prefetch(%w[json])
+
+      expect(report[:attempted]).to be(false)
+      expect(report[:reason]).to eq('tree_sitter_language_pack is not installed')
+      expect(report[:failures]['json']).to eq('tree_sitter_language_pack is not installed')
+    end
+
+    it 'reports skipped when the installed pack does not expose prefetch' do
+      stub_const('TreeSitterLanguagePack', Module.new)
+
+      report = described_class.prefetch(%w[json])
+
+      expect(report[:attempted]).to be(false)
+      expect(report[:reason]).to eq('tree_sitter_language_pack does not expose prefetch')
+    end
+  end
+
   it 'parses through the language-pack parser API when available' do
     raw_node = instance_double(
       'TreeSitterLanguagePack::Node',
