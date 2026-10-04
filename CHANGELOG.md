@@ -92,6 +92,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Require the release containing the Prism all-statements owner scope used by StructuredMerge templating.
 
+- Markdown merging now deduplicates template link-reference definitions against destination labels.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10

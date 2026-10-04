@@ -176,6 +176,40 @@ RSpec.describe Markdown::Merge do
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
+  it 'keeps destination link definitions unique when the template adds later sections' do
+    template = <<~MARKDOWN
+      # Project
+
+      ## Introduction
+
+      Template introduction.
+
+      ## Template-only section
+
+      Template content.
+
+      [shared]: https://template.example/shared
+      [template-only]: https://template.example/only
+    MARKDOWN
+    destination = <<~MARKDOWN
+      # Project
+
+      [shared]: https://destination.example/shared
+
+      ## Introduction
+
+      Destination introduction.
+    MARKDOWN
+
+    result = markdown_merge.merge_markdown(template, destination, 'markdown', backend: :markly)
+    definitions = Markdown::Merge::FileAnalysis.new(result.fetch(:output), backend: :markly).link_definition_owners
+
+    expect(result[:ok]).to be(true)
+    expect(definitions.map(&:label)).to include('shared', 'template-only')
+    expect(definitions.map(&:label).count('shared')).to eq(1)
+    expect(definitions.find { |owner| owner.label == 'shared' }.url).to eq('https://destination.example/shared')
+  end
+
   it 'conforms to the slice-208 embedded-family fixture' do
     fixture = read_json(fixtures_root.join('markdown', 'slice-208-embedded-families', 'code-fence-families.json'))
 

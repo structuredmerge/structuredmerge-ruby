@@ -202,11 +202,13 @@ module Markdown
 
       destination_sections = collect_markdown_sections(
         destination.dig(:analysis, :normalized_source),
-        destination.dig(:analysis, :owners)
+        destination.dig(:analysis, :owners),
+        backend: backend
       )
       template_sections = collect_markdown_sections(
         template.dig(:analysis, :normalized_source),
-        template.dig(:analysis, :owners)
+        template.dig(:analysis, :owners),
+        backend: backend
       )
       destination_paths = destination_sections.to_h { |section| [section[:path], true] }
       merged_sections = destination_sections.map { |section| section[:text] }.reject(&:empty?) +
@@ -543,11 +545,28 @@ module Markdown
       starts
     end
 
-    def collect_markdown_sections(source, owners)
+    def collect_markdown_sections(source, owners, backend: nil)
       lines = normalize_source(source).split("\n")
       starts = markdown_owner_start_indices(source)
-      ordered = owners.filter_map do |owner|
-        start = starts[owner[:path]]
+      link_definitions = FileAnalysis.new(source, backend: backend || :auto).statements
+        .grep(LinkDefinitionNode)
+        .each_with_object({}) do |owner, definitions|
+          label = owner.signature.last
+          path = "/link_definition/#{label}"
+          definitions[path] ||= {
+            path: path,
+            owner_kind: "link_definition",
+            match_key: label,
+            start_line: owner.location.start_line
+          }
+        end
+      all_owners = owners + link_definitions.values
+      ordered = all_owners.filter_map do |owner|
+        start = if owner.key?(:start_line)
+          owner[:start_line] - 1
+        else
+          starts[owner[:path]]
+        end
         next if start.nil?
 
         { owner: owner, start: start }
