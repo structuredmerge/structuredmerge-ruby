@@ -133,9 +133,9 @@ module Ast
         operations = normalize_identifiers(values)
         unknown = operations - OPERATIONS
         raise InvalidProviderError, "Unknown provider operations: #{unknown.join(', ')}" unless unknown.empty?
-        unless operations.sort == OPERATIONS.sort
-          raise InvalidProviderError, "Provider must implement all operations: #{OPERATIONS.join(', ')}"
-        end
+        # Methods remain required so direct unsupported calls fail consistently;
+        # advertised capabilities must reflect only implemented operations.
+        raise InvalidProviderError, 'Provider must advertise at least one operation' if operations.empty?
 
         operations
       end

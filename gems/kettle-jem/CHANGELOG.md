@@ -31,6 +31,12 @@ Please file a bug if you notice a violation of semantic versioning.
   the existing template-managed (case 1) conflicts, and the same
   auto-resolution path for any future entry in this category with
   `force_review: false`.
+- `workflows.framework_matrix` gemfiles for gems tracked by kettle-rb's
+  `Kettle::Rb::GemFloors` (activemodel, activerecord, activesupport, sqlite3)
+  require the minor series' security floor when the version's requirement
+  still admits the series' first release (e.g.
+  `gem "activerecord", "~> 7.1.0", ">= 7.1.6"`), and carry a `# kettle-rb:`
+  warning comment when no release in the series fixes an advisory.
 
 - kettle-jem-template-20260913-001 - Templating now also surfaces a review
   entry in `dependency_conflicts.resolve` when a direct development
@@ -42,6 +48,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templating plan phases now prefetch the tree-sitter-language-pack grammars used by template merges (bash, go, html, json, json5, markdown, rbs, ruby, rust, toml, tsx, typescript, yaml) through the language pack's hot-load API before recipes run, so on-demand grammar downloads happen up front with attributable diagnostics instead of failing inside a merge. Configure via KJ_TSLP_PREFETCH_LANGUAGES (space/comma list, or false to disable).
 
 ### Changed
+
+- Require kettle-rb `>= 0.1.14` (security floor data).
+- The `sqlite3` `KNOWN_GEM_CONFLICT_RESOLUTIONS` reason now points at a
+  `platforms: [:ruby]` modular gemfile (kettle-jem-appraisals generates
+  `gemfiles/modular/activerecord_support/*.gemfile`) instead of saying sqlite3
+  has no modular home.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - appraisal2 (>= 3.2.4 -> >= 3.2.5)
@@ -63,6 +75,13 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Deprecated
 
 ### Removed
+
+- The `commonmarker-merge` and `kramdown-merge` runtime dependencies, and their
+  entries in the local sibling and `templating_local.gemfile` path lists.
+  kettle-jem merges Markdown with markly (via `ast-crispr-markdown-markly` and
+  `markly-merge`); other Markdown backends are still used when a project installs
+  them, but are no longer forced on every bundle. This also stops `commonmarker`'s
+  native extension from being compiled, which fails on ruby-head.
 
 ### Fixed
 

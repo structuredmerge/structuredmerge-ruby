@@ -71,6 +71,36 @@ The _amazing_ test matrix is powered by the kettle-dev stack.
 
 </details>
 
+## Opt-in typed TypeScript provider
+
+`TypeScript::Merge::RustHostProvider` keeps its compatibility name but now uses
+`structuredmerge-core`, not `structuredmerge_host_prototype`. Explicit selection
+of `rust.typescript` routes analyze, diff2, merge2 and merge3 to the typed kernel
+using the existing TreeHaver registry. `typescript` and `tsx` select their respective
+grammars; JSX is not silently accepted by the TypeScript grammar. Defaults are unchanged.
+
+Owners are whole class, enum, function, function-signature, interface, internal-module,
+type-alias and single-variable declarations, including supported single wrappers.
+Nested wrappers such as `export const`, ambiguous multi-variable owners and
+unsupported top-level forms fail closed. This is not full compiler semantics.
+
+Typed merge2 intentionally preserves current declarations, unlike native Ruby's
+incoming-preferred policy. Additions require exact import compatibility; current
+bytes and document headers remain in place. Native leading comments after imports
+or owners travel with additions. This positional contract does not interpret
+compiler directives or promise semantic JSDoc attachment. Every clean result is
+reparsed and source retention is checked in Rust.
+
+Analysis/diff identities now use kernel paths such as `/function:left` and native
+byte spans rather than host-rendered signatures. Complete typed results, canonical
+conflicts and actual verification remain available. Neutral Git framing is accepted;
+custom marker labels/widths are unsupported.
+
+`gemfiles/typed_core.gemfile` is the pre-publication installed-artifact test bundle.
+Workspace siblings resolve through `STRUCTUREDMERGE_DEV` and the installed core
+through Bundler. Broader downstream/platform, source-gem and release gates remain
+separate; this migration does not authorize publication or default promotion.
+
 ## ✨ Installation
 
 Install the gem and add to the application's Gemfile by executing:

@@ -5,7 +5,13 @@ require 'spec_helper'
 RSpec.describe Rust::Merge::RustHostProvider do
   subject(:provider) { described_class.new }
 
-  before { skip 'compiled Rust host is unavailable' unless described_class.available? }
+  before(:context) do
+    if File.basename(ENV.fetch('BUNDLE_GEMFILE', '')) == 'typed_core.gemfile' && !Rust::Merge::RustHostProvider.available?
+      raise 'The typed-core artifact test bundle must load structuredmerge-core'
+    end
+  end
+
+  before { skip 'compiled typed core is unavailable' unless described_class.available? }
 
   before { Rust::Merge.register_rust_host_provider!(replace: true) }
 
@@ -21,7 +27,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
   let(:ours_source) { "fn left() -> i32 { 2 }\n\nfn right() -> i32 { 1 }\n" }
   let(:theirs_source) { "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 2 }\n" }
 
-  it 'satisfies the provider contract for every operation through the host' do
+  it 'satisfies the provider contract for every operation through the typed core' do
+    expect(described_class.ancestors).not_to include(Ast::Merge::RustHostProvider)
     requests = {
       analyze: request_base.merge(source: base_source),
       diff2: request_base.merge(before_source: base_source, after_source: ours_source),
@@ -33,7 +40,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
       result = provider.public_send(operation, request)
       expect(Ast::Merge::ProviderContract.validate_result!(operation, result)).to eq(result)
       expect(result.fetch(:provider)).to include(provider_id: 'rust.rust', backend: :rust_tslp)
-      expect(result.fetch(:verification)).to include(rust_host: true)
+      expect(result.fetch(:verification)).to include(rust_core: true)
       expect(result.fetch(:ok)).to be(true), result.inspect
     end
   end
@@ -49,7 +56,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
 
     expect(result.fetch(:provider)).to include(provider_id: 'rust.rust')
-    expect(result.fetch(:verification)).to include(rust_host: true)
+    expect(result.fetch(:verification)).to include(rust_core: true)
     expect(result.fetch(:ok)).to be(true), result.inspect
   end
 
@@ -82,39 +89,41 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(native.fetch(:output))
   end
 
-  it 'preserves native merge2 output' do
+  it 'records the intentional current-preferred policy difference from native merge2' do
     request = request_base.merge(incoming_source: ours_source, current_source: base_source)
     native = Rust::Merge::Provider.new.merge2(request)
     rust = provider.merge2(request)
 
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(rust.fetch(:ok)).to be(true), rust.inspect
-    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(native.fetch(:output)).to eq(ours_source)
+    expect(rust.fetch(:output)).to eq(base_source)
+    expect(rust.fetch(:verification)).to include(directional_roles_preserved: true, output_reparsed: true)
   end
 
   it 'reports edits when declaration identity is unchanged' do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: ours_source))
 
     expect(result.fetch(:ok)).to be(true), result.inspect
-    change = result.fetch(:changes).find { |entry| entry[:path] == '[:function, "left"]' }
+    change = result.fetch(:changes).find { |entry| entry[:path] == '/function:left' }
     expect(change).to include(
-      before: { present: true, source_role: :before, line_range: [1, 1] },
-      after: { present: true, source_role: :after, line_range: [1, 1] },
+      before: hash_including(present: true, source_role: :before, line_range: [1, 1]),
+      after: hash_including(present: true, source_role: :after, line_range: [1, 1]),
       change: :edited
     )
   end
 
-  it 'preserves named declaration kinds in host analysis and diff paths' do
+  it 'preserves named declaration kinds in typed analysis and diff paths' do
     source = "const LIMIT: usize = 1;\n\nstruct Config {\n    value: usize,\n}\n"
     analysis = provider.analyze(request_base.merge(source: source))
     paths = analysis.dig(:analysis, :declarations).map { |declaration| declaration.fetch(:path) }
 
-    expect(paths).to contain_exactly('[:const, "LIMIT"]', '[:struct, "Config"]')
+    expect(paths).to contain_exactly('/const:LIMIT', '/struct:Config')
 
     changed = source.sub('LIMIT: usize = 1', 'LIMIT: usize = 2')
     diff = provider.diff2(request_base.merge(before_source: source, after_source: changed))
 
-    expect(diff.fetch(:changes).map { |change| change.fetch(:path) }).to include('[:const, "LIMIT"]')
+    expect(diff.fetch(:changes).map { |change| change.fetch(:path) }).to include('/const:LIMIT')
   end
 
   it 'reports added and deleted declarations with explicit presence records' do
@@ -122,16 +131,16 @@ RSpec.describe Rust::Merge::RustHostProvider do
     result = provider.diff2(request_base.merge(before_source: base_source, after_source: after_source))
 
     expect(result.fetch(:ok)).to be(true), result.inspect
-    deleted = result.fetch(:changes).find { |entry| entry[:path] == '[:function, "right"]' }
-    added = result.fetch(:changes).find { |entry| entry[:path] == '[:function, "added"]' }
+    deleted = result.fetch(:changes).find { |entry| entry[:path] == '/function:right' }
+    added = result.fetch(:changes).find { |entry| entry[:path] == '/function:added' }
     expect(deleted).to include(
-      before: { present: true, source_role: :before, line_range: [3, 3] },
+      before: hash_including(present: true, source_role: :before, line_range: [3, 3]),
       after: { present: false, source_role: :after, line_range: [nil, nil] },
       change: :deleted
     )
     expect(added).to include(
       before: { present: false, source_role: :before, line_range: [nil, nil] },
-      after: { present: true, source_role: :after, line_range: [3, 3] },
+      after: hash_including(present: true, source_role: :after, line_range: [3, 3]),
       change: :added
     )
   end
@@ -158,12 +167,12 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
   it 'matches native behavior for independently edited reordered declarations' do
     reordered_ours = base_source.sub(
-      'fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }',
-      'fn right() -> i32 { 1 }\n\nfn left() -> i32 { 2 }'
+      "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }",
+      "fn right() -> i32 { 1 }\n\nfn left() -> i32 { 2 }"
     )
     reordered_theirs = base_source.sub(
-      'fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }',
-      'fn right() -> i32 { 3 }\n\nfn left() -> i32 { 1 }'
+      "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }",
+      "fn right() -> i32 { 3 }\n\nfn left() -> i32 { 1 }"
     )
     request = request_base.merge(
       base_source: base_source,
@@ -193,7 +202,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
   end
 
-  it 'matches native membership conflict dispositions through the Rust host' do
+  it 'matches native membership conflict dispositions through the typed core' do
     deletion = request_base.merge(
       base_source: "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }\n",
       ours_source: "fn left() -> i32 { 2 }\n\nfn right() -> i32 { 1 }\n",
@@ -220,5 +229,63 @@ RSpec.describe Rust::Merge::RustHostProvider do
     else
       expect(added.fetch(:conflicts)).not_to be_empty
     end
+  end
+
+  it 'projects native identities and UTF-8 byte spans without loading the prototype' do
+    source = "// é\nfn f() {}\n"
+    result = provider.analyze(source: source)
+    expect(result).to include(ok: true)
+    expect(result.dig(:analysis, :declarations)).to contain_exactly(
+      hash_including(path: '/function:f', line_range: [2, 2], byte_range: { 'start_byte' => 6, 'end_byte' => 15 })
+    )
+    expect(result.dig(:analysis, :facts, 'owners', 0, 'node_ids')).not_to be_empty
+    expect(Gem.loaded_specs.keys).not_to include('structuredmerge_host_prototype')
+  end
+
+  it 'retains module docs and imports while inserting outer docs and new declarations' do
+    result = provider.merge2(incoming_source: "//! incoming module\nuse std::fmt;\n/// é added\nfn f() {}\n",
+      current_source: "//! current module\nuse std::fmt;\n// footer\n")
+    expect(result).to include(ok: true, output: "//! current module\nuse std::fmt;\n/// é added\nfn f() {}\n// footer\n")
+    expect(result.fetch(:verification)).to include(output_reparsed: true, directional_roles_preserved: true)
+    expect(provider.merge2(incoming_source: "use std::io;\nfn f() {}\n", current_source: "use std::fmt;\n")).to include(ok: false, output: nil)
+    expect(provider.merge2(incoming_source: "struct T;\n", current_source: '')).to include(ok: true, output: "struct T;\n")
+  end
+
+  it 'retains canonical guard evidence before whole-source shortcuts without inventing owner decisions' do
+    result = provider.merge3(base_source: base_source, ours_source: ours_source + "fn added() {}\n", theirs_source: base_source)
+    expect(result).to include(ok: false, output: nil)
+    conflict = result.dig(:typed_result, :conflicts, 0, :canonical)
+    expect(conflict).to include(code: 'rust.membership_with_owner_edit', decision_ids: [])
+    expect(conflict.fetch(:subject)).to include(whole_document: true)
+    expect(conflict.fetch(:alternatives).length).to eq(3)
+    expect(conflict.fetch(:classification)).to include(base_participated: true, decision_ids: [])
+    expect(result.dig(:typed_result, :verification, :extra, 'owner_classification')).to be_nil
+    expect(JSON.generate(result)).not_to include('#<StructuredmergeCore::')
+  end
+
+  it 'reports layout diffs and deterministically reparses unchanged source' do
+    source = "use std::fmt;\n// é\nfn f() {}"
+    diff = provider.diff2(before_source: source, after_source: source.sub('std::fmt', 'std::io'))
+    expect(diff).to include(ok: true)
+    expect(diff.fetch(:changes)).to contain_exactly(hash_including(subject_ref: 'document', change: :edited))
+    request = { base_source: source, ours_source: source, theirs_source: source }
+    result = provider.merge3(request)
+    expect(result).to include(ok: true, output: source)
+    expect(result.fetch(:verification)).to include(output_reparsed: true)
+    expect(JSON.generate(result)).to eq(JSON.generate(provider.merge3(request)))
+  end
+
+  it 'rejects unsupported selectors, syntax and framing without changing caller bytes' do
+    expect(provider.analyze(source: base_source, dialect: :go)).to include(ok: false)
+    expect(provider.analyze(source: base_source, comments: true)).to include(ok: false)
+    expect(provider.analyze(source: "#[test]\nfn f() {}\n")).to include(ok: false)
+    request = { base_source: base_source, ours_source: base_source, theirs_source: base_source }
+    expect(provider.merge3(request.merge(path_name: 'file.rs', labels: {}, conflict_marker_size: '7'))).to include(ok: true)
+    expect(provider.merge3(request.merge(conflict_marker_size: 8))).to include(ok: false)
+    expect(provider.merge3(request.merge(labels: { ours: 'custom' }))).to include(ok: false)
+    expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
+    bytes = base_source.b
+    expect(provider.analyze(source: bytes)).to include(ok: true)
+    expect(bytes.encoding).to eq(Encoding::ASCII_8BIT)
   end
 end

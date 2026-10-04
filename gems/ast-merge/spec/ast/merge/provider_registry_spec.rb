@@ -60,6 +60,18 @@ RSpec.describe Ast::Merge::ProviderRegistry do
     ).to equal(workflow_provider)
   end
 
+  it 'selects a partial-capability provider only for its advertised operations' do
+    provider = provider_class.new(provider_id: 'git.json', family: 'json')
+    provider.capabilities[:operations] = [:merge3]
+    registry.register(provider)
+    expect(registry.resolve(provider_id: 'git.json', operation: :merge3)).to equal(provider)
+    expect(registry.resolve(provider_id: 'git.json', operation: :analyze)).to be_nil
+    provider.capabilities[:operations] = []
+    expect { Ast::Merge::ProviderContract.validate_provider!(provider) }.to raise_error(Ast::Merge::ProviderContract::InvalidProviderError)
+    provider.capabilities[:operations] = [:invented]
+    expect { Ast::Merge::ProviderContract.validate_provider!(provider) }.to raise_error(Ast::Merge::ProviderContract::InvalidProviderError)
+  end
+
   it 'selects an explicitly requested backend instead of the workflow provider' do
     backend_provider = provider_class.new(
       provider_id: 'ruby.json.alternate',

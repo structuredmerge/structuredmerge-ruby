@@ -71,6 +71,32 @@ The _amazing_ test matrix is powered by the kettle-dev stack.
 
 </details>
 
+## Opt-in typed Rust provider
+
+`Rust::Merge::RustHostProvider` retains its compatibility name but now uses
+`structuredmerge-core`, not `structuredmerge_host_prototype`. Explicit selection
+of `rust.rust` routes analyze, diff2, merge2 and merge3 through the typed kernel
+and the existing TreeHaver parser registry. Native defaults are unchanged.
+
+The supported profile merges nine top-level declaration kinds as whole owners:
+const, enum, function, module, static, struct, trait, type and union. Impl blocks,
+standalone attributes/macros and duplicate identities fail closed. This is not
+full Rust semantic analysis or compilation validation.
+
+Directional merge2 intentionally preserves current declarations, unlike native
+Ruby's incoming-preferred policy. Incoming-only declarations carry their native
+leading comments; module docs/imports and every current byte remain in place.
+Additions require identical use declarations. Analysis/diff paths now use kernel
+identities such as `/function:left` and native byte spans, not rendered host
+signatures. Complete typed results and canonical conflict evidence are retained.
+The membership-change-plus-owner-edit guard is a whole-document conflict, not
+invented owner localization. Custom marker labels/widths are unsupported.
+
+`gemfiles/typed_core.gemfile` is the pre-publication installed-artifact test bundle.
+It resolves workspace siblings through `STRUCTUREDMERGE_DEV` and the installed
+core gem through Bundler. Released-package, downstream and platform gates remain
+separate; this migration does not authorize publishing or changing defaults.
+
 ## ✨ Installation
 
 Install the gem and add to the application's Gemfile by executing:

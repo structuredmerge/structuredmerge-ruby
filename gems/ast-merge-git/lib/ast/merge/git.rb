@@ -274,6 +274,10 @@ module Ast
 
       def register_explicit_rust_provider(request)
         provider_id = request[:provider_id].to_s
+        if provider_id == 'rust.git.json'
+          register_rust_host_provider!(replace: true) if RustHostProvider.available?
+          return
+        end
         return unless provider_id.start_with?('rust.')
 
         family_module_name = RUST_PROVIDER_FAMILIES[request[:family].to_s]

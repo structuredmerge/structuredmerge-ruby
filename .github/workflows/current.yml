@@ -33,6 +33,8 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+      - name: Validate typed core workflow contract
+        run: python3 -m unittest discover -s .github/tests -v
       - name: Detect changed gems
         id: changed-gems
         shell: bash
@@ -81,7 +83,7 @@ jobs:
           gems = [gem for gem in gems if gem in all_gems]
 
           family_input_changed = any(
-              path in {
+              path.startswith(".github/") or path in {
                   "Gemfile",
                   "Gemfile.lock",
                   ".structuredmerge/fixtures.lock",
@@ -114,13 +116,18 @@ jobs:
           PY
 
   gem-suite:
-    name: Gem suite (${{ matrix.gem }})
-    needs: detect
+    name: Gem suite with core artifact (${{ matrix.gem }})
+    needs: [detect, typed-core]
     if: ${{ needs.detect.outputs.count != '0' && needs.detect.outputs.release_mode == '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/ci_core.gemfile
+      KETTLE_FAMILY_BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/ci_core.gemfile
+      STRUCTUREDMERGE_CI_GEM_DIR: ${{ github.workspace }}/${{ matrix.gem }}
+      STRUCTUREDMERGE_CI_DEP_HEADS: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -139,11 +146,13 @@ jobs:
       - name: Setup Ruby
         uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
         with:
-          ruby-version: ruby
+          ruby-version: "4.0"
           bundler-cache: false
           working-directory: ${{ matrix.gem }}
           pre-bundle-gems: |
             nomono --source https://gem.coop --source https://rubygems.org
+      - name: Install verified typed core artifact
+        uses: ./.github/actions/typed-core
       - name: Install dependencies
         working-directory: ${{ matrix.gem }}
         env:
@@ -162,6 +171,11 @@ jobs:
           done
 
           exit 1
+      - name: Verify installed typed core loads
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: bundle exec ruby .github/verify_typed_core.rb
       - name: Run checks
         working-directory: ${{ matrix.gem }}
         env:
@@ -169,6 +183,267 @@ jobs:
           K_SOUP_COV_DO: false
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test
+
+  typed-core:
+    name: Typed core artifact @ HEAD (pre-publication)
+    needs: detect
+    if: ${{ needs.detect.outputs.count != '0' && needs.detect.outputs.release_mode == '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CARGO_BUILD_JOBS: "1"
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_PROFILE_TEST_DEBUG: "0"
+      CARGO_TARGET_DIR: ${{ github.workspace }}/kernel/tmp/typed-core-target
+    steps:
+      - name: Checkout Ruby provider candidate
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          path: native-ruby
+          persist-credentials: false
+      - name: Checkout kernel HEAD
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: structuredmerge/structuredmerge
+          ref: main
+          path: kernel
+          persist-credentials: false
+      - name: Record kernel revision
+        working-directory: kernel
+        run: git rev-parse HEAD
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772
+        with:
+          toolchain: stable
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+        with:
+          ruby-version: "4.0"
+          bundler-cache: false
+      - name: Build committed typed bindings and export platform gem
+        working-directory: kernel/packages/ruby
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          mkdir -p ../../tmp
+          export TMPDIR="${GITHUB_WORKSPACE}/kernel/tmp"
+          bundle install --jobs 4 --retry 8
+          bundle exec rake compile
+          bundle exec ruby ../../workspace-scripts/check_core_ruby_artifact.rb --package-only ../../tmp/core-export
+          cp ../../workspace-scripts/verify_core_ruby_export.rb ../../tmp/core-export/
+          git -C ../.. rev-parse HEAD > ../../tmp/core-export/kernel-revision.txt
+      - name: Package candidate Psych provider without publication
+        working-directory: native-ruby/gems/psych-merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          mkdir -p "${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+          ruby -rrubygems/package -e '
+            spec = Gem::Specification.load("psych-merge.gemspec")
+            abort "unexpected provider gem" unless spec && spec.name == "psych-merge"
+            abort "typed parser host missing" unless spec.files.include?("lib/psych/merge/core_parser_host.rb")
+            destination = File.join(ARGV.fetch(0), "#{spec.full_name}.gem")
+            abort "refusing to overwrite provider archive" if File.exist?(destination)
+            Gem::Package.build(spec, false, false, destination)
+          ' "${GITHUB_WORKSPACE}/kernel/tmp/psych-provider"
+      - name: Verify candidate through full installed Ruby kernel gates
+        working-directory: kernel
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          export TMPDIR="${GITHUB_WORKSPACE}/kernel/tmp"
+          mapfile -t providers < <(find tmp/psych-provider -maxdepth 1 -name '*.gem' -print)
+          test "${#providers[@]}" -eq 1
+          ruby workspace-scripts/check_core_ruby_artifact.rb --provider-gem "${providers[0]}" 2>&1 | tee tmp/psych-native-provider.log
+      - name: Upload native-provider evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: psych-native-provider-head
+          path: |
+            kernel/tmp/psych-native-provider.log
+            kernel/tmp/core-ruby-artifact-*/report.json
+            kernel/tmp/core-ruby-artifact-*/failure.json
+            kernel/tmp/core-ruby-artifact-*/Gemfile.lock
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Upload typed core export
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: structuredmerge-core-head
+          path: kernel/tmp/core-export/*
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove disposable compiler output
+        if: always()
+        shell: bash
+        run: |
+          if [ -d kernel/tmp/typed-core-target ]; then
+            rm -r -- kernel/tmp/typed-core-target
+          fi
+
+  dep-heads:
+    name: Deps @ HEAD (${{ matrix.gem }})
+    needs:
+      - detect
+      - typed-core
+    if: ${{ needs.detect.outputs.count != '0' && needs.detect.outputs.release_mode == '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/ci_core.gemfile
+      KETTLE_FAMILY_BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/ci_core.gemfile
+      STRUCTUREDMERGE_CI_GEM_DIR: ${{ github.workspace }}/${{ matrix.gem }}
+      STRUCTUREDMERGE_CI_DEP_HEADS: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Clone sibling fixtures repo
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixtures_repository="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("repository")')"
+          fixtures_tag="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("tag")')"
+          fixtures_revision="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("revision")')"
+          git clone --filter=blob:none --no-checkout "${fixtures_repository}" ../fixtures
+          git -C ../fixtures fetch --depth 1 origin "refs/tags/${fixtures_tag}:refs/tags/${fixtures_tag}"
+          git -C ../fixtures checkout --detach "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse "refs/tags/${fixtures_tag}^{commit}")" = "${fixtures_revision}"
+      - name: Setup Ruby
+        uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: false
+          working-directory: ${{ matrix.gem }}
+          pre-bundle-gems: |
+            nomono --source https://gem.coop --source https://rubygems.org
+      - name: Install verified typed core artifact
+        uses: ./.github/actions/typed-core
+      - name: Install dependencies
+        working-directory: ${{ matrix.gem }}
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          bundle config set frozen false
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
+      - name: Verify installed typed core loads
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: bundle exec ruby .github/verify_typed_core.rb
+      - name: Run checks
+        working-directory: ${{ matrix.gem }}
+        env:
+          K_JEM_TEMPLATING: true
+          K_SOUP_COV_DO: false
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: timeout 12m bundle exec kettle-test
+
+  coverage:
+    name: Coverage with core artifact (${{ matrix.gem }})
+    needs: [detect, typed-core]
+    if: ${{ needs.detect.outputs.count != '0' && needs.detect.outputs.release_mode == '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/ci_core.gemfile
+      KETTLE_FAMILY_BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gem }}/ci_core.gemfile
+      STRUCTUREDMERGE_CI_GEM_DIR: ${{ github.workspace }}/${{ matrix.gem }}
+      STRUCTUREDMERGE_CI_DEP_HEADS: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Clone sibling fixtures repo
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixtures_repository="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("repository")')"
+          fixtures_tag="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("tag")')"
+          fixtures_revision="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("revision")')"
+          git clone --filter=blob:none --no-checkout "${fixtures_repository}" ../fixtures
+          git -C ../fixtures fetch --depth 1 origin "refs/tags/${fixtures_tag}:refs/tags/${fixtures_tag}"
+          git -C ../fixtures checkout --detach "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse "refs/tags/${fixtures_tag}^{commit}")" = "${fixtures_revision}"
+      - name: Setup Ruby
+        uses: appraisal-rb/setup-ruby-flash@925395edf973d2dc0a629919f407f3547a03d4b5 # v2.1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: false
+          working-directory: ${{ matrix.gem }}
+          pre-bundle-gems: |
+            nomono --source https://gem.coop --source https://rubygems.org
+      - name: Install verified typed core artifact
+        uses: ./.github/actions/typed-core
+      - name: Install dependencies
+        working-directory: ${{ matrix.gem }}
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          bundle config set frozen false
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
+      - name: Verify installed typed core loads
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: bundle exec ruby .github/verify_typed_core.rb
+      - name: Load coverage thresholds
+        shell: bash
+        working-directory: ${{ matrix.gem }}
+        run: |
+          set -euo pipefail
+          for key in K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE K_SOUP_COV_MIN_HARD; do
+            value="$(sed -nE "s/^${key}[[:space:]]*=[[:space:]]*\"([^\"]*)\".*/\\1/p" mise.toml 2>/dev/null | head -1)"
+            if [[ -n "${value}" ]]; then
+              echo "${key}=${value}" >> "${GITHUB_ENV}"
+            fi
+          done
+      - name: Run checks with coverage
+        working-directory: ${{ matrix.gem }}
+        env:
+          K_JEM_TEMPLATING: true
+          K_SOUP_COV_COMMAND_NAME: Test Coverage
+          K_SOUP_COV_DO: true
+          K_SOUP_COV_FORMATTERS: xml,rcov,lcov,tty
+          K_SOUP_COV_MULTI_FORMATTERS: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: timeout 20m bundle exec kettle-test
+      - name: Verify coverage reports
+        working-directory: ${{ matrix.gem }}
+        run: |
+          test -s coverage/lcov.info
+          test -s coverage/coverage.xml
 
   family-suite:
     name: StructuredMerge family suite
@@ -424,6 +699,9 @@ jobs:
     needs:
       - detect
       - gem-suite
+      - typed-core
+      - dep-heads
+      - coverage
       - family-suite
       - benchmark-dev
       - rbs
@@ -438,6 +716,9 @@ jobs:
           RELEASE_MODE: ${{ needs.detect.outputs.release_mode }}
           DETECT_RESULT: ${{ needs.detect.result }}
           GEM_SUITE_RESULT: ${{ needs.gem-suite.result }}
+          TYPED_CORE_RESULT: ${{ needs.typed-core.result }}
+          DEP_HEADS_RESULT: ${{ needs.dep-heads.result }}
+          COVERAGE_RESULT: ${{ needs.coverage.result }}
           FAMILY_SUITE_RESULT: ${{ needs.family-suite.result }}
           BENCHMARK_DEV_RESULT: ${{ needs.benchmark-dev.result }}
           RBS_RESULT: ${{ needs.rbs.result }}
@@ -447,6 +728,9 @@ jobs:
           echo "Selected gem suites: ${SELECTED_GEMS}"
           echo "Detect result: ${DETECT_RESULT}"
           echo "Gem suite result: ${GEM_SUITE_RESULT}"
+          echo "Typed core artifact result: ${TYPED_CORE_RESULT}"
+          echo "Deps @ HEAD result: ${DEP_HEADS_RESULT}"
+          echo "Coverage result: ${COVERAGE_RESULT}"
           echo "Family suite result: ${FAMILY_SUITE_RESULT}"
           echo "Dev benchmark result: ${BENCHMARK_DEV_RESULT}"
           echo "RBS result: ${RBS_RESULT}"
@@ -462,6 +746,9 @@ jobs:
 
           if [[ "${FAMILY_SUITE_RESULT}" == "success" ]]; then
             [[ "${GEM_SUITE_RESULT}" == "skipped" ]] || exit 1
+            [[ "${TYPED_CORE_RESULT}" == "skipped" ]] || exit 1
+            [[ "${DEP_HEADS_RESULT}" == "skipped" ]] || exit 1
+            [[ "${COVERAGE_RESULT}" == "skipped" ]] || exit 1
             [[ "${RBS_RESULT}" == "skipped" ]] || exit 1
             [[ "${BENCHMARK_DEV_RESULT}" == "skipped" ]] || exit 1
             [[ "${TSLP_COLD_CACHE_RESULT}" == "skipped" ]] || exit 1
@@ -472,10 +759,12 @@ jobs:
             [[ "${result}" == "success" ]] || exit 1
           done
 
-          case "${GEM_SUITE_RESULT}" in
-            success|skipped)
-              ;;
-            *)
-              exit 1
-              ;;
-          esac
+          for result in "${GEM_SUITE_RESULT}" "${TYPED_CORE_RESULT}" "${DEP_HEADS_RESULT}" "${COVERAGE_RESULT}"; do
+            case "${result}" in
+              success|skipped)
+                ;;
+              *)
+                exit 1
+                ;;
+            esac
+          done

@@ -4,6 +4,8 @@ require_relative '../spec_helper'
 
 RSpec.describe TreeHaver::Backends::RustTslp do
   it 'normalizes JSON5 node names to the established TSLP contract' do
+    skip TreeHaver::Backends::RustTslp.unavailable_reason unless TreeHaver::Backends::RustTslp.available?
+
     tree = TreeHaver.with_backend(:rust_tslp) do
       TreeHaver::GrammarFinder.new(:json5).register!(raise_on_missing: true)
       TreeHaver.parser_for(:json5).parse("{ answer: true }\n")

@@ -1,0 +1,30 @@
+name: Install typed core artifact
+description: Verify and install the pre-publication kernel artifact under the consumer Ruby
+runs:
+  using: composite
+  steps:
+    - name: Download typed core export
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: structuredmerge-core-head
+        path: ${{ runner.temp }}/structuredmerge-core-export
+    - name: Verify and install exact artifact
+      shell: bash
+      run: |
+        set -euo pipefail
+        export_root="${RUNNER_TEMP}/structuredmerge-core-export"
+        mapfile -t artifacts < <(find "${export_root}" -maxdepth 1 -name '*.gem' -print)
+        test "${#artifacts[@]}" -eq 1
+        ruby "${export_root}/verify_core_ruby_export.rb" "${artifacts[0]}" "${export_root}/core-ruby-artifact.json"
+        gem install --local --no-document --ignore-dependencies "${artifacts[0]}"
+        ruby -rjson -rrubygems -e '
+          report = JSON.parse(File.read(ARGV.fetch(0)))
+          spec = Gem::Specification.find_by_name("structuredmerge-core", "= #{report.fetch("version")}")
+          abort "installed platform mismatch" unless spec.platform.to_s == report.fetch("platform")
+          File.open(ENV.fetch("GITHUB_ENV"), "a") do |output|
+            output.puts "STRUCTUREDMERGE_CORE_VERSION=#{spec.version}"
+            output.puts "STRUCTUREDMERGE_CORE_INSTALLED_DIR=#{spec.full_gem_path}"
+          end
+        ' "${export_root}/core-ruby-artifact.json"
+        # kettle-test discovers the owning gem from the bundle's directory.
+        cp "${GITHUB_WORKSPACE}/.github/typed_core.gemfile" "${STRUCTUREDMERGE_CI_GEM_DIR}/ci_core.gemfile"

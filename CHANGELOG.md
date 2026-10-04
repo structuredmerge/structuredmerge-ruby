@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Add an opt-in Rust-backed Bash provider for top-level function merges.
 
+- Add an explicitly registered typed ParserHost for the optional generated kernel integration, using Psych 5.5.x native facts while retaining Rust-owned YAML semantics and exact source bytes.
+
 ### Changed
 
 - Require tree_sitter_language_pack 1.17.0 or later.
@@ -49,6 +51,34 @@ Please file a bug if you notice a violation of semantic versioning.
 - Correct the Rust Bash provider capability metadata to describe its top-level variable-assignment ownership.
 
 - Extend the opt-in Rust Bash provider to preserve literal-title test_expect_success calls.
+
+- markdown-merge: an unspecified (`:auto`) Markdown backend now prefers markly, then commonmarker, then kramdown, and uses kreuzberg-language-pack only as the last resort; optional backend gems are loaded markly first. The reported `available_markdown_backends` order is unchanged.
+
+- Use the generated structuredmerge-core typed API for Rust profile reports and explicit source edits instead of the host-prototype gem, retaining Ruby structural selection and Hash result compatibility.
+
+- Migrate the opt-in ast-template report and read-only planning adapter from the prototype facade to generated structuredmerge-core DTOs, retaining Ruby-owned template application.
+
+- Migrate the explicit Rust TSLP backend from the host prototype to typed structuredmerge-core parsing, preserving native node flags and exact source bytes.
+
+- Move the opt-in Rust JSON provider to structuredmerge-core typed operations, using Rust-owned diff classifications and native byte spans; retain complete portable core evidence and JSON Pointer owner identities without the prototype dependency.
+
+- Migrate the opt-in Ruby Git JSON provider to typed structuredmerge-core operations, preserve canonical conflict/render evidence and Git write policies, and advertise only implemented operations through the shared provider contract.
+
+- Migrate the opt-in Bash Rust provider from the prototype to typed structuredmerge-core operations, with Rust-owned analysis/diffs, current-preferred directional merge2, canonical conflicts, and source verification. Share family-aware transport projection with JSON and Git; native defaults remain unchanged.
+
+- Migrate the opt-in Go Rust provider to typed structuredmerge-core operations with Rust-owned analysis/diffs, current-preferred source-preserving merge2, and canonical Go ownership-guard conflicts. Keep native Ruby defaults; document the intentional merge2 policy difference and test actual reordered declarations.
+
+- Migrate opt-in rust.rust to typed structuredmerge-core operations without the host prototype; expose native identities and canonical guard evidence, with explicit current-preferred directional semantics and unchanged native defaults.
+
+- Migrate opt-in rust.typescript and TSX to typed structuredmerge-core operations without the host prototype, retaining explicit grammar selection, native owner evidence and current-preferred directional semantics; native defaults remain unchanged.
+
+- Replace prototype CI builds and publication switches with verified pre-publication structuredmerge-core artifacts for current, coverage, and dependency-HEAD jobs; verify installed payloads and retain per-gem test discovery.
+
+- Replace obsolete prototype development switches with explicit typed-core source and registry switches in migrated consumers, and remove unused prototype dependencies from YAML, Markdown, and Kettle Jem.
+
+- Require the independently packaged Psych provider to pass installed Ruby kernel gates before exporting the CI core artifact; retain evidence and clean disposable compiler output.
+
+- Align typed Git integration coverage with source-backed absent-owner conflict review: write review markers with conflict status while preserving leave-ours and invalid-input behavior.
 
 ### Deprecated
 
@@ -101,6 +131,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - json-merge backend registration now only treats registration as complete when a JSON grammar actually registered, so a transient TSLP hot-load failure stays retryable instead of latching for the process lifetime.
 
 - TreeHaver exposes prefetch_languages to pre-download and pre-load language-pack grammars through their hot-load API before parsing.
+- Require conflict markers or a categorized conflict diagnostic before benchmark exit status 1 can count as a conflict; startup failures remain reliability errors.
+
+- Accept established categorized conflict diagnostics without a separate code field while still rejecting empty diagnostics and unexplained exit-one failures.
 
 ### Security
 
