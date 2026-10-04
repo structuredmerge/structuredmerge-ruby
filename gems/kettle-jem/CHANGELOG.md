@@ -143,6 +143,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Avoid duplicate rubocop-packaging declarations when local style Gemfiles are evaluated.
 
+- The template-managed kettle-jem self-dependency floor now matches the running gem version, so local-path template reconciliation converges injected kettle-jem requirements to the current release instead of a stale floor.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

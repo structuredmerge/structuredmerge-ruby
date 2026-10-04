@@ -58,7 +58,7 @@ module Kettle
     # declarations in the destination and reconciles their complete requirement
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
-      {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
+      {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.29"], bootstrap: false},
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.6"], bootstrap: true},
       {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.5"], bootstrap: true},
       {
