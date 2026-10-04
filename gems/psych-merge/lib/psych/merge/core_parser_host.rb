@@ -22,17 +22,18 @@ module Psych
 
       def descriptor
         CORE::ParserProviderDescriptor.new(id: PROVIDER_ID, family: 'native', runtime: RUBY_ENGINE,
-          package: 'psych-merge', package_version: Version::VERSION, parser: 'psych', parser_version: Psych::VERSION,
-          languages: ['yaml'], dialects: [], contracts: ['structuredmerge.parse-result/v1'],
-          capabilities: %w[diagnostics native_extensions source_spans], probe_id: 'psych.loaded',
-          priority: 0, metadata: {}, extensions: [])
+                                           package: 'psych-merge', package_version: Version::VERSION, parser: 'psych', parser_version: Psych::VERSION,
+                                           languages: ['yaml'], dialects: [], contracts: ['structuredmerge.parse-result/v1'],
+                                           capabilities: %w[diagnostics native_extensions source_spans], probe_id: 'psych.loaded',
+                                           priority: 0, metadata: {}, extensions: [])
       end
 
       def probe_batch(request)
         raise TypeError, 'Expected typed ProbeBatchRequest' unless request.is_a?(CORE::ProbeBatchRequest)
 
         CORE::ProbeBatchResult.new(items: request.items.map do |item|
-          CORE::ParserProbeResult.new(available: compatible? && item.language == 'yaml' && item.dialect.nil?, loadable: true)
+          CORE::ParserProbeResult.new(available: compatible? && item.language == 'yaml' && item.dialect.nil?,
+                                      loadable: true)
         end)
       end
 
@@ -49,14 +50,14 @@ module Psych
       def parse(item)
         text = item.source.bytes.pack('C*').force_encoding(Encoding::UTF_8)
         code = if !compatible?
-          'psych.unsupported_version'
-        elsif item.language != 'yaml' || !item.dialect.nil?
-          'psych.unsupported_language'
-        elsif item.options.comments || item.options.tokens
-          'psych.unsupported_options'
-        elsif !text.valid_encoding? || item.source.descriptor.encoding.to_s != 'utf8'
-          'psych.unsupported_source'
-        end
+                 'psych.unsupported_version'
+               elsif item.language != 'yaml' || !item.dialect.nil?
+                 'psych.unsupported_language'
+               elsif item.options.comments || item.options.tokens
+                 'psych.unsupported_options'
+               elsif !text.valid_encoding? || item.source.descriptor.encoding.to_s != 'utf8'
+                 'psych.unsupported_source'
+               end
         # Bare CR has different native coordinate semantics. Inspect bytes, not
         # source syntax; comments and ownership are never inferred from text.
         code = 'psych.unsupported_source' if text.b.gsub("\r\n", '').include?("\r")
@@ -64,8 +65,8 @@ module Psych
 
         nodes = project(Psych.parse_stream(text), text, item.options.native_extensions)
         CORE::ParseOutput.new(request_id: item.request_id, source: item.source.descriptor,
-          ok: true, root_id: nodes.first.id, nodes: nodes, comments: [], diagnostics: [],
-          extensions: [], metadata: {}, extra: {})
+                              ok: true, root_id: nodes.first.id, nodes: nodes, comments: [], diagnostics: [],
+                              extensions: [], metadata: {}, extra: {})
       rescue Psych::SyntaxError
         # Psych exception messages can contain private source. Never forward them.
         failure(item, 'psych.syntax')
@@ -73,15 +74,15 @@ module Psych
 
       def failure(item, code)
         message = case code
-        when 'psych.syntax' then 'Psych syntax error'
-        when 'psych.unsupported_version' then 'Psych provider requires the verified Psych 5.5.x series'
-        else 'Unsupported Psych provider input'
-        end
+                  when 'psych.syntax' then 'Psych syntax error'
+                  when 'psych.unsupported_version' then 'Psych provider requires the verified Psych 5.5.x series'
+                  else 'Unsupported Psych provider input'
+                  end
         diagnostic = CORE::ParseDiagnostic.new(id: code, severity: :error, category: 'parse_error', code: code,
-          message: message,
-          source_role: item.source.descriptor.role, blocking: true, metadata: {}, extra: {})
+                                               message: message,
+                                               source_role: item.source.descriptor.role, blocking: true, metadata: {}, extra: {})
         CORE::ParseOutput.new(request_id: item.request_id, source: item.source.descriptor, ok: false,
-          nodes: [], comments: [], diagnostics: [diagnostic], extensions: [], metadata: {}, extra: {})
+                              nodes: [], comments: [], diagnostics: [diagnostic], extensions: [], metadata: {}, extra: {})
       end
 
       def project(stream, text, native_extensions)
@@ -119,20 +120,27 @@ module Psych
           kind = node.class.name.split('::').last.downcase
           first = kind == 'stream' ? 0 : offset.call(node.start_line, node.start_column)
           last = kind == 'stream' ? text.bytesize : offset.call(node.end_line, node.end_column)
-          facts = %i[value style plain quoted anchor tag implicit implicit_end].each_with_object({}) do |attribute, result|
+          facts = %i[value style plain quoted anchor tag implicit
+                     implicit_end].each_with_object({}) do |attribute, result|
             result[attribute] = node.public_send(attribute) if node.respond_to?(attribute)
           end
-          extensions = native_extensions ? [CORE::NativeExtension.new(schema: 'structuredmerge.extension/ruby-psych/v1',
-            namespace: 'ruby-psych', capabilities: [], payload: ::JSON.generate(facts), extra: {})] : []
+          extensions = if native_extensions
+                         [CORE::NativeExtension.new(schema: 'structuredmerge.extension/ruby-psych/v1',
+                                                    namespace: 'ruby-psych', capabilities: [], payload: ::JSON.generate(facts), extra: {})]
+                       else
+                         []
+                       end
           CORE::ParseNode.new(id: id, kind: kind, native_type: node.class.name, role: :structural,
-            named: true, missing: false, has_error: false, parent_id: parent,
-            span: CORE::SourceSpan.new(range: CORE::ByteRange.new(start_byte: first, end_byte: last),
-              start_point: point.call(first), end_point: point.call(last)),
-            children: (node.children || []).each_with_index.map do |child, index|
-              CORE::ChildEdge.new(node_id: ids.fetch(child.object_id), index: index,
-                field_name: kind == 'mapping' ? (index.even? ? 'key' : 'value') : nil)
-            end,
-            semantic_roles: [], unsupported_features: [], extensions: extensions, metadata: {}, extra: {})
+                              named: true, missing: false, has_error: false, parent_id: parent,
+                              span: CORE::SourceSpan.new(range: CORE::ByteRange.new(start_byte: first, end_byte: last),
+                                                         start_point: point.call(first), end_point: point.call(last)),
+                              children: (node.children || []).each_with_index.map do |child, index|
+                                CORE::ChildEdge.new(node_id: ids.fetch(child.object_id), index: index,
+                                                    field_name: if kind == 'mapping'
+                                                                  index.even? ? 'key' : 'value'
+                                                                end)
+                              end,
+                              semantic_roles: [], unsupported_features: [], extensions: extensions, metadata: {}, extra: {})
         end
       end
     end
