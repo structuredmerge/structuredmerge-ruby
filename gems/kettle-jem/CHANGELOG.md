@@ -151,6 +151,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Avoid duplicate rubocop-packaging declarations when local style Gemfiles are evaluated.
 
+- The StructuredMerge family link in generated READMEs now points to the consolidated StructuredMerge repository.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10
