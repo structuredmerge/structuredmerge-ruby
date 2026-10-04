@@ -352,6 +352,10 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
   end
 
   it "reconciles an injected kettle-jem dependency to the running template version" do
+    # Non-path mode: convergence targets the running version, not the static
+    # released floor. Pin the env so a job-level STRUCTUREDMERGE_DEV (e.g. the
+    # CI gem-suite) cannot silently flip this into path-mode floor behavior.
+    stub_env("STRUCTUREDMERGE_DEV" => "false")
     source = "gem \"kettle-jem\", \">= 7.0\"\n"
 
     expect(Kettle::Jem.reconcile_template_managed_dependencies(source)).to eq(

@@ -1607,6 +1607,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   end
 
   it "converges an existing injected kettle-jem dependency to the running version" do
+    # Non-path mode: the running version, not the static released floor. Pin
+    # the env so a job-level STRUCTUREDMERGE_DEV cannot flip the assertion.
+    stub_env("STRUCTUREDMERGE_DEV" => "false")
     updated = described_class.ensure_monorepo_root_gemfile_dependencies(
       "source \"https://gem.coop\"\ngem \"kettle-jem\", \">= 7.0\"\n"
     )
