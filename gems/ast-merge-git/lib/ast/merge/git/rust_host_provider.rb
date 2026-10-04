@@ -24,15 +24,21 @@ module Ast
 
         def policy(_operation, request)
           labels = request.fetch(:labels, {})
-          raise ArgumentError, 'Git labels must be a Hash of text values' unless labels.is_a?(Hash) && labels.values.all? { |label| label.is_a?(String) }
+          unless labels.is_a?(Hash) && labels.values.all? do |label|
+            label.is_a?(String)
+          end
+            raise ArgumentError,
+                  'Git labels must be a Hash of text values'
+          end
 
           width = request[:conflict_marker_size]
           width = Integer(width, 10) if width.is_a?(String) # Git argv is textual.
           raise ArgumentError, 'Git marker width must be an Integer' unless width.nil? || width.is_a?(Integer)
 
           core::OperationPolicy.from_merge3(core::ThreeWayMergePolicy.new(
-            render_policy: 'source-preserving', fallback_policy: 'none',
-            labels: labels.transform_keys(&:to_s), conflict_marker_size: width, extra: {}))
+                                              render_policy: 'source-preserving', fallback_policy: 'none',
+                                              labels: labels.transform_keys(&:to_s), conflict_marker_size: width, extra: {}
+                                            ))
         end
       end
     end

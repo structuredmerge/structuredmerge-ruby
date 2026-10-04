@@ -1224,9 +1224,7 @@ module Ast
           # Exit 1 alone also describes Ruby startup failures and other crashes.
           # Require an emitted marker region or the portable conflict diagnostic;
           # the expected oracle must never turn an unexplained failure into success.
-          if status == 1 && conflict_regions.empty? && !conflict_diagnostic?(stderr)
-            return 'error'
-          end
+          return 'error' if status == 1 && conflict_regions.empty? && !conflict_diagnostic?(stderr)
 
           if expected == 'error'
             return 'error' if status.nil?

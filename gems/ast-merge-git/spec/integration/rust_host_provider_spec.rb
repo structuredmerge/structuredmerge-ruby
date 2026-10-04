@@ -8,7 +8,9 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
   subject(:provider) { described_class.new }
 
   before(:context) do
-    raise 'typed artifact core is unavailable' if ENV['BUNDLE_GEMFILE']&.end_with?('typed_core.gemfile') && !described_class.available?
+    if ENV['BUNDLE_GEMFILE']&.end_with?('typed_core.gemfile') && !described_class.available?
+      raise 'typed artifact core is unavailable'
+    end
   end
   before { skip 'typed Rust core is unavailable' unless described_class.available? }
   before { Ast::Merge::Git.register_rust_host_provider!(replace: true) }
@@ -95,8 +97,8 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
     sources = { base_source: '{"x":0}', ours_source: '{"x":1}', theirs_source: '{"x":2}' }
     result = provider.merge3(request_base.merge(sources, conflict_marker_size: '9', labels: { ours: 'local-é' }))
     expect(result.fetch(:conflicted_output)).to include('<<<<<<<<< local-é')
-    [ { labels: { ours: "bad\nlabel" } }, { labels: { unknown: 'bad' } },
-      { conflict_marker_size: -1 }, { conflict_marker_size: 1025 }, { unexpected: true } ].each do |options|
+    [{ labels: { ours: "bad\nlabel" } }, { labels: { unknown: 'bad' } },
+     { conflict_marker_size: -1 }, { conflict_marker_size: 1025 }, { unexpected: true }].each do |options|
       rejected = provider.merge3(request_base.merge(sources, **options))
       expect(rejected[:ok]).to be(false)
       expect(rejected[:output]).to be_nil
@@ -117,7 +119,7 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
       ].each do |base, ours, theirs, policy, exit_code|
         paths.zip([base, ours, theirs]).each { |path, text| path.binwrite(text) }
         result = Ast::Merge::Git.merge_files(**request_base, provider_id: 'rust.git.json',
-          base_path: paths[0], ours_path: paths[1], theirs_path: paths[2], conflict_policy: policy)
+                                                             base_path: paths[0], ours_path: paths[1], theirs_path: paths[2], conflict_policy: policy)
         expect(result.fetch(:git)).to include(exit_code: exit_code, output_written: false)
         expect(paths[1].binread).to eq(ours)
       end
@@ -132,7 +134,7 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
       paths = %w[base ours theirs].map { |role| Pathname(directory).join("#{role}.json") }
       paths.zip(['{"x":0}', '{}', '{"x":2}']).each { |path, text| path.binwrite(text) }
       result = Ast::Merge::Git.merge_files(**request_base, provider_id: 'rust.git.json',
-        base_path: paths[0], ours_path: paths[1], theirs_path: paths[2], conflict_policy: :write)
+                                                           base_path: paths[0], ours_path: paths[1], theirs_path: paths[2], conflict_policy: :write)
 
       expect(result.fetch(:git)).to include(exit_code: 1, output_written: true)
       expect(result[:ok]).to be(false)
@@ -154,7 +156,7 @@ RSpec.describe Ast::Merge::Git::RustHostProvider do
       paths.zip(['{"x":0}', '{"x":1}', '{"x":2}']).each { |path, text| path.binwrite(text) }
       expect(Ast::Merge::Git).to receive(:register_rust_host_provider!).with(replace: true).and_call_original
       status = Ast::Merge::Git.run(paths.map(&:to_s) + ['file.json', '9', 'ancestor', 'local', 'remote'],
-        env: { 'AST_MERGE_PROVIDER' => 'rust.git.json', 'AST_MERGE_DIALECT' => 'json' }, stderr: StringIO.new)
+                                   env: { 'AST_MERGE_PROVIDER' => 'rust.git.json', 'AST_MERGE_DIALECT' => 'json' }, stderr: StringIO.new)
       expect(status).to eq(1)
       expect(paths[1].binread).to include('<<<<<<<<< local', '||||||||| ancestor', '>>>>>>>>> remote')
     end

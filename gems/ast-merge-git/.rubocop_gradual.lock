@@ -2,13 +2,13 @@
   ".simplecov:74630949": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:3548614143": [
+  "Rakefile:153899668": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
     [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "ast-merge-git.gemspec:1635236738": [
+  "ast-merge-git.gemspec:296794465": [
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [139, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 2105564149],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
@@ -28,8 +28,11 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/coverage_local.gemfile:3080699222": [
-    [42, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
+  "gemfiles/modular/changelog.gemfile:2477451209": [
+    [38, 7, 580, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 393701499]
+  ],
+  "gemfiles/modular/coverage_local.gemfile:1246000888": [
+    [53, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
   ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
@@ -83,7 +86,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/x_std_libs.gemfile:3163909001": [
+  "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
@@ -102,13 +105,19 @@
   "lib/ast-merge-git.rb:4085939583": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`ast-merge-git.rb`) should use snake_case.", 5381]
   ],
-  "lib/ast/merge/git/rust_host_provider.rb:839283132": [
-    [52, 9, 1412, "Metrics/AbcSize: Assignment Branch Condition size for `merge3` is too high. [<7, 26, 9> 28.39/17]", 3115020697],
-    [52, 9, 1412, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge3` is too high. [9/7]", 3115020697],
-    [52, 9, 1412, "Metrics/MethodLength: Method has too many lines. [30/10]", 3115020697],
-    [52, 9, 1412, "Metrics/PerceivedComplexity: Perceived complexity for `merge3` is too high. [9/8]", 3115020697]
+  "lib/ast/merge/git.rb:591150602": [
+    [275, 7, 790, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `register_explicit_rust_provider` is too high. [8/7]", 1977872112]
   ],
-  "spec/integration/rust_host_provider_spec.rb:3034134041": [
-    [7, 1, 4907, "Metrics/BlockLength: Block has too many lines. [128/25]", 3432371652]
+  "lib/ast/merge/git/rust_host_provider.rb:3562734462": [
+    [25, 9, 910, "Metrics/AbcSize: Assignment Branch Condition size for `policy` is too high. [<4, 17, 7> 18.81/17]", 1969699911],
+    [25, 9, 910, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `policy` is too high. [8/7]", 1969699911],
+    [25, 9, 910, "Metrics/MethodLength: Method has too many lines. [14/10]", 1969699911],
+    [40, 121, 3, "Layout/LineLength: Line is too long. [123/120]", 193344099]
+  ],
+  "spec/integration/rust_host_provider_spec.rb:3985665377": [
+    [7, 1, 9438, "Metrics/BlockLength: Block has too many lines. [202/25]", 312809233],
+    [122, 121, 30, "Layout/LineLength: Line is too long. [150/120]", 349763508],
+    [137, 121, 28, "Layout/LineLength: Line is too long. [148/120]", 1682513787],
+    [159, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 419467831]
   ]
 }
