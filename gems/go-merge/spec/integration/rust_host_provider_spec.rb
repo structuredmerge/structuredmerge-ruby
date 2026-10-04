@@ -205,17 +205,17 @@ RSpec.describe Go::Merge::RustHostProvider do
 
   it 'imports function comments into package-only current source without losing its footer' do
     result = provider.merge2(incoming_source: "package main\n\n// é new\nfunc f() {}\n",
-      current_source: "// module\npackage main\n// footer\n")
+                             current_source: "// module\npackage main\n// footer\n")
     expect(result).to include(ok: true, output: "// module\npackage main\n\n// é new\nfunc f() {}\n// footer\n")
     expect(result.fetch(:verification)).to include(output_reparsed: true, directional_roles_preserved: true)
     rejected = provider.merge2(incoming_source: "package main\nimport \"fmt\"\nfunc f() { fmt.Println(1) }\n",
-      current_source: "package main\n")
+                               current_source: "package main\n")
     expect(rejected).to include(ok: false, output: nil)
   end
 
   it 'retains full-document guard evidence without claiming an owner decision' do
     result = provider.merge3(base_source: base_source, ours_source: ours_source,
-      theirs_source: base_source + "func added() {}\n")
+                             theirs_source: base_source + "func added() {}\n")
     expect(result).to include(ok: false, output: nil)
     conflict = result.dig(:typed_result, :conflicts, 0, :canonical)
     expect(conflict).to include(code: 'go.membership_with_owner_edit', decision_ids: [])
@@ -242,7 +242,8 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(provider.analyze(source: base_source, dialect: :bash)).to include(ok: false)
     expect(provider.analyze(source: base_source, comments: true)).to include(ok: false)
     request = { base_source: base_source, ours_source: base_source, theirs_source: base_source }
-    expect(provider.merge3(request.merge(path_name: 'file.go', labels: {}, conflict_marker_size: '7'))).to include(ok: true)
+    expect(provider.merge3(request.merge(path_name: 'file.go', labels: {},
+                                         conflict_marker_size: '7'))).to include(ok: true)
     expect(provider.merge3(request.merge(conflict_marker_size: 8))).to include(ok: false)
     expect(provider.merge3(request.merge(labels: { ours: 'custom' }))).to include(ok: false)
     expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
