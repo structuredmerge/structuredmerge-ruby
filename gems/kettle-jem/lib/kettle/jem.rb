@@ -2668,6 +2668,70 @@ module Kettle
       require "ast/crispr/ruby/prism"
       @runtime_dependencies_loaded = true
     end
+
+    # Grammars templating merges through tree_sitter_language_pack. Prefetching
+    # them through TSLP's hot-load API downloads and loads the grammars up
+    # front so the on-demand download cannot transiently fail inside a merge
+    # and surface as a misleading "No parser registered" abort.
+    TSLP_PREFETCH_LANGUAGES = %w[
+      bash
+      go
+      html
+      json
+      json5
+      markdown
+      rbs
+      ruby
+      rust
+      toml
+      tsx
+      typescript
+      yaml
+    ].freeze
+
+    def tslp_prefetch_languages(env)
+      override = env["KJ_TSLP_PREFETCH_LANGUAGES"]
+      return TSLP_PREFETCH_LANGUAGES if override.nil? || override.to_s.strip.empty?
+
+      override.to_s.split(/[\s,]+/).map(&:downcase).uniq
+    end
+
+    def prefetch_tslp_grammars(env: ENV, events: nil)
+      override = env["KJ_TSLP_PREFETCH_LANGUAGES"]
+      if DecisionPolicy.value_to_boolean(override) == false
+        return {attempted: false, reason: "disabled via KJ_TSLP_PREFETCH_LANGUAGES"}
+      end
+
+      languages = tslp_prefetch_languages(env)
+      report = TreeHaver.prefetch_languages(languages)
+      report[:languages] = languages
+      emit_event(events, "diagnostic", {
+        severity: report.fetch(:failures, {}).empty? ? "advisory" : "warning",
+        category: "tslp_prefetch",
+        message: tslp_prefetch_message(report)
+      }) if events
+      report
+    rescue StandardError => error
+      emit_event(events, "diagnostic", {
+        severity: "warning",
+        category: "tslp_prefetch",
+        message: "TSLP grammar prefetch failed: #{error.class}: #{error.message}"
+      }) if events
+      {attempted: false, reason: "#{error.class}: #{error.message}"}
+    end
+
+    def tslp_prefetch_message(report)
+      return "TSLP grammar prefetch skipped: #{report[:reason]}" unless report.fetch(:attempted, false)
+
+      prefetched = Array(report[:prefetched])
+      failures = report.fetch(:failures, {})
+      message = "TSLP grammar prefetch loaded #{prefetched.length} grammar(s): #{prefetched.sort.join(", ")}"
+      unless failures.empty?
+        detail = failures.sort.map { |name, reason| "#{name}: #{reason}" }.join("; ")
+        message += "; #{failures.length} failure(s): #{detail}"
+      end
+      message
+    end
     # rubocop:enable ThreadSafety/ClassInstanceVariable
 
     def display_path(path)
@@ -4045,6 +4109,7 @@ module Kettle
       events = event_stream_from_options(run_options)
       emit_event(events, "run_start", mode: "plan", project_root: project_root.to_s)
       with_event_phase(events, "runtime_dependencies") { ensure_runtime_dependencies! }
+      with_event_phase(events, "tslp_prefetch") { prefetch_tslp_grammars(env: env, events: events) }
       with_event_phase(events, "preflight") { preflight_project!(project_root) }
       template_selection = with_event_phase(events, "template_selection") { template_selection_for(env, run_options) }
       checksum_mode = with_event_phase(events, "checksum_mode") { checksum_mode_for(env, run_options) }

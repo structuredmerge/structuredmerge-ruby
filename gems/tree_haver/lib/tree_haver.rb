@@ -258,6 +258,19 @@ module TreeHaver
     LanguageRegistry.registered(name)
   end
 
+  # Warm up language-pack grammars through their hot-load/prefetch API so the
+  # on-demand grammar download happens explicitly, up front, instead of firing
+  # inside the first availability smoke probe during a merge.
+  #
+  # Safe to call with the TSLP backend unavailable or absent: reports
+  # attempted: false with a reason instead of raising.
+  #
+  # @param languages [Array<String, Symbol>] grammar names to prefetch
+  # @return [Hash] prefetch report (see Backends::Tslp.prefetch)
+  def prefetch_languages(languages)
+    Backends::Tslp.prefetch(languages)
+  end
+
   def register_language(name, path: nil, symbol: nil, grammar_module: nil, grammar_class: nil, backend_module: nil,
                         backend_type: nil, gem_name: nil, contract: nil)
     LanguageRegistry.register(name, :tree_sitter, path: path, symbol: symbol, contract: contract) if path
@@ -345,7 +358,21 @@ module TreeHaver
       return parser_for_registered_backend(name, backend_type, registrations)
     end
 
-    raise NotAvailable, "No parser registered for #{name}"
+    raise NotAvailable, no_parser_registered_message(name)
+  end
+
+  # Build the "No parser registered" error message, surfacing why the
+  # tree-sitter-language-pack backend declined the language (for example a
+  # failed on-demand grammar download) so CI logs are attributable instead of
+  # misleading.
+  def no_parser_registered_message(name)
+    message = "No parser registered for #{name}"
+    language_reason = Backends::Tslp.language_unavailable_reason(name)
+    backend_reason = Backends::Tslp.unavailable_reason
+    reasons = [language_reason, backend_reason].map(&:to_s).reject(&:empty?).uniq
+    return message if reasons.empty?
+
+    "#{message} (tree_sitter_language_pack: #{reasons.join("; ")})"
   end
 
   def ruby_reference_parser_backend_contract_report

@@ -39,6 +39,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `jruby`). Review each entry and pick a resolution per the project's own
   engine support needs.
 
+- Templating plan phases now prefetch the tree-sitter-language-pack grammars used by template merges (bash, go, html, json, json5, markdown, rbs, ruby, rust, toml, tsx, typescript, yaml) through the language pack's hot-load API before recipes run, so on-demand grammar downloads happen up front with attributable diagnostics instead of failing inside a merge. Configure via KJ_TSLP_PREFETCH_LANGUAGES (space/comma list, or false to disable).
+
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:

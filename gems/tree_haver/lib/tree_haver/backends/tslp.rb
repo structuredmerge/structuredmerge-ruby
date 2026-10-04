@@ -8,11 +8,20 @@ module TreeHaver
     # process API is not a TreeHaver parser backend and must not be used as a
     # merge-gem integration surface.
     module Tslp
-      @load_attempted = false
+      # Transient grammar hot-load failures (for example a failed on-demand
+      # download of the tree-sitter-language-pack bundle) are retried on later
+      # availability probes instead of latching for the whole process. After
+      # this many consecutive transient failures the backend latches as
+      # unavailable so a dead network cannot slow every later parse attempt.
+      TRANSIENT_FAILURE_RETRY_LIMIT = 3
+
       @loaded = false
+      @permanently_unavailable = false
+      @transient_failures = 0
       @unavailable_reason = nil
       @language_availability = {}
       @language_unavailable_reasons = {}
+      @language_attempts = {}
       PARSER_SMOKE_SOURCES = {
         'json' => '{}',
         'json5' => '{}',
@@ -28,35 +37,91 @@ module TreeHaver
       }.freeze
       DEFAULT_PARSER_SMOKE_SOURCE = ''
 
+      # Grammar hot-load failures caused by the on-demand bundle download
+      # (network flake, transient GitHub release fetch failure, cache lock
+      # contention) must not latch the backend for the whole process.
+      TRANSIENT_FAILURE_PATTERN = /
+        Download\ error
+        | Download\ cache\ lock\ error
+        | Failed\ to\ fetch\ manifest
+        | Failed\ to\ download
+        | Failed\ to\ read\ (cached|download)
+        | connection\ (refused|reset)
+        | timed?\ out
+        | timeout
+        | temporarily
+      /xi.freeze
+
       class << self
         attr_reader :unavailable_reason
 
         def available?
-          return @loaded if @load_attempted
+          return true if @loaded
+          return false if @permanently_unavailable
 
-          @load_attempted = true
+          @loaded = probe_availability
+          return true if @loaded
+
+          if transient_reason?(@unavailable_reason) && @transient_failures < TRANSIENT_FAILURE_RETRY_LIMIT
+            # Leave the backend probeable so a later availability check retries
+            # the on-demand grammar download instead of failing every parse for
+            # the rest of the process.
+            @transient_failures += 1
+            return false
+          end
+
+          @permanently_unavailable = true
+          false
+        end
+
+        # Reason the last per-language probe failed, when known.
+        def language_unavailable_reason(language_name)
+          @language_unavailable_reasons[language_name.to_s]
+        end
+
+        # Pre-download and pre-load grammars through the language pack's
+        # hot-load API before any parse/smoke probing happens. This turns the
+        # on-demand download (which otherwise fires inside the first
+        # availability probe and can transiently fail) into an explicit,
+        # attributable warm-up step.
+        #
+        # @param languages [Array<String, Symbol>] grammar names to prefetch
+        # @return [Hash] {attempted:, prefetched:, failures: {name => reason}}
+        def prefetch(languages)
+          names = languages.map(&:to_s).uniq
           begin
             require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
-            @loaded = parser_api_available?
-            if !@loaded && @unavailable_reason.to_s.empty?
-              @unavailable_reason = 'tree_sitter_language_pack parser API is not exposed'
-            end
           rescue LoadError => e
-            @loaded = false
-            @unavailable_reason = e.message
-          rescue StandardError => e
-            @loaded = false
-            @unavailable_reason = e.message
+            return prefetch_skip_report('tree_sitter_language_pack is not installed', e.message, names)
           end
-          @loaded
+
+          unless ::TreeSitterLanguagePack.respond_to?(:prefetch)
+            return prefetch_skip_report('tree_sitter_language_pack does not expose prefetch', nil, names)
+          end
+
+          failures = {}
+          prefetched = names.select do |name|
+            ::TreeSitterLanguagePack.prefetch([name])
+            true
+          rescue StandardError => e
+            failures[name] = e.message
+            false
+          end
+          {attempted: true, prefetched: prefetched, failures: failures}
+        end
+
+        def transient_reason?(reason)
+          !reason.to_s.empty? && TRANSIENT_FAILURE_PATTERN.match?(reason.to_s)
         end
 
         def reset!
-          @load_attempted = false
           @loaded = false
+          @permanently_unavailable = false
+          @transient_failures = 0
           @unavailable_reason = nil
           @language_availability = {}
           @language_unavailable_reasons = {}
+          @language_attempts = {}
         end
 
         def capabilities
@@ -78,16 +143,61 @@ module TreeHaver
           name = language_name.to_s
           return @language_availability.fetch(name) if @language_availability.key?(name)
 
-          @language_availability[name] = smoke_parse_language(name)
-          @language_unavailable_reasons[name] = @unavailable_reason unless @language_availability.fetch(name)
-          @language_availability.fetch(name)
+          available = smoke_parse_language(name)
+          if available
+            @language_availability[name] = true
+            @language_unavailable_reasons.delete(name)
+            return true
+          end
+
+          reason = @language_unavailable_reasons[name] = @unavailable_reason
+          attempts = (@language_attempts[name] = @language_attempts.fetch(name, 0) + 1)
+          if transient_reason?(reason) && attempts < TRANSIENT_FAILURE_RETRY_LIMIT
+            # Do not memoize: a later probe retries the on-demand hot load.
+            return false
+          end
+
+          @language_availability[name] = false
+          false
         rescue StandardError => e
+          name = language_name.to_s
           @unavailable_reason = e.message
-          @language_unavailable_reasons[language_name.to_s] = e.message
+          @language_unavailable_reasons[name] = e.message
+          attempts = (@language_attempts[name] = @language_attempts.fetch(name, 0) + 1)
+          # Memoize only after exhausting the transient retry budget; raising
+          # here is how the on-demand grammar download reports failures.
+          @language_availability[name] = false if attempts >= TRANSIENT_FAILURE_RETRY_LIMIT
           false
         end
 
         private
+
+        def prefetch_skip_report(reason, detail, names)
+          @unavailable_reason = detail if detail
+          {
+            attempted: false,
+            reason: reason,
+            prefetched: [],
+            failures: names.to_h { |name| [name, reason] }
+          }
+        end
+
+        def probe_availability
+          require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
+          loaded = parser_api_available?
+          if !loaded && @unavailable_reason.to_s.empty?
+            @unavailable_reason = 'tree_sitter_language_pack parser API is not exposed'
+          end
+          loaded
+        rescue LoadError => e
+          # A missing gem is permanent for the process lifetime.
+          @unavailable_reason = e.message
+          @permanently_unavailable = true
+          false
+        rescue StandardError => e
+          @unavailable_reason = e.message
+          false
+        end
 
         def parser_api_available?
           return false unless ::TreeSitterLanguagePack.respond_to?(:get_parser)
