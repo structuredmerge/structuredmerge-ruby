@@ -17,18 +17,26 @@ RSpec.describe Ast::Crispr::RustHostProvider do
     expect(boundary.fetch('metadata').fetch('source')).to eq('legacy_crispr_reference')
     ruby = boundary.fetch('implementations').find { |item| item.fetch('language') == 'ruby' }
     expect(ruby).to eq('language' => 'ruby', 'package_name' => 'ast-crispr', 'require' => 'ast/crispr')
-    expect(provider.report(kind: 'match', start_boundary: 'future', end_boundary: 'owner_end_plus_trailing_gap', payload_kind: 'comment_owned_body')).to include(
-      'known_start_boundary' => false, 'trailing_gap_extended' => true, 'comment_anchored' => true)
-    expect(provider.report(kind: 'selection', owner_scope: '', owner_selector: '', selector_kind: '', selection_intent: '')).to include(
-      'owner_scope' => 'shared_default', 'comment_region' => nil)
-    expect(provider.report(kind: 'destination', resolution_kind: '', resolution_source: '', anchor_boundary: '')).to include(
-      'append_fallback' => true, 'used_if_missing' => false)
+    expect(provider.report(kind: 'match', start_boundary: 'future', end_boundary: 'owner_end_plus_trailing_gap',
+                           payload_kind: 'comment_owned_body')).to include(
+                             'known_start_boundary' => false, 'trailing_gap_extended' => true, 'comment_anchored' => true
+                           )
+    expect(provider.report(kind: 'selection', owner_scope: '', owner_selector: '', selector_kind: '',
+                           selection_intent: '')).to include(
+                             'owner_scope' => 'shared_default', 'comment_region' => nil
+                           )
+    expect(provider.report(kind: 'destination', resolution_kind: '', resolution_source: '',
+                           anchor_boundary: '')).to include(
+                             'append_fallback' => true, 'used_if_missing' => false
+                           )
   end
 
   it 'normalizes supported limit inputs without changing default or empty conjunctions' do
     expect(provider.report(kind: 'limit')).to eq('description' => '== 1')
     expect(provider.report(kind: 'limit', spec: [])).to eq('description' => '')
-    expect(provider.report(kind: 'limit', spec: [{ at_least: 1, at_most: 3 }, '!= 2'])).to eq('description' => '<= 3 and >= 1 and != 2')
+    expect(provider.report(kind: 'limit',
+                           spec: [{ at_least: 1, at_most: 3 },
+                                  '!= 2'])).to eq('description' => '<= 3 and >= 1 and != 2')
     expect(provider.report(kind: 'limit', spec: { none_or_one: true })).to eq('description' => '<= 1')
     expect { provider.report(kind: 'limit', spec: 'nonsense') }.to raise_error(RuntimeError)
   end

@@ -14,8 +14,8 @@ module Ast
         def available?
           require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
           %i[report_structural_boundary report_structural_limit report_structural_match
-            report_structural_selection report_structural_destination report_structural_operations
-            apply_explicit_source_edits].all? { |method| ::StructuredmergeCore.respond_to?(method) }
+             report_structural_selection report_structural_destination report_structural_operations
+             apply_explicit_source_edits].all? { |method| ::StructuredmergeCore.respond_to?(method) }
         rescue LoadError
           false
         end
@@ -41,7 +41,7 @@ module Ast
 
         core_report(request)
       rescue KeyError, ArgumentError, TypeError => e
-        raise RuntimeError, e.message
+        raise e.message.to_s
       end
 
       def apply_source_edits(request)
@@ -52,7 +52,7 @@ module Ast
 
         core_source_edits(request)
       rescue KeyError, ArgumentError, TypeError => e
-        raise RuntimeError, e.message
+        raise e.message.to_s
       end
     end
   end

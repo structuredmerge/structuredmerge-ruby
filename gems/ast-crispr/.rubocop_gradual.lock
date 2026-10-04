@@ -2,13 +2,13 @@
   ".simplecov:1693819493": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:2438818815": [
+  "Rakefile:1020524212": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [81, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [165, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
     [168, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "ast-crispr.gemspec:217013975": [
+  "ast-crispr.gemspec:28013556": [
     [137, 121, 34, "Layout/LineLength: Line is too long. [154/120]", 4147388508],
     [139, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 2105564149],
     [148, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
@@ -28,8 +28,11 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/coverage_local.gemfile:3080699222": [
-    [42, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
+  "gemfiles/modular/changelog.gemfile:2477451209": [
+    [38, 7, 580, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 393701499]
+  ],
+  "gemfiles/modular/coverage_local.gemfile:1246000888": [
+    [53, 1, 1236, "Metrics/BlockLength: Block has too many lines. [27/25]", 3741021062]
   ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
@@ -83,7 +86,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/x_std_libs.gemfile:3163909001": [
+  "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
@@ -211,8 +214,40 @@
   "lib/ast/crispr/rspec/shared_examples/operation_profile.rb:3583567850": [
     [3, 1, 2148, "Metrics/BlockLength: Block has too many lines. [26/25]", 2745151209]
   ],
-  "spec/integration/rust_host_provider_spec.rb:2611338970": [
-    [5, 1, 2568, "Metrics/BlockLength: Block has too many lines. [69/25]", 144646218]
+  "lib/ast/crispr/typed_core_bridge.rb:2269720916": [
+    [10, 5, 9251, "Metrics/ModuleLength: Module has too many lines. [143/100]", 2239651115],
+    [21, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 281542062],
+    [23, 121, 108, "Layout/LineLength: Line is too long. [228/120]", 3300263874],
+    [25, 121, 60, "Layout/LineLength: Line is too long. [180/120]", 1629342034],
+    [27, 121, 188, "Layout/LineLength: Line is too long. [308/120]", 3244824303],
+    [33, 7, 1635, "Metrics/AbcSize: Assignment Branch Condition size for `core_report` is too high. [<11, 26, 14> 31.51/17]", 3129360007],
+    [33, 7, 1635, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `core_report` is too high. [12/7]", 3129360007],
+    [33, 7, 1635, "Metrics/MethodLength: Method has too many lines. [30/10]", 3129360007],
+    [33, 7, 1635, "Metrics/PerceivedComplexity: Perceived complexity for `core_report` is too high. [11/8]", 3129360007],
+    [66, 7, 2455, "Metrics/AbcSize: Assignment Branch Condition size for `core_source_edits` is too high. [<12, 46, 7> 48.05/17]", 1013940814],
+    [66, 7, 2455, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `core_source_edits` is too high. [8/7]", 1013940814],
+    [66, 7, 2455, "Metrics/MethodLength: Method has too many lines. [26/10]", 1013940814],
+    [74, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 2340269878],
+    [78, 135, 18, "Layout/LineLength: Line is too long. [152/120]", 4052434095],
+    [79, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 3439733813],
+    [80, 121, 73, "Layout/LineLength: Line is too long. [193/120]", 3195484959],
+    [82, 121, 43, "Layout/LineLength: Line is too long. [163/120]", 2543585684],
+    [94, 121, 38, "Layout/LineLength: Line is too long. [158/120]", 2391269874],
+    [99, 7, 664, "Metrics/AbcSize: Assignment Branch Condition size for `profile_request` is too high. [<4, 15, 8> 17.46/17]", 1061402162],
+    [99, 7, 664, "Metrics/MethodLength: Method has too many lines. [13/10]", 1061402162],
+    [119, 7, 904, "Metrics/AbcSize: Assignment Branch Condition size for `boundary_hash` is too high. [<13, 19, 6> 23.79/17]", 370184827],
+    [119, 7, 904, "Metrics/MethodLength: Method has too many lines. [16/10]", 370184827],
+    [138, 7, 1130, "Metrics/AbcSize: Assignment Branch Condition size for `limit_constraints` is too high. [<7, 21, 13> 25.67/17]", 280593955],
+    [138, 7, 1130, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `limit_constraints` is too high. [12/7]", 280593955],
+    [138, 7, 1130, "Metrics/MethodLength: Method has too many lines. [20/10]", 280593955],
+    [138, 7, 1130, "Metrics/PerceivedComplexity: Perceived complexity for `limit_constraints` is too high. [11/8]", 280593955]
+  ],
+  "spec/integration/rust_host_provider_spec.rb:2876622955": [
+    [5, 1, 5102, "Metrics/BlockLength: Block has too many lines. [106/25]", 2221361197],
+    [22, 121, 1, "Layout/LineLength: Line is too long. [121/120]", 177600]
+  ],
+  "spec/integration/typed_core_fixture_spec.rb:1331475064": [
+    [6, 1, 2555, "Metrics/BlockLength: Block has too many lines. [43/25]", 696960222]
   ],
   "spec/old_runtime_spec.rb:682575016": [
     [5, 1, 22396, "Metrics/BlockLength: Block has too many lines. [485/25]", 3050657641],
