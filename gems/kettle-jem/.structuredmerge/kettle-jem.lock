@@ -2,7 +2,7 @@
 version: 1
 template_state:
   version: 7.1.29
-  applied_at: '2026-10-04'
+  applied_at: '2026-10-05'
   changelog_replay:
     last_entry_key: kettle-jem-template-20260913-001
     last_entry_date: '2026-09-13'
@@ -175,7 +175,7 @@ template_state:
     gemfiles/modular/stringio/r3/v3.0.gemfile.example: 6a21546445b166b784f5dc0458d9f9acc506f3b6fcc1931daa5c62821da90d6c
     gemfiles/modular/stringio/r4/v3.0.gemfile.example: 6a21546445b166b784f5dc0458d9f9acc506f3b6fcc1931daa5c62821da90d6c
     gemfiles/modular/stringio/vHEAD.gemfile.example: e0497ab6dad9667b22725485b781e9d99349a079250eb29cb125d58f01f4a5be
-    gemfiles/modular/style.gemfile.example: e63f8e620e8cbcf82f9234e25d9d9c7ca60f1b11e71dedafddff77889ca8544b
+    gemfiles/modular/style.gemfile.example: 36d43130c3b5f101f517d582a4d9b166065500bb9e652e1af4dd047951cbd1c1
     gemfiles/modular/style_local.gemfile.example: 6b32a4bc1d77f8eb3112e99f0df6e091dc4abae32570eb8a1e0685b628f5a93b
     gemfiles/modular/templating.gemfile.example: f6b9f92ef0ea63b5ab6b58ef27e956d4ad37e14dd3d990ba9231c50b9f9330c5
     gemfiles/modular/templating_local.gemfile.example: b0d780bbf0f5c2f384656438506a17b02ef8a28f5ca67719e9551365ff759d62
@@ -848,8 +848,8 @@ files:
   gemfiles/modular/style.gemfile:
     recipe: template_source_application_gemfiles_modular_style_gemfile
     action: write
-    dest_sha256: 3aaedaaa505243851e615400203ee26cb5f092b5db5bf30ef042cc1cd662f63e
-    input_fingerprint: a5bceaafcb15f0f6effbc80063aebcf35c82fd854261e04899d0d2076a9940d9
+    dest_sha256: 1219beae02e6d51ace2ce96b91a7f72095f39ef8d7ae360ef8d1a9084ab920de
+    input_fingerprint: 51120af871fbb598287860185236e027099a8f5c28322069a3f656c8542e5abd
     template_sources:
     - gemfiles/modular/style.gemfile.example
   gemfiles/modular/style_local.gemfile:

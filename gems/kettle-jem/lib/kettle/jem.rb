@@ -3799,6 +3799,12 @@ module Kettle
       if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :appraisals
         payload[:appraisals_template_policy_fingerprint_version] = APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
+      if report.fetch(:relative_path).to_s.start_with?("gemfiles/modular/")
+        conflict_policy = modular_dependency_conflict_decisions(
+          kettle_jem_config(project_root)
+        ).select { |decision| decision.fetch("modular") == report.fetch(:relative_path).to_s }
+        payload[:modular_dependency_conflict_policy] = conflict_policy
+      end
       if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :gemspec
         payload[:gemspec_template_policy_fingerprint_version] = GEMSPEC_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end

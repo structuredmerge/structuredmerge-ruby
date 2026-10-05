@@ -157,6 +157,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Hold template style.gemfile rubocop-minitest floor at 0.40: version 0.41.0 requires rubocop >= 1.89.0 while standard (~> 1.56) caps rubocop at ~> 1.88.0, making the generated style bundle unsatisfiable and breaking family re-templating (kettle-family template --execute).
 
+- Include modular dependency conflict decisions in template checksums so corrected Gemfile policies are reapplied.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

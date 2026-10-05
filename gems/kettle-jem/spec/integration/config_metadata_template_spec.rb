@@ -2018,6 +2018,52 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "invalidates modular Gemfile checksum inputs when dependency conflict policy changes" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-modular-conflict-checksum", tmp_root) do |root|
+      write_tree(root, {
+        "template/gemfiles/modular/style.gemfile.example" => "gem \"rubocop-packaging\", github: \"pboling/rubocop-packaging\"\n",
+        ".kettle-jem.yml" => <<~YAML
+          dependency_conflicts:
+            reviewed: true
+            resolve:
+              - gem: rubocop-packaging
+                direct: example.gemspec
+                modular: gemfiles/modular/style.gemfile
+                action: remove_modular_gem
+                reason: "Legacy source-removal policy"
+        YAML
+      })
+      report = {
+        recipe_name: "template_source_application_gemfiles_modular_style_gemfile",
+        relative_path: "gemfiles/modular/style.gemfile",
+        metadata: {
+          template_source_preference: {
+            source_root_path: File.join(root, "template"),
+            source_relative_path: "gemfiles/modular/style.gemfile.example"
+          }
+        },
+        request_envelope: {request: {recipe_name: "supplied_template_source_application", recipe_version: "1"}}
+      }
+
+      removal_policy = described_class.template_input_fingerprint_payload(root, report)
+      config_path = File.join(root, ".kettle-jem.yml")
+      config = YAML.safe_load_file(config_path)
+      config.dig("dependency_conflicts", "resolve").first["action"] = "keep_both"
+      File.write(config_path, YAML.dump(config))
+      keep_both_policy = described_class.template_input_fingerprint_payload(root, report)
+      config.dig("dependency_conflicts", "resolve").clear
+      File.write(config_path, YAML.dump(config))
+      removed_policy = described_class.template_input_fingerprint_payload(root, report)
+
+      expect(keep_both_policy).not_to eq(removal_policy)
+      expect(keep_both_policy.fetch(:modular_dependency_conflict_policy).first.fetch("action")).to eq("keep_both")
+      expect(removed_policy).not_to eq(keep_both_policy)
+      expect(removed_policy.fetch(:modular_dependency_conflict_policy)).to be_empty
+    end
+  end
+
   it "recreates a missing managed file even when default checksum mode ignores destination changes" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
