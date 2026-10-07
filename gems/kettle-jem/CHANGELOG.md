@@ -71,6 +71,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - yard-timekeeper (>= 0.2.7 -> >= 0.2.9)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - actions/upload-artifact v7.0.1 (043fb46d1a93c77aae656e7c1c64a875d1fc6a0a) -> v7.0.2 (cf430e030ddbb5b0abf93d22962f4752f3646cd9)
   - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.14 (6f8ad36ba7488db591541483afb5464d01e8861b)
 
 - [kc] kettle-jem/prepare: updated 13 project files:
