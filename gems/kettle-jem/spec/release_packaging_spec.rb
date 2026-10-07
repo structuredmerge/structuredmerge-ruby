@@ -50,7 +50,24 @@ RSpec.describe Kettle::Jem do
     expect(spec.metadata["homepage_uri"]).to eq("https://structuredmerge.org")
     expect(spec.executables).to eq(["kettle-jem"])
     changelog_dependency = spec.runtime_dependencies.find { |dependency| dependency.name == "kettle-changelog" }
-    expect(changelog_dependency.requirement).to eq(Gem::Requirement.new(["~> 1.0", ">= 1.0.7"]))
+    # The floor is read from the gemspec source rather than hardcoded here,
+    # because kettle-jem templating owns and raises it: a duplicated literal went
+    # stale when templating raised the floor to 1.0.8, leaving main red from that
+    # commit onward. Reading it keeps this spec from asserting a version it does
+    # not own.
+    #
+    # That alone would be vacuous — source and loaded spec would move together,
+    # so dropping the floor entirely would still pass. The two guards below give
+    # it teeth: a floor must be declared, and what the gemspec declares must
+    # survive being parsed into a Gem::Specification (the packaging property this
+    # example exists to check). Verified: removing `>= 1.0.8` from the gemspec
+    # fails on the first guard.
+    declared_floor = gemspec_source.scan(/add_dependency\("kettle-changelog"((?:,\s*"[^"]*")+)/).first&.first.to_s
+    declared_requirements = declared_floor.scan(/"([^"]*)"/).flatten
+    expect(declared_requirements).not_to be_empty, "expected kettle-changelog to declare a version floor in the gemspec source"
+    expect(declared_requirements.any? { |requirement| requirement.start_with?(">=") }).to be(true),
+      "expected kettle-changelog to declare an explicit >= floor, got #{declared_requirements.inspect}"
+    expect(changelog_dependency.requirement).to eq(Gem::Requirement.new(declared_requirements))
     expect(File.executable?(gem_root.join("exe/kettle-jem"))).to be(true)
     expect(File.executable?(gem_root.join("bin/kettle-jem-deps-floor"))).to be(true)
     expect(File.executable?(gem_root.join("bin/kettle-jem-workflow-pins"))).to be(true)
