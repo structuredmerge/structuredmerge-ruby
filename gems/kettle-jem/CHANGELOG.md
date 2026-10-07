@@ -59,11 +59,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - gitmoji-regex (>= 2.0.13 -> >= 2.0.15)
-  - kettle-dev (>= 3.1.5 -> >= 3.1.6)
-  - kettle-family (>= 1.3.3 -> >= 1.3.4)
+  - kettle-dev (>= 3.1.5 -> >= 3.1.8)
+  - kettle-family (>= 1.3.3 -> >= 1.3.6)
   - reek (>= 6.5.0 -> >= 6.6.0)
   - rubocop-lts-rspec (>= 1.0.6 -> >= 1.0.7)
   - rubocop-minitest (>= 0.40.0 -> >= 0.41.0)
+  - standard (>= 1.56.0 -> >= 1.57.0)
   - turbo_tests2 (>= 3.2.12 -> >= 3.2.13)
   - yaml-converter (>= 0.2.6 -> >= 0.2.7)
   - yard-fence (>= 0.9.9 -> >= 0.9.10)
