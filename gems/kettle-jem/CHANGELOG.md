@@ -82,6 +82,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - The templating workflow template now restores tree-sitter-language-pack grammar downloads from actions/cache keyed by the templating lockfiles, keeping the self-test off the network in the common case; a cache miss falls back to the in-run tslp_prefetch phase.
 
+- [kc] license-eye-workflow-retry: The generated `.github/workflows/license-eye.yml` retries the license check once before failing. The pinned `apache/skywalking-eyes/dependency` action is a composite that builds license-eye from source on every run, and its own dependency cache is broken upstream: `dependency/action.yml` passes `cache-dependency-path: ${{ github.action_path }}/go.sum`, but `go.sum` lives at the action's repository root rather than in `dependency/` (404 versus 200). setup-go therefore logs "Restore cache failed: Some specified paths were not resolved", the module cache never restores, and each run re-downloads roughly 35 Go modules and re-runs `make`. Every templated repository is consequently exposed to a transient `proxy.golang.org` error on every push; one such run failed with `stream error: stream ID 133; INTERNAL_ERROR; received from peer` after eleven consecutive successes. The retry uses the same `[Attempt 1]`/`[Attempt 2]` idiom as the generated Ruby matrix workflows, and the action pin is unchanged.
+
 ### Deprecated
 
 ### Removed
