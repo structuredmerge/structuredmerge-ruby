@@ -333,6 +333,57 @@ RSpec.describe KettleJemDepsFloor do
     expect(entry).to eq("Update kettle-jem template dependency floors:\n  - kettle-family (>= 1.2.50 -> >= 1.2.52)")
   end
 
+  # The keyed upserter replaces the prior entry wholesale, so a floor raised in an
+  # earlier run of the same Unreleased cycle that this run does not touch must be
+  # carried forward. Without this the still-unreleased raise loses its only
+  # changelog record, which is silent data loss: nothing later re-derives it.
+  it "carries forward floors from earlier runs that this run does not touch" do
+    tool = described_class.new(project_root: project_root, resolver: resolver)
+    entry = tool.send(
+      :dependency_changelog_entry,
+      [{name: "kettle-dev", current_floor_version: Gem::Version.new("3.1.6"), new_floor_version: Gem::Version.new("3.1.8")}],
+      existing_entries: [
+        {
+          source: "- [kc] kettle-jem-deps-floor: Previous.\n" \
+                  "  - gitmoji-regex (>= 2.0.13 -> >= 2.0.15)\n" \
+                  "  - kettle-dev (>= 3.1.5 -> >= 3.1.6)\n" \
+                  "  - turbo_tests2 (>= 3.2.12 -> >= 3.2.13)\n"
+        }
+      ]
+    )
+
+    expect(entry).to eq(
+      "Update kettle-jem template dependency floors:\n" \
+      "  - gitmoji-regex (>= 2.0.13 -> >= 2.0.15)\n" \
+      "  - kettle-dev (>= 3.1.5 -> >= 3.1.8)\n" \
+      "  - turbo_tests2 (>= 3.2.12 -> >= 3.2.13)"
+    )
+  end
+
+  it "keeps the newest target when an earlier run already advanced a floor" do
+    tool = described_class.new(project_root: project_root, resolver: resolver)
+    entry = tool.send(
+      :dependency_changelog_entry,
+      [{name: "kettle-family", current_floor_version: Gem::Version.new("1.3.4"), new_floor_version: Gem::Version.new("1.3.6")}],
+      existing_entries: [{source: "- [kc] kettle-jem-deps-floor: Previous.\n  - kettle-family (>= 1.3.0 -> >= 1.3.4)\n"}]
+    )
+
+    expect(entry).to eq("Update kettle-jem template dependency floors:\n  - kettle-family (>= 1.3.0 -> >= 1.3.6)")
+  end
+
+  it "ignores malformed detail lines instead of raising" do
+    tool = described_class.new(project_root: project_root, resolver: resolver)
+    entry = tool.send(
+      :dependency_changelog_entry,
+      [{name: "kettle-dev", current_floor_version: Gem::Version.new("3.1.6"), new_floor_version: Gem::Version.new("3.1.8")}],
+      existing_entries: [
+        {source: "- [kc] kettle-jem-deps-floor: Previous.\n  - broken (>= not-a-version -> >= 1.0)\n  - partial (>= 1.0)\n"}
+      ]
+    )
+
+    expect(entry).to eq("Update kettle-jem template dependency floors:\n  - kettle-dev (>= 3.1.6 -> >= 3.1.8)")
+  end
+
   it "commits written updates by default inside git repositories" do
     init_git_repository
 

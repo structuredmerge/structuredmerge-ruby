@@ -37,6 +37,10 @@ class KettleJemWorkflowPins
   CHANGELOG_KEY = "kettle-jem-workflow-pins"
   LEGACY_CHANGELOG_PREFIX = "Update pinned GitHub Actions in kettle-jem templates:"
   PIN_PATTERN = %r{(([-\w.]+/[-\w.]+(?:/[-\w.]+)*)@[0-9a-f]{40}[ \t]*#[ \t]*[^\s"',]+)}
+  # Matches a detail line `  - action vOLD (sha) -> vNEW (sha)` as rendered by
+  # .pin_label. Captures the whole range rather than the leading version alone, so
+  # a pin carried forward from an earlier run keeps the ref it was last raised to.
+  WORKFLOW_RANGE_LINE_PATTERN = /([\w.-]+\/[\w.-]+(?:\/[\w.-]+)*)\s+(v?[\d.]+)\s+\(([0-9a-f]{40})\)\s+->\s+(v?[\d.]+)\s+\(([0-9a-f]{40})\)/
 
   def initialize(project_root:, env: ENV, options: {})
     @project_root = File.expand_path(project_root)
@@ -441,27 +445,82 @@ class KettleJemWorkflowPins
     )
   end
 
+  # Renders the consolidated [kc] entry for pinned GitHub Actions.
+  #
+  # Pins are accumulated across the whole Unreleased cycle, not just this run: the
+  # keyed upserter REPLACES the prior entry wholesale, so an action re-pinned in an
+  # earlier run that this run does not touch would silently lose its record even
+  # though it is still unreleased. Existing pins are therefore seeded first and
+  # overlaid with this run's changes, keeping each action's earliest baseline while
+  # advancing it to the newest target.
   def workflow_changelog_entry(changes, existing_entries: [])
-    existing_baselines = workflow_changelog_baselines(existing_entries)
-    details = changes.group_by { |change| change.fetch(:action) }.sort.map do |action, grouped|
-      latest = grouped.max_by { |change| Gem::Version.new(change.fetch(:new_version).to_s) }
-      baseline = existing_baselines.fetch(action, {
-        old_version: latest.fetch(:old_version),
-        old_ref: latest.fetch(:old_ref)
-      })
-      "#{action} #{self.class.pin_label(baseline.fetch(:old_version), baseline.fetch(:old_ref))} -> " \
-        "#{self.class.pin_label(latest.fetch(:new_version), latest.fetch(:new_ref))}"
+    pins = workflow_changelog_pins(existing_entries)
+    changes.group_by { |change| change.fetch(:action) }.each do |action, grouped|
+      latest = grouped.max_by { |change| version_number(change.fetch(:new_version)) }
+      parsed = parse_pin_versions(latest.fetch(:old_version), latest.fetch(:new_version))
+      next if parsed.nil?
+
+      incoming = parsed.merge(old_ref: latest.fetch(:old_ref), new_ref: latest.fetch(:new_ref))
+      pins[action] = merge_pins(pins[action], incoming)
+    end
+    details = pins.sort.map do |action, pinned|
+      "#{action} #{self.class.pin_label(pinned.fetch(:old_version), pinned.fetch(:old_ref))} -> " \
+        "#{self.class.pin_label(pinned.fetch(:new_version), pinned.fetch(:new_ref))}"
     end
     "Update pinned GitHub Actions in kettle-jem templates:\n#{details.map { |detail| "  - #{detail}" }.join("\n")}"
   end
 
-  def workflow_changelog_baselines(existing_entries)
-    pattern = /([\w.-]+\/[\w.-]+(?:\/[\w.-]+)*)\s+(v?[\d.]+)\s+\(([0-9a-f]{40})\)\s+->\s+(v?[\d.]+)\s+\(([0-9a-f]{40})\)/
-    Array(existing_entries).flat_map { |entry| entry.fetch(:source).to_s.lines }.each_with_object({}) do |line, baselines|
-      line.scan(pattern).each do |action, old_version, old_ref, _new_version, _new_ref|
-        baselines[action] ||= {old_version: old_version, old_ref: old_ref}
+  # Parses `action vOLD (sha) -> vNEW (sha)` detail lines from existing keyed
+  # entries into {action => {old_version:, old_ref:, new_version:, new_ref:}}.
+  #
+  # Captures the full range rather than the leading version alone, so a pin
+  # carried forward from an earlier run keeps the ref it was last raised to
+  # instead of reverting to a stale baseline.
+  def workflow_changelog_pins(existing_entries)
+    Array(existing_entries).flat_map { |entry| entry.fetch(:source).to_s.lines }.each_with_object({}) do |line, pins|
+      line.scan(WORKFLOW_RANGE_LINE_PATTERN).each do |action, old_version, old_ref, new_version, new_ref|
+        parsed = parse_pin_versions(old_version, new_version)
+        next if parsed.nil?
+
+        pins[action] = merge_pins(pins[action], parsed.merge(old_ref: old_ref, new_ref: new_ref))
       end
     end
+  end
+
+  # Returns nil when either side is not a parseable version, so malformed detail
+  # lines are skipped rather than raising.
+  def parse_pin_versions(old_version, new_version)
+    {
+      old_version: old_version,
+      new_version: new_version,
+      old_number: version_number(old_version),
+      new_number: version_number(new_version)
+    }
+  rescue ArgumentError
+    nil
+  end
+
+  # Gem::Version for a pin label version, tolerating the optional "v" prefix that
+  # .pin_label renders and that WORKFLOW_RANGE_LINE_PATTERN captures. Live-run
+  # changes carry bare versions while parsed changelog lines carry the "v".
+  def version_number(version)
+    Gem::Version.new(version.to_s.delete_prefix("v"))
+  end
+
+  # Widens the range of two pins for one action: oldest start, newest target.
+  def merge_pins(existing, incoming)
+    return incoming if existing.nil?
+
+    keep_oldest_start = incoming.fetch(:old_number) < existing.fetch(:old_number)
+    keep_newest_target = incoming.fetch(:new_number) > existing.fetch(:new_number)
+    {
+      old_version: keep_oldest_start ? incoming.fetch(:old_version) : existing.fetch(:old_version),
+      old_ref: keep_oldest_start ? incoming.fetch(:old_ref) : existing.fetch(:old_ref),
+      new_version: keep_newest_target ? incoming.fetch(:new_version) : existing.fetch(:new_version),
+      new_ref: keep_newest_target ? incoming.fetch(:new_ref) : existing.fetch(:new_ref),
+      old_number: keep_oldest_start ? incoming.fetch(:old_number) : existing.fetch(:old_number),
+      new_number: keep_newest_target ? incoming.fetch(:new_number) : existing.fetch(:new_number)
+    }
   end
 
   def human_join(values)
@@ -524,13 +583,15 @@ class KettleJemWorkflowPins
     return path if File.file?(File.join(@project_root, path))
 
     absolute_path = (File.absolute_path(path) == path) ? path : File.expand_path(path, git_worktree_root || @project_root)
-    Pathname(absolute_path).relative_path_from(Pathname(@project_root)).to_s
-  rescue ArgumentError
-    path
+    Kettle::Jem::RelativePaths.relative_path_under(absolute_path, @project_root) || path
   end
 
+  # See Kettle::Jem::RelativePaths for why lexical relativization is wrong here:
+  # the result is handed to `git add --`, and a "/home" vs "/var/home" symlink
+  # spelling mismatch makes Pathname#relative_path_from return an escaping path.
   def worktree_relative_path(path)
-    Pathname(File.join(@project_root, path)).relative_path_from(Pathname(git_worktree_root || @project_root)).to_s
+    Kettle::Jem::RelativePaths.relative_path_under(File.join(@project_root, path), git_worktree_root || @project_root) ||
+      File.join(@project_root, path)
   end
 end
 

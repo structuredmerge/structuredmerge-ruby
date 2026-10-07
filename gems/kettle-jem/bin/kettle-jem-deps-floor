@@ -38,6 +38,11 @@ class KettleJemDepsFloor
   DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
   CHANGELOG_KEY = "kettle-jem-deps-floor"
   LEGACY_CHANGELOG_PREFIX = "Update kettle-jem template dependency floors:"
+  # Matches a detail line `  - name (>= initial -> >= latest)`. Captures the full
+  # range so a floor carried forward from an earlier run keeps the version it was
+  # last raised to rather than reverting to its oldest baseline. Gem names may
+  # contain hyphens and dots; versions may carry prerelease/platform suffixes.
+  RANGE_LINE_PATTERN = /\b([A-Za-z0-9_.-]+)\s+\(>=\s*([0-9A-Za-z.+-]+)\s*->\s*>=\s*([0-9A-Za-z.+-]+)/
   CACHE_TTL_SECONDS = 30 * 24 * 60 * 60
   CACHE_ENV_KEY = "KETTLE_JEM_DEPS_FLOOR_CACHE"
   CACHE_REFRESH_ENV_KEY = "KETTLE_JEM_DEPS_FLOOR_CACHE_REFRESH"
@@ -640,24 +645,56 @@ class KettleJemDepsFloor
     )
   end
 
+  # Renders the consolidated [kc] entry for template dependency floors.
+  #
+  # Floors are accumulated across the whole Unreleased cycle, not just this run:
+  # the keyed upserter REPLACES the prior entry wholesale, so any floor raised in
+  # an earlier run that this run does not touch would silently lose its record
+  # even though it is still unreleased. Existing ranges are therefore seeded
+  # first and overlaid with this run's changes, which keeps a floor's earliest
+  # baseline while advancing it to the newest target.
   def dependency_changelog_entry(changes, existing_entries: [])
-    existing_baselines = dependency_changelog_baselines(existing_entries)
-    details = changes.group_by { |change| change.fetch(:name) }.sort.map do |name, grouped|
+    ranges = dependency_changelog_ranges(existing_entries)
+    changes.group_by { |change| change.fetch(:name) }.each do |name, grouped|
       current_versions = grouped.map { |change| change.fetch(:current_floor_version) }
       new_versions = grouped.map { |change| change.fetch(:new_floor_version) }
-      initial = [*existing_baselines[name], *current_versions].map { |version| Gem::Version.new(version.to_s) }.min
-      latest = new_versions.map { |version| Gem::Version.new(version.to_s) }.max
+      prior = ranges[name]
+      initial = [*prior, *current_versions].map { |version| Gem::Version.new(version.to_s) }.min
+      latest = [*prior, *new_versions].map { |version| Gem::Version.new(version.to_s) }.max
+      ranges[name] = [initial, latest]
+    end
+    details = ranges.sort.map do |name, (initial, latest)|
       "#{name} (>= #{initial} -> >= #{latest})"
     end
     "Update kettle-jem template dependency floors:\n#{details.map { |detail| "  - #{detail}" }.join("\n")}"
   end
 
-  def dependency_changelog_baselines(existing_entries)
-    Array(existing_entries).flat_map { |entry| entry.fetch(:source).to_s.lines }.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |line, baselines|
-      line.scan(/\b([A-Za-z0-9_.-]+)\s+\(>=\s*([0-9A-Za-z.+-]+)/).each do |name, version|
-        baselines[name] << Gem::Version.new(version)
+  # Parses `name (>= initial -> >= latest)` detail lines from existing keyed
+  # entries into {name => [initial_version, latest_version]}.
+  #
+  # Scans the full `initial -> latest` pair rather than the leading version
+  # alone, so a carried-forward floor keeps the version it was last raised to
+  # instead of reverting to a stale baseline.
+  def dependency_changelog_ranges(existing_entries)
+    Array(existing_entries).flat_map { |entry| entry.fetch(:source).to_s.lines }.each_with_object({}) do |line, ranges|
+      line.scan(RANGE_LINE_PATTERN).each do |name, initial, latest|
+        begin
+          initial_version = Gem::Version.new(initial)
+          latest_version = Gem::Version.new(latest)
+        rescue ArgumentError
+          next
+        end
+        ranges[name] = merge_ranges(ranges[name], initial_version, latest_version)
       end
     end
+  end
+
+  # Widens a floor's range: oldest start, newest target. A floor carried forward
+  # from an earlier run keeps the version it was last raised to.
+  def merge_ranges(existing, initial_version, latest_version)
+    return [initial_version, latest_version] if existing.nil?
+
+    [[existing.first, initial_version].min, [existing.last, latest_version].max]
   end
 
   def human_join(values)
@@ -699,13 +736,15 @@ class KettleJemDepsFloor
     return path if File.file?(File.join(project_root, path))
 
     absolute_path = File.expand_path(path, git_worktree_root || project_root)
-    Pathname(absolute_path).relative_path_from(Pathname(project_root)).to_s
-  rescue ArgumentError
-    path
+    Kettle::Jem::RelativePaths.relative_path_under(absolute_path, project_root) || path
   end
 
+  # See Kettle::Jem::RelativePaths for why lexical relativization is wrong here:
+  # the result is handed to `git add --`, and a "/home" vs "/var/home" symlink
+  # spelling mismatch makes Pathname#relative_path_from return an escaping path.
   def worktree_relative_path(path)
-    Pathname(File.join(project_root, path)).relative_path_from(Pathname(git_worktree_root || project_root)).to_s
+    Kettle::Jem::RelativePaths.relative_path_under(File.join(project_root, path), git_worktree_root || project_root) ||
+      File.join(project_root, path)
   end
 
   def serializable_change(change)

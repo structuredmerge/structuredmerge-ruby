@@ -27,6 +27,7 @@ require "kettle/rb/gem_floors"
 require_relative "jem/version"
 require_relative "jem/license_txt_migrator"
 require_relative "jem/maintenance_changelog"
+require_relative "jem/relative_paths"
 
 begin
   require "kettle/drift"

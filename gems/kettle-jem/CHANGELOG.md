@@ -161,6 +161,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Include modular dependency conflict decisions in template checksums so corrected Gemfile policies are reapplied.
 
+- [kc] deps-floor-changelog-carry-forward: kettle-jem-deps-floor dropped changelog records for dependency floors raised earlier in the same Unreleased cycle that the current run did not touch, because its consolidated [kc] entry was rebuilt from only the current run's changes while the keyed upserter replaces the prior entry wholesale. Existing ranges are now parsed and carried forward, so each floor keeps its earliest baseline and its newest target.
+
+- [kc] workflow-pins-changelog-carry-forward: kettle-jem-workflow-pins dropped changelog records for GitHub Actions re-pinned earlier in the same Unreleased cycle that the current run did not touch, for the same reason as kettle-jem-deps-floor. Existing pin ranges are now parsed and carried forward, keeping each action's earliest baseline ref and newest target ref.
+
+- [kc] git-add-path-escaping-symlinked-home: kettle-jem-deps-floor and kettle-jem-workflow-pins could pass a parent-directory escaping path to git add -- when the project root and the git worktree root were two valid spellings of the same directory, as on hosts where /home is a symlink to /var/home and TMPDIR reports the symlink spelling while git rev-parse --show-toplevel reports the realpath spelling. Both tools now relativize through Kettle::Jem::RelativePaths, which canonicalizes both sides before comparing and refuses to return an escaping path.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

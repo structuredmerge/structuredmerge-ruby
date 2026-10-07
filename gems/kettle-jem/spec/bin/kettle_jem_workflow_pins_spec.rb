@@ -134,6 +134,65 @@ RSpec.describe KettleJemWorkflowPins do
     )
   end
 
+  # The keyed upserter replaces the prior entry wholesale, so an action re-pinned in
+  # an earlier run of the same Unreleased cycle that this run does not touch must be
+  # carried forward. Without this the still-unreleased re-pin loses its only
+  # changelog record, which is silent data loss: nothing later re-derives it.
+  it "carries forward actions pinned in earlier runs that this run does not touch" do
+    tool = described_class.new(project_root: project_root, env: env)
+    entry = tool.send(
+      :workflow_changelog_entry,
+      [{
+        action: "actions/upload-artifact",
+        old_version: "7.0.1",
+        old_ref: old_sha,
+        new_version: "7.0.2",
+        new_ref: new_sha
+      }],
+      existing_entries: [
+        {
+          source: "- [kc] kettle-jem-workflow-pins: Previous.\n" \
+                  "  - appraisal-rb/setup-ruby-flash v2.7 (#{"a" * 40}) -> v2.14 (#{"b" * 40})\n"
+        }
+      ]
+    )
+
+    expect(entry).to eq(
+      "Update pinned GitHub Actions in kettle-jem templates:\n" \
+      "  - actions/upload-artifact v7.0.1 (#{old_sha}) -> v7.0.2 (#{new_sha})\n" \
+      "  - appraisal-rb/setup-ruby-flash v2.7 (#{"a" * 40}) -> v2.14 (#{"b" * 40})"
+    )
+  end
+
+  # Detail lines are rendered with the "v" prefix while live-run changes carry bare
+  # versions; both must parse, and unparseable ones must be skipped rather than
+  # raising, since a malformed prior entry would otherwise break every future run.
+  it "tolerates a v-prefixed baseline and skips malformed detail lines" do
+    tool = described_class.new(project_root: project_root, env: env)
+    entry = tool.send(
+      :workflow_changelog_entry,
+      [{
+        action: "actions/checkout",
+        old_version: "1.0.3",
+        old_ref: new_sha,
+        new_version: "1.0.4",
+        new_ref: "c" * 40
+      }],
+      existing_entries: [
+        {
+          source: "- [kc] kettle-jem-workflow-pins: Previous.\n" \
+                  "  - actions/checkout v1.0.0 (#{old_sha}) -> v1.0.3 (#{new_sha})\n" \
+                  "  - broken/action v1.0.0 (#{old_sha}) -> not-a-version (#{new_sha})\n"
+        }
+      ]
+    )
+
+    expect(entry).to eq(
+      "Update pinned GitHub Actions in kettle-jem templates:\n" \
+      "  - actions/checkout v1.0.0 (#{old_sha}) -> v1.0.4 (#{"c" * 40})"
+    )
+  end
+
   it "prints dry-run mode and a write hint when stale pins are found" do
     out = StringIO.new
     err = StringIO.new
