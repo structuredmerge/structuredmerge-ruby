@@ -2913,7 +2913,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"
 
           # Templating
-          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           templates:
@@ -2931,7 +2933,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           gemspec
 
           # Templating
-          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         "template/gemfiles/modular/templating.gemfile.example" => <<~RUBY
           # frozen_string_literal: true
@@ -3087,7 +3091,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
 
           # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
@@ -3180,7 +3186,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
 
           # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
@@ -3265,7 +3273,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
 
           # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"

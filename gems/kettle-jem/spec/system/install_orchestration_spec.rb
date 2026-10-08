@@ -799,7 +799,9 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         "gemfiles/modular/templating_local.gemfile"
       )
       expect(File.read(File.join(root, "Gemfile"))).to include(
-        'eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
+        'eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0'
       )
       expect_gem_dependency_declared(File.read(File.join(root, "gemfiles", "modular", "templating.gemfile")), "kettle-jem")
       expect(install.fetch(:install_steps)).to include(hash_including(

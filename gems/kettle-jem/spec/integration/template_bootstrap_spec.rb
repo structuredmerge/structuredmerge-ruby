@@ -1714,7 +1714,9 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(report.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?')
+      expect(gemfile).to include('eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0')
       expect(gemfile).to include(<<~RUBY.rstrip)
         unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
           unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)

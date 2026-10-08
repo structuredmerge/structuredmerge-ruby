@@ -24,8 +24,18 @@ gemspec
 
 {KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK}
 
-# Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+# Templating and the StructuredMerge family share this modular Gemfile.
+# kettle-jem needs StructuredMerge to template, and kettle-changelog needs it at
+# runtime (ast-crispr-markdown-markly -> markdown-merge -> tree_haver), so the
+# test, lint, and release bundles resolve the family too. While the family is
+# only partially released, registry copies pin the last published version exactly
+# and cannot be satisfied alongside a local lockstep version, so a partial local
+# wiring fails version solving for every command in the bundle.
+#
+# (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
 
 # Debugging
 eval_gemfile "gemfiles/modular/debug.gemfile"

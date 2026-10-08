@@ -2441,7 +2441,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
           gemspec
 
-          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          eval_gemfile "gemfiles/modular/templating.gemfile" if
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           templates:
