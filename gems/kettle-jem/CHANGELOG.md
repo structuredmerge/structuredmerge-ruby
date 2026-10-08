@@ -73,6 +73,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - actions/upload-artifact v7.0.1 (043fb46d1a93c77aae656e7c1c64a875d1fc6a0a) -> v7.0.2 (cf430e030ddbb5b0abf93d22962f4752f3646cd9)
   - appraisal-rb/setup-ruby-flash v2.7 (b7ed1caf57f7986cedd2acca8624960b0820bc9a) -> v2.14 (6f8ad36ba7488db591541483afb5464d01e8861b)
+  - github/codeql-action/analyze v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2) -> v4.38.3 (24c54180a607b1449ed407dd24f251e4e9147c8d)
+  - github/codeql-action/autobuild v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2) -> v4.38.3 (24c54180a607b1449ed407dd24f251e4e9147c8d)
+  - github/codeql-action/init v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2) -> v4.38.3 (24c54180a607b1449ed407dd24f251e4e9147c8d)
 
 - [kc] kettle-jem/prepare: updated 13 project files:
   - dependencies (13)
