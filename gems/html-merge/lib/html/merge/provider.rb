@@ -515,7 +515,7 @@ module Html
         end
 
         actual = parsed.owners.map { |owner| [owner.signature, owner.fingerprint] }
-                              .sort_by { |value| JSON.generate(Ast::Merge.json_ready(value.first)) }
+                       .sort_by { |value| JSON.generate(Ast::Merge.json_ready(value.first)) }
         {
           output_reparsed: true,
           semantic_match: actual == expected,
