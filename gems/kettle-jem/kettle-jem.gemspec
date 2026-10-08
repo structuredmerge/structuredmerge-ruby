@@ -104,7 +104,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.8")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
   spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.8")          # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", "~> 3.1", ">= 3.1.6")               # ruby >= 2.4.0
+  spec.add_dependency("kettle-dev", "~> 3.1", ">= 3.1.8")               # ruby >= 2.4.0
   spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.14")          # ruby >= 2.4.0
   spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.13")            # ruby >= 2.4.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.11")                 # ruby >= 1.8.7
@@ -150,7 +150,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("anonymous_loader", "~> 0.1", ">= 0.1.3")         # ruby >= 2.2.0
   spec.add_development_dependency("appraisal2", "~> 3.2", ">= 3.2.5")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
   spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.23")            # ruby >= 4.0.0
-  spec.add_development_dependency("turbo_tests2", "~> 3.2", ">= 3.2.13")           # ruby >= 2.4.0, default kettle-test runner
+  spec.add_development_dependency("turbo_tests2", "~> 3.2", ">= 3.2.14")           # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0

@@ -2903,19 +2903,19 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
         RUBY
         "Gemfile" => <<~RUBY,
-          # frozen_string_literal: true
+                  # frozen_string_literal: true
 
-          source "https://gem.coop"
+                  source "https://gem.coop"
 
-          gemspec
+                  gemspec
 
-          # Use released TSLP with the Ruby ABI platform-gem fix.
-          gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"
+                  # Use released TSLP with the Ruby ABI platform-gem fix.
+                  gem "tree_sitter_language_pack", "~> 1.16", ">= 1.16.2"
 
-          # Templating
-          eval_gemfile "gemfiles/modular/templating.gemfile" if
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
-  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
+                  # Templating
+                  eval_gemfile "gemfiles/modular/templating.gemfile" if
+          ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+          ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           templates:
@@ -2926,16 +2926,16 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
               - gemfiles/modular/templating.gemfile
         YAML
         "template/Gemfile.example" => <<~RUBY,
-          # frozen_string_literal: true
+                  # frozen_string_literal: true
 
-          source "https://gem.coop"
+                  source "https://gem.coop"
 
-          gemspec
+                  gemspec
 
-          # Templating
-          eval_gemfile "gemfiles/modular/templating.gemfile" if
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
-  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
+                  # Templating
+                  eval_gemfile "gemfiles/modular/templating.gemfile" if
+          ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+          ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         "template/gemfiles/modular/templating.gemfile.example" => <<~RUBY
           # frozen_string_literal: true
@@ -3042,58 +3042,58 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
         RUBY
         "Gemfile" => <<~RUBY,
-          source "https://gem.coop"
+                  source "https://gem.coop"
 
-          gemspec
+                  gemspec
 
-          gem "nomono", require: false
+                  gem "nomono", require: false
 
-          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
-          direct_sibling_gems = %w[
-            stale-core
-          ]
-          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
-          direct_sibling_local =
-            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
-          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+                  # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+                  direct_sibling_gems = %w[
+                    stale-core
+                  ]
+                  direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+                  direct_sibling_local =
+                    !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+                  direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
-          if direct_sibling_gems.any? &&
-              (direct_sibling_local ||
-                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: direct_sibling_gems,
-              prefix: "RUBYTHEMS",
-              path_env: "RUBYTHEMS_DEV",
-              root: ["src", "my", "rubythems"]
-            )
-          end
+                  if direct_sibling_gems.any? &&
+                      (direct_sibling_local ||
+                        ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+                    require "nomono/bundler"
+                    eval_nomono_gems(
+                      gems: direct_sibling_gems,
+                      prefix: "RUBYTHEMS",
+                      path_env: "RUBYTHEMS_DEV",
+                      root: ["src", "my", "rubythems"]
+                    )
+                  end
 
-          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
-          direct_sibling_gems = %w[
-            shared-core
-          ]
-          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
-          direct_sibling_local =
-            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
-          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+                  # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+                  direct_sibling_gems = %w[
+                    shared-core
+                  ]
+                  direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+                  direct_sibling_local =
+                    !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+                  direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
-          if direct_sibling_gems.any? &&
-              (direct_sibling_local ||
-                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: direct_sibling_gems,
-              prefix: "RUBYTHEMS",
-              path_env: "RUBYTHEMS_DEV",
-              root: ["src", "my", "rubythems"]
-            )
-          end
+                  if direct_sibling_gems.any? &&
+                      (direct_sibling_local ||
+                        ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+                    require "nomono/bundler"
+                    eval_nomono_gems(
+                      gems: direct_sibling_gems,
+                      prefix: "RUBYTHEMS",
+                      path_env: "RUBYTHEMS_DEV",
+                      root: ["src", "my", "rubythems"]
+                    )
+                  end
 
-          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-          eval_gemfile "gemfiles/modular/templating.gemfile" if
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
-  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
+                  # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+                  eval_gemfile "gemfiles/modular/templating.gemfile" if
+          ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+          ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
@@ -3146,49 +3146,49 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
         RUBY
         "Gemfile" => <<~RUBY,
-          source "https://gem.coop"
+                  source "https://gem.coop"
 
-          gemspec
+                  gemspec
 
-          gem "nomono", require: false
+                  gem "nomono", require: false
 
-          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
-          direct_sibling_gems = %w[
-            shared-core
-          ]
-          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
-          direct_sibling_local =
-            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
-          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+                  # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+                  direct_sibling_gems = %w[
+                    shared-core
+                  ]
+                  direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+                  direct_sibling_local =
+                    !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+                  direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
-          if direct_sibling_gems.any? &&
-              (direct_sibling_local ||
-                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: direct_sibling_gems,
-              prefix: "RUBYTHEMS",
-              path_env: "RUBYTHEMS_DEV",
-              root: ["src", "my", "rubythems"]
-            )
-          end
+                  if direct_sibling_gems.any? &&
+                      (direct_sibling_local ||
+                        ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+                    require "nomono/bundler"
+                    eval_nomono_gems(
+                      gems: direct_sibling_gems,
+                      prefix: "RUBYTHEMS",
+                      path_env: "RUBYTHEMS_DEV",
+                      root: ["src", "my", "rubythems"]
+                    )
+                  end
 
-          if direct_sibling_gems.any? &&
-              (direct_sibling_local ||
-                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: direct_sibling_gems,
-              prefix: "RUBYTHEMS",
-              path_env: "RUBYTHEMS_DEV",
-              root: ["src", "my", "rubythems"]
-            )
-          end
+                  if direct_sibling_gems.any? &&
+                      (direct_sibling_local ||
+                        ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+                    require "nomono/bundler"
+                    eval_nomono_gems(
+                      gems: direct_sibling_gems,
+                      prefix: "RUBYTHEMS",
+                      path_env: "RUBYTHEMS_DEV",
+                      root: ["src", "my", "rubythems"]
+                    )
+                  end
 
-          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-          eval_gemfile "gemfiles/modular/templating.gemfile" if
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
-  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
+                  # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+                  eval_gemfile "gemfiles/modular/templating.gemfile" if
+          ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+          ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
@@ -3245,37 +3245,37 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           end
         RUBY
         "Gemfile" => <<~RUBY,
-          source "https://gem.coop"
+                  source "https://gem.coop"
 
-          gemspec
+                  gemspec
 
-          gem "nomono", require: false
+                  gem "nomono", require: false
 
-          # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
-          direct_sibling_gems = %w[
-            rack-openid
-          ]
-          direct_sibling_dev = ENV.fetch("RUBY_OPENID_DEV", "")
-          direct_sibling_local =
-            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
-          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+                  # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
+                  direct_sibling_gems = %w[
+                    rack-openid
+                  ]
+                  direct_sibling_dev = ENV.fetch("RUBY_OPENID_DEV", "")
+                  direct_sibling_local =
+                    !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+                  direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
-          if direct_sibling_gems.any? &&
-              (direct_sibling_local ||
-                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
-            require "nomono/bundler"
-            eval_nomono_gems(
-              gems: direct_sibling_gems,
-              prefix: "RUBY_OPENID",
-              path_env: "RUBY_OPENID_DEV",
-              root: ["src", "my", "ruby-openid"]
-            )
-          end
+                  if direct_sibling_gems.any? &&
+                      (direct_sibling_local ||
+                        ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+                    require "nomono/bundler"
+                    eval_nomono_gems(
+                      gems: direct_sibling_gems,
+                      prefix: "RUBY_OPENID",
+                      path_env: "RUBY_OPENID_DEV",
+                      root: ["src", "my", "ruby-openid"]
+                    )
+                  end
 
-          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-          eval_gemfile "gemfiles/modular/templating.gemfile" if
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
-  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
+                  # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+                  eval_gemfile "gemfiles/modular/templating.gemfile" if
+          ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+          ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"

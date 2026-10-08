@@ -2435,15 +2435,15 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
           end
         RUBY
         "Gemfile" => <<~RUBY,
-          # frozen_string_literal: true
+                  # frozen_string_literal: true
 
-          source "https://gem.coop"
+                  source "https://gem.coop"
 
-          gemspec
+                  gemspec
 
-          eval_gemfile "gemfiles/modular/templating.gemfile" if
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
-  ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
+                  eval_gemfile "gemfiles/modular/templating.gemfile" if
+          ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
+          ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
         RUBY
         ".kettle-jem.yml" => <<~YAML
           templates:
