@@ -613,7 +613,7 @@ module TreeHaver
           ok = Native.ts_parser_set_language(@parser, ptr)
           raise TreeHaver::NotAvailable, 'Failed to set language on parser' unless ok
 
-          lang # rubocop:disable Lint/Void (intentional return value)
+          lang # (intentional return value)
         end
 
         # Parse source code into a syntax tree

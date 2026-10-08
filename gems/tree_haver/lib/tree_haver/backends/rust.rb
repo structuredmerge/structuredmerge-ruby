@@ -207,7 +207,7 @@ module TreeHaver
           lang_name = lang.respond_to?(:name) ? lang.name : lang.to_s
           # tree_stump uses set_language with a string name
           @parser.set_language(lang_name)
-          lang # rubocop:disable Lint/Void (intentional return value)
+          lang # (intentional return value)
         end
 
         # Parse source code
