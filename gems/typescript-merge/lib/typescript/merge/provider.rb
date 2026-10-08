@@ -332,7 +332,7 @@ module TypeScript
       def grouped_ownership_failure(request, documents)
         signatures = documents.transform_values do |document|
           document.owners.filter_map { |owner| owner.signature if grouped_owner?(owner) }
-                         .sort_by { |signature| JSON.generate(Ast::Merge.json_ready(signature)) }
+                  .sort_by { |signature| JSON.generate(Ast::Merge.json_ready(signature)) }
         end
         return if signatures.values.uniq.length == 1
 
