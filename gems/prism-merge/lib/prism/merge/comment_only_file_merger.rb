@@ -2,6 +2,28 @@
 
 module Prism
   module Merge
+    # Merges files whose top-level statements are ALL comments (no code).
+    #
+    # Dispatched from TopLevelMergeRunner#comment_only_merge?, which requires BOTH
+    # sides to be comment-only. A mixed pair - e.g. a comment-only destination
+    # merged into a template that has code - takes the main node path instead.
+    #
+    # == NOT THE PRAGMA RESOLVER
+    #
+    # The header handling here (comment_only_prefix_info, duplicate_magic_line_nums,
+    # emit_comment_only_prefix_lines) deduplicates magic comments WITHIN one side's
+    # own header prefix. It does not resolve pragmas ACROSS template and
+    # destination, and it does not run at all for a mixed pair.
+    #
+    # That gap is why a comment-only destination's pragma used to be emitted as an
+    # unmatched node at the end of the merged file, where Ruby ignores it. Which
+    # pragmas survive a merge and where they are placed is decided by
+    # {Prism::Merge::PragmaMerger}, wired in from
+    # {Prism::Merge::SmartMerger#apply_pragma_header} after the resolver runs, so it
+    # covers both dispatch paths uniformly.
+    #
+    # Keep this class focused on comment-only files. Do not extend it to resolve
+    # pragma retention or placement.
     class CommentOnlyFileMerger
       attr_reader :merger, :comment_only_prefix_lines
 

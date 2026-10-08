@@ -2,6 +2,24 @@
 
 module Prism
   module Merge
+    # Emits nodes and their comments into the MergeResult.
+    #
+    # == PRAGMAS ARE NOT PLACED HERE
+    #
+    # The prefix/leading-comment emission below positions ordinary comments. A
+    # file-level pragma (magic comment) is NOT placed by this class, and must not
+    # be: Ruby honours a pragma only when it precedes the first statement, so its
+    # position cannot depend on which node happens to carry it.
+    #
+    # Pragma retention and placement are resolved by {Prism::Merge::PragmaMerger},
+    # applied once by {Prism::Merge::SmartMerger#apply_pragma_header} after the
+    # whole merge finishes. That post-pass strips pragmas from wherever emission
+    # put them and pins the resolved block to the header region, so it is correct
+    # regardless of the path taken here.
+    #
+    # Consequence: a pragma may transiently appear at the wrong position in the
+    # result this class builds. That is expected and repaired downstream. Do not
+    # add pragma-specific handling here to pre-empt it.
     class NodeEmissionSupport
       include Prism::Merge::SourceLineLookup
 

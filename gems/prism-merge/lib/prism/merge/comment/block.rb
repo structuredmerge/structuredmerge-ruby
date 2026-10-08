@@ -49,6 +49,21 @@ module Prism
         #
         # For non-magic blocks, uses the parent implementation.
         #
+        # == NOT PART OF PRAGMA RESOLUTION
+        #
+        # This signature makes a comment-only file's magic comment matchable as a
+        # top-level node. That is the mechanism by which a file-level pragma can be
+        # treated as ordinary content and emitted at the wrong position: when the
+        # destination is comment-only, its pragma becomes a node whose signature
+        # cannot match the template's pragma (which is a leading comment of the
+        # template's first statement, not a statement), so it lands after the last
+        # template statement where Ruby ignores it.
+        #
+        # Do NOT extend pragma handling here. Which pragmas survive a merge, and
+        # where they are placed, is decided by {Prism::Merge::PragmaMerger}, wired
+        # in from {Prism::Merge::SmartMerger#apply_pragma_header} after this
+        # resolver runs. This signature governs comment-block MATCHING only.
+        #
         # @return [Array] Signature for matching
         def signature
           if contains_magic_comment?

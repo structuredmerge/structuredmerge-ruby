@@ -58,6 +58,7 @@ module Prism
     autoload :MethodMatchRefiner, 'prism/merge/method_match_refiner'
     autoload :NestedStatementWalker, 'prism/merge/nested_statement_walker'
     autoload :NocovNode, 'prism/merge/nocov_node'
+    autoload :PragmaMerger, 'prism/merge/pragma_merger'
     autoload :NoCovWrapper, 'prism/merge/nocov_wrapper'
     autoload :NodeBodyLayout, 'prism/merge/node_body_layout'
     autoload :NodeEmissionSupport, 'prism/merge/node_emission_support'
@@ -1235,6 +1236,17 @@ module Prism
     end
     # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
+    # Classifies a comment for node-signature and doc-surface purposes.
+    #
+    # == CLASSIFICATION ONLY, NOT PRAGMA RESOLUTION
+    #
+    # The 'magic_comment' kind here labels a comment so it can be matched and
+    # documented. It does not decide whether a pragma survives a merge or where it
+    # is placed - that is Prism::Merge::PragmaMerger, wired in from
+    # Prism::Merge::SmartMerger#apply_pragma_header, which reads Prism's native
+    # ParseResult#magic_comments directly and does not consult this method.
+    #
+    # Do not build pragma retention or placement on this classification.
     def prism_comment_directive(comment_text, magic_comment)
       if comment_text.strip.match?(/\A#\s*smorg:freeze\b/)
         {

@@ -809,6 +809,17 @@ module Prism
         }
       end
 
+      # Magic comment types in this file's header prefix, keyed by line number.
+      #
+      # CLASSIFICATION ONLY. Used to populate Comment::Line#magic_comment_type so
+      # comment nodes can be typed and signed. Not pragma resolution: it does not
+      # decide which pragmas survive a merge or where they are placed. See
+      # Prism::Merge::PragmaMerger (wired in via
+      # Prism::Merge::SmartMerger#apply_pragma_header) for that.
+      #
+      # Note this is regex/line-based (via MagicCommentSupport) and only covers the
+      # contiguous header prefix - it breaks at the first blank line. PragmaMerger
+      # instead reads Prism's native ParseResult#magic_comments.
       def native_header_magic_comment_types
         @native_header_magic_comment_types ||= Prism::Merge::MagicCommentSupport.header_magic_comment_types_for_lines(@lines)
       end

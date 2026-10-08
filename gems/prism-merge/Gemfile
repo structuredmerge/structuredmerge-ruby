@@ -95,7 +95,9 @@ if direct_sibling_gems.any? &&
 end
 
 # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+eval_gemfile 'gemfiles/modular/templating.gemfile' if
+  ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? ||
+  ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false') != 0
 
 # Debugging
 eval_gemfile 'gemfiles/modular/debug.gemfile'

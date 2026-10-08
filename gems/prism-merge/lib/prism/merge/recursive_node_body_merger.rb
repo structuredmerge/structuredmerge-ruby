@@ -62,6 +62,10 @@ module Prism
         template_comments = actual_template.location.respond_to?(:leading_comments) ? actual_template.location.leading_comments : []
         dest_comments = actual_dest.location.respond_to?(:leading_comments) ? actual_dest.location.leading_comments : []
         dest_prefix_comment_lines = merger.instance_variable_get(:@dest_prefix_comment_lines)
+        # CLASSIFICATION ONLY: filters header comments already claimed as prefix
+        # lines so they are not re-emitted inside a recursive body merge. This is
+        # comment dedup, not pragma resolution - see Prism::Merge::PragmaMerger,
+        # applied by Prism::Merge::SmartMerger#apply_pragma_header.
         template_prefix_line_numbers = Prism::Merge::MagicCommentSupport.prefix_comment_line_numbers_for_comments(template_comments)
         dest_claimed = merger.dest_analysis.respond_to?(:claimed_lines) ? merger.dest_analysis.claimed_lines : Set.new
         template_claimed = merger.template_analysis.respond_to?(:claimed_lines) ? merger.template_analysis.claimed_lines : Set.new

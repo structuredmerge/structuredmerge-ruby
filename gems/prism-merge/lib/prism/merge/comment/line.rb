@@ -58,6 +58,20 @@ module Prism
         # - `# warn_indent: true/false`
         # - `# shareable_constant_value: literal/...`
         #
+        # == CLASSIFICATION ONLY, NOT PRAGMA RESOLUTION
+        #
+        # This attribute feeds comment classification and node signatures. It does
+        # not decide whether a pragma survives a merge or where it is placed - that
+        # is {Prism::Merge::PragmaMerger}, wired in from
+        # {Prism::Merge::SmartMerger#apply_pragma_header}. PragmaMerger reads
+        # Prism's native ParseResult#magic_comments directly and does not consult
+        # this attribute.
+        #
+        # Do not build pragma retention or placement on top of this. Note also that
+        # `magic_comment_type` is populated only for comments in the header prefix,
+        # so it is not a reliable test for "is this text a pragma" elsewhere in a
+        # file.
+        #
         # @return [Boolean] true if this is a magic comment
         def magic_comment?
           !@magic_comment_type.nil?

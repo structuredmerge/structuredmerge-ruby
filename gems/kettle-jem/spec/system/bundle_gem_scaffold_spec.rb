@@ -263,6 +263,16 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(rakefile).to include('Kettle::Dev.install_tasks unless Kettle::Dev::RUNNING_AS == "rake"')
     expect(rakefile).to include("Kettle::Jem.install_tasks")
     expect(rakefile).to include("rescue LoadError")
+    # The scaffold Rakefile and the template both open with a magic comment. The
+    # Rakefile recipe is strategy: merge with preference: destination, so an
+    # unmatched scaffold node can be re-emitted at the end of the merged file,
+    # producing a second magic comment after code. RuboCop then reports
+    # Lint/MisplacedMagicComment and the file is silently ignored for frozen
+    # string literals. There must be exactly one, on line 1.
+    magic_comment_lines = rakefile.lines.each_index.select do |index|
+      rakefile.lines[index].match?(/^#\s*frozen_string_literal/)
+    end
+    expect(magic_comment_lines).to eq([0])
     previous_significant = nil
     orphaned_task_requires = rakefile.lines.filter_map do |line|
       required = line[/^\s*require\s+["']([^"']+)["']\s*$/, 1]

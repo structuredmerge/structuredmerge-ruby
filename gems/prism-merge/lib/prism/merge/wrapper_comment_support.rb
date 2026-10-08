@@ -2,6 +2,18 @@
 
 module Prism
   module Merge
+    # Selects and emits the leading/trailing comments attached to a node.
+    #
+    # == PRAGMAS ARE NOT PLACED HERE
+    #
+    # prefix_comment_line_numbers_for_comments is consulted to avoid re-emitting
+    # header comments already claimed as prefix lines. That is comment dedup within
+    # one side's header, NOT pragma resolution: it does not decide which pragmas
+    # survive a merge, nor where they are placed.
+    #
+    # File-level pragmas are resolved by {Prism::Merge::PragmaMerger} and pinned by
+    # {Prism::Merge::SmartMerger#apply_pragma_header} after the merge completes.
+    # Do not add pragma retention or placement logic to this class.
     class WrapperCommentSupport
       include Prism::Merge::SourceLineLookup
 

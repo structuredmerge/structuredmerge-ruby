@@ -169,6 +169,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] git-add-path-escaping-symlinked-home: kettle-jem-deps-floor and kettle-jem-workflow-pins could pass a parent-directory escaping path to git add -- when the project root and the git worktree root were two valid spellings of the same directory, as on hosts where /home is a symlink to /var/home and TMPDIR reports the symlink spelling while git rev-parse --show-toplevel reports the realpath spelling. Both tools now relativize through Kettle::Jem::RelativePaths, which canonicalizes both sides before comparing and refuses to return an escaping path.
 
+- Always load the StructuredMerge sibling closure when `STRUCTUREDMERGE_DEV` is set, not only when `K_JEM_TEMPLATING` is set. StructuredMerge is no longer a templating-only concern: `kettle-changelog` reaches it at runtime through `ast-crispr-markdown-markly` -> `markdown-merge` -> `tree_haver`, so the test, lint, and release bundles resolve the family too. While the family is only partially released, the registry copies pin the last published version with an exact requirement, which cannot be satisfied next to a local lockstep version, and version solving failed for every command in the member bundle rather than only for lint. The generated main `Gemfile` and shim `Gemfile` now evaluate `gemfiles/modular/templating.gemfile` when either flag is set; neither flag set still skips it, so CI and released-mode resolution are unchanged.
+
+- The templated `gemfiles/modular/style_local.gemfile` passed `root: ["src", "rubocop-lts"]` to `eval_nomono_gems`, which nomono resolves through `join_home` to `$HOME/src/rubocop-lts`. The rubocop-lts family actually lives at `$HOME/src/my/rubocop-lts`, so `RUBOCOP_LTS_DEV=true` silently selected a stale sibling checkout when one existed and a missing tree otherwise. Now `["src", "my", "rubocop-lts"]`, matching the other sibling templates and nomono's own default root. Already-templated projects keep the stale root until re-templated.
+
 ### Security
 
 ## [7.1.28] - 2026-09-10

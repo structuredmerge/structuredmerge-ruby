@@ -105,4 +105,42 @@ RSpec.describe 'Prism reproducible merge' do
       ).to eq(merged)
     end
   end
+
+  describe 'Ruby merge with comment-only destination (regression)' do
+    # A scaffold reduced to just its magic comment merges into a full template.
+    # The destination pragma arrives as an unmatched statement node because the
+    # template's equivalent is a leading comment of its first statement, so no
+    # signature match is possible. Without the fix it was appended after the last
+    # template statement, producing Lint/MisplacedMagicComment and silently
+    # disabling frozen string literals for the file.
+    context 'when destination is only a magic comment the template also declares' do
+      it_behaves_like 'a reproducible merge', '07_comment_only_destination_magic_comment', {
+        preference: :destination,
+        add_template_only_nodes: true,
+        merge_template_requires: true
+      }
+    end
+
+    it 'preserves the destination pragma when the template declares none' do
+      template = <<~RUBY
+        require "bundler/gem_tasks"
+
+        task :default do
+          puts "Default task complete."
+        end
+      RUBY
+      merged = Prism::Merge.merge_ruby(
+        template,
+        "# frozen_string_literal: true\n",
+        'ruby',
+        preference: :destination,
+        add_template_only_nodes: true,
+        merge_template_requires: true
+      )[:output]
+
+      # Suppression must not drop a pragma the template never declared; doing so
+      # would silently change semantics, which is worse than a duplicate.
+      expect(merged.scan(/^#\s*frozen_string_literal/).size).to eq(1)
+    end
+  end
 end

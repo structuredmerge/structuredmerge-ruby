@@ -163,6 +163,12 @@ module Prism
         Ruby::Merge::BlockDirectiveDetector.directive_content?(content)
       end
 
+      # CLASSIFICATION ONLY: decides whether a header comment is documentation or
+      # a directive/pragma, so the doc surface excludes non-prose comments. This is
+      # a documentation concern, not pragma resolution - it does not decide which
+      # pragmas survive a merge or where they are placed. See
+      # Prism::Merge::PragmaMerger, applied by
+      # Prism::Merge::SmartMerger#apply_pragma_header.
       def magic_comment_line?(entry, content)
         node = entry[:node]
         return true if node.respond_to?(:magic_comment_type) && !node.magic_comment_type.nil?

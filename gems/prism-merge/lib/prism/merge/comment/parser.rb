@@ -33,6 +33,10 @@ module Prism
 
           nodes = []
           current_block = []
+          # CLASSIFICATION ONLY: tags comment lines so Comment::Line can carry a
+          # magic_comment_type for node signatures. Not pragma resolution - see
+          # Prism::Merge::PragmaMerger, applied by
+          # Prism::Merge::SmartMerger#apply_pragma_header after the merge.
           header_magic_comment_types = Prism::Merge::MagicCommentSupport.header_magic_comment_types_for_lines(lines)
 
           lines.each_with_index do |line, idx|

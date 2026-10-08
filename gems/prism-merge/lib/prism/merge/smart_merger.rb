@@ -274,10 +274,56 @@ module Prism
       # @return [MergeResult] The merge result
       def perform_merge
         validate_files!
-        top_level_merge_runner.merge
+        apply_pragma_header(top_level_merge_runner.merge)
       end
 
       private
+
+      # Resolves file-level pragmas as a discrete document and pins the result to
+      # the top of the merged output.
+      #
+      # The main resolver treats a magic comment as an ordinary comment attached to
+      # a statement, which satisfies neither axis of pragma semantics: it inherits
+      # the host statement's placement, so it can be stranded below code where Ruby
+      # ignores it; and it bypasses the add/remove flags that govern statements, so
+      # retention follows `preference` alone. PragmaMerger resolves both.
+      #
+      # Applied after the merge rather than by stripping the inputs, so line numbers
+      # recorded in MergeResult#line_metadata keep matching the source files they
+      # came from. This mirrors how regions rewrite content post-hoc via
+      # update_result_content.
+      #
+      # @param result [MergeResult]
+      # @return [MergeResult]
+      def apply_pragma_header(result)
+        return result if result.nil?
+
+        merged_content = result.to_s
+        merger = build_pragma_merger
+        # Strips pragmas the main resolver emitted anywhere in the file, then pins
+        # the preference-resolved block above the first statement (and below any
+        # shebang). A no-op when neither side declares a pragma.
+        pinned = merger.place_in(PragmaMerger.strip_pragma_lines(merged_content))
+        return result if pinned == merged_content
+
+        # MergeResult#to_s appends a trailing newline, while the inherited
+        # content= splits with -1 and so keeps a trailing empty line. Passing the
+        # pinned text through unchanged would therefore add a blank line at the end
+        # of the file on every merge. Removing exactly one trailing newline makes
+        # the assignment round-trip.
+        update_result_content(result, pinned.sub(/\n\z/, ''))
+        result
+      end
+
+      def build_pragma_merger
+        PragmaMerger.new(
+          template_source: template_content,
+          destination_source: dest_content,
+          preference: preference,
+          add_template_only_nodes: add_template_only_nodes,
+          remove_template_missing_nodes: remove_template_missing_nodes
+        )
+      end
 
       def record_runtime_session(session)
         @runtime_session = session

@@ -135,6 +135,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Accept established categorized conflict diagnostics without a separate code field while still rejecting empty diagnostics and unexplained exit-one failures.
 
+- Pragmas (magic comments) are now merged by a dedicated resolver, `Prism::Merge::PragmaMerger`, instead of being handled as ordinary comments by the main node resolver. A magic comment is syntactically a comment but semantically a file-level directive, and the two axes of a merge resolve differently for it: whether it is KEPT is preference resolved exactly like any other content, governed by `preference`, `add_template_only_nodes`, and `remove_template_missing_nodes`, while its POSITION never follows merge placement rules, because Ruby honours a pragma only when it precedes the first statement, so the rendered block is pinned above the first statement and below any shebang. Modelling a pragma as a comment attached to a statement satisfied neither axis, so a pragma could be stranded below code and silently stop taking effect, and retention followed `preference` alone instead of the add/remove flags. Identity and position come from Prism's native `ParseResult#magic_comments`, so no comment text matching is involved. Only the five file-level pragma keys are in scope; block directives such as `# kettle-jem:freeze` and `# simplecov:disable` stay with the main resolver, because their position is meaningful and they legitimately appear mid-file.
+
+- Templating no longer duplicates the `# frozen_string_literal: true` magic comment at the bottom of a generated file. When the destination was comment-only (a lone magic comment), the main resolver treated that pragma as an unmatched destination node and emitted it after the last template statement, producing a Rakefile with the pragma at both line 1 and line 188. The trailing copy is inert, because Ruby only honours a magic comment in the leading comment region, and it also confused later merges. The pragma now resolves in its own pass and is pinned to the header, so a comment-only destination cannot leak a duplicate at the end.
+
 ### Security
 
 ## [7.1.9] - 2026-09-10
