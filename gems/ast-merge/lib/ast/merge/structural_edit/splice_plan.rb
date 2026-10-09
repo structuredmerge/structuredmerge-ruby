@@ -39,6 +39,12 @@ module Ast
         # @param preserve_removed_trailing_blank_lines [Boolean] whether to preserve trailing blank lines from removed content
         # @param metadata [Hash] base metadata
         # @param options [Hash] extra metadata merged into +metadata+
+        #
+        # @note An empty replacement never preserves trailing blanks: a deletion
+        #   contributes no text to separate from the following content, and the
+        #   blank run preceding the range already separates the survivors. The
+        #   junction blank run is also capped at the longest single contributing
+        #   run. See BlankLineSupport for both rules.
         def initialize(source:, replacement:, replace_start_line:, replace_end_line:, leading_boundary: nil,
                        trailing_boundary: nil, preserve_removed_trailing_blank_lines: true, metadata: {}, **options)
           @source = source.to_s
@@ -92,7 +98,9 @@ module Ast
         #
         # @return [String]
         def merged_content
-          +before_content + replacement_with_preserved_boundary_layout + after_content
+          preserved = preserved_trailing_blank_line_chunks
+          head = +before_content + replacement_with_preserved_boundary_layout(preserved)
+          capped_junction_content(head, after_content, preserved.length)
         end
 
         def changed?
@@ -134,33 +142,52 @@ module Ast
 
         private
 
-        def replacement_with_preserved_boundary_layout
+        def replacement_with_preserved_boundary_layout(preserved_chunks)
           result = +replacement
-
-          result << missing_trailing_blank_line_chunks.join if preserve_removed_trailing_blank_lines?
+          result << preserved_chunks.join unless preserved_chunks.empty?
 
           result
         end
 
-        def preserve_removed_trailing_blank_lines?
-          return false unless preserve_removed_trailing_blank_lines
+        # Trailing blank chunks from the removed range that the replacement should
+        # re-emit, so it is not left butting against the following content.
+        #
+        # An empty replacement preserves nothing: a deletion contributes no text of
+        # its own to separate, and the blank run that preceded the range already
+        # separates the survivors. Re-emitting the removed owner's trailing
+        # separator instead either duplicates it -- two blanks at a junction where
+        # the source had one -- or, when the range starts the file, invents a
+        # leading blank the source never had. Deleting a job from a GitHub Actions
+        # workflow produced the first; deleting a leading block produced the second.
+        def preserved_trailing_blank_line_chunks
+          return [] unless preserve_removed_trailing_blank_lines
+          return [] if replacement.empty?
+          return [] if after_content.empty?
 
-          !after_content.empty? &&
-            !missing_trailing_blank_line_chunks.empty?
+          BlankLineSupport.missing_trailing_blank_line_chunks(
+            removed_content: removed_content,
+            replacement: replacement,
+            after_content: after_content
+          )
         end
 
-        def missing_trailing_blank_line_chunks
-          removed_blank_chunks = trailing_blank_line_chunks(removed_content)
-          replacement_blank_chunks = trailing_blank_line_chunks(replacement)
-          return [] if removed_blank_chunks.empty?
-          return [] if replacement_blank_chunks.length >= removed_blank_chunks.length
-          return [] if after_content.start_with?("\n")
-
-          removed_blank_chunks[replacement_blank_chunks.length..]
-        end
-
-        def trailing_blank_line_chunks(text)
-          text.lines.reverse.take_while { |line| line.strip.empty? }.reverse
+        # Cap the blank run where the spliced head meets the untouched tail.
+        #
+        # Removal is what exposes this: a blank on each side of the removed owner
+        # was separated by that owner's own text, and deleting it makes the two
+        # runs adjacent. Observed in both shapes -- removing a Ruby `appraise`
+        # block, whose owner range ends at the statement so the separator on either
+        # side survives, and removing a GitHub Actions job, whose range includes
+        # the job's trailing separator so it stacks on the blank that preceded it.
+        # In each case the source had a single blank and the splice emitted two.
+        def capped_junction_content(head, tail, preserved_count)
+          BlankLineSupport.cap_junction_blank_runs(
+            head: head,
+            tail: tail,
+            preserved_count: preserved_count,
+            before_content: before_content,
+            replacement: replacement
+          )
         end
 
         def validate_range!

@@ -75,6 +75,73 @@ RSpec.describe Ast::Merge::StructuralEdit::SplicePlan do
 
       expect(plan.merged_content).to eq("## Section\nNew body\n## After\n")
     end
+
+    # The junction invariant: a splice must not emit a blank-line run longer than
+    # any single contributor already had. Deletion is what exposes it -- the
+    # separator that preceded the removed range and the separator that followed
+    # it become adjacent once the range's own text is gone.
+    it 'does not stack the junction blanks when an empty replacement removes a range' do
+      source = <<~TEXT
+        ## Section
+        Old body
+
+        ## After
+      TEXT
+
+      plan = described_class.new(
+        source: source,
+        replacement: '',
+        replace_start_line: 1,
+        replace_end_line: 3
+      )
+
+      expect(plan.merged_content).to eq("## After\n")
+    end
+
+    it 'caps a junction where both sides of the removed range had a blank' do
+      source = "# Before\n\n## Section\nOld body\n\n# After\n"
+
+      plan = described_class.new(
+        source: source,
+        replacement: '',
+        replace_start_line: 3,
+        replace_end_line: 5
+      )
+
+      # One blank survives, matching the source's own section separator; two
+      # would be a separator the source never had.
+      expect(plan.merged_content).to eq("# Before\n\n# After\n")
+    end
+
+    it 'keeps a longer junction blank run that the source already had on one side' do
+      source = "# Before\n\n\n## Section\nOld body\n\n# After\n"
+
+      plan = described_class.new(
+        source: source,
+        replacement: '',
+        replace_start_line: 4,
+        replace_end_line: 6
+      )
+
+      # The cap is the longest contributing run, not a flat single blank.
+      expect(plan.merged_content).to eq("# Before\n\n\n# After\n")
+    end
+
+    # The range's trailing blank belongs to the removed owner. With nothing
+    # spliced in to separate, re-emitting it invents a blank the source never had
+    # -- a leading one when the range starts the file.
+    it 'does not invent a leading blank when removing a range at the start of the file' do
+      source = "## Section\nOld body\n\n## After\n"
+
+      plan = described_class.new(
+        source: source,
+        replacement: '',
+        replace_start_line: 1,
+        replace_end_line: 3
+      )
+
+      expect(plan.merged_content).to eq("## After\n")
+    end
   end
 
   describe 'validation' do

@@ -1314,24 +1314,24 @@
     [100, 9, 519, "Metrics/MethodLength: Method has too many lines. [11/10]", 318006380],
     [136, 121, 48, "Layout/LineLength: Line is too long. [168/120]", 2367140872]
   ],
-  "lib/ast/merge/structural_edit/remove_plan.rb:1189569486": [
-    [11, 7, 9717, "Metrics/ClassLength: Class has too many lines. [160/100]", 3652701475],
+  "lib/ast/merge/structural_edit/remove_plan.rb:3236777942": [
+    [11, 7, 9922, "Metrics/ClassLength: Class has too many lines. [160/100]", 821535932],
     [25, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5861091],
-    [27, 9, 1409, "Metrics/MethodLength: Method has too many lines. [22/10]", 3344870777],
-    [27, 23, 255, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [11/5]", 3970946607],
-    [28, 121, 40, "Layout/LineLength: Line is too long. [160/120]", 1637059282],
-    [36, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5859104],
-    [196, 121, 32, "Layout/LineLength: Line is too long. [152/120]", 1617827253],
-    [224, 9, 1032, "Metrics/MethodLength: Method has too many lines. [20/10]", 968444047]
+    [31, 9, 1409, "Metrics/MethodLength: Method has too many lines. [22/10]", 3344870777],
+    [31, 23, 255, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [11/5]", 3970946607],
+    [32, 121, 40, "Layout/LineLength: Line is too long. [160/120]", 1637059282],
+    [40, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5859104],
+    [200, 121, 32, "Layout/LineLength: Line is too long. [152/120]", 1617827253],
+    [228, 9, 1032, "Metrics/MethodLength: Method has too many lines. [20/10]", 968444047]
   ],
   "lib/ast/merge/structural_edit/remove_plan_support.rb:777827819": [
     [19, 9, 1429, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `build_remove_plan` is too high. [8/7]", 4091314919],
     [19, 9, 1429, "Metrics/MethodLength: Method has too many lines. [32/10]", 4091314919]
   ],
-  "lib/ast/merge/structural_edit/splice_plan.rb:2675806114": [
+  "lib/ast/merge/structural_edit/splice_plan.rb:367929203": [
     [39, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 1683893295],
-    [42, 23, 203, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 3653221702],
-    [113, 9, 517, "Metrics/MethodLength: Method has too many lines. [11/10]", 634912361]
+    [48, 23, 203, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 3653221702],
+    [121, 9, 517, "Metrics/MethodLength: Method has too many lines. [11/10]", 634912361]
   ],
   "lib/ast/merge/structured_emitter_provenance_support.rb:445323365": [
     [5, 5, 41, "Style/Documentation: Missing top-level documentation comment for `module Ast::Merge::StructuredEmitterProvenanceSupport`.", 3548518830]
@@ -1937,6 +1937,11 @@
     [70, 3, 1887, "Metrics/BlockLength: Block has too many lines. [66/25]", 1773930426],
     [159, 3, 1109, "Metrics/BlockLength: Block has too many lines. [38/25]", 1457507554]
   ],
+  "spec/ast/merge/structural_edit/blank_line_support_spec.rb:3475065192": [
+    [11, 1, 5036, "Metrics/BlockLength: Block has too many lines. [107/25]", 752937992],
+    [40, 3, 1344, "Metrics/BlockLength: Block has too many lines. [32/25]", 3340688079],
+    [86, 3, 2359, "Metrics/BlockLength: Block has too many lines. [49/25]", 4099898584]
+  ],
   "spec/ast/merge/structural_edit/boundary_support_spec.rb:863387845": [
     [3, 1, 4226, "Metrics/BlockLength: Block has too many lines. [86/25]", 1889771490],
     [16, 9, 42, "Lint/HashCompareByIdentity: Use `Hash#compare_by_identity` instead of using `object_id` for keys.", 1304492024],
@@ -1948,10 +1953,11 @@
     [14, 3, 2139, "Metrics/BlockLength: Block has too many lines. [72/25]", 3558415255],
     [128, 3, 1412, "Metrics/BlockLength: Block has too many lines. [39/25]", 1216754705]
   ],
-  "spec/ast/merge/structural_edit/remove_plan_spec.rb:3569534665": [
-    [3, 1, 6442, "Metrics/BlockLength: Block has too many lines. [134/25]", 3440814588],
-    [39, 3, 3768, "Metrics/BlockLength: Block has too many lines. [75/25]", 876721813],
-    [127, 3, 1439, "Metrics/BlockLength: Block has too many lines. [29/25]", 3378195351]
+  "spec/ast/merge/structural_edit/remove_plan_spec.rb:4103024650": [
+    [3, 1, 7829, "Metrics/BlockLength: Block has too many lines. [144/25]", 3171557518],
+    [10, 3, 2152, "Metrics/BlockLength: Block has too many lines. [29/25]", 3880749748],
+    [63, 3, 3768, "Metrics/BlockLength: Block has too many lines. [75/25]", 876721813],
+    [151, 3, 1439, "Metrics/BlockLength: Block has too many lines. [29/25]", 3378195351]
   ],
   "spec/ast/merge/structural_edit/remove_plan_support_spec.rb:800158061": [
     [3, 1, 2893, "Metrics/BlockLength: Block has too many lines. [62/25]", 3748446914],
@@ -1960,9 +1966,9 @@
     [29, 3, 2091, "Metrics/BlockLength: Block has too many lines. [39/25]", 1684933040],
     [30, 5, 1653, "Metrics/BlockLength: Block has too many lines. [27/25]", 2456404305]
   ],
-  "spec/ast/merge/structural_edit/splice_plan_spec.rb:3331205681": [
-    [3, 1, 3159, "Metrics/BlockLength: Block has too many lines. [83/25]", 2234926397],
-    [16, 3, 1837, "Metrics/BlockLength: Block has too many lines. [46/25]", 2935991482],
+  "spec/ast/merge/structural_edit/splice_plan_spec.rb:3754071003": [
+    [3, 1, 5369, "Metrics/BlockLength: Block has too many lines. [125/25]", 1292691361],
+    [16, 3, 4047, "Metrics/BlockLength: Block has too many lines. [88/25]", 210267003],
     [42, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5860750]
   ],
   "spec/ast/merge/text/conflict_resolver_spec.rb:3810004132": [

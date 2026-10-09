@@ -31,8 +31,32 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
       expect(plan.before_content).to eq("# Before\n\n")
       expect(plan.removed_content).to eq("## Section\nOld body\n\n")
       expect(plan.after_content).to eq("## After\n")
-      expect(plan.merged_content).to eq("# Before\n\n\n## After\n")
+      # The removed section's trailing separator and the separator that preceded
+      # it both survive, which would stack two blank lines at the junction. The
+      # source has no adjacent blanks anywhere, so the junction is capped to the
+      # longest surviving contributor rather than inventing a double separator.
+      # Removing a GitHub Actions job hit exactly this: the workflow gained a
+      # blank line the source never had.
+      expect(plan.merged_content).to eq("# Before\n\n## After\n")
       expect(plan.changed?).to be true
+    end
+
+    it 'preserves a genuine multi-blank separator that lies outside the removed range' do
+      double_blank = "# Before\n\n\n## Section\nOld body\n\n## After\n"
+      plan = described_class.new(source: double_blank, remove_start_line: 4, remove_end_line: 6)
+
+      # The cap is the longest contributing run, not a flat single blank, so a
+      # source that really does separate sections with two blanks keeps both.
+      expect(plan.merged_content).to eq("# Before\n\n\n## After\n")
+    end
+
+    it 'caps the junction when the removed range consumes only part of a double blank' do
+      double_blank = "# Before\n\n## Section\nOld body\n\n\n## After\n"
+      plan = described_class.new(source: double_blank, remove_start_line: 3, remove_end_line: 5)
+
+      # One of the two blanks was inside the range, leaving single contributors on
+      # both sides of the junction.
+      expect(plan.merged_content).to eq("# Before\n\n## After\n")
     end
   end
 

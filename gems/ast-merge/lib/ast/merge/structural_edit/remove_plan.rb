@@ -24,6 +24,10 @@ module Ast
         # @param metadata [Hash] base metadata
         # @param preserve_removed_trailing_blank_lines [Boolean] whether trailing blank lines should survive in the splice
         # @param options [Hash] extra metadata merged into +metadata+
+        #
+        # @note Removal always passes an empty replacement, so trailing blank
+        #   preservation is not applied; the junction blank run is capped instead.
+        #   See BlankLineSupport.
         def initialize(source:, remove_start_line:, remove_end_line:, leading_boundary: nil, trailing_boundary: nil,
                        removed_attachments: [], removed_owners: nil, retained_owners: nil, metadata: {}, preserve_removed_trailing_blank_lines: true, **options)
           normalized_removed_attachments = Array(removed_attachments).compact.freeze

@@ -8,6 +8,7 @@ module Ast
     # boundaries and splice plans without taking ownership of parser-specific
     # traversal or post-processing behavior.
     module StructuralEdit
+      autoload :BlankLineSupport, 'ast/merge/structural_edit/blank_line_support'
       autoload :BoundarySupport, 'ast/merge/structural_edit/boundary_support'
       autoload :Boundary, 'ast/merge/structural_edit/boundary'
       autoload :PlanSet, 'ast/merge/structural_edit/plan_set'

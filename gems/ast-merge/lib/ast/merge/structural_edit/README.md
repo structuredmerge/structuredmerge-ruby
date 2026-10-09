@@ -61,6 +61,17 @@ It keeps the source-preserving removal behavior passive while also recording:
 - which adjacent owners survived
 - which removed comment/layout attachments should be promoted rather than dropped
 
+Blank lines at the junction are capped rather than preserved. Removal's
+replacement is always empty, so nothing needs separating from the content that
+follows, and the blank run that preceded the removed range already separates the
+survivors. Re-emitting the removed owner's trailing separator would either
+duplicate it, giving two blank lines at a junction where the source had one, or
+invent a leading blank line when the range started the file. `SplicePlan`
+therefore ignores `preserve_removed_trailing_blank_lines` for an empty
+replacement, and caps any remaining junction run at the longest single
+contributing run so a genuine multi-blank separator that lies outside the removed
+range survives intact.
+
 Minimal example:
 
 ```ruby
