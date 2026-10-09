@@ -1863,7 +1863,13 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(jruby_line).to include("[![JRuby current Compat][💎jruby-c-i]][🚎10-j-wf]")
     expect(truffleruby_line).to include("[![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf]")
     expect(truffleruby_line).to include("[![Truffle Ruby current Compat][💎truby-c-i]][🚎9-t-wf]")
-    expect(truffleruby_line).to include("[![Truffle Ruby HEAD Compat][💎truby-headi]][🚎3-hd-wf]")
+    # TruffleRuby HEAD is dropped from the template: the truffleruby-head job
+    # deadlocked in the Heads workflow, ran to GitHub's 6-hour ceiling, and was
+    # cancelled. The heads.yml workflow itself stays for ruby-head and jruby-head,
+    # so the badge would not be pruned automatically by the missing-workflow pass.
+    expect(truffleruby_line).not_to include("Truffle Ruby HEAD")
+    expect(truffleruby_line).not_to include("💎truby-headi")
+    expect(jruby_line).to include("[![JRuby HEAD Compat][💎jruby-headi]][🚎3-hd-wf]")
   end
 
   it "adds missing compatible versioned engine README badges when workflows exist" do

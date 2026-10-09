@@ -1049,7 +1049,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
               - .github/workflows/jruby-9.1.yml
               - .github/workflows/jruby-9.4.yml
               - .github/workflows/jruby-10.0.yml
-              - .github/workflows/truffleruby-23.0.yml
               - .github/workflows/truffleruby-23.1.yml
               - .github/workflows/truffleruby-33.0.yml
         YAML
@@ -1073,7 +1072,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(paths).not_to include(".github/workflows/jruby-9.1.yml")
       expect(paths).not_to include(".github/workflows/jruby-9.4.yml")
       expect(paths).to include(".github/workflows/jruby-10.0.yml")
-      expect(paths).not_to include(".github/workflows/truffleruby-23.0.yml")
       expect(paths).not_to include(".github/workflows/truffleruby-23.1.yml")
       expect(paths).to include(".github/workflows/truffleruby-33.0.yml")
       expect(stale_report).to include(
