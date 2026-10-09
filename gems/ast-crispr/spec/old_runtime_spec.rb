@@ -499,7 +499,10 @@ RSpec.describe Ast::Crispr do
       expect(actor.match_count).to eq(2)
       expect(actor.captured_text).to include('puts "one"')
       expect(actor.captured_text).to include('puts "stable"')
-      expect(actor.updated_content).to eq("\n### MANAGED SNIPPET\nputs \"two\"\nputs \"still managed\"\n\n")
+      # The first deleted block's trailing blank belonged to that block. With no
+      # replacement spliced in, re-emitting it would invent a leading blank line
+      # the source never had, so the output starts at the surviving block.
+      expect(actor.updated_content).to eq("### MANAGED SNIPPET\nputs \"two\"\nputs \"still managed\"\n\n")
       expect(adapter.read_count).to eq(1)
     end
   end
