@@ -988,11 +988,20 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
     expect(current_workflow).to include("rspec-status-current-${{matrix.os}}-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(current_workflow).to include("runs-on: ${{ matrix.os }}")
-    expect(current_workflow).to include("appraisal: \"current\"\n            os: ubuntu-latest")
-    expect(current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
-    expect(current_workflow).to include("appraisal: \"current\"\n            os: windows-latest")
-    expect(current_workflow).not_to include("appraisal: \"unlocked_deps\"\n            os: windows-latest")
-    expect(current_workflow).to include("run: ruby -rbundler/setup bin/turbo_tests2")
+    resolved_current_workflow = described_class.send(
+      :resolve_template_tokens,
+      current_workflow,
+      {
+        "KJ|CI:EXEC_CMD" => "bundle exec kettle-test",
+        "KJ|CI:OS_MATRIX_ENTRIES" => described_class.send(:github_actions_current_os_matrix_entries, {ci: {exec_cmd: "bundle exec kettle-test", platforms: %w[linux macos windows]}}),
+        "KJ|CI:OS_TEST_STEPS" => described_class.send(:github_actions_current_os_test_steps, {ci: {exec_cmd: "bundle exec kettle-test", platforms: %w[linux macos windows]}})
+      }
+    )
+    expect(resolved_current_workflow).to include("appraisal: \"current\"\n            os: ubuntu-latest")
+    expect(resolved_current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
+    expect(resolved_current_workflow).to include("appraisal: \"current\"\n            os: windows-latest")
+    expect(resolved_current_workflow).not_to include("appraisal: \"unlocked_deps\"\n            os: windows-latest")
+    expect(resolved_current_workflow).to include("run: ruby -rbundler/setup bin/kettle-test")
     turbo_tests2_launcher = File.read(project_root.join("lib/kettle/jem/templates/bin/turbo_tests2.example"))
     expect(turbo_tests2_launcher).to include('load Gem.bin_path("turbo_tests2", "turbo_tests2")')
     template_entries = described_class.send(
@@ -1460,7 +1469,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
-    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-family kettle-test kettle-soup-cover kettle-changelog kettle-drift")
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-family kettle-rb kettle-test kettle-soup-cover kettle-changelog kettle-drift")
     expect(tokens.fetch("KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM")).to include('gem "kettle-family"')
     expect(tokens.fetch("KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP")).to include('gem "nomono"')
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")

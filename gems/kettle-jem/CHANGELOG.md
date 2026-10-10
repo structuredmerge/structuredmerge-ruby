@@ -49,6 +49,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - kettle-jem-deps-floor: add FLOOR_HOLDS registry to exclude a dependency floor from automatic raising when a newer release would produce an unresolvable dependency set in generated projects. Held floors are skipped during planning and reported separately (held_floors in JSON, a 'held' line in text output) so the exclusion is auditable rather than silent. First entry: rubocop-minitest (0.41.0 needs rubocop >= 1.89, but standard ~> 1.56 caps rubocop at ~> 1.88).
 
+- Add Kettle::Rb::PlatformSupport: generated OS-platform support evidence for CI matrix generation. Introduces the CI OS-family vocabulary (linux, macos, windows) as a fourth, explicitly distinct platform vocabulary, with runner-label mapping and per-engine support claims that each carry a citation. TruffleRuby Windows support (zero Windows assets across all releases) and the RubyInstaller series (including ARM64 from 3.4) are derived from live APIs on regeneration; every other claim is documentation-sourced. Regenerate with rake kettle:rb:platform_support:generate.
+
+- kettle-jem: first-class OS-platform support for the CI matrix (spec slice 1038). A new documented `platforms:` config key (CI OS families linux/macos/windows; default linux+macos, Windows opt-in only) drives generation of the current.yml OS matrix from facts via new KJ|CI:OS_MATRIX_ENTRIES and KJ|CI:OS_TEST_STEPS tokens, and a generated KJ|README:PLATFORM_SUPPORT_TABLE tier table under Runtime and Platform Support. Re-templating a repo with existing Windows CI detects and preserves windows via workflow evidence, both in the injected config key and in the facts themselves, so first-run templating cannot silently drop Windows coverage. Platform evidence lives in Kettle::Rb::PlatformSupport (kettle-rb 0.1.17+), with per-claim citations.
+
 ### Changed
 
 - Require kettle-rb `>= 0.1.14` (security floor data).
@@ -177,6 +181,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Always load the StructuredMerge sibling closure when `STRUCTUREDMERGE_DEV` is set, not only when `K_JEM_TEMPLATING` is set. StructuredMerge is no longer a templating-only concern: `kettle-changelog` reaches it at runtime through `ast-crispr-markdown-markly` -> `markdown-merge` -> `tree_haver`, so the test, lint, and release bundles resolve the family too. While the family is only partially released, the registry copies pin the last published version with an exact requirement, which cannot be satisfied next to a local lockstep version, and version solving failed for every command in the member bundle rather than only for lint. The generated main `Gemfile` and shim `Gemfile` now evaluate `gemfiles/modular/templating.gemfile` when either flag is set; neither flag set still skips it, so CI and released-mode resolution are unchanged.
 
 - The templated `gemfiles/modular/style_local.gemfile` passed `root: ["src", "rubocop-lts"]` to `eval_nomono_gems`, which nomono resolves through `join_home` to `$HOME/src/rubocop-lts`. The rubocop-lts family actually lives at `$HOME/src/my/rubocop-lts`, so `RUBOCOP_LTS_DEV=true` silently selected a stale sibling checkout when one existed and a missing tree otherwise. Now `["src", "my", "rubocop-lts"]`, matching the other sibling templates and nomono's own default root. Already-templated projects keep the stale root until re-templated.
+
+- kettle-jem: the packaged current.yml Windows test step hardcoded `bin/turbo_tests2`, correct for exactly one destination (and inconsistent even there, since its exec_cmd is kettle-test). The generated step now invokes the destination's own configured test command, resolved to its binstub from ci.exec_cmd. Also: the kettle-dev family local-gems wiring now includes kettle-rb, so destinations can develop against unreleased kettle-rb with KETTLE_DEV_DEV.
 
 ### Security
 

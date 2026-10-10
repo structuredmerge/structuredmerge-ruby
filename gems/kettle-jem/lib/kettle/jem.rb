@@ -24,6 +24,7 @@ require "kettle/dev"
 require "kettle/changelog"
 require "kettle/rb/compat_matrix"
 require "kettle/rb/gem_floors"
+require "kettle/rb/platform_support"
 require_relative "jem/version"
 require_relative "jem/license_txt_migrator"
 require_relative "jem/maintenance_changelog"
@@ -92,6 +93,32 @@ module Kettle
       "kettle-test -I ../spec --options ../.rspec ../spec"
     ].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
+    # CI OS families a destination supports when it declares no `platforms:` key.
+    # Windows is opt-in only: Windows CI is materially slower and most gems do
+    # not need it, so a destination that wants it must declare it. The values
+    # are Kettle::Rb::PlatformSupport OS families, not Gem::Platform strings.
+    DEFAULT_PLATFORMS = %w[linux macos].freeze
+    # Matches GitHub Windows runner labels (windows-latest, windows-2022,
+    # windows-11-arm, ...) anywhere in a workflow file, which covers both a
+    # direct `runs-on:` and the `matrix.os` indirection. Validated against the
+    # packaged templates: their only Windows token is windows-latest, and
+    # `runs-on:` only ever appears as `${{ matrix.os }}` or an ubuntu label.
+    WINDOWS_RUNNER_LABEL_PATTERN = /windows-(?:latest|\d+)/i
+    # Documentation injected with `platforms:` by #migrate_platforms_config.
+    # Kept in sync with the packaged config template
+    # (templates/.structuredmerge/kettle-jem.yml.example).
+    PLATFORMS_CONFIG_DOCUMENTATION = [
+      "# List the OS platforms this project's CI exercises. kettle-jem uses this to",
+      "# generate the current.yml OS matrix and the README platform tier table.",
+      "# Windows applies only when declared: the `if: matrix.os` guards and the",
+      "# Windows-only test step are emitted solely for destinations that opt in.",
+      "#",
+      "# Supported values: linux, macos, windows",
+      "# Default (when key is absent): linux, macos",
+      "# These are CI OS families, a distinct vocabulary from Gem::Platform strings",
+      "# and Gemfile DSL platform symbols; never reuse them for",
+      "# `bundle lock --add-platform`."
+    ].freeze
     DEFAULT_OPENCOLLECTIVE_ORG = "galtzo-floss"
     # These tools remain active, but their dependency ownership belongs to the
     # generated modular Gemfiles rather than a destination gemspec.
@@ -2835,6 +2862,7 @@ module Kettle
       }
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
       bootstrap[:licenses] = configured_or_detected_licenses if bootstrap && !configured_or_detected_licenses.empty?
+      bootstrap[:platforms] = detected_os_platforms(project_root) if bootstrap && !detected_os_platforms(project_root).empty?
       facts[:kettle_config_bootstrap] = bootstrap if bootstrap
       facts[:author] = author unless author.empty?
       facts[:copyright] = copyright unless copyright.empty?
@@ -3096,6 +3124,7 @@ module Kettle
       if bootstrap
         min_ruby_token = minimum_ruby_token(min_ruby)
         bootstrap[:licenses] = gemspec_license_spdx unless gemspec_license_spdx.empty?
+        bootstrap[:platforms] = detected_os_platforms(project_root) unless detected_os_platforms(project_root).empty?
         bootstrap[:gemspec_path] = File.basename(gemspec_path) if gemspec_path
         bootstrap[:min_ruby] = min_ruby_token unless min_ruby_token.empty?
         bootstrap[:test_min_ruby] = config_test_min_ruby(kettle_config, min_ruby).to_s
@@ -3162,6 +3191,7 @@ module Kettle
         default_branch: "main",
         exec_cmd: github_actions_exec_cmd(kettle_config, env),
         engine_exec_cmds: github_actions_engine_exec_cmds(kettle_config),
+        platforms: ci_os_platforms_facts(kettle_config, project_root),
         recording: project_recording_enabled?(project_root, kettle_config),
         ruby_versions: github_actions_ruby_versions(project_runtime.fetch(:test_min_ruby)),
         test_min_ruby: project_runtime.fetch(:test_min_ruby).to_s,
@@ -5138,6 +5168,24 @@ module Kettle
       end.sort
     end
 
+    # CI OS families evidenced by the destination's existing workflows. The
+    # heuristic exists so re-templating a repo that already runs Windows CI
+    # does not silently drop that coverage when the `platforms:` key is
+    # injected or generated from. It only ever ADDS windows to the default:
+    # the key's absent-means-default semantics already cover linux and macos,
+    # and every packaged workflow is Linux-only except current.yml, which the
+    # template always ships with ubuntu and macos lanes. Returns [] when the
+    # destination has no workflow directory, so callers fall back cleanly.
+    def detected_os_platforms(project_root)
+      workflows_dir = File.join(project_root.to_s, ".github", "workflows")
+      return [] unless Dir.exist?(workflows_dir)
+
+      windows = Dir.glob(File.join(workflows_dir, "*.{yml,yaml}")).any? do |path|
+        File.read(path).match?(WINDOWS_RUNNER_LABEL_PATTERN)
+      end
+      windows ? DEFAULT_PLATFORMS + ["windows"] : DEFAULT_PLATFORMS.dup
+    end
+
     def spdx_from_basename(basename)
       return "LicenseRef-Big-Time-Public-License" if basename.to_s == "Big-Time-Public-License"
 
@@ -6822,7 +6870,7 @@ module Kettle
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts, env: env)
         merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root, facts: facts) if template_file_type(recipe) == :toml
-        return finalize_template_source_content(recipe, sync_kettle_config_env_overrides(merged, env)) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
+        return finalize_template_source_content(recipe, sync_kettle_config_env_overrides(merged, env, project_root: project_root)) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
         merged = postprocess_funding_markdown_content(merged, facts) if recipe.fetch(:target_path) == "FUNDING.md"
 
@@ -6837,7 +6885,7 @@ module Kettle
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts, project_root: project_root)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original, project_root: project_root) if github_workflow_template_recipe?(recipe)
-        accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
+        accepted = sync_kettle_config_env_overrides(accepted, env, project_root: project_root) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
         accepted = postprocess_funding_markdown_content(accepted, facts) if recipe.fetch(:target_path) == "FUNDING.md"
         if github_workflow_template_recipe?(recipe)
           accepted = finalize_github_workflow_template(accepted, facts)
@@ -12595,11 +12643,13 @@ module Kettle
       content = resolve_template_tokens(content, tokens, scan_unresolved: false)
       bootstrap_licenses = Array(recipe[:bootstrap_licenses]).map(&:to_s).reject(&:empty?)
       content = replace_kettle_config_bootstrap_licenses(content, bootstrap_licenses) unless bootstrap_licenses.empty?
+      bootstrap_platforms = Array(recipe[:bootstrap_platforms]).map(&:to_s).reject(&:empty?)
+      content = replace_kettle_config_bootstrap_platforms(content, bootstrap_platforms) unless bootstrap_platforms.empty?
       content = replace_kettle_config_bootstrap_project_emoji(content, recipe[:bootstrap_project_emoji]) unless recipe[:bootstrap_project_emoji].to_s.empty?
       content = replace_kettle_config_bootstrap_rubyforum(content, recipe[:bootstrap_rubyforum]) if recipe[:bootstrap_rubyforum].is_a?(Hash)
       content = apply_kettle_config_bootstrap_profile(content, recipe[:bootstrap_template_profile], recipe[:bootstrap_gemspec_path])
       content = add_shim_bootstrap_config(content, recipe[:bootstrap_shim]) if recipe[:bootstrap_shim].is_a?(Hash)
-      assert_no_unresolved_template_tokens_in_yaml_values(sync_kettle_config_env_overrides(content, env), KETTLE_CONFIG_PATH)
+      assert_no_unresolved_template_tokens_in_yaml_values(sync_kettle_config_env_overrides(content, env, project_root: project_root), KETTLE_CONFIG_PATH)
     end
 
     def replace_kettle_config_bootstrap_project_emoji(content, emoji)
@@ -12615,6 +12665,14 @@ module Kettle
       return updated unless updated == content
 
       raise Error, "Could not replace licenses block in .kettle-jem.yml bootstrap template"
+    end
+
+    def replace_kettle_config_bootstrap_platforms(content, platforms)
+      platform_block = ["platforms:", *platforms.map { |platform| "  - #{platform}" }].join("\n")
+      updated = replace_yaml_node_lines(content, "platforms", "#{platform_block}\n")
+      return updated unless updated == content
+
+      raise Error, "Could not replace platforms block in .kettle-jem.yml bootstrap template"
     end
 
     def replace_kettle_config_bootstrap_rubyforum(content, rubyforum)
@@ -12656,7 +12714,7 @@ module Kettle
       nil
     end
 
-    def sync_kettle_config_env_overrides(content, env)
+    def sync_kettle_config_env_overrides(content, env, project_root: nil)
       synced = KETTLE_CONFIG_ENV_SYNC_PATHS.reduce(content.to_s) do |updated, (path, env_key)|
         value = env_sync_value(env, env_key)
         next updated unless present_template_token_value?(value)
@@ -12668,7 +12726,34 @@ module Kettle
       synced = sync_kettle_config_internal_values(synced)
       synced = migrate_readme_logo_config(synced)
       synced = prune_legacy_kettle_config_keys(synced)
+      synced = migrate_platforms_config(synced, project_root) if project_root
       sync_kettle_config_documentation_comments(synced)
+    end
+
+    # Injects the `platforms:` key into a pre-existing config that predates it.
+    # The injected value is computed from repo evidence (existing Windows CI)
+    # rather than defaulted, so a destination that already runs Windows CI does
+    # not silently lose that coverage on its next re-template. Mirrors the
+    # licenses bootstrap: config wins when present, evidence only fills an
+    # absent key. The block lands adjacent to `engines:`, which it documents by
+    # analogy, and carries its own documentation because the packaged config
+    # documents every key with a preceding comment block.
+    def migrate_platforms_config(content, project_root)
+      config = YAML.safe_load(content.to_s, permitted_classes: [], aliases: true) || {}
+      return content if config.key?("platforms")
+
+      platforms = detected_os_platforms(project_root)
+      platforms = DEFAULT_PLATFORMS if platforms.empty?
+      block = [
+        *PLATFORMS_CONFIG_DOCUMENTATION,
+        "platforms:",
+        *platforms.map { |platform| "  - #{platform}" },
+        ""
+      ].join("\n")
+
+      insert_yaml_block_after_top_level_key(content, "engines", block)
+    rescue Psych::Exception
+      content
     end
 
     def normalize_kettle_config_optional_scalars(content)
@@ -13048,6 +13133,26 @@ module Kettle
         end
       end
       content
+    end
+
+    # Inserts a pre-indented block (comment lines plus a key with a block
+    # sequence) immediately after the given top-level key's value span, so an
+    # injected key lands adjacent to the analogous key it documents by
+    # analogy. Falls back to appending at end of file when the anchor key is
+    # absent. Only column-zero keys match: a nested key of the same name under
+    # `files:` must not become the anchor.
+    def insert_yaml_block_after_top_level_key(content, key, block)
+      lines = content.to_s.lines
+      yaml_mapping_nodes(content).each do |mapping|
+        mapping.children.each_slice(2) do |key_node, value_node|
+          next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+          next unless key_node.start_column.zero?
+
+          end_line = value_node.end_line
+          return [*lines[0...end_line], block, *lines[end_line..].to_a].join
+        end
+      end
+      "#{content.to_s.sub(/\n*\z/, "\n")}\n#{block}"
     end
 
     def apply_kettle_config_bootstrap_profile(content, profile, gemspec_path)
@@ -13699,6 +13804,13 @@ module Kettle
       return unless engines.is_a?(Array)
 
       engines.map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).uniq
+    end
+
+    def os_platforms_config(config)
+      platforms = config["platforms"]
+      return unless platforms.is_a?(Array)
+
+      platforms.map { |platform| platform.to_s.strip.downcase }.reject(&:empty?).uniq
     end
 
     def funding_urls(project_root, package_name, funding_uri: nil, opencollective_disabled: false, open_collective_org: nil, enabled_platforms: nil)
@@ -14519,6 +14631,9 @@ module Kettle
           package.fetch(:name).to_s
         ),
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
+        "KJ|CI:OS_MATRIX_ENTRIES" => github_actions_current_os_matrix_entries(facts),
+        "KJ|CI:OS_TEST_STEPS" => github_actions_current_os_test_steps(facts),
+        "KJ|README:PLATFORM_SUPPORT_TABLE" => readme_platform_support_table(facts),
         "KJ|RAKE:TOP_LEVEL_DOCS_TASK" => rake_top_level_docs_task_token(facts).rstrip,
         "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
       }.merge(
@@ -14591,6 +14706,68 @@ module Kettle
       return namespace if entrypoint.empty? || entrypoint == default_entrypoint || namespace.empty?
 
       "#{package_name} / #{namespace}"
+    end
+
+    # The README platform tier table, generated from the same facts that drive
+    # the workflows, so it cannot drift from CI again (spec slice 1038). Rows
+    # mirror the generated workflow set: versioned MRI workflows are Linux-only,
+    # the current.yml OS matrix covers the declared platforms for MRI current,
+    # and every engine lane outside current.yml is Linux-only. Engine capability
+    # notes come from Kettle::Rb::PlatformSupport and carry their citation.
+    def readme_platform_support_table(facts)
+      engines = facts.dig(:rubygems, :engines)
+      engines = DEFAULT_ENGINES if engines.nil? || engines.empty?
+      platforms = facts.dig(:ci, :platforms)
+      platforms = DEFAULT_PLATFORMS if platforms.nil? || platforms.empty?
+      ruby_versions = facts.dig(:ci, :ruby_versions).to_a.map(&:to_s).reject(&:empty?)
+
+      parallel = "Parallel support"
+      unsupported = "Unsupported"
+      rows = []
+
+      unless ruby_versions.empty?
+        rows << [
+          "MRI #{ruby_versions.first}-#{ruby_versions.last}",
+          parallel, unsupported, unsupported,
+          "Versioned Ruby workflows run on Linux."
+        ]
+      end
+      rows << [
+        "MRI current",
+        parallel,
+        platforms.include?("macos") ? parallel : unsupported,
+        platforms.include?("windows") ? parallel : unsupported,
+        "Current Ruby workflow covers the declared OS platforms."
+      ]
+      rows << [
+        "MRI head",
+        parallel, unsupported, unsupported,
+        "CI is allowed to fail while Ruby is in development."
+      ]
+
+      (engines - ["ruby"]).each do |engine|
+        label = (engine == "jruby") ? "JRuby" : "TruffleRuby"
+        windows_entry = Kettle::Rb::PlatformSupport.engine_os_entry(engine, "windows")
+        note = if windows_entry && windows_entry.support == "unsupported"
+          "#{windows_entry.note} ([source](#{windows_entry.citation}))"
+        else
+          "Engine workflows run on Linux; macOS and Windows are not exercised by CI."
+        end
+        rows << ["#{label} (all CI lanes)", parallel, unsupported, unsupported, note]
+      end
+
+      [
+        "Support tiers describe what this project's CI actually exercises, not what may",
+        "work in an untested environment:",
+        "",
+        "- **Parallel support**: CI runs the test suite with multiple workers available.",
+        "- **Unsupported**: the engine/platform combination is not covered by CI and is",
+        "  not a project compatibility claim.",
+        "",
+        "| Ruby engine/version | Linux | macOS | Windows | Notes |",
+        "|---------------------|-------|-------|---------|-------|",
+        *rows.map { |row| "| #{row.join(" | ")} |" }
+      ].join("\n")
     end
 
     def readme_dev_test_stack_table(package_name)
@@ -15619,7 +15796,7 @@ module Kettle
     end
 
     def kettle_dev_local_gems(config)
-      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover kettle-changelog]
+      gems = %w[kettle-dev kettle-family kettle-rb kettle-test kettle-soup-cover kettle-changelog]
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
       gems.uniq.join(" ")
@@ -18788,6 +18965,7 @@ module Kettle
         "KJ|RUBYFORUM:PROJECT_TAG" => bootstrap.dig(:rubyforum, :project_tag).to_s
       }
       recipe[:bootstrap_licenses] = Array(bootstrap[:licenses]).map(&:to_s).reject(&:empty?)
+      recipe[:bootstrap_platforms] = Array(bootstrap[:platforms]).map(&:to_s).reject(&:empty?)
       recipe[:bootstrap_template_profile] = bootstrap[:template_profile].to_s unless bootstrap[:template_profile].to_s.empty?
       recipe[:bootstrap_gemspec_path] = bootstrap[:gemspec_path].to_s unless bootstrap[:gemspec_path].to_s.empty?
       recipe[:bootstrap_project_emoji] = bootstrap[:project_emoji].to_s unless bootstrap[:project_emoji].to_s.empty?
@@ -19105,6 +19283,27 @@ module Kettle
     def enabled_ruby_engines(config)
       engines = ruby_engines_config(config)
       (engines.nil? || engines.empty?) ? DEFAULT_ENGINES : engines
+    end
+
+    # CI OS families the destination supports, from the `platforms:` config key,
+    # falling back to DEFAULT_PLATFORMS when the key is absent or empty. Named
+    # to stay clear of the funding-platforms vocabulary (#funding_platform_enabled?).
+    def enabled_os_platforms(config)
+      platforms = os_platforms_config(config)
+      (platforms.nil? || platforms.empty?) ? DEFAULT_PLATFORMS : platforms
+    end
+
+    # Configured → detected → default. Facts are computed BEFORE the config
+    # migration runs in the same templating pass, so a missing `platforms:` key
+    # must fold repo evidence in here: generating from the default alone would
+    # silently drop existing Windows CI coverage on the first run, even though
+    # the migration writes the correct key in that same run. Mirrors
+    # configured_or_detected_licenses.
+    def ci_os_platforms_facts(kettle_config, project_root)
+      platforms = os_platforms_config(kettle_config)
+      platforms = detected_os_platforms(project_root) if platforms.nil? || platforms.empty?
+      platforms = DEFAULT_PLATFORMS if platforms.nil? || platforms.empty?
+      platforms
     end
 
     def config_min_ruby(config)
@@ -19439,6 +19638,19 @@ module Kettle
       normalize_github_actions_exec_cmd(
         preferred_template_token_value("kettle-test", workflows["exec_cmd"], env, "KJ_EXEC_CMD").to_s
       )
+    end
+
+    # The binstub the generated Windows-only test step invokes. The step
+    # bypasses Appraisal and runs under gemfiles/current.gemfile, but the
+    # command itself is the destination's own configured test command
+    # (ci.exec_cmd) resolved to its binstub -- never a hardcoded binstub of
+    # any one repo. The packaged template once hardcoded bin/turbo_tests2,
+    # which was correct for exactly one destination and inconsistent even
+    # there, since that destination's own exec_cmd is kettle-test.
+    def github_actions_windows_exec_binstub(exec_cmd)
+      token = exec_cmd.to_s.strip.split(/\s+/).last.to_s
+      token = token.sub(%r{\Abin/}, "")
+      token.empty? ? "kettle-test" : token
     end
 
     # A generated workflow normally uses one command for every matrix entry.
@@ -20055,6 +20267,61 @@ module Kettle
       )
       updated = append_github_actions_coverage_steps(updated, disabled_integrations: facts.dig(:integrations, :disabled)) if github_actions_coverage_enabled?(updated)
       update_github_actions_pins(updated)
+    end
+
+    # The current.yml OS matrix entries, generated from the destination's
+    # declared CI OS families (facts[:ci][:platforms]). current.yml is
+    # strategy: accept_template, so it is replaced wholesale and the matrix
+    # must be generated from facts rather than pruned from a destination file
+    # (spec slice 1038). Runner labels come from Kettle::Rb::PlatformSupport,
+    # and an unknown family raises rather than silently dropping a lane, since
+    # a typo'd family would otherwise produce no CI for that platform at all.
+    def github_actions_current_os_matrix_entries(facts)
+      platforms = facts.dig(:ci, :platforms)
+      platforms = DEFAULT_PLATFORMS if platforms.nil? || platforms.empty?
+      exec_cmd = facts.dig(:ci, :exec_cmd).to_s
+
+      platforms.map do |platform|
+        label = Kettle::Rb::PlatformSupport.runner_label(platform)
+        raise Error, "Unknown CI OS family in platforms config: #{platform.inspect} (expected one of #{Kettle::Rb::PlatformSupport::OS_FAMILIES.join(", ")})" unless label
+
+        [
+          %(          - ruby: "ruby"),
+          %(            appraisal: "current"),
+          %(            os: #{label}),
+          %(            exec_cmd: "#{exec_cmd}"),
+          "            rubygems: latest",
+          "            bundler: latest"
+        ].join("\n")
+      end.join("\n")
+    end
+
+    # The current.yml test steps, generated from the same platforms facts. The
+    # Windows-only guard and step exist only when windows is declared, so no
+    # tautological `if:` survives in a linux+macos destination (spec slice
+    # 1038). The Windows step bypasses Appraisal and invokes the destination's
+    # own configured test command, resolved to its binstub from
+    # facts[:ci][:exec_cmd] -- never a hardcoded binstub of any one repo.
+    def github_actions_current_os_test_steps(facts)
+      platforms = facts.dig(:ci, :platforms)
+      platforms = DEFAULT_PLATFORMS if platforms.nil? || platforms.empty?
+      windows = platforms.include?("windows")
+      windows_label = Kettle::Rb::PlatformSupport.runner_label("windows")
+
+      lines = ["      - name: Tests for ${{ matrix.os }} ${{ matrix.ruby }} via ${{ matrix.exec_cmd }}"]
+      lines << %(        if: matrix.os != '#{windows_label}') if windows
+      lines << "        run: bundle exec appraisal ${{ matrix.appraisal }} ${{ matrix.exec_cmd }}"
+      return lines.join("\n") unless windows
+
+      binstub = github_actions_windows_exec_binstub(facts.dig(:ci, :exec_cmd))
+      (lines + [
+        "",
+        "      - name: Tests for #{windows_label} ${{ matrix.ruby }} via ruby bin/#{binstub}",
+        %(        if: matrix.os == '#{windows_label}'),
+        "        env:",
+        "          BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/current.gemfile",
+        "        run: ruby -rbundler/setup bin/#{binstub}"
+      ]).join("\n")
     end
 
     def github_actions_push_branches_yaml(content, default_branch:, indent: "              ")

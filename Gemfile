@@ -11,7 +11,7 @@ unless kettle_dev_dev.casecmp('false').zero?
   require 'nomono/bundler'
 
   eval_nomono_gems(
-    gems: %w[kettle-dev kettle-drift kettle-family kettle-test kettle-soup-cover],
+    gems: %w[kettle-dev kettle-drift kettle-family kettle-rb kettle-test kettle-soup-cover],
     prefix: 'KETTLE_DEV',
     path_env: 'KETTLE_DEV_DEV',
     vendored_gems_env: 'VENDORED_GEMS',

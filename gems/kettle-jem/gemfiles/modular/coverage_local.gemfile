@@ -39,7 +39,7 @@ else
   require "nomono/bundler"
 end
 
-local_gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover kettle-changelog kettle-drift]
+local_gems = %w[kettle-dev kettle-family kettle-rb kettle-test kettle-soup-cover kettle-changelog kettle-drift]
 kettle_dev_nomono_options = {
   prefix: "KETTLE_DEV",
   path_env: "KETTLE_DEV_DEV",
