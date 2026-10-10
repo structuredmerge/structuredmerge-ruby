@@ -545,6 +545,7 @@ module Kettle
       KJ|MIN_RUBY
       KJ|KETTLE_CHANGELOG_GEMFILE_DEPENDENCY
       KJ|OPENCOLLECTIVE_ORG
+      KJ|RAKE:TOP_LEVEL_DOCS_TASK
       KJ|README:COPYRIGHT_NOTICE
       KJ|README:CORPORATE_SPONSORS
       KJ|README:FAMILY_INTRO_BACKEND_MATRIX
@@ -14518,6 +14519,7 @@ module Kettle
           package.fetch(:name).to_s
         ),
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
+        "KJ|RAKE:TOP_LEVEL_DOCS_TASK" => rake_top_level_docs_task_token(facts).rstrip,
         "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
       }.merge(
         rubocop_template_tokens(rubygems[:min_ruby], ruby_style: facts.fetch(:ruby_style, {}))
@@ -17555,6 +17557,38 @@ module Kettle
         "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => family_gem_dirs_enumeration.lines.map { |line| "    #{line}" }.join.chomp,
         "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => trailing_array_comma ? "," : ""
       }
+    end
+
+    # Top-level `docs` task, emitted only for the profiles that need it.
+    #
+    # The gate is inverted from the obvious reading. At a monorepo root the
+    # `family` namespace loads (the root has a `gems/` directory) and
+    # `family:docs` exists, and there is no `docs/` directory, so `rake docs`
+    # fails loudly with "Don't know how to build task 'docs'". That is an honest
+    # error which points the reader at `family:docs`; adding a delegating task
+    # there would only create a second path to behavior the family task already
+    # owns.
+    #
+    # Everywhere else the failure is silent, and that is what this fixes. A
+    # generated `docs/` directory makes Rake resolve the bare name `docs` as an
+    # implicit file task whose target already exists, so `rake docs` exits 0
+    # having regenerated nothing. Verified per profile: standalone and
+    # monorepo-subgem both have `docs/` and no top-level `docs` task;
+    # monorepo-root has neither.
+    #
+    # Document generation is owned by `yard`, which kettle-dev installs and
+    # registers as a `default` prerequisite, so this delegates rather than
+    # reimplementing it.
+    def rake_top_level_docs_task_token(facts)
+      return "" if monorepo_root_template_profile?(facts)
+
+      <<~RAKE
+        # Without this, a generated docs/ directory makes Rake resolve the bare
+        # name `docs` as an up-to-date file task, so `rake docs` exits 0 having
+        # regenerated nothing.
+        desc "Generate YARD documentation"
+        task docs: "yard"
+      RAKE
     end
 
     def gemspec_template_facts(config)

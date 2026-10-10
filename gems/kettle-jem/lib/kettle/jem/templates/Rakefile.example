@@ -64,6 +64,8 @@ task :default do
   puts "Default task complete."
 end
 
+{KJ|RAKE:TOP_LEVEL_DOCS_TASK}
+
 # simplecov:disable
 ### MONOREPO FAMILY TASKS
 if Dir.exist?(File.join(__dir__, "gems"))
