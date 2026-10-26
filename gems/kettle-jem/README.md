@@ -381,14 +381,14 @@ With Duel on, the full template generates:
 
 | File | What it holds |
 |------|---------------|
-| `.github/workflows/perf.yml` | A read-only Duel job that compares each pull request with the main branch, each push to `main` with the commit before it, and, on a schedule, the last release. A separate Comment job, with only `pull-requests: write` and none of the branch's code, posts the report on the pull request. When the baseline's version file names another Ruby, the workflow installs that Ruby too. |
+| `.github/workflows/perf.yml` | A read-only Duel job that compares each pull request with the main branch, each push to `main` with the commit before it, and, on a schedule, the last release. A separate Comment job, with only `pull-requests: write` and none of the branch's code, posts the report on the pull request as a new comment, when a benchmark fails by default (`c.comment` in `.duel.rb` chooses when), and again when a later run's outcome differs from its last comment's. When the baseline's version file names another Ruby, the workflow installs that Ruby too. |
 | `gemfiles/modular/duel.gemfile` | Duel and StackProf, on Ruby 3.4 or later only, so older Rubies install neither. |
 | `Appraisals` | A `perf` appraisal, whose generated `gemfiles/perf.gemfile` the Perf workflow bundles. |
 | `Gemfile` | `eval_gemfile "gemfiles/modular/duel.gemfile"`, for `rake duel` in local development. |
 | `Rakefile` | `rake duel`, with a stub task that only warns where Duel isn't installed. |
 | `.rubocop.yml` | `.duel.rb` in `AllCops/Include` (RuboCop skips dotfiles otherwise), merged with RuboCop's own patterns. |
 | `README.md` | The Duel badge, at the end of the badge row. |
-| `.duel.rb` | Duel's configuration, created only when it is missing. It runs each version on the Ruby that its own version file names, and watches the benchmarks, `.duel.rb`, `mise.toml`, and the Perf workflow as well as `lib/` and `ext/`. After that it is the project's own. |
+| `.duel.rb` | Duel's configuration, created only when it is missing. It runs each version on the Ruby that its own version file names, and watches the Perf workflow on top of what Duel watches already: `lib/`, `ext/`, the benchmarks, `.duel.rb`, and the version files. After that it is the project's own. |
 
 The benchmarks in `duel/` are the project's to write: see
 [Write a benchmark](https://github.com/sferik/duel-ruby#write-a-benchmark).

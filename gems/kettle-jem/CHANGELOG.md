@@ -23,6 +23,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem: corporate sponsor configuration now accepts the explicit target_href and image_src keys alongside legacy url and img_src, preserving existing configs while supporting direct, date-bounded static sponsors.
 - kettle-jem: opt-in Duel performance regression guards (https://github.com/sferik/duel-ruby), off by default. With `workflows.duel: true`, the full template generates the Perf workflow (`.github/workflows/perf.yml`), `gemfiles/modular/duel.gemfile` (Duel and StackProf on Ruby 3.4 or later only), a `perf` appraisal, the root Gemfile wiring, a `rake duel` task with a stub for older Rubies, the RuboCop include for `.duel.rb`, and the Duel README badge. It creates `.duel.rb` only when it is missing. While Duel is off, a project's own `.duel.rb`, `perf.yml`, and `duel.gemfile` are neither written nor removed.
 - kettle-jem: `actions/download-artifact` joins the template workflow pins, for the Perf workflow's Comment job.
+- kettle-jem: the Duel template follows Duel 0.1.1, which it now requires. The Perf workflow's Comment job posts a new comment only when Duel says to (by default when a benchmark fails, as `c.comment` in `.duel.rb` chooses), and never edits one, so the pull request keeps every report. `.duel.rb` adds only the Perf workflow to what Duel watches, as Duel 0.1.1 watches the benchmarks, `.duel.rb`, and the version files itself.
 
 ### Changed
 
