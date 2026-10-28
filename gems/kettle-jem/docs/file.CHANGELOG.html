@@ -84,15 +84,15 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h3 id="security">Security</h3>
 
-<h2 id="7141---2026-10-23">
-<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.40...v7.1.41">7.1.41</a> - 2026-10-23</h2>
+<h2 id="7141---2026-10-27">
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.40...v7.1.41">7.1.41</a> - 2026-10-27</h2>
 
 <ul>
   <li>TAG: <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.41">v7.1.41</a>
 </li>
-  <li>COVERAGE: 93.48% – 11446/12244 lines in 17 files</li>
-  <li>BRANCH COVERAGE: 77.12% – 4931/6394 branches in 17 files</li>
-  <li>20.11% documented</li>
+  <li>COVERAGE: 93.53% – 11581/12382 lines in 17 files</li>
+  <li>BRANCH COVERAGE: 77.20% – 4998/6474 branches in 17 files</li>
+  <li>20.48% documented</li>
 </ul>
 
 <h3 id="changed-1">Changed</h3>
@@ -112,26 +112,66 @@ Please file a bug if you notice a violation of semantic versioning.</p>
       <li>ruby/setup-ruby v1.333.0 (e1bd6146574da5e0795075b5319b300edb30c5b0) -&gt; v1.334.0 (26e5b7d197ebf60545ee9667bcbace0be11ccaec)</li>
     </ul>
   </li>
-  <li>[kc] kettle-jem/prepare: updated 6 project files:
+  <li>[kc] kettle-jem/prepare: updated 13 project files:
     <ul>
-      <li>dependencies (6)</li>
+      <li>dependencies (13)</li>
     </ul>
   </li>
-  <li>[kc] kettle-jem/template: updated 6 project files:
+  <li>[kc] kettle-jem/template: updated 10 project files:
     <ul>
-      <li>code and tests (1)</li>
+      <li>code and tests (2)</li>
       <li>dependencies (2)</li>
-      <li>other (1)</li>
+      <li>documentation (1)</li>
+      <li>other (3)</li>
       <li>workflows (2)</li>
     </ul>
   </li>
-  <li>kettle-jem: cold-start bootstrap runs now materialize the first <code>.github/FUNDING.yml</code> structurally from discovered funding facts (GitHub org, Open Collective org, configured platform tokens) instead of relying on the removed unconditional <code>tidelift:</code> key; configured runs continue to receive FUNDING.yml from packaged template application</li>
+  <li>
+    <p>kettle-jem: cold-start bootstrap runs now materialize the first <code>.github/FUNDING.yml</code> structurally from discovered funding facts (GitHub org, Open Collective org, configured platform tokens) instead of relying on the removed unconditional <code>tidelift:</code> key; configured runs continue to receive FUNDING.yml from packaged template application</p>
+  </li>
+  <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+    <ul>
+      <li>kettle-family (&gt;= 1.3.34 -&gt; &gt;= 1.3.35)</li>
+      <li>duel (&gt;= 0.1.0 -&gt; &gt;= 0.1.1)</li>
+    </ul>
+  </li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>[kc] kettle-deps-floor-extraction: kettle-jem-deps-floor now delegates shared discovery, planning, AST edits, and CLI reporting to the kettle-deps-floor runtime gem while retaining Kettle Jem source defaults and changelog identity. Template sources with {KJ</td>
+          <td>…} placeholder tokens stay floor-managed through kettle-deps-floor’s placeholder_pattern parsing.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>[kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+    <ul>
+      <li>ruby/setup-ruby v1.334.0 (26e5b7d197ebf60545ee9667bcbace0be11ccaec) -&gt; v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f)</li>
+    </ul>
+  </li>
 </ul>
 
 <h3 id="fixed-1">Fixed</h3>
 
 <ul>
-  <li>Gemspec template: the legacy (Ruby &lt; 3.1) gem_version loader no longer require_relative’s version.rb, which defined the gem’s top-level namespace whenever the gemspec was evaluated (e.g. by bundler/setup), polluting the load path on old Rubies and breaking isolated-loading specs. It now loads version.rb anonymously via Module#module_eval (available on Ruby 2.2+); the Ruby &lt; 2.2 load-path fallback is unchanged.</li>
+  <li>
+    <p>Gemspec template: the legacy (Ruby &lt; 3.1) gem_version loader no longer require_relative’s version.rb, which defined the gem’s top-level namespace whenever the gemspec was evaluated (e.g. by bundler/setup), polluting the load path on old Rubies and breaking isolated-loading specs. It now loads version.rb anonymously via Module#module_eval (available on Ruby 2.2+); the Ruby &lt; 2.2 load-path fallback is unchanged.</p>
+  </li>
+  <li>
+    <p>Skip the generated coverage comment step for fork-originated pull requests, where GitHub’s read-only token cannot create comments.</p>
+  </li>
+  <li>
+    <p>Remove a stale <code>runtime_heads.gemfile</code> evaluation from existing <code>head</code> appraisals when the separate <code>dep-heads</code> appraisal already tests runtime dependency HEADs, avoiding conflicting duplicate requirements for extracted standard libraries.</p>
+  </li>
+  <li>
+    <p>Curated x_std_lib modular Gemfiles by the shared Ruby-series bucket ranges; obsolete matrix files are removed when the destination raises its minimum Ruby.</p>
+  </li>
+  <li>Cap the Ruby 2.x StringIO templates at the last compatible release lines, so dependency-floor updates cannot select incompatible releases.</li>
+  <li>
+    <p>Limit automatic template dependency-floor updates to ordinary modular Gemfiles, their <code>_local</code> counterparts, and <code>vHEAD</code> lanes; Ruby-version compatibility matrix files remain curated.</p>
+  </li>
+  <li>Legacy kettle-jem config handling: templating now fails closed with a clear error when both .structuredmerge/kettle-jem.yml and a legacy .kettle-jem.yml exist (the legacy file was previously ignored silently, dropping any settings it alone held, e.g. readme.corporate_sponsors), and a legacy-only .kettle-jem.yml is now moved to the canonical .structuredmerge/kettle-jem.yml path on apply (including prepare flows), with the legacy file removed.</li>
 </ul>
 
 <h3 id="added-1">Added</h3>
@@ -143,6 +183,10 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>
     <p>kettle-jem: corporate sponsor entries now support umbrella sponsors via <code>members</code> (e.g. Alpha-Omega backed by AWS, Google, Microsoft): the umbrella renders in the top logo row and members render as linked names in a <code>backed by</code> caption in the new <code>{KJ|README:CORPORATE_SPONSORS_DETAIL}</code> FLOSS Funding block; members support the same <code>since</code>/<code>until</code> window and cannot nest further</p>
   </li>
+  <li>kettle-jem: corporate sponsor configuration now accepts the explicit target_href and image_src keys alongside legacy url and img_src, preserving existing configs while supporting direct, date-bounded static sponsors.</li>
+  <li>kettle-jem: opt-in Duel performance regression guards (https://github.com/sferik/duel-ruby), off by default. With <code>workflows.duel: true</code>, the full template generates the Perf workflow (<code>.github/workflows/perf.yml</code>), <code>gemfiles/modular/duel.gemfile</code> (Duel and StackProf on Ruby 3.4 or later only), a <code>perf</code> appraisal, the root Gemfile wiring, a <code>rake duel</code> task with a stub for older Rubies, the RuboCop include for <code>.duel.rb</code>, and the Duel README badge. It creates <code>.duel.rb</code> only when it is missing. While Duel is off, a project’s own <code>.duel.rb</code>, <code>perf.yml</code>, and <code>duel.gemfile</code> are neither written nor removed.</li>
+  <li>kettle-jem: <code>actions/download-artifact</code> joins the template workflow pins, for the Perf workflow’s Comment job.</li>
+  <li>kettle-jem: the Duel template follows Duel 0.1.1, which it now requires. The Perf workflow’s Comment job posts a new comment only when Duel says to (by default when a benchmark fails, as <code>c.comment</code> in <code>.duel.rb</code> chooses), and never edits one, so the pull request keeps every report. <code>.duel.rb</code> adds only the Perf workflow to what Duel watches, as Duel 0.1.1 watches the benchmarks, <code>.duel.rb</code>, and the version files itself.</li>
 </ul>
 
 <h3 id="removed-1">Removed</h3>

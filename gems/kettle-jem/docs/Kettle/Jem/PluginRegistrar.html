@@ -276,13 +276,13 @@
       <pre class="lines">
 
 
-1742
-1743
-1744
-1745</pre>
+1750
+1751
+1752
+1753</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1742</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1750</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>plugin_name:</span><span class='comma'>,</span> <span class='label'>registry:</span><span class='rparen'>)</span>
   <span class='ivar'>@plugin_name</span> <span class='op'>=</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -325,12 +325,12 @@
       <pre class="lines">
 
 
-1740
-1741
-1742</pre>
+1748
+1749
+1750</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1740</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1748</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span>
   <span class='ivar'>@plugin_name</span>
@@ -362,12 +362,12 @@
       <pre class="lines">
 
 
-1755
-1756
-1757</pre>
+1763
+1764
+1765</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1755</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1763</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_after_phase'>after_phase</span><span class='lparen'>(</span><span class='id identifier rubyid_phase'>phase</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_on_phase'>on_phase</span><span class='lparen'>(</span><span class='id identifier rubyid_phase'>phase</span><span class='comma'>,</span> <span class='label'>timing:</span> <span class='symbol'>:after</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -392,12 +392,12 @@
       <pre class="lines">
 
 
-1751
-1752
-1753</pre>
+1759
+1760
+1761</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1751</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1759</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_before_phase'>before_phase</span><span class='lparen'>(</span><span class='id identifier rubyid_phase'>phase</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_on_phase'>on_phase</span><span class='lparen'>(</span><span class='id identifier rubyid_phase'>phase</span><span class='comma'>,</span> <span class='label'>timing:</span> <span class='symbol'>:before</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -422,12 +422,12 @@
       <pre class="lines">
 
 
-1747
-1748
-1749</pre>
+1755
+1756
+1757</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1747</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1755</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on_phase'>on_phase</span><span class='lparen'>(</span><span class='id identifier rubyid_phase'>phase</span><span class='comma'>,</span> <span class='label'>timing:</span> <span class='symbol'>:after</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@registry</span><span class='period'>.</span><span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='label'>plugin_name:</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='comma'>,</span> <span class='label'>phase:</span> <span class='id identifier rubyid_phase'>phase</span><span class='comma'>,</span> <span class='label'>timing:</span> <span class='id identifier rubyid_timing'>timing</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>

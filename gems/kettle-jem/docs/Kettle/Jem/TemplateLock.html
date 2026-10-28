@@ -433,16 +433,16 @@
       <pre class="lines">
 
 
-2253
-2254
-2255
-2256
-2257
-2258
-2259</pre>
+2261
+2262
+2263
+2264
+2265
+2266
+2267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2253</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2261</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_build_lock'>build_lock</span><span class='lparen'>(</span><span class='label'>template_state:</span><span class='comma'>,</span> <span class='label'>file_records:</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -471,13 +471,13 @@
       <pre class="lines">
 
 
-2220
-2221
-2222
-2223</pre>
+2228
+2229
+2230
+2231</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2220</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2228</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_file_record'>file_record</span><span class='lparen'>(</span><span class='id identifier rubyid_lock'>lock</span><span class='comma'>,</span> <span class='id identifier rubyid_relative_path'>relative_path</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_record'>record</span> <span class='op'>=</span> <span class='id identifier rubyid_files'>files</span><span class='lparen'>(</span><span class='id identifier rubyid_lock'>lock</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='id identifier rubyid_relative_path'>relative_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span>
@@ -503,13 +503,13 @@
       <pre class="lines">
 
 
-2215
-2216
-2217
-2218</pre>
+2223
+2224
+2225
+2226</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2215</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2223</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_files'>files</span><span class='lparen'>(</span><span class='id identifier rubyid_lock'>lock</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_lock'>lock</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_lock'>lock</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#FILES_KEY-constant" title="Kettle::Jem::TemplateLock::FILES_KEY (constant)">FILES_KEY</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>nil</span>
@@ -535,12 +535,12 @@
       <pre class="lines">
 
 
-2164
-2165
-2166</pre>
+2172
+2173
+2174</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2164</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2172</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_legacy_path'>legacy_path</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../Jem.html#LEGACY_KETTLE_LOCK_PATH-constant" title="Kettle::Jem::LEGACY_KETTLE_LOCK_PATH (constant)">LEGACY_KETTLE_LOCK_PATH</a></span></span><span class='rparen'>)</span>
@@ -565,14 +565,6 @@
       <pre class="lines">
 
 
-2168
-2169
-2170
-2171
-2172
-2173
-2174
-2175
 2176
 2177
 2178
@@ -581,10 +573,18 @@
 2181
 2182
 2183
-2184</pre>
+2184
+2185
+2186
+2187
+2188
+2189
+2190
+2191
+2192</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2168</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>config_path:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_path'>lock_path</span> <span class='op'>=</span> <span class='id identifier rubyid_path'>path</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
@@ -623,13 +623,13 @@
       <pre class="lines">
 
 
-2225
-2226
-2227
-2228</pre>
+2233
+2234
+2235
+2236</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2225</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2233</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_maintenance_changelog'>maintenance_changelog</span><span class='lparen'>(</span><span class='id identifier rubyid_lock'>lock</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_lock'>lock</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#TEMPLATE_STATE_KEY-constant" title="Kettle::Jem::TemplateLock::TEMPLATE_STATE_KEY (constant)">TEMPLATE_STATE_KEY</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#MAINTENANCE_CHANGELOG_SUBKEY-constant" title="Kettle::Jem::TemplateLock::MAINTENANCE_CHANGELOG_SUBKEY (constant)">MAINTENANCE_CHANGELOG_SUBKEY</a></span></span><span class='rparen'>)</span>
@@ -655,15 +655,15 @@
       <pre class="lines">
 
 
-2230
-2231
-2232
-2233
-2234
-2235</pre>
+2238
+2239
+2240
+2241
+2242
+2243</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2230</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2238</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_maintenance_changelog_paths'>maintenance_changelog_paths</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>key:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_maintenance_changelog'>maintenance_changelog</span><span class='lparen'>(</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='label'>project_root:</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -691,23 +691,23 @@
       <pre class="lines">
 
 
-2186
-2187
-2188
-2189
-2190
-2191
-2192
-2193
 2194
 2195
 2196
 2197
 2198
-2199</pre>
+2199
+2200
+2201
+2202
+2203
+2204
+2205
+2206
+2207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2186</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2194</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_legacy'>merge_legacy</span><span class='lparen'>(</span><span class='id identifier rubyid_lock'>lock</span><span class='comma'>,</span> <span class='id identifier rubyid_legacy'>legacy</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_lock'>lock</span> <span class='kw'>unless</span> <span class='id identifier rubyid_legacy'>legacy</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_legacy'>legacy</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -743,12 +743,12 @@
       <pre class="lines">
 
 
-2160
-2161
-2162</pre>
+2168
+2169
+2170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2160</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_path'>path</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../Jem.html#KETTLE_LOCK_PATH-constant" title="Kettle::Jem::KETTLE_LOCK_PATH (constant)">KETTLE_LOCK_PATH</a></span></span><span class='rparen'>)</span>
@@ -773,16 +773,16 @@
       <pre class="lines">
 
 
-2207
-2208
-2209
-2210
-2211
-2212
-2213</pre>
+2215
+2216
+2217
+2218
+2219
+2220
+2221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2207</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2215</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_legacy'>remove_legacy</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_legacy_lock_path'>legacy_lock_path</span> <span class='op'>=</span> <span class='id identifier rubyid_legacy_path'>legacy_path</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
@@ -811,24 +811,24 @@
       <pre class="lines">
 
 
-2237
-2238
-2239
-2240
-2241
-2242
-2243
-2244
 2245
 2246
 2247
 2248
 2249
 2250
-2251</pre>
+2251
+2252
+2253
+2254
+2255
+2256
+2257
+2258
+2259</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2237</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2245</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update_maintenance_changelog_paths'>update_maintenance_changelog_paths</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>key:</span><span class='comma'>,</span> <span class='label'>paths:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock'>lock</span> <span class='op'>=</span> <span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='label'>project_root:</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
@@ -865,14 +865,14 @@
       <pre class="lines">
 
 
-2201
-2202
-2203
-2204
-2205</pre>
+2209
+2210
+2211
+2212
+2213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2201</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 2209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>lock:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_path'>lock_path</span> <span class='op'>=</span> <span class='id identifier rubyid_path'>path</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>

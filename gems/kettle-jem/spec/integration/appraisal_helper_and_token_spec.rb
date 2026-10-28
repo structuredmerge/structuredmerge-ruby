@@ -891,7 +891,7 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
   it "skips the coverage PR comment for pull requests from forks" do
     coverage_steps = described_class.github_actions_coverage_steps(disabled_integrations: [])
 
-    expect(coverage_steps).to include(%q(if: ${{ !env.ACT && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}))
+    expect(coverage_steps).to include("if: ${{ !env.ACT && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}")
   end
 
   it "supports partial coverage integration disablement" do

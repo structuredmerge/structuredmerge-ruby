@@ -389,15 +389,15 @@
       <pre class="lines">
 
 
-1228
-1229
-1230
-1231
-1232
-1233</pre>
+1239
+1240
+1241
+1242
+1243
+1244</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1228</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1239</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>cache:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>http_get:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>v1_api_base:</span> <span class='const'><span class='object_link'><a href="#RUBYGEMS_V1_API_BASE-constant" title="Kettle::Jem::RubyGemsResolver::RUBYGEMS_V1_API_BASE (constant)">RUBYGEMS_V1_API_BASE</a></span></span><span class='comma'>,</span> <span class='label'>v2_api_base:</span> <span class='const'><span class='object_link'><a href="#RUBYGEMS_V2_API_BASE-constant" title="Kettle::Jem::RubyGemsResolver::RUBYGEMS_V2_API_BASE (constant)">RUBYGEMS_V2_API_BASE</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@cache</span> <span class='op'>=</span> <span class='id identifier rubyid_cache'>cache</span>
@@ -442,12 +442,12 @@
       <pre class="lines">
 
 
-1226
-1227
-1228</pre>
+1237
+1238
+1239</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1226</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1237</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cache'>cache</span>
   <span class='ivar'>@cache</span>
@@ -479,19 +479,19 @@
       <pre class="lines">
 
 
-1304
-1305
-1306
-1307
-1308
-1309
-1310
-1311
-1312
-1313</pre>
+1315
+1316
+1317
+1318
+1319
+1320
+1321
+1322
+1323
+1324</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1304</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1315</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch_gem_info'>fetch_gem_info</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cache_key'>cache_key</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>info:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_version'>version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -546,19 +546,19 @@
       <pre class="lines">
 
 
-1293
-1294
-1295
-1296
-1297
-1298
-1299
-1300
-1301
-1302</pre>
+1304
+1305
+1306
+1307
+1308
+1309
+1310
+1311
+1312
+1313</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1293</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1304</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch_versions'>fetch_versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cache_key'>cache_key</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>versions:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -590,13 +590,13 @@
       <pre class="lines">
 
 
-1270
-1271
-1272
-1273</pre>
+1281
+1282
+1283
+1284</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1270</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1281</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_min_ruby_version'>min_ruby_version</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_fetch_versions'>fetch_versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>number</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='id identifier rubyid_version'>version</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span>
@@ -622,26 +622,26 @@
       <pre class="lines">
 
 
-1275
-1276
-1277
-1278
-1279
-1280
-1281
-1282
-1283
-1284
-1285
 1286
 1287
 1288
 1289
 1290
-1291</pre>
+1291
+1292
+1293
+1294
+1295
+1296
+1297
+1298
+1299
+1300
+1301
+1302</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1275</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1286</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_minor_versions_by_major'>minor_versions_by_major</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='label'>requirements:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_versions'>versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='label'>requirements:</span> <span class='id identifier rubyid_requirements'>requirements</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='comma'>,</span> <span class='id identifier rubyid_grouped'>grouped</span><span class='op'>|</span>
@@ -680,23 +680,23 @@
       <pre class="lines">
 
 
-1315
-1316
-1317
-1318
-1319
-1320
-1321
-1322
-1323
-1324
-1325
 1326
 1327
-1328</pre>
+1328
+1329
+1330
+1331
+1332
+1333
+1334
+1335
+1336
+1337
+1338
+1339</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1315</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1326</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_min_ruby'>parse_min_ruby</span><span class='lparen'>(</span><span class='id identifier rubyid_requirement'>requirement</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_requirement'>requirement</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -732,26 +732,26 @@
       <pre class="lines">
 
 
-1252
-1253
-1254
-1255
-1256
-1257
-1258
-1259
-1260
-1261
-1262
 1263
 1264
 1265
 1266
 1267
-1268</pre>
+1268
+1269
+1270
+1271
+1272
+1273
+1274
+1275
+1276
+1277
+1278
+1279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1252</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_version_info'>version_info</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_fetch_gem_info'>fetch_gem_info</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
@@ -790,25 +790,25 @@
       <pre class="lines">
 
 
-1235
-1236
-1237
-1238
-1239
-1240
-1241
-1242
-1243
-1244
-1245
 1246
 1247
 1248
 1249
-1250</pre>
+1250
+1251
+1252
+1253
+1254
+1255
+1256
+1257
+1258
+1259
+1260
+1261</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1235</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1246</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_versions'>versions</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='comma'>,</span> <span class='label'>include_prerelease:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>requirements:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_requirement'>requirement</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_requirements'>normalize_requirements</span><span class='lparen'>(</span><span class='id identifier rubyid_requirements'>requirements</span><span class='rparen'>)</span>
