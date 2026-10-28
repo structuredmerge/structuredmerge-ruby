@@ -28,7 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-soup-cover (>= 3.0.14 -> >= 3.0.15)
+  - kettle-family (>= 1.3.34 -> >= 1.3.35)
+  - duel (>= 0.1.0 -> >= 0.1.1)
 
 - [kc] kettle-deps-floor-extraction: kettle-jem-deps-floor now delegates shared discovery, planning, AST edits, and CLI reporting to the kettle-deps-floor runtime gem while retaining Kettle Jem source defaults and changelog identity. Template sources with {KJ|...} placeholder tokens stay floor-managed through kettle-deps-floor's placeholder_pattern parsing.
 
