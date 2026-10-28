@@ -106,18 +106,27 @@ module Ast
       def policy(operation, _request)
         case operation
         when :analyze
-          core::OperationPolicy.from_analyze(core::AnalyzePolicy.new(extra: {}))
+          core::OperationPolicyAnalyze.new(value: core::AnalyzePolicy.new(extra: {}))
         when :diff2
-          core::OperationPolicy.from_diff2(core::DiffPolicy.new(comparison_profile: 'exact-source-owners',
-                                                                equivalence: ['exact-source'], extra: {}))
+          core::OperationPolicyDiff2.new(value: diff2_policy)
         when :merge2
-          core::OperationPolicy.from_merge2(core::DirectionalMergePolicy.new(
-                                              directional_merge: 'template-into-current', render_policy: 'source-preserving', extra: {}
-                                            ))
+          core::OperationPolicyMerge2.new(value: merge2_policy)
         when :merge3
-          core::OperationPolicy.from_merge3(core::ThreeWayMergePolicy.new(render_policy: 'source-preserving',
-                                                                          fallback_policy: 'none', extra: {}))
+          core::OperationPolicyMerge3.new(value: merge3_policy)
         end
+      end
+
+      def diff2_policy
+        core::DiffPolicy.new(comparison_profile: 'exact-source-owners', equivalence: ['exact-source'], extra: {})
+      end
+
+      def merge2_policy
+        core::DirectionalMergePolicy.new(directional_merge: 'template-into-current', render_policy: 'source-preserving',
+                                         extra: {})
+      end
+
+      def merge3_policy
+        core::ThreeWayMergePolicy.new(render_policy: 'source-preserving', fallback_policy: 'none', extra: {})
       end
 
       # Only open metadata values are encoded by the generated binding; never

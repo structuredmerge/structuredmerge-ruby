@@ -33,28 +33,47 @@ RSpec.describe 'Installed Psych parser host for the typed kernel' do
   before { core.register_parser_host(host) }
   after { core.unregister_parser_host('ruby.psych') }
 
-  def request(operation, texts)
+  def build_policy(operation)
+    case operation
+    when 'analyze' then core::OperationPolicyAnalyze.new(value: core::AnalyzePolicy.new(extra: {}))
+    when 'diff2' then core::OperationPolicyDiff2.new(value: core::DiffPolicy.new(extra: {}))
+    when 'merge2' then core::OperationPolicyMerge2.new(value: directional_policy)
+    else core::OperationPolicyMerge3.new(value: three_way_policy)
+    end
+  end
+
+  def directional_policy
+    core::DirectionalMergePolicy.new(directional_merge: 'template-into-current', render_policy: 'source-preserving',
+                                     extra: {})
+  end
+
+  def three_way_policy
+    core::ThreeWayMergePolicy.new(render_policy: 'source-preserving', fallback_policy: 'none', extra: {})
+  end
+
+  def build_sources(operation, texts)
     roles = { 'analyze' => %w[source], 'diff2' => %w[before after], 'merge2' => %w[incoming current],
               'merge3' => %w[base ours theirs] }.fetch(operation)
-    sources = roles.zip(texts).to_h do |role, text|
+    roles.zip(texts).to_h do |role, text|
       [role, core::OperationSource.new(source_id: role, role: role, content: text, encoding: 'utf-8',
                                        byte_length: text.bytesize, sha256: Digest::SHA256.hexdigest(text), extra: {})]
     end
-    policy = case operation
-             when 'analyze' then core::OperationPolicy.from_analyze(core::AnalyzePolicy.new(extra: {}))
-             when 'diff2' then core::OperationPolicy.from_diff2(core::DiffPolicy.new(extra: {}))
-             when 'merge2' then core::OperationPolicy.from_merge2(core::DirectionalMergePolicy.new(
-                                                                    directional_merge: 'template-into-current', render_policy: 'source-preserving', extra: {}
-                                                                  ))
-             else core::OperationPolicy.from_merge3(core::ThreeWayMergePolicy.new(
-                                                      render_policy: 'source-preserving', fallback_policy: 'none', extra: {}
-                                                    ))
-             end
+  end
+
+  def provider_selection(operation)
+    core::MergeProviderSelection.new(provider_id: 'kernel.yaml', family: 'yaml', extra: {},
+                                     profile_id: 'kernel.yaml.native_mapping.v1', required_capabilities: [operation])
+  end
+
+  def parser_selection
+    core::OperationParserSelection.new(backend: 'ruby.psych', preference: [], required_capabilities: [], extra: {})
+  end
+
+  def request(operation, texts)
     core::OperationRequest.new(schema: 'structuredmerge.operation-request/v1', request_id: operation,
-                               operation: policy, sources: sources, extensions: [], metadata: {}, extra: {},
-                               provider_selection: core::MergeProviderSelection.new(provider_id: 'kernel.yaml', family: 'yaml',
-                                                                                    profile_id: 'kernel.yaml.native_mapping.v1', required_capabilities: [operation], extra: {}),
-                               parser_selection: core::OperationParserSelection.new(backend: 'ruby.psych', preference: [], required_capabilities: [], extra: {}))
+                               operation: build_policy(operation), sources: build_sources(operation, texts),
+                               extensions: [], metadata: {}, extra: {},
+                               provider_selection: provider_selection(operation), parser_selection: parser_selection)
   end
 
   def parse_request(text, extensions: true, **options)

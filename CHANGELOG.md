@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Adapt the opt-in typed-core Rust providers to the regenerated structuredmerge-core Ruby binding: OperationPolicy is now a sum-type module with OperationPolicyAnalyze, OperationPolicyDiff2, OperationPolicyMerge2, and OperationPolicyMerge3 variant wrappers, replacing the removed from_* factory methods and restoring the kernel artifact integration for the bash, git, go, json, rust, and typescript providers.
+
 ### Security
 
 ## [7.1.16] - 2026-10-23

@@ -22,10 +22,10 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/changelog.gemfile:3511714816": [
+  "gemfiles/modular/changelog.gemfile:683682754": [
     [38, 7, 580, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 393701499]
   ],
-  "gemfiles/modular/coverage_local.gemfile:1719512667": [
+  "gemfiles/modular/coverage_local.gemfile:4103837785": [
     [43, 121, 297, "Layout/LineLength: Line is too long. [417/120]", 647050365]
   ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
@@ -73,14 +73,14 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/style_local.gemfile:1080273477": [
+  "gemfiles/modular/style_local.gemfile:1690605447": [
     [57, 1, 882, "Metrics/AbcSize: Assignment Branch Condition size for `local_gem_satisfies?` is too high. [<6, 17, 12> 21.66/17]", 3860978908],
     [57, 1, 882, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `local_gem_satisfies?` is too high. [12/7]", 3860978908],
     [57, 1, 882, "Metrics/MethodLength: Method has too many lines. [14/10]", 3860978908],
     [57, 1, 882, "Metrics/PerceivedComplexity: Perceived complexity for `local_gem_satisfies?` is too high. [12/8]", 3860978908],
     [71, 23, 20, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 1851388465]
   ],
-  "gemfiles/modular/templating_local.gemfile:82970350": [
+  "gemfiles/modular/templating_local.gemfile:3836519596": [
     [44, 121, 297, "Layout/LineLength: Line is too long. [417/120]", 647050365]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -112,7 +112,6 @@
   "lib/psych/merge.rb:3936506656": [
     [37, 3, 9571, "Metrics/ModuleLength: Module has too many lines. [192/100]", 3652838080],
     [116, 5, 6396, "Metrics/ClassLength: Class has too many lines. [162/100]", 2805786752],
-    [164, 7, 81, "Lint/ShadowedException: Do not shadow rescued Exceptions.", 3378244706],
     [172, 7, 1593, "Metrics/MethodLength: Method has too many lines. [26/10]", 162695378],
     [172, 21, 295, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 2742902791],
     [213, 7, 440, "Metrics/MethodLength: Method has too many lines. [11/10]", 4238054657],
@@ -423,24 +422,17 @@
     [109, 3, 1594, "Metrics/BlockLength: Block has too many lines. [41/25]", 568154065],
     [233, 3, 1413, "Metrics/BlockLength: Block has too many lines. [29/25]", 1847754351]
   ],
-  "spec/integration/core_parser_host_spec.rb:538088973": [
-    [5, 1, 11037, "Metrics/BlockLength: Block has too many lines. [169/25]", 3923851609],
+  "spec/integration/core_parser_host_spec.rb:3177517671": [
+    [5, 1, 11096, "Metrics/BlockLength: Block has too many lines. [182/25]", 3923851609],
     [22, 89, 42, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 1741899406],
     [22, 121, 11, "Layout/LineLength: Line is too long. [131/120]", 3899322250],
-    [36, 3, 1998, "Metrics/AbcSize: Assignment Branch Condition size for `request` is too high. [<5, 29, 4> 29.7/17]", 2573539460],
-    [36, 3, 1998, "Metrics/MethodLength: Method has too many lines. [21/10]", 2573539460],
-    [47, 121, 37, "Layout/LineLength: Line is too long. [157/120]", 3236161216],
-    [50, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2086223289],
-    [55, 121, 7, "Layout/LineLength: Line is too long. [127/120]", 1945945776],
-    [56, 121, 56, "Layout/LineLength: Line is too long. [176/120]", 3113366945],
-    [57, 121, 41, "Layout/LineLength: Line is too long. [161/120]", 454509922],
-    [60, 3, 1168, "Metrics/AbcSize: Assignment Branch Condition size for `parse_request` is too high. [<1, 29, 0> 29.02/17]", 2419832543],
-    [62, 121, 23, "Layout/LineLength: Line is too long. [143/120]", 3363584301],
-    [64, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5860844],
-    [70, 121, 38, "Layout/LineLength: Line is too long. [158/120]", 2033307657],
-    [78, 121, 65, "Layout/LineLength: Line is too long. [185/120]", 1440163466],
-    [111, 3, 1808, "Metrics/BlockLength: Block has too many lines. [28/25]", 4011324962],
-    [115, 121, 59, "Layout/LineLength: Line is too long. [179/120]", 3151506009]
+    [79, 3, 1168, "Metrics/AbcSize: Assignment Branch Condition size for `parse_request` is too high. [<1, 29, 0> 29.02/17]", 2419832543],
+    [81, 121, 23, "Layout/LineLength: Line is too long. [143/120]", 3363584301],
+    [83, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5860844],
+    [89, 121, 38, "Layout/LineLength: Line is too long. [158/120]", 2033307657],
+    [97, 121, 65, "Layout/LineLength: Line is too long. [185/120]", 1440163466],
+    [130, 3, 1808, "Metrics/BlockLength: Block has too many lines. [28/25]", 4011324962],
+    [134, 121, 59, "Layout/LineLength: Line is too long. [179/120]", 3151506009]
   ],
   "spec/reproducible_merge_spec.rb:2168097366": [
     [3, 1, 5699, "Metrics/BlockLength: Block has too many lines. [107/25]", 3775945048],

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-appraise "benchmark-dev" do
-  eval_gemfile "modular/templating.gemfile"
-  eval_gemfile "modular/x_std_libs.gemfile"
+appraise 'benchmark-dev' do
+  eval_gemfile 'modular/templating.gemfile'
+  eval_gemfile 'modular/x_std_libs.gemfile'
 end
