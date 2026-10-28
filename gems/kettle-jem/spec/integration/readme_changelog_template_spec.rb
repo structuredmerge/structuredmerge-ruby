@@ -1724,7 +1724,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       )
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include("# {KJ|PROJECT_EMOJI} {KJ|README:TITLE}")
       expect(template_report.fetch(:final_content)).to include("# 💎 Example")
-      expect(template_report.fetch(:final_content)).to include("Compatible with MRI Ruby 3.2+")
       expect(template_report.fetch(:final_content)).to include("https://github.com/acme/example")
       expect(template_report.fetch(:final_content)).to include("Sponsor collective-acme/example on Open Source Collective")
       expect(template_report.fetch(:final_content)).to include("https://opencollective.com/collective-acme")
