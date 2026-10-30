@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Restore per-Ruby-version modular Gemfile variants (x_std_libs r2/r3/r3.1 libs plus std-lib gem variant files across all members) deleted by the 7.1.41 template sweep but still referenced by the committed version-split loaders; CI's Ruby 3.3 probe and every sub-4.0 bundle evaluation hit Errno::ENOENT without them
+
 ### Security
 
 ## [7.1.17] - 2026-10-29
