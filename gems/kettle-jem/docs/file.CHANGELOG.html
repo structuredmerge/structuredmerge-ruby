@@ -84,13 +84,13 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h3 id="security">Security</h3>
 
-<h2 id="7141---2026-10-28">
-<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.40...v7.1.41">7.1.41</a> - 2026-10-28</h2>
+<h2 id="7141---2026-10-29">
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.40...v7.1.41">7.1.41</a> - 2026-10-29</h2>
 
 <ul>
   <li>TAG: <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.41">v7.1.41</a>
 </li>
-  <li>COVERAGE: 93.52% – 11580/12382 lines in 17 files</li>
+  <li>COVERAGE: 93.52% – 11582/12384 lines in 17 files</li>
   <li>BRANCH COVERAGE: 77.20% – 4998/6474 branches in 17 files</li>
   <li>20.48% documented</li>
 </ul>
@@ -150,6 +150,17 @@ Please file a bug if you notice a violation of semantic versioning.</p>
       <li>ruby/setup-ruby v1.334.0 (26e5b7d197ebf60545ee9667bcbace0be11ccaec) -&gt; v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f)</li>
     </ul>
   </li>
+  <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+    <ul>
+      <li>nomono (&gt;= 1.1.16 -&gt; &gt;= 1.1.17)</li>
+      <li>kettle-dev (&gt;= 3.1.25 -&gt; &gt;= 3.1.26)</li>
+      <li>kettle-changelog (&gt;= 1.0.14 -&gt; &gt;= 1.0.15)</li>
+      <li>kettle-drift (&gt;= 1.0.18 -&gt; &gt;= 1.0.19)</li>
+      <li>kettle-family (&gt;= 1.3.35 -&gt; &gt;= 1.3.36)</li>
+      <li>kettle-test (&gt;= 2.0.28 -&gt; &gt;= 2.0.29)</li>
+      <li>kettle-soup-cover (&gt;= 3.0.15 -&gt; &gt;= 3.0.16)</li>
+    </ul>
+  </li>
 </ul>
 
 <h3 id="fixed-1">Fixed</h3>
@@ -171,7 +182,10 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>
     <p>Limit automatic template dependency-floor updates to ordinary modular Gemfiles, their <code>_local</code> counterparts, and <code>vHEAD</code> lanes; Ruby-version compatibility matrix files remain curated.</p>
   </li>
-  <li>Legacy kettle-jem config handling: templating now fails closed with a clear error when both .structuredmerge/kettle-jem.yml and a legacy .kettle-jem.yml exist (the legacy file was previously ignored silently, dropping any settings it alone held, e.g. readme.corporate_sponsors), and a legacy-only .kettle-jem.yml is now moved to the canonical .structuredmerge/kettle-jem.yml path on apply (including prepare flows), with the legacy file removed.</li>
+  <li>
+    <p>Legacy kettle-jem config handling: templating now fails closed with a clear error when both .structuredmerge/kettle-jem.yml and a legacy .kettle-jem.yml exist (the legacy file was previously ignored silently, dropping any settings it alone held, e.g. readme.corporate_sponsors), and a legacy-only .kettle-jem.yml is now moved to the canonical .structuredmerge/kettle-jem.yml path on apply (including prepare flows), with the legacy file removed.</p>
+  </li>
+  <li>kettle-jem: Nomono bundler bootstrap payload now derives its activation floor from TEMPLATE_MANAGED_DEPENDENCIES (was a stale literal &gt;= 1.1.16 while the managed floor is &gt;= 1.1.17), so generated *_local.gemfile bootstraps can no longer drift from the managed nomono floor on floor bumps</li>
 </ul>
 
 <h3 id="added-1">Added</h3>

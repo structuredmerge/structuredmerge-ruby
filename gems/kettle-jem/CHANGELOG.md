@@ -22,29 +22,18 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - nomono (>= 1.1.16 -> >= 1.1.17)
-  - kettle-dev (>= 3.1.25 -> >= 3.1.26)
-  - kettle-changelog (>= 1.0.14 -> >= 1.0.15)
-  - kettle-drift (>= 1.0.18 -> >= 1.0.19)
-  - kettle-family (>= 1.3.35 -> >= 1.3.36)
-  - kettle-test (>= 2.0.28 -> >= 2.0.29)
-  - kettle-soup-cover (>= 3.0.15 -> >= 3.0.16)
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- kettle-jem: Nomono bundler bootstrap payload now derives its activation floor from TEMPLATE_MANAGED_DEPENDENCIES (was a stale literal >= 1.1.16 while the managed floor is >= 1.1.17), so generated *_local.gemfile bootstraps can no longer drift from the managed nomono floor on floor bumps
-
 ### Security
 
-## [7.1.41] - 2026-10-28
+## [7.1.41] - 2026-10-29
 
 - TAG: [v7.1.41][7.1.41t]
-- COVERAGE: 93.52% -- 11580/12382 lines in 17 files
+- COVERAGE: 93.52% -- 11582/12384 lines in 17 files
 - BRANCH COVERAGE: 77.20% -- 4998/6474 branches in 17 files
 - 20.48% documented
 
@@ -79,6 +68,15 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - ruby/setup-ruby v1.334.0 (26e5b7d197ebf60545ee9667bcbace0be11ccaec) -> v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f)
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - nomono (>= 1.1.16 -> >= 1.1.17)
+  - kettle-dev (>= 3.1.25 -> >= 3.1.26)
+  - kettle-changelog (>= 1.0.14 -> >= 1.0.15)
+  - kettle-drift (>= 1.0.18 -> >= 1.0.19)
+  - kettle-family (>= 1.3.35 -> >= 1.3.36)
+  - kettle-test (>= 2.0.28 -> >= 2.0.29)
+  - kettle-soup-cover (>= 3.0.15 -> >= 3.0.16)
+
 ### Fixed
 
 - Gemspec template: the legacy (Ruby < 3.1) gem_version loader no longer require_relative's version.rb, which defined the gem's top-level namespace whenever the gemspec was evaluated (e.g. by bundler/setup), polluting the load path on old Rubies and breaking isolated-loading specs. It now loads version.rb anonymously via Module#module_eval (available on Ruby 2.2+); the Ruby < 2.2 load-path fallback is unchanged.
@@ -93,6 +91,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Limit automatic template dependency-floor updates to ordinary modular Gemfiles, their `_local` counterparts, and `vHEAD` lanes; Ruby-version compatibility matrix files remain curated.
 
 - Legacy kettle-jem config handling: templating now fails closed with a clear error when both .structuredmerge/kettle-jem.yml and a legacy .kettle-jem.yml exist (the legacy file was previously ignored silently, dropping any settings it alone held, e.g. readme.corporate_sponsors), and a legacy-only .kettle-jem.yml is now moved to the canonical .structuredmerge/kettle-jem.yml path on apply (including prepare flows), with the legacy file removed.
+
+- kettle-jem: Nomono bundler bootstrap payload now derives its activation floor from TEMPLATE_MANAGED_DEPENDENCIES (was a stale literal >= 1.1.16 while the managed floor is >= 1.1.17), so generated *_local.gemfile bootstraps can no longer drift from the managed nomono floor on floor bumps
 
 ### Added
 

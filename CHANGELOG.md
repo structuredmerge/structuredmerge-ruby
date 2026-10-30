@@ -28,9 +28,18 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Adapt the opt-in typed-core Rust providers to the regenerated structuredmerge-core Ruby binding: OperationPolicy is now a sum-type module with OperationPolicyAnalyze, OperationPolicyDiff2, OperationPolicyMerge2, and OperationPolicyMerge3 variant wrappers, replacing the removed from_* factory methods and restoring the kernel artifact integration for the bash, git, go, json, rust, and typescript providers.
-
 ### Security
+
+## [7.1.17] - 2026-10-29
+
+- TAG: [v7.1.17][7.1.17t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 72.95% documented
+
+### Fixed
+
+- Adapt the opt-in typed-core Rust providers to the regenerated structuredmerge-core Ruby binding: OperationPolicy is now a sum-type module with OperationPolicyAnalyze, OperationPolicyDiff2, OperationPolicyMerge2, and OperationPolicyMerge3 variant wrappers, replacing the removed from_* factory methods and restoring the kernel artifact integration for the bash, git, go, json, rust, and typescript providers.
 
 ## [7.1.16] - 2026-10-23
 
@@ -959,7 +968,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.16...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.17...HEAD
+[7.1.17]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.16...v7.1.17
+[7.1.17t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.17
 [7.1.16]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.15...v7.1.16
 [7.1.16t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.16
 [7.1.15]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.14...v7.1.15
