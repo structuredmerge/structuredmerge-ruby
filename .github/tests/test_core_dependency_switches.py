@@ -30,7 +30,14 @@ end
 puts JSON.generate(result: result, home: Dir.home)
 '''
         completed = subprocess.run(["ruby", "-e", script, json.dumps(switches), *names],
-                                   cwd=self.root, text=True, capture_output=True, check=True)
+                                   cwd=self.root, text=True, capture_output=True, check=False)
+        if completed.returncode != 0:
+            self.fail(
+                "ruby probe exited "
+                f"{completed.returncode} for switches={switches!r}\n"
+                f"--- stdout ---\n{completed.stdout[-2000:]}\n"
+                f"--- stderr ---\n{completed.stderr[-3000:]}"
+            )
         return json.loads(completed.stdout)
 
     def test_default_and_false_values_do_not_add_core(self):
