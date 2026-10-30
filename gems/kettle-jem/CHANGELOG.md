@@ -32,6 +32,9 @@ Please file a bug if you notice a violation of semantic versioning.
   - documentation (1)
   - other (1)
 
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - addressable (>= 2.9.0 -> >= 2.9.1)
+
 ### Deprecated
 
 ### Removed
