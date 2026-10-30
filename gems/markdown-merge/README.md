@@ -94,11 +94,12 @@ Signatures computed by default for common Markdown block elements:
 
 ### Compatibility
 
-Compatible with MRI Ruby 4.0.0+, JRuby, and TruffleRuby.
+The gem's declared runtime compatibility floor is MRI Ruby 4.0.0+, with concordant releases of JRuby and TruffleRuby.
 CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.
-This test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml` and
-may be higher than the gem's runtime compatibility floor when legacy Rubies are
-not practical for the current toolchain.
+The current MRI CI lane runs on Linux and macOS.
+The test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml`.
+When it is higher than the runtime floor, older runtime-compatible Rubies are
+not covered by the generated CI or Appraisal matrix.
 
 <a href="https://github.com/kettle-dev"><img alt="kettle-dev Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/kettle-dev/avatar-128px.svg" width="14%" align="right"/></a>
 
@@ -603,9 +604,6 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [👨🏼‍🏫expsup-upwork-img]: https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&logo=Upwork&logoColor=white
 [👨🏼‍🏫expsup-codementor]: https://www.codementor.io/peterboling?utm_source=github&utm_medium=button&utm_term=peterboling&utm_campaign=github
 [👨🏼‍🏫expsup-codementor-img]: https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&logo=CodeMentor&logoColor=white
-[🏙️entsup-tidelift]: https://tidelift.com/subscription/pkg/rubygems-markdown-merge?utm_source=rubygems-markdown-merge&utm_medium=referral&utm_campaign=readme
-[🏙️entsup-tidelift-img]: https://img.shields.io/badge/Tidelift_and_Sonar-Enterprise_Support-FD3456?style=for-the-badge&logo=sonar&logoColor=white
-[🏙️entsup-tidelift-sonar]: https://blog.tidelift.com/tidelift-joins-sonar
 [💁🏼‍♂️peterboling]: http://www.peterboling.com
 [🚂railsbling]: http://www.railsbling.com
 [📜src-gl-img]: https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&logo=Gitlab&logoColor=orange
