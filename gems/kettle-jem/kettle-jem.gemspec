@@ -9,7 +9,7 @@
 Gem::Specification.new do |spec|
   spec.name = "kettle-jem"
   spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/kettle/jem/version.rb", mod) }::Kettle::Jem::Version::VERSION
-  spec.authors = ["Peter H. Boling"]
+  spec.authors = ["Peter H. Boling", "Erik Berlin"]
   spec.email = ["floss@galtzo.com"]
 
   spec.summary = "🔮 Gem templating engine using AST-based merging and configurable token resolution."
@@ -104,9 +104,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency("citrus-toml-merge", "~> 7.1", ">= 7.1.8")          # ruby >= 4.0.0
   spec.add_dependency("dotenv-merge", "~> 7.1", ">= 7.1.8")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
-  spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.13")          # ruby >= 4.0.0
+  spec.add_dependency("kettle-changelog", "~> 1.0", ">= 1.0.15")          # ruby >= 4.0.0
   spec.add_dependency("kettle-deps-floor", "~> 0.1", ">= 0.1.0")              # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", "~> 3.1", ">= 3.1.24")               # ruby >= 2.4.0
+  spec.add_dependency("kettle-dev", "~> 3.1", ">= 3.1.26")               # ruby >= 2.4.0
   spec.add_dependency("kettle-gha-pins", "~> 0.3", ">= 0.3.14")          # ruby >= 2.4.0
   spec.add_dependency("kettle-ndjson", "~> 0.1", ">= 0.1.13")            # ruby >= 2.4.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.19")                 # ruby >= 1.8.7; shared Ruby-series bucket ranges
@@ -122,7 +122,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("toml-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
-  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.16")              # ruby >= 2.2.0
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.17")              # ruby >= 2.2.0
   spec.add_dependency("yaml-merge", "~> 7.1", ">= 7.1.8")                 # ruby >= 4.0.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
@@ -149,9 +149,9 @@ Gem::Specification.new do |spec|
 
   # Testing
   # Loads version files in anonymous namespaces for coverage without constant redefinition warnings.
-  spec.add_development_dependency("anonymous_loader", "~> 0.1", ">= 0.1.4")         # ruby >= 2.2.0
+  spec.add_development_dependency("anonymous_loader", "~> 0.1", ">= 0.1.5")         # ruby >= 2.2.0
   spec.add_development_dependency("appraisal2", "~> 3.2", ">= 3.2.6")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
-  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.27")            # ruby >= 4.0.0
+  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.29")            # ruby >= 4.0.0
   spec.add_development_dependency("turbo_tests2", "~> 4.0", ">= 4.0.0")           # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing

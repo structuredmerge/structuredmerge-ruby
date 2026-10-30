@@ -57,11 +57,12 @@ to build `kettle-jem` extension gems against the supported plugin seam.
 
 ### Compatibility
 
-Compatible with MRI Ruby 4.0.0+, and JRuby.
+The gem's declared runtime compatibility floor is MRI Ruby 4.0.0+, with concordant releases of JRuby and TruffleRuby.
 CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.
-This test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml` and
-may be higher than the gem's runtime compatibility floor when legacy Rubies are
-not practical for the current toolchain.
+The current MRI CI lane runs on Linux and macOS.
+The test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml`.
+When it is higher than the runtime floor, older runtime-compatible Rubies are
+not covered by the generated CI or Appraisal matrix.
 
 <a href="https://github.com/kettle-dev"><img alt="kettle-dev Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/kettle-dev/avatar-128px.svg" width="14%" align="right"/></a>
 
@@ -98,22 +99,6 @@ Merge analysis must enter parsing through `tree_haver`. Parser-specific gems reg
 [sm-family-rust]: https://github.com/structuredmerge/structuredmerge
 [sm-family-typescript]: https://github.com/structuredmerge/structuredmerge-typescript
 
-### Runtime and Platform Support
-
-Support tiers describe what this project's CI actually exercises, not what may
-work in an untested environment:
-
-- **Parallel support**: CI runs the test suite with multiple workers available.
-- **Unsupported**: the engine/platform combination is not covered by CI and is
- not a project compatibility claim.
-
-| Ruby engine/version | Linux | macOS | Windows | Notes |
-|---------------------|-------|-------|---------|-------|
-| MRI 4.0-4.0 | Parallel support | Unsupported | Unsupported | Versioned Ruby workflows run on Linux. |
-| MRI current | Parallel support | Parallel support | Unsupported | Current Ruby workflow covers the declared OS platforms. |
-| MRI head | Parallel support | Unsupported | Unsupported | CI is allowed to fail while Ruby is in development. |
-| JRuby (all CI lanes) | Parallel support | Unsupported | Unsupported | Engine workflows run on Linux; macOS and Windows are not exercised by CI. |
-
 ### Federated DVCS
 
 <details markdown="1">
@@ -129,16 +114,12 @@ work in an untested environment:
 
 ### Enterprise Support
 
-[![Lifted through Tidelift](https://tidelift.com/badges/package/rubygems/kettle-jem)][🏙️entsup-tidelift-sonar]
-
-Lifted through Tidelift, part of [Sonar][🏙️entsup-tidelift-sonar].
+For enterprise support from the maintainer, use [Upwork][👨🏼‍🏫expsup-upwork] or [CodeMentor][👨🏼‍🏫expsup-codementor].
 
 Other support channels:
 
 - [![Ruby Users Forum][✉️ruby-forum-img]][✉️ruby-forum]
 - [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite]
-- [![Get help from me on Upwork][👨🏼‍🏫expsup-upwork-img]][👨🏼‍🏫expsup-upwork]
-- [![Get help from me on Codementor][👨🏼‍🏫expsup-codementor-img]][👨🏼‍🏫expsup-codementor]
 
 ## ✨ Installation
 
@@ -796,6 +777,7 @@ See [LICENSE.md][📄license] for the official copyright notice.
 <details markdown="1">
 <summary>Copyright holders</summary>
 
+- Required Notice: Copyright (c) 2026 Erik Berlin
 - Required Notice: Copyright (c) 2026 Peter H. Boling
 
 </details>
@@ -894,7 +876,6 @@ Thanks for RTFM. ☺️
 [👨🏼‍🏫expsup-upwork-img]: https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&logo=Upwork&logoColor=white
 [👨🏼‍🏫expsup-codementor]: https://www.codementor.io/peterboling?utm_source=github&utm_medium=button&utm_term=peterboling&utm_campaign=github
 [👨🏼‍🏫expsup-codementor-img]: https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&logo=CodeMentor&logoColor=white
-[🏙️entsup-tidelift-sonar]: https://blog.tidelift.com/tidelift-joins-sonar
 [💁🏼‍♂️peterboling]: http://www.peterboling.com
 [🚂railsbling]: http://www.railsbling.com
 [📜src-gl-img]: https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&logo=Gitlab&logoColor=orange
