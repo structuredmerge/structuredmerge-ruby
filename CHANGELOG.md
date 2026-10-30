@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- kettle-family release: Remove kettle-jem from aggregate_validation exclude_members so it releases with the shared cohort (marked prep commit, no duplicate full-family CI run, no independent CI monitoring) instead of re-running the full workflow per release
+
 ### Deprecated
 
 ### Removed
