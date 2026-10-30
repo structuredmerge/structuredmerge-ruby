@@ -16183,11 +16183,16 @@ module Kettle
     end
 
     def nomono_bundler_bootstrap(lockfile_path)
+      # Derive the activation floor from TEMPLATE_MANAGED_DEPENDENCIES (the same
+      # source of truth as the main-Gemfile declaration) so the two can never
+      # drift apart when the floor is bumped.
+      nomono_managed = TEMPLATE_MANAGED_DEPENDENCIES.find { |dependency| dependency.fetch(:name) == "nomono" }
+      nomono_floor_requirements = nomono_managed.fetch(:requirements).inspect
       <<~RUBY.rstrip
         # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
         # Bundler records that dependency during Gemfile evaluation, but it does not
         # activate that exact version before the immediate `require "nomono/bundler"`.
-        nomono_activation_requirements = ["~> 1.1", ">= 1.1.16"]
+        nomono_activation_requirements = #{nomono_floor_requirements}
         nomono_requirement = Gem::Requirement.new(nomono_activation_requirements)
         nomono_already_activated = Gem.loaded_specs["nomono"]
         nomono_lockfile = File.expand_path(#{lockfile_path.inspect}, __dir__)

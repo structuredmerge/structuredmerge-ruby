@@ -37,6 +37,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- kettle-jem: Nomono bundler bootstrap payload now derives its activation floor from TEMPLATE_MANAGED_DEPENDENCIES (was a stale literal >= 1.1.16 while the managed floor is >= 1.1.17), so generated *_local.gemfile bootstraps can no longer drift from the managed nomono floor on floor bumps
+
 ### Security
 
 ## [7.1.41] - 2026-10-28
