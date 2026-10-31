@@ -105,6 +105,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'citrus', '~> 3.0'
   spec.add_dependency 'parslet', '~> 2.0'
   spec.add_dependency 'tree_sitter_language_pack', '>= 1.17.0', '< 2.0'
+  # Rust parsing is opt-in, but its typed core binding is a TreeHaver runtime dependency.
+  spec.add_dependency 'structuredmerge-core', '~> 0.2'
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.17') # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
