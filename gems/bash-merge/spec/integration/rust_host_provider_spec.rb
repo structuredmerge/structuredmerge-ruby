@@ -120,6 +120,20 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include("\n\n# right documentation")
   end
 
+  it 'fails closed consistently when inline owner comments make ranges unsafe' do
+    base = "left() { echo one; } # left note\nright() { echo one; } # right note\n# footer\n"
+    ours = base.sub('echo one', 'echo two')
+    theirs = base.sub('right() { echo one; }', 'right() { echo three; }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    expect(rust.fetch(:diagnostics)).not_to be_empty
+  end
+
   it 'preserves native output for literal test-harness edits' do
     base = "test_expect_success 'works' 'echo one'\n"
     ours = "test_expect_success 'works' 'echo two'\n"
