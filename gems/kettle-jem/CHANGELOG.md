@@ -48,6 +48,14 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Security
 
+## [7.1.42] - 2026-10-31
+
+- TAG: [v7.1.42][7.1.42t]
+
+### Changed
+
+- Historical release notes are unavailable in this changelog.
+
 ## [7.1.41] - 2026-10-29
 
 - TAG: [v7.1.41][7.1.41t]
@@ -2564,7 +2572,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.41...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.42...HEAD
+[7.1.42]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.41...v7.1.42
+[7.1.42t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.42
 [7.1.41]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.40...v7.1.41
 [7.1.41t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.41
 [7.1.40]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.39...v7.1.40
