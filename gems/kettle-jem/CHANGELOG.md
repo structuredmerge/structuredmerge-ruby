@@ -33,7 +33,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - addressable (>= 2.9.0 -> >= 2.9.1)
+  - kettle-family (>= 1.3.36 -> >= 1.3.37)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -> v1.336.0 (de492cf36cbab201753d720ce4f4e336cd688c94)
