@@ -53,6 +53,11 @@ raw = true
 description = "Apply templates with local StructuredMerge and Kettle stacks"
 run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV_DEV={{config_root}}/../../kettle-dev RUBYOPT=-rbundler/setup BUNDLE_GEMFILE=Gemfile bundle exec kettle-family template --execute --env=K_JEM_TEMPLATING=true --env=STRUCTUREDMERGE_DEV={{config_root}}/gems --env=KETTLE_DEV_DEV={{config_root}}/../../kettle-dev --env=RUBYOPT=-rbundler/setup --env=BUNDLE_GEMFILE=Gemfile"
 
+[tasks.local-core-template]
+raw = true
+description = "Apply templates with local StructuredMerge, Rust core, and Kettle stacks"
+run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems STRUCTUREDMERGE_CORE_DEV={{config_root}}/../structuredmerge KETTLE_DEV_DEV={{config_root}}/../../kettle-dev RUBYOPT=-rbundler/setup BUNDLE_GEMFILE=Gemfile bundle exec kettle-family template --execute --env=K_JEM_TEMPLATING=true --env=STRUCTUREDMERGE_DEV={{config_root}}/gems --env=STRUCTUREDMERGE_CORE_DEV={{config_root}}/../structuredmerge --env=KETTLE_DEV_DEV={{config_root}}/../../kettle-dev --env=RUBYOPT=-rbundler/setup --env=BUNDLE_GEMFILE=Gemfile"
+
 [tasks.docs]
 raw = true
 description = "Generate documentation across family members"
