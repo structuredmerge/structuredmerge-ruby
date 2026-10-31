@@ -923,5 +923,19 @@ RSpec.describe Ast::Merge::Git::LocalBenchmark do
     )
     expect(report.dig('dimensions', 'safety', 'false_auto_merge_result_ids')).not_to be_empty
   end
+
+  describe '#verify_environment!' do
+    it 'creates a tmp_root whose ancestors are missing before resolving it' do
+      nested = tmp_root.join('fresh', 'ancestors', "spec-#{Process.pid}")
+      fresh = Ast::Merge::Git::LocalBenchmarkRunner.new(
+        benchmark: benchmark,
+        driver_path: driver,
+        tmp_root: nested
+      )
+
+      expect { fresh.send(:verify_environment!) }.not_to raise_error
+      expect(nested).to be_directory
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength

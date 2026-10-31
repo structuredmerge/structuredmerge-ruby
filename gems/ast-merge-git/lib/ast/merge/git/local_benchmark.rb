@@ -700,7 +700,10 @@ module Ast
             error!("missing competitor executable: #{path}") unless path.file? && path.executable?
           end
           root = Pathname(__dir__).join('..', '..', '..', '..').realpath
-          resolved = @tmp_root.exist? ? @tmp_root.realpath : @tmp_root.dirname.realpath.join(@tmp_root.basename)
+          # A fresh checkout has no tmp/ yet; create the root before resolving so
+          # realpath cannot fail on a missing ancestor (observed on CI runners).
+          FileUtils.mkdir_p(@tmp_root)
+          resolved = @tmp_root.realpath
           error!('tmp_root must be inside the ast-merge-git repository') unless resolved.to_s.start_with?("#{root}/")
         end
 
