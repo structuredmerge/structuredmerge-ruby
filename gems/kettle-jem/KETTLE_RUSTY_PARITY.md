@@ -30,6 +30,34 @@ the remaining audit is to map every behavior test and unsupported path.
 | Plugins and hooks | Plugin registry/loader/context and pre/post phase hooks; public implementation in lib/kettle/jem.rb | No plugin lifecycle equivalent | Ruby-only until a Rust extension contract is requested. |
 | Release and packaging | Gem release packaging, require boundaries, docs and scaffold contracts; release_packaging_spec.rb, require_boundary_spec.rb, docs_rake_spec.rb, docs_no_task_control_rake_spec.rb, system/bundle_gem_scaffold_spec.rb | Cargo package metadata and CLI packaging | Ruby gem packaging rules are Ruby-only; compare only portable file ownership where an existing shared fixture applies. |
 
+## Ruby spec-file disposition index
+
+Every first-party spec file is listed below. Ruby-only means kettle-rusty has no
+equivalent contract; candidate means comparable semantics still need paired
+cases; shared refers only to the fixture IDs listed above.
+
+| Spec paths | Disposition |
+| --- | --- |
+| e2e/rubygems_thin_vertical_slice_spec.rb | Mixed integration: Ruby gem discovery, recipe application, and CLI; only template convergence overlaps a shared fixture. |
+| integration/recipe_planning_spec.rb; integration/template_bootstrap_spec.rb | Candidate/shared local template convergence; remaining selection and bootstrap behavior is Ruby-only or unpaired. |
+| integration/structural_merge_template_spec.rb; kettle/jem_template_markdown_merge_spec.rb; byte_offset_edit_spec.rb | Shared README preservation fixture for the narrow user-owned-section case; Markdown/byte-offset algorithms are Ruby-only or unpaired. |
+| integration/config_metadata_template_spec.rb; kettle/jem_platforms_config_spec.rb | Ruby config and platform policy; separate schema, semantic comparison deferred. |
+| integration/gemspec_template_spec.rb; integration/appraisals_and_gemfile_template_spec.rb; integration/appraisal_helper_and_token_spec.rb; bin/kettle_jem_deps_floor_spec.rb | Ruby-only gem/dependency generation. |
+| integration/github_workflow_template_spec.rb; kettle/jem_style_workflow_template_spec.rb; bin/kettle_jem_workflow_pins_spec.rb | Ruby runtime matrix and pin policy are Ruby-only; path reporting is a comparison candidate. |
+| integration/readme_changelog_template_spec.rb; kettle/jem_readme_star_history_template_spec.rb; kettle/jem/maintenance_changelog_spec.rb | Shared README preservation only; changelog transfer and Ruby badge policy are Ruby-only. |
+| integration/coverage_template_spec.rb; integration/duel_template_spec.rb; integration/shim_profile_spec.rb; integration/x_std_libs_sweep_reference_guard_spec.rb; template_version_gem_bootstrap_spec.rb; version_gem_pattern_spec.rb | Ruby ecosystem-specific generated artifacts and profile policy. |
+| kettle/jem_style_template_spec.rb | Ruby style-template rendering and defaults; no paired Rust style-template contract is claimed. |
+| cli_spec.rb | Ruby CLI options, policy, stdout/stderr and report behavior; contract differs from Rust CLI; common process failure cases remain candidates. |
+| kettle/jem_spec.rb; kettle/jem/version_spec.rb; old_public_spec_audit_spec.rb; require_boundary_spec.rb | Ruby public API, versioning, compatibility and load-boundary contracts; no equivalent Rust API. |
+| rake_tasks_spec.rb; kettle/jem_rake_docs_task_spec.rb; docs_rake_spec.rb; docs_no_task_control_rake_spec.rb; self_test_task_spec.rb | Ruby Rake and documentation task orchestration; Ruby-only. |
+| kettle/jem/tasks/install_task_normal_lockfile_env_spec.rb; kettle/jem/tasks/prepare_task_spec.rb; system/install_orchestration_spec.rb | Ruby install/prepare orchestration, lockfile environment and side effects; Ruby-only. |
+| system/bundle_gem_scaffold_spec.rb; release_packaging_spec.rb | Ruby bundle/gem scaffold and release archive contracts; Ruby-only. |
+
+This file-level index is not an example-level audit. Mixed files need example
+group dispositions before #96 can close. Passing a suite does not establish
+parity. An unsupported Rust operation requires an explicit diagnostic and
+regression test; it cannot be inferred from a missing crate.
+
 ## Shared fixture records
 
 | Fixture | Consumers | Contract |
