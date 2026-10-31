@@ -93,7 +93,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
     <ul>
-      <li>addressable (&gt;= 2.9.0 -&gt; &gt;= 2.9.1)</li>
+      <li>kettle-family (&gt;= 1.3.36 -&gt; &gt;= 1.3.37)</li>
     </ul>
   </li>
   <li>[kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
@@ -108,6 +108,10 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 <h3 id="removed">Removed</h3>
 
 <h3 id="fixed">Fixed</h3>
+
+<ul>
+  <li>Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile’s them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.</li>
+</ul>
 
 <h3 id="security">Security</h3>
 
