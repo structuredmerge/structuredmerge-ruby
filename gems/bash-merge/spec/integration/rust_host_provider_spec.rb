@@ -63,6 +63,43 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(result.fetch(:ok)).to be(true), result.inspect
   end
 
+  it 'matches the shared adjacent-comment ownership fixture across native and Rust providers' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/bash_merge3_comment_ownership.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input').to_h { |role, source| ["#{role}_source".to_sym, source] }
+    expected = fixture.fetch('assertions').find { |assertion| assertion.fetch('field') == 'output' }.fetch('value')
+    request = request_base.merge(input)
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(native.fetch(:output)).to eq(expected)
+    expect(rust.fetch(:output)).to eq(expected)
+  end
+
+  it 'fails closed through explicit Rust dispatch when parser registration fails' do
+    registry = Ast::Merge::ProviderRegistry.new
+    registry.register(Bash::Merge::Provider.new)
+    registry.register(provider)
+    allow(TreeHaver::Backends::RustTslp).to receive(:register_language_parser)
+      .and_raise(RuntimeError, 'forced Rust parser registration failure')
+
+    result = registry.dispatch(
+      :analyze,
+      request_base.merge(provider_id: 'rust.bash', source: base_source)
+    )
+
+    expect(result).to include(ok: false)
+    expect(result.fetch(:diagnostics).first).to include(
+      category: :provider_failure, message: 'forced Rust parser registration failure'
+    )
+  end
+
   it 'preserves native output for independent function edits' do
     native = Bash::Merge::Provider.new.merge3(
       request_base.merge(base_source: base_source, ours_source: ours_source, theirs_source: theirs_source)
