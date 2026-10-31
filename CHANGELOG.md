@@ -22,17 +22,28 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- kettle-family release: Remove kettle-jem from aggregate_validation exclude_members so it releases with the shared cohort (marked prep commit, no duplicate full-family CI run, no independent CI monitoring) instead of re-running the full workflow per release
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Restore per-Ruby-version modular Gemfile variants (x_std_libs r2/r3/r3.1 libs plus std-lib gem variant files across all members) deleted by the 7.1.41 template sweep but still referenced by the committed version-split loaders; CI's Ruby 3.3 probe and every sub-4.0 bundle evaluation hit Errno::ENOENT without them
-
 ### Security
+
+## [7.1.18] - 2026-10-30
+
+- TAG: [v7.1.18][7.1.18t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 72.95% documented
+
+### Changed
+
+- kettle-family release: Remove kettle-jem from aggregate_validation exclude_members so it releases with the shared cohort (marked prep commit, no duplicate full-family CI run, no independent CI monitoring) instead of re-running the full workflow per release
+
+### Fixed
+
+- Restore per-Ruby-version modular Gemfile variants (x_std_libs r2/r3/r3.1 libs plus std-lib gem variant files across all members) deleted by the 7.1.41 template sweep but still referenced by the committed version-split loaders; CI's Ruby 3.3 probe and every sub-4.0 bundle evaluation hit Errno::ENOENT without them
 
 ## [7.1.17] - 2026-10-29
 
@@ -972,7 +983,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.17...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.18...HEAD
+[7.1.18]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.17...v7.1.18
+[7.1.18t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.18
 [7.1.17]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.16...v7.1.17
 [7.1.17t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.17
 [7.1.16]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.15...v7.1.16
