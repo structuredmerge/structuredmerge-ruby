@@ -240,6 +240,9 @@ module TreeHaver
     #
     # @return [Boolean] true if the library can be found AND tree-sitter runtime works
     def available?
+      if TreeHaver.effective_backend == :rust_tslp
+        return tree_sitter_language_pack_parser_available?
+      end
       return true if tree_sitter_language_pack_parser_available?
 
       path = find_library_path
@@ -313,6 +316,12 @@ module TreeHaver
     # @return [Boolean] true if registration succeeded
     # @raise [NotAvailable] if library not found and raise_on_missing is true
     def register!(raise_on_missing: false)
+      if TreeHaver.effective_backend == :rust_tslp && !tree_sitter_language_pack_parser_available?
+        raise NotAvailable, not_found_message if raise_on_missing
+
+        return false
+      end
+
       if tree_sitter_language_pack_parser_available?
         backend_module, backend_type, gem_name = language_pack_registration
         TreeHaver.register_language(
@@ -352,7 +361,7 @@ module TreeHaver
         library_filenames: library_filenames,
         search_paths: search_paths,
         found_path: found,
-        available: tree_sitter_language_pack_parser_available? || !found.nil?
+        available: available?
       }
     end
 
@@ -366,6 +375,8 @@ module TreeHaver
       env_value = ENV[env_var_name]
       msg += if env_value && @env_rejection_reason
                " #{env_var_name} is set to #{env_value.inspect} but #{@env_rejection_reason}."
+             elsif TreeHaver.effective_backend == :rust_tslp && @tree_sitter_language_pack_rejection_reason
+               " Rust TSLP parser probe failed: #{@tree_sitter_language_pack_rejection_reason}."
              elsif env_value && File.exist?(env_value) && !self.class.tree_sitter_runtime_usable?
                " #{env_var_name} is set and file exists, but no tree-sitter runtime is available. " \
                  'Add ruby_tree_sitter, ffi, or tree_stump gem to your Gemfile.'
@@ -410,7 +421,12 @@ module TreeHaver
 
       @tree_sitter_language_pack_parser_available = begin
         if TreeHaver.effective_backend == :rust_tslp
-          TreeHaver::Backends::RustTslp.available?
+          available = TreeHaver::Backends::RustTslp.parser_available_for?(@language_name)
+          unless available
+            @tree_sitter_language_pack_rejection_reason =
+              TreeHaver::Backends::RustTslp.unavailable_reason_for(@language_name)
+          end
+          available
         else
           require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
           TreeHaver::Backends::Tslp.available? &&

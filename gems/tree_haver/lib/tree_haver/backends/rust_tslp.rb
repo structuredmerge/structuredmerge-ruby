@@ -24,6 +24,7 @@ module TreeHaver
           @load_attempted = false
           @loaded = false
           @unavailable_reason = nil
+          @language_unavailable_reasons = nil
         end
 
         def capabilities
@@ -38,6 +39,42 @@ module TreeHaver
             language_pack: true,
             provenance: :rust_tree_haver
           }
+        end
+
+        # Check a specific grammar through the core registry's provider probe.
+        # Probing can load a grammar under the configured language-pack policy.
+        def parser_available_for?(language)
+          return false unless available?
+
+          name = language.to_s
+          return false if name.empty?
+
+          provider_id = register_language_parser(name)
+          core = ::StructuredmergeCore
+          request = core::ParserSelectionRequest.new(
+            language: name,
+            dialect: nil,
+            selection: core::ParserSelection.new(backend_id: provider_id, preference: [], required_capabilities: []),
+            options: core::ParseOptions.new(comments: false, tokens: false, diagnostics: false,
+                                            native_extensions: false)
+          )
+          limits = core::ParseLimits.new(max_batch_items: 1, max_input_bytes: 1, max_nodes: 1, max_diagnostics: 1)
+          report = core.parser_selection_report(request, limits)
+          if report.selected_backend == provider_id
+            @language_unavailable_reasons&.delete(name)
+            return true
+          end
+
+          candidate = report.candidates.find { |item| item.backend_id == provider_id }
+          remember_language_failure(name, candidate&.probe_fault || candidate&.rejections&.join(', '))
+          false
+        rescue StandardError => e
+          remember_language_failure(name, e.message)
+          false
+        end
+
+        def unavailable_reason_for(language)
+          @language_unavailable_reasons&.fetch(language.to_s, nil)
         end
 
         def register_language_parser(language)
@@ -55,6 +92,13 @@ module TreeHaver
         end
 
         private
+
+        def remember_language_failure(language, reason)
+          return if reason.to_s.empty?
+
+          @language_unavailable_reasons ||= {}
+          @language_unavailable_reasons[language] = reason
+        end
 
         # rubocop:disable Metrics/MethodLength
         def load_host

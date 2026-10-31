@@ -50,7 +50,10 @@ RSpec.describe TreeHaver::Backends::RustTslp do
 
   before do
     stub_const('StructuredmergeCore', Module.new)
-    %w[SourceDescriptor LineEndings SourceInput ParseRequest ParserSelection ParseOptions ParseLimits].each do |name|
+    %w[
+      SourceDescriptor LineEndings SourceInput ParseRequest ParserSelectionRequest
+      ParserSelection ParseOptions ParseLimits
+    ].each do |name|
       klass = Class.new do
         def self.new(**fields)
           Struct.new(*fields.keys, keyword_init: true).new(**fields)
@@ -60,6 +63,8 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     end
     allow(StructuredmergeCore).to receive(:register_language_pack_parser)
       .with('tree_haver.rust_tslp.json', 'json').and_return(record(id: 'tree_haver.rust_tslp.json'))
+    allow(StructuredmergeCore).to receive(:parser_selection_report)
+      .and_return(record(selected_backend: 'tree_haver.rust_tslp.json', candidates: []))
     allow(StructuredmergeCore).to receive(:parse_sources).and_return([typed_result(result)])
     described_class.reset!
   end

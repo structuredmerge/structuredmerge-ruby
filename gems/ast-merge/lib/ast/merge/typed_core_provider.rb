@@ -46,6 +46,8 @@ module Ast
       def core = ::StructuredmergeCore
 
       def execute(operation, request)
+        request = ProviderContract.normalize_hash(request)
+
         unless capabilities[:operations].include?(operation)
           return Ast::Merge::ProviderResult.unsupported(operation: operation,
                                                         message: 'Typed profile does not implement this operation')
