@@ -191,6 +191,21 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(rust.fetch(:conflicts)).not_to be_empty
   end
 
+  it 'matches native behavior for one-sided owner deletion with an independent edit' do
+    base = "package main\n\nfunc left() int { return 1 }\n\nfunc right() int { return 1 }\n"
+    ours = base.sub("func left() int { return 1 }\n\n", '')
+    theirs = base.sub('func right() int { return 1 }', 'func right() int { return 2 }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Go::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    expect(native.fetch(:conflicts)).not_to be_empty
+    expect(rust.fetch(:conflicts)).not_to be_empty
+  end
+
   it 'projects native identities and byte spans after Unicode without host source lookup' do
     source = "package main\n// é\nfunc f() {}\n"
     result = provider.analyze(source: source)
