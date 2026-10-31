@@ -2,23 +2,22 @@
 
 # rubocop:disable Metrics/BlockLength -- complete ZIP planning and rendering fixture contract
 RSpec.describe Zip::Merge do
+  it 'does not advertise or select an unimplemented Rust operation provider' do
+    result = Ast::Merge.dispatch_provider(
+      :merge3,
+      provider_id: 'rust.zip',
+      family: :zip,
+      dialect: :zip,
+      backend: :rust_tslp,
+      profile_id: :opaque_archive,
+      base_source: 'base',
+      ours_source: 'ours',
+      theirs_source: 'theirs'
+    )
 
-it 'does not advertise or select an unimplemented Rust operation provider' do
-  result = Ast::Merge.dispatch_provider(
-    :merge3,
-    provider_id: 'rust.zip',
-    family: :zip,
-    dialect: :zip,
-    backend: :rust_tslp,
-    profile_id: :opaque_archive,
-    base_source: 'base',
-    ours_source: 'ours',
-    theirs_source: 'theirs'
-  )
-
-  expect(result).to include(operation: :merge3, ok: false)
-  expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
-end
+    expect(result).to include(operation: :merge3, ok: false)
+    expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
+  end
 
   def fixtures_root
     Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
