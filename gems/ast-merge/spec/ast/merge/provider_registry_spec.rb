@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'ast/merge/typed_core_provider'
 
 # rubocop:disable Metrics/BlockLength -- provider protocol behavior is kept in one cohesive contract spec
 RSpec.describe Ast::Merge::ProviderRegistry do
@@ -194,6 +195,29 @@ RSpec.describe Ast::Merge::ProviderRegistry do
     )
 
     expect(result).to include(operation: :merge3, ok: false)
+    expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
+  end
+
+  it 'returns invalid_request for malformed direct typed-core provider input' do
+    provider = Class.new(Ast::Merge::TypedCoreProvider).new
+
+    result = provider.analyze(nil)
+
+    expect(result).to include(operation: :analyze, ok: false)
+    expect(result.fetch(:diagnostics)).to include(hash_including(category: :invalid_request))
+  end
+
+  it 'advertises only the operations implemented by the generic Rust host adapter' do
+    provider = Ast::Merge::RustHostProvider.new(
+      provider_id: 'rust.partial', family: :json, dialect: :json,
+      package: 'json-merge', package_version: '0.0.0',
+      host_methods: { 'analyze' => 'analyze_json' }
+    )
+
+    expect(provider.capabilities.fetch(:operations)).to eq(%i[analyze diff2])
+    result = provider.merge2({})
+
+    expect(result).to include(operation: :merge2, ok: false)
     expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
   end
 

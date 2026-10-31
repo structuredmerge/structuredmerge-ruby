@@ -61,8 +61,9 @@ RSpec.describe TreeHaver::Backends::RustTslp do
       end
       stub_const("StructuredmergeCore::#{name}", klass)
     end
-    allow(StructuredmergeCore).to receive(:register_language_pack_parser)
-      .with('tree_haver.rust_tslp.json', 'json').and_return(record(id: 'tree_haver.rust_tslp.json'))
+    allow(StructuredmergeCore).to receive(:register_language_pack_parser) do |id, _language|
+      record(id: id)
+    end
     allow(StructuredmergeCore).to receive(:parser_selection_report)
       .and_return(record(selected_backend: 'tree_haver.rust_tslp.json', candidates: []))
     allow(StructuredmergeCore).to receive(:parse_sources).and_return([typed_result(result)])
@@ -226,6 +227,24 @@ RSpec.describe TreeHaver::Backends::RustTslp do
     expect(tree.root_node.children.first.native_type).to eq('line_comment')
     expect(tree.root_node.children.first.extra?).to be(true)
     expect(tree.comments).to eq([])
+  end
+
+  it 'fails closed for an unavailable language instead of using a local grammar path' do
+    provider_id = 'tree_haver.rust_tslp.unknown_language'
+    allow(StructuredmergeCore).to receive(:parser_selection_report).and_return(
+      record(selected_backend: nil,
+             candidates: [record(backend_id: provider_id, probe_fault: 'parser.unavailable',
+                                 rejections: ['parser.unavailable'])])
+    )
+    finder = TreeHaver::GrammarFinder.new(:unknown_language)
+    allow(finder).to receive(:find_library_path).and_return('/tmp/native-grammar.so')
+
+    expect(TreeHaver).not_to receive(:register_language)
+    expect(TreeHaver.with_backend(:rust_tslp) { finder.available? }).to be(false)
+    expect(TreeHaver.with_backend(:rust_tslp) { finder.register! }).to be(false)
+    expect do
+      TreeHaver.with_backend(:rust_tslp) { finder.register!(raise_on_missing: true) }
+    end.to raise_error(TreeHaver::NotAvailable, /parser probe failed: parser.unavailable/)
   end
 
   it 'registers once and pins typed requests to the explicit provider' do

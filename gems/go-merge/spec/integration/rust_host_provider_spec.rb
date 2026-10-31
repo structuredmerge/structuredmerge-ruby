@@ -244,8 +244,12 @@ RSpec.describe Go::Merge::RustHostProvider do
     request = { base_source: base_source, ours_source: base_source, theirs_source: base_source }
     expect(provider.merge3(request.merge(path_name: 'file.go', labels: {},
                                          conflict_marker_size: '7'))).to include(ok: true)
-    expect(provider.merge3(request.merge(conflict_marker_size: 8))).to include(ok: false)
-    expect(provider.merge3(request.merge(labels: { ours: 'custom' }))).to include(ok: false)
+    expect(provider.merge3(request.merge(conflict_marker_size: 8))).to include(
+      ok: false, diagnostics: include(hash_including(category: :unsupported_capability))
+    )
+    expect(provider.merge3(request.merge(labels: { ours: 'custom' }))).to include(
+      ok: false, diagnostics: include(hash_including(category: :unsupported_capability))
+    )
     expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
     bytes = base_source.b
     expect(provider.analyze(source: bytes)).to include(ok: true)

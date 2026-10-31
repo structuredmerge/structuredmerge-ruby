@@ -206,9 +206,13 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(provider.merge3(base_source: "x=1\n", ours_source: "x=1\n", theirs_source: "x=1\n",
                            path_name: 'script.sh', labels: {}, conflict_marker_size: '7')).to include(ok: true)
     expect(provider.merge3(base_source: "x=1\n", ours_source: "x=1\n", theirs_source: "x=1\n",
-                           conflict_marker_size: 8)).to include(ok: false)
+                           conflict_marker_size: 8)).to include(
+                             ok: false, diagnostics: include(hash_including(category: :unsupported_capability))
+                           )
     expect(provider.merge3(base_source: "x=1\n", ours_source: "x=1\n", theirs_source: "x=1\n",
-                           labels: { ours: 'custom' })).to include(ok: false)
+                           labels: { ours: 'custom' })).to include(
+                             ok: false, diagnostics: include(hash_including(category: :unsupported_capability))
+                           )
     expect(provider.merge2(incoming_source: "b=2\nnew=3\na=1\n",
                            current_source: "a=9\nb=9\n")).to include(ok: false, output: nil)
     expect(provider.analyze(source: "\xFF".b)).to include(ok: false)
