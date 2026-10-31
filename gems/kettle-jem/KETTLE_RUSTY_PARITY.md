@@ -53,10 +53,15 @@ cases; shared refers only to the fixture IDs listed above.
 | kettle/jem/tasks/install_task_normal_lockfile_env_spec.rb; kettle/jem/tasks/prepare_task_spec.rb; system/install_orchestration_spec.rb | Ruby install/prepare orchestration, lockfile environment and side effects; Ruby-only. |
 | system/bundle_gem_scaffold_spec.rb; release_packaging_spec.rb | Ruby bundle/gem scaffold and release archive contracts; Ruby-only. |
 
-This file-level index is not an example-level audit. Mixed files need example
-group dispositions before #96 can close. Passing a suite does not establish
-parity. An unsupported Rust operation requires an explicit diagnostic and
-regression test; it cannot be inferred from a missing crate.
+The machine-readable
+[KETTLE_RUSTY_PARITY_EXAMPLES.json](KETTLE_RUSTY_PARITY_EXAMPLES.json) lists all
+727 explicit it/specify declarations plus 9 shared-example invocations across
+these 40 files, with each source path, line, behavior title, and disposition.
+For mixed files, shared fixture cases are individually identified; the
+remaining groups inherit the explicit file-level Ruby-only or distinct-contract
+disposition above. Passing a suite does not establish parity. An unsupported
+Rust operation requires an explicit diagnostic and regression test; it cannot
+be inferred from a missing crate.
 
 ## Mixed-suite behavior boundaries
 
