@@ -16,6 +16,24 @@ RSpec.describe Yaml::Merge::Provider do
 
   subject(:provider) { described_class.new }
 
+it 'does not treat a Rust parser or crate as a Rust merge-operation provider' do
+  result = Ast::Merge.dispatch_provider(
+    :merge3,
+    provider_id: 'rust.yaml',
+    family: :yaml,
+    dialect: :yaml,
+    backend: :rust_tslp,
+    profile_id: :source_preserving,
+    base_source: 'base',
+    ours_source: 'ours',
+    theirs_source: 'theirs'
+  )
+
+  expect(result).to include(operation: :merge3, ok: false)
+  expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
+end
+
+
   let(:backend) { :'kreuzberg-language-pack' }
   let(:base) { "obsolete: true\nstable: true\n" }
   let(:ours) { "obsolete: true\nstable: true\nours: left\n" }

@@ -17,6 +17,24 @@ RSpec.describe Toml::Merge::Provider do
 
   subject(:provider) { described_class.new }
 
+it 'does not treat a Rust parser or crate as a Rust merge-operation provider' do
+  result = Ast::Merge.dispatch_provider(
+    :merge3,
+    provider_id: 'rust.toml',
+    family: :toml,
+    dialect: :toml,
+    backend: :rust_tslp,
+    profile_id: :source_preserving,
+    base_source: 'base',
+    ours_source: 'ours',
+    theirs_source: 'theirs'
+  )
+
+  expect(result).to include(operation: :merge3, ok: false)
+  expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
+end
+
+
   let(:base) { "# retained\nalpha = \"base\"\nbeta = 1\n" }
   let(:ours) { "# retained\nalpha = 'ours'\nbeta = 1\nours_only = [1, 2]\n" }
   let(:theirs) { "# retained\nalpha = \"base\"\nbeta = 2_000\ntheirs_only = { enabled = true }\n" }
