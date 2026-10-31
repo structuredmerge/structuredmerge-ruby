@@ -7,23 +7,22 @@ require 'json'
 RSpec.describe Ruby::Merge::Provider do
   subject(:provider) { described_class.new }
 
-it 'does not treat a Rust parser or crate as a Rust merge-operation provider' do
-  result = Ast::Merge.dispatch_provider(
-    :merge3,
-    provider_id: 'rust.ruby',
-    family: :ruby,
-    dialect: :ruby,
-    backend: :rust_tslp,
-    profile_id: :source_preserving,
-    base_source: 'base',
-    ours_source: 'ours',
-    theirs_source: 'theirs'
-  )
+  it 'does not treat a Rust parser or crate as a Rust merge-operation provider' do
+    result = Ast::Merge.dispatch_provider(
+      :merge3,
+      provider_id: 'rust.ruby',
+      family: :ruby,
+      dialect: :ruby,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      base_source: 'base',
+      ours_source: 'ours',
+      theirs_source: 'theirs'
+    )
 
-  expect(result).to include(operation: :merge3, ok: false)
-  expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
-end
-
+    expect(result).to include(operation: :merge3, ok: false)
+    expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
+  end
 
   it 'advertises a workflow for every TreeHaver tree-sitter runtime' do
     expect(provider).to have_attributes(provider_id: 'ruby.ruby', family: 'ruby')
