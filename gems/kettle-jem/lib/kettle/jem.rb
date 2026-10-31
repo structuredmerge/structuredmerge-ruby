@@ -149,7 +149,7 @@ module Kettle
       ast-template bash-merge binary-merge citrus-toml-merge commonmarker-merge dotenv-merge
       go-merge html-merge json-merge kettle-jem kramdown-merge markdown-merge markly-merge
       parslet-toml-merge plain-merge prism-merge psych-merge rbs-merge ruby-merge rust-merge
-      smorg-rb toml-merge tree_haver typescript-merge yaml-merge zip-merge
+      smorg-rb structuredmerge-core toml-merge tree_haver typescript-merge yaml-merge zip-merge
     ].freeze
     # Canonical resolutions for development-dependency gems whose handling is
     # already known ahead of any specific destination project. Two

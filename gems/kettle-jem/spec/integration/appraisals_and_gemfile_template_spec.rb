@@ -1651,6 +1651,18 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
   end
 
+  it "loads local core dependencies while generating Appraisal Gemfiles" do
+    facts = {package: {runtime_dependencies: [{name: "structuredmerge-core"}]}}
+    template = File.read(File.expand_path("../../lib/kettle/jem/templates/Appraisal.root.gemfile.example", __dir__))
+
+    updated = described_class.send(:normalize_appraisal_root_templating_gate, template, facts)
+
+    expect(updated).to include('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated).to include('ENV.fetch("K_JEM_TEMPLATING", "false")')
+    expect(updated.index("generator_only do")).to be < updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+  end
+
   it "reattaches the style-gate comment when a generator gate already exists" do
     facts = {package: {runtime_dependencies: [{name: "kettle-jem"}]}}
     root_gemfile = <<~RUBY
