@@ -1472,6 +1472,53 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "matches shared user-owned README section preservation" do
+    shared_fixture_path = Pathname(__dir__).join(
+      "../../../../../fixtures/packaging/kettle-readme-preservation.json"
+    ).expand_path
+    fixture = JSON.parse(shared_fixture_path.read, symbolize_names: true)
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-shared-readme-preservation", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => {
+          "readme" => { "preserve_sections" => fixture.fetch(:preserve_sections) },
+          "templates" => { "root" => "template", "apply" => true, "entries" => ["README.md"] }
+        }.to_yaml,
+        "README.md" => fixture.fetch(:destination_readme),
+        "template/README.md.example" => [
+          "# New Project",
+          "",
+          "## Synopsis",
+          "",
+          "Generated synopsis.",
+          "",
+          "## Configuration",
+          "",
+          "Generated configuration.",
+          "",
+          "## Basic Usage",
+          "",
+          "Generated usage.",
+          ""
+        ].join("\n")
+      })
+
+      plan = described_class.plan_project(root, env: {}, run_options: { only: "README.md" })
+      report = plan.fetch(:recipe_reports).find { |item| item.fetch(:relative_path) == "README.md" }
+      fixture.fetch(:expected_preserved_fragments).each do |fragment|
+        expect(report.fetch(:final_content)).to include(fragment)
+      end
+    end
+  end
+
   it "preserves configured README sections during merge template application" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
