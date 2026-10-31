@@ -240,9 +240,7 @@ module TreeHaver
     #
     # @return [Boolean] true if the library can be found AND tree-sitter runtime works
     def available?
-      if TreeHaver.effective_backend == :rust_tslp
-        return tree_sitter_language_pack_parser_available?
-      end
+      return tree_sitter_language_pack_parser_available? if TreeHaver.effective_backend == :rust_tslp
       return true if tree_sitter_language_pack_parser_available?
 
       path = find_library_path
