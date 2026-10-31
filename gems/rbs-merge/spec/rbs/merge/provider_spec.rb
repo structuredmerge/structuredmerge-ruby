@@ -8,23 +8,22 @@ require 'ast/merge/rspec/shared_examples'
 RSpec.describe Rbs::Merge::Provider do
   subject(:provider) { described_class.new }
 
-it 'does not advertise or select an unimplemented Rust operation provider' do
-  result = Ast::Merge.dispatch_provider(
-    :merge3,
-    provider_id: 'rust.rbs',
-    family: :rbs,
-    dialect: :rbs,
-    backend: :rust_tslp,
-    profile_id: :source_preserving,
-    base_source: 'base',
-    ours_source: 'ours',
-    theirs_source: 'theirs'
-  )
+  it 'does not advertise or select an unimplemented Rust operation provider' do
+    result = Ast::Merge.dispatch_provider(
+      :merge3,
+      provider_id: 'rust.rbs',
+      family: :rbs,
+      dialect: :rbs,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      base_source: 'base',
+      ours_source: 'ours',
+      theirs_source: 'theirs'
+    )
 
-  expect(result).to include(operation: :merge3, ok: false)
-  expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
-end
-
+    expect(result).to include(operation: :merge3, ok: false)
+    expect(result.fetch(:diagnostics)).to include(hash_including(category: :unsupported_capability))
+  end
 
   let(:base) do
     <<~RBS
