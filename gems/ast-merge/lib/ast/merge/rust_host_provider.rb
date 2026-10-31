@@ -24,14 +24,20 @@ module Ast
         @dialect = dialect
         @package = package
         @package_version = package_version
-        @host_methods = host_methods.freeze
+        @host_methods = host_methods.to_h do |operation, method_name|
+          [operation.to_sym, method_name.to_sym]
+        end.freeze
       end
 
       attr_reader :provider_id, :family
 
       def capabilities
+        operations = []
+        operations.concat(%i[analyze diff2]) if @host_methods.key?(:analyze)
+        operations << :merge2 if @host_methods.key?(:merge2)
+        operations << :merge3 if @host_methods.key?(:merge3)
         {
-          operations: ProviderContract::OPERATIONS,
+          operations: operations.freeze,
           dialects: [@dialect],
           backends: [:rust_tslp],
           profiles: [:source_preserving],
@@ -41,6 +47,8 @@ module Ast
       end
 
       def analyze(request)
+        return unsupported_result(:analyze) unless operation_supported?(:analyze)
+
         raw = call_host(:analyze, request.fetch(:source), request.fetch(:dialect).to_s)
         return failure(:analyze, request, raw) unless raw.fetch('ok')
 
@@ -69,6 +77,8 @@ module Ast
       end
 
       def diff2(request)
+        return unsupported_result(:diff2) unless operation_supported?(:diff2)
+
         before = analysis_for(request.fetch(:before_source), request.fetch(:dialect).to_s)
         return failure(:diff2, request, before) unless before.fetch('ok')
 
@@ -116,6 +126,8 @@ module Ast
       end
 
       def merge2(request)
+        return unsupported_result(:merge2) unless operation_supported?(:merge2)
+
         raw = call_host(
           :merge2,
           request.fetch(:current_source),
@@ -128,6 +140,8 @@ module Ast
       end
 
       def merge3(request)
+        return unsupported_result(:merge3) unless operation_supported?(:merge3)
+
         raw = call_host(
           :merge3,
           request.fetch(:base_source),
@@ -141,6 +155,15 @@ module Ast
       end
 
       private
+
+      def operation_supported?(operation)
+        capabilities[:operations].include?(operation)
+      end
+
+      def unsupported_result(operation)
+        ProviderResult.unsupported(operation: operation,
+                                   message: 'Rust host does not implement this operation')
+      end
 
       def host
         require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
