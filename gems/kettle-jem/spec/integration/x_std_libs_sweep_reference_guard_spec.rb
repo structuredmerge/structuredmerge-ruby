@@ -20,6 +20,10 @@ RSpec.describe Kettle::Jem, "x_std_libs sweep reference-closure guard" do
       end
     RUBY
   end
+  # A Ruby 4.0+ test floor makes every bucket below r4 irrelevant to the sweep,
+  # which is what deleted the referenced r2/r3/r3.1 variants in the 7.1.41
+  # family-wide incident while the committed loaders still branched to them.
+  let(:min_ruby_4_config) { {"ruby" => {"test_minimum" => "4.0"}} }
 
   def write_member_gemfile_tree(root, loader:)
     write_tree(root, {
@@ -70,11 +74,6 @@ RSpec.describe Kettle::Jem, "x_std_libs sweep reference-closure guard" do
       "gemfiles/modular/mutex_m/r3/v0.3.gemfile" => %(gem "mutex_m", "~> 0.3.0"\n)
     })
   end
-
-  # A Ruby 4.0+ test floor makes every bucket below r4 irrelevant to the sweep,
-  # which is what deleted the referenced r2/r3/r3.1 variants in the 7.1.41
-  # family-wide incident while the committed loaders still branched to them.
-  let(:min_ruby_4_config) { {"ruby" => {"test_minimum" => "4.0"}} }
 
   it "keeps variant gemfiles a remaining version-split loader still references" do
     tmp_root = File.expand_path("../tmp", __dir__)

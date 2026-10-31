@@ -30,7 +30,7 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         template_source => fixture.fetch(:template_content)
       })
 
-      options = { only: target_path }
+      options = {only: target_path}
       plan = described_class.plan_project(root, env: {}, run_options: options)
       report = plan.fetch(:recipe_reports).find { |item| item.fetch(:relative_path) == target_path }
 
