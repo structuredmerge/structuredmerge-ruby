@@ -2780,7 +2780,18 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       }
     }
 
-    content = described_class.send(:merge_gemfile_template_policy, template, facts: facts, template_content: template)
+    recipe = {
+      target_path: "gemfiles/modular/templating.gemfile",
+      template_preference: {strategy: "accept_template"}
+    }
+    content = described_class.send(
+      :finalize_gemfile_template_source,
+      recipe,
+      template,
+      "",
+      facts: facts,
+      template_content: template
+    )
 
     expect(content).to include('gem "structuredmerge-core", path: File.join(core_root, "packages/ruby")')
   end

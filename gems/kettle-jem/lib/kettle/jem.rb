@@ -7824,6 +7824,9 @@ module Kettle
             target.include?(dependency.tr("-", "_"))
           end
           removable = [package_name, *(runtime_dependencies - named_fragment_dependencies)]
+          # A modular Gemfile may repeat a runtime gem only to select its local
+          # source. Keep explicit path overrides while pruning ordinary duplicates.
+          removable -= gemfile_path_source_override_names(template_content)
           output = remove_gemfile_dependency_blocks(content, removable)
           output = remove_gemfile_percent_w_entries(output, removable)
         end
