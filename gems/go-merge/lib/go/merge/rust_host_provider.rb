@@ -35,7 +35,8 @@ module Go
         width = request[:conflict_marker_size]
         width = Integer(width, 10) if width.is_a?(String)
         unless labels == {} && (width.nil? || (width.is_a?(Integer) && width == 7))
-          raise ArgumentError, 'Typed Go does not support custom conflict markers or labels'
+          raise Ast::Merge::TypedCoreProvider::UnsupportedCapabilityError,
+              'Typed Go does not support custom conflict markers or labels'
         end
 
         super

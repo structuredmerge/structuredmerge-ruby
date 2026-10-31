@@ -7,6 +7,8 @@ module Ast
   module Merge
     # Shared typed transport adaptation. Subclasses select explicit Rust profiles.
     class TypedCoreProvider
+      class UnsupportedCapabilityError < StandardError; end
+
       DIALECTS = %i[json jsonc json5].freeze
       ROLES = { analyze: %i[source], diff2: %i[before after], merge2: %i[incoming current],
                 merge3: %i[base ours theirs] }.freeze
@@ -93,6 +95,8 @@ module Ast
                                         core::ParseLimits.new(max_batch_items: 3, max_input_bytes: 64 * 1024 * 1024, max_nodes: 1_000_000,
                                                               max_diagnostics: 1000))
         project(operation, request, result)
+      rescue UnsupportedCapabilityError => e
+        Ast::Merge::ProviderResult.unsupported(operation: operation, message: e.message)
       rescue KeyError, ArgumentError, TypeError, RangeError => e
         Ast::Merge::ProviderResult.invalid_request(operation: operation, message: e.message)
       rescue RuntimeError => e
