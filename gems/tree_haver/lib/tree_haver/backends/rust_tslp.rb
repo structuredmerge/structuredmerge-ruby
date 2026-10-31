@@ -37,6 +37,8 @@ module TreeHaver
             incremental: false,
             comment_support: :nodes_only,
             language_pack: true,
+            normalized_tree: true,
+            native_node_access: false,
             provenance: :rust_tree_haver
           }
         end
@@ -108,8 +110,18 @@ module TreeHaver
           end
 
           require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
-          unless ::StructuredmergeCore.respond_to?(:parse_sources) && ::StructuredmergeCore.respond_to?(:register_language_pack_parser)
-            @unavailable_reason = 'structuredmerge-core does not expose typed Rust parser registration'
+          core = ::StructuredmergeCore
+          required_methods = %i[parse_sources register_language_pack_parser parser_selection_report]
+          missing_methods = required_methods.reject { |method_name| core.respond_to?(method_name) }
+          unless missing_methods.empty?
+            @unavailable_reason = "structuredmerge-core missing typed parser methods: #{missing_methods.join(', ')})"
+            return false
+          end
+
+          required_types = %i[ParserSelectionRequest ParserSelection ParseOptions ParseLimits]
+          missing_types = required_types.reject { |type_name| core.const_defined?(type_name, false) }
+          unless missing_types.empty?
+            @unavailable_reason = "structuredmerge-core missing typed parser records: #{missing_types.join(', ')})"
             return false
           end
 

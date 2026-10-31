@@ -153,14 +153,39 @@ RSpec.describe TreeHaver::Backends::RustTslp do
       .to raise_error(TreeHaver::NotAvailable, /requires valid UTF-8/)
   end
 
-  it 'advertises unsupported operations instead of emulating native behavior' do
+  it 'advertises normalized-only access and unsupported native operations' do
     expect(described_class.capabilities).to include(
       backend: :rust_tslp,
       query: false,
       incremental: false,
       comment_support: :nodes_only,
+      normalized_tree: true,
+      native_node_access: false,
       provenance: :rust_tree_haver
     )
+  end
+
+  it 'requires typed per-language selection support before reporting availability' do
+    core = Module.new
+    allow(core).to receive(:parse_sources)
+    allow(core).to receive(:register_language_pack_parser)
+    stub_const('StructuredmergeCore', core)
+    described_class.reset!
+
+    expect(described_class.available?).to be(false)
+    expect(described_class.unavailable_reason).to include('parser_selection_report')
+  end
+
+  it 'requires generated parser-selection record types' do
+    core = Module.new
+    allow(core).to receive(:parse_sources)
+    allow(core).to receive(:register_language_pack_parser)
+    allow(core).to receive(:parser_selection_report)
+    stub_const('StructuredmergeCore', core)
+    described_class.reset!
+
+    expect(described_class.available?).to be(false)
+    expect(described_class.unavailable_reason).to include('ParserSelectionRequest')
   end
 
   it 'fails closed when the selected Rust provider is unavailable' do
