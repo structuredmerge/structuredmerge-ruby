@@ -37,7 +37,7 @@ module Bash
         width = Integer(width, 10) if width.is_a?(String)
         unless labels == {} && (width.nil? || (width.is_a?(Integer) && width == 7))
           raise Ast::Merge::TypedCoreProvider::UnsupportedCapabilityError,
-              'Typed Bash does not support custom conflict markers or labels'
+                'Typed Bash does not support custom conflict markers or labels'
         end
 
         super
