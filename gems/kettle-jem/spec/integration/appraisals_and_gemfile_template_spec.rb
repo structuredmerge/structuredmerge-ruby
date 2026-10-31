@@ -2768,6 +2768,23 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "preserves path source overrides for gemspec runtime dependencies" do
+    template = <<~RUBY
+      core_root = ENV.fetch("STRUCTUREDMERGE_CORE_DEV")
+      gem "structuredmerge-core", path: File.join(core_root, "packages/ruby")
+    RUBY
+    facts = {
+      package: {
+        name: "tree_haver",
+        runtime_dependencies: [{name: "structuredmerge-core"}]
+      }
+    }
+
+    content = described_class.send(:merge_gemfile_template_policy, template, facts: facts, template_content: template)
+
+    expect(content).to include('gem "structuredmerge-core", path: File.join(core_root, "packages/ruby")')
+  end
+
   it "keeps a named modular dependency when materializing a missing Gemfile" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

@@ -9468,6 +9468,10 @@ module Kettle
       removable_gems = [*PROHIBITED_GEMFILE_DEPENDENCIES]
       removable_gems << package_name unless package_name.to_s.empty?
       removable_gems.concat(package_runtime_dependency_names(facts))
+      # A Gemfile path declaration can override the source of a runtime gemspec
+      # dependency. Keep those declarations so local development can resolve an
+      # unpublished dependency without changing the runtime dependency graph.
+      removable_gems -= gemfile_path_source_override_names(template_content.to_s)
       removable_gems << "version_gem" unless version_gem_enabled?(facts)
       pruned = remove_gemfile_dependency_blocks(content, removable_gems)
       pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
@@ -9768,6 +9772,13 @@ module Kettle
           end_line: ruby_node_source_end_line(call)
         }
       end
+    end
+
+    def gemfile_path_source_override_names(content)
+      ruby_call_records(content, :gem).filter_map do |call|
+        name = ruby_string_argument(call)
+        name if name && ruby_keyword_argument_node(call, :path)
+      end.uniq
     end
 
     # A dependency owned directly by the project must not also be introduced by
