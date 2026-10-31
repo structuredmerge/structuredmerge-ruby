@@ -298,4 +298,15 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(provider.analyze(source: bytes)).to include(ok: true)
     expect(bytes.encoding).to eq(Encoding::ASCII_8BIT)
   end
+
+  it 'consumes the shared malformed owner fixture with native status parity' do
+    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/rust_merge3_malformed_owner.json', __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = request_base.merge(base_source: input.fetch('base'), ours_source: input.fetch('ours'), theirs_source: input.fetch('theirs'))
+    native = Rust::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to eq(native.fetch(:ok)), rust.inspect
+  end
 end

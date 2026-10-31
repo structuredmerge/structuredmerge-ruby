@@ -284,4 +284,19 @@ RSpec.describe Json::Merge::RustHostProvider do
       expect(rust_value).to eq(native_value)
     end
   end
+
+  it 'consumes the shared nested owner fixture against native and Rust providers' do
+    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/typed-core/json_merge3_nested_owner.json', __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = { base_source: input.fetch('base'), ours_source: input.fetch('ours'),
+                theirs_source: input.fetch('theirs'), dialect: :json }
+    native = Json::Merge::Provider.new.merge3(request.merge(backend: 'kreuzberg-language-pack'))
+    rust = provider.merge3(request)
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to eq(native.fetch(:ok)), rust.inspect
+    expect(Json::Merge.json_value_for_source(rust.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack')).to eq(
+      Json::Merge.json_value_for_source(native.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack')
+    )
+  end
 end
