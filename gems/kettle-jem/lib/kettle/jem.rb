@@ -19390,7 +19390,76 @@ module Kettle
 
         {target_path: relative_path} if skip_packaged_gemfile_template?(relative_path, config)
       end
+      gemfile_cleanups = reject_loader_referenced_gemfile_cleanups(project_root, gemfile_cleanups)
       (gemfile_cleanups + disabled_integration_config_cleanups(project_root, config)).sort_by { |cleanup| cleanup.fetch(:target_path) }
+    end
+
+    # Reference-closure guard for sweep deletions of per-Ruby-version modular
+    # gemfile variants. The committed loaders (e.g. gemfiles/modular/x_std_libs.gemfile)
+    # branch on RUBY_VERSION and eval_gemfile every bucket variant, so a bucket can
+    # be irrelevant to the destination's minimum test Ruby while older Rubies still
+    # resolve the loader's branch table to it. Observed: the 7.1.41 family sweep
+    # deleted the r2/r3/r3.1 variants (plus the std-lib gem variants they load)
+    # and CI's Ruby 3.3 probe hit Errno::ENOENT eval_gemfile'ing a deleted file.
+    # A variant may only be deleted when no loader that itself survives the sweep
+    # references it, directly or through another kept variant.
+    def reject_loader_referenced_gemfile_cleanups(project_root, cleanups)
+      deletable = cleanups.map { |cleanup| cleanup.fetch(:target_path).to_s }.select { |path| path.end_with?(".gemfile") }.uniq
+      return cleanups if deletable.empty?
+
+      referenced = loader_referenced_gemfile_closure(project_root, deletable.to_set)
+      return cleanups if referenced.empty?
+
+      cleanups.reject { |cleanup| referenced.include?(cleanup.fetch(:target_path).to_s) }
+    end
+
+    # Every +deletable+ gemfile path under the project reachable via
+    # eval_gemfile / require_relative from a gemfile that is NOT slated for
+    # deletion (the loaders that remain after the sweep). Kept variants join the
+    # scan, so reference chains survive whole: loader -> r3/libs.gemfile ->
+    # ../../erb/r3/v5.0.gemfile. References are collected from the AST call
+    # records (Prism), never from regex source scanning; branch tables inside
+    # if/elsif still yield every eval_gemfile call node they contain, which is
+    # exactly the closure the committed loader needs.
+    def loader_referenced_gemfile_closure(project_root, deletable)
+      root = File.expand_path(project_root.to_s)
+      raw_prefix = "#{project_root.to_s.chomp('/')}/"
+      queue = Dir.glob(File.join(root, "gemfiles/**/*.gemfile")).map { |path| path.delete_prefix("#{root}/").delete_prefix(raw_prefix) }
+      main_gemfile = File.join(root, "Gemfile")
+      queue << "Gemfile" if File.file?(main_gemfile)
+      queue.reject! { |path| deletable.include?(path) }
+
+      kept = Set.new
+      scanned = Set.new
+      until queue.empty?
+        relative = queue.pop
+        next unless scanned.add?(relative)
+
+        absolute = File.join(root, relative)
+        next unless File.file?(absolute)
+
+        gemfile_reference_targets(File.read(absolute), File.dirname(absolute)).each do |target|
+          next unless target.start_with?("#{root}/")
+
+          project_relative = target.delete_prefix("#{root}/")
+          next unless deletable.include?(project_relative)
+          next unless kept.add?(project_relative)
+
+          # The referenced variant survives the sweep, so its own references
+          # must survive too (iterated closure to a fixed point).
+          queue << project_relative
+        end
+      end
+      kept
+    end
+
+    # Absolute paths targeted by eval_gemfile / require_relative calls in a
+    # gemfile source. Both resolve relative to the referencing file's directory.
+    def gemfile_reference_targets(content, base_dir)
+      %i[eval_gemfile require_relative].flat_map { |call_name| ruby_call_records(content.to_s, call_name) }
+        .filter_map { |call| ruby_string_argument(call) }
+        .map { |reference| File.expand_path(reference.to_s, base_dir) }
+        .uniq
     end
 
     def shim_profile_cleanups(project_root, facts, preferences, template_selection: {})
