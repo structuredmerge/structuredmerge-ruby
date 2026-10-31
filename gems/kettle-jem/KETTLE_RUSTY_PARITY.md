@@ -108,18 +108,23 @@ other cross-language fixture pair is currently claimed.
 
 kettle-rusty accepts a root Cargo package, one literal workspace member, or one
 literal default-members entry that is also explicitly present in members.
-Missing/empty workspace package selection, multiple default entries, globs, and
-traversal fail closed with diagnostics. Ruby has no equivalent Cargo workspace
-selection surface. Implementation and tests are recorded in #97.
+Missing/empty workspace package selection, multiple default entries, missing
+selected manifests, globs, and traversal fail closed with diagnostics. Ruby has
+no equivalent Cargo workspace selection surface. Implementation and tests are
+recorded in #97.
 
 ## Evidence and remaining work
 
 - Ruby focused suites recorded on #96 pass 173 examples across the e2e thin
   slice, recipe planning, template bootstrap, README/changelog, workflow, and CLI
   groups. This is Ruby implementation evidence, not cross-language parity.
-- Rust cargo test -p kettle-rusty --locked passes 4 unit, 3 CLI, and 20
-  thin-slice tests after the #97 workspace selection change.
+- Rust cargo test -p kettle-rusty --locked passes 4 unit, 3 CLI, and 22
+  thin-slice tests after the #97 workspace selection change and its acceptance
+  audit follow-up.
 - Shared fixture contracts are recorded in #98 and in the fixtures repository.
-- Remaining audit: inspect every public kettle-jem behavior spec and assign each
-  example group to shared semantics, Ruby-only, unsupported, or deferred.
-  Expand paired fixtures only when Rust and Ruby implement the same contract.
+- The spec audit is complete at the behavior-group level: all 40 first-party
+  spec files and 736 explicit examples/shared-example invocations have source
+  line evidence and dispositions in the JSON index. The behavior map records
+  each public surface family and its Ruby/Rust disposition.
+- Future parity work is limited to new paired fixtures where both tools expose
+  the same contract; no broad parity claim is made for Ruby-only features.
