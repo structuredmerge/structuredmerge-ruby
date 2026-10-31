@@ -58,6 +58,37 @@ group dispositions before #96 can close. Passing a suite does not establish
 parity. An unsupported Rust operation requires an explicit diagnostic and
 regression test; it cannot be inferred from a missing crate.
 
+## Mixed-suite behavior boundaries
+
+- integration/recipe_planning_spec.rb: the shared fixture test proves portable
+  template bytes, destination path, changed-path reporting, and reapply no-op.
+  Recipe worker selection, Ractor/thread equivalence, timings, Ruby write-intent
+  scheduling, and Git URL normalization are Ruby implementation details; Rust
+  has no matching parallel-planning API.
+- integration/template_bootstrap_spec.rb: packaged gem bootstrap, monorepo
+  topology, gemspec/license migration, Ruby/RBS version entrypoints, and Gemfile
+  wiring are Ruby-only. The shared local-template convergence fixture does not
+  establish parity for the full bootstrap pipeline.
+- integration/structural_merge_template_spec.rb and
+  kettle/jem_template_markdown_merge_spec.rb: the shared README fixture proves
+  preservation of one user-owned section. Format-specific merge routing,
+  parser/provider failures, structural JSON/YAML/Bash/RBS merges, and Markdown
+  byte-offset edits belong to structured-merge provider parity, not
+  kettle-rusty project templating.
+- integration/readme_changelog_template_spec.rb: README style preservation is
+  comparable only for the shared fixture case. Transfer-changelog parsing,
+  applicability filters, replay cursors, migration, and release-section
+  ordering are Ruby-only.
+- integration/github_workflow_template_spec.rb and
+  kettle/jem_style_workflow_template_spec.rb: Rust workflow path discovery does
+  not correspond to Ruby runtime matrix generation, workflow pin normalization,
+  or Appraisal policy. Only path/report facts are candidates for a future
+  portable comparison.
+- cli_spec.rb: Rust and Ruby expose different command trees and option models.
+  The tests cover each executable's own contract; only generic process outcomes
+  such as usage failure can be compared, and the existing Rust process tests
+  currently cover its own usage and missing-manifest cases.
+
 ## Shared fixture records
 
 | Fixture | Consumers | Contract |
