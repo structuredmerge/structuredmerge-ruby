@@ -2,7 +2,7 @@
   ".simplecov:3300221605": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:3967549179": [
+  "Rakefile:2966310169": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [87, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [171, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
@@ -34,11 +34,23 @@
   "gemfiles/modular/coverage_local.gemfile:1733458466": [
     [43, 121, 366, "Layout/LineLength: Line is too long. [486/120]", 3266283392]
   ],
+  "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/erb/r3/v5.0.gemfile:343545730": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/erb/r4/v5.0.gemfile:343545730": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
+  ],
+  "gemfiles/modular/mutex_m/r2/v0.3.gemfile:4055275004": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
+  ],
+  "gemfiles/modular/mutex_m/r3/v0.3.gemfile:4055275004": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/mutex_m/r4/v0.3.gemfile:4055275004": [
@@ -53,6 +65,12 @@
   ],
   "gemfiles/modular/rspec.gemfile:2263543889": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/stringio/r2/v3.0.gemfile:821604304": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
+  ],
+  "gemfiles/modular/stringio/r3/v3.0.gemfile:821604304": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/stringio/r4/v3.0.gemfile:1375823756": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -80,6 +98,12 @@
   ],
   "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
+  ],
+  "gemfiles/modular/x_std_libs/r2/libs.gemfile:36276542": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
+  ],
+  "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
   "gemfiles/modular/x_std_libs/r4/libs.gemfile:1427643281": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
@@ -1373,39 +1397,39 @@
     [69, 9, 751, "Metrics/MethodLength: Method has too many lines. [12/10]", 3915657972],
     [69, 47, 199, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 2545849044]
   ],
-  "lib/ast/merge/typed_core_provider.rb:3696428186": [
-    [9, 5, 12529, "Metrics/ClassLength: Class has too many lines. [181/100]", 1181369177],
-    [14, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 2690452844],
-    [48, 7, 3961, "Metrics/AbcSize: Assignment Branch Condition size for `execute` is too high. [<14, 82, 20> 85.56/17]", 1998909826],
-    [48, 7, 3961, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `execute` is too high. [20/7]", 1998909826],
-    [48, 7, 3961, "Metrics/MethodLength: Method has too many lines. [46/10]", 1998909826],
-    [48, 7, 3961, "Metrics/PerceivedComplexity: Perceived complexity for `execute` is too high. [20/8]", 1998909826],
-    [62, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 467556763],
-    [82, 130, 12, "Layout/LineLength: Line is too long. [141/120]", 1043736503],
-    [85, 121, 59, "Layout/LineLength: Line is too long. [179/120]", 893760951],
-    [86, 121, 39, "Layout/LineLength: Line is too long. [159/120]", 3983784156],
-    [87, 121, 92, "Layout/LineLength: Line is too long. [212/120]", 1602047082],
-    [88, 121, 58, "Layout/LineLength: Line is too long. [178/120]", 1555825564],
-    [91, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 1340945134],
-    [98, 121, 36, "Layout/LineLength: Line is too long. [156/120]", 3869645323],
-    [138, 7, 2849, "Metrics/AbcSize: Assignment Branch Condition size for `project` is too high. [<19, 71, 10> 74.18/17]", 1125886717],
-    [138, 7, 2849, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `project` is too high. [11/7]", 1125886717],
-    [138, 7, 2849, "Metrics/MethodLength: Method has too many lines. [35/10]", 1125886717],
-    [138, 7, 2849, "Metrics/PerceivedComplexity: Perceived complexity for `project` is too high. [11/8]", 1125886717],
-    [142, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 803595318],
-    [148, 121, 12, "Layout/LineLength: Line is too long. [132/120]", 3552194681],
-    [163, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 1522573198],
-    [168, 121, 49, "Layout/LineLength: Line is too long. [169/120]", 3237563205],
-    [169, 121, 43, "Layout/LineLength: Line is too long. [163/120]", 4258966632],
-    [170, 121, 33, "Layout/LineLength: Line is too long. [153/120]", 2084494791],
-    [171, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 3904389868],
-    [172, 121, 32, "Layout/LineLength: Line is too long. [152/120]", 404071084],
-    [176, 7, 1092, "Metrics/AbcSize: Assignment Branch Condition size for `portable` is too high. [<11, 27, 17> 33.75/17]", 2208946319],
-    [176, 7, 1092, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `portable` is too high. [16/7]", 2208946319],
-    [176, 7, 1092, "Metrics/MethodLength: Method has too many lines. [18/10]", 2208946319],
-    [176, 7, 1092, "Metrics/PerceivedComplexity: Perceived complexity for `portable` is too high. [15/8]", 2208946319],
-    [183, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 2247151577],
-    [199, 7, 858, "Metrics/AbcSize: Assignment Branch Condition size for `revision` is too high. [<3, 17, 2> 17.38/17]", 1230078516]
+  "lib/ast/merge/typed_core_provider.rb:881090668": [
+    [9, 5, 12784, "Metrics/ClassLength: Class has too many lines. [185/100]", 1243933817],
+    [16, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 2690452844],
+    [50, 7, 4155, "Metrics/AbcSize: Assignment Branch Condition size for `execute` is too high. [<16, 85, 20> 88.77/17]", 3313210667],
+    [50, 7, 4155, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `execute` is too high. [20/7]", 3313210667],
+    [50, 7, 4155, "Metrics/MethodLength: Method has too many lines. [49/10]", 3313210667],
+    [50, 7, 4155, "Metrics/PerceivedComplexity: Perceived complexity for `execute` is too high. [20/8]", 3313210667],
+    [66, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 467556763],
+    [86, 130, 12, "Layout/LineLength: Line is too long. [141/120]", 1043736503],
+    [89, 121, 59, "Layout/LineLength: Line is too long. [179/120]", 893760951],
+    [90, 121, 39, "Layout/LineLength: Line is too long. [159/120]", 3983784156],
+    [91, 121, 92, "Layout/LineLength: Line is too long. [212/120]", 1602047082],
+    [92, 121, 58, "Layout/LineLength: Line is too long. [178/120]", 1555825564],
+    [95, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 1340945134],
+    [104, 121, 36, "Layout/LineLength: Line is too long. [156/120]", 3869645323],
+    [144, 7, 2849, "Metrics/AbcSize: Assignment Branch Condition size for `project` is too high. [<19, 71, 10> 74.18/17]", 1125886717],
+    [144, 7, 2849, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `project` is too high. [11/7]", 1125886717],
+    [144, 7, 2849, "Metrics/MethodLength: Method has too many lines. [35/10]", 1125886717],
+    [144, 7, 2849, "Metrics/PerceivedComplexity: Perceived complexity for `project` is too high. [11/8]", 1125886717],
+    [148, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 803595318],
+    [154, 121, 12, "Layout/LineLength: Line is too long. [132/120]", 3552194681],
+    [169, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 1522573198],
+    [174, 121, 49, "Layout/LineLength: Line is too long. [169/120]", 3237563205],
+    [175, 121, 43, "Layout/LineLength: Line is too long. [163/120]", 4258966632],
+    [176, 121, 33, "Layout/LineLength: Line is too long. [153/120]", 2084494791],
+    [177, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 3904389868],
+    [178, 121, 32, "Layout/LineLength: Line is too long. [152/120]", 404071084],
+    [182, 7, 1092, "Metrics/AbcSize: Assignment Branch Condition size for `portable` is too high. [<11, 27, 17> 33.75/17]", 2208946319],
+    [182, 7, 1092, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `portable` is too high. [16/7]", 2208946319],
+    [182, 7, 1092, "Metrics/MethodLength: Method has too many lines. [18/10]", 2208946319],
+    [182, 7, 1092, "Metrics/PerceivedComplexity: Perceived complexity for `portable` is too high. [15/8]", 2208946319],
+    [189, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 2247151577],
+    [205, 7, 858, "Metrics/AbcSize: Assignment Branch Condition size for `revision` is too high. [<3, 17, 2> 17.38/17]", 1230078516]
   ],
   "lib/ast/merge/unresolved_support.rb:2884195150": [
     [7, 5, 24, "Style/Documentation: Missing top-level documentation comment for `module Ast::Merge::UnresolvedSupport`.", 990281691],
