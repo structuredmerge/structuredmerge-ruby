@@ -271,3 +271,19 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(bytes.encoding).to eq(Encoding::ASCII_8BIT)
   end
 end
+
+RSpec.describe "Go shared comment ownership fixture" do
+  it "matches native and Rust host output" do
+    skip "compiled typed core is unavailable" unless Go::Merge::RustHostProvider.available?
+    fixture_path = File.expand_path("../../../../../fixtures/polyglot/typed-core/go_merge3_comment_ownership.json", __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch("input")
+    request = { family: :go, dialect: :go, backend: :rust_tslp, profile_id: :source_preserving,
+      base_source: input.fetch("base"), ours_source: input.fetch("ours"), theirs_source: input.fetch("theirs") }
+    native = Go::Merge::Provider.new.merge3(request)
+    rust = Go::Merge::RustHostProvider.new.merge3(request)
+    expected = fixture.dig("assertions", 1, "value")
+    expect(native.fetch(:output)).to eq(expected)
+    expect(rust.fetch(:output)).to eq(expected)
+  end
+end
