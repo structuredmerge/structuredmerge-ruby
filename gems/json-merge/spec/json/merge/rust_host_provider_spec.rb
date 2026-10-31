@@ -178,6 +178,54 @@ RSpec.describe Json::Merge::RustHostProvider do
     end
   end
 
+  it 'matches native independent merge semantics for every advertised dialect' do
+    skip_for(
+      engine: 'ruby',
+      versions: 'head',
+      reason: 'Ruby head is permanently unsupported by '         "tree_sitter_language_pack's released-ABI-only native gem policy"
+    )
+    skip 'compiled Rust host unavailable' unless described_class.available?
+
+    cases = {
+      json: [
+        "{\"stable\": true}\n",
+        "{\"stable\": true, \"ours\": 1}\n",
+        "{\"stable\": true, \"theirs\": 2}\n"
+      ],
+      jsonc: [
+        "// document\n{\n  \"stable\": true,\n}\n",
+        "// document\n{\n  \"stable\": true,\n  \"ours\": 1,\n}\n",
+        "// document\n{\n  \"stable\": true,\n  \"theirs\": 2,\n}\n"
+      ],
+      json5: [
+        "{\n  stable: true,\n}\n",
+        "{\n  stable: true,\n  ours: 1,\n}\n",
+        "{\n  stable: true,\n  theirs: 2,\n}\n"
+      ]
+    }
+
+    native_provider = Json::Merge::Provider.new
+    cases.each do |dialect, (base, ours, theirs)|
+      native = native_provider.merge3(
+        base_source: base, ours_source: ours, theirs_source: theirs,
+        dialect: dialect, backend: 'kreuzberg-language-pack'
+      )
+      rust = provider.merge3(
+        base_source: base, ours_source: ours, theirs_source: theirs, dialect: dialect
+      )
+
+      expect(native.fetch(:ok)).to be(true), native.inspect
+      expect(rust.fetch(:ok)).to eq(native.fetch(:ok)), rust.inspect
+      native_value = Json::Merge.json_value_for_source(
+        native.fetch(:output), dialect: dialect, backend: 'kreuzberg-language-pack'
+      )
+      rust_value = Json::Merge.json_value_for_source(
+        rust.fetch(:output), dialect: dialect, backend: 'kreuzberg-language-pack'
+      )
+      expect(rust_value).to eq(native_value)
+    end
+  end
+
   it 'matches native merge status and semantic output for exact and conflicting revisions' do
     skip_for(
       engine: 'ruby',
