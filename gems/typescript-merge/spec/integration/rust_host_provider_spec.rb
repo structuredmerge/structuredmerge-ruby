@@ -302,10 +302,13 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
   end
 
   it 'consumes the shared multi-declarator fixture with native fail-closed parity' do
-    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/typescript_merge3_multi_declarator.json', __dir__)
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/typescript_merge3_multi_declarator.json', __dir__
+    )
     fixture = JSON.parse(File.read(fixture_path))
     input = fixture.fetch('input')
-    request = request_base.merge(base_source: input.fetch('base'), ours_source: input.fetch('ours'), theirs_source: input.fetch('theirs'))
+    request = request_base.merge(base_source: input.fetch('base'), ours_source: input.fetch('ours'),
+                                 theirs_source: input.fetch('theirs'))
     native = TypeScript::Merge::Provider.new.merge3(request)
     rust = provider.merge3(request)
     expect(native.fetch(:ok)).to be(false), native.inspect
