@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile's them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.
+
 ### Security
 
 ## [7.1.41] - 2026-10-29
