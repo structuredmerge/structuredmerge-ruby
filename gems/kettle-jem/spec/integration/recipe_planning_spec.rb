@@ -1,6 +1,50 @@
 # frozen_string_literal: true
 
 RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
+  it "matches the shared portable template convergence fixture" do
+    shared_fixture_path = Pathname(__dir__).join(
+      "../../../../../fixtures/packaging/kettle-portable-template-convergence.json"
+    ).expand_path
+    fixture = JSON.parse(shared_fixture_path.read, symbolize_names: true)
+    template_source = fixture.fetch(:template_source_paths).fetch(:rubygems)
+    target_path = fixture.fetch(:template_target_path)
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-portable-template", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+          templates:
+            root: templates
+            apply: true
+            entries:
+              - #{target_path}
+        YAML
+        template_source => fixture.fetch(:template_content)
+      })
+
+      options = { only: target_path }
+      plan = described_class.plan_project(root, env: {}, run_options: options)
+      report = plan.fetch(:recipe_reports).find { |item| item.fetch(:relative_path) == target_path }
+
+      expect(report).to include(changed: true, final_content: fixture.fetch(:expected_content))
+
+      first = described_class.apply_project(root, env: {}, run_options: options)
+      expect(first.fetch(:changed_files)).to eq(fixture.fetch(:expected_changed_files))
+      expect(File.read(File.join(root, target_path))).to eq(fixture.fetch(:expected_content))
+
+      second = described_class.apply_project(root, env: {}, run_options: options)
+      expect(second.fetch(:changed_files)).to eq(fixture.fetch(:expected_second_run_changed_files))
+    end
+  end
+
   include_context "with isolated kettle-jem environment"
   include_context "with kettle-jem fixture contracts"
 
