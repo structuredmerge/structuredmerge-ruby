@@ -190,6 +190,11 @@ release:
     command: kettle-changelog
   aggregate_validation:
     enabled: true
+  version_series:
+    # kettle-jem keeps its own monotonic series; lockstep shared-version raises
+    # skip it and the aggregate same-version invariant tolerates it.
+    independent_members:
+      - kettle-jem
 
 pre_release:
   image_url_skip_patterns:
