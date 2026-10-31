@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- dev benchmark CI job no longer races unpublished lockstep versions: the ast-merge-git appraisal root baseline now resolves lockstep siblings (ast-merge, tree_haver) from STRUCTUREDMERGE_DEV workspace paths, mirroring .github/typed_core.gemfile, so pre-publication aggregate validation runs resolve instead of failing registry-only
+
 ### Security
 
 ## [7.1.18] - 2026-10-30

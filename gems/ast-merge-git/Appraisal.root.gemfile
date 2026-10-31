@@ -6,3 +6,22 @@ source 'https://gem.coop'
 gemspec
 
 gem 'nomono', '~> 1.1', '>= 1.1.17'
+
+# Lockstep family gems: when STRUCTUREDMERGE_DEV points at the workspace gem
+# directories, wire the exact-pinned sibling dependencies from local paths so
+# this baseline stays resolvable while a lockstep version is bumped but not
+# yet published (the aggregate validation run happens before the cohort
+# publishes, so registry-only resolution races unpublished pins such as
+# tree_haver = 7.1.18 against a registry that still only has 7.1.17).
+# Mirrors the lockstep wiring in .github/typed_core.gemfile; registry-only
+# resolution (toggle unset) remains the default for local development and
+# post-publication runs.
+structuredmerge_dev_root = ENV.fetch('STRUCTUREDMERGE_DEV', '')
+if !structuredmerge_dev_root.empty? && !%w[false 0 no off].include?(structuredmerge_dev_root.downcase)
+  %w[ast-merge tree_haver].each do |lockstep_name|
+    lockstep_path = File.join(structuredmerge_dev_root, lockstep_name)
+    if File.directory?(lockstep_path) && File.exist?(File.join(lockstep_path, "#{lockstep_name}.gemspec"))
+      gem lockstep_name, path: lockstep_path
+    end
+  end
+end
