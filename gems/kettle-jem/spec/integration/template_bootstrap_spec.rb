@@ -40,6 +40,30 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "allows a modular path source override for a gemspec runtime dependency" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-runtime-dependency-path-override", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/kettle-jem.yml" => "dependency_conflicts:\n  reviewed: true\n  resolve: []\n"
+      })
+      reports = [
+        {
+          relative_path: "tree_haver.gemspec",
+          final_content: %(spec.add_dependency("structuredmerge-core", "~> 0.2")\n)
+        },
+        {
+          relative_path: "gemfiles/modular/templating.gemfile",
+          final_content: %(gem "structuredmerge-core", path: File.join(core_root, "packages/ruby")\n)
+        }
+      ]
+
+      expect {
+        described_class.validate_modular_dependency_conflicts!(root, reports)
+      }.not_to raise_error
+    end
+  end
+
   it "keeps an explicit direct-versus-modular dependency decision stable across runs" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

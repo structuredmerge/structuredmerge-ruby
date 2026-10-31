@@ -9925,8 +9925,9 @@ module Kettle
         direct_records = dependency_records_for(direct_path, content)
         modular.flat_map do |modular_path, modular_content|
           modular_records = dependency_records_for(modular_path, modular_content)
+          source_overrides = gemfile_path_source_override_names(modular_content)
           direct_records.flat_map do |direct_record|
-            modular_records.select { |record| record.fetch(:name) == direct_record.fetch(:name) }.map do |modular_record|
+            modular_records.select { |record| record.fetch(:name) == direct_record.fetch(:name) && !source_overrides.include?(record.fetch(:name)) }.map do |modular_record|
               {
                 name: direct_record.fetch(:name),
                 direct: direct_path,
