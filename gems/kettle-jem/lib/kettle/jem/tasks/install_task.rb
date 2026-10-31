@@ -1001,7 +1001,7 @@ module Kettle
           command_env = (env || {}).to_h.dup
           strip_inherited_bundler_activation!(command_env)
           command_env["K_JEM_TEMPLATING"] = "false"
-          %w[KETTLE_DEV_DEV GALTZO_FLOSS_DEV STRUCTUREDMERGE_DEV].each do |key|
+          %w[KETTLE_DEV_DEV GALTZO_FLOSS_DEV STRUCTUREDMERGE_DEV STRUCTUREDMERGE_CORE_DEV].each do |key|
             command_env[key] = "false" if command_env.key?(key)
           end
           gemfile = File.join(project_root.to_s, "Gemfile")

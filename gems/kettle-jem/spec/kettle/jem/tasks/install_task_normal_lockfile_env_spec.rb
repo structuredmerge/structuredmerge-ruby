@@ -36,6 +36,18 @@ RSpec.describe Kettle::Jem::Tasks::InstallTask, ".normal_lockfile_env" do
     end
   end
 
+  it "disables local core paths while normalizing release lockfiles" do
+    env = described_class.send(
+      :normal_lockfile_env,
+      @root,
+      {"STRUCTUREDMERGE_CORE_DEV" => "/workspace/structuredmerge", "STRUCTUREDMERGE_CORE_PUBLISHED" => "true"},
+      repository: {mode: "standalone"}
+    )
+
+    expect(env["STRUCTUREDMERGE_CORE_DEV"]).to eq("false")
+    expect(env["STRUCTUREDMERGE_CORE_PUBLISHED"]).to eq("true")
+  end
+
   it "does not infer local development from adjacent standalone repositories in CI" do
     env = described_class.send(:normal_lockfile_env, @root, {"CI" => "true"}, repository: {mode: "standalone"})
 
