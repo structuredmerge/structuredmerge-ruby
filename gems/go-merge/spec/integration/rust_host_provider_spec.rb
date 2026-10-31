@@ -272,14 +272,14 @@ RSpec.describe Go::Merge::RustHostProvider do
   end
 end
 
-RSpec.describe "Go shared conflict fixture" do
-  it "matches fail-closed status while exposing the remaining diagnostic-category gap" do
-    skip "compiled typed core is unavailable" unless Go::Merge::RustHostProvider.available?
-    fixture_path = File.expand_path("../../../../../fixtures/polyglot/typed-core/go_merge3_conflict.json", __dir__)
+RSpec.describe 'Go shared conflict fixture' do
+  it 'matches fail-closed status while exposing the remaining diagnostic-category gap' do
+    skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
+    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/go_merge3_conflict.json', __dir__)
     fixture = JSON.parse(File.read(fixture_path))
-    input = fixture.fetch("input")
+    input = fixture.fetch('input')
     request = { family: :go, dialect: :go, backend: :rust_tslp, profile_id: :source_preserving,
-      base_source: input.fetch("base"), ours_source: input.fetch("ours"), theirs_source: input.fetch("theirs") }
+                base_source: input.fetch('base'), ours_source: input.fetch('ours'), theirs_source: input.fetch('theirs') }
     native = Go::Merge::Provider.new.merge3(request)
     rust = Go::Merge::RustHostProvider.new.merge3(request)
 
@@ -287,8 +287,8 @@ RSpec.describe "Go shared conflict fixture" do
     expect(rust.fetch(:ok)).to be(false)
     expect(native[:output]).to be_nil
     expect(rust[:output]).to be_nil
-    expect(native.fetch(:conflicts).length).to eq(fixture.dig("assertions", 2, "value"))
-    expect(rust.fetch(:conflicts).length).to eq(fixture.dig("assertions", 2, "value"))
+    expect(native.fetch(:conflicts).length).to eq(fixture.dig('assertions', 2, 'value'))
+    expect(rust.fetch(:conflicts).length).to eq(fixture.dig('assertions', 2, 'value'))
     expect(native.fetch(:conflicted_output)).not_to be_empty
     expect(rust[:conflicted_output]).to be_nil
     expect(native.fetch(:diagnostics).first).to include(category: :unsafe_source_range, blocking: true)
@@ -296,17 +296,18 @@ RSpec.describe "Go shared conflict fixture" do
   end
 end
 
-RSpec.describe "Go shared comment ownership fixture" do
-  it "matches native and Rust host output" do
-    skip "compiled typed core is unavailable" unless Go::Merge::RustHostProvider.available?
-    fixture_path = File.expand_path("../../../../../fixtures/polyglot/typed-core/go_merge3_comment_ownership.json", __dir__)
+RSpec.describe 'Go shared comment ownership fixture' do
+  it 'matches native and Rust host output' do
+    skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
+    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/go_merge3_comment_ownership.json',
+                                    __dir__)
     fixture = JSON.parse(File.read(fixture_path))
-    input = fixture.fetch("input")
+    input = fixture.fetch('input')
     request = { family: :go, dialect: :go, backend: :rust_tslp, profile_id: :source_preserving,
-      base_source: input.fetch("base"), ours_source: input.fetch("ours"), theirs_source: input.fetch("theirs") }
+                base_source: input.fetch('base'), ours_source: input.fetch('ours'), theirs_source: input.fetch('theirs') }
     native = Go::Merge::Provider.new.merge3(request)
     rust = Go::Merge::RustHostProvider.new.merge3(request)
-    expected = fixture.dig("assertions", 1, "value")
+    expected = fixture.dig('assertions', 1, 'value')
     expect(native.fetch(:output)).to eq(expected)
     expect(rust.fetch(:output)).to eq(expected)
   end
