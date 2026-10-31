@@ -182,7 +182,7 @@ RSpec.describe Json::Merge::RustHostProvider do
     skip_for(
       engine: 'ruby',
       versions: 'head',
-      reason: 'Ruby head is permanently unsupported by '         "tree_sitter_language_pack's released-ABI-only native gem policy"
+      reason: 'Ruby head is permanently unsupported by ' + "tree_sitter_language_pack's released-ABI-only native gem policy"
     )
     skip 'compiled Rust host unavailable' unless described_class.available?
 
@@ -286,7 +286,8 @@ RSpec.describe Json::Merge::RustHostProvider do
   end
 
   it 'consumes the shared nested owner fixture against native and Rust providers' do
-    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/typed-core/json_merge3_nested_owner.json', __dir__)
+    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/typed-core/json_merge3_nested_owner.json',
+                                    __dir__)
     fixture = JSON.parse(File.read(fixture_path))
     input = fixture.fetch('input')
     request = { base_source: input.fetch('base'), ours_source: input.fetch('ours'),
@@ -295,8 +296,11 @@ RSpec.describe Json::Merge::RustHostProvider do
     rust = provider.merge3(request)
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(rust.fetch(:ok)).to eq(native.fetch(:ok)), rust.inspect
-    expect(Json::Merge.json_value_for_source(rust.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack')).to eq(
-      Json::Merge.json_value_for_source(native.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack')
-    )
+    expect(Json::Merge.json_value_for_source(rust.fetch(:output), dialect: :json,
+                                                                  backend: 'kreuzberg-language-pack')).to eq(
+                                                                    Json::Merge.json_value_for_source(
+                                                                      native.fetch(:output), dialect: :json, backend: 'kreuzberg-language-pack'
+                                                                    )
+                                                                  )
   end
 end
