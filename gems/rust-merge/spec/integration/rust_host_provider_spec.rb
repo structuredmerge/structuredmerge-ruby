@@ -365,7 +365,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
   it 'rejects unsupported selectors, syntax and framing without changing caller bytes' do
     expect(provider.analyze(source: base_source, dialect: :go)).to include(ok: false)
     expect(provider.analyze(source: base_source, comments: true)).to include(ok: false)
-    expect(provider.analyze(source: "#[test]\nfn f() {}\n")).to include(ok: false)
+    expect(provider.analyze(source: "macro_rules! m { () => {} }\n")).to include(ok: false)
     request = { base_source: base_source, ours_source: base_source, theirs_source: base_source }
     expect(provider.merge3(request.merge(path_name: 'file.rs', labels: {},
                                          conflict_marker_size: '7'))).to include(ok: true)

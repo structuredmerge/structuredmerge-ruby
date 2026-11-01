@@ -138,6 +138,15 @@ module Rust
         policies: [DESTINATION_WINS_ARRAY_POLICY] }
     end
 
+    # Owner paths are namespace-specific, matching the syn-backed typed core, so a type and a
+    # function with the same spelling remain distinct owners.
+    RUST_OWNER_NAMESPACES = {
+      'function_item' => 'function', 'struct_item' => 'struct', 'enum_item' => 'enum',
+      'trait_item' => 'trait', 'impl_item' => 'impl', 'const_item' => 'const',
+      'static_item' => 'static', 'type_item' => 'type', 'mod_item' => 'mod'
+    }.freeze
+    private_constant :RUST_OWNER_NAMESPACES
+
     def analyze_rust_module(source)
       parser = TreeHaver.parser_for(:rust, backend_type: :tree_sitter)
       tree = parser.parse(source)
@@ -161,7 +170,7 @@ module Rust
           next unless name
 
           declarations << {
-            path: "/declarations/#{name}",
+            path: "/#{RUST_OWNER_NAMESPACES.fetch(node.type)}:#{name}",
             owner_kind: 'declaration',
             match_key: name,
             text: declaration_text(source, node)
