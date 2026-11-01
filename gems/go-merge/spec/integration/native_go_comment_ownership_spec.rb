@@ -93,6 +93,30 @@ RSpec.describe 'Go native comment ownership fixture' do
     )
   end
 
+  it 'records native go/parser BOM acceptance separately from Tree-sitter provider boundaries' do
+    fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/bom-source-ownership.json',
+                                    __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    fixture.fetch('cases').each do |test_case|
+      expected = test_case.fetch('expected')
+      native_request = { source: test_case.fetch('source'), dialect: :go }
+      rust_request = {
+        family: :go,
+        dialect: :go,
+        backend: :rust_tslp,
+        profile_id: :source_preserving,
+        source: test_case.fetch('source')
+      }
+      ruby = Go::Merge::Provider.new.analyze(native_request)
+      rust = Go::Merge::RustHostProvider.new.analyze(rust_request)
+
+      expect(ruby.fetch(:ok)).to be(false), "#{test_case.fetch('name')}: #{ruby.inspect}"
+      expect(ruby.dig(:diagnostics, 0, :category).to_s).to eq(expected.fetch('ruby_treesitter_category'))
+      expect(rust.fetch(:ok)).to be(false), "#{test_case.fetch('name')}: #{rust.inspect}"
+      expect(rust.dig(:diagnostics, 0, :category).to_s).to eq(expected.fetch('rust_treesitter_category'))
+    end
+  end
+
   it 'fails closed on partial parser recovery in both Ruby and Rust providers' do
     fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/parser-recovery-fail-closed.json',
                                     __dir__)
