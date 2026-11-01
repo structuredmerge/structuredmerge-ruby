@@ -3,7 +3,7 @@
 require 'json'
 
 RSpec.describe 'shared ast-merge source-line disposition contract' do
-  Owner = Struct.new(:id, :start_line, :end_line, :indent, keyword_init: true)
+  LineDispositionOwner = Struct.new(:id, :start_line, :end_line, :indent, keyword_init: true)
 
   it 'composes Ruby comment and layout augmenters into the shared per-line rubric' do
     fixture_path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/source_line_disposition.json', __dir__)
@@ -11,7 +11,7 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
 
     fixture.fetch('cases').each do |contract|
       owners = contract.fetch('owners').map do |entry|
-        Owner.new(id: entry.fetch('id'), start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'), indent: entry.fetch('indent'))
+        LineDispositionOwner.new(id: entry.fetch('id'), start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'), indent: entry.fetch('indent'))
       end
       comments = contract.fetch('comments').map do |entry|
         entry.transform_keys(&:to_sym).merge(raw: entry.fetch('text'))
