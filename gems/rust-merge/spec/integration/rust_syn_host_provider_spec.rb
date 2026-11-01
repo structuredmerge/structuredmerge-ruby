@@ -838,7 +838,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
     end
   end
 
-  it 'fails closed when a reorder crosses the other tip’s new owner gap' do
+  it 'reports an owner-order conflict when a reorder crosses the other tip’s new owner gap' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
@@ -861,8 +861,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
     expect(result.fetch(:ok)).to eq(false), result.inspect
     expect(result[:output]).to be_nil
-    expect(result.dig(:conflicts, 0, :conflict_id)).to eq('rust-owner-order-divergence')
-    expect(result.dig(:conflicts, 0, :path)).to eq('<owner-order>')
+    expect(result.dig(:conflicts, 0, :typed_record, :canonical, :id)).to eq('rust-owner-order-divergence')
+    expect(result.dig(:conflicts, 0, :typed_record, :canonical, :subject, :structural_path)).to eq('<owner-order>')
   end
 
 end
