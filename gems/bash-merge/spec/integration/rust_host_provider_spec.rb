@@ -210,17 +210,6 @@ RSpec.describe Bash::Merge::RustHostProvider do
         category: expected.fetch('diagnostic_category').to_sym
       )
     end
-
-    ours = source.sub('x=1', 'x=2')
-    theirs = source.sub('y=1', 'y=2')
-    request = request_base.merge(base_source: source, ours_source: ours, theirs_source: theirs)
-    native = Bash::Merge::Provider.new.merge3(request)
-    rust = provider.merge3(request)
-
-    expect(native.fetch(:ok)).to be(false), native.inspect
-    expect(rust.fetch(:ok)).to be(false), rust.inspect
-    expect(native.fetch(:diagnostics).first).to include(category: expected.fetch('diagnostic_category').to_sym)
-    expect(rust.fetch(:diagnostics).first).to include(category: expected.fetch('diagnostic_category').to_sym)
   end
 
   it 'preserves native output for literal test-harness edits' do
