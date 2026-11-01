@@ -326,12 +326,33 @@ RSpec.describe Rust::Merge::RustHostProvider do
       profile_id: :source_preserving,
       source: input.fetch('base')
     )
+    diff = provider.diff2(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      before_source: input.fetch('base'),
+      after_source: input.fetch('ours')
+    )
+    directional = provider.merge2(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      incoming_source: input.fetch('base'),
+      current_source: ""
+    )
 
     expect(result.fetch(:ok)).to eq(true), result.inspect
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
     expect(analysis.fetch(:ok)).to eq(true), analysis.inspect
     expect(analysis.dig(:analysis, :declarations).map { |owner| owner.fetch(:path) })
       .to include(fixture.dig('expected', 'trait_alias_path'))
+    expect(diff.fetch(:ok)).to eq(true), diff.inspect
+    expect(diff.fetch(:changes).map { |change| change.fetch(:path) })
+      .to include(fixture.dig('expected', 'trait_alias_path'))
+    expect(directional.fetch(:ok)).to eq(true), directional.inspect
+    expect(directional.fetch(:output)).to eq(input.fetch('base'))
   end
 
   it 'merges extern-crate alias changes with independent function edits through rust_syn' do
