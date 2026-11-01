@@ -1489,8 +1489,8 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
           end
         RUBY
         ".kettle-jem.yml" => {
-          "readme" => { "preserve_sections" => fixture.fetch(:preserve_sections) },
-          "templates" => { "root" => "template", "apply" => true, "entries" => ["README.md"] }
+          "readme" => {"preserve_sections" => fixture.fetch(:preserve_sections)},
+          "templates" => {"root" => "template", "apply" => true, "entries" => ["README.md"]}
         }.to_yaml,
         "README.md" => fixture.fetch(:destination_readme),
         "template/README.md.example" => [
@@ -1511,7 +1511,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
         ].join("\n")
       })
 
-      plan = described_class.plan_project(root, env: {}, run_options: { only: "README.md" })
+      plan = described_class.plan_project(root, env: {}, run_options: {only: "README.md"})
       report = plan.fetch(:recipe_reports).find { |item| item.fetch(:relative_path) == "README.md" }
       fixture.fetch(:expected_preserved_fragments).each do |fragment|
         expect(report.fetch(:final_content)).to include(fragment)

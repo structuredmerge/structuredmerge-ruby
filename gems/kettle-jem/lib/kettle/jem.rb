@@ -19423,7 +19423,7 @@ module Kettle
     # exactly the closure the committed loader needs.
     def loader_referenced_gemfile_closure(project_root, deletable)
       root = File.expand_path(project_root.to_s)
-      raw_prefix = "#{project_root.to_s.chomp('/')}/"
+      raw_prefix = "#{project_root.to_s.chomp("/")}/"
       queue = Dir.glob(File.join(root, "gemfiles/**/*.gemfile")).map { |path| path.delete_prefix("#{root}/").delete_prefix(raw_prefix) }
       main_gemfile = File.join(root, "Gemfile")
       queue << "Gemfile" if File.file?(main_gemfile)
