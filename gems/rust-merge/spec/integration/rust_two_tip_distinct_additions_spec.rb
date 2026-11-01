@@ -290,6 +290,40 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
   end
 
+  it 'preserves a one-sided owner reorder beside a documented edge addition' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_edge_addition_with_reorder.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    expect(native.fetch(:ok)).to be(true)
+    expect(native.fetch(:output)).to eq(fixture.dig('ruby_native_expected', 'output'))
+
+    backends = [:rust_tslp]
+    if StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.edge-addition-reorder')
+      backends << :rust_syn
+    end
+    backends.each do |backend|
+      result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving
+      ))
+      expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
+      expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    end
+  end
+
   it 'composes two-tip additions from empty and comment-only bases' do
     fixture_path = File.expand_path(
       '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_tip_additions_empty_base.json',
