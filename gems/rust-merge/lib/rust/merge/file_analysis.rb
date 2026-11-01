@@ -69,6 +69,8 @@ module Rust
         attached = []
         cursor = owner.start_byte
         items.reverse_each do |item|
+          break if inner_document_comment?(item)
+
           gap = source.byteslice(item.end_byte...cursor).to_s
           break unless whitespace_only?(gap)
           break if gap.count("\n") > 1 && !structural_attribute?(item)
@@ -83,6 +85,10 @@ module Rust
         return true if NodeWrapper::ATTRIBUTE_TYPES.include?(item.type)
 
         !find_descendant(item, 'outer_doc_comment_marker').nil?
+      end
+
+      def inner_document_comment?(item)
+        comment?(item) && !find_descendant(item, 'inner_doc_comment_marker').nil?
       end
 
       def find_descendant(parent, type)
