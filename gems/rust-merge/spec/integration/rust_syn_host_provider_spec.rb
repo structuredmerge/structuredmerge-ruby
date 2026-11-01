@@ -147,6 +147,33 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'merges named macro definitions as whole owners through rust_syn' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/rust_macro_definition_merge3.json', __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    native = Rust::Merge::Provider.new.merge3(request)
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.macro-owner')
+    rust = described_class.new.merge3(request.merge(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    ))
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(native.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    expect(rust.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+  end
+
   it 'matches the shared Rust parser and owner-profile failure boundary' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
