@@ -75,7 +75,7 @@ module Ast
             trailing.each { |comment| claimed << comment.object_id }
             [owner, { leading: leading, inline: inline, trailing: trailing }]
           end
-          layout_attachments = build_layout_attachments_by_owner(comments_by_owner)
+          layout_attachments = build_layout_attachments_by_owner
 
           owners.each do |owner|
             comments = comments_by_owner.fetch(owner)
@@ -329,20 +329,10 @@ module Ast
           )
         end
 
-        def build_layout_attachments_by_owner(comments_by_owner)
+        def build_layout_attachments_by_owner
           return {} if owners.empty?
 
-          boundaries = comments_by_owner.flat_map do |owner, comments|
-            %i[leading trailing].filter_map do |kind|
-              region = comments.fetch(kind)
-              next if region.empty?
-
-              { owner: owner, kind: kind, start_line: region.map { |comment| comment.fetch(:line) }.min,
-                end_line: region.map { |comment| comment.fetch(:line) }.max }
-            end
-          end
-          Ast::Merge::Layout::Augmenter.new(lines: lines, owners: owners,
-                                            comment_boundaries: boundaries).attachments_by_owner
+          Ast::Merge::Layout::Augmenter.new(lines: lines, owners: owners).attachments_by_owner
         end
 
         def normalize_lines(lines, source)

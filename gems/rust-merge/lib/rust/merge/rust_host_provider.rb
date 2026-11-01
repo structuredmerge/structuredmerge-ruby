@@ -24,18 +24,18 @@ module Rust
       def parser_backends = %i[rust_tslp rust_syn]
 
       def parser_backend_available?(backend)
-        return super unless backend == "rust_syn"
+        return super unless backend == 'rust_syn'
 
-        require "structuredmerge_core" unless defined?(::StructuredmergeCore)
+        require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
         ::StructuredmergeCore.respond_to?(:register_rust_syn_parser)
       rescue LoadError
         false
       end
 
       def register_parser_backend(dialect, backend)
-        return super unless backend == "rust_syn"
+        return super unless backend == 'rust_syn'
 
-        core.register_rust_syn_parser("rust.syn.ruby").id
+        core.register_rust_syn_parser('rust.syn.ruby').id
       end
 
       def package_version = Rust::Merge::Version::VERSION

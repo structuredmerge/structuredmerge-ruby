@@ -8,9 +8,9 @@ RSpec.describe 'Rust owner membership change with an independent edit' do
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
     fixture = JSON.parse(File.read(File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/rust_merge3_owner_membership_change_with_independent_edit.json',
-      __dir__
-    )))
+                                     '../../../../../fixtures/polyglot/typed-core/rust_merge3_owner_membership_change_with_independent_edit.json',
+                                     __dir__
+                                   )))
     input = fixture.fetch('input')
     request = {
       base_source: input.fetch('base'),
@@ -20,9 +20,7 @@ RSpec.describe 'Rust owner membership change with an independent edit' do
     ruby_expected = fixture.fetch('ruby_native_expected')
     native = Rust::Merge::Provider.new.merge3(request)
     expect(native.fetch(:ok)).to eq(ruby_expected.fetch('outcome') == 'clean'), native.inspect
-    if ruby_expected.key?('output')
-      expect(native.fetch(:output)).to eq(ruby_expected.fetch('output'))
-    end
+    expect(native.fetch(:output)).to eq(ruby_expected.fetch('output')) if ruby_expected.key?('output')
     if ruby_expected.key?('diagnostic_category')
       expect(native.fetch(:diagnostics).first.fetch(:category).to_s)
         .to eq(ruby_expected.fetch('diagnostic_category'))
@@ -43,10 +41,8 @@ RSpec.describe 'Rust owner membership change with an independent edit' do
       )
       host_expected = fixture.fetch('rust_host_expected').fetch(backend.to_s)
       expect(result.fetch(:ok)).to eq(host_expected.fetch('outcome') == 'clean'),
-                                     "#{backend}: #{result.inspect}"
-      if host_expected.key?('output')
-        expect(result.fetch(:output)).to eq(host_expected.fetch('output')), backend.to_s
-      end
+                                   "#{backend}: #{result.inspect}"
+      expect(result.fetch(:output)).to eq(host_expected.fetch('output')), backend.to_s if host_expected.key?('output')
       if host_expected.key?('diagnostic_category')
         expect(result.fetch(:diagnostics).first.fetch(:category).to_s)
           .to eq(host_expected.fetch('diagnostic_category')), backend.to_s

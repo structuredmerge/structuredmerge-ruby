@@ -14,7 +14,7 @@ RSpec.describe 'shared Ast::Merge comment layout contract' do
       owner_class.new(start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'),
                       indent: entry.fetch('indent'), id: entry.fetch('id'))
     end
-    by_id = owners.to_h { |owner| [owner.id, owner] }
+    owners.to_h { |owner| [owner.id, owner] }
     comments = fixture.fetch('comments').map do |entry|
       entry.transform_keys(&:to_sym).merge(raw: entry.fetch('text'))
     end

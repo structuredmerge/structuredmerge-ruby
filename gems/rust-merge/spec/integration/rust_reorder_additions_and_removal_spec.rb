@@ -29,10 +29,8 @@ RSpec.describe 'Rust compatible reorder merge with additions and removal' do
       native = Rust::Merge::Provider.new.merge3(request)
       ruby_expected = fixture.fetch('ruby_native_expected')
       expect(native.fetch(:ok)).to eq(ruby_expected.fetch('outcome') == 'clean'),
-                                  "#{fixture_name}: #{native.inspect}"
-      if ruby_expected.key?('output')
-        expect(native.fetch(:output)).to eq(ruby_expected.fetch('output')), fixture_name
-      end
+                                   "#{fixture_name}: #{native.inspect}"
+      expect(native.fetch(:output)).to eq(ruby_expected.fetch('output')), fixture_name if ruby_expected.key?('output')
       if ruby_expected.key?('diagnostic_category')
         expect(native.fetch(:diagnostics).first.fetch(:category).to_s)
           .to eq(ruby_expected.fetch('diagnostic_category')), fixture_name
@@ -51,9 +49,9 @@ RSpec.describe 'Rust compatible reorder merge with additions and removal' do
           **request
         )
         expect(result.fetch(:ok)).to eq(fixture.dig('expected', 'outcome') == 'clean'),
-                                       "#{fixture_name} #{backend}: #{result.inspect}"
+                                     "#{fixture_name} #{backend}: #{result.inspect}"
         expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output')),
-                                       "#{fixture_name} #{backend}"
+                                         "#{fixture_name} #{backend}"
       end
     end
   end

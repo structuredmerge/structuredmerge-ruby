@@ -125,9 +125,10 @@ module Ast
             start_line = Integer(boundary.fetch(:start_line))
             end_line = Integer(boundary.fetch(:end_line))
             unless owners.include?(owner) && %i[leading trailing].include?(kind) &&
-                start_line.positive? && end_line >= start_line && end_line <= lines.length
+                   start_line.positive? && end_line >= start_line && end_line <= lines.length
               raise ArgumentError, 'comment boundary has an invalid owner, kind, or line range'
             end
+
             outside_owner = if kind == :leading
                               end_line < owner_start_line(owner)
                             else

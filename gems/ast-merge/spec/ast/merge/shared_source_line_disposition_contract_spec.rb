@@ -6,12 +6,14 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
   LineDispositionOwner = Struct.new(:id, :start_line, :end_line, :indent, keyword_init: true)
 
   it 'composes Ruby comment and layout augmenters into the shared per-line rubric' do
-    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/source_line_disposition.json', __dir__)
+    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/source_line_disposition.json',
+                                    __dir__)
     fixture = JSON.parse(File.read(fixture_path))
 
     fixture.fetch('cases').each do |contract|
       owners = contract.fetch('owners').map do |entry|
-        LineDispositionOwner.new(id: entry.fetch('id'), start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'), indent: entry.fetch('indent'))
+        LineDispositionOwner.new(id: entry.fetch('id'), start_line: entry.fetch('start_line'),
+                                 end_line: entry.fetch('end_line'), indent: entry.fetch('indent'))
       end
       comments = contract.fetch('comments').map do |entry|
         entry.transform_keys(&:to_sym).merge(raw: entry.fetch('text'))
@@ -29,15 +31,20 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
           actual_comment_regions << comment_region_record(owner.id, kind.to_s, region)
         end
       end
-      { 'preamble' => comment_augmenter.preamble_region, 'postlude' => comment_augmenter.postlude_region }.each do |kind, region|
+      { 'preamble' => comment_augmenter.preamble_region,
+        'postlude' => comment_augmenter.postlude_region }.each do |kind, region|
         actual_comment_regions << comment_region_record(nil, kind, region) if region
       end
       comment_augmenter.orphan_regions.each do |region|
         actual_comment_regions << comment_region_record(nil, 'orphan', region)
       end
-      region_keys = contract.fetch('comment_regions').to_h { |region| [region.fetch('id'), region.fetch('selection_key')] }
+      region_keys = contract.fetch('comment_regions').to_h do |region|
+        [region.fetch('id'), region.fetch('selection_key')]
+      end
       actual_comment_regions.each { |region| region['selection_key'] = region_keys.fetch(region.fetch('id')) }
-      actual_comment_regions.sort_by! { |region| [region.fetch('start_line'), region.fetch('end_line'), region.fetch('id')] }
+      actual_comment_regions.sort_by! do |region|
+        [region.fetch('start_line'), region.fetch('end_line'), region.fetch('id')]
+      end
       expect(actual_comment_regions).to eq(contract.fetch('comment_regions')), contract.fetch('name')
 
       owner_by_id = owners.to_h { |owner| [owner.id, owner] }
@@ -107,12 +114,14 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
         current = dispositions[line_number - 1]
         if current
           if region['owner_id'].nil? && containing_owner &&
-              current['kind'] == 'structural_owner' && current['owner_id'] == containing_owner.id
+             current['kind'] == 'structural_owner' && current['owner_id'] == containing_owner.id
             current['comment_region_ids'] << region.fetch('id')
             current['root_region_kind'] = region.fetch('kind')
             next
           end
-          raise "comment and structural owner disagree at line #{line_number}" unless current['kind'] == 'structural_owner' && current['owner_id'] == region['owner_id']
+          unless current['kind'] == 'structural_owner' && current['owner_id'] == region['owner_id']
+            raise "comment and structural owner disagree at line #{line_number}"
+          end
 
           current['comment_region_ids'] << region.fetch('id')
           current['comment_kind'] = region.fetch('kind')

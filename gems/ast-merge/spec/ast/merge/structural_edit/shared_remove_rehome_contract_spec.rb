@@ -13,7 +13,7 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
                 case_data.fetch('removed_attachments').map { |entry| entry['owner_id'] } +
                 case_data.dig('owner_overrides', 'removed_owner_ids').to_a +
                 case_data.dig('owner_overrides', 'retained_owner_ids').to_a).compact.uniq
-                 .to_h { |id| [id, owner_class.new(id)] }
+               .to_h { |id| [id, owner_class.new(id)] }
       boundary_for = lambda do |key, edge|
         entry = case_data.dig('boundaries', key)
         entry && Ast::Merge::StructuralEdit::Boundary.new(edge: edge, owner: owners.fetch(entry.fetch('owner_id')))
@@ -77,4 +77,3 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
     end
   end
 end
-

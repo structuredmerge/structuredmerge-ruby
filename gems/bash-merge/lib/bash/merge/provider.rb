@@ -131,12 +131,12 @@ module Bash
             output_line_count: merged.lines.length
           }
         )
-      rescue StandardError => error
+      rescue StandardError => e
         failure(
           :merge2,
           request,
           category: :provider_failure,
-          message: error.message
+          message: e.message
         )
       end
 

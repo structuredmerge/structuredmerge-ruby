@@ -8,9 +8,9 @@ RSpec.describe 'Rust comment rehome with an owner deletion and independent edit'
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
     fixture = JSON.parse(File.read(File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/rust_merge3_comment_rehome_on_owner_deletion_with_independent_edit.json',
-      __dir__
-    )))
+                                     '../../../../../fixtures/polyglot/typed-core/rust_merge3_comment_rehome_on_owner_deletion_with_independent_edit.json',
+                                     __dir__
+                                   )))
     input = fixture.fetch('input')
     request = {
       base_source: input.fetch('base'),

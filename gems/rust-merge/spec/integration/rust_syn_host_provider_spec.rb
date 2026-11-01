@@ -169,11 +169,11 @@ RSpec.describe Rust::Merge::RustHostProvider do
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.directional-comment-gap')
     %i[rust_tslp rust_syn].each do |backend|
       rust = described_class.new.merge2(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
+                                          family: :rust,
+                                          dialect: :rust,
+                                          backend: backend,
+                                          profile_id: :source_preserving
+                                        ))
 
       expect(rust.fetch(:ok)).to eq(fixture.dig('expected', 'ok')), "#{backend}: #{rust.inspect}"
       expect(rust.fetch(:output)).to eq(fixture.dig('expected', 'output')), backend.to_s
@@ -188,7 +188,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
-    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/rust_macro_definition_merge3.json', __dir__)
+    fixture_path = File.expand_path('../../../../../fixtures/polyglot/typed-core/rust_macro_definition_merge3.json',
+                                    __dir__)
     fixture = JSON.parse(File.read(fixture_path))
     input = fixture.fetch('input')
     request = {
@@ -199,11 +200,11 @@ RSpec.describe Rust::Merge::RustHostProvider do
     native = Rust::Merge::Provider.new.merge3(request)
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.macro-owner')
     rust = described_class.new.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_syn,
-      profile_id: :source_preserving
-    ))
+                                        family: :rust,
+                                        dialect: :rust,
+                                        backend: :rust_syn,
+                                        profile_id: :source_preserving
+                                      ))
 
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(rust.fetch(:ok)).to be(true), rust.inspect
@@ -229,11 +230,11 @@ RSpec.describe Rust::Merge::RustHostProvider do
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.impl-forms')
     provider = described_class.new
     result = provider.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_syn,
-      profile_id: :source_preserving
-    ))
+                               family: :rust,
+                               dialect: :rust,
+                               backend: :rust_syn,
+                               profile_id: :source_preserving
+                             ))
     analysis = provider.analyze(
       family: :rust,
       dialect: :rust,
@@ -266,11 +267,11 @@ RSpec.describe Rust::Merge::RustHostProvider do
     }
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.impl-owner')
     result = described_class.new.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_syn,
-      profile_id: :source_preserving
-    ))
+                                          family: :rust,
+                                          dialect: :rust,
+                                          backend: :rust_syn,
+                                          profile_id: :source_preserving
+                                        ))
 
     expect(result.fetch(:ok)).to eq(true), result.inspect
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
@@ -351,11 +352,11 @@ RSpec.describe Rust::Merge::RustHostProvider do
       theirs_source: input.fetch('theirs')
     }
     result = provider.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_syn,
-      profile_id: :source_preserving
-    ))
+                               family: :rust,
+                               dialect: :rust,
+                               backend: :rust_syn,
+                               profile_id: :source_preserving
+                             ))
     analysis = provider.analyze(
       family: :rust,
       dialect: :rust,
@@ -377,7 +378,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
       backend: :rust_syn,
       profile_id: :source_preserving,
       incoming_source: input.fetch('base'),
-      current_source: ""
+      current_source: ''
     )
 
     expect(result.fetch(:ok)).to eq(true), result.inspect
@@ -410,11 +411,11 @@ RSpec.describe Rust::Merge::RustHostProvider do
     native = Rust::Merge::Provider.new.merge3(request)
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.extern-crate')
     rust = described_class.new.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_syn,
-      profile_id: :source_preserving
-    ))
+                                        family: :rust,
+                                        dialect: :rust,
+                                        backend: :rust_syn,
+                                        profile_id: :source_preserving
+                                      ))
 
     [native, rust].each do |result|
       expect(result.fetch(:ok)).to eq(true), result.inspect
@@ -519,9 +520,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
       )
       provider_expected = expected.dig('rust_host', backend.to_s)
       expect(result.fetch(:ok)).to eq(provider_expected.fetch('ok')), "#{backend}: #{result.inspect}"
-      if provider_expected['output']
-        expect(result.fetch(:output)).to eq(provider_expected.fetch('output'))
-      end
+      expect(result.fetch(:output)).to eq(provider_expected.fetch('output')) if provider_expected['output']
       if provider_expected['diagnostic_code']
         expect(result.dig(:diagnostics, 0, :code).to_s)
           .to eq(provider_expected.fetch('diagnostic_code'))
@@ -562,15 +561,13 @@ RSpec.describe Rust::Merge::RustHostProvider do
       )
       provider_expected = expected.dig('rust_host', backend.to_s)
       expect(result.fetch(:ok)).to eq(provider_expected.fetch('ok')), "#{backend}: #{result.inspect}"
-      if provider_expected['output']
-        expect(result.fetch(:output)).to eq(provider_expected.fetch('output'))
-      end
-      if provider_expected['diagnostic_code']
-        expect(result.dig(:diagnostics, 0, :code).to_s)
-          .to eq(provider_expected.fetch('diagnostic_code'))
-        expect(result.dig(:conflicts, 0, :typed_record, :canonical, :classification, :extra, 'family_guard'))
-          .to eq(provider_expected.fetch('diagnostic_code'))
-      end
+      expect(result.fetch(:output)).to eq(provider_expected.fetch('output')) if provider_expected['output']
+      next unless provider_expected['diagnostic_code']
+
+      expect(result.dig(:diagnostics, 0, :code).to_s)
+        .to eq(provider_expected.fetch('diagnostic_code'))
+      expect(result.dig(:conflicts, 0, :typed_record, :canonical, :classification, :extra, 'family_guard'))
+        .to eq(provider_expected.fetch('diagnostic_code'))
     end
   end
 
@@ -621,14 +618,14 @@ RSpec.describe Rust::Merge::RustHostProvider do
         source: source
       )
       tree_sitter_result = if expected.key?('rust_treesitter_ok')
-        described_class.new.analyze(
-          family: :rust,
-          dialect: :rust,
-          backend: :rust_tslp,
-          profile_id: :source_preserving,
-          source: source
-        )
-      end
+                             described_class.new.analyze(
+                               family: :rust,
+                               dialect: :rust,
+                               backend: :rust_tslp,
+                               profile_id: :source_preserving,
+                               source: source
+                             )
+                           end
 
       expect(native_result.fetch(:ok)).to eq(expected.fetch('ruby_native_ok', expected.fetch('ok')))
       if tree_sitter_result
@@ -641,12 +638,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
       expect(rust_result.fetch(:ok)).to eq(expected.fetch('rust_syn_host_ok', expected.fetch('ok')))
       native_categories = native_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
       rust_categories = rust_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
-      if expected['ruby_native_category']
-        expect(native_categories).to include(expected.fetch('ruby_native_category'))
-      end
-      if expected['rust_syn_host_category']
-        expect(rust_categories).to include(expected.fetch('rust_syn_host_category'))
-      end
+      expect(native_categories).to include(expected.fetch('ruby_native_category')) if expected['ruby_native_category']
+      expect(rust_categories).to include(expected.fetch('rust_syn_host_category')) if expected['rust_syn_host_category']
 
       input = case_data.fetch('merge3')
       native_merge = native.merge3(
@@ -664,16 +657,16 @@ RSpec.describe Rust::Merge::RustHostProvider do
         theirs_source: input.fetch('theirs')
       )
       tree_sitter_merge = if expected.key?('rust_treesitter_merge_ok')
-        described_class.new.merge3(
-          family: :rust,
-          dialect: :rust,
-          backend: :rust_tslp,
-          profile_id: :source_preserving,
-          base_source: input.fetch('base'),
-          ours_source: input.fetch('ours'),
-          theirs_source: input.fetch('theirs')
-        )
-      end
+                            described_class.new.merge3(
+                              family: :rust,
+                              dialect: :rust,
+                              backend: :rust_tslp,
+                              profile_id: :source_preserving,
+                              base_source: input.fetch('base'),
+                              ours_source: input.fetch('ours'),
+                              theirs_source: input.fetch('theirs')
+                            )
+                          end
       expect(native_merge.fetch(:ok)).to eq(expected.fetch('ruby_native_merge_ok', false))
       if tree_sitter_merge
         expect(tree_sitter_merge.fetch(:ok)).to eq(expected.fetch('rust_treesitter_merge_ok'))
@@ -765,8 +758,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
     result = provider.merge3(request)
     analysis = provider.analyze(request.slice(:family, :dialect, :backend, :profile_id).merge(
-      source: input.fetch('base')
-    ))
+                                  source: input.fetch('base')
+                                ))
 
     expect(result.fetch(:ok)).to eq(true), result.inspect
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
@@ -834,10 +827,10 @@ RSpec.describe Rust::Merge::RustHostProvider do
     }
     analysis = provider.analyze(request.merge(source: input.fetch('base')))
     result = provider.merge3(request.merge(
-      base_source: input.fetch('base'),
-      ours_source: input.fetch('ours'),
-      theirs_source: input.fetch('theirs')
-    ))
+                               base_source: input.fetch('base'),
+                               ours_source: input.fetch('ours'),
+                               theirs_source: input.fetch('theirs')
+                             ))
 
     expect(analysis.fetch(:ok)).to eq(true), analysis.inspect
     expect(analysis.dig(:analysis, :declarations).map { |owner| owner.fetch(:path) })
@@ -1031,5 +1024,4 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.dig(:conflicts, 0, :typed_record, :canonical, :id)).to eq('rust-owner-order-divergence')
     expect(result.dig(:conflicts, 0, :typed_record, :canonical, :subject, :structural_path)).to eq('<owner-order>')
   end
-
 end

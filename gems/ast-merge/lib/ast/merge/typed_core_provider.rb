@@ -110,14 +110,15 @@ module Ast
       def default_parser_backend = parser_backends.first
 
       def parser_backend_available?(backend)
-        backend == "rust_tslp" && self.class.available?
+        backend == 'rust_tslp' && self.class.available?
       end
 
       def register_parser_backend(dialect, backend)
-        raise UnsupportedCapabilityError, "Unsupported parser backend #{backend}" unless backend == "rust_tslp"
+        raise UnsupportedCapabilityError, "Unsupported parser backend #{backend}" unless backend == 'rust_tslp'
 
         TreeHaver::Backends::RustTslp.register_language_parser(parser_language(dialect))
       end
+
       def default_dialect = self.class::DIALECTS.first
       def parser_language(dialect) = dialect == 'json' ? 'json' : 'json5'
       def owner_path(owner) = owner.fetch('path')

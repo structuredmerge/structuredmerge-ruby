@@ -8,9 +8,9 @@ RSpec.describe 'Rust documented enum owner merge' do
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
     fixture = JSON.parse(File.read(File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/rust_merge3_enum_doc_attributes_with_independent_function_edit.json',
-      __dir__
-    )))
+                                     '../../../../../fixtures/polyglot/typed-core/rust_merge3_enum_doc_attributes_with_independent_function_edit.json',
+                                     __dir__
+                                   )))
     input = fixture.fetch('input')
     request = {
       base_source: input.fetch('base'),
@@ -32,7 +32,7 @@ RSpec.describe 'Rust documented enum owner merge' do
         **request
       )
       expect(result.fetch(:ok)).to eq(fixture.dig('expected', 'outcome') == 'clean'),
-                                     "#{backend}: #{result.inspect}"
+                                   "#{backend}: #{result.inspect}"
       expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output')), backend.to_s
     end
   end

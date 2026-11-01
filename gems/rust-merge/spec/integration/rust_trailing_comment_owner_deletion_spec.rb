@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 RSpec.describe 'Rust native trailing-comment ownership on owner deletion' do
-  it "keeps a deleted owner line comment with it and merges the independent edit through syn" do
+  it 'keeps a deleted owner line comment with it and merges the independent edit through syn' do
     compare_fixture('rust_merge3_delete_owner_trailing_comment_with_independent_edit')
   end
 
-  it "keeps a deleted owner block comment with it and merges the independent edit through syn" do
+  it 'keeps a deleted owner block comment with it and merges the independent edit through syn' do
     compare_fixture('rust_merge3_delete_owner_trailing_block_comment_with_independent_edit')
   end
 
@@ -20,9 +20,9 @@ RSpec.describe 'Rust native trailing-comment ownership on owner deletion' do
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
     fixture = JSON.parse(File.read(File.expand_path(
-      "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
-      __dir__
-    )))
+                                     "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
+                                     __dir__
+                                   )))
     input = fixture.fetch('input')
     request = {
       base_source: input.fetch('base'),

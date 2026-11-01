@@ -20,11 +20,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     }
     native = Rust::Merge::Provider.new.merge3(request)
     rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_tslp,
-      profile_id: :source_preserving
-    ))
+                                                      family: :rust,
+                                                      dialect: :rust,
+                                                      backend: :rust_tslp,
+                                                      profile_id: :source_preserving
+                                                    ))
 
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(native.fetch(:output)).to eq(expected.fetch('output'))
@@ -48,11 +48,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
 
     native = Rust::Merge::Provider.new.merge3(request)
     rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_tslp,
-      profile_id: :source_preserving
-    ))
+                                                      family: :rust,
+                                                      dialect: :rust,
+                                                      backend: :rust_tslp,
+                                                      profile_id: :source_preserving
+                                                    ))
 
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(native.fetch(:output)).to eq(expected_output)
@@ -62,17 +62,17 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     if StructuredmergeCore.respond_to?(:register_rust_syn_parser)
       StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.same-gap')
       rust_syn = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: :rust_syn,
-        profile_id: :source_preserving
-      ))
+                                                            family: :rust,
+                                                            dialect: :rust,
+                                                            backend: :rust_syn,
+                                                            profile_id: :source_preserving
+                                                          ))
       expect(rust_syn.fetch(:ok)).to be(true), rust_syn.inspect
       expect(rust_syn.fetch(:output)).to eq(expected_output)
     end
   end
 
-  it "preserves additions in the preamble and postlude gaps" do
+  it 'preserves additions in the preamble and postlude gaps' do
     fixture_path = File.expand_path(
       '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_tip_additions_file_edges.json',
       __dir__
@@ -97,11 +97,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
     backends.each do |backend|
       rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
+                                                        family: :rust,
+                                                        dialect: :rust,
+                                                        backend: backend,
+                                                        profile_id: :source_preserving
+                                                      ))
       expect(rust.fetch(:ok)).to be(true), "#{backend}: #{rust.inspect}"
       expect(rust.fetch(:output)).to eq(expected_output)
     end
@@ -132,11 +132,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
     backends.each do |backend|
       rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
+                                                        family: :rust,
+                                                        dialect: :rust,
+                                                        backend: backend,
+                                                        profile_id: :source_preserving
+                                                      ))
       expect(rust.fetch(:ok)).to be(true), "#{backend}: #{rust.inspect}"
       expect(rust.fetch(:output)).to eq(expected_output)
     end
@@ -167,11 +167,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
     backends.each do |backend|
       rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
+                                                        family: :rust,
+                                                        dialect: :rust,
+                                                        backend: backend,
+                                                        profile_id: :source_preserving
+                                                      ))
       expect(rust.fetch(:ok)).to be(true), "#{backend}: #{rust.inspect}"
       expect(rust.fetch(:output)).to eq(expected_output)
     end
@@ -207,11 +207,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
 
       backends.each do |backend|
         result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-          family: :rust,
-          dialect: :rust,
-          backend: backend,
-          profile_id: :source_preserving
-        ))
+                                                            family: :rust,
+                                                            dialect: :rust,
+                                                            backend: backend,
+                                                            profile_id: :source_preserving
+                                                          ))
         expect(result.fetch(:ok)).to be(true), "#{backend} #{fixture_name}: #{result.inspect}"
         expect(result.fetch(:output)).to eq(expected.fetch('output')), "#{backend} #{fixture_name}"
       end
@@ -242,11 +242,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
     backends.each do |backend|
       result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
+                                                          family: :rust,
+                                                          dialect: :rust,
+                                                          backend: backend,
+                                                          profile_id: :source_preserving
+                                                        ))
       expect(result.fetch(:ok)).to be(false), "#{backend}: #{result.inspect}"
       expect(result.fetch(:output)).to be_nil
       expect(result.fetch(:diagnostics).map { |diagnostic| diagnostic[:category] }).to include(:merge_conflict)
@@ -279,11 +279,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
 
       backends.each do |backend|
         result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-          family: :rust,
-          dialect: :rust,
-          backend: backend,
-          profile_id: :source_preserving
-        ))
+                                                            family: :rust,
+                                                            dialect: :rust,
+                                                            backend: backend,
+                                                            profile_id: :source_preserving
+                                                          ))
         expect(result.fetch(:ok)).to be(true), "#{backend} #{case_data.fetch('name')}: #{result.inspect}"
         expect(result.fetch(:output)).to eq(expected), "#{backend} #{case_data.fetch('name')}"
       end
@@ -314,11 +314,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
     backends.each do |backend|
       result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
+                                                          family: :rust,
+                                                          dialect: :rust,
+                                                          backend: backend,
+                                                          profile_id: :source_preserving
+                                                        ))
       expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
       expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
     end
@@ -350,11 +350,11 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
 
       backends.each do |backend|
         rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-          family: :rust,
-          dialect: :rust,
-          backend: backend,
-          profile_id: :source_preserving
-        ))
+                                                          family: :rust,
+                                                          dialect: :rust,
+                                                          backend: backend,
+                                                          profile_id: :source_preserving
+                                                        ))
         expect(rust.fetch(:ok)).to be(true), "#{backend} #{case_data.fetch('name')}: #{rust.inspect}"
         expect(rust.fetch(:output)).to eq(expected_output), "#{backend} #{case_data.fetch('name')}"
       end

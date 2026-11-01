@@ -7,17 +7,17 @@ RSpec.describe 'Rust documentation ownership on item deletion' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
-    fixture_ids = [
-      'rust_merge3_delete_documented_owner_with_independent_edit',
-      'rust_merge3_delete_module_inner_doc_owner_with_independent_edit'
+    fixture_ids = %w[
+      rust_merge3_delete_documented_owner_with_independent_edit
+      rust_merge3_delete_module_inner_doc_owner_with_independent_edit
     ]
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.documented-owner-deletion')
 
     fixture_ids.each do |fixture_id|
       fixture = JSON.parse(File.read(File.expand_path(
-        "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
-        __dir__
-      )))
+                                       "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
+                                       __dir__
+                                     )))
       input = fixture.fetch('input')
       request = {
         base_source: input.fetch('base'),

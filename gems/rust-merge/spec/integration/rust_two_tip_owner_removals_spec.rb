@@ -20,11 +20,11 @@ RSpec.describe 'Rust two-tip owner-removal source emission' do
     }
     native = Rust::Merge::Provider.new.merge3(request)
     rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_tslp,
-      profile_id: :source_preserving
-    ))
+                                                      family: :rust,
+                                                      dialect: :rust,
+                                                      backend: :rust_tslp,
+                                                      profile_id: :source_preserving
+                                                    ))
 
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(native.fetch(:output)).to eq(expected.fetch('output'))

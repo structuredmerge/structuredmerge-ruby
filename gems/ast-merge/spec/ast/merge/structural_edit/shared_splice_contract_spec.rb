@@ -28,4 +28,3 @@ RSpec.describe Ast::Merge::StructuralEdit::SplicePlan do
     end
   end
 end
-

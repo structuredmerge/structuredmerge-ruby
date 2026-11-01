@@ -3,8 +3,8 @@
 require 'json'
 
 RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
-  Statement = Struct.new(:name, :start_line, :end_line, keyword_init: true)
-  Region = Struct.new(:start_line, :end_line, :normalized_content, keyword_init: true) do
+  RemovedOwnerStatement = Struct.new(:name, :start_line, :end_line, keyword_init: true)
+  RemovedOwnerRegion = Struct.new(:start_line, :end_line, :normalized_content, keyword_init: true) do
     def empty?
       false
     end
@@ -13,9 +13,9 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
       normalized_content
     end
   end
-  Attachment = Struct.new(:leading_region, :trailing_region, :trailing_gap, keyword_init: true)
+  RemovedOwnerAttachment = Struct.new(:leading_region, :trailing_region, :trailing_gap, keyword_init: true)
 
-  class Analysis
+  class RemovedOwnerAnalysis
     attr_reader :lines
 
     def initialize(lines:, attachment:)
@@ -39,16 +39,17 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
   end
 
   it 'matches the shared removed-owner emission contract' do
-    path = File.expand_path('../../../../../../../fixtures/polyglot/ast-merge/structural_removed_owner_emission.json', __dir__)
+    path = File.expand_path('../../../../../../../fixtures/polyglot/ast-merge/structural_removed_owner_emission.json',
+                            __dir__)
     fixture = JSON.parse(File.read(path))
     fixture.fetch('cases').each do |entry|
       owner_line = entry.fetch('removed_owner_line_number')
-      owner = Statement.new(name: entry.fetch('removed_owner_id'), start_line: owner_line, end_line: owner_line)
+      owner = RemovedOwnerStatement.new(name: entry.fetch('removed_owner_id'), start_line: owner_line, end_line: owner_line)
       later_id = entry.dig('trailing_gap', 'after_owner_id')
       later_line = entry.fetch('retained_owner_line_number')
-      later = later_id && Statement.new(name: later_id, start_line: later_line, end_line: later_line)
+      later = later_id && RemovedOwnerStatement.new(name: later_id, start_line: later_line, end_line: later_line)
       region_data = entry.fetch('trailing_region')
-      region = Region.new(start_line: region_data.fetch('line_numbers').first,
+      region = RemovedOwnerRegion.new(start_line: region_data.fetch('line_numbers').first,
                           end_line: region_data.fetch('line_numbers').last,
                           normalized_content: region_data.fetch('lines').join("\n"))
       gap_data = entry.fetch('trailing_gap')
@@ -61,10 +62,10 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
         after_owner: later,
         controller_side: gap_data.fetch('controller_side').to_sym
       )
-      analysis = Analysis.new(
+      analysis = RemovedOwnerAnalysis.new(
         lines: entry.fetch('source'),
-        attachment: Attachment.new(leading_region: Region.new(start_line: 1, end_line: 1,
-                                                               normalized_content: entry.fetch('leading_segment_lines').first),
+        attachment: RemovedOwnerAttachment.new(leading_region: RemovedOwnerRegion.new(start_line: 1, end_line: 1,
+                                                              normalized_content: entry.fetch('leading_segment_lines').first),
                                    trailing_region: region,
                                    trailing_gap: gap)
       )
