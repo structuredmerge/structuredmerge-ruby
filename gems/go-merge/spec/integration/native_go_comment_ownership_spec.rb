@@ -72,7 +72,10 @@ RSpec.describe 'Go native comment ownership fixture' do
                                     __dir__)
     fixture = JSON.parse(File.read(fixture_path))
     source = fixture.fetch('source')
-    expected_range = fixture.dig('expected', 'owner_line_range')
+    expected = fixture.fetch('expected')
+    import_signature = expected.fetch('import_signature')
+    import_signature[0] = import_signature[0].to_sym
+    expected_range = expected.fetch('owner_line_range')
     request = { family: :go, dialect: :go, backend: :rust_tslp, profile_id: :source_preserving, source: source }
 
     native = Go::Merge::Provider.new.analyze(request)
@@ -80,7 +83,22 @@ RSpec.describe 'Go native comment ownership fixture' do
 
     expect(native.fetch(:ok)).to be(true), native.inspect
     expect(rust.fetch(:ok)).to be(true), rust.inspect
-    expect(native.dig(:analysis, :declarations)).to include(hash_including(line_range: expected_range))
-    expect(rust.dig(:analysis, :declarations)).to include(hash_including(line_range: expected_range))
+    expect(native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: import_signature, line_range: expected_range)
+    )
+    expect(rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: expected.fetch('rust_import_path'), line_range: expected_range)
+    )
+
+    reordered_source = fixture.fetch('reordered_source')
+    reordered_request = request.merge(source: reordered_source)
+    reordered_native = Go::Merge::Provider.new.analyze(reordered_request)
+    reordered_rust = Go::Merge::RustHostProvider.new.analyze(reordered_request)
+    expect(reordered_native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: import_signature)
+    )
+    expect(reordered_rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: expected.fetch('rust_import_path'))
+    )
   end
 end
