@@ -116,6 +116,8 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
         current['gap_id'] = gap.fetch('id')
         current['selection_key'] = gap.fetch('selection_key')
         current['controller_owner_id'] = gap['controller_owner_id']
+        current['before_owner_id'] = gap['before_owner_id']
+        current['after_owner_id'] = gap['after_owner_id']
         dispositions[line_number - 1] = current
       end
     end

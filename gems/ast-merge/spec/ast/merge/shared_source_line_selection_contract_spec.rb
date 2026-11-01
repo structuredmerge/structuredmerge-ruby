@@ -123,4 +123,70 @@ RSpec.describe 'shared ast-merge source line selection contract' do
     expect(actual_content).to eq(fixture.dig('expected', 'content'))
     expect(actual_records).to eq(fixture.dig('expected', 'line_records'))
   end
+
+  it 'selects an added owner with its leading gap and attached comments' do
+    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/source_line_addition_selection.json', __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    owner_revisions = fixture.fetch('owner_revisions').to_h { |entry| [entry.fetch('owner_id'), entry.fetch('revision')] }
+    baseline_revision = fixture.fetch('baseline_revision')
+    documents = fixture.fetch('documents')
+    baseline = documents.find { |document| document.fetch('revision') == baseline_revision }
+    baseline_owner_ids = baseline.fetch('owners').map { |owner| owner.fetch('id') }
+    additions = owner_revisions.keys.reject { |owner_id| baseline_owner_ids.include?(owner_id) }
+
+    baseline_selections = baseline.fetch('owners').map do |owner|
+      { 'selection_key' => "owner:#{owner.fetch('id')}", 'revision' => owner_revisions.fetch(owner.fetch('id')) }
+    end
+    appended = []
+    documents.each do |document|
+      revision = document.fetch('revision')
+      document.fetch('layout_gaps').each do |gap|
+        owner_id = gap['after_owner_id']
+        next unless additions.include?(owner_id) && owner_revisions[owner_id] == revision
+
+        owners = document.fetch('owners').map do |owner|
+          SelectionOwner.new(id: owner.fetch('id'), start_line: owner.fetch('start_line'), end_line: owner.fetch('end_line'), indent: 0)
+        end
+        layout = Ast::Merge::Layout::Augmenter.new(lines: document.fetch('source').lines, owners: owners)
+        actual_gap = layout.gaps.find { |candidate| candidate.start_line == gap.fetch('start_line') && candidate.end_line == gap.fetch('end_line') }
+        expect(actual_gap&.after_owner&.id).to eq(owner_id)
+        (gap.fetch('start_line')..gap.fetch('end_line')).each do |line_number|
+          appended << { 'selection_key' => gap.fetch('selection_key'), 'revision' => revision, 'line_number' => line_number }
+        end
+      end
+      document.fetch('comment_regions').each do |region|
+        owner_id = region['owner_id']
+        next unless additions.include?(owner_id) && owner_revisions[owner_id] == revision
+
+        (region.fetch('start_line')..region.fetch('end_line')).each do |line_number|
+          appended << { 'selection_key' => region.fetch('selection_key'), 'revision' => revision, 'line_number' => line_number }
+        end
+      end
+      document.fetch('owners').each do |owner|
+        owner_id = owner.fetch('id')
+        next unless additions.include?(owner_id) && owner_revisions[owner_id] == revision
+
+        (owner.fetch('start_line')..owner.fetch('end_line')).each do |line_number|
+          appended << { 'selection_key' => "owner:#{owner_id}", 'revision' => revision, 'line_number' => line_number }
+        end
+      end
+    end
+    additions_by_line = appended.sort_by { |entry| [entry.fetch('revision'), entry.fetch('line_number')] }
+    addition_selections = additions_by_line.map do |entry|
+      { 'selection_key' => entry.fetch('selection_key'), 'revision' => entry.fetch('revision') }
+    end.uniq
+    selections = baseline_selections + addition_selections
+    expect(selections).to eq(fixture.fetch('expected').fetch('selections'))
+
+    content = selections.flat_map do |selection|
+      document = documents.find { |entry| entry.fetch('revision') == selection.fetch('revision') }
+      key = selection.fetch('selection_key')
+      region = document.fetch('comment_regions').find { |entry| entry.fetch('selection_key') == key }
+      gap = document.fetch('layout_gaps').find { |entry| entry.fetch('selection_key') == key }
+      owner = document.fetch('owners').find { |entry| "owner:#{entry.fetch('id')}" == key }
+      range = region || gap || owner
+      (range.fetch('start_line')..range.fetch('end_line')).map { |line_number| document.fetch('source').lines.fetch(line_number - 1) }
+    end.join
+    expect(content).to eq(fixture.fetch('expected').fetch('content'))
+  end
 end
