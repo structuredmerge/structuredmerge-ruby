@@ -68,6 +68,28 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it "matches shared classic Rust comment-owner fixture through rust_syn" do
+    unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      skip "compiled native syn registration is unavailable"
+    end
+
+    path = File.expand_path("../../../../../fixtures/polyglot/typed-core/rust_merge2_comment_owner.json", __dir__)
+    fixture = JSON.parse(File.read(path))
+    input = fixture.fetch("input")
+    StructuredmergeCore.register_rust_syn_parser("rust.syn.ruby.classic")
+    result = described_class.new.merge2(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      incoming_source: input.fetch("template"),
+      current_source: input.fetch("destination")
+    )
+
+    expect(result.fetch(:ok)).to eq(fixture.dig("expected", "ok")), result.inspect
+    expect(result.fetch(:output)).to eq(fixture.dig("expected", "output"))
+  end
+
   it 'fails closed on syntax errors and unsupported native Rust items' do
     unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
       skip 'compiled native syn registration is unavailable'
