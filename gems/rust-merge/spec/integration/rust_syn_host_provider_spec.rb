@@ -496,12 +496,16 @@ RSpec.describe Rust::Merge::RustHostProvider do
         source: source
       )
 
-      expect([native_result, rust_result].map { |result| result.fetch(:ok) })
-        .to all(eq(expected.fetch('ok')))
+      expect(native_result.fetch(:ok)).to eq(expected.fetch('ruby_native_ok', expected.fetch('ok')))
+      expect(rust_result.fetch(:ok)).to eq(expected.fetch('rust_syn_host_ok', expected.fetch('ok')))
       native_categories = native_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
       rust_categories = rust_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
-      expect(native_categories).to include(expected.fetch('ruby_native_category'))
-      expect(rust_categories).to include(expected.fetch('rust_syn_host_category'))
+      if expected['ruby_native_category']
+        expect(native_categories).to include(expected.fetch('ruby_native_category'))
+      end
+      if expected['rust_syn_host_category']
+        expect(rust_categories).to include(expected.fetch('rust_syn_host_category'))
+      end
 
       input = case_data.fetch('merge3')
       native_merge = native.merge3(
@@ -518,19 +522,27 @@ RSpec.describe Rust::Merge::RustHostProvider do
         ours_source: input.fetch('ours'),
         theirs_source: input.fetch('theirs')
       )
-      expect([native_merge, rust_merge].map { |result| result.fetch(:ok) }).to all(eq(false))
+      expect(native_merge.fetch(:ok)).to eq(expected.fetch('ruby_native_merge_ok', false))
+      expect(rust_merge.fetch(:ok)).to eq(expected.fetch('rust_syn_host_merge_ok', false))
+      if expected['rust_syn_host_merge_output']
+        expect(rust_merge.fetch(:output)).to eq(expected.fetch('rust_syn_host_merge_output'))
+      end
       native_merge_categories = native_merge.fetch(:diagnostics).map do |diagnostic|
         diagnostic.fetch(:category).to_s
       end
       rust_merge_categories = rust_merge.fetch(:diagnostics).map do |diagnostic|
         diagnostic.fetch(:category).to_s
       end
-      expect(native_merge_categories).to include(expected.fetch('ruby_native_category'))
-      expect(rust_merge_categories).to include(expected.fetch('rust_syn_host_category'))
+      if expected['ruby_native_category']
+        expect(native_merge_categories).to include(expected.fetch('ruby_native_category'))
+      end
+      if expected['rust_syn_host_category']
+        expect(rust_merge_categories).to include(expected.fetch('rust_syn_host_category'))
+      end
     end
   end
 
-  it 'fails closed on syntax errors and unsupported native Rust items' do
+  it 'fails closed on native Rust syntax errors' do
     unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
       skip 'compiled native syn registration is unavailable'
     end
@@ -548,7 +560,6 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
     fixture = JSON.parse(File.read(fixture_path))
     malformed = provider.analyze(request.merge(source: fixture.dig('input', 'source')))
-    unsupported = provider.analyze(request.merge(source: "unsafe extern \"C\" { fn native_symbol(); }\n"))
 
     expect(malformed.fetch(:ok)).to be(false)
     malformed_messages = malformed.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
@@ -558,8 +569,39 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to eq(fixture.dig('expected', 'diagnostic_byte_range', 0))
     expect(source_span.dig(:range, :end_byte))
       .to eq(fixture.dig('expected', 'diagnostic_byte_range', 1))
-    expect(unsupported.fetch(:ok)).to be(false)
-    unsupported_messages = unsupported.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
-    expect(unsupported_messages).to include('unsupported top-level Rust node')
   end
+  it 'treats a syn foreign module as one owner and preserves its attached comment' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_foreign_mod_owner_merge3.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.foreign-mod')
+    provider = described_class.new
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs'),
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    }
+
+    result = provider.merge3(request)
+    analysis = provider.analyze(request.slice(:family, :dialect, :backend, :profile_id).merge(
+      source: input.fetch('base')
+    ))
+
+    expect(result.fetch(:ok)).to eq(true), result.inspect
+    expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    expect(analysis.fetch(:ok)).to eq(true), analysis.inspect
+    expect(analysis.dig(:analysis, :declarations).map { |owner| owner.fetch(:path) })
+      .to include(fixture.dig('expected', 'foreign_mod_path'))
+  end
+
 end
