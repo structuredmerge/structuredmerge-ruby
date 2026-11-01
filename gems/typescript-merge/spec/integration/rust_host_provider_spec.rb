@@ -313,5 +313,16 @@ RSpec.describe TypeScript::Merge::RustHostProvider do
     rust = provider.merge3(request)
     expect(native.fetch(:ok)).to be(false), native.inspect
     expect(rust.fetch(:ok)).to eq(native.fetch(:ok)), rust.inspect
+    expect(native.fetch(:conflicts)).to contain_exactly(
+      hash_including(category: :edit_edit, path: '[:variables, "const", ["first", "second"]]')
+    )
+    expect(rust.fetch(:diagnostics)).to include(
+      hash_including(category: :merge_conflict, code: 'merge.edit_edit')
+    )
+    conflict = rust.fetch(:conflicts).fetch(0).fetch(:typed_record).fetch(:canonical)
+    expect(conflict.fetch(:code)).to eq('merge.edit_edit')
+    expect(conflict.dig(:subject, :structural_path)).to eq('/variables:first,second')
+    expect(conflict.dig(:localization, :status)).to eq(:owner)
+    expect(rust.fetch(:conflicted_output)).to be_nil
   end
 end
