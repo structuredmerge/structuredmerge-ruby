@@ -1896,6 +1896,7 @@ RSpec.describe Ast::Merge do
              parse_error
              destination_parse_error
              unsupported_feature
+             unsafe_source_range
              fallback_applied
              ambiguity
              assumed_default
