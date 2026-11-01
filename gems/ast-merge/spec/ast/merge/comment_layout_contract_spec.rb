@@ -60,5 +60,24 @@ RSpec.describe 'shared Ast::Merge comment layout contract' do
       expect(attachment.trailing_region&.normalized_content).to eq(case_data['expected_trailing'])
       expect(case_augmenter.postlude_region&.normalized_content).to eq(case_data['expected_postlude'])
     end
+    fixture.fetch('document_cases').each do |case_data|
+      case_owners = case_data.fetch('owners').map do |entry|
+        owner_class.new(start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'),
+                        indent: entry.fetch('indent'), id: entry.fetch('id'))
+      end
+      case_comments = case_data.fetch('comments').map do |entry|
+        entry.transform_keys(&:to_sym).merge(raw: entry.fetch('text'))
+      end
+      case_augmenter = Ast::Merge::Comment::Augmenter.new(
+        source: case_data.fetch('source'), comments: case_comments, owners: case_owners,
+        style: fixture.fetch('style')
+      )
+      expect(case_augmenter.preamble_region&.normalized_content).to eq(case_data.dig('expected', 'preamble'))
+      expect(case_augmenter.orphan_regions.map(&:normalized_content)).to eq(case_data.dig('expected', 'orphans'))
+      case_data.dig('expected', 'leading_by_owner').each do |owner_id, expected|
+        owner = case_owners.find { |candidate| candidate.id == owner_id }
+        expect(case_augmenter.attachment_for(owner).leading_region&.normalized_content).to eq(expected)
+      end
+    end
   end
 end
