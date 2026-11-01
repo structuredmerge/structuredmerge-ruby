@@ -486,6 +486,49 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to eq(duplicate.dig('expected', 'rust_syn_host_category'))
   end
 
+  it 'keeps preamble comments and removes comments owned by deleted Rust items' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_multiple_deletions_keep_preamble_comment_and_remove_attached_comment.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    expected = fixture.fetch('expected')
+    native = Rust::Merge::Provider.new.merge3(
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    )
+    expect(native.fetch(:ok)).to eq(expected.dig('ruby_native', 'ok'))
+    expect(native.dig(:diagnostics, 0, :category).to_s)
+      .to eq(expected.dig('ruby_native', 'diagnostic_category'))
+
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.deleted-comment-ownership')
+    %i[rust_tslp rust_syn].each do |backend|
+      result = described_class.new.merge3(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving,
+        base_source: input.fetch('base'),
+        ours_source: input.fetch('ours'),
+        theirs_source: input.fetch('theirs')
+      )
+      provider_expected = expected.dig('rust_host', backend.to_s)
+      expect(result.fetch(:ok)).to eq(provider_expected.fetch('ok')), "#{backend}: #{result.inspect}"
+      if provider_expected['output']
+        expect(result.fetch(:output)).to eq(provider_expected.fetch('output'))
+      end
+      if provider_expected['diagnostic_code']
+        expect(result.dig(:diagnostics, 0, :code).to_s)
+          .to eq(provider_expected.fetch('diagnostic_code'))
+      end
+    end
+  end
+
   it 'rehomes a deleted owner comment across a retained-owner reorder through syn' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
