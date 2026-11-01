@@ -178,18 +178,49 @@ RSpec.describe Bash::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include("\n\n# right documentation")
   end
 
-  it 'fails closed consistently when inline owner comments make ranges unsafe' do
-    base = "left() { echo one; } # left note\nright() { echo one; } # right note\n# footer\n"
-    ours = base.sub('echo one', 'echo two')
-    theirs = base.sub('right() { echo one; }', 'right() { echo three; }')
-    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+  it 'matches the shared unsafe owner-range diagnostic contract' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/bash_analysis_unsafe_source_range.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    source = fixture.fetch('input').fetch('source')
+    expected = fixture.fetch('expected')
+    analysis_request = request_base.merge(source: source)
 
+    native_analysis = Bash::Merge::Provider.new.analyze(analysis_request)
+    rust_analysis = provider.analyze(analysis_request)
+
+    expect(native_analysis.fetch(:ok)).to be(false), native_analysis.inspect
+    expect(rust_analysis.fetch(:ok)).to be(false), rust_analysis.inspect
+    [native_analysis, rust_analysis].each do |result|
+      expect(result.fetch(:diagnostics).first).to include(
+        category: expected.fetch('diagnostic_category').to_sym,
+        message: expected.fetch('diagnostic_message')
+      )
+    end
+
+    after = source.sub('x=1', 'x=2')
+    diff_request = request_base.merge(before_source: source, after_source: after)
+    native_diff = Bash::Merge::Provider.new.diff2(diff_request)
+    rust_diff = provider.diff2(diff_request)
+    [native_diff, rust_diff].each do |result|
+      expect(result.fetch(:ok)).to be(false), result.inspect
+      expect(result.fetch(:diagnostics).first).to include(
+        category: expected.fetch('diagnostic_category').to_sym
+      )
+    end
+
+    ours = source.sub('x=1', 'x=2')
+    theirs = source.sub('y=1', 'y=2')
+    request = request_base.merge(base_source: source, ours_source: ours, theirs_source: theirs)
     native = Bash::Merge::Provider.new.merge3(request)
     rust = provider.merge3(request)
 
     expect(native.fetch(:ok)).to be(false), native.inspect
     expect(rust.fetch(:ok)).to be(false), rust.inspect
-    expect(rust.fetch(:diagnostics)).not_to be_empty
+    expect(native.fetch(:diagnostics).first).to include(category: expected.fetch('diagnostic_category').to_sym)
+    expect(rust.fetch(:diagnostics).first).to include(category: expected.fetch('diagnostic_category').to_sym)
   end
 
   it 'preserves native output for literal test-harness edits' do
