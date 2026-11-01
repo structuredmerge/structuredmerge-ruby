@@ -198,6 +198,22 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
     expect(result.fetch(:ok)).to eq(true), result.inspect
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+
+    duplicate = fixture.fetch('duplicate_identity')
+    native_failure = Rust::Merge::Provider.new.analyze(source: duplicate.fetch('source'))
+    rust_failure = described_class.new.analyze(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      source: duplicate.fetch('source')
+    )
+    expect(native_failure.fetch(:ok)).to eq(false)
+    expect(native_failure.dig(:diagnostics, 0, :category).to_s)
+      .to eq(duplicate.dig('expected', 'ruby_native_category'))
+    expect(rust_failure.fetch(:ok)).to eq(false)
+    expect(rust_failure.dig(:diagnostics, 0, :category).to_s)
+      .to eq(duplicate.dig('expected', 'rust_syn_host_category'))
   end
 
   it 'matches the shared Rust parser and owner-profile failure boundary' do
