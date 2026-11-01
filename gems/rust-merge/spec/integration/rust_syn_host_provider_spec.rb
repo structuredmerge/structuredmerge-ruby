@@ -174,6 +174,44 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'distinguishes negative trait and inherent impl owners using native syn facts' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_impl_polarity_inherent_merge3.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.impl-forms')
+    provider = described_class.new
+    result = provider.merge3(request.merge(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    ))
+    analysis = provider.analyze(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      source: input.fetch('base')
+    )
+
+    expect(result.fetch(:ok)).to eq(true), result.inspect
+    expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    expect(analysis.fetch(:ok)).to eq(true), analysis.inspect
+    expect(analysis.dig(:analysis, :declarations).map { |owner| owner.fetch(:path) })
+      .to include(*fixture.dig('expected', 'impl_owner_paths'))
+  end
+
   it 'merges trait impl owners using native syn identity' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
