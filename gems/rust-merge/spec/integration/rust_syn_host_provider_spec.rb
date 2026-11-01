@@ -861,6 +861,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
 
     expect(result.fetch(:ok)).to eq(false), result.inspect
     expect(result[:output]).to be_nil
+    expect(result.dig(:conflicts, 0, :conflict_id)).to eq('rust-owner-order-divergence')
+    expect(result.dig(:conflicts, 0, :path)).to eq('<owner-order>')
   end
 
 end
