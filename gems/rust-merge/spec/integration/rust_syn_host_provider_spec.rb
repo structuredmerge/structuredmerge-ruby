@@ -495,12 +495,22 @@ RSpec.describe Rust::Merge::RustHostProvider do
       backend: :rust_syn,
       profile_id: :source_preserving
     }
-    malformed = provider.analyze(request.merge(source: 'fn broken('))
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_syn_parse_diagnostic_span.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    malformed = provider.analyze(request.merge(source: fixture.dig('input', 'source')))
     unsupported = provider.analyze(request.merge(source: "unsafe extern \"C\" { fn native_symbol(); }\n"))
 
     expect(malformed.fetch(:ok)).to be(false)
     malformed_messages = malformed.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
     expect(malformed_messages).to include('native parser rejected input')
+    source_span = malformed.dig(:diagnostics, 0, :typed_record, :canonical, :source_refs, 0, :span)
+    expect(source_span.dig(:range, :start_byte))
+      .to eq(fixture.dig('expected', 'diagnostic_byte_range', 0))
+    expect(source_span.dig(:range, :end_byte))
+      .to eq(fixture.dig('expected', 'diagnostic_byte_range', 1))
     expect(unsupported.fetch(:ok)).to be(false)
     unsupported_messages = unsupported.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
     expect(unsupported_messages).to include('unsupported top-level Rust node')
