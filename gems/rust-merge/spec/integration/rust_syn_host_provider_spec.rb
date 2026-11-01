@@ -725,6 +725,39 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'merges compatible disjoint owner reorders with Rust source identities' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_compatible_two_sided_reorders.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    native = Rust::Merge::Provider.new.merge3(request)
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(native.fetch(:output)).to eq(fixture.dig('expected', 'ruby_native_output'))
+
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.compatible-reorders')
+    %i[rust_tslp rust_syn].each do |backend|
+      result = described_class.new.merge3(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving,
+        **request
+      )
+      expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
+      expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output')), backend.to_s
+    end
+  end
+
   it 'fails closed when a reorder crosses the other tip’s new owner gap' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
