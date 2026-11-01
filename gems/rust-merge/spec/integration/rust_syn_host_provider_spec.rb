@@ -291,6 +291,49 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to include(*fixture.dig('expected', 'impl_owner_paths'))
   end
 
+  it 'merges trait aliases with independent edits through native syn' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_trait_alias_merge3.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    tree_sitter = Rust::Merge::Provider.new.analyze(source: input.fetch('base'))
+    expect(tree_sitter).to include(ok: fixture.dig('expected', 'ruby_tree_sitter_boundary', 'ok'))
+    expect(tree_sitter.dig(:diagnostics, 0, :category).to_s)
+      .to eq(fixture.dig('expected', 'ruby_tree_sitter_boundary', 'diagnostic_category'))
+
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.trait-alias')
+    provider = described_class.new
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    result = provider.merge3(request.merge(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    ))
+    analysis = provider.analyze(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      source: input.fetch('base')
+    )
+
+    expect(result.fetch(:ok)).to eq(true), result.inspect
+    expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    expect(analysis.fetch(:ok)).to eq(true), analysis.inspect
+    expect(analysis.dig(:analysis, :declarations).map { |owner| owner.fetch(:path) })
+      .to include(fixture.dig('expected', 'trait_alias_path'))
+  end
+
   it 'merges extern-crate alias changes with independent function edits through rust_syn' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
