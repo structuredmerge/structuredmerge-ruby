@@ -177,6 +177,43 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
   end
 
+  it 'composes divergent Rust crate docs from independent owner additions using Rust providers' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_syn_crate_doc_additions.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    expected = fixture.fetch('expected')
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    expect(native.fetch(:ok)).to be(false)
+    expect(native.fetch(:diagnostics).map { |diagnostic| diagnostic[:category] }).to include(
+      fixture.dig('ruby_native_expected', 'diagnostic_category').to_sym
+    )
+
+    backends = [:rust_tslp]
+    if StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.crate-doc-additions')
+      backends << :rust_syn
+    end
+    backends.each do |backend|
+      result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving
+      ))
+      expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
+      expect(result.fetch(:output)).to eq(expected.fetch('output'))
+    end
+  end
+
   it 'composes two-tip additions from empty and comment-only bases' do
     fixture_path = File.expand_path(
       '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_tip_additions_empty_base.json',
