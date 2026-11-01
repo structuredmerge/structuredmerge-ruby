@@ -14,6 +14,7 @@ module Ast
                     :owners,
                     :tracked_comments,
                     :style,
+                    :attachment_policy,
                     :capability,
                     :attachments_by_owner,
                     :preamble_region,
@@ -30,9 +31,11 @@ module Ast
           end
         end
 
-        def initialize(lines: nil, source: nil, comments: [], owners: [], style: nil, capability: nil, **options)
+        def initialize(lines: nil, source: nil, comments: [], owners: [], style: nil, capability: nil,
+                       attachment_policy: :preceding_owner, **options)
           @lines = normalize_lines(lines, source)
           @style = resolve_style(style)
+          @attachment_policy = normalize_attachment_policy(attachment_policy)
           @owners = normalize_owners(owners)
           @tracked_comments = normalize_comments(comments)
           @capability = capability || Capability.source_augmented(
@@ -109,7 +112,7 @@ module Ast
             if comment
               selected.unshift(comment)
               current_line -= 1
-            elsif blank_line?(current_line)
+            elsif attachment_policy == :preceding_owner && blank_line?(current_line)
               current_line -= 1
             else
               break
@@ -131,6 +134,7 @@ module Ast
         end
 
         def infer_trailing_comments(owner, claimed)
+          return [] if attachment_policy == :following_owner
           return [] unless owner.respond_to?(:end_line)
           return [] unless owner.end_line
 
@@ -315,6 +319,13 @@ module Ast
           values = source.split("\n", -1)
           values.pop if values.last&.empty? && source.end_with?("\n")
           values
+        end
+
+        def normalize_attachment_policy(policy)
+          value = policy.to_sym
+          return value if %i[preceding_owner following_owner].include?(value)
+
+          raise ArgumentError, "Unknown comment attachment policy: #{policy.inspect}"
         end
 
         def resolve_style(style)

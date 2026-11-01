@@ -202,6 +202,38 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
   end
 
+  it 'selects changed leading comments with their owner revision' do
+    base = "// left documentation\nfn left() -> i32 { 1 }\n\n// right documentation\nfn right() -> i32 { 1 }\n"
+    ours = base.sub('// left documentation', '// left documentation updated')
+    theirs = base.sub('fn right() -> i32 { 1 }', 'fn right() -> i32 { 2 }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to eq(
+      "// left documentation updated\nfn left() -> i32 { 1 }\n\n// right documentation\nfn right() -> i32 { 2 }\n"
+    )
+  end
+
+  it 'attaches a comment after a use item to the following declaration' do
+    base = "use std::fmt;\n// constant documentation\nconst LIMIT: usize = 1;\nfn right() -> usize { 1 }\n"
+    ours = base.sub('// constant documentation', '// updated constant documentation')
+    theirs = base.sub('fn right() -> usize { 1 }', 'fn right() -> usize { 2 }')
+    request = request_base.merge(base_source: base, ours_source: ours, theirs_source: theirs)
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(native.fetch(:output))
+    expect(rust.fetch(:output)).to include('// updated constant documentation')
+  end
+
   it 'matches native membership conflict dispositions through the typed core' do
     deletion = request_base.merge(
       base_source: "fn left() -> i32 { 1 }\n\nfn right() -> i32 { 1 }\n",
