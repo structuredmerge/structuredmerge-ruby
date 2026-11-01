@@ -113,7 +113,9 @@ module Go
         spec_types << 'type_alias' if kind == :type
         specs = spec_types.flat_map { |type| descendants(node, type) }.sort_by(&:start_byte)
         member_names = specs.map do |spec|
-          spec.children.select { |child| child.type == identifier_type }.map { |child| text(child) }
+          names = spec.children.select { |child| child.type == identifier_type }.map { |child| text(child) }
+          names = names.take(1) if kind == :type
+          names
         end
         raise ArgumentError, "#{node.type} has no declared name" if member_names.flatten.empty?
         return [:"#{kind}_group", member_names.map(&:freeze).freeze] if grouped?

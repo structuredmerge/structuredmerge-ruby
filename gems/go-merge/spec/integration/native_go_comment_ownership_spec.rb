@@ -75,6 +75,22 @@ RSpec.describe 'Go native comment ownership fixture' do
     expect(rust.dig(:analysis, :declarations)).to include(
       hash_including(path: '/function:Contains', line_range: expected.fetch('function_line_range'))
     )
+
+    grouped_signature = expected.fetch('grouped_ruby_signature')
+    grouped_signature[0] = grouped_signature[0].to_sym
+    grouped_request = request.merge(source: fixture.fetch('grouped_source'))
+    grouped_native = Go::Merge::Provider.new.analyze(grouped_request)
+    grouped_rust = Go::Merge::RustHostProvider.new.analyze(grouped_request)
+    expect(grouped_native.fetch(:ok)).to be(true), grouped_native.inspect
+    expect(grouped_rust.fetch(:ok)).to be(true), grouped_rust.inspect
+    expect(grouped_native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: grouped_signature,
+                     line_range: expected.fetch('grouped_line_range'))
+    )
+    expect(grouped_rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: expected.fetch('grouped_rust_path'),
+                     line_range: expected.fetch('grouped_line_range'))
+    )
   end
 
   it 'fails closed on partial parser recovery in both Ruby and Rust providers' do
