@@ -42,6 +42,16 @@ RSpec.describe 'shared Ast::Merge layout ownership contract' do
     expect(actual_gaps).to eq(fixture.fetch('gaps'))
     expect(actual_attachments).to eq(fixture.fetch('attachments'))
 
+    fixture.fetch('controller_checks').each do |check|
+      owner = by_id.fetch(check.fetch('owner_id'))
+      attachment = augmenter.attachment_for(owner)
+      removed = check.fetch('removed_owner_ids').map { |id| by_id.fetch(id) }
+      controls_output = attachment.public_send(
+        "#{check.fetch('edge')}_controls_output?", removed_owners: removed
+      )
+      expect(controls_output).to eq(check.fetch('expected'))
+    end
+
     fixture.fetch('physical_line_case').fetch('documents').each do |document|
       source_lines = document.fetch('source').lines
       owner_lines = document.fetch('owners').map do |owner|
