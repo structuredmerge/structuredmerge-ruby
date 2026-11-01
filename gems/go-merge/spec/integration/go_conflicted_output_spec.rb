@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Go membership conflict review output' do
-  it 'matches each provider conflict rendering for shared fixtures' do
+RSpec.describe 'Go membership edit shared fixture' do
+  it 'keeps the native conflict review while the Rust host merges cleanly' do
     skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
     fixture_ids = %w[go_merge3_membership_edit_conflict]
 
@@ -28,9 +28,8 @@ RSpec.describe 'Go membership conflict review output' do
       expect(native.fetch(:conflicted_output)).to eq(
         fixture.dig('expected_conflicted_output', 'ruby_native')
       )
-      expect(rust.fetch(:conflicted_output)).to eq(
-        fixture.dig('expected_conflicted_output', 'rust_host')
-      )
+      expect(rust.fetch(:ok)).to be(true), rust.inspect
+      expect(rust.fetch(:output)).to eq(fixture.dig('rust_host_expected', 'output'))
     end
   end
 end

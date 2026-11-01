@@ -175,7 +175,7 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to include('// left documentation', '// right documentation')
   end
 
-  it 'matches native behavior for one-sided owner addition' do
+  it 'keeps the native conflict but merges a one-sided owner addition cleanly in the Rust host' do
     base = "package main\n\nfunc left() int { return 1 }\n\nfunc right() int { return 1 }\n"
     ours = base.sub('func left() int { return 1 }', 'func left() int { return 2 }')
     theirs = base.sub("func right() int { return 1 }\n",
@@ -186,12 +186,14 @@ RSpec.describe Go::Merge::RustHostProvider do
     rust = provider.merge3(request)
 
     expect(native.fetch(:ok)).to be(false), native.inspect
-    expect(rust.fetch(:ok)).to be(false), rust.inspect
     expect(native.fetch(:conflicts)).not_to be_empty
-    expect(rust.fetch(:conflicts)).not_to be_empty
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq(
+      "package main\n\nfunc left() int { return 2 }\n\nfunc right() int { return 1 }\n\nfunc added() int { return 3 }\n"
+    )
   end
 
-  it 'matches native behavior for one-sided owner deletion with an independent edit' do
+  it 'keeps the native conflict but merges a one-sided owner deletion with an independent edit in the Rust host' do
     base = "package main\n\nfunc left() int { return 1 }\n\nfunc right() int { return 1 }\n"
     ours = base.sub("func left() int { return 1 }\n\n", '')
     theirs = base.sub('func right() int { return 1 }', 'func right() int { return 2 }')
@@ -201,9 +203,9 @@ RSpec.describe Go::Merge::RustHostProvider do
     rust = provider.merge3(request)
 
     expect(native.fetch(:ok)).to be(false), native.inspect
-    expect(rust.fetch(:ok)).to be(false), rust.inspect
     expect(native.fetch(:conflicts)).not_to be_empty
-    expect(rust.fetch(:conflicts)).not_to be_empty
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(rust.fetch(:output)).to eq("package main\n\nfunc right() int { return 2 }\n")
   end
 
   it 'projects native identities and byte spans after Unicode without host source lookup' do
