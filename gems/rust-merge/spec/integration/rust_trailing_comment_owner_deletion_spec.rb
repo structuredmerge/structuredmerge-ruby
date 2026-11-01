@@ -3,12 +3,20 @@
 require 'spec_helper'
 
 RSpec.describe 'Rust native trailing-comment ownership on owner deletion' do
-  it "keeps a deleted owner's trailing comment with it and merges the independent edit through syn" do
+  it "keeps a deleted owner line comment with it and merges the independent edit through syn" do
+    compare_fixture('rust_merge3_delete_owner_trailing_comment_with_independent_edit')
+  end
+
+  it "keeps a deleted owner block comment with it and merges the independent edit through syn" do
+    compare_fixture('rust_merge3_delete_owner_trailing_block_comment_with_independent_edit')
+  end
+
+  def compare_fixture(fixture_id)
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
     fixture = JSON.parse(File.read(File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/rust_merge3_delete_owner_trailing_comment_with_independent_edit.json',
+      "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
       __dir__
     )))
     input = fixture.fetch('input')
@@ -26,7 +34,7 @@ RSpec.describe 'Rust native trailing-comment ownership on owner deletion' do
     expect(native.fetch(:conflicts).first.fetch(:category).to_s)
       .to eq(native_expected.fetch('conflict_category'))
 
-    StructuredmergeCore.register_rust_syn_parser('rust.syn.trailing-comment-owner-deletion')
+    StructuredmergeCore.register_rust_syn_parser("rust.syn.#{fixture_id}")
     %i[rust_tslp rust_syn].each do |backend|
       result = Rust::Merge::RustHostProvider.new.merge3(
         family: :rust,
