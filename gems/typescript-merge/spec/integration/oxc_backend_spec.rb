@@ -57,10 +57,8 @@ RSpec.describe TypeScript::Merge::RustHostProvider, 'oxc_parser backend' do
   end
 
   it 'preserves the shared documented-owner deletion boundary' do
-    path = File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/typescript_merge3_delete_documented_owner_with_independent_edit.json',
-      __dir__
-    )
+    fixture_id = 'typescript_merge3_delete_documented_owner_with_independent_edit'
+    path = File.expand_path("../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json", __dir__)
     input = JSON.parse(File.read(path)).fetch('input')
     result = provider.merge3(request(:typescript_oxc, base_source: input.fetch('base'),
                                                       ours_source: input.fetch('ours'),
