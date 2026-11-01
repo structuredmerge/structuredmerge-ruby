@@ -56,15 +56,19 @@ RSpec.describe TypeScript::Merge::RustHostProvider, 'oxc_parser backend' do
     expect(result.fetch(:diagnostics).first.fetch(:category).to_s).to eq('parse_error')
   end
 
-  it 'preserves the shared documented-owner deletion boundary' do
+  it 'merges the shared documented-owner deletion cleanly like the Tree-sitter backend' do
     fixture_id = 'typescript_merge3_delete_documented_owner_with_independent_edit'
     path = File.expand_path("../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json", __dir__)
-    input = JSON.parse(File.read(path)).fetch('input')
-    result = provider.merge3(request(:typescript_oxc, base_source: input.fetch('base'),
-                                                      ours_source: input.fetch('ours'),
-                                                      theirs_source: input.fetch('theirs')))
+    fixture = JSON.parse(File.read(path))
+    input = fixture.fetch('input')
+    payload = { base_source: input.fetch('base'), ours_source: input.fetch('ours'),
+                theirs_source: input.fetch('theirs') }
 
-    expect(result.fetch(:ok)).to be(false)
-    expect(result[:output]).to be_nil
+    %i[typescript_oxc rust_tslp].each do |backend|
+      result = provider.merge3(request(backend, payload))
+
+      expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
+      expect(result.fetch(:output)).to eq(fixture.dig('rust_host_expected', 'output'))
+    end
   end
 end

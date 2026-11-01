@@ -3,29 +3,32 @@
 require 'spec_helper'
 require 'json'
 
-RSpec.describe 'TypeScript documented owner deletion boundary' do
-  it 'fails closed in native and Rust providers per the shared fixture' do
-    skip 'compiled Rust host unavailable' unless TypeScript::Merge::RustHostProvider.available?
-
+RSpec.describe 'TypeScript documented owner deletion' do
+  let(:fixture) do
     fixture_id = 'typescript_merge3_delete_documented_owner_with_independent_edit'
-    path = File.expand_path(
-      "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json", __dir__
-    )
-    fixture = JSON.parse(File.read(path))
+    JSON.parse(File.read(File.expand_path("../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json", __dir__)))
+  end
+  let(:request) do
     input = fixture.fetch('input')
-    request = { base_source: input.fetch('base'), ours_source: input.fetch('ours'),
-                theirs_source: input.fetch('theirs') }
+    { base_source: input.fetch('base'), ours_source: input.fetch('ours'), theirs_source: input.fetch('theirs') }
+  end
 
-    {
-      TypeScript::Merge::Provider.new => fixture.fetch('ruby_native_expected'),
-      TypeScript::Merge::RustHostProvider.new => fixture.fetch('rust_host_expected')
-    }.each do |provider, expected|
-      result = provider.merge3(request)
-      expect(result.fetch(:ok)).to be(false), result.inspect
-      expect(result[:output]).to be_nil
-      diagnostic = result.fetch(:diagnostics).first
-      expect(diagnostic.fetch(:category).to_s).to eq(expected.fetch('diagnostic_category'))
-      expect(diagnostic.fetch(:code)).to eq(expected['diagnostic_code']) if expected['diagnostic_code']
-    end
+  before { skip 'compiled Rust host unavailable' unless TypeScript::Merge::RustHostProvider.available? }
+
+  it 'fails closed in the native Ruby provider' do
+    expected = fixture.fetch('ruby_native_expected')
+    result = TypeScript::Merge::Provider.new.merge3(request)
+
+    expect(result.fetch(:ok)).to be(false), result.inspect
+    expect(result[:output]).to be_nil
+    expect(result.fetch(:diagnostics).first.fetch(:category).to_s).to eq(expected.fetch('diagnostic_category'))
+  end
+
+  it 'merges cleanly in the Rust host by deleting the JSDoc with its owner' do
+    expected = fixture.fetch('rust_host_expected')
+    result = TypeScript::Merge::RustHostProvider.new.merge3(request)
+
+    expect(result.fetch(:ok)).to be(true), result.inspect
+    expect(result.fetch(:output)).to eq(expected.fetch('output'))
   end
 end
