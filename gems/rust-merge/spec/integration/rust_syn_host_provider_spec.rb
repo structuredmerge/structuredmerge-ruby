@@ -495,8 +495,24 @@ RSpec.describe Rust::Merge::RustHostProvider do
         profile_id: :source_preserving,
         source: source
       )
+      tree_sitter_result = if expected.key?('rust_treesitter_ok')
+        described_class.new.analyze(
+          family: :rust,
+          dialect: :rust,
+          backend: :rust_tslp,
+          profile_id: :source_preserving,
+          source: source
+        )
+      end
 
       expect(native_result.fetch(:ok)).to eq(expected.fetch('ruby_native_ok', expected.fetch('ok')))
+      if tree_sitter_result
+        expect(tree_sitter_result.fetch(:ok)).to eq(expected.fetch('rust_treesitter_ok'))
+        if expected['rust_treesitter_category']
+          category = tree_sitter_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
+          expect(category).to include(expected.fetch('rust_treesitter_category'))
+        end
+      end
       expect(rust_result.fetch(:ok)).to eq(expected.fetch('rust_syn_host_ok', expected.fetch('ok')))
       native_categories = native_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
       rust_categories = rust_result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
@@ -522,7 +538,28 @@ RSpec.describe Rust::Merge::RustHostProvider do
         ours_source: input.fetch('ours'),
         theirs_source: input.fetch('theirs')
       )
+      tree_sitter_merge = if expected.key?('rust_treesitter_merge_ok')
+        described_class.new.merge3(
+          family: :rust,
+          dialect: :rust,
+          backend: :rust_tslp,
+          profile_id: :source_preserving,
+          base_source: input.fetch('base'),
+          ours_source: input.fetch('ours'),
+          theirs_source: input.fetch('theirs')
+        )
+      end
       expect(native_merge.fetch(:ok)).to eq(expected.fetch('ruby_native_merge_ok', false))
+      if tree_sitter_merge
+        expect(tree_sitter_merge.fetch(:ok)).to eq(expected.fetch('rust_treesitter_merge_ok'))
+        if expected['rust_treesitter_merge_category']
+          categories = tree_sitter_merge.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s }
+          expect(categories).to include(expected.fetch('rust_treesitter_merge_category'))
+        end
+        if expected['rust_treesitter_merge_output']
+          expect(tree_sitter_merge.fetch(:output)).to eq(expected.fetch('rust_treesitter_merge_output'))
+        end
+      end
       expect(rust_merge.fetch(:ok)).to eq(expected.fetch('rust_syn_host_merge_ok', false))
       if expected['rust_syn_host_merge_output']
         expect(rust_merge.fetch(:output)).to eq(expected.fetch('rust_syn_host_merge_output'))
