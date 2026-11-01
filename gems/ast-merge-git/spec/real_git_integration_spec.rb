@@ -639,7 +639,13 @@ RSpec.describe 'ast-merge-git executable' do
       _stdout, stderr, status = git('merge', '--no-edit', 'theirs', allow_failure: true)
 
       expect(status.exitstatus).to eq(1), stderr
-      expect(repository.join(path).binread).to eq(provider.fetch(:conflict_ours))
+      written = repository.join(path).binread.force_encoding(Encoding::UTF_8)
+      if report[:conflicted_output]
+        # Providers that localize ownership conflicts write review markers around the conflicting owner.
+        expect(written).to include('<<<<<<<', provider.fetch(:conflict_ours).lines.last, '>>>>>>>')
+      else
+        expect(written).to eq(provider.fetch(:conflict_ours))
+      end
     end
   end
 
