@@ -139,6 +139,41 @@ RSpec.describe 'Go native comment ownership fixture' do
     end
   end
 
+  it 'fails closed when only one merge3 input has partial parser recovery' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/go/slice-114-native/merge3-one-sided-parser-failure.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    fixture.fetch('cases').each do |test_case|
+      request = {
+        family: :go,
+        dialect: :go,
+        backend: :rust_tslp,
+        profile_id: :source_preserving,
+        base_source: test_case.fetch('base_source'),
+        ours_source: test_case.fetch('ours_source'),
+        theirs_source: test_case.fetch('theirs_source')
+      }
+      native = Go::Merge::Provider.new.merge3(request)
+      rust = Go::Merge::RustHostProvider.new.merge3(request)
+      role = test_case.fetch('failed_role').to_sym
+
+      expect(native.fetch(:ok)).to be(false), "#{test_case.fetch('name')}: #{native.inspect}"
+      expect(native.fetch(:diagnostics).first.fetch(:category)).to eq(:parse_error)
+      expect(native.fetch(:diagnostics).first.fetch(:message)).to start_with("#{role} parse error")
+      expect(native[:output]).to be_nil
+      expect(native[:conflicted_output]).to be_nil
+
+      expect(rust.fetch(:ok)).to be(false), "#{test_case.fetch('name')}: #{rust.inspect}"
+      expect(rust.fetch(:diagnostics).first.fetch(:category)).to eq(:parse_error)
+      source_refs = rust.dig(:diagnostics, 0, :typed_record, :canonical, :source_refs)
+      expect(source_refs).to include(hash_including(role: role))
+      expect(rust[:output]).to be_nil
+      expect(rust[:conflicted_output]).to be_nil
+    end
+  end
+
   it 'compares duplicate-owner failure categories across Ruby and Rust providers' do
     fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/duplicate-owner-identity.json',
                                     __dir__)
