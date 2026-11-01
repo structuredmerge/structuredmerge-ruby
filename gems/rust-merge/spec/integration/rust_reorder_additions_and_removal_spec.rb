@@ -3,38 +3,58 @@
 require 'spec_helper'
 
 RSpec.describe 'Rust compatible reorder merge with additions and removal' do
-  it 'compares Ruby native and both Rust host backends against the shared contract' do
+  it 'compares Ruby native and both Rust host backends against shared contracts' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
-    fixture_path = File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/rust_merge3_compatible_two_sided_reorders_additions_and_removal.json',
-      __dir__
-    )
-    fixture = JSON.parse(File.read(fixture_path))
-    input = fixture.fetch('input')
-    request = {
-      base_source: input.fetch('base'),
-      ours_source: input.fetch('ours'),
-      theirs_source: input.fetch('theirs')
-    }
-
-    native = Rust::Merge::Provider.new.merge3(request)
-    expect(native.fetch(:ok)).to eq(fixture.dig('ruby_native_expected', 'outcome') == 'clean'), native.inspect
-    expect(native.fetch(:output)).to eq(fixture.dig('ruby_native_expected', 'output'))
+    fixture_names = %w[
+      rust_merge3_compatible_two_sided_reorders_additions_and_removal
+      rust_merge3_two_sided_reorders_additions_removal_owned_gaps
+    ]
 
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.two-sided-reorder-addition-removal')
-    %i[rust_tslp rust_syn].each do |backend|
-      result = Rust::Merge::RustHostProvider.new.merge3(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving,
-        **request
+    fixture_names.each do |fixture_name|
+      fixture_path = File.expand_path(
+        "../../../../../fixtures/polyglot/typed-core/#{fixture_name}.json",
+        __dir__
       )
-      expect(result.fetch(:ok)).to eq(fixture.dig('expected', 'outcome') == 'clean'),
-                                     "#{backend}: #{result.inspect}"
-      expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output')), backend.to_s
+      fixture = JSON.parse(File.read(fixture_path))
+      input = fixture.fetch('input')
+      request = {
+        base_source: input.fetch('base'),
+        ours_source: input.fetch('ours'),
+        theirs_source: input.fetch('theirs')
+      }
+
+      native = Rust::Merge::Provider.new.merge3(request)
+      ruby_expected = fixture.fetch('ruby_native_expected')
+      expect(native.fetch(:ok)).to eq(ruby_expected.fetch('outcome') == 'clean'),
+                                  "#{fixture_name}: #{native.inspect}"
+      if ruby_expected.key?('output')
+        expect(native.fetch(:output)).to eq(ruby_expected.fetch('output')), fixture_name
+      end
+      if ruby_expected.key?('diagnostic_category')
+        expect(native.fetch(:diagnostics).first.fetch(:category).to_s)
+          .to eq(ruby_expected.fetch('diagnostic_category')), fixture_name
+      end
+      if ruby_expected.key?('conflict_category')
+        expect(native.fetch(:conflicts).first.fetch(:category).to_s)
+          .to eq(ruby_expected.fetch('conflict_category')), fixture_name
+      end
+
+      %i[rust_tslp rust_syn].each do |backend|
+        result = Rust::Merge::RustHostProvider.new.merge3(
+          family: :rust,
+          dialect: :rust,
+          backend: backend,
+          profile_id: :source_preserving,
+          **request
+        )
+        expect(result.fetch(:ok)).to eq(fixture.dig('expected', 'outcome') == 'clean'),
+                                       "#{fixture_name} #{backend}: #{result.inspect}"
+        expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output')),
+                                       "#{fixture_name} #{backend}"
+      end
     end
   end
 end
