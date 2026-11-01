@@ -147,6 +147,43 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'compares directional comment and gap ownership through native and rust_syn providers' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge2_directional_comment_gap_ownership.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      incoming_source: input.fetch('incoming'),
+      current_source: input.fetch('current')
+    }
+
+    native = Rust::Merge::Provider.new.merge2(request)
+    expect(native.fetch(:ok)).to eq(fixture.dig('ruby_native_expected', 'ok')), native.inspect
+    expect(native.fetch(:output)).to eq(fixture.dig('ruby_native_expected', 'output'))
+
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.directional-comment-gap')
+    %i[rust_tslp rust_syn].each do |backend|
+      rust = described_class.new.merge2(request.merge(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving
+      ))
+
+      expect(rust.fetch(:ok)).to eq(fixture.dig('expected', 'ok')), "#{backend}: #{rust.inspect}"
+      expect(rust.fetch(:output)).to eq(fixture.dig('expected', 'output')), backend.to_s
+      expect(rust.fetch(:verification)).to include(
+        directional_roles_preserved: true,
+        output_reparsed: true
+      )
+    end
+  end
+
   it 'merges named macro definitions as whole owners through rust_syn' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
