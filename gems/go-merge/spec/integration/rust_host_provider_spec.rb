@@ -272,6 +272,29 @@ RSpec.describe Go::Merge::RustHostProvider do
   end
 end
 
+RSpec.describe 'Go native parser doc ownership fixture' do
+  it 'projects the documented declaration to the same source lines in both adapters' do
+    skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
+    fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/doc-comment-ownership.json', __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    source = fixture.fetch('source')
+    expected_lines = fixture.dig('expected', 'declaration_line_range')
+    request = { family: :go, dialect: :go, backend: :rust_tslp, profile_id: :source_preserving, source: source }
+
+    ruby = Go::Merge::Provider.new.analyze(request)
+    rust = Go::Merge::RustHostProvider.new.analyze(request)
+
+    expect(ruby.fetch(:ok)).to be(true), ruby.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(ruby.dig(:analysis, :declarations)).to include(
+      hash_including(signature: [:function, 'Greet'], line_range: expected_lines)
+    )
+    expect(rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: '/function:Greet', line_range: expected_lines)
+    )
+  end
+end
+
 RSpec.describe 'Go shared conflict fixture' do
   it 'matches fail-closed status while exposing the remaining diagnostic-category gap' do
     skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
