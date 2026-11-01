@@ -24,6 +24,27 @@ RSpec.describe 'Go native comment ownership fixture' do
     end
   end
 
+  it 'rejects malformed Go syntax with matching parser-error categories' do
+    fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/malformed-source.json',
+                                    __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    request = {
+      family: :go,
+      dialect: :go,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      source: fixture.fetch('source')
+    }
+
+    native = Go::Merge::Provider.new.analyze(request)
+    rust = Go::Merge::RustHostProvider.new.analyze(request)
+
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    expect(native.fetch(:diagnostics).first.fetch(:category)).to eq(:parse_error)
+    expect(rust.fetch(:diagnostics).first.fetch(:category)).to eq(:parse_error)
+  end
+
   it 'compares duplicate-owner failure categories across Ruby and Rust providers' do
     fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/duplicate-owner-identity.json',
                                     __dir__)
