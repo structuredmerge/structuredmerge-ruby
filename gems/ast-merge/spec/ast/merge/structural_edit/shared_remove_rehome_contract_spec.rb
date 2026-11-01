@@ -51,7 +51,21 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
             'edge' => entry.edge.to_s,
             'kind' => entry.metadata.fetch(:kind).to_s,
             'comment_region_ids' => entry.comment_regions.map(&:normalized_content),
-            'layout_gap_ids' => entry.layout_gaps
+            'layout_gap_ids' => entry.layout_gaps,
+            'comment_attachment' => {
+              'owner_id' => entry.comment_attachment.owner.id,
+              'leading_region_id' => entry.comment_attachment.leading_region&.normalized_content,
+              'inline_region_id' => entry.comment_attachment.inline_region&.normalized_content,
+              'trailing_region_id' => entry.comment_attachment.trailing_region&.normalized_content,
+              'orphan_region_ids' => entry.comment_attachment.orphan_regions.map(&:normalized_content),
+              'metadata' => entry.comment_attachment.metadata.transform_keys(&:to_s).transform_values(&:to_s)
+            },
+            'layout_attachment' => {
+              'owner_id' => entry.layout_attachment.owner.id,
+              'leading_gap_id' => entry.layout_attachment.leading_gap,
+              'trailing_gap_id' => entry.layout_attachment.trailing_gap,
+              'metadata' => entry.layout_attachment.metadata.transform_keys(&:to_s).transform_values(&:to_s)
+            }
           }
         end
       }
