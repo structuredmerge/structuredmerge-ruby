@@ -163,7 +163,8 @@ module Ast
         end
         diagnostics = result.diagnostics.map do |record|
           diagnostic = record.canonical || record.migration
-          { id: diagnostic.id, code: diagnostic.code, category: diagnostic.category.to_sym,
+          category = diagnostic.code == 'analysis.ambiguous_owner' ? :ambiguous_owner : diagnostic.category.to_sym
+          { id: diagnostic.id, code: diagnostic.code, category: category,
             severity: diagnostic.severity.to_sym, message: diagnostic.message, blocking: diagnostic.blocking, typed_record: record }
         end
         conflicts = result.conflicts.map do |record|
