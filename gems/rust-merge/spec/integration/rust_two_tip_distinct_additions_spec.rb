@@ -176,4 +176,41 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
       expect(rust.fetch(:output)).to eq(expected_output)
     end
   end
+
+  it 'composes two-tip additions from empty and comment-only bases' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_tip_additions_empty_base.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    backends = [:rust_tslp]
+    if StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.empty-base-additions')
+      backends << :rust_syn
+    end
+
+    fixture.fetch('cases').each do |case_data|
+      input = case_data.fetch('input')
+      expected_output = case_data.dig('expected', 'output')
+      request = {
+        base_source: input.fetch('base'),
+        ours_source: input.fetch('ours'),
+        theirs_source: input.fetch('theirs')
+      }
+      native = Rust::Merge::Provider.new.merge3(request)
+      expect(native.fetch(:ok)).to be(true), "#{case_data.fetch('name')}: #{native.inspect}"
+      expect(native.fetch(:output)).to eq(expected_output), case_data.fetch('name')
+
+      backends.each do |backend|
+        rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
+          family: :rust,
+          dialect: :rust,
+          backend: backend,
+          profile_id: :source_preserving
+        ))
+        expect(rust.fetch(:ok)).to be(true), "#{backend} #{case_data.fetch('name')}: #{rust.inspect}"
+        expect(rust.fetch(:output)).to eq(expected_output), "#{backend} #{case_data.fetch('name')}"
+      end
+    end
+  end
 end
