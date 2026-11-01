@@ -124,7 +124,7 @@ RSpec.describe 'shared ast-merge source line selection contract' do
     expect(actual_records).to eq(fixture.dig('expected', 'line_records'))
   end
 
-  it 'selects an added owner with its leading gap and attached comments' do
+  it 'selects every gap controlled by an added owner and its attached comments' do
     fixture_path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/source_line_addition_selection.json', __dir__)
     fixture = JSON.parse(File.read(fixture_path))
     owner_revisions = fixture.fetch('owner_revisions').to_h { |entry| [entry.fetch('owner_id'), entry.fetch('revision')] }
@@ -141,7 +141,7 @@ RSpec.describe 'shared ast-merge source line selection contract' do
     documents.each do |document|
       revision = document.fetch('revision')
       document.fetch('layout_gaps').each do |gap|
-        owner_id = gap['after_owner_id']
+        owner_id = gap['controller_owner_id']
         next unless additions.include?(owner_id) && owner_revisions[owner_id] == revision
 
         owners = document.fetch('owners').map do |owner|
@@ -149,7 +149,7 @@ RSpec.describe 'shared ast-merge source line selection contract' do
         end
         layout = Ast::Merge::Layout::Augmenter.new(lines: document.fetch('source').lines, owners: owners)
         actual_gap = layout.gaps.find { |candidate| candidate.start_line == gap.fetch('start_line') && candidate.end_line == gap.fetch('end_line') }
-        expect(actual_gap&.after_owner&.id).to eq(owner_id)
+        expect(actual_gap&.controller&.id).to eq(owner_id)
         (gap.fetch('start_line')..gap.fetch('end_line')).each do |line_number|
           appended << { 'selection_key' => gap.fetch('selection_key'), 'revision' => revision, 'line_number' => line_number }
         end
