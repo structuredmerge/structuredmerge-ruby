@@ -604,4 +604,31 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to include(fixture.dig('expected', 'foreign_mod_path'))
   end
 
+  it 'fails closed when both Rust tips reorder stable owners differently' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_sided_owner_reorder_boundary.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.two-sided-reorder')
+    result = described_class.new.merge3(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    )
+
+    expect(result.fetch(:ok)).to eq(false), result.inspect
+    expect(result.fetch(:output)).to be_nil
+    expect(result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s })
+      .to include('verification_error')
+  end
+
 end
