@@ -34,14 +34,52 @@ RSpec.describe 'shared ast-merge source line selection contract' do
       document.fetch('layout_gaps').each do |gap|
         actual_gap = layout.gaps.find { |candidate| candidate.start_line == gap.fetch('start_line') && candidate.end_line == gap.fetch('end_line') }
         expect(actual_gap&.kind.to_s).to eq(gap.fetch('kind'))
+        controller = actual_gap&.controller_side == :after ? actual_gap.after_owner : actual_gap&.before_owner
+        expect(controller&.id).to eq(gap.fetch('controller_owner_id'))
+        actual_key = "gap:#{actual_gap&.kind}:#{actual_gap&.before_owner&.id || 'root'}:#{actual_gap&.after_owner&.id || 'root'}"
+        expect(actual_key).to eq(gap.fetch('selection_key'))
       end
       lines = document.fetch('source').lines
       selected << [document.fetch('revision'), lines, owners, document.fetch('comment_regions'), document.fetch('layout_gaps')]
     end
 
+    baseline_revision = fixture.fetch('baseline_revision')
+    baseline_document = selected.find { |entry| entry.fetch(0) == baseline_revision }
+    owner_revisions = fixture.fetch('selections').each_with_object({}) do |selection, revisions|
+      owner_id = selection.fetch('selection_key').delete_prefix('owner:')
+      revisions[owner_id] = selection.fetch('revision') if selection.fetch('selection_key').start_with?('owner:')
+    end
+    line_regions = {}
+    baseline_document.fetch(2).each do |owner|
+      line_regions["owner:#{owner.id}"] = owner.start_line
+    end
+    baseline_document.fetch(3).each do |region|
+      line_regions[region.fetch('selection_key')] = region.fetch('start_line')
+    end
+    baseline_document.fetch(4).each do |gap|
+      line_regions[gap.fetch('selection_key')] = gap.fetch('start_line')
+    end
+    expect(fixture.fetch('selections').map { |selection| selection.fetch('selection_key') }).to eq(
+      line_regions.sort_by { |_key, start_line| start_line }.map(&:first)
+    )
+
     key_to_lines = {}
     key_to_records = {}
     fixture.fetch('selections').each do |selection|
+      selection_key = selection.fetch('selection_key')
+      owner_id = selection_key.delete_prefix('owner:')
+      region = baseline_document.fetch(3).find { |entry| entry.fetch('selection_key') == selection_key }
+      gap = baseline_document.fetch(4).find { |entry| entry.fetch('selection_key') == selection_key }
+      expected_revision = if selection_key.start_with?('owner:')
+                            owner_revisions.fetch(owner_id)
+                          elsif region && region['owner_id']
+                            owner_revisions.fetch(region.fetch('owner_id'))
+                          elsif gap && gap['controller_owner_id']
+                            owner_revisions.fetch(gap.fetch('controller_owner_id'), baseline_revision)
+                          else
+                            baseline_revision
+                          end
+      expect(selection.fetch('revision')).to eq(expected_revision), selection_key
       document = selected.find { |entry| entry.fetch(0) == selection.fetch('revision') }
       source_lines = document.fetch(1)
       owner = document.fetch(2).find { |entry| selection.fetch('selection_key') == "owner:#{entry.id}" }
