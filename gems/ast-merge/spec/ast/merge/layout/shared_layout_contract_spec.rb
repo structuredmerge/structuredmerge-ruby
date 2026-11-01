@@ -41,5 +41,13 @@ RSpec.describe 'shared Ast::Merge layout ownership contract' do
 
     expect(actual_gaps).to eq(fixture.fetch('gaps'))
     expect(actual_attachments).to eq(fixture.fetch('attachments'))
+
+    fixture.fetch('physical_line_case').fetch('documents').each do |document|
+      source_lines = document.fetch('source').lines
+      owner_lines = document.fetch('owners').map do |owner|
+        source_lines[(owner.fetch('start_line') - 1)...owner.fetch('end_line')].join
+      end
+      expect(owner_lines).to all(end_with("\n"))
+    end
   end
 end
