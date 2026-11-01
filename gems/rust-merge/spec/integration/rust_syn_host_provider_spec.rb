@@ -32,10 +32,14 @@ RSpec.describe Rust::Merge::RustHostProvider do
     merge = provider.merge3(family: :rust, dialect: :rust, backend: :rust_syn,
                             profile_id: :source_preserving, base_source: base,
                             ours_source: ours, theirs_source: theirs)
+    directional = provider.merge2(family: :rust, dialect: :rust, backend: :rust_syn,
+                                  profile_id: :source_preserving, incoming_source: ours,
+                                  current_source: base)
 
     expect(diff.fetch(:ok)).to be(true), diff.inspect
     expect(diff.fetch(:changes).map { |change| change.fetch(:path) }).to include('/function:left')
     expect(merge.fetch(:ok)).to be(true), merge.inspect
     expect(merge.fetch(:output)).to include("fn left() -> i32 { 2 }", "fn right() -> i32 { 2 }")
+    expect(directional.fetch(:ok)).to be(true), directional.inspect
   end
 end
