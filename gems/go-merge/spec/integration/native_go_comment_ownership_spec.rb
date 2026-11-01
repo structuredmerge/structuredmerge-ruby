@@ -257,3 +257,40 @@ RSpec.describe 'Go comment directive ownership fixture' do
     expect(rust.dig(:analysis, :declarations)).to include(hash_including(line_range: expected_range))
   end
 end
+
+RSpec.describe 'Go build constraint comment ownership fixture' do
+  it 'keeps build constraints at document scope and package docs with their declaration' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/go/slice-114-native/build-constraint-comment-ownership.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    expected = fixture.fetch('expected')
+    native_request = { dialect: :go, source: fixture.fetch('source') }
+    rust_request = {
+      family: :go,
+      dialect: :go,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      source: fixture.fetch('source')
+    }
+
+    native = Go::Merge::Provider.new.analyze(native_request)
+    rust = Go::Merge::RustHostProvider.new.analyze(rust_request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: [:package, 'buildtags'], line_range: expected.fetch('package_line_range'))
+    )
+    expect(rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: expected.fetch('package_owner_path'), line_range: expected.fetch('package_line_range'))
+    )
+    expect(native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: [:function, 'Run'], line_range: expected.fetch('function_line_range'))
+    )
+    expect(rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: expected.fetch('rust_function_path'), line_range: expected.fetch('function_line_range'))
+    )
+  end
+end
