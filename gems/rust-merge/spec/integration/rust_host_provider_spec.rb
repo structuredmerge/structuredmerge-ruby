@@ -301,8 +301,8 @@ RSpec.describe Rust::Merge::RustHostProvider do
   end
 
   it 'reports layout diffs and deterministically reparses unchanged source' do
-    source = "use std::fmt;\n// é\nfn f() {}"
-    diff = provider.diff2(before_source: source, after_source: source.sub('std::fmt', 'std::io'))
+    source = "use std::fmt;\nfn f() {}"
+    diff = provider.diff2(before_source: source, after_source: source.sub("\nfn f", "\n\nfn f"))
     expect(diff).to include(ok: true)
     expect(diff.fetch(:changes)).to contain_exactly(hash_including(subject_ref: 'document', change: :edited))
     request = { base_source: source, ours_source: source, theirs_source: source }
@@ -310,6 +310,29 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result).to include(ok: true, output: source)
     expect(result.fetch(:verification)).to include(output_reparsed: true)
     expect(JSON.generate(result)).to eq(JSON.generate(provider.merge3(request)))
+  end
+
+  it 'reports use declaration changes with the same owner dispositions as the native provider' do
+    source = "use std::fmt;\n// \u00e9\nfn f() {}"
+    changed = source.sub('std::fmt', 'std::io')
+    native = Rust::Merge::Provider.new.diff2(before_source: source, after_source: changed)
+    rust = provider.diff2(before_source: source, after_source: changed)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    native_dispositions = native.fetch(:changes).map do |change|
+      [change.fetch(:change), change.dig(:before, :present), change.dig(:after, :present)]
+    end
+    rust_owner_changes = rust.fetch(:changes).reject { |change| change[:subject_ref] == 'document' }
+    rust_dispositions = rust_owner_changes.map do |change|
+      [change.fetch(:change), change.dig(:before, :present), change.dig(:after, :present)]
+    end
+    expect(rust_dispositions).to match_array(native_dispositions)
+    expect(rust_owner_changes).to contain_exactly(
+      hash_including(path: '/use:std::fmt', change: :deleted),
+      hash_including(path: '/use:std::io', change: :added)
+    )
+    expect(rust.fetch(:changes)).to include(hash_including(subject_ref: 'document', change: :edited))
   end
 
   it 'rejects unsupported selectors, syntax and framing without changing caller bytes' do
