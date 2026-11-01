@@ -11,6 +11,10 @@ RSpec.describe 'Rust native trailing-comment ownership on owner deletion' do
     compare_fixture('rust_merge3_delete_owner_trailing_block_comment_with_independent_edit')
   end
 
+  it 'keeps the complete multiline block comment with its deleted owner through syn' do
+    compare_fixture('rust_merge3_delete_owner_multiline_trailing_block_comment_with_independent_edit')
+  end
+
   def compare_fixture(fixture_id)
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
