@@ -177,40 +177,44 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
     end
   end
 
-  it 'composes divergent Rust crate docs from independent owner additions using Rust providers' do
-    fixture_path = File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/rust_syn_crate_doc_additions.json',
-      __dir__
-    )
-    fixture = JSON.parse(File.read(fixture_path))
-    input = fixture.fetch('input')
-    request = {
-      base_source: input.fetch('base'),
-      ours_source: input.fetch('ours'),
-      theirs_source: input.fetch('theirs')
-    }
-    expected = fixture.fetch('expected')
-
-    native = Rust::Merge::Provider.new.merge3(request)
-    expect(native.fetch(:ok)).to be(false)
-    expect(native.fetch(:diagnostics).map { |diagnostic| diagnostic[:category] }).to include(
-      fixture.dig('ruby_native_expected', 'diagnostic_category').to_sym
-    )
-
+  it 'composes divergent and edited Rust crate docs through Rust providers' do
+    fixture_names = [
+      'rust_syn_crate_doc_additions.json',
+      'rust_syn_crate_doc_edit_with_independent_addition.json'
+    ]
     backends = [:rust_tslp]
     if StructuredmergeCore.respond_to?(:register_rust_syn_parser)
       StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.crate-doc-additions')
       backends << :rust_syn
     end
-    backends.each do |backend|
-      result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
-        family: :rust,
-        dialect: :rust,
-        backend: backend,
-        profile_id: :source_preserving
-      ))
-      expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
-      expect(result.fetch(:output)).to eq(expected.fetch('output'))
+
+    fixture_names.each do |fixture_name|
+      fixture_path = File.expand_path("../../../../../fixtures/polyglot/typed-core/#{fixture_name}", __dir__)
+      fixture = JSON.parse(File.read(fixture_path))
+      input = fixture.fetch('input')
+      request = {
+        base_source: input.fetch('base'),
+        ours_source: input.fetch('ours'),
+        theirs_source: input.fetch('theirs')
+      }
+      expected = fixture.fetch('expected')
+
+      native = Rust::Merge::Provider.new.merge3(request)
+      expect(native.fetch(:ok)).to be(false), "#{fixture_name}: #{native.inspect}"
+      expect(native.fetch(:diagnostics).map { |diagnostic| diagnostic[:category] }).to include(
+        fixture.dig('ruby_native_expected', 'diagnostic_category').to_sym
+      )
+
+      backends.each do |backend|
+        result = Rust::Merge::RustHostProvider.new.merge3(request.merge(
+          family: :rust,
+          dialect: :rust,
+          backend: backend,
+          profile_id: :source_preserving
+        ))
+        expect(result.fetch(:ok)).to be(true), "#{backend} #{fixture_name}: #{result.inspect}"
+        expect(result.fetch(:output)).to eq(expected.fetch('output')), "#{backend} #{fixture_name}"
+      end
     end
   end
 
