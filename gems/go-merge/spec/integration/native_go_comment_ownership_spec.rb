@@ -196,3 +196,29 @@ RSpec.describe 'Go native comment ownership fixture' do
     )
   end
 end
+
+
+RSpec.describe 'Go comment directive ownership fixture' do
+  it 'keeps a go:embed directive attached to its variable in Ruby and Rust host analysis' do
+    skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
+    fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/comment-directive-ownership.json',
+                                    __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    expected_range = fixture.dig('expected', 'declaration_line_range')
+    request = {
+      family: :go,
+      dialect: :go,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      source: fixture.fetch('source')
+    }
+
+    ruby = Go::Merge::Provider.new.analyze(request)
+    rust = Go::Merge::RustHostProvider.new.analyze(request)
+
+    expect(ruby.fetch(:ok)).to be(true), ruby.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(ruby.dig(:analysis, :declarations)).to include(hash_including(line_range: expected_range))
+    expect(rust.dig(:analysis, :declarations)).to include(hash_including(line_range: expected_range))
+  end
+end
