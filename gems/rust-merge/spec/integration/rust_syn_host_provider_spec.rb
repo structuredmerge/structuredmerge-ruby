@@ -633,8 +633,17 @@ RSpec.describe Rust::Merge::RustHostProvider do
       __dir__
     )
     fixture = JSON.parse(File.read(fixture_path))
-    malformed = provider.analyze(request.merge(source: fixture.dig('input', 'source')))
+    source = fixture.dig('input', 'source')
+    malformed = provider.analyze(request.merge(source: source))
+    ruby_native = Rust::Merge::Provider.new.analyze(source: source)
+    rust_tslp = provider.analyze(request.merge(backend: :rust_tslp, source: source))
 
+    expect(ruby_native.fetch(:ok)).to be(false)
+    expect(ruby_native.dig(:diagnostics, 0, :category).to_s)
+      .to eq(fixture.dig('expected', 'ruby_native_category'))
+    expect(rust_tslp.fetch(:ok)).to be(false)
+    expect(rust_tslp.dig(:diagnostics, 0, :category).to_s)
+      .to eq(fixture.dig('expected', 'rust_tslp_category'))
     expect(malformed.fetch(:ok)).to be(false)
     malformed_messages = malformed.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
     expect(malformed_messages).to include('native parser rejected input')
