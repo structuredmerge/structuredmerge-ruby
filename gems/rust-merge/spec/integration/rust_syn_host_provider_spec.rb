@@ -174,6 +174,32 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'merges unique top-level macro invocations as syn-backed owners' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_macro_invocation_merge3.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.macro-invocation')
+    result = described_class.new.merge3(request)
+
+    expect(result.fetch(:ok)).to eq(true), result.inspect
+    expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+  end
+
   it 'matches the shared Rust parser and owner-profile failure boundary' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
