@@ -174,6 +174,36 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(rust.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'merges extern-crate alias changes with independent function edits through rust_syn' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_extern_crate_owner_merge3.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    native = Rust::Merge::Provider.new.merge3(request)
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.extern-crate')
+    rust = described_class.new.merge3(request.merge(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    ))
+
+    [native, rust].each do |result|
+      expect(result.fetch(:ok)).to eq(true), result.inspect
+      expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    end
+  end
+
   it 'merges unique top-level macro invocations as syn-backed owners' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
