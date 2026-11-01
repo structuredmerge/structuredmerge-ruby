@@ -59,5 +59,28 @@ RSpec.describe 'shared Ast::Merge layout ownership contract' do
       end
       expect(owner_lines).to all(end_with("\n"))
     end
+
+    membership_case = fixture.fetch('membership_removal_case')
+    stable_ids = membership_case.fetch('stable_owner_ids')
+    actual_segments = membership_case.fetch('documents').map do |document|
+      source_lines = document.fetch('source').lines
+      cursor = 0
+      segment = []
+      segments = []
+      document.fetch('owners').each do |owner|
+        start_index = owner.fetch('start_line') - 1
+        end_index = owner.fetch('end_line')
+        segment.concat(source_lines[cursor...start_index] || [])
+        if stable_ids.include?(owner.fetch('id'))
+          segments << segment.join
+          segment = []
+        end
+        cursor = end_index
+      end
+      segment.concat(source_lines[cursor..] || [])
+      segments << segment.join
+      segments
+    end
+    expect(actual_segments).to all(eq(membership_case.fetch('expected_stable_layout_segments')))
   end
 end
