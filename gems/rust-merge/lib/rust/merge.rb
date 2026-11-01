@@ -186,7 +186,7 @@ module Rust
           dialect: 'rust',
           imports: imports,
           declarations: declarations,
-          owners: owner_views(imports + declarations)
+          owners: owner_views(imports + declarations.sort_by { |item| item[:path] })
         },
         policies: []
       }
