@@ -407,6 +407,28 @@ RSpec.describe Rust::Merge::RustHostProvider do
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.macro-invocation')
     result = described_class.new.merge3(request)
 
+    parser_paths = fixture.dig('expected', 'parser_paths')
+    native_parse = Rust::Merge::Provider.new.analyze(source: input.fetch('base'))
+    tree_sitter_parse = described_class.new.analyze(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      source: input.fetch('base')
+    )
+    syn_parse = described_class.new.analyze(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      source: input.fetch('base')
+    )
+
+    expect(native_parse.fetch(:ok)).to eq(parser_paths.dig('ruby_native', 'ok')), native_parse.inspect
+    expect(tree_sitter_parse.fetch(:ok)).to eq(parser_paths.dig('rust_treesitter', 'ok'))
+    expect(tree_sitter_parse.dig(:diagnostics, 0, :category).to_s)
+      .to eq(parser_paths.dig('rust_treesitter', 'category'))
+    expect(syn_parse.fetch(:ok)).to eq(parser_paths.dig('rust_syn', 'ok')), syn_parse.inspect
     expect(result.fetch(:ok)).to eq(true), result.inspect
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
 
