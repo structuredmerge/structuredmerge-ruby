@@ -68,6 +68,38 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
   end
 
+  it 'matches the shared Rust block-doc two-tip addition fixture' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_block_doc_two_tip_additions.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.block-doc-merge3')
+    native = Rust::Merge::Provider.new.merge3(
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    )
+    rust = described_class.new.merge3(
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving,
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    )
+
+    [native, rust].each do |result|
+      expect(result.fetch(:ok)).to eq(fixture.dig('expected', 'ok')), result.inspect
+      expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+    end
+  end
+
   it 'matches shared classic Rust comment-owner fixture through rust_syn' do
     unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
       skip 'compiled native syn registration is unavailable'
