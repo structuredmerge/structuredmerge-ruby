@@ -24,6 +24,28 @@ RSpec.describe 'Go native comment ownership fixture' do
     end
   end
 
+  it 'compares duplicate-owner failure categories across Ruby and Rust providers' do
+    fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/duplicate-owner-identity.json',
+                                    __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    request = {
+      family: :go,
+      dialect: :go,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      source: fixture.fetch('source')
+    }
+
+    native = Go::Merge::Provider.new.analyze(request)
+    rust = Go::Merge::RustHostProvider.new.analyze(request)
+
+    expect(native.fetch(:ok)).to be(false), native.inspect
+    expect(rust.fetch(:ok)).to be(false), rust.inspect
+    native_category = native.fetch(:diagnostics).first.fetch(:category)
+    rust_category = rust.fetch(:diagnostics).first.fetch(:category)
+    expect(rust_category).to eq(native_category), rust.inspect
+  end
+
   it 'keeps a grouped import declaration as one comment-owned range in both adapters' do
     fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/grouped-import-owner.json',
                                     __dir__)
