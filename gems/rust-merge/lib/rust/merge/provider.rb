@@ -115,7 +115,7 @@ module Rust
         %i[base ours theirs].each_with_object({}) do |role, documents|
           source = request.fetch(:"#{role}_source")
           document = parse_source(source, role, request[:dialect])
-          if document.is_a?(Hash) && document[:parse_error]
+          if document.is_a?(Hash) && (document[:parse_error] || document[:unsupported_feature])
             return parse_failure(:merge3, request, role, document)
           elsif provider_failure?(document)
             return unsafe_document_failure(request, role, document)
@@ -135,6 +135,9 @@ module Rust
 
       def parse_source(source, role, _dialect = nil)
         analysis = FileAnalysis.new(source)
+        unsupported = analysis.errors.find { |error| error.is_a?(FileAnalysis::UnsupportedNodeError) }
+        return { unsupported_feature: unsupported.message, source_role: role } if unsupported
+
         unless analysis.errors.empty? && analysis.backend == TREE_SITTER_BACKEND.id.to_sym
           return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role }
         end
@@ -172,6 +175,9 @@ module Rust
 
       def parse_exact_source(source, role, _dialect = nil)
         analysis = FileAnalysis.new(source)
+        unsupported = analysis.errors.find { |error| error.is_a?(FileAnalysis::UnsupportedNodeError) }
+        return { unsupported_feature: unsupported.message, source_role: role } if unsupported
+
         unless analysis.errors.empty? && analysis.backend == TREE_SITTER_BACKEND.id.to_sym
           return { parse_error: analysis.errors.map(&:to_s).join('; '), source_role: role }
         end
@@ -500,9 +506,9 @@ module Rust
         documents.flat_map do |role, document|
           if provider_failure?(document)
             [{
-              category: :parse_error,
+              category: failure_category(document),
               severity: :warning,
-              message: "#{role} parse error: #{failure_detail(document)}",
+              message: "#{role} #{failure_label(document)}: #{failure_detail(document)}",
               blocking: false,
               source_role: role
             }]
@@ -878,25 +884,32 @@ module Rust
         )
       end
 
+      def failure_category(parsed)
+        return :parse_error if parsed[:parse_error]
+        return :unsupported_feature if parsed[:unsupported_feature]
+        return :ambiguous_owner if parsed[:ambiguous_owner]
+
+        :unsafe_source_range
+      end
+
+      def failure_label(parsed)
+        parsed[:unsupported_feature] ? 'unsupported feature' : 'parse error'
+      end
+
       def parse_failure(operation, request, role, parsed)
-        category = if parsed[:parse_error]
-                     :parse_error
-                   elsif parsed[:ambiguous_owner]
-                     :ambiguous_owner
-                   else
-                     :unsafe_source_range
-                   end
+        category = failure_category(parsed)
         failure(
           operation,
           request,
           category: category,
-          message: "#{role} parse error: #{failure_detail(parsed)}",
+          message: "#{role} #{failure_label(parsed)}: #{failure_detail(parsed)}",
           source_role: role
         )
       end
 
       def failure_detail(parsed)
         return parsed[:parse_error] if parsed[:parse_error]
+        return parsed[:unsupported_feature] if parsed[:unsupported_feature]
         return "ambiguous duplicate declaration #{parsed[:ambiguous_owner].inspect}" if parsed[:ambiguous_owner]
 
         "unsafe declaration range #{parsed[:unsafe_range].inspect}"
@@ -904,7 +917,13 @@ module Rust
 
       def provider_failure?(value)
         value.is_a?(Hash) &&
-          (value[:ok] == false || value.key?(:parse_error) || value.key?(:ambiguous_owner) || value.key?(:unsafe_range))
+          (
+            value[:ok] == false ||
+            value.key?(:parse_error) ||
+            value.key?(:unsupported_feature) ||
+            value.key?(:ambiguous_owner) ||
+            value.key?(:unsafe_range)
+          )
       end
 
       def result(operation, request, changes: [], diagnostics: [], render_report: {}, verification: {}, **payload)

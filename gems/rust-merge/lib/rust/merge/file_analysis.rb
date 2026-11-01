@@ -5,6 +5,8 @@ module Rust
     # Native TreeHaver analysis of safely attributable top-level Rust items.
     # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity -- one AST pass establishes ordered ownership and attribute/comment attachment
     class FileAnalysis
+      class UnsupportedNodeError < StandardError; end
+
       attr_reader :source, :root_node, :declarations, :errors, :backend
 
       def initialize(source)
@@ -42,7 +44,7 @@ module Rust
           elsif globally_unmanaged?(node)
             pending.clear
           elsif node.named?
-            raise TreeHaver::NotAvailable, "Unmanaged top-level Rust node #{node.type.inspect}"
+            raise UnsupportedNodeError, "Unmanaged top-level Rust node #{node.type.inspect}"
           end
         end
         @declarations = wrappers.freeze
