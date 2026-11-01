@@ -641,7 +641,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to include(fixture.dig('expected', 'foreign_mod_path'))
   end
 
-  it 'fails closed when both Rust tips reorder stable owners differently' do
+  it 'reports a portable conflict when Rust tips impose cyclic owner orders' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
@@ -651,21 +651,33 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
     fixture = JSON.parse(File.read(fixture_path))
     input = fixture.fetch('input')
-    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.two-sided-reorder')
-    result = described_class.new.merge3(
-      family: :rust,
-      dialect: :rust,
-      backend: :rust_syn,
-      profile_id: :source_preserving,
+    request = {
       base_source: input.fetch('base'),
       ours_source: input.fetch('ours'),
       theirs_source: input.fetch('theirs')
-    )
+    }
 
-    expect(result.fetch(:ok)).to eq(false), result.inspect
-    expect(result.fetch(:output)).to be_nil
-    expect(result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category).to_s })
-      .to include('verification_error')
+    native = Rust::Merge::Provider.new.merge3(request)
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(native.fetch(:output)).to eq(fixture.dig('expected', 'ruby_native_expected', 'output'))
+
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.two-sided-reorder-conflict')
+    %i[rust_tslp rust_syn].each do |backend|
+      result = described_class.new.merge3(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving,
+        **request
+      )
+      expect(result.fetch(:ok)).to be(false), "#{backend}: #{result.inspect}"
+      expect(result[:output]).to be_nil
+      expect(result.fetch(:diagnostics).first.fetch(:category)).to eq(:merge_conflict)
+      conflict = result.fetch(:conflicts).fetch(0).fetch(:typed_record).fetch(:canonical)
+      expect(conflict.fetch(:id)).to eq(fixture.dig('expected', 'conflict_id'))
+      expect(conflict.fetch(:subject).fetch(:structural_path)).to eq(fixture.dig('expected', 'path'))
+      expect(conflict.fetch(:roles)).to eq(%i[base ours theirs])
+    end
   end
 
   it 'keeps same-spelling Rust type and value owners distinct through syn' do
@@ -848,7 +860,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
 
     expect(result.fetch(:ok)).to eq(false), result.inspect
-    expect(result.fetch(:output)).to be_nil
+    expect(result[:output]).to be_nil
   end
 
 end
