@@ -312,8 +312,12 @@ RSpec.describe 'Go shared conflict fixture' do
     expect(rust[:output]).to be_nil
     expect(native.fetch(:conflicts).length).to eq(fixture.dig('assertions', 2, 'value'))
     expect(rust.fetch(:conflicts).length).to eq(fixture.dig('assertions', 2, 'value'))
-    expect(native.fetch(:conflicted_output)).not_to be_empty
-    expect(rust[:conflicted_output]).to be_nil
+    expect(native.fetch(:conflicted_output)).to eq(
+      fixture.dig('expected_conflicted_output', 'ruby_native')
+    )
+    expect(rust.fetch(:conflicted_output)).to eq(
+      fixture.dig('expected_conflicted_output', 'rust_host')
+    )
     expect(native.fetch(:diagnostics).first).to include(category: :unsafe_source_range, blocking: true)
     expect(rust.fetch(:diagnostics).first).to include(category: :merge_conflict, blocking: true)
   end
