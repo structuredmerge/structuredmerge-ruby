@@ -10,7 +10,9 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
     fixture.fetch('cases').each do |case_data|
       owners = ([case_data.dig('boundaries', 'leading', 'owner_id'),
                  case_data.dig('boundaries', 'trailing', 'owner_id')] +
-                case_data.fetch('removed_attachments').map { |entry| entry['owner_id'] }).compact.uniq
+                case_data.fetch('removed_attachments').map { |entry| entry['owner_id'] } +
+                case_data.dig('owner_overrides', 'removed_owner_ids').to_a +
+                case_data.dig('owner_overrides', 'retained_owner_ids').to_a).compact.uniq
                  .to_h { |id| [id, owner_class.new(id)] }
       boundary_for = lambda do |key, edge|
         entry = case_data.dig('boundaries', key)
@@ -36,7 +38,9 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
         remove_end_line: case_data.fetch('remove_end_line'),
         leading_boundary: boundary_for.call('leading', :leading),
         trailing_boundary: boundary_for.call('trailing', :trailing),
-        removed_attachments: removed
+        removed_attachments: removed,
+        removed_owners: case_data.dig('owner_overrides', 'removed_owner_ids')&.map { |id| owners.fetch(id) },
+        retained_owners: case_data.dig('owner_overrides', 'retained_owner_ids')&.map { |id| owners.fetch(id) }
       )
       actual = {
         'merged' => plan.merged_content,
