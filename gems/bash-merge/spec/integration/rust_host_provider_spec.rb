@@ -100,6 +100,27 @@ RSpec.describe Bash::Merge::RustHostProvider do
     )
   end
 
+  it 'matches the shared unmanaged-source membership conflict contract' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/ast-merge/bash_unmanaged_source_membership_conflict.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    fixture.fetch('cases').each do |entry|
+      input = entry.fetch('input').to_h { |role, source| ["#{role}_source".to_sym, source] }
+      request = request_base.merge(input)
+      native = Bash::Merge::Provider.new.merge3(request)
+      rust = provider.merge3(request)
+
+      expect(native.fetch(:ok)).to eq(entry.dig('expected', 'ok')), native.inspect
+      expect(rust.fetch(:ok)).to eq(entry.dig('expected', 'ok')), rust.inspect
+      expect(native.fetch(:output, nil)).to eq(entry.dig('expected', 'output'))
+      expect(rust.fetch(:output, nil)).to eq(entry.dig('expected', 'output'))
+      expect(native.fetch(:conflicts)).not_to be_empty if entry.dig('expected', 'conflict')
+      expect(rust.fetch(:conflicts)).not_to be_empty if entry.dig('expected', 'conflict')
+    end
+  end
+
   it 'preserves native output for independent function edits' do
     native = Bash::Merge::Provider.new.merge3(
       request_base.merge(base_source: base_source, ours_source: ours_source, theirs_source: theirs_source)
