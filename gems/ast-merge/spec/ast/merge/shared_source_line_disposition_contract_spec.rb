@@ -35,6 +35,8 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
       comment_augmenter.orphan_regions.each do |region|
         actual_comment_regions << comment_region_record(nil, 'orphan', region)
       end
+      region_keys = contract.fetch('comment_regions').to_h { |region| [region.fetch('id'), region.fetch('selection_key')] }
+      actual_comment_regions.each { |region| region['selection_key'] = region_keys.fetch(region.fetch('id')) }
       actual_comment_regions.sort_by! { |region| [region.fetch('start_line'), region.fetch('end_line'), region.fetch('id')] }
       expect(actual_comment_regions).to eq(contract.fetch('comment_regions')), contract.fetch('name')
 
@@ -43,6 +45,7 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
         controller = gap.controller_side == :after ? gap.after_owner : gap.before_owner
         {
           'id' => "layout-gap:#{gap.start_line}-#{gap.end_line}",
+          'selection_key' => "gap:#{gap.kind}:#{gap.before_owner&.id || 'root'}:#{gap.after_owner&.id || 'root'}",
           'kind' => gap.kind.to_s,
           'start_line' => gap.start_line,
           'end_line' => gap.end_line,
@@ -79,7 +82,9 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
       (owner.start_line..owner.end_line).each do |line_number|
         raise "overlapping structural owners at line #{line_number}" if dispositions[line_number - 1]
 
-        dispositions[line_number - 1] = disposition(line_number, lines[line_number - 1], 'structural_owner', owner_id: owner.id)
+        current = disposition(line_number, lines[line_number - 1], 'structural_owner', owner_id: owner.id)
+        current['selection_key'] = "owner:#{owner.id}"
+        dispositions[line_number - 1] = current
       end
     end
     comment_regions.each do |region|
@@ -94,6 +99,7 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
           kind = region['owner_id'] ? 'comment_owner' : 'root_region'
           current = disposition(line_number, lines[line_number - 1], kind, owner_id: region['owner_id'])
           current['comment_region_ids'] << region.fetch('id')
+          current['selection_key'] = region.fetch('selection_key')
           if kind == 'root_region'
             current['root_region_kind'] = region.fetch('kind')
           else
@@ -109,6 +115,7 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
 
         current = disposition(line_number, lines[line_number - 1], 'layout_gap')
         current['gap_id'] = gap.fetch('id')
+        current['selection_key'] = gap.fetch('selection_key')
         current['controller_owner_id'] = gap['controller_owner_id']
         dispositions[line_number - 1] = current
       end
@@ -123,6 +130,7 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
       'line_number' => line_number,
       'line' => line,
       'kind' => kind,
+      'selection_key' => "unmanaged:#{line_number}",
       'owner_id' => owner_id,
       'comment_region_ids' => [],
       'comment_kind' => nil,
