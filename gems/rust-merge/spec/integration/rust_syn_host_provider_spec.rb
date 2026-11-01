@@ -804,6 +804,39 @@ RSpec.describe Rust::Merge::RustHostProvider do
     end
   end
 
+  it 'composes acyclic two-tip reorders around a documented interior addition' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_compatible_reorders_with_interior_addition.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+    native = Rust::Merge::Provider.new.merge3(request)
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(native.fetch(:output)).to eq(fixture.dig('ruby_native_expected', 'output'))
+
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.reorders-with-interior-addition')
+    %i[rust_tslp rust_syn].each do |backend|
+      result = described_class.new.merge3(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving,
+        **request
+      )
+      expect(result.fetch(:ok)).to be(true), "#{backend}: #{result.inspect}"
+      expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output')), backend.to_s
+    end
+  end
+
   it 'composes compatible Rust reorders with controller-owned blank-line gaps' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
