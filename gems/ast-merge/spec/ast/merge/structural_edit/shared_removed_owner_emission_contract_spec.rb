@@ -42,9 +42,11 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
     path = File.expand_path('../../../../../../../fixtures/polyglot/ast-merge/structural_removed_owner_emission.json', __dir__)
     fixture = JSON.parse(File.read(path))
     fixture.fetch('cases').each do |entry|
-      owner = Statement.new(name: entry.fetch('removed_owner_id'), start_line: 3, end_line: 3)
+      owner_line = entry.fetch('removed_owner_line_number')
+      owner = Statement.new(name: entry.fetch('removed_owner_id'), start_line: owner_line, end_line: owner_line)
       later_id = entry.dig('trailing_gap', 'after_owner_id')
-      later = later_id && Statement.new(name: later_id, start_line: 7, end_line: 7)
+      later_line = entry.fetch('retained_owner_line_number')
+      later = later_id && Statement.new(name: later_id, start_line: later_line, end_line: later_line)
       region_data = entry.fetch('trailing_region')
       region = Region.new(start_line: region_data.fetch('line_numbers').first,
                           end_line: region_data.fetch('line_numbers').last,
