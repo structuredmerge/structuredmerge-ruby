@@ -66,28 +66,32 @@ module Ast
 
         def build!
           claimed = Set.new
-          layout_attachments = build_layout_attachments_by_owner
+          comments_by_owner = owners.to_h do |owner|
+            leading = infer_leading_comments(owner, claimed)
+            inline = infer_inline_comments(owner, claimed)
+            trailing = infer_trailing_comments(owner, claimed)
+            leading.each { |comment| claimed << comment.object_id }
+            inline.each { |comment| claimed << comment.object_id }
+            trailing.each { |comment| claimed << comment.object_id }
+            [owner, { leading: leading, inline: inline, trailing: trailing }]
+          end
+          layout_attachments = build_layout_attachments_by_owner(comments_by_owner)
 
           owners.each do |owner|
-            leading_comments = infer_leading_comments(owner, claimed)
-            inline_comments = infer_inline_comments(owner, claimed)
-            trailing_comments = infer_trailing_comments(owner, claimed)
+            comments = comments_by_owner.fetch(owner)
             layout_attachment = layout_attachments[owner]
+            leading_comments = comments.fetch(:leading)
 
             leading_floating = leading_comments.any? && gap_before_owner?(leading_comments, owner)
 
             attachments_by_owner[owner] = Attachment.new(
               owner: owner,
               leading_region: build_region(:leading, leading_comments, floating: leading_floating),
-              inline_region: build_region(:inline, inline_comments, include_blank_lines: false),
-              trailing_region: build_region(:trailing, trailing_comments),
+              inline_region: build_region(:inline, comments.fetch(:inline), include_blank_lines: false),
+              trailing_region: build_region(:trailing, comments.fetch(:trailing)),
               leading_gap: layout_attachment&.leading_gap,
               trailing_gap: layout_attachment&.trailing_gap
             )
-
-            leading_comments.each { |comment| claimed << comment.object_id }
-            inline_comments.each { |comment| claimed << comment.object_id }
-            trailing_comments.each { |comment| claimed << comment.object_id }
           end
 
           infer_postlude!(claimed)
@@ -121,6 +125,13 @@ module Ast
           end
 
           strip_preamble(selected, owner.start_line)
+        end
+
+        def structural_prefix_comment_before_blank?(current_line, candidates)
+          candidate = candidates.select { |comment| comment[:line] < current_line }.max_by { |comment| comment[:line] }
+          return false unless candidate&.fetch(:structural_prefix, false)
+
+          ((candidate[:line] + 1)...current_line).all? { |line_number| blank_line?(line_number) }
         end
 
         def infer_inline_comments(owner, claimed)

@@ -40,7 +40,20 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
       actual_comment_regions.sort_by! { |region| [region.fetch('start_line'), region.fetch('end_line'), region.fetch('id')] }
       expect(actual_comment_regions).to eq(contract.fetch('comment_regions')), contract.fetch('name')
 
-      layout_augmenter = Ast::Merge::Layout::Augmenter.new(lines: contract.fetch('source').lines, owners: owners)
+      owner_by_id = owners.to_h { |owner| [owner.id, owner] }
+      comment_boundaries = actual_comment_regions.filter_map do |region|
+        next unless region['owner_id'] && %w[leading trailing].include?(region.fetch('kind'))
+
+        {
+          owner: owner_by_id.fetch(region.fetch('owner_id')),
+          kind: region.fetch('kind').to_sym,
+          start_line: region.fetch('start_line'),
+          end_line: region.fetch('end_line')
+        }
+      end
+      layout_augmenter = Ast::Merge::Layout::Augmenter.new(
+        lines: contract.fetch('source').lines, owners: owners, comment_boundaries: comment_boundaries
+      )
       actual_gaps = layout_augmenter.gaps.map do |gap|
         controller = gap.controller_side == :after ? gap.after_owner : gap.before_owner
         {

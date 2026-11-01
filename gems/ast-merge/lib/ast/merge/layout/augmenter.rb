@@ -21,11 +21,12 @@ module Ast
         end
 
         def initialize(lines: nil, source: nil, owners: [], start_line_for: nil, end_line_for: nil, metadata: {},
-                       **options)
+                       comment_boundaries: [], **options)
           @lines = normalize_lines(lines, source)
           @start_line_for = start_line_for
           @end_line_for = end_line_for
           @owners = normalize_owners(owners)
+          @comment_boundaries = normalize_comment_boundaries(comment_boundaries)
           @metadata = metadata.merge(options).freeze
           @attachments_by_owner = {}
           @preamble_gap = nil
@@ -58,8 +59,12 @@ module Ast
           end
 
           blank_runs.each do |run|
-            before_owner = owners.reverse_each.find { |owner| owner_end_line(owner) == run[:start_line] - 1 }
-            after_owner = owners.find { |owner| owner_start_line(owner) == run[:end_line] + 1 }
+            structural_before = owners.reverse_each.find { |owner| owner_end_line(owner) == run[:start_line] - 1 }
+            structural_after = owners.find { |owner| owner_start_line(owner) == run[:end_line] + 1 }
+            comment_before = comment_boundary_owner(:trailing, run[:start_line], :end_line)
+            comment_after = comment_boundary_owner(:leading, run[:end_line] + 1, :start_line)
+            before_owner = structural_before || comment_before
+            after_owner = structural_after || comment_after
             next unless before_owner || after_owner
 
             kind = if before_owner && after_owner
@@ -70,6 +75,14 @@ module Ast
                      :preamble
                    end
 
+            controller_side = if structural_before && !structural_after && comment_after
+                                :before
+                              elsif structural_after || after_owner
+                                :after
+                              else
+                                :before
+                              end
+
             gap = Gap.new(
               kind: kind,
               start_line: run[:start_line],
@@ -77,6 +90,7 @@ module Ast
               lines: run[:lines],
               before_owner: before_owner,
               after_owner: after_owner,
+              controller_side: controller_side,
               metadata: { source: :layout_augmenter }
             )
 
@@ -102,6 +116,34 @@ module Ast
               metadata: { source: :layout_augmenter }
             )
           end
+        end
+
+        def normalize_comment_boundaries(boundaries)
+          Array(boundaries).map do |boundary|
+            owner = boundary.fetch(:owner)
+            kind = boundary.fetch(:kind).to_sym
+            start_line = Integer(boundary.fetch(:start_line))
+            end_line = Integer(boundary.fetch(:end_line))
+            unless owners.include?(owner) && %i[leading trailing].include?(kind) &&
+                start_line.positive? && end_line >= start_line && end_line <= lines.length
+              raise ArgumentError, 'comment boundary has an invalid owner, kind, or line range'
+            end
+            outside_owner = if kind == :leading
+                              end_line < owner_start_line(owner)
+                            else
+                              start_line > owner_end_line(owner)
+                            end
+            raise ArgumentError, 'comment boundary overlaps its structural owner' unless outside_owner
+
+            { owner: owner, kind: kind, start_line: start_line, end_line: end_line }.freeze
+          end.freeze
+        end
+
+        def comment_boundary_owner(kind, line, edge)
+          boundary = @comment_boundaries.find do |candidate|
+            candidate.fetch(:kind) == kind && candidate.fetch(edge) == line
+          end
+          boundary&.fetch(:owner)
         end
 
         def blank_runs

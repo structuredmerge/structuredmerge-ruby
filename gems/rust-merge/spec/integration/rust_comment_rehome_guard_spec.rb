@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Rust comment rehome with an owner deletion and independent edit' do
-  it 'fails closed when the comment separator has no shared line owner' do
+  it 'rehomes the removed owner comment and preserves its separator with the native syn parser' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
 
@@ -20,11 +20,16 @@ RSpec.describe 'Rust comment rehome with an owner deletion and independent edit'
     expected = fixture.fetch('ruby_native_expected')
     native = Rust::Merge::Provider.new.merge3(request)
     expect(native.fetch(:ok)).to eq(expected.fetch('outcome') == 'clean'), native.inspect
-    expect(native.fetch(:output, nil)).to be_nil
-    expect(native.fetch(:diagnostics).first.fetch(:category).to_s)
-      .to eq(expected.fetch('diagnostic_category'))
-    expect(native.fetch(:conflicts).first.fetch(:category).to_s)
-      .to eq(expected.fetch('conflict_category'))
+    if expected.fetch('outcome') == 'clean'
+      expect(native.fetch(:output)).to eq(expected.fetch('output'))
+      expect(native.fetch(:conflicts)).to be_empty
+    else
+      expect(native.fetch(:output, nil)).to be_nil
+      expect(native.fetch(:diagnostics).first.fetch(:category).to_s)
+        .to eq(expected.fetch('diagnostic_category'))
+      expect(native.fetch(:conflicts).first.fetch(:category).to_s)
+        .to eq(expected.fetch('conflict_category'))
+    end
 
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.comment-rehome-guard')
     %i[rust_tslp rust_syn].each do |backend|
@@ -37,13 +42,18 @@ RSpec.describe 'Rust comment rehome with an owner deletion and independent edit'
       )
       host_expected = fixture.fetch('rust_host_expected').fetch(backend.to_s)
       expect(result.fetch(:ok)).to eq(host_expected.fetch('outcome') == 'clean'), result.inspect
-      expect(result.fetch(:output, nil)).to be_nil
-      expect(result.fetch(:diagnostics).first.fetch(:category).to_s)
-        .to eq(host_expected.fetch('diagnostic_category'))
-      expect(result.fetch(:diagnostics).first.fetch(:code))
-        .to eq(host_expected.fetch('diagnostic_code'))
-      expect(result.fetch(:conflicts).first.dig(:typed_record, :canonical, :category).to_s)
-        .to eq(host_expected.fetch('conflict_category'))
+      if host_expected.fetch('outcome') == 'clean'
+        expect(result.fetch(:output)).to eq(host_expected.fetch('output'))
+        expect(result.fetch(:conflicts)).to be_empty
+      else
+        expect(result.fetch(:output, nil)).to be_nil
+        expect(result.fetch(:diagnostics).first.fetch(:category).to_s)
+          .to eq(host_expected.fetch('diagnostic_category'))
+        expect(result.fetch(:diagnostics).first.fetch(:code))
+          .to eq(host_expected.fetch('diagnostic_code'))
+        expect(result.fetch(:conflicts).first.dig(:typed_record, :canonical, :category).to_s)
+          .to eq(host_expected.fetch('conflict_category'))
+      end
     end
   end
 end
