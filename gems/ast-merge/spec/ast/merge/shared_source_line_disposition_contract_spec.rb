@@ -65,9 +65,8 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
   def comment_region_record(owner_id, kind, region)
     start_line = region.start_line
     end_line = region.end_line
-    owner_key = owner_id || 'root'
     {
-      'id' => "comment:#{owner_key}:#{kind}:#{start_line}-#{end_line}",
+      'id' => "comment-region:#{kind}:#{start_line}-#{end_line}",
       'owner_id' => owner_id,
       'kind' => kind,
       'start_line' => start_line,
