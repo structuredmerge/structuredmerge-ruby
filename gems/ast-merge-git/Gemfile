@@ -149,12 +149,6 @@ if direct_sibling_gems.any? &&
   end
 end
 
-unless direct_sibling_local || direct_sibling_templating
-  provider_gems.each do |gem_name|
-    gem gem_name, '~> 7.1', '>= 7.1.4', require: false
-  end
-end
-
 # Templating and the StructuredMerge family share this modular Gemfile.
 # kettle-jem needs StructuredMerge to template, and kettle-changelog needs it at
 # runtime (ast-crispr-markdown-markly -> markdown-merge -> tree_haver), so the
@@ -164,9 +158,22 @@ end
 # wiring fails version solving for every command in the bundle.
 #
 # (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+structuredmerge_core_dev = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', '').strip
+structuredmerge_core_dev_enabled =
+  !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
+structuredmerge_core_published = ENV.fetch('STRUCTUREDMERGE_CORE_PUBLISHED', 'false').casecmp('true').zero?
+
+unless direct_sibling_local || direct_sibling_templating
+  provider_gems.each do |gem_name|
+    gem gem_name, '~> 7.1', '>= 7.1.4', require: false
+  end
+end
+
 eval_gemfile 'gemfiles/modular/templating.gemfile' if
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? ||
-  ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false') != 0
+  ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false') != 0 ||
+  structuredmerge_core_dev_enabled ||
+  structuredmerge_core_published
 
 # Debugging
 eval_gemfile 'gemfiles/modular/debug.gemfile'

@@ -149,7 +149,7 @@ module Kettle
       ast-template bash-merge binary-merge citrus-toml-merge commonmarker-merge dotenv-merge
       go-merge html-merge json-merge kettle-jem kramdown-merge markdown-merge markly-merge
       parslet-toml-merge plain-merge prism-merge psych-merge rbs-merge ruby-merge rust-merge
-      smorg-rb toml-merge tree_haver typescript-merge yaml-merge zip-merge
+      smorg-rb structuredmerge-core toml-merge tree_haver typescript-merge yaml-merge zip-merge
     ].freeze
     # Canonical resolutions for development-dependency gems whose handling is
     # already known ahead of any specific destination project. Two
@@ -7824,6 +7824,9 @@ module Kettle
             target.include?(dependency.tr("-", "_"))
           end
           removable = [package_name, *(runtime_dependencies - named_fragment_dependencies)]
+          # A modular Gemfile may repeat a runtime gem only to select its local
+          # source. Keep explicit path overrides while pruning ordinary duplicates.
+          removable -= gemfile_path_source_override_names(template_content)
           output = remove_gemfile_dependency_blocks(content, removable)
           output = remove_gemfile_percent_w_entries(output, removable)
         end
@@ -9468,6 +9471,10 @@ module Kettle
       removable_gems = [*PROHIBITED_GEMFILE_DEPENDENCIES]
       removable_gems << package_name unless package_name.to_s.empty?
       removable_gems.concat(package_runtime_dependency_names(facts))
+      # A Gemfile path declaration can override the source of a runtime gemspec
+      # dependency. Keep those declarations so local development can resolve an
+      # unpublished dependency without changing the runtime dependency graph.
+      removable_gems -= gemfile_path_source_override_names(template_content.to_s)
       removable_gems << "version_gem" unless version_gem_enabled?(facts)
       pruned = remove_gemfile_dependency_blocks(content, removable_gems)
       pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
@@ -9770,6 +9777,13 @@ module Kettle
       end
     end
 
+    def gemfile_path_source_override_names(content)
+      ruby_call_records(content, :gem).filter_map do |call|
+        name = ruby_string_argument(call)
+        name if name && ruby_keyword_argument_node(call, :path)
+      end.uniq
+    end
+
     # A dependency owned directly by the project must not also be introduced by
     # a generated modular Gemfile. On first bootstrap, write a reviewable
     # resolution list; later runs require an explicit removal operation.
@@ -9911,8 +9925,9 @@ module Kettle
         direct_records = dependency_records_for(direct_path, content)
         modular.flat_map do |modular_path, modular_content|
           modular_records = dependency_records_for(modular_path, modular_content)
+          source_overrides = gemfile_path_source_override_names(modular_content)
           direct_records.flat_map do |direct_record|
-            modular_records.select { |record| record.fetch(:name) == direct_record.fetch(:name) }.map do |modular_record|
+            modular_records.select { |record| record.fetch(:name) == direct_record.fetch(:name) && !source_overrides.include?(record.fetch(:name)) }.map do |modular_record|
               {
                 name: direct_record.fetch(:name),
                 direct: direct_path,

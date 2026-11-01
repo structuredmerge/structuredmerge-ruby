@@ -1651,6 +1651,18 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(described_class.send(:normalize_appraisal_root_templating_gate, updated, facts)).to eq(updated)
   end
 
+  it "loads local core dependencies while generating Appraisal Gemfiles" do
+    facts = {package: {runtime_dependencies: [{name: "structuredmerge-core"}]}}
+    template = File.read(File.expand_path("../../lib/kettle/jem/templates/Appraisal.root.gemfile.example", __dir__))
+
+    updated = described_class.send(:normalize_appraisal_root_templating_gate, template, facts)
+
+    expect(updated).to include('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated).to include('ENV.fetch("K_JEM_TEMPLATING", "false")')
+    expect(updated.index("generator_only do")).to be < updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    expect(updated.index('eval_gemfile "gemfiles/modular/templating.gemfile"')).to be < updated.index("if Gem::Version.new(RUBY_VERSION)")
+  end
+
   it "reattaches the style-gate comment when a generator gate already exists" do
     facts = {package: {runtime_dependencies: [{name: "kettle-jem"}]}}
     root_gemfile = <<~RUBY
@@ -2766,6 +2778,34 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).not_to include('gem "yaml-converter"')
       expect(File.read(File.join(root, "gemfiles/modular/documentation.gemfile"))).to eq(content)
     end
+  end
+
+  it "preserves path source overrides for gemspec runtime dependencies" do
+    template = <<~RUBY
+      core_root = ENV.fetch("STRUCTUREDMERGE_CORE_DEV")
+      gem "structuredmerge-core", path: File.join(core_root, "packages/ruby")
+    RUBY
+    facts = {
+      package: {
+        name: "tree_haver",
+        runtime_dependencies: [{name: "structuredmerge-core"}]
+      }
+    }
+
+    recipe = {
+      target_path: "gemfiles/modular/templating.gemfile",
+      template_preference: {strategy: "accept_template"}
+    }
+    content = described_class.send(
+      :finalize_gemfile_template_source,
+      recipe,
+      template,
+      "",
+      facts: facts,
+      template_content: template
+    )
+
+    expect(content).to include('gem "structuredmerge-core", path: File.join(core_root, "packages/ruby")')
   end
 
   it "keeps a named modular dependency when materializing a missing Gemfile" do
