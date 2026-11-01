@@ -631,4 +631,36 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to include('verification_error')
   end
 
+  it 'keeps same-spelling Rust type and value owners distinct through syn' do
+    skip 'compiled native syn registration is unavailable' unless
+      StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_same_spelling_type_and_value_owners.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.namespaces')
+    provider = described_class.new
+    request = {
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    }
+    analysis = provider.analyze(request.merge(source: input.fetch('base')))
+    result = provider.merge3(request.merge(
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    ))
+
+    expect(analysis.fetch(:ok)).to eq(true), analysis.inspect
+    expect(analysis.dig(:analysis, :declarations).map { |owner| owner.fetch(:path) })
+      .to include(*fixture.dig('expected', 'owner_paths'))
+    expect(result.fetch(:ok)).to eq(true), result.inspect
+    expect(result.fetch(:output)).to eq(fixture.dig('expected', 'output'))
+  end
+
 end
