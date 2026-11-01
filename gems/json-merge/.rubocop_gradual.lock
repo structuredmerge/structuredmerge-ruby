@@ -123,7 +123,6 @@
     [125, 5, 1337, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parse_json` is too high. [10/7]", 2581608668],
     [125, 5, 1337, "Metrics/MethodLength: Method has too many lines. [31/10]", 2581608668],
     [125, 5, 1337, "Metrics/PerceivedComplexity: Perceived complexity for `parse_json` is too high. [10/8]", 2581608668],
-    [158, 5, 74, "Lint/ShadowedException: Do not shadow rescued Exceptions.", 1342503724],
     [166, 5, 1190, "Metrics/MethodLength: Method has too many lines. [24/10]", 1390480966],
     [208, 5, 994, "Metrics/AbcSize: Assignment Branch Condition size for `json_value_for_source` is too high. [<5, 21, 10> 23.79/17]", 299250882],
     [208, 5, 994, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `json_value_for_source` is too high. [9/7]", 299250882],
@@ -305,6 +304,15 @@
   "spec/fixtures_integration_spec.rb:1865276692": [
     [3, 1, 12798, "Metrics/BlockLength: Block has too many lines. [284/25]", 715121217],
     [263, 3, 801, "Metrics/BlockLength: Block has too many lines. [27/25]", 716259872]
+  ],
+  "spec/json/merge/duplicate_key_parity_spec.rb:2938063366": [
+    [5, 1, 3861, "Metrics/BlockLength: Block has too many lines. [74/25]", 3880515528],
+    [16, 3, 1472, "Metrics/BlockLength: Block has too many lines. [27/25]", 3356223022],
+    [49, 3, 1885, "Metrics/BlockLength: Block has too many lines. [35/25]", 2574298711]
+  ],
+  "spec/json/merge/jsonc_comment_parity_spec.rb:3075166057": [
+    [5, 1, 1656, "Metrics/BlockLength: Block has too many lines. [32/25]", 1335835110],
+    [6, 3, 1570, "Metrics/BlockLength: Block has too many lines. [30/25]", 3508783523]
   ],
   "spec/json/merge/rust_host_provider_spec.rb:1182388168": [
     [5, 1, 12217, "Metrics/BlockLength: Block has too many lines. [270/25]", 1801365701],

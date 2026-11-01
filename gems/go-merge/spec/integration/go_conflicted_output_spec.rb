@@ -3,15 +3,15 @@
 require 'spec_helper'
 
 RSpec.describe 'Go membership conflict review output' do
-  it "matches each provider conflict rendering for shared fixtures" do
+  it 'matches each provider conflict rendering for shared fixtures' do
     skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
     fixture_ids = %w[go_merge3_membership_edit_conflict]
 
     fixture_ids.each do |fixture_id|
       fixture = JSON.parse(File.read(File.expand_path(
-        "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
-        __dir__
-      )))
+                                       "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json",
+                                       __dir__
+                                     )))
       input = fixture.fetch('input')
       request = {
         family: :go,

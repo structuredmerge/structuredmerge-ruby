@@ -210,8 +210,10 @@ RSpec.describe Go::Merge::RustHostProvider do
     source = "package main\n// é\nfunc f() {}\n"
     result = provider.analyze(source: source)
     expect(result).to include(ok: true)
+    # go/ast attaches the doc comment to the declaration, so the owner starts at the comment.
     expect(result.dig(:analysis, :declarations)).to contain_exactly(
-      hash_including(path: '/function:f', line_range: [3, 3], byte_range: { 'start_byte' => 19, 'end_byte' => 30 })
+      hash_including(path: '/package:main', line_range: [1, 1]),
+      hash_including(path: '/function:f', line_range: [2, 3], byte_range: { 'start_byte' => 13, 'end_byte' => 30 })
     )
     expect(result.dig(:analysis, :facts, 'owners', 0, 'node_ids')).not_to be_empty
     expect(Ast::Merge::ProviderContract.validate_result!(:analyze, result)).to include(ok: true)
@@ -228,16 +230,11 @@ RSpec.describe Go::Merge::RustHostProvider do
     expect(rejected).to include(ok: false, output: nil)
   end
 
-  it 'retains full-document guard evidence without claiming an owner decision' do
-    result = provider.merge3(base_source: base_source, ours_source: ours_source,
-                             theirs_source: base_source + "func added() {}\n")
-    expect(result).to include(ok: false, output: nil)
-    conflict = result.dig(:typed_result, :conflicts, 0, :canonical)
-    expect(conflict).to include(code: 'go.membership_with_owner_edit', decision_ids: [])
-    expect(conflict.fetch(:subject)).to include(whole_document: true)
-    expect(conflict.fetch(:alternatives).length).to eq(3)
-    expect(conflict.fetch(:classification)).to include(base_participated: true, decision_ids: [])
-    expect(result.dig(:typed_result, :verification, :extra, 'owner_classification')).to be_nil
+  it 'merges an independent owner edit with an added owner exactly like the native provider' do
+    request = { base_source: base_source, ours_source: ours_source, theirs_source: base_source + "func added() {}\n" }
+    native = Go::Merge::Provider.new.merge3(request)
+    result = provider.merge3(request)
+    expect(result).to include(ok: true, output: native.fetch(:output))
     expect(JSON.generate(result)).not_to include('#<StructuredmergeCore::')
   end
 
@@ -245,7 +242,11 @@ RSpec.describe Go::Merge::RustHostProvider do
     source = "package main\n// é\nfunc f() {}"
     diff = provider.diff2(before_source: source, after_source: source.sub('// é', '// changed'))
     expect(diff).to include(ok: true)
-    expect(diff.fetch(:changes)).to contain_exactly(hash_including(subject_ref: 'document', change: :edited))
+    # The doc comment belongs to the function owner, so the owner reports the edit too.
+    expect(diff.fetch(:changes)).to contain_exactly(
+      hash_including(subject_ref: 'document', change: :edited),
+      hash_including(subject_ref: '/function:f', change: :edited)
+    )
     request = { base_source: source, ours_source: source, theirs_source: source }
     result = provider.merge3(request)
     expect(result).to include(ok: true, output: source)

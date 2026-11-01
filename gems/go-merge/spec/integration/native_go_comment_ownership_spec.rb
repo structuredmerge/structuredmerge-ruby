@@ -232,7 +232,6 @@ RSpec.describe 'Go native comment ownership fixture' do
   end
 end
 
-
 RSpec.describe 'Go comment directive ownership fixture' do
   it 'keeps a go:embed directive attached to its variable in Ruby and Rust host analysis' do
     skip 'compiled typed core is unavailable' unless Go::Merge::RustHostProvider.available?
