@@ -106,4 +106,39 @@ RSpec.describe 'Rust two-tip additions at distinct source gaps' do
       expect(rust.fetch(:output)).to eq(expected_output)
     end
   end
+
+  it "composes both tips' additions in the same preamble gap" do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_tip_additions_same_preamble_gap.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    expected_output = fixture.dig('expected', 'output')
+    request = {
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+
+    native = Rust::Merge::Provider.new.merge3(request)
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(native.fetch(:output)).to eq(expected_output)
+
+    backends = [:rust_tslp]
+    if StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.same-preamble-additions')
+      backends << :rust_syn
+    end
+    backends.each do |backend|
+      rust = Rust::Merge::RustHostProvider.new.merge3(request.merge(
+        family: :rust,
+        dialect: :rust,
+        backend: backend,
+        profile_id: :source_preserving
+      ))
+      expect(rust.fetch(:ok)).to be(true), "#{backend}: #{rust.inspect}"
+      expect(rust.fetch(:output)).to eq(expected_output)
+    end
+  end
 end
