@@ -99,7 +99,8 @@ module Ast
           return [] unless owner.start_line
 
           candidates = tracked_comments.select do |comment|
-            comment[:full_line] && !claimed.include?(comment.object_id) && comment[:line] < owner.start_line
+            owner_scoped_comment?(comment) && comment[:full_line] &&
+              !claimed.include?(comment.object_id) && comment[:line] < owner.start_line
           end
           return [] if candidates.empty?
 
@@ -128,6 +129,7 @@ module Ast
 
           tracked_comments.select do |comment|
             !comment[:full_line] &&
+              owner_scoped_comment?(comment) &&
               !claimed.include?(comment.object_id) &&
               (owner.start_line..owner.end_line).cover?(comment[:line])
           end
@@ -147,6 +149,7 @@ module Ast
           while current <= max_line
             comment = tracked_comments.find do |candidate|
               candidate[:full_line] &&
+                owner_scoped_comment?(candidate) &&
                 !claimed.include?(candidate.object_id) &&
                 candidate[:line] == current &&
                 trailing_comment_owned_by?(candidate, owner)
@@ -166,7 +169,8 @@ module Ast
           return unless last_line
 
           comments = tracked_comments.select do |comment|
-            comment[:full_line] && !claimed.include?(comment.object_id) && comment[:line] > last_line
+            owner_scoped_comment?(comment) && comment[:full_line] &&
+              !claimed.include?(comment.object_id) && comment[:line] > last_line
           end
           return if comments.empty?
 
@@ -210,6 +214,10 @@ module Ast
               @orphan_regions << region
             end
           end
+        end
+
+        def owner_scoped_comment?(comment)
+          comment.fetch(:scope, :owner).to_sym != :root
         end
 
         # Split a comment group that starts at line 1 into preamble and

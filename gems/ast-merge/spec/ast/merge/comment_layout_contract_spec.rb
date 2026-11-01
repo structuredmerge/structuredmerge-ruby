@@ -66,6 +66,14 @@ RSpec.describe 'shared Ast::Merge comment layout contract' do
         owner = case_owners.find { |candidate| candidate.id == owner_id }
         expect(case_augmenter.attachment_for(owner).trailing_region&.normalized_content).to eq(expected)
       end
+      case_data.dig('expected', 'leading_by_owner')&.each do |owner_id, expected|
+        owner = case_owners.find { |candidate| candidate.id == owner_id }
+        expect(case_augmenter.attachment_for(owner).leading_region&.normalized_content).to eq(expected)
+      end
+      if case_data.dig('expected')&.key?('preamble')
+        expect(case_augmenter.preamble_region&.normalized_content).to eq(case_data.dig('expected', 'preamble'))
+        expect(case_augmenter.orphan_regions.map(&:normalized_content)).to eq(case_data.dig('expected', 'orphans'))
+      end
       expect(case_augmenter.postlude_region&.normalized_content).to eq(case_data.dig('expected', 'postlude'))
     end
     fixture.fetch('policy_cases').each do |case_data|
