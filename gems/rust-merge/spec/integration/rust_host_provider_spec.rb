@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'json'
 
 RSpec.describe Rust::Merge::RustHostProvider do
   subject(:provider) { described_class.new }
@@ -272,6 +273,32 @@ RSpec.describe Rust::Merge::RustHostProvider do
     )
     expect(result.dig(:analysis, :facts, 'owners', 0, 'node_ids')).not_to be_empty
     expect(Gem.loaded_specs.keys).not_to include('structuredmerge_host_prototype')
+  end
+
+  it 'projects outer documentation and attributes onto the declaration owner range' do
+    path = File.expand_path('../../../../../fixtures/polyglot/ast-merge/native_owner_prefix_ownership.json', __dir__)
+    fixture = JSON.parse(File.read(path))
+
+    fixture.fetch('cases').each do |case_data|
+      source = case_data.fetch('source')
+      native = Rust::Merge::Provider.new.analyze(source: source)
+      rust = provider.analyze(source: source)
+
+      expect(native.fetch(:ok)).to be(true), native.inspect
+      expect(rust.fetch(:ok)).to be(true), rust.inspect
+      native_owner = native.dig(:analysis, :declarations).find do |item|
+        item[:signature] == [:function, 'stable']
+      end
+      rust_owner = rust.dig(:analysis, :declarations).find { |item| item[:path] == case_data.fetch('owner_path') }
+      expect(native_owner).to include(line_range: case_data.fetch('owner_line_range'))
+      expect(rust_owner).to include(
+        line_range: case_data.fetch('owner_line_range'),
+        byte_range: {
+          'start_byte' => case_data.fetch('owner_byte_range').first,
+          'end_byte' => case_data.fetch('owner_byte_range').last
+        }
+      )
+    end
   end
 
   it 'retains module docs and imports while inserting outer docs and new declarations' do

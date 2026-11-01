@@ -183,6 +183,20 @@ RSpec.describe Rust::Merge::Provider do
     )
   end
 
+  it 'projects outer docs and attributes according to the shared owner-prefix fixture' do
+    path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/native_owner_prefix_ownership.json', __dir__)
+    fixture = JSON.parse(File.read(path))
+
+    fixture.fetch('cases').each do |case_data|
+      owner = Rust::Merge::FileAnalysis.new(case_data.fetch('source')).declarations.find do |declaration|
+        declaration.signature == [:function, 'stable']
+      end
+      expect(owner).not_to be_nil, case_data.fetch('name')
+      expect([owner.start_line, owner.end_line]).to eq(case_data.fetch('owner_line_range'))
+      expect(owner.source_text).to eq(case_data.fetch('owner_source'))
+    end
+  end
+
   it 'attaches attributes and docs to exact owner ranges and preserves a no-final-newline winner' do
     exact = "/// docs\n#[cold]\nfn chosen( ) { }\n\nfn stable() {}".chomp
     result = provider.merge3(base_source: base, ours_source: base, theirs_source: exact)

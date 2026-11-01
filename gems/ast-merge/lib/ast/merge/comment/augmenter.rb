@@ -117,7 +117,11 @@ module Ast
             if comment
               selected.unshift(comment)
               current_line -= 1
-            elsif attachment_policy == :preceding_owner && blank_line?(current_line)
+            elsif blank_line?(current_line) && (
+              attachment_policy == :preceding_owner ||
+              selected.last&.fetch(:structural_prefix, false) ||
+              structural_prefix_comment_before_blank?(current_line, candidates)
+            )
               current_line -= 1
             else
               break
@@ -325,10 +329,20 @@ module Ast
           )
         end
 
-        def build_layout_attachments_by_owner
+        def build_layout_attachments_by_owner(comments_by_owner)
           return {} if owners.empty?
 
-          Ast::Merge::Layout::Augmenter.new(lines: lines, owners: owners).attachments_by_owner
+          boundaries = comments_by_owner.flat_map do |owner, comments|
+            %i[leading trailing].filter_map do |kind|
+              region = comments.fetch(kind)
+              next if region.empty?
+
+              { owner: owner, kind: kind, start_line: region.map { |comment| comment.fetch(:line) }.min,
+                end_line: region.map { |comment| comment.fetch(:line) }.max }
+            end
+          end
+          Ast::Merge::Layout::Augmenter.new(lines: lines, owners: owners,
+                                            comment_boundaries: boundaries).attachments_by_owner
         end
 
         def normalize_lines(lines, source)

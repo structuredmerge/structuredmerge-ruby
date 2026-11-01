@@ -70,6 +70,33 @@ RSpec.describe 'Bash Rust line ownership parity' do
     expect(rust).to include(ok: true, output: expected.fetch('output'))
   end
 
+  it 'promotes a deleted assignment inline comment through the shared Rust line plan' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/bash_merge3_inline_comment_owner_deletion.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    expected = fixture.fetch('expected')
+    request = {
+      family: :bash,
+      dialect: :bash,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      base_source: input.fetch('base'),
+      ours_source: input.fetch('ours'),
+      theirs_source: input.fetch('theirs')
+    }
+
+    native = Bash::Merge::Provider.new.merge3(request)
+    rust = provider.merge3(request)
+
+    expect(native.fetch(:ok)).to eq(false)
+    expect(native.dig(:diagnostics, 0, :category).to_s)
+      .to eq(fixture.dig('ruby_native_expected', 'diagnostic_category'))
+    expect(rust).to include(ok: true, output: expected.fetch('output'))
+  end
+
   it 'matches Ruby when an independently edited merge includes an added owner' do
     fixture_path = File.expand_path(
       '../../../../../fixtures/polyglot/typed-core/bash_merge3_added_owner_layout.json',
