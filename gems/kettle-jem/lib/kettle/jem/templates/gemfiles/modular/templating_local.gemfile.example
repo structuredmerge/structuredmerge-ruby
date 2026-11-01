@@ -6,17 +6,6 @@
 
 {KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP}
 
-# Resolve the core checkout in the same local bundle as its Ruby adapters.
-structuredmerge_core_dev = ENV.fetch("STRUCTUREDMERGE_CORE_DEV", "").strip
-unless structuredmerge_core_dev.empty? || %w[false 0 no off].include?(structuredmerge_core_dev.downcase)
-  structuredmerge_core_root = if %w[true 1 yes on].include?(structuredmerge_core_dev.downcase)
-                                File.join(Dir.home, "src/my/structuredmerge/structuredmerge")
-                              else
-                                File.expand_path(structuredmerge_core_dev, Dir.home)
-                              end
-  gem "structuredmerge-core", path: File.join(structuredmerge_core_root, "packages/ruby")
-end
-
 # Declared dependency requirements, supplied by project facts.
 local_gem_requirements = {KJ|LOCAL_GEM_REQUIREMENTS}
 

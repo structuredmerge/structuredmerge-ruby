@@ -2604,14 +2604,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   it "selects the core dependency source in the modular templating bundle" do
     root_template = File.read(File.expand_path("../../lib/kettle/jem/templates/Gemfile.example", __dir__))
     modular_template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating.gemfile.example", __dir__))
-    local_template = File.read(File.expand_path("../../lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example", __dir__))
 
     condition = root_template[/eval_gemfile "gemfiles\/modular\/templating.gemfile" if\n.*?(?=\n\n# Debugging)/m]
 
     expect(condition).to include("structuredmerge_core_dev_enabled", "structuredmerge_core_published")
     expect(modular_template).to include('gem "structuredmerge-core", path: File.join(structuredmerge_core_root, "packages/ruby")')
     expect(modular_template).to include('gem "structuredmerge-core", "~> 0.2"')
-    expect(local_template).to include('gem "structuredmerge-core", path: File.join(structuredmerge_core_root, "packages/ruby")')
     expect(modular_template).to include("Runtime parser/provider selection")
     expect(modular_template).not_to include('ENV["TREE_HAVER_BACKEND"]')
   end
