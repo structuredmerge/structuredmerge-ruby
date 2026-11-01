@@ -45,6 +45,38 @@ RSpec.describe 'Go native comment ownership fixture' do
     expect(rust.fetch(:diagnostics).first.fetch(:category)).to eq(:parse_error)
   end
 
+  it 'projects a generic type alias as one stable type owner in both providers' do
+    fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/generic-type-alias-owner.json',
+                                    __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    expected = fixture.fetch('expected')
+    request = {
+      family: :go,
+      dialect: :go,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      source: fixture.fetch('source')
+    }
+
+    native = Go::Merge::Provider.new.analyze(request)
+    rust = Go::Merge::RustHostProvider.new.analyze(request)
+
+    expect(native.fetch(:ok)).to be(true), native.inspect
+    expect(rust.fetch(:ok)).to be(true), rust.inspect
+    expect(native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: [:type, 'Set'], line_range: expected.fetch('type_line_range'))
+    )
+    expect(rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: '/type:Set', line_range: expected.fetch('type_line_range'))
+    )
+    expect(native.dig(:analysis, :declarations)).to include(
+      hash_including(signature: [:function, 'Contains'], line_range: expected.fetch('function_line_range'))
+    )
+    expect(rust.dig(:analysis, :declarations)).to include(
+      hash_including(path: '/function:Contains', line_range: expected.fetch('function_line_range'))
+    )
+  end
+
   it 'fails closed on partial parser recovery in both Ruby and Rust providers' do
     fixture_path = File.expand_path('../../../../../fixtures/go/slice-114-native/parser-recovery-fail-closed.json',
                                     __dir__)

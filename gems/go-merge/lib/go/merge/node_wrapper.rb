@@ -109,7 +109,9 @@ module Go
       end
 
       def declaration_signature(kind, spec_type, identifier_type)
-        specs = descendants(node, spec_type)
+        spec_types = [spec_type]
+        spec_types << 'type_alias' if kind == :type
+        specs = spec_types.flat_map { |type| descendants(node, type) }.sort_by(&:start_byte)
         member_names = specs.map do |spec|
           spec.children.select { |child| child.type == identifier_type }.map { |child| text(child) }
         end
