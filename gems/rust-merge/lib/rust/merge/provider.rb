@@ -565,15 +565,19 @@ module Rust
             append_owner(fragments, owner)
             ensure_plan_boundary!(fragments, documents) if index < edit.fetch(:owners).length - 1
           end
+          if (trailing_range = edit[:trailing_source_range])
+            append_range(fragments, :theirs, trailing_range[0], trailing_range[1])
+          end
           cursor = [cursor, edit.fetch(:end_line) + 1].max
         end
         append_range(fragments, :ours, cursor, ours.source.lines.length)
-        append_declaration_additions(fragments, documents, decision)
         fragments
       end
 
       def composite_edits(documents, decision)
-        replacement_edits(documents, decision) + import_insertion_edits(documents, decision)
+        replacement_edits(documents, decision) +
+          import_insertion_edits(documents, decision) +
+          declaration_insertion_edits(documents, decision)
       end
 
       def replacement_edits(documents, decision)
@@ -605,14 +609,48 @@ module Rust
         }]
       end
 
-      def append_declaration_additions(fragments, documents, decision)
-        additions = added_theirs_owners(documents, decision).reject { |owner| import_owner?(owner) }
-        return if additions.empty?
+      def declaration_insertion_edits(documents, decision)
+        ours = documents.fetch(:ours)
+        declaration_insertion_groups(documents, decision).map do |group|
+          anchor_id = group.fetch(:anchor_owner_id)
+          anchor = anchor_id && ours.by_id[anchor_id]
+          insertion_line = anchor ? anchor.start_line : ours.source.lines.length + 1
+          {
+            start_line: insertion_line,
+            end_line: insertion_line - 1,
+            owners: group.fetch(:owners),
+            trailing_source_range: group[:trailing_source_range]
+          }
+        end
+      end
 
-        ensure_plan_boundary!(fragments, documents)
-        additions.each_with_index do |owner, index|
-          append_owner(fragments, owner)
-          ensure_plan_boundary!(fragments, documents) if index < additions.length - 1
+      def declaration_insertion_groups(documents, decision)
+        ours = documents.fetch(:ours)
+        theirs = documents.fetch(:theirs)
+        additions = added_theirs_owners(documents, decision).reject { |owner| import_owner?(owner) }
+        return [] if additions.empty?
+
+        additions.group_by do |owner|
+          index = theirs.owners.index(owner)
+          following = theirs.owners.drop(index + 1).find { |candidate| ours.by_id.key?(candidate.id) }
+          following&.id
+        end.map do |anchor_id, owners|
+          trailing_range = if anchor_id
+                             anchor_index = theirs.owners.index { |candidate| candidate.id == anchor_id }
+                             next_owner = theirs.owners[anchor_index]
+                             start_line = owners.last.end_line + 1
+                             end_line = next_owner.start_line - 1
+                             [start_line, end_line] if start_line <= end_line
+                           else
+                             start_line = owners.last.end_line + 1
+                             end_line = theirs.source.lines.length
+                             [start_line, end_line] if start_line <= end_line
+                           end
+          {
+            anchor_owner_id: anchor_id,
+            owners: owners,
+            trailing_source_range: trailing_range
+          }
         end
       end
 
@@ -672,13 +710,15 @@ module Rust
         documents.fetch(:theirs).owners.each do |owner|
           next if ours.by_id.key?(owner.id)
           next unless decision.choices[owner.id] == :theirs
+          next unless import_owner?(owner)
 
-          if import_owner?(owner)
-            import_offset = import_offset ? import_offset + 1 : 0
-            expected.insert(import_offset, owner)
-          else
-            expected << owner
-          end
+          import_offset = import_offset ? import_offset + 1 : 0
+          expected.insert(import_offset, owner)
+        end
+        declaration_insertion_groups(documents, decision).each do |group|
+          anchor_id = group.fetch(:anchor_owner_id)
+          offset = anchor_id && expected.index { |owner| owner.id == anchor_id }
+          expected.insert(offset || expected.length, *group.fetch(:owners))
         end
         expected
       end

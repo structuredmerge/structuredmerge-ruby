@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe 'Rust two-tip additions at distinct source gaps' do
   before { skip 'compiled typed core is unavailable' unless Rust::Merge::RustHostProvider.available? }
 
-  it 'keeps native owner ordering and appends the theirs-only owner with its comment' do
+  it 'preserves both tips additions at their original source gaps' do
     fixture_path = File.expand_path(
       '../../../../../fixtures/polyglot/typed-core/rust_merge3_two_tip_additions_distinct_source_gaps.json',
       __dir__
