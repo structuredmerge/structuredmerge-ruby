@@ -4,7 +4,9 @@ require 'spec_helper'
 
 RSpec.describe Rust::Merge::RustHostProvider do
   it 'runs Rust typed analysis through the native syn parser' do
-    skip 'compiled native syn registration is unavailable' unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+    unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      skip 'compiled native syn registration is unavailable'
+    end
 
     descriptor = StructuredmergeCore.register_rust_syn_parser("rust.syn.ruby")
     expect(StructuredmergeCore.register_rust_syn_parser("rust.syn.ruby").id).to eq(descriptor.id)
@@ -41,5 +43,28 @@ RSpec.describe Rust::Merge::RustHostProvider do
     expect(merge.fetch(:ok)).to be(true), merge.inspect
     expect(merge.fetch(:output)).to include("fn left() -> i32 { 2 }", "fn right() -> i32 { 2 }")
     expect(directional.fetch(:ok)).to be(true), directional.inspect
+  end
+
+  it 'fails closed on syntax errors and unsupported native Rust items' do
+    unless StructuredmergeCore.respond_to?(:register_rust_syn_parser)
+      skip 'compiled native syn registration is unavailable'
+    end
+
+    provider = described_class.new
+    request = {
+      family: :rust,
+      dialect: :rust,
+      backend: :rust_syn,
+      profile_id: :source_preserving
+    }
+    malformed = provider.analyze(request.merge(source: "fn broken("))
+    unsupported = provider.analyze(request.merge(source: "unsafe extern \"C\" { fn native_symbol(); }\n"))
+
+    expect(malformed.fetch(:ok)).to be(false)
+    malformed_messages = malformed.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
+    expect(malformed_messages).to include('native parser rejected input')
+    expect(unsupported.fetch(:ok)).to be(false)
+    unsupported_messages = unsupported.fetch(:diagnostics).map { |item| item.fetch(:message) }.join
+    expect(unsupported_messages).to include('unsupported top-level Rust node')
   end
 end
