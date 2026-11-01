@@ -58,3 +58,52 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
     end
   end
 end
+
+RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
+  class SharedRootBoundaryHarness
+    include Ast::Merge::CommentLayoutEmissionSupport
+
+    public :root_boundary_lines_for
+  end
+
+  it 'matches shared preamble and postlude line selection contracts' do
+    fixture_path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/comment_layout_emission.json', __dir__)
+    fixture = JSON.parse(File.read(fixture_path))
+    owner_class = Struct.new(:start_line, :end_line)
+    region_class = Struct.new(:start_line, :end_line) do
+      def empty? = false
+    end
+    augmenter_class = Struct.new(:preamble_region, :postlude_region)
+    analysis_class = Struct.new(:lines, :statements, :augmenter) do
+      def line_at(line_number)
+        lines[line_number - 1]
+      end
+
+      def comment_augmenter(owners:)
+        augmenter
+      end
+    end
+
+    fixture.fetch('root_boundary_cases').each do |contract|
+      owners = contract.fetch('owners').map do |owner|
+        owner_class.new(owner.fetch('start_line'), owner.fetch('end_line'))
+      end
+      build_region = lambda do |entry|
+        entry && region_class.new(entry.fetch('start_line'), entry.fetch('end_line'))
+      end
+      analysis = analysis_class.new(
+        contract.fetch('lines'),
+        owners,
+        augmenter_class.new(build_region.call(contract['preamble_region']), build_region.call(contract['postlude_region']))
+      )
+      actual = SharedRootBoundaryHarness.new.root_boundary_lines_for(
+        contract.fetch('kind').to_sym,
+        analysis,
+        fallback_to_owner_bounds: contract.fetch('fallback_to_owner_bounds')
+      )
+      actual_numbers = actual.map { |line| contract.fetch('lines').index(line) + 1 }
+
+      expect(actual_numbers).to eq(contract.fetch('expected_line_numbers')), contract.fetch('name')
+    end
+  end
+end
