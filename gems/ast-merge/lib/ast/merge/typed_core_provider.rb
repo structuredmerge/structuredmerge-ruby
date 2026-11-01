@@ -34,7 +34,7 @@ module Ast
       def family = self.class::FAMILY
 
       def capabilities
-        { operations: self.class::OPERATIONS, dialects: self.class::DIALECTS, backends: [:rust_tslp],
+        { operations: self.class::OPERATIONS, dialects: self.class::DIALECTS, backends: parser_backends,
           profiles: [:source_preserving], role: :workflow,
           source_preservation: %i[exact_source byte_spans reparse] }.freeze
       end
@@ -59,19 +59,20 @@ module Ast
         allowed = fields + %i[dialect provider_id family backend profile_id request_id] + additional_fields
         unless (request.keys - allowed).empty? &&
                self.class::DIALECTS.include?(request.fetch(:dialect, default_dialect).to_s.to_sym) &&
-               [nil, 'rust_tslp'].include?(request[:backend]&.to_s) &&
+               [nil, *parser_backends.map(&:to_s)].include?(request[:backend]&.to_s) &&
                [nil, 'source_preserving'].include?(request[:profile_id]&.to_s) &&
                [nil, provider_id].include?(request[:provider_id]) && [nil, family].include?(request[:family]&.to_s)
           return Ast::Merge::ProviderResult.unsupported(operation: operation,
                                                         message: 'Typed provider cannot honor the requested fields or selectors')
         end
-        unless self.class.available?
+        dialect = request.fetch(:dialect, default_dialect).to_s
+        backend = request[:backend]&.to_s || default_parser_backend.to_s
+        unless parser_backend_available?(backend)
           return Ast::Merge::ProviderResult.unsupported(operation: operation,
-                                                        message: 'structuredmerge-core is unavailable')
+                                                        message: "Requested parser backend #{backend} is unavailable")
         end
 
-        dialect = request.fetch(:dialect, default_dialect).to_s
-        parser_id = TreeHaver::Backends::RustTslp.register_language_parser(parser_language(dialect))
+        parser_id = register_parser_backend(dialect, backend)
         sources = ROLES.fetch(operation).zip(fields).to_h do |role, field|
           text = request.fetch(field)
           unless text.is_a?(String) && [Encoding::UTF_8, Encoding::US_ASCII, Encoding::ASCII_8BIT].include?(text.encoding)
@@ -94,7 +95,7 @@ module Ast
         result = core.execute_operation(typed_request,
                                         core::ParseLimits.new(max_batch_items: 3, max_input_bytes: 64 * 1024 * 1024, max_nodes: 1_000_000,
                                                               max_diagnostics: 1000))
-        project(operation, request, result)
+        project(operation, request, result, backend)
       rescue UnsupportedCapabilityError => e
         Ast::Merge::ProviderResult.unsupported(operation: operation, message: e.message)
       rescue KeyError, ArgumentError, TypeError, RangeError => e
@@ -105,6 +106,18 @@ module Ast
       end
 
       def additional_fields = []
+      def parser_backends = [:rust_tslp]
+      def default_parser_backend = parser_backends.first
+
+      def parser_backend_available?(backend)
+        backend == "rust_tslp" && self.class.available?
+      end
+
+      def register_parser_backend(dialect, backend)
+        raise UnsupportedCapabilityError, "Unsupported parser backend #{backend}" unless backend == "rust_tslp"
+
+        TreeHaver::Backends::RustTslp.register_language_parser(parser_language(dialect))
+      end
       def default_dialect = self.class::DIALECTS.first
       def parser_language(dialect) = dialect == 'json' ? 'json' : 'json5'
       def owner_path(owner) = owner.fetch('path')
@@ -141,7 +154,7 @@ module Ast
         values.to_h { |key, value| [key, JSON.parse(value)] }
       end
 
-      def project(operation, request, result)
+      def project(operation, request, result, backend)
         changes = result.changes.map do |change|
           states = metadata(change.role_states)
           { id: change.id, path: change.path, subject_ref: change.subject_ref, change: change.classification.to_sym,
@@ -163,7 +176,7 @@ module Ast
         payload = { output: result.output, conflicted_output: result.conflicted_output, typed_result: result }
         if result.analysis
           facts = metadata(result.analysis.extra)
-          payload[:analysis] = { backend: :rust_tslp, valid: true, facts: facts,
+          payload[:analysis] = { backend: backend.to_sym, valid: true, facts: facts,
                                  declarations: facts.fetch('owners').map do |owner|
                                    { path: owner_path(owner), signature: owner_path(owner), source_role: :source,
                                      line_range: line_range(owner.fetch('span')), byte_range: owner.fetch('span').fetch('range') }
@@ -172,7 +185,7 @@ module Ast
         payload[:diff] = { changes: changes } if result.diff
         projected = Ast::Merge::ProviderResult.build(operation: operation, success: result.ok,
                                                      envelope: { provider: { provider_id: provider_id, family: family, dialect: request.fetch(:dialect, default_dialect),
-                                                                             backend: :rust_tslp, package: self.class::PACKAGE, package_version: package_version },
+                                                                             backend: backend.to_sym, package: self.class::PACKAGE, package_version: package_version },
                                                                  profile: { profile_id: :source_preserving, core_profile_id: result.profile.profile_id },
                                                                  diagnostics: diagnostics, changes: changes, conflicts: conflicts,
                                                                  render_report: metadata(result.render_report), verification: verification }, **payload)
