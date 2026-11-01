@@ -83,16 +83,93 @@ module Bash
       end
 
       def merge2(request)
-        merge3_request = request.merge(
-          base_source: request.fetch(:current_source),
-          ours_source: request.fetch(:current_source),
-          theirs_source: request.fetch(:incoming_source)
+        merger = SmartMerger.new(
+          request.fetch(:incoming_source),
+          request.fetch(:current_source),
+          preference: :destination,
+          add_template_only_nodes: true
         )
-        merged = merge3(merge3_request)
-        merged.merge(
-          operation: :merge2,
-          verification: merged.fetch(:verification).except(:base_participated)
+        merged = merger.merge_result
+        output = merged.to_bash
+        parsed_output = parse_exact_source(output, :output, request[:dialect])
+        return parse_failure(:merge2, request, :output, parsed_output) if provider_failure?(parsed_output)
+
+        unless merged.conflicts.empty?
+          return failure(
+            :merge2,
+            request,
+            category: :merge_conflict,
+            message: 'Bash directional merge requires resolving native SmartMerger conflicts.',
+            conflicts: merged.conflicts,
+            conflicted_output: output,
+            render_report: directional_render_report(merged),
+            verification: { output_reparsed: true }
+          )
+        end
+
+        provenance_verified = directional_lines_preserved?(merged, request)
+        unless provenance_verified
+          return failure(
+            :merge2,
+            request,
+            category: :render_failure,
+            message: 'Bash directional merge emitted a line without matching source provenance.',
+            render_report: directional_render_report(merged),
+            verification: { output_reparsed: true, directional_roles_preserved: true }
+          )
+        end
+
+        result(
+          :merge2,
+          request,
+          output: output,
+          render_report: directional_render_report(merged),
+          verification: {
+            output_reparsed: true,
+            directional_roles_preserved: true,
+            source_line_provenance_verified: true,
+            output_line_count: merged.lines.length
+          }
         )
+      rescue StandardError => error
+        failure(
+          :merge2,
+          request,
+          category: :provider_failure,
+          message: error.message
+        )
+      end
+
+      def directional_render_report(merged)
+        {
+          strategy: :ruby_smart_merger_directional,
+          line_records: merged.lines.each_with_index.map do |line, index|
+            source_role = { template: :incoming, destination: :current }[line[:source]]
+            {
+              output_line: index + 1,
+              fragment_kind: source_role ? :source : :synthesized,
+              source_role: source_role,
+              original_line: line[:original_line],
+              decision: line[:decision]
+            }.compact
+          end,
+          statistics: merged.statistics
+        }
+      end
+
+      def directional_lines_preserved?(merged, request)
+        sources = {
+          template: request.fetch(:incoming_source),
+          destination: request.fetch(:current_source)
+        }
+        merged.lines.all? do |line|
+          source = sources[line[:source]]
+          original_line = line[:original_line]
+          next false unless source && original_line
+
+          source_line = source.lines[original_line - 1]
+          source_line && source_line.chomp == line[:content]
+        end
       end
 
       def merge3(request)

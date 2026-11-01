@@ -11,6 +11,39 @@ RSpec.describe 'Bash Rust line ownership parity' do
     Bash::Merge::RustHostProvider.available?
   end
 
+  it 'matches the shared merge2 contract for attached and inline comments' do
+    fixture_path = File.expand_path(
+      '../../../../../fixtures/polyglot/typed-core/bash_merge2_comments.json',
+      __dir__
+    )
+    fixture = JSON.parse(File.read(fixture_path))
+    input = fixture.fetch('input')
+    expected = fixture.dig('ruby_native_expected', 'output')
+    request = {
+      family: :bash,
+      dialect: :bash,
+      backend: :rust_tslp,
+      profile_id: :source_preserving,
+      incoming_source: input.fetch('incoming'),
+      current_source: input.fetch('current')
+    }
+
+    native = Bash::Merge::SmartMerger.new(
+      input.fetch('incoming'),
+      input.fetch('current'),
+      add_template_only_nodes: true
+    ).merge
+    ruby_provider = Bash::Merge::Provider.new.merge2(
+      incoming_source: input.fetch('incoming'),
+      current_source: input.fetch('current')
+    )
+    rust = provider.merge2(request)
+
+    expect(native).to eq(expected)
+    expect(ruby_provider).to include(ok: true, output: expected)
+    expect(rust).to include(ok: true, output: expected)
+  end
+
   it 'matches Ruby when an independently edited merge includes an added owner' do
     fixture_path = File.expand_path(
       '../../../../../fixtures/polyglot/typed-core/bash_merge3_added_owner_layout.json',
