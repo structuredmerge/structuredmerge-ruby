@@ -7,8 +7,9 @@ RSpec.describe 'Go documented owner deletion boundary' do
   it 'fails closed in native and Rust providers per the shared fixture' do
     skip 'compiled Rust host unavailable' unless Go::Merge::RustHostProvider.available?
 
+    fixture_id = 'go_merge3_delete_documented_owner_with_independent_edit'
     path = File.expand_path(
-      '../../../../../fixtures/polyglot/typed-core/go_merge3_delete_documented_owner_with_independent_edit.json', __dir__
+      "../../../../../fixtures/polyglot/typed-core/#{fixture_id}.json", __dir__
     )
     fixture = JSON.parse(File.read(path))
     input = fixture.fetch('input')
