@@ -1,0 +1,64 @@
+# frozen_string_literal: true
+
+require 'json'
+
+RSpec.describe 'shared Ast::Merge comment layout contract' do
+  let(:fixture) do
+    path = File.expand_path('../../../../../../fixtures/polyglot/ast-merge/comment_line_ownership.json', __dir__)
+    JSON.parse(File.read(path))
+  end
+
+  it 'matches comment regions, floating ownership, and neighboring layout gaps' do
+    owner_class = Struct.new(:start_line, :end_line, :indent, :id, keyword_init: true)
+    owners = fixture.fetch('owners').map do |entry|
+      owner_class.new(start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'),
+                      indent: entry.fetch('indent'), id: entry.fetch('id'))
+    end
+    by_id = owners.to_h { |owner| [owner.id, owner] }
+    comments = fixture.fetch('comments').map do |entry|
+      entry.transform_keys(&:to_sym).merge(raw: entry.fetch('text'))
+    end
+    augmenter = Ast::Merge::Comment::Augmenter.new(
+      source: fixture.fetch('source'), comments: comments, owners: owners,
+      style: fixture.fetch('style')
+    )
+    region_summary = lambda do |region|
+      next unless region
+
+      { 'kind' => region.kind.to_s, 'normalized_content' => region.normalized_content,
+        'floating' => region.floating?, 'start_line' => region.start_line, 'end_line' => region.end_line }
+    end
+    gap_summary = lambda do |gap|
+      next unless gap
+
+      { 'kind' => gap.kind.to_s, 'start_line' => gap.start_line, 'end_line' => gap.end_line }
+    end
+    actual_attachments = owners.map do |owner|
+      attachment = augmenter.attachment_for(owner)
+      { 'owner_id' => owner.id, 'leading' => region_summary.call(attachment.leading_region),
+        'inline' => region_summary.call(attachment.inline_region),
+        'trailing' => region_summary.call(attachment.trailing_region),
+        'leading_gap' => gap_summary.call(attachment.leading_gap),
+        'trailing_gap' => gap_summary.call(attachment.trailing_gap) }
+    end
+    actual_document_regions = {
+      'preamble' => augmenter.preamble_region&.normalized_content,
+      'postlude' => augmenter.postlude_region&.normalized_content,
+      'orphans' => augmenter.orphan_regions.map(&:normalized_content)
+    }
+
+    expect(actual_attachments).to eq(fixture.dig('expected', 'attachments'))
+    expect(actual_document_regions).to eq(fixture.dig('expected', 'document_regions'))
+
+    fixture.fetch('indent_cases').each do |case_data|
+      owner = owner_class.new(start_line: 1, end_line: 1, indent: case_data['owner_indent'], id: 'alpha')
+      comment = case_data.fetch('comment').transform_keys(&:to_sym).merge(raw: case_data.dig('comment', 'text'))
+      case_augmenter = Ast::Merge::Comment::Augmenter.new(
+        source: case_data.fetch('source'), comments: [comment], owners: [owner], style: fixture.fetch('style')
+      )
+      attachment = case_augmenter.attachment_for(owner)
+      expect(attachment.trailing_region&.normalized_content).to eq(case_data['expected_trailing'])
+      expect(case_augmenter.postlude_region&.normalized_content).to eq(case_data['expected_postlude'])
+    end
+  end
+end
