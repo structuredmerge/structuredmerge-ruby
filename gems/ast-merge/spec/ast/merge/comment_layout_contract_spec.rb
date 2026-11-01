@@ -50,6 +50,24 @@ RSpec.describe 'shared Ast::Merge comment layout contract' do
     expect(actual_attachments).to eq(fixture.dig('expected', 'attachments'))
     expect(actual_document_regions).to eq(fixture.dig('expected', 'document_regions'))
 
+    fixture.fetch('attachment_cases').each do |case_data|
+      case_owners = case_data.fetch('owners').map do |entry|
+        owner_class.new(start_line: entry.fetch('start_line'), end_line: entry.fetch('end_line'),
+                        indent: entry.fetch('indent'), id: entry.fetch('id'))
+      end
+      case_comments = case_data.fetch('comments').map do |entry|
+        entry.transform_keys(&:to_sym).merge(raw: entry.fetch('text'))
+      end
+      case_augmenter = Ast::Merge::Comment::Augmenter.new(
+        source: case_data.fetch('source'), comments: case_comments, owners: case_owners,
+        style: case_data.fetch('style')
+      )
+      case_data.dig('expected', 'trailing_by_owner').each do |owner_id, expected|
+        owner = case_owners.find { |candidate| candidate.id == owner_id }
+        expect(case_augmenter.attachment_for(owner).trailing_region&.normalized_content).to eq(expected)
+      end
+      expect(case_augmenter.postlude_region&.normalized_content).to eq(case_data.dig('expected', 'postlude'))
+    end
     fixture.fetch('indent_cases').each do |case_data|
       owner = owner_class.new(start_line: 1, end_line: 1, indent: case_data['owner_indent'], id: 'alpha')
       comment = case_data.fetch('comment').transform_keys(&:to_sym).merge(raw: case_data.dig('comment', 'text'))
