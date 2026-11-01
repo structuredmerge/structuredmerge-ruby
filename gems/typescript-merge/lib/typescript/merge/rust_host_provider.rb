@@ -21,6 +21,23 @@ module TypeScript
 
       private
 
+      def parser_backends = %i[rust_tslp typescript_oxc]
+
+      def parser_backend_available?(backend)
+        return super unless backend == 'typescript_oxc'
+
+        require 'structuredmerge_core' unless defined?(::StructuredmergeCore)
+        ::StructuredmergeCore.respond_to?(:register_typescript_oxc_parser)
+      rescue LoadError
+        false
+      end
+
+      def register_parser_backend(dialect, backend)
+        return super unless backend == 'typescript_oxc'
+
+        core.register_typescript_oxc_parser('typescript.oxc.ruby').id
+      end
+
       def package_version = TypeScript::Merge::Version::VERSION
       def parser_language(dialect) = dialect
       def owner_path(owner) = owner.fetch('id')
