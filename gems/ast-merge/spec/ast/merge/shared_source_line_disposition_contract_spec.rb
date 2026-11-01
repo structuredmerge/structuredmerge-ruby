@@ -87,9 +87,18 @@ RSpec.describe 'shared ast-merge source-line disposition contract' do
       end
     end
     comment_regions.each do |region|
+      containing_owner = owners.find do |owner|
+        owner.start_line <= region.fetch('start_line') && owner.end_line >= region.fetch('end_line')
+      end
       (region.fetch('start_line')..region.fetch('end_line')).each do |line_number|
         current = dispositions[line_number - 1]
         if current
+          if region['owner_id'].nil? && containing_owner &&
+              current['kind'] == 'structural_owner' && current['owner_id'] == containing_owner.id
+            current['comment_region_ids'] << region.fetch('id')
+            current['root_region_kind'] = region.fetch('kind')
+            next
+          end
           raise "comment and structural owner disagree at line #{line_number}" unless current['kind'] == 'structural_owner' && current['owner_id'] == region['owner_id']
 
           current['comment_region_ids'] << region.fetch('id')
