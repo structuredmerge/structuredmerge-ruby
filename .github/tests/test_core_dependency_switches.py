@@ -8,8 +8,8 @@ import unittest
 class CoreDependencySwitchTest(unittest.TestCase):
     root = pathlib.Path(__file__).resolve().parents[2]
     consumers = ["ast-crispr", "ast-template", "ast-merge-git", "bash-merge",
-                 "go-merge", "json-merge", "rust-merge", "typescript-merge", "tree_haver"]
-    native_only = ["yaml-merge", "markdown-merge", "kettle-jem"]
+                 "go-merge", "json-merge", "rust-merge", "typescript-merge", "tree_haver",
+                 "yaml-merge", "markdown-merge", "kettle-jem"]
 
     def evaluate(self, names, switches):
         script = r'''
@@ -58,13 +58,9 @@ puts JSON.generate(result: result, home: Dir.home)
                                              "path": str(expected)}], name)
 
     def test_old_switches_cannot_select_prototype_or_kernel(self):
-        result = self.evaluate(self.consumers + self.native_only,
+        result = self.evaluate(self.consumers,
                                {"STRUCTUREDMERGE_RUST_DEV": "/workspace/old-rust",
                                 "STRUCTUREDMERGE_RUST_HOST_PUBLISHED": "true"})
-        self.assertTrue(all(not deps for deps in result["result"].values()))
-
-    def test_native_only_gems_do_not_gain_unneeded_core_dependency(self):
-        result = self.evaluate(self.native_only, {"STRUCTUREDMERGE_CORE_DEV": "/workspace/kernel"})
         self.assertTrue(all(not deps for deps in result["result"].values()))
 
 

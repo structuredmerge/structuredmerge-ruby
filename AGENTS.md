@@ -23,6 +23,7 @@ export STRUCTUREDMERGE_CORE_DEV=/path/to/core            # contains packages/rub
 cd gems/<gem> && gem install nomono && bundle install && bundle exec rspec
 ```
 
+- Keep both checkouts current before testing: `git pull` on this repo and on the core clone (`git status` clean, no stray edits).
 - Ruby version comes from `mise.toml` (`mise install`, then `mise trust`).
 - `STRUCTUREDMERGE_CORE_DEV` is resolved relative to `$HOME` unless absolute.
 - `bundle install` rewrites `Gemfile.lock`; do not commit those changes.

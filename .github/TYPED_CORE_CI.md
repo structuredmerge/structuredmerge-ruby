@@ -53,7 +53,6 @@ and `structuredmerge-core` resolves from the registry through the gemspec
 dependency, like every other `*_DEV` switch. There is no separate registry switch.
 The obsolete `STRUCTUREDMERGE_RUST_DEV` and
 `STRUCTUREDMERGE_RUST_HOST_PUBLISHED` switches no longer select any dependency.
-YAML, Markdown and Kettle Jem have no direct typed-core/prototype dependency;
-their obsolete development declarations were removed, not renamed to a new
-unnecessary requirement. Downstream typed operations can still be supplied by
-the explicit artifact bundle and migrated sibling adapters.
+Every family gem receives the same templated wiring: each depends on `tree_haver`, which
+depends on `structuredmerge-core`, so a local core checkout must be selected for all of them
+when core is not on the registry. There is no per-gem exception.
