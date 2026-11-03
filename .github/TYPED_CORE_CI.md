@@ -47,9 +47,9 @@ kernel directory (relative paths are relative to the home directory). The bindin
 is under `packages/ruby` and must be compiled before runtime use. This source-path
 mode is not installed-artifact validation.
 
-`STRUCTUREDMERGE_CORE_PUBLISHED=true` requests `structuredmerge-core ~> 0.2` from
-the configured registry when development mode is off. It does not publish or
-assert that a compatible release exists. Artifact CI does not use this switch.
+When `STRUCTUREDMERGE_CORE_DEV` is false or unset, no local override is applied
+and `structuredmerge-core` resolves from the registry through the gemspec
+dependency, like every other `*_DEV` switch. There is no separate registry switch.
 The obsolete `STRUCTUREDMERGE_RUST_DEV` and
 `STRUCTUREDMERGE_RUST_HOST_PUBLISHED` switches no longer select any dependency.
 YAML, Markdown and Kettle Jem have no direct typed-core/prototype dependency;

@@ -2619,9 +2619,9 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
 
     condition = root_template[/eval_gemfile "gemfiles\/modular\/templating.gemfile" if\n.*?(?=\n\n# Debugging)/m]
 
-    expect(condition).to include("structuredmerge_core_dev_enabled", "structuredmerge_core_published")
+    expect(condition).to include("structuredmerge_core_dev_enabled")
     expect(modular_template).to include('gem "structuredmerge-core", path: File.join(structuredmerge_core_root, "packages/ruby")')
-    expect(modular_template).to include('gem "structuredmerge-core", "~> 0.2"')
+    expect(modular_template).not_to include("PUBLISHED")
     expect(modular_template).to include("Runtime parser/provider selection")
     expect(modular_template).not_to include('ENV["TREE_HAVER_BACKEND"]')
   end

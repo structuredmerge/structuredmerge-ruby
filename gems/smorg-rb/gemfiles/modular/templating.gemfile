@@ -13,8 +13,6 @@ if !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredme
                                 File.expand_path(structuredmerge_core_dev, Dir.home)
                               end
   gem 'structuredmerge-core', path: File.join(structuredmerge_core_root, 'packages/ruby')
-elsif ENV.fetch('STRUCTUREDMERGE_CORE_PUBLISHED', 'false').casecmp('true').zero?
-  gem 'structuredmerge-core', '~> 0.2'
 end
 
 tslp_dev = ENV.fetch('TSLP_DEV', nil).to_s
