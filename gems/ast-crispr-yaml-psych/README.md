@@ -115,6 +115,21 @@ puts result.updated_content
 
 The selector identifies the second item under `jobs.test.strategy.matrix.include`; `Ast::Crispr::Delete.result` performs the structural edit. Nested sibling groups retain their layout gaps through `psych-merge`, preserving separator and blank-line ownership at each YAML level.
 
+### Owner spans and Insert destinations
+
+A mapping entry owner spans from the line holding its key through its last value line, including entries whose value starts on a following line, so `Replace` and `Delete` treat the entry as a unit and never leave an orphaned or duplicate key. Sequence item owners span the whole item.
+
+`Selectors.mapping_entry` and `Selectors.sequence_item` can also be used as an `Insert` `destination:`; the new text is inserted after the matched entry or item:
+
+```ruby
+selectors = Ast::Crispr::Yaml::Psych::Selectors
+result = Ast::Crispr::Insert.result(
+  content: source,
+  text: "  '2025-01-06b': ['13:00:00']\n",
+  destination: selectors.mapping_entry(path: ["stars", "2025-01-06"])
+)
+```
+
 ## 🔐 Security
 
 See [SECURITY.md][🔐security].
