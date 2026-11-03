@@ -33,6 +33,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+      - name: Install nomono for Gemfile evaluation
+        # The contract tests evaluate real Gemfiles, which bootstrap nomono for *_DEV wiring.
+        run: gem install --user-install nomono --version '>= 1.1.18'
       - name: Validate typed core workflow contract
         run: python3 -m unittest discover -s .github/tests -v
       - name: Detect changed gems
