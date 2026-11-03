@@ -24,9 +24,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- structuredmerge-core local wiring now uses nomono (`eval_nomono_gems` with `subdirs`, nomono >= 1.1.18) instead of hand-rolled `STRUCTUREDMERGE_CORE_DEV` parsing in every templating gemfile; the kettle-jem templates generate the same wiring. The nomono floor is bumped to >= 1.1.18 across the family.
+
 ### Deprecated
 
 ### Removed
+
+- `STRUCTUREDMERGE_CORE_PUBLISHED` switch: an unset or false `STRUCTUREDMERGE_CORE_DEV` already resolves `structuredmerge-core` from the registry through the gemspec dependency, like every other `*_DEV` variable.
 
 ### Fixed
 

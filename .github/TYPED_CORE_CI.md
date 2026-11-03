@@ -40,7 +40,8 @@ with local path dependencies.
 
 ## Local development and registry selection
 
-Migrated consumers use `STRUCTUREDMERGE_CORE_DEV` for kernel source checkouts:
+Migrated consumers use `STRUCTUREDMERGE_CORE_DEV` for kernel source checkouts, wired through
+nomono (`eval_nomono_gems` with `subdirs: {"structuredmerge-core" => "packages/ruby"}`, nomono >= 1.1.18):
 false/unset, `0`, `no` or `off` adds no core dependency; true, `1`, `yes` or `on`
 uses `$HOME/src/my/structuredmerge/structuredmerge`; another value selects that
 kernel directory (relative paths are relative to the home directory). The binding

@@ -2,18 +2,7 @@
 
 structuredmerge_remote = ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false').zero?
 kettle_remote = ENV.fetch('KETTLE_DEV_DEV', 'false').casecmp('false').zero?
-
-# This selects the dependency source only. Runtime parser/provider selection
-# remains explicit through TreeHaver and the family provider registries.
-structuredmerge_core_dev = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', '').strip
-if !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
-  structuredmerge_core_root = if %w[true 1 yes on].include?(structuredmerge_core_dev.downcase)
-                                File.join(Dir.home, 'src/my/structuredmerge/structuredmerge')
-                              else
-                                File.expand_path(structuredmerge_core_dev, Dir.home)
-                              end
-  gem 'structuredmerge-core', path: File.join(structuredmerge_core_root, 'packages/ruby')
-end
+structuredmerge_core_remote = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', 'false').casecmp('false').zero?
 
 tslp_dev = ENV.fetch('TSLP_DEV', nil).to_s
 tslp_dev = nil if tslp_dev.empty? || %w[false 0 no off].include?(tslp_dev.downcase)
@@ -44,4 +33,4 @@ end
 #
 # Set KETTLE_DEV_DEV=/path/to/my for local development with Kettle plugin gems.
 # When false (default / CI), released Kettle plugin gems are used.
-eval_gemfile 'templating_local.gemfile' unless structuredmerge_remote && kettle_remote
+eval_gemfile 'templating_local.gemfile' unless structuredmerge_remote && kettle_remote && structuredmerge_core_remote
