@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- ast-crispr-yaml-psych: `Selectors.mapping_entry` and `Selectors.sequence_item` can be used as `Insert` destinations (insert after the matched owner) (#105)
+
 ### Changed
 
 ### Deprecated
@@ -27,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Removed
 
 ### Fixed
+
+- ast-crispr-yaml-psych: mapping entry owners now span from the key line through the last value line, so `Replace`/`Delete` no longer leave an orphaned or duplicate key when the value starts on a following line (#105)
 
 - dev benchmark CI job no longer races unpublished lockstep versions: the ast-merge-git appraisal root baseline now resolves lockstep siblings (ast-merge, tree_haver) from STRUCTUREDMERGE_DEV workspace paths, mirroring .github/typed_core.gemfile, so pre-publication aggregate validation runs resolve instead of failing registry-only
 

@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+require "yaml"
+
 # Structural edits (Replace / Delete / Insert) against entries that are not single-line scalars.
-# Examples marked `pending` document known gaps (structuredmerge-ruby#105); each one fails if it starts
-# passing, which is the cue to drop the `pending` call.
+# Regression coverage for structuredmerge-ruby#105.
 RSpec.describe "Ast::Crispr YAML owner edits" do
   let(:selectors) { Ast::Crispr::Yaml::Psych::Selectors }
   let(:source) do
@@ -54,14 +55,12 @@ RSpec.describe "Ast::Crispr YAML owner edits" do
     let(:path) { %w[stars 2025-01-06] }
 
     it "starts the owner at the line holding the key" do
-      pending "owner span starts at the first value line (4), not the key line (3)"
       owner = owner_at(path)
 
       expect([owner.start_line, owner.end_line]).to eq([3, 5])
     end
 
     it "replaces the whole entry without leaving the old key behind" do
-      pending "the key line survives, leaving a duplicate key"
       result = Ast::Crispr::Replace.result(content: source, target: selectors.mapping_entry(path: path),
                                            replacement: "  '2025-01-06': ['09:00:00']\n")
 
@@ -71,7 +70,6 @@ RSpec.describe "Ast::Crispr YAML owner edits" do
     end
 
     it "deletes the whole entry without leaving a dangling key" do
-      pending "the key line survives as a null value"
       result = Ast::Crispr::Delete.result(content: source, target: selectors.mapping_entry(path: path))
 
       expect(result).to be_success
@@ -102,7 +100,6 @@ RSpec.describe "Ast::Crispr YAML owner edits" do
 
   describe "Insert with a YAML selector as the destination" do
     it "inserts after a mapping entry" do
-      pending "YAML selectors define no anchor, so Insert cannot resolve the destination"
       result = Ast::Crispr::Insert.result(content: source, text: "  '2025-01-05b': ['13:00:00']\n",
                                           destination: selectors.mapping_entry(path: %w[stars 2025-01-05]))
 
@@ -112,7 +109,6 @@ RSpec.describe "Ast::Crispr YAML owner edits" do
     end
 
     it "inserts after a sequence item" do
-      pending "YAML selectors define no anchor, so Insert cannot resolve the destination"
       list = "plugins:\n  - rubocop\n  - reek\n"
       result = Ast::Crispr::Insert.result(content: list, text: "  - flay\n",
                                           destination: selectors.sequence_item(path: %w[plugins], index: 0))
