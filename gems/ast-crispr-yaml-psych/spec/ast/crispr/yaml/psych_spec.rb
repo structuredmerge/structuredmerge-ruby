@@ -78,4 +78,60 @@ RSpec.describe Ast::Crispr::Yaml::Psych do
       expect(::Psych::Merge::FileAnalysis.new(result.updated_content)).to be_valid
     end
   end
+
+  describe "multi-line mapping entries" do
+    let(:selectors) { described_class::Selectors }
+    let(:source) do
+      <<~YAML
+        stars:
+          '2025-01-05': ['12:00:00']
+          '2025-01-06':
+            - '01:00:00'
+            - '02:00:00'
+          '2025-01-07': ['03:00:00']
+      YAML
+    end
+    let(:target) { selectors.mapping_entry(path: %w[stars 2025-01-06]) }
+
+    it "spans from the key line through the last value line" do
+      owner = described_class.document_context(content: source).structural_owners(owner_scope: :mapping_entries)
+                             .find { |o| o.path == %w[stars 2025-01-06] }
+
+      expect([owner.start_line, owner.end_line]).to eq([3, 5])
+    end
+
+    it "replaces the whole entry without orphaning the key" do
+      result = Ast::Crispr::Replace.result(content: source, target: target,
+                                           replacement: "  '2025-01-06': ['09:00:00']\n")
+
+      expect(result.updated_content.scan("'2025-01-06'").length).to eq(1)
+      expect(result.updated_content).to include("'2025-01-06': ['09:00:00']")
+    end
+
+    it "deletes the whole entry" do
+      result = Ast::Crispr::Delete.result(content: source, target: target)
+
+      expect(result.updated_content).not_to include("2025-01-06")
+      expect(result.updated_content).not_to include("01:00:00")
+    end
+
+    it "inserts after a mapping entry destination" do
+      result = Ast::Crispr::Insert.result(content: source, text: "  '2025-01-06b': ['13:00:00']\n",
+                                          destination: target)
+
+      expect(result).to be_success
+      lines = result.updated_content.lines.map(&:strip).reject(&:empty?)
+      expect(lines.index("'2025-01-06b': ['13:00:00']")).to eq(lines.index("- '02:00:00'") + 1)
+    end
+
+    it "inserts after a sequence item destination" do
+      result = Ast::Crispr::Insert.result(
+        content: "list:\n  - a\n  - b\n", text: "  - a2\n",
+        destination: selectors.sequence_item(path: %w[list], index: 0)
+      )
+
+      expect(result).to be_success
+      expect(result.updated_content.lines.map(&:strip).reject(&:empty?)).to eq(["list:", "- a", "- a2", "- b"])
+    end
+  end
 end

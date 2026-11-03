@@ -91,7 +91,8 @@ module Ast
             analysis.structural_owner_groups.map do |group|
               group.map do |wrapper|
                 metadata = analysis.structural_owner_metadata_for(wrapper)
-                start_line = wrapper.start_line || 1
+                # A mapping entry owns its key line, even when the value starts on a later line.
+                start_line = [wrapper.start_line, metadata[:key_start_line]].compact.min || 1
                 end_line = wrapper.end_line || start_line
                 Owner.new(
                   location: ::Ast::Merge::AstNode::Location.new(start_line: start_line, end_line: end_line),
@@ -110,8 +111,20 @@ module Ast
           end
         end
 
+        # Anchor adapter so selector matches can be used as Insert destinations.
+        AnchorPoint = Struct.new(:anchor)
+
         module Selectors
           module_function
+
+          # Insert resolves destinations through an anchor; insert after the matched owner.
+          def anchored(selector)
+            Ast::Crispr::OwnerSelector.new(
+              id: selector.id, locate: selector.locate, owned_span: selector.owned_span,
+              anchor: ->(_context, match) { AnchorPoint.new(match) },
+              limit: selector.limit, metadata: selector.metadata
+            )
+          end
 
           def owner_filter(id:, limit: nil, owner_scope: :shared_default, include_trailing_gap: false, metadata: {},
                            &block)
@@ -128,22 +141,22 @@ module Ast
 
           def mapping_entry(path:, id: nil, limit: nil, metadata: {}, **options)
             expected_path = normalize_path(path)
-            owner_filter(
+            anchored(owner_filter(
               id: id || "yaml_mapping_entry_#{expected_path.join(".")}",
               limit: limit,
               owner_scope: :mapping_entries,
               metadata: metadata.merge(options)
-            ) { |_context, owner| owner.path == expected_path }
+            ) { |_context, owner| owner.path == expected_path })
           end
 
           def sequence_item(path:, index:, id: nil, limit: nil, metadata: {}, **options)
             expected_path = normalize_path(path) + [Integer(index)]
-            owner_filter(
+            anchored(owner_filter(
               id: id || "yaml_sequence_item_#{expected_path.join(".")}",
               limit: limit,
               owner_scope: :sequence_items,
               metadata: metadata.merge(options)
-            ) { |_context, owner| owner.path == expected_path }
+            ) { |_context, owner| owner.path == expected_path })
           end
 
           def comment_region_owned_owner(marker:, id: nil, limit: nil, owner_scope: :shared_default,

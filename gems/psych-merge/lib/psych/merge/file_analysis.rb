@@ -291,9 +291,11 @@ module Psych
       def collect_structural_owner_groups(wrapper, parent_path, groups)
         return unless wrapper
 
+        key_lines = {}
         group_kind, children = if wrapper.mapping?
-                                 [:mapping_entry,
-                                  wrapper.mapping_entries(comment_tracker: @comment_tracker).map(&:last)]
+                                 pairs = wrapper.mapping_entries(comment_tracker: @comment_tracker)
+                                 pairs.each { |key_wrapper, value| key_lines[value.object_id] = key_wrapper.start_line }
+                                 [:mapping_entry, pairs.map(&:last)]
                                elsif wrapper.sequence?
                                  [:sequence_item, wrapper.sequence_items(comment_tracker: @comment_tracker)]
                                else
@@ -309,7 +311,8 @@ module Psych
                    parent_path + [index]
                  end
           @structural_owner_metadata[child.object_id] =
-            { kind: group_kind, index: (index if group_kind == :sequence_item), path: path.freeze }
+            { kind: group_kind, index: (index if group_kind == :sequence_item), path: path.freeze,
+              key_start_line: key_lines[child.object_id] }
           collect_structural_owner_groups(child, path, groups)
         end
       end
