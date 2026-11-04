@@ -1,8 +1,37 @@
 # frozen_string_literal: true
 
+# kettle-jem:freeze
+# To retain chunks of comments & code during kettle-jem templating:
+# Wrap custom sections with freeze markers (e.g., as above and below this comment chunk).
+# kettle-jem will then preserve content between those markers across template runs.
+# kettle-jem:unfreeze
+
 source 'https://gem.coop'
 
 # Shared baseline for the Appraisal2 CI lanes in this gem.
 gemspec
 
 gem 'nomono', '~> 1.1', '>= 1.1.18'
+
+if respond_to?(:generator_only)
+  generator_only do
+    if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+      eval_gemfile 'gemfiles/modular/templating.gemfile'
+    end
+  end
+end
+# kettle-jem:freeze
+# The gemspec's runtime dependency on structuredmerge-core ~> 0.2 cannot be
+# resolved from any registry before the kernel publishes. Appraisal's root
+# resolution runs under plain Bundler, where generator_only is unavailable, so
+# wire core (and any lockstep siblings) from local checkouts through the
+# modular templating gemfile whenever the family dev env is engaged. Without
+# that env the modular file retains registry mode, and published gems resolve
+# normally.
+unless respond_to?(:generator_only)
+  if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? ||
+      !ENV.fetch('STRUCTUREDMERGE_DEV', '').strip.empty?
+    eval_gemfile 'gemfiles/modular/templating.gemfile'
+  end
+end
+# kettle-jem:unfreeze

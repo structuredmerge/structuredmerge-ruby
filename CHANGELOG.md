@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- kettle-jem: the `current.yml` workflow template now removes the eMudhra-related roots that Apple still ships in `/etc/ssl/cert.pem` as its first step (before checkout) on macOS runners, when `macos` is a declared platform. The inlined script, `lib/kettle/jem/ci/harden_macos_ca_bundle.sh`, matches by certificate subject, logs each removed fingerprint and fails if any remains; it is not emitted for destinations without macOS lanes (galadran/we-have-a-problem.com#157)
+
 - ast-crispr-yaml-psych: `Selectors.mapping_entry` and `Selectors.sequence_item` can be used as `Insert` destinations (insert after the matched owner) (#105)
 
 ### Changed
