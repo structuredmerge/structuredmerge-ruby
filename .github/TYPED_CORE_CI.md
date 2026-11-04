@@ -40,19 +40,19 @@ with local path dependencies.
 
 ## Local development and registry selection
 
-Migrated consumers use `STRUCTUREDMERGE_CORE_DEV` for kernel source checkouts:
+Migrated consumers use `STRUCTUREDMERGE_CORE_DEV` for kernel source checkouts, wired through
+nomono (`eval_nomono_gems` with `subdirs: {"structuredmerge-core" => "packages/ruby"}`, nomono >= 1.1.18):
 false/unset, `0`, `no` or `off` adds no core dependency; true, `1`, `yes` or `on`
 uses `$HOME/src/my/structuredmerge/structuredmerge`; another value selects that
 kernel directory (relative paths are relative to the home directory). The binding
 is under `packages/ruby` and must be compiled before runtime use. This source-path
 mode is not installed-artifact validation.
 
-`STRUCTUREDMERGE_CORE_PUBLISHED=true` requests `structuredmerge-core ~> 0.2` from
-the configured registry when development mode is off. It does not publish or
-assert that a compatible release exists. Artifact CI does not use this switch.
+When `STRUCTUREDMERGE_CORE_DEV` is false or unset, no local override is applied
+and `structuredmerge-core` resolves from the registry through the gemspec
+dependency, like every other `*_DEV` switch. There is no separate registry switch.
 The obsolete `STRUCTUREDMERGE_RUST_DEV` and
 `STRUCTUREDMERGE_RUST_HOST_PUBLISHED` switches no longer select any dependency.
-YAML, Markdown and Kettle Jem have no direct typed-core/prototype dependency;
-their obsolete development declarations were removed, not renamed to a new
-unnecessary requirement. Downstream typed operations can still be supplied by
-the explicit artifact bundle and migrated sibling adapters.
+Every family gem receives the same templated wiring: each depends on `tree_haver`, which
+depends on `structuredmerge-core`, so a local core checkout must be selected for all of them
+when core is not on the registry. There is no per-gem exception.

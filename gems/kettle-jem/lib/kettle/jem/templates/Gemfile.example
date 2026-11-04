@@ -33,16 +33,11 @@ gemspec
 # wiring fails version solving for every command in the bundle.
 #
 # (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-structuredmerge_core_dev = ENV.fetch("STRUCTUREDMERGE_CORE_DEV", "").strip
-structuredmerge_core_dev_enabled =
-  !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
-structuredmerge_core_published = ENV.fetch("STRUCTUREDMERGE_CORE_PUBLISHED", "false").casecmp("true").zero?
 
 eval_gemfile "gemfiles/modular/templating.gemfile" if
   ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? ||
   ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0 ||
-  structuredmerge_core_dev_enabled ||
-  structuredmerge_core_published
+  ENV.fetch("STRUCTUREDMERGE_CORE_DEV", "false").casecmp("false") != 0
 
 # Debugging
 eval_gemfile "gemfiles/modular/debug.gemfile"

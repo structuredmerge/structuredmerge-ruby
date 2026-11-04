@@ -64,7 +64,7 @@ module Kettle
     # set in place before Bundler is allowed to evaluate that destination.
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
-      {name: "nomono", requirements: ["~> 1.1", ">= 1.1.17"], bootstrap: true},
+      {name: "nomono", requirements: ["~> 1.1", ">= 1.1.18"], bootstrap: true},
       {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.26"], bootstrap: true},
       {
         name: "kettle-changelog",
@@ -16190,7 +16190,7 @@ module Kettle
     end
 
     def nomono_gemfile_declaration
-      %(gem "nomono", "~> 1.1", ">= 1.1.17", require: false # ruby >= 3.2.0)
+      %(gem "nomono", "~> 1.1", ">= 1.1.18", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
