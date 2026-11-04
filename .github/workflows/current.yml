@@ -587,6 +587,8 @@ jobs:
           working-directory: gems/ast-merge-git
           appraisal-name: benchmark-dev
           appraisal-root-gemfile: Appraisal.root.gemfile
+          pre-bundle-gems: |
+            nomono --source https://gem.coop --source https://rubygems.org
       - name: Compile the kernel Ruby binding
         working-directory: kernel/packages/ruby
         shell: bash
@@ -750,6 +752,8 @@ jobs:
           working-directory: gems/tree_haver
           appraisal-name: tslp-cold-start
           appraisal-root-gemfile: Appraisal.root.gemfile
+          pre-bundle-gems: |
+            nomono --source https://gem.coop --source https://rubygems.org
       - name: Compile the kernel Ruby binding
         working-directory: kernel/packages/ruby
         shell: bash
