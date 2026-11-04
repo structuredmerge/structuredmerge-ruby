@@ -592,6 +592,8 @@ jobs:
       - name: Compile the kernel Ruby binding
         working-directory: kernel/packages/ruby
         shell: bash
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/kernel/packages/ruby/Gemfile
         run: |
           set -euo pipefail
           ulimit -c 0
@@ -757,6 +759,8 @@ jobs:
       - name: Compile the kernel Ruby binding
         working-directory: kernel/packages/ruby
         shell: bash
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/kernel/packages/ruby/Gemfile
         run: |
           set -euo pipefail
           ulimit -c 0
