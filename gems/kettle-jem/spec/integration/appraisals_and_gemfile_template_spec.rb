@@ -1072,9 +1072,11 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       {
         "KJ|CI:EXEC_CMD" => "bundle exec kettle-test",
         "KJ|CI:OS_MATRIX_ENTRIES" => described_class.send(:github_actions_current_os_matrix_entries, {ci: {exec_cmd: "bundle exec kettle-test", platforms: %w[linux macos windows]}}),
-        "KJ|CI:OS_TEST_STEPS" => described_class.send(:github_actions_current_os_test_steps, {ci: {exec_cmd: "bundle exec kettle-test", platforms: %w[linux macos windows]}})
+        "KJ|CI:OS_TEST_STEPS" => described_class.send(:github_actions_current_os_test_steps, {ci: {exec_cmd: "bundle exec kettle-test", platforms: %w[linux macos windows]}}),
+        "KJ|CI:MACOS_HARDENING_STEP" => described_class.send(:github_actions_macos_hardening_step, {ci: {exec_cmd: "bundle exec kettle-test", platforms: %w[linux macos windows]}})
       }
     )
+    expect(resolved_current_workflow.index("Remove eMudhra roots from the macOS CA bundle")).to be < resolved_current_workflow.index("- name: Checkout")
     expect(resolved_current_workflow).to include("appraisal: \"current\"\n            os: ubuntu-latest")
     expect(resolved_current_workflow).to include("appraisal: \"current\"\n            os: macos-latest")
     expect(resolved_current_workflow).to include("appraisal: \"current\"\n            os: windows-latest")

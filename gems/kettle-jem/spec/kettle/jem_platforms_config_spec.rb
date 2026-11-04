@@ -195,6 +195,59 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  describe "github_actions_macos_hardening_step" do
+    let(:script) { File.read(File.expand_path("../../lib/kettle/jem/ci/harden_macos_ca_bundle.sh", __dir__)).rstrip }
+
+    def step_for(platforms)
+      described_class.send(:github_actions_macos_hardening_step, ci_facts(platforms))
+    end
+
+    it "is empty when macos is not declared, so no dead step is emitted" do
+      expect(step_for(%w[linux])).to eq("")
+      expect(step_for(%w[linux windows])).to eq("")
+    end
+
+    it "emits a macOS-only inline step when macos is declared, including by default" do
+      step = step_for(%w[linux macos])
+
+      expect(step).to start_with("      - name: Remove eMudhra roots from the macOS CA bundle\n")
+      expect(step).to include("        if: runner.os == 'macOS'\n")
+      expect(step).to end_with("\n\n")
+      expect(described_class.send(:github_actions_macos_hardening_step, {ci: {}})).to eq(step)
+    end
+
+    it "inlines the packaged script verbatim and parses as a workflow step" do
+      steps = YAML.safe_load(step_for(%w[linux macos windows]))
+
+      expect(steps.length).to eq(1)
+      expect(steps.first).to include("if" => "runner.os == 'macOS'", "shell" => "bash")
+      expect(steps.first.fetch("run").rstrip).to eq(script)
+      expect(steps.first).not_to have_key("uses")
+    end
+
+    it "is wired in before checkout in the current.yml template" do
+      template = File.read(File.expand_path("../../lib/kettle/jem/templates/.github/workflows/current.yml.example", __dir__))
+
+      expect(template).to match(/steps:\n\{KJ\|CI:MACOS_HARDENING_STEP\}      - name: Checkout\n/)
+    end
+
+    it "produces a current.yml whose first step hardens macOS before checkout" do
+      template = File.read(File.expand_path("../../lib/kettle/jem/templates/.github/workflows/current.yml.example", __dir__))
+      rendered = template.sub("{KJ|CI:MACOS_HARDENING_STEP}", step_for(%w[linux macos]))
+      rendered = rendered.sub("{KJ|CI:OS_MATRIX_ENTRIES}", "")
+      names = rendered.scan(/^      - name: (.+)$/).flatten
+
+      expect(names.first(2)).to eq(["Remove eMudhra roots from the macOS CA bundle", "Checkout"])
+    end
+
+    it "leaves the template unchanged for destinations without macos" do
+      template = File.read(File.expand_path("../../lib/kettle/jem/templates/.github/workflows/current.yml.example", __dir__))
+      rendered = template.sub("{KJ|CI:MACOS_HARDENING_STEP}", step_for(%w[linux]))
+
+      expect(rendered).to include("    steps:\n      - name: Checkout\n")
+    end
+  end
+
   describe "readme_current_mri_platforms" do
     def summary_facts(platforms:)
       {ci: {platforms: platforms}}
@@ -215,7 +268,7 @@ RSpec.describe Kettle::Jem do
   end
 
   describe "packaged current.yml template" do
-    it "resolves both tokens through the real pipeline into valid YAML" do
+    it "resolves its tokens through the real pipeline into valid YAML" do
       facts = ci_facts(%w[linux macos windows])
       resolved = described_class.send(
         :resolve_template_tokens,
@@ -223,12 +276,17 @@ RSpec.describe Kettle::Jem do
         {
           "KJ|CI:EXEC_CMD" => "bundle exec kettle-test",
           "KJ|CI:OS_MATRIX_ENTRIES" => described_class.send(:github_actions_current_os_matrix_entries, facts),
-          "KJ|CI:OS_TEST_STEPS" => described_class.send(:github_actions_current_os_test_steps, facts)
+          "KJ|CI:OS_TEST_STEPS" => described_class.send(:github_actions_current_os_test_steps, facts),
+          "KJ|CI:MACOS_HARDENING_STEP" => described_class.send(:github_actions_macos_hardening_step, facts)
         }
       )
 
       expect(resolved).not_to include("{KJ|")
-      expect(YAML.safe_load(resolved.gsub(/\{\{.*?}}/, "x"), aliases: true).dig("jobs", "test", "strategy", "matrix", "include").length).to eq(3)
+      workflow = YAML.safe_load(resolved.gsub(/\{\{.*?}}/, "x"), aliases: true)
+      expect(workflow.dig("jobs", "test", "strategy", "matrix", "include").length).to eq(3)
+      steps = workflow.dig("jobs", "test", "steps")
+      expect(steps.first(2).map { |step| step["name"] }).to eq(["Remove eMudhra roots from the macOS CA bundle", "Checkout"])
+      expect(steps.first["if"]).to eq("runner.os == 'macOS'")
     end
   end
 end

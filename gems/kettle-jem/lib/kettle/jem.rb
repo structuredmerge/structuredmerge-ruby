@@ -14985,6 +14985,7 @@ module Kettle
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
         "KJ|CI:OS_MATRIX_ENTRIES" => github_actions_current_os_matrix_entries(facts),
         "KJ|CI:OS_TEST_STEPS" => github_actions_current_os_test_steps(facts),
+        "KJ|CI:MACOS_HARDENING_STEP" => github_actions_macos_hardening_step(facts),
         "KJ|README:CURRENT_MRI_PLATFORMS" => readme_current_mri_platforms(facts),
         "KJ|RAKE:TOP_LEVEL_DOCS_TASK" => rake_top_level_docs_task_token(facts).rstrip,
         "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
@@ -20958,6 +20959,38 @@ module Kettle
           "            bundler: latest"
         ].join("\n")
       end.join("\n")
+    end
+
+    MACOS_CA_HARDENING_SCRIPT = File.expand_path("jem/ci/harden_macos_ca_bundle.sh", __dir__)
+    private_constant :MACOS_CA_HARDENING_SCRIPT
+
+    # The first step of current.yml's test job when macos is a declared platform:
+    # removes the eMudhra-related roots Apple still ships in /etc/ssl/cert.pem
+    # (https://github.com/galadran/we-have-a-problem.com/issues/157). The script is
+    # inlined, not fetched or run from the repo, because it has to run before the
+    # first download, and actions/checkout runs git. Like the Windows guard, the
+    # step exists only when its platform is declared, so no dead `if:` is emitted
+    # for linux-only or linux+windows destinations. Returns the step plus a blank
+    # line, or "" so the token vanishes without leaving a stray line behind. The
+    # script is a copy of structuredmerge/structuredmerge
+    # workspace-scripts/harden_macos_ca_bundle.sh (tested there against a bundle
+    # containing an eMudhra root).
+    def github_actions_macos_hardening_step(facts)
+      platforms = facts.dig(:ci, :platforms)
+      platforms = DEFAULT_PLATFORMS if platforms.nil? || platforms.empty?
+      return "" unless platforms.include?("macos")
+
+      header = [
+        "      - name: Remove eMudhra roots from the macOS CA bundle",
+        "        if: runner.os == 'macOS'",
+        "        shell: bash",
+        "        run: |"
+      ]
+      script = File.read(MACOS_CA_HARDENING_SCRIPT).rstrip.lines(chomp: true).map do |line|
+        line.empty? ? "" : "          #{line}"
+      end
+
+      "#{(header + script).join("\n")}\n\n"
     end
 
     # The current.yml test steps, generated from the same platforms facts. The
