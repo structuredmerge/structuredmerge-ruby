@@ -6,3 +6,18 @@ source 'https://gem.coop'
 gemspec
 
 gem 'nomono', '~> 1.1', '>= 1.1.18'
+
+# structuredmerge-core lives in a subdirectory of its own repository. tree_haver
+# (this gem) depends on it at runtime, and it is pre-publication: when
+# STRUCTUREDMERGE_CORE_DEV points at a kernel checkout, wire the binding from
+# packages/ruby so this baseline resolves. Mirrors the switch in
+# gemfiles/modular/templating_local.gemfile; registry-only resolution (toggle
+# unset) remains the default for local development and post-publication runs.
+structuredmerge_core_dev = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', '')
+if !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
+  core_gemspec = File.join(structuredmerge_core_dev, 'packages/ruby/structuredmerge_core.gemspec')
+  if File.exist?(core_gemspec)
+    instance_variable_get(:@dependencies).reject! { |dependency| dependency.name == 'structuredmerge-core' }
+    gem 'structuredmerge-core', path: File.join(structuredmerge_core_dev, 'packages/ruby')
+  end
+end
