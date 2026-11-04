@@ -9413,7 +9413,7 @@ module Kettle
     end
 
     def merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: nil)
-      return merge_prism_gemfile_template_source(template_content, destination_content) if file_type == :gemfile
+      return merge_prism_gemfile_template_source(template_content, destination_content, recipe) if file_type == :gemfile
 
       template_preference = recipe.fetch(:template_preference, {})
       preference = (template_preference[:preference] || "destination").to_sym
@@ -9434,22 +9434,31 @@ module Kettle
       )
     end
 
-    def merge_prism_gemfile_template_source(template_content, destination_content)
+    def merge_prism_gemfile_template_source(template_content, destination_content, recipe)
       Prism::Merge.merge_ruby(
         template_content,
         destination_content,
         "ruby",
         preference: :template,
         add_template_only_nodes: true,
-        signature_generator: Prism::Merge.ruby_dsl_signature_generator
+        signature_generator: Prism::Merge.ruby_dsl_signature_generator,
+        freeze_token: ruby_merge_freeze_token(recipe)
       )
+    end
+
+    # kettle-jem orchestrates every merge, so freeze blocks in templated files
+    # are uniformly owned by kettle-jem regardless of the merge backend's own
+    # default token (Prism::Merge defaults to "prism-merge").
+    def ruby_merge_freeze_token(recipe)
+      recipe.dig(:template_preference, :freeze_token) || "kettle-jem"
     end
 
     def prism_ruby_merge_options(recipe)
       {
         method_move_policy: ruby_method_move_policy(recipe),
         merge_template_requires: true,
-        template_only_placement: :after_anchor
+        template_only_placement: :after_anchor,
+        freeze_token: ruby_merge_freeze_token(recipe)
       }
     end
 

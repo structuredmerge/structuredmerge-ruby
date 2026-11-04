@@ -40,6 +40,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - ast-merge-git: LocalBenchmarkRunner#verify_environment! creates the tmp_root before realpath resolution; fresh checkouts without gems/ast-merge-git/tmp no longer crash the family suite with Errno::ENOENT (observed on CI runners)
 
+- kettle-jem: Packaged modular ostruct r4 template now declares `~> 0.6`, `>= 0.6.1`, matching the floors destinations add on the Appraisals side; divergent duplicate ostruct declarations across a bundle's eval_gemfile chain are fatal under Bundler 4
+
+- kettle-jem: Ruby and gemfile template merges now pass the configured freeze_token (default kettle-jem) through to Prism::Merge, so freeze blocks in templated Gemfiles and Ruby files are honored uniformly with YAML/JSON/dotenv merges; previously the gemfile path never forwarded the token and Prism::Merge's own default (prism-merge) silently decided ownership, letting template refreshes erase frozen gem declarations
+
 ### Security
 
 ## [7.1.18] - 2026-10-30
