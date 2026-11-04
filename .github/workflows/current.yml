@@ -559,17 +559,6 @@ jobs:
           ref: main
           path: kernel
           persist-credentials: false
-      - name: Compile the kernel Ruby binding
-        working-directory: kernel/packages/ruby
-        shell: bash
-        run: |
-          set -euo pipefail
-          ulimit -c 0
-          export CARGO_BUILD_JOBS="1" CARGO_INCREMENTAL="0"
-          export CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/kernel/tmp/benchmark-core-target"
-          mkdir -p ../../tmp
-          bundle install --jobs 4 --retry 8
-          bundle exec rake compile
       - name: Clone benchmark corpus
         shell: bash
         run: |
@@ -598,6 +587,17 @@ jobs:
           working-directory: gems/ast-merge-git
           appraisal-name: benchmark-dev
           appraisal-root-gemfile: Appraisal.root.gemfile
+      - name: Compile the kernel Ruby binding
+        working-directory: kernel/packages/ruby
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          export CARGO_BUILD_JOBS="1" CARGO_INCREMENTAL="0"
+          export CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/kernel/tmp/benchmark-core-target"
+          mkdir -p ../../tmp
+          bundle install --jobs 4 --retry 8
+          bundle exec rake compile
       - name: Run affected-capability benchmark
         working-directory: gems/ast-merge-git
         env:
@@ -735,17 +735,6 @@ jobs:
           ref: main
           path: kernel
           persist-credentials: false
-      - name: Compile the kernel Ruby binding
-        working-directory: kernel/packages/ruby
-        shell: bash
-        run: |
-          set -euo pipefail
-          ulimit -c 0
-          export CARGO_BUILD_JOBS="1" CARGO_INCREMENTAL="0"
-          export CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/kernel/tmp/tslp-core-target"
-          mkdir -p ../../tmp
-          bundle install --jobs 4 --retry 8
-          bundle exec rake compile
       - name: Setup Ruby
         uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
         env:
@@ -761,6 +750,17 @@ jobs:
           working-directory: gems/tree_haver
           appraisal-name: tslp-cold-start
           appraisal-root-gemfile: Appraisal.root.gemfile
+      - name: Compile the kernel Ruby binding
+        working-directory: kernel/packages/ruby
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          export CARGO_BUILD_JOBS="1" CARGO_INCREMENTAL="0"
+          export CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/kernel/tmp/tslp-core-target"
+          mkdir -p ../../tmp
+          bundle install --jobs 4 --retry 8
+          bundle exec rake compile
       - name: Run cold-start TSLP checks
         working-directory: gems/tree_haver
         env:
