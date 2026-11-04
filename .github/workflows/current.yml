@@ -546,11 +546,30 @@ jobs:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gems/ast-merge-git/Appraisal.root.gemfile
       K_JEM_TEMPLATING: true
       STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+      STRUCTUREDMERGE_CORE_DEV: ${{ github.workspace }}/kernel
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+      - name: Checkout kernel for the local core override
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: structuredmerge/structuredmerge
+          ref: main
+          path: kernel
+          persist-credentials: false
+      - name: Compile the kernel Ruby binding
+        working-directory: kernel/packages/ruby
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          export CARGO_BUILD_JOBS="1" CARGO_INCREMENTAL="0"
+          export CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/kernel/tmp/benchmark-core-target"
+          mkdir -p ../../tmp
+          bundle install --jobs 4 --retry 8
+          bundle exec rake compile
       - name: Clone benchmark corpus
         shell: bash
         run: |
@@ -570,6 +589,7 @@ jobs:
           BUNDLE_GEMFILE: ${{ github.workspace }}/gems/ast-merge-git/Appraisal.root.gemfile
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+          STRUCTUREDMERGE_CORE_DEV: ${{ github.workspace }}/kernel
         with:
           ruby-version: ruby
           bundler: latest
@@ -584,6 +604,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+          STRUCTUREDMERGE_CORE_DEV: ${{ github.workspace }}/kernel
         run: |
           set -euo pipefail
 
@@ -703,15 +724,35 @@ jobs:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gems/tree_haver/Appraisal.root.gemfile
       K_JEM_TEMPLATING: true
       STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+      STRUCTUREDMERGE_CORE_DEV: ${{ github.workspace }}/kernel
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout kernel for the local core override
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: structuredmerge/structuredmerge
+          ref: main
+          path: kernel
+          persist-credentials: false
+      - name: Compile the kernel Ruby binding
+        working-directory: kernel/packages/ruby
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          export CARGO_BUILD_JOBS="1" CARGO_INCREMENTAL="0"
+          export CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/kernel/tmp/tslp-core-target"
+          mkdir -p ../../tmp
+          bundle install --jobs 4 --retry 8
+          bundle exec rake compile
       - name: Setup Ruby
         uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
         env:
           BUNDLE_GEMFILE: ${{ github.workspace }}/gems/tree_haver/Appraisal.root.gemfile
           K_JEM_TEMPLATING: true
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+          STRUCTUREDMERGE_CORE_DEV: ${{ github.workspace }}/kernel
         with:
           ruby-version: ruby
           bundler: latest
@@ -726,6 +767,7 @@ jobs:
           K_JEM_TEMPLATING: true
           K_SOUP_COV_DO: false
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+          STRUCTUREDMERGE_CORE_DEV: ${{ github.workspace }}/kernel
         run: |
           set -euo pipefail
           export TREE_SITTER_LANGUAGE_PACK_CACHE_DIR

@@ -7825,8 +7825,10 @@ module Kettle
           end
           removable = [package_name, *(runtime_dependencies - named_fragment_dependencies)]
           # A modular Gemfile may repeat a runtime gem only to select its local
-          # source. Keep explicit path overrides while pruning ordinary duplicates.
-          removable -= gemfile_path_source_override_names(template_content)
+          # source. Keep explicit path overrides while pruning ordinary
+          # duplicates. The package's own gem is never exempt: a self-reference
+          # is a prohibited declaration, not a local source override.
+          removable -= (gemfile_path_source_override_names(template_content) - [package_name])
           output = remove_gemfile_dependency_blocks(content, removable)
           output = remove_gemfile_percent_w_entries(output, removable)
         end
@@ -9483,7 +9485,9 @@ module Kettle
       # A Gemfile path declaration can override the source of a runtime gemspec
       # dependency. Keep those declarations so local development can resolve an
       # unpublished dependency without changing the runtime dependency graph.
-      removable_gems -= gemfile_path_source_override_names(template_content.to_s)
+      # The package's own gem is never exempt: a self-reference is a prohibited
+      # declaration, not a local source override.
+      removable_gems -= (gemfile_path_source_override_names(template_content.to_s) - [package_name])
       removable_gems << "version_gem" unless version_gem_enabled?(facts)
       pruned = remove_gemfile_dependency_blocks(content, removable_gems)
       pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
