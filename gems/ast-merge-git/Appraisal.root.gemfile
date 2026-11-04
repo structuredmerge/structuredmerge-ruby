@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# kettle-jem:freeze
+# To retain chunks of comments & code during kettle-jem templating:
+# Wrap custom sections with freeze markers (e.g., as above and below this comment chunk).
+# kettle-jem will then preserve content between those markers across template runs.
+# kettle-jem:unfreeze
+
 source 'https://gem.coop'
 
 # Shared baseline for the Appraisal2 CI lanes in this gem.
@@ -26,17 +32,24 @@ if !structuredmerge_dev_root.empty? && !%w[false 0 no off].include?(structuredme
   end
 end
 
-# structuredmerge-core lives in a subdirectory of its own repository. The
-# lockstep tree_haver depends on it at runtime, and it is pre-publication: when
-# STRUCTUREDMERGE_CORE_DEV points at a kernel checkout, wire the binding from
-# packages/ruby so this baseline resolves. Mirrors the switch in
-# gemfiles/modular/templating_local.gemfile; registry-only resolution (toggle
-# unset) remains the default for local development and post-publication runs.
-structuredmerge_core_dev = ENV.fetch('STRUCTUREDMERGE_CORE_DEV', '')
-if !structuredmerge_core_dev.empty? && !%w[false 0 no off].include?(structuredmerge_core_dev.downcase)
-  core_gemspec = File.join(structuredmerge_core_dev, 'packages/ruby/structuredmerge_core.gemspec')
-  if File.exist?(core_gemspec)
-    instance_variable_get(:@dependencies).reject! { |dependency| dependency.name == 'structuredmerge-core' }
-    gem 'structuredmerge-core', path: File.join(structuredmerge_core_dev, 'packages/ruby')
+if respond_to?(:generator_only)
+  generator_only do
+    if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+      eval_gemfile 'gemfiles/modular/templating.gemfile'
+    end
   end
 end
+# kettle-jem:freeze
+# The lockstep tree_haver depends on structuredmerge-core ~> 0.2, which no
+# registry carries before the kernel publishes. Appraisal's root resolution
+# runs under plain Bundler, where generator_only is unavailable, so wire core
+# from the local kernel checkout through the modular templating gemfile
+# whenever the family dev env is engaged. Without that env the modular file
+# retains registry mode, and published gems resolve normally.
+unless respond_to?(:generator_only)
+  if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? ||
+      !ENV.fetch('STRUCTUREDMERGE_DEV', '').strip.empty?
+    eval_gemfile 'gemfiles/modular/templating.gemfile'
+  end
+end
+# kettle-jem:unfreeze
