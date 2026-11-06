@@ -39,7 +39,8 @@ RSpec.describe "Ast::Crispr YAML owner edits" do
                                            replacement: "  '2025-01-05': ['09:00:00']\n")
 
       expect(result).to be_success
-      expect(result.updated_content.lines.first(3)).to eq(["stars:\n", "  '2025-01-05': ['09:00:00']\n", "  '2025-01-06':\n"])
+      expect(result.updated_content.lines.first(3)).to eq(["stars:\n", "  '2025-01-05': ['09:00:00']\n",
+                                                           "  '2025-01-06':\n"])
     end
 
     it "deletes the entry" do
@@ -93,8 +94,9 @@ RSpec.describe "Ast::Crispr YAML owner edits" do
       replaced = Ast::Crispr::Replace.result(content: list, target: target, replacement: "  - os: debian\n")
       deleted = Ast::Crispr::Delete.result(content: list, target: target)
 
-      expect(YAML.safe_load(replaced.updated_content)["include"]).to eq([{"os" => "debian"}, {"os" => "macos", "node" => 20}])
-      expect(YAML.safe_load(deleted.updated_content)["include"]).to eq([{"os" => "macos", "node" => 20}])
+      expect(YAML.safe_load(replaced.updated_content)["include"]).to eq([{ "os" => "debian" },
+                                                                         { "os" => "macos", "node" => 20 }])
+      expect(YAML.safe_load(deleted.updated_content)["include"]).to eq([{ "os" => "macos", "node" => 20 }])
     end
   end
 
