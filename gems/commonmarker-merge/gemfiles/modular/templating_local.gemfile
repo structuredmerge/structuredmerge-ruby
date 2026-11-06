@@ -122,6 +122,6 @@ if ENV.fetch('STRUCTUREDMERGE_CORE_DEV', 'false').casecmp('false') != 0
     path_env: 'STRUCTUREDMERGE_CORE_DEV',
     debug_env: 'STRUCTUREDMERGE_CORE_DEBUG',
     root: %w[src my structuredmerge structuredmerge],
-    subdirs: {'structuredmerge-core' => 'packages/ruby'}
+    subdirs: { 'structuredmerge-core' => 'packages/ruby' }
   )
 end
