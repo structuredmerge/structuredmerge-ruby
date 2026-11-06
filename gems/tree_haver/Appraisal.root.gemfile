@@ -15,9 +15,7 @@ gem 'nomono', '~> 1.1', '>= 1.1.18'
 
 if respond_to?(:generator_only)
   generator_only do
-    if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
-      eval_gemfile 'gemfiles/modular/templating.gemfile'
-    end
+    eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
   end
 end
 # kettle-jem:freeze
@@ -28,10 +26,8 @@ end
 # modular templating gemfile whenever the family dev env is engaged. Without
 # that env the modular file retains registry mode, and published gems resolve
 # normally.
-unless respond_to?(:generator_only)
-  if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? ||
-      !ENV.fetch('STRUCTUREDMERGE_DEV', '').strip.empty?
-    eval_gemfile 'gemfiles/modular/templating.gemfile'
-  end
+if !respond_to?(:generator_only) && (ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? ||
+     !ENV.fetch('STRUCTUREDMERGE_DEV', '').strip.empty?)
+  eval_gemfile 'gemfiles/modular/templating.gemfile'
 end
 # kettle-jem:unfreeze
