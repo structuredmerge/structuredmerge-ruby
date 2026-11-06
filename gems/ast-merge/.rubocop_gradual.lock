@@ -2,7 +2,7 @@
   ".simplecov:3300221605": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Rakefile:2966310169": [
+  "Rakefile:2566880764": [
     [18, 121, 17, "Layout/LineLength: Line is too long. [137/120]", 174264873],
     [87, 3, 1023, "Metrics/BlockLength: Block has too many lines. [32/25]", 54868638],
     [171, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
@@ -28,10 +28,10 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/changelog.gemfile:1227836325": [
+  "gemfiles/modular/changelog.gemfile:4206999050": [
     [38, 7, 580, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 393701499]
   ],
-  "gemfiles/modular/coverage_local.gemfile:1733458466": [
+  "gemfiles/modular/coverage_local.gemfile:2933332301": [
     [43, 121, 366, "Layout/LineLength: Line is too long. [486/120]", 3266283392]
   ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
@@ -60,7 +60,7 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/ostruct/r4/v0.6.gemfile:2083919651": [
+  "gemfiles/modular/ostruct/r4/v0.6.gemfile:3318403163": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "gemfiles/modular/rspec.gemfile:2263543889": [
@@ -79,14 +79,14 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "gemfiles/modular/style_local.gemfile:3068164838": [
+  "gemfiles/modular/style_local.gemfile:285246665": [
     [57, 1, 882, "Metrics/AbcSize: Assignment Branch Condition size for `local_gem_satisfies?` is too high. [<6, 17, 12> 21.66/17]", 3860978908],
     [57, 1, 882, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `local_gem_satisfies?` is too high. [12/7]", 3860978908],
     [57, 1, 882, "Metrics/MethodLength: Method has too many lines. [14/10]", 3860978908],
     [57, 1, 882, "Metrics/PerceivedComplexity: Perceived complexity for `local_gem_satisfies?` is too high. [12/8]", 3860978908],
     [71, 23, 20, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 1851388465]
   ],
-  "gemfiles/modular/templating_local.gemfile:2935744586": [
+  "gemfiles/modular/templating_local.gemfile:237956629": [
     [44, 121, 366, "Layout/LineLength: Line is too long. [486/120]", 3266283392]
   ],
   "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
@@ -1754,6 +1754,9 @@
     [79, 3, 3574, "Metrics/BlockLength: Block has too many lines. [97/25]", 969726064],
     [126, 5, 1158, "Metrics/BlockLength: Block has too many lines. [29/25]", 389808524]
   ],
+  "spec/ast/merge/native_only_dispatch_boundary_spec.rb:1255895197": [
+    [3, 1, 1556, "Metrics/BlockLength: Block has too many lines. [29/25]", 3976129791]
+  ],
   "spec/ast/merge/navigable/injection_point_finder_spec.rb:3693754765": [
     [3, 1, 5152, "Metrics/BlockLength: Block has too many lines. [123/25]", 3265221808],
     [15, 3, 4026, "Metrics/BlockLength: Block has too many lines. [96/25]", 1482695302],
@@ -2031,27 +2034,16 @@
     [6, 3, 4293, "Metrics/BlockLength: Block has too many lines. [71/25]", 3268326076],
     [10, 5, 4026, "Metrics/BlockLength: Block has too many lines. [66/25]", 36655174]
   ],
-  "spec/ast/merge/structural_edit/shared_removed_owner_emission_contract_spec.rb:1416700383": [
-    [5, 1, 3240, "Metrics/BlockLength: Block has too many lines. [68/25]", 1891578975],
+  "spec/ast/merge/structural_edit/shared_removed_owner_emission_contract_spec.rb:348040117": [
+    [5, 1, 3352, "Metrics/BlockLength: Block has too many lines. [69/25]", 2292564021],
     [6, 3, 85, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 2372484596],
     [7, 3, 187, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1153893151],
     [16, 3, 105, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 2342053189],
     [18, 3, 293, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 519928517],
     [35, 3, 162, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 123181781],
-    [41, 3, 2325, "Metrics/BlockLength: Block has too many lines. [39/25]", 2786799165],
-    [45, 5, 2058, "Metrics/BlockLength: Block has too many lines. [34/25]", 2917032676],
-    [47, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2087826382],
-    [53, 27, 48, "Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.", 840232736],
-    [53, 27, 48, "Layout/HashAlignment: Align the keys of a hash literal if they span more than one line.", 840232736],
-    [54, 27, 57, "Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.", 2668086094],
-    [54, 27, 57, "Layout/HashAlignment: Align the keys of a hash literal if they span more than one line.", 2668086094],
-    [68, 63, 62, "Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.", 3732075625],
-    [68, 63, 62, "Layout/HashAlignment: Align the keys of a hash literal if they span more than one line.", 3732075625],
-    [68, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 1637719420],
-    [69, 36, 23, "Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.", 2448555586],
-    [69, 36, 23, "Layout/HashAlignment: Align the keys of a hash literal if they span more than one line.", 2448555586],
-    [70, 36, 17, "Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.", 311287490],
-    [70, 36, 17, "Layout/HashAlignment: Align the keys of a hash literal if they span more than one line.", 311287490]
+    [41, 3, 2437, "Metrics/BlockLength: Block has too many lines. [40/25]", 3593539799],
+    [45, 5, 2170, "Metrics/BlockLength: Block has too many lines. [35/25]", 115654966],
+    [69, 121, 30, "Layout/LineLength: Line is too long. [150/120]", 710946852]
   ],
   "spec/ast/merge/structural_edit/splice_plan_spec.rb:3754071003": [
     [3, 1, 5369, "Metrics/BlockLength: Block has too many lines. [125/25]", 1292691361],

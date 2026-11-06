@@ -44,14 +44,15 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
     fixture = JSON.parse(File.read(path))
     fixture.fetch('cases').each do |entry|
       owner_line = entry.fetch('removed_owner_line_number')
-      owner = RemovedOwnerStatement.new(name: entry.fetch('removed_owner_id'), start_line: owner_line, end_line: owner_line)
+      owner = RemovedOwnerStatement.new(name: entry.fetch('removed_owner_id'), start_line: owner_line,
+                                        end_line: owner_line)
       later_id = entry.dig('trailing_gap', 'after_owner_id')
       later_line = entry.fetch('retained_owner_line_number')
       later = later_id && RemovedOwnerStatement.new(name: later_id, start_line: later_line, end_line: later_line)
       region_data = entry.fetch('trailing_region')
       region = RemovedOwnerRegion.new(start_line: region_data.fetch('line_numbers').first,
-                          end_line: region_data.fetch('line_numbers').last,
-                          normalized_content: region_data.fetch('lines').join("\n"))
+                                      end_line: region_data.fetch('line_numbers').last,
+                                      normalized_content: region_data.fetch('lines').join("\n"))
       gap_data = entry.fetch('trailing_gap')
       gap = Ast::Merge::Layout::Gap.new(
         kind: gap_data.fetch('kind').to_sym,
@@ -65,9 +66,9 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
       analysis = RemovedOwnerAnalysis.new(
         lines: entry.fetch('source'),
         attachment: RemovedOwnerAttachment.new(leading_region: RemovedOwnerRegion.new(start_line: 1, end_line: 1,
-                                                              normalized_content: entry.fetch('leading_segment_lines').first),
-                                   trailing_region: region,
-                                   trailing_gap: gap)
+                                                                                      normalized_content: entry.fetch('leading_segment_lines').first),
+                                               trailing_region: region,
+                                               trailing_gap: gap)
       )
       actual_lines = Harness.new.removed_owner_preserved_lines_for(
         owner, analysis, inline_lines: entry.fetch('inline_lines')
