@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] alef-gemspec-spec-files: Kettle Jem now merges Alef-generated spec.files candidate lists and exclusion filters while retaining destination gem version metadata.
 
+- Remove the Style/SafeNavigation offense from the generated gemfiles/modular/style_local.gemfile (spec&.version in the local_gem_satisfies? gemspec guard), so templated projects no longer carry a .rubocop_gradual.lock baseline entry for it
+
 ### Security
 
 ## [7.1.42] - 2026-10-31

@@ -1,5 +1,13 @@
 {
-  "gemfiles/modular/style_local.gemfile:3800591096": [
-    [71, 23, 20, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 1851388465]
+  "lib/kettle/jem.rb:1450298428": [
+    [19805, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871]
+  ],
+  "spec/integration/gemspec_template_spec.rb:3033857952": [
+    [1195, 34, 33, "Style/StringLiterals: Prefer double-quoted strings unless you need single quotes to avoid extra backslashes for escaping.", 1543944752],
+    [1220, 34, 37, "Style/StringLiterals: Prefer double-quoted strings unless you need single quotes to avoid extra backslashes for escaping.", 3576286859],
+    [1221, 34, 41, "Style/StringLiterals: Prefer double-quoted strings unless you need single quotes to avoid extra backslashes for escaping.", 3817645911],
+    [1222, 38, 37, "Style/StringLiterals: Prefer double-quoted strings unless you need single quotes to avoid extra backslashes for escaping.", 2379708347],
+    [1316, 14, 15, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 131138375],
+    [1316, 32, 4, "Security/Eval: The use of `eval` is a serious security risk.", 2087429787]
   ]
 }
