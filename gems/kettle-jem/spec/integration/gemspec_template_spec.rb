@@ -1213,6 +1213,71 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL)")
   end
 
+  it "merges Alef filtered candidate_files manifests with template package files" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = [
+          "README.md",
+          "lib/demo.rb"
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        candidate_files = Dir.glob(%W[README* LICENSE* lib/structuredmerge_core.rb lib/structuredmerge_core/**/* ext/structuredmerge_core_rb/**/* sig/**/* Steepfile]).select { |file| File.file?(file) }
+        spec.files = candidate_files.grep_v(%r{/(?:target|tmp)/|\\.(?:bundle|so|dylib|dll|o|a|log)\\z|\\.dSYM/})
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect { RubyVM::InstructionSequence.compile(merged) }.not_to raise_error
+    expect(merged).to include("Dir.glob(%W[README* LICENSE* lib/structuredmerge_core.rb lib/structuredmerge_core/**/* ext/structuredmerge_core_rb/**/* sig/**/* Steepfile])")
+    expect(merged).to include('"README.md"')
+    expect(merged).to include('"lib/demo.rb"')
+    expect(merged).to include(".grep_v(%r{/(?:target|tmp)/")
+    expect(merged).not_to include("candidate_files")
+    expect(described_class.merge_gemspec_template_source(template, merged, facts: {package: {name: "demo"}})).to eq(merged)
+
+    Dir.mktmpdir("alef-gemspec-files") do |root|
+      %w[README.md lib/structuredmerge_core/demo.rb ext/structuredmerge_core_rb/native.so].each do |path|
+        absolute = File.join(root, path)
+        FileUtils.mkdir_p(File.dirname(absolute))
+        File.write(absolute, "fixture")
+      end
+      spec = Dir.chdir(root) { eval(merged, TOPLEVEL_BINDING, "demo.gemspec") }
+
+      expect(spec.files).to include("README.md", "lib/structuredmerge_core/demo.rb")
+      expect(spec.files.grep(/\.so\z/)).to be_empty
+    end
+  end
+
+  it "preserves a destination gemspec native extension declaration" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = [
+          "lib/demo.rb"
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.files = [
+          "lib/demo.rb"
+        ]
+        spec.extensions = ["ext/demo/extconf.rb"]
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect(merged).to include('spec.extensions = ["ext/demo/extconf.rb"]')
+  end
+
   it "replaces legacy backtick git-ls-files pipelines with the canonical package manifest" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

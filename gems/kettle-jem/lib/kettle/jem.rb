@@ -11759,6 +11759,7 @@ module Kettle
         licenses
         required_ruby_version
         executables
+        extensions
       ]
     end
 
@@ -11773,6 +11774,13 @@ module Kettle
         template_record: template_record,
         destination_record: destination_record
       )
+      replacement ||= merge_gemspec_files_assignment_with_destination_filter(
+        template_record: template_record,
+        destination_content: destination_content,
+        destination_record: destination_record,
+        template_receiver: template_receiver,
+        destination_receiver: destination_receiver
+      )
       replacement ||= replacement_for_supported_gemspec_files_assignment(
         template_record: template_record,
         destination_record: destination_record,
@@ -11783,6 +11791,54 @@ module Kettle
       end
 
       replace_source_range_lines(content, merged_record.fetch(:start_line), merged_record.fetch(:end_line), replacement)
+    end
+
+    # Alef emits a named candidate_files list and applies a grep_v exclusion
+    # after it. Keep both parts of that contract while adding the template's
+    # package files before the exclusion runs. Inlining the candidate list is
+    # necessary because the rest of the destination gemspec is template-owned.
+    def merge_gemspec_files_assignment_with_destination_filter(template_record:, destination_content:, destination_record:, template_receiver:, destination_receiver:)
+      template_parts = gemspec_files_collection_parts(template_record)
+      return unless template_parts
+
+      assignment = destination_record.fetch(:value_node)
+      return unless assignment.is_a?(::Prism::CallNode) && assignment.name == :grep_v && !assignment.block
+
+      arguments = Array(assignment.arguments&.arguments)
+      variable = assignment.receiver
+      if arguments.length == 1 && assignment.receiver.is_a?(::Prism::ParenthesesNode)
+        existing_expression = assignment.receiver.body&.body&.first
+        if existing_expression.is_a?(::Prism::CallNode) && existing_expression.name == :+
+          existing_additions = Array(existing_expression.arguments&.arguments).first
+          desired_groups = gemspec_files_normalize_dir_globs_for_array(template_parts.fetch(:groups), template_parts)
+          if existing_additions.is_a?(::Prism::ArrayNode) &&
+              desired_groups.map { |group| group.fetch(:node).slice }.all? { |source| existing_additions.elements.any? { |node| node.slice == source } }
+            return normalize_gemspec_receiver(
+              destination_record.fetch(:source).rstrip,
+              from: destination_receiver,
+              to: template_receiver
+            ) + "\n"
+          end
+        end
+      end
+      return unless arguments.length == 1 && variable.is_a?(::Prism::LocalVariableReadNode)
+
+      candidate_assignment = prism_parse_success(destination_content)&.value&.breadth_first_search_all do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == variable.name
+      end&.first
+      return unless candidate_assignment&.value
+
+      additions = gemspec_files_normalize_dir_globs_for_array(template_parts.fetch(:groups), template_parts)
+      indent = destination_record.fetch(:source)[/\A\s*/].to_s
+      addition_source = additions.map { |group| "#{indent}  #{group.fetch(:node).slice}" }.join(",\n")
+      candidate_source = candidate_assignment.value.slice
+      filter_source = arguments.first.slice
+      expression = "(#{candidate_source} + [\n#{addition_source}\n#{indent}]).grep_v(#{filter_source})"
+      normalize_gemspec_receiver(
+        destination_record.fetch(:source).sub(assignment.slice, expression).rstrip,
+        from: destination_receiver,
+        to: template_receiver
+      ) + "\n"
     end
 
     def insert_missing_gemspec_files_assignment(content, template_content:, template_receiver:)
