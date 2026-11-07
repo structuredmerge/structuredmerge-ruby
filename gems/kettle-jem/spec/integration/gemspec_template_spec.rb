@@ -1199,6 +1199,29 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     ).to eq(gemspec)
   end
 
+  it "normalizes the Alef gemspec version path when destination fields win" do
+    gemspec = <<~'RUBY'
+      gem_version = Module.new.tap do |mod|
+        Kernel.load("#{__dir__}/lib/structuredmerge/core/version.rb", mod)
+      end::StructuredmergeCore::Version::VERSION
+      Gem::Specification.new do |spec|
+        spec.name = "structuredmerge-core"
+        spec.version = gem_version
+      end
+    RUBY
+    facts = {
+      package: {name: "structuredmerge-core"},
+      rubygems: {entrypoint_require: "structuredmerge_core", namespace: "StructuredmergeCore"},
+      gemspec: {preference: "destination"}
+    }
+
+    rewritten = described_class.send(:rewrite_gemspec_version_loader, gemspec, facts: facts)
+
+    expect(rewritten).to include('lib/structuredmerge_core/version.rb')
+    expect(rewritten).to include('::StructuredmergeCore::Version::VERSION')
+    expect(rewritten).not_to include('lib/structuredmerge/core/version.rb')
+  end
+
   it "honors a gemspec preference configured without an explicit strategy" do
     config = {
       "files" => {

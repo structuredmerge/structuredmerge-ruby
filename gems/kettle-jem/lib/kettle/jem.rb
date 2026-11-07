@@ -11265,9 +11265,17 @@ module Kettle
 
     def rewrite_gemspec_version_loader(content, facts:)
       return content if shim_template_profile?(facts)
-      # A per-file destination preference retains the version expression along
-      # with the other Alef-owned gemspec fields.
-      return content if facts.to_h.dig(:gemspec, :preference).to_s == "destination"
+
+      if facts.to_h.dig(:gemspec, :preference).to_s == "destination"
+        # Keep Alef's version expression, but normalize the generated file path
+        # when its configured Ruby entrypoint does not follow the gem-name path.
+        package_name = facts.to_h.dig(:package, :name).to_s
+        entrypoint_require = facts.to_h.dig(:rubygems, :entrypoint_require).to_s
+        default_path = package_name.tr("-", "/")
+        return content if package_name.empty? || entrypoint_require.empty? || default_path == entrypoint_require
+
+        return content.gsub("lib/#{default_path}/version.rb", "lib/#{entrypoint_require}/version.rb")
+      end
 
       min_ruby = gemspec_runtime_floor_token(facts)
       return content if min_ruby.to_s.empty?
