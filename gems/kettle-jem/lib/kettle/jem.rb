@@ -5057,9 +5057,11 @@ module Kettle
       strategy_index = ((rakefile_index + 1)...block_end).find do |index|
         lines.fetch(index).start_with?("    strategy:")
       end
-      if strategy_index
-        lines[strategy_index] = "    strategy: accept_template"
-      else
+      # The monorepo-subgem profile seeds accept_template, but an explicit
+      # per-file strategy is an operator override. In particular, preserve
+      # merge so a generated destination Rakefile can keep its custom tasks
+      # while receiving template-only nodes.
+      unless strategy_index
         lines.insert(rakefile_index + 1, "    strategy: accept_template")
       end
     end

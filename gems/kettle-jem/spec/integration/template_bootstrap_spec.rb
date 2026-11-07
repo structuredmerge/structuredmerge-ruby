@@ -1677,6 +1677,37 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     expect(config_yaml.dig("files", "gemfiles", "strategy")).to eq("keep_destination")
   end
 
+  it "preserves an explicit destination-preserving Rakefile merge in a monorepo subgem profile" do
+    content = <<~YAML
+      project_emoji: "💎"
+      templates:
+        root: packaged
+        apply: true
+        profile: monorepo-subgem-package
+        entries:
+          - Rakefile
+      files:
+        Rakefile:
+          strategy: merge
+          preference: destination
+          add_template_only_nodes: true
+    YAML
+
+    updated = described_class.send(
+      :sync_kettle_config_monorepo_subgem_profile,
+      content,
+      "structuredmerge_core.gemspec",
+      "monorepo-subgem-package"
+    )
+    config_yaml = YAML.safe_load(updated)
+
+    expect(config_yaml.dig("files", "Rakefile")).to include(
+      "strategy" => "merge",
+      "preference" => "destination",
+      "add_template_only_nodes" => true
+    )
+  end
+
   it "templates a monorepo root without a gemspec and syncs root Gemfile tooling dependencies" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
