@@ -164,9 +164,9 @@ run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false TSLP_DEV=false bu
 [local-template]
 description = "Apply templates using member-local Nomono and local workspace gems"
 raw = true
-run = "STRUCTUREDMERGE_DEV={{config_root}}/gems K_JEM_TEMPLATING=true RUBYOPT=-rbundler/setup BUNDLE_GEMFILE=Gemfile bundle exec kettle-family template --execute --env STRUCTUREDMERGE_DEV\\={{config_root}}/gems --env K_JEM_TEMPLATING\\=true --env RUBYOPT\\=-rbundler/setup --env BUNDLE_GEMFILE\\=Gemfile"
+run = "STRUCTUREDMERGE_CORE_DEV={{config_root}}/../structuredmerge KETTLE_DEV_DEV={{config_root}}/../../kettle-dev STRUCTUREDMERGE_DEV={{config_root}}/gems K_JEM_TEMPLATING=true RUBYOPT=-rbundler/setup BUNDLE_GEMFILE=Gemfile bundle exec kettle-family template --execute --env STRUCTUREDMERGE_CORE_DEV\\={{config_root}}/../structuredmerge --env KETTLE_DEV_DEV\\={{config_root}}/../../kettle-dev --env STRUCTUREDMERGE_DEV\\={{config_root}}/gems --env K_JEM_TEMPLATING\\=true --env RUBYOPT\\=-rbundler/setup --env BUNDLE_GEMFILE\\=Gemfile"
 
 [unreleased-template]
 description = "Apply templates to stale members using the family-root bundle"
 raw = true
-run = "STRUCTUREDMERGE_DEV={{config_root}}/gems K_JEM_TEMPLATING=true RUBYOPT=-rbundler/setup BUNDLE_GEMFILE=Gemfile bundle exec kettle-family template --execute --env STRUCTUREDMERGE_DEV\\={{config_root}}/gems --env K_JEM_TEMPLATING\\=true --env RUBYOPT\\=-rbundler/setup --env BUNDLE_GEMFILE\\={{config_root}}/Gemfile"
+run = "STRUCTUREDMERGE_CORE_DEV={{config_root}}/../structuredmerge KETTLE_DEV_DEV={{config_root}}/../../kettle-dev STRUCTUREDMERGE_DEV={{config_root}}/gems K_JEM_TEMPLATING=true RUBYOPT=-rbundler/setup BUNDLE_GEMFILE=Gemfile bundle exec kettle-family template --execute --env STRUCTUREDMERGE_CORE_DEV\\={{config_root}}/../structuredmerge --env KETTLE_DEV_DEV\\={{config_root}}/../../kettle-dev --env STRUCTUREDMERGE_DEV\\={{config_root}}/gems --env K_JEM_TEMPLATING\\=true --env RUBYOPT\\=-rbundler/setup --env BUNDLE_GEMFILE\\={{config_root}}/Gemfile"

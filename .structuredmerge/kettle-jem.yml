@@ -270,6 +270,7 @@ templates:
 #     and most template-managed files already exist on disk.
 #   - `duplicate_check` runs last, after all template writes are complete.
 plugins:
+  - kettle-family
   - kettle-drift
 
 # Default merge options
@@ -326,6 +327,8 @@ patterns:
 # Per-file configuration (nested directory structure)
 # Only files that need overrides belong here. Everything else defaults to merge.
 files:
+  mise-family.tasks.toml:
+    strategy: keep_destination
   CHANGELOG.md:
     strategy: keep_destination
   CODE_OF_CONDUCT.md:

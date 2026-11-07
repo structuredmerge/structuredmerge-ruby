@@ -139,6 +139,9 @@ changelog:
   version_file: gems/tree_haver/lib/tree_haver/version.rb
 
 template:
+  local_env:
+    STRUCTUREDMERGE_CORE_DEV: "{{config_root}}/../structuredmerge"
+    KETTLE_DEV_DEV: "{{config_root}}/../../kettle-dev"
   normalize_lockfiles: true
   normalize_lockfiles_command: bundle update --bundler
 
