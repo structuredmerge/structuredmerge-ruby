@@ -1173,6 +1173,49 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(remerged).to eq(merged)
   end
 
+  it "loads Alef style module-level VERSION constants in a gemspec" do
+    gemspec = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "structuredmerge-core"
+        spec.version = "0.2.1"
+        spec.required_ruby_version = ">= 3.3.0"
+      end
+    RUBY
+    facts = {
+      rubygems: {
+        entrypoint_require: "structuredmerge_core",
+        namespace: "StructuredmergeCore",
+        min_ruby: "3.3.0",
+        version_constant_path: "VERSION"
+      }
+    }
+
+    rewritten = described_class.send(:rewrite_gemspec_version_loader, gemspec, facts: facts)
+
+    expect(rewritten).to include('}::StructuredmergeCore::VERSION')
+    expect(rewritten).not_to include("StructuredmergeCore::Version::VERSION")
+    expect(
+      described_class.send(:rewrite_gemspec_version_loader, gemspec, facts: facts.merge(gemspec: {preference: "destination"}))
+    ).to eq(gemspec)
+  end
+
+  it "honors a gemspec preference configured without an explicit strategy" do
+    config = {
+      "files" => {
+        "structuredmerge_core.gemspec" => {
+          "preference" => "destination",
+          "add_template_only_nodes" => true
+        }
+      }
+    }
+
+    expect(described_class.send(:template_strategy_config, config, "structuredmerge_core.gemspec")).to eq(
+      strategy: :merge,
+      preference: "destination",
+      add_template_only_nodes: true
+    )
+  end
+
   it "replaces executable destination gemspec files assignments with template package collections" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
@@ -1252,6 +1295,38 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(spec.files).to include("README.md", "lib/structuredmerge_core/demo.rb")
       expect(spec.files.grep(/\.so\z/)).to be_empty
     end
+  end
+
+  it "keeps Alef's literal gem version while merging its filtered file manifest" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "1.0.0"
+        spec.files = [
+          "lib/template_helper.rb"
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "0.2.1"
+        candidate_files = Dir.glob(%W[README* lib/**/*.rb]).select { |file| File.file?(file) }
+        spec.files = candidate_files.grep_v(%r{/tmp/})
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(
+      template,
+      destination,
+      facts: {package: {name: "demo"}, gemspec: {preference: "destination"}}
+    )
+
+    expect(merged).to include('spec.version = "0.2.1"')
+    expect(merged).to include(".grep_v(%r{/tmp/})")
+    expect(merged).to include('"lib/template_helper.rb"')
+    expect(merged).not_to include("candidate_files")
+    expect(described_class.merge_gemspec_template_source(template, merged, facts: {package: {name: "demo"}, gemspec: {preference: "destination"}})).to eq(merged)
   end
 
   it "preserves a destination gemspec native extension declaration" do

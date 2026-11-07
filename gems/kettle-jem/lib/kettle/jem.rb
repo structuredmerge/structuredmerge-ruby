@@ -3025,6 +3025,7 @@ module Kettle
         namespace,
         entrypoint_path: entrypoint_path
       )
+      version_constant_path = existing_version_constant_path(project_root, version_path, namespace)
       version_namespace_superclasses = existing_version_namespace_superclasses(
         project_root,
         version_path,
@@ -3107,6 +3108,7 @@ module Kettle
           entrypoint_require: entrypoint_require,
           namespace: namespace,
           min_ruby: min_ruby,
+          version_constant_path: (version_constant_path unless version_constant_path == "Version::VERSION"),
           version_namespace_kinds: version_namespace_kinds,
           version_namespace_superclasses: version_namespace_superclasses,
           entrypoint_namespace_superclasses: entrypoint_namespace_superclasses,
@@ -6858,6 +6860,10 @@ module Kettle
     end
 
     def apply_template_source(project_root, recipe, original, facts: nil, env: ENV, template_contents: nil)
+      if template_file_type(recipe) == :gemspec && recipe.dig(:template_preference, :preference).to_s == "destination"
+        facts = deep_dup(facts || {})
+        facts[:gemspec] = facts[:gemspec].to_h.merge(preference: "destination")
+      end
       strategy = recipe.dig(:template_preference, :strategy).to_s
       return original if Ast::Template::Strategies.keep_destination?(strategy)
 
@@ -11119,9 +11125,11 @@ module Kettle
     def merge_gemspec_template_source(template_content, destination_content, facts: nil, env: ENV)
       template_receiver = gemspec_block_param(template_content) || "spec"
       destination_receiver = gemspec_block_param(destination_content) || "spec"
+      gemspec_preference = facts.to_h.dig(:gemspec, :preference).to_s
       package_name = facts.dig(:package, :name).to_s if facts
       replacements = gemspec_preserved_assignments(destination_content, receiver: destination_receiver)
         .except(*env_overridden_gemspec_fields(env))
+      replacements.delete("version") if gemspec_preference == "destination"
       replacements = remove_stale_generated_gemspec_homepage_replacement(
         replacements,
         destination_content,
@@ -11140,8 +11148,10 @@ module Kettle
         template_content: template_content,
         destination_content: destination_content,
         template_receiver: template_receiver,
-        destination_receiver: destination_receiver
+        destination_receiver: destination_receiver,
+        preference: gemspec_preference
       )
+      merged = preserve_destination_gemspec_version(merged, destination_content, template_receiver: template_receiver, destination_receiver: destination_receiver) if gemspec_preference == "destination"
       merged = insert_missing_gemspec_files_assignment(
         merged,
         template_content: template_content,
@@ -11188,6 +11198,14 @@ module Kettle
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
+    end
+
+    def preserve_destination_gemspec_version(content, destination_content, template_receiver:, destination_receiver:)
+      destination = gemspec_assignment_records(destination_content, receiver: destination_receiver).find { |record| record.fetch(:field) == "version" }
+      return content unless destination
+
+      replacement = normalize_gemspec_receiver(destination.fetch(:source).rstrip, from: destination_receiver, to: template_receiver)
+      replace_gemspec_assignment_sources(content, {"version" => replacement}, receiver: template_receiver)
     end
 
     def normalize_gemspec_package_helper_assignments(content, template_content)
@@ -11247,6 +11265,9 @@ module Kettle
 
     def rewrite_gemspec_version_loader(content, facts:)
       return content if shim_template_profile?(facts)
+      # A per-file destination preference retains the version expression along
+      # with the other Alef-owned gemspec fields.
+      return content if facts.to_h.dig(:gemspec, :preference).to_s == "destination"
 
       min_ruby = gemspec_runtime_floor_token(facts)
       return content if min_ruby.to_s.empty?
@@ -11259,7 +11280,9 @@ module Kettle
       receiver = gemspec_block_param(content) || "spec"
       min_ruby_version = Gem::Version.new(min_ruby)
       modern = min_ruby_version >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
-      rhs = modern ? gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace) : "gem_version"
+      version_constant_path = facts.to_h.dig(:rubygems, :version_constant_path).to_s
+      version_constant_path = "Version::VERSION" if version_constant_path.empty?
+      rhs = modern ? gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace, version_constant_path: version_constant_path) : "gem_version"
       rewritten = replace_gemspec_version_assignment(content, receiver: receiver, rhs: rhs)
       if modern
         remove_gemspec_legacy_version_loader_preamble(rewritten)
@@ -11269,6 +11292,7 @@ module Kettle
           entrypoint_require: entrypoint_require,
           namespace: namespace,
           min_ruby: min_ruby_version,
+          version_constant_path: version_constant_path,
           superclass_sensitive: gemspec_version_loader_superclass_sensitive?(facts),
           fallback_version: facts.to_h.dig(:project_runtime, :version)
         )
@@ -11288,16 +11312,17 @@ module Kettle
       insert_lines_after(content, gemspec_new_call(content)&.location&.start_line || 1, "  #{replacement}\n")
     end
 
-    def gemspec_modern_version_loader_expression(entrypoint_require:, namespace:)
-      %(Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/#{entrypoint_require}/version.rb", mod) }::#{namespace}::Version::VERSION)
+    def gemspec_modern_version_loader_expression(entrypoint_require:, namespace:, version_constant_path: "Version::VERSION")
+      %(Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/#{entrypoint_require}/version.rb", mod) }::#{namespace}::#{version_constant_path})
     end
 
-    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:, superclass_sensitive: false, fallback_version: nil)
+    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:, version_constant_path: "Version::VERSION", superclass_sensitive: false, fallback_version: nil)
       unless superclass_sensitive
         return gemspec_standard_legacy_version_loader_block(
           entrypoint_require: entrypoint_require,
           namespace: namespace,
-          min_ruby: min_ruby
+          min_ruby: min_ruby,
+          version_constant_path: version_constant_path
         )
       end
 
@@ -11305,7 +11330,7 @@ module Kettle
         require "anonymous_loader"
         path = File.expand_path("lib/#{entrypoint_require}/version.rb", __dir__)
         anonymous_namespace = AnonymousLoader.load(files: path)
-        anonymous_namespace::#{namespace}::Version::VERSION
+        anonymous_namespace::#{namespace}::#{version_constant_path}
       RUBY
       anonymous_loader_lines = anonymous_loader.lines.map { |line| "    #{line.chomp}" }
       fallback = fallback_version.to_s
@@ -11316,7 +11341,7 @@ module Kettle
         "    # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!",
         "    # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358",
         "    # See: https://github.com/panorama-ed/memo_wise/pull/397",
-        "    #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace)}"
+        "    #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace, version_constant_path: version_constant_path)}"
       ]
       lines << "  # The namesake namespace has a superclass. Directly requiring version.rb"
       lines << "  # on legacy Ruby could define that namespace with the wrong superclass."
@@ -11333,7 +11358,7 @@ module Kettle
       "#{lines.join("\n")}\n"
     end
 
-    def gemspec_standard_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:)
+    def gemspec_standard_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:, version_constant_path: "Version::VERSION")
       legacy_else =
         if min_ruby >= REQUIRE_RELATIVE_MIN_RUBY
           <<~RUBY.chomp
@@ -11342,7 +11367,7 @@ module Kettle
             # gemspec (e.g. by bundler/setup in a subprocess) must not define top-level constants,
             # which isolated-loading specs assert on.
             version_path = "\#{__dir__}/lib/#{entrypoint_require}/version.rb"
-            Module.new.tap { |mod| mod.module_eval(File.read(version_path), version_path, 1) }::#{namespace}::Version::VERSION
+            Module.new.tap { |mod| mod.module_eval(File.read(version_path), version_path, 1) }::#{namespace}::#{version_constant_path}
           RUBY
         else
           <<~RUBY.chomp
@@ -11351,7 +11376,7 @@ module Kettle
             lib = File.expand_path("lib", File.dirname(__FILE__))
             $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
             require "#{entrypoint_require}/version"
-            #{namespace}::Version::VERSION
+            #{namespace}::#{version_constant_path}
           RUBY
         end
 
@@ -11361,7 +11386,7 @@ module Kettle
             # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!
             # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358
             # See: https://github.com/panorama-ed/memo_wise/pull/397
-            #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace)}
+            #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace, version_constant_path: version_constant_path)}
           else
             #{legacy_else.gsub("\n", "\n    ")}
           end
@@ -11408,8 +11433,8 @@ module Kettle
       {start_line: start_index + 1, end_line: end_line}
     end
 
-    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:, min_ruby:, superclass_sensitive: false, fallback_version: nil)
-      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby, superclass_sensitive: superclass_sensitive, fallback_version: fallback_version)}\n"
+    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:, min_ruby:, version_constant_path: "Version::VERSION", superclass_sensitive: false, fallback_version: nil)
+      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby, version_constant_path: version_constant_path, superclass_sensitive: superclass_sensitive, fallback_version: fallback_version)}\n"
       node = gemspec_top_level_gem_version_node(content)
       return replace_source_range_lines(content, node.location.start_line, expand_line_range_through_following_blanks(content, node.location.end_line), block) if node
 
@@ -11763,23 +11788,25 @@ module Kettle
       ]
     end
 
-    def merge_gemspec_files_assignment(content, template_content:, destination_content:, template_receiver:, destination_receiver:)
+    def merge_gemspec_files_assignment(content, template_content:, destination_content:, template_receiver:, destination_receiver:, preference: nil)
       merged_record = gemspec_assignment_records(content, receiver: template_receiver).find { |record| record.fetch(:field) == "files" }
       template_record = gemspec_assignment_records(template_content, receiver: template_receiver).find { |record| record.fetch(:field) == "files" }
       destination_record = gemspec_assignment_records(destination_content, receiver: destination_receiver).find { |record| record.fetch(:field) == "files" }
       return content unless merged_record && template_record && destination_record
 
-      replacement = merge_gemspec_files_assignment_source(
-        merged_record: merged_record,
-        template_record: template_record,
-        destination_record: destination_record
-      )
+      # The destination preference preserves the Alef manifest and filter,
+      # while still adding files required by the template.
       replacement ||= merge_gemspec_files_assignment_with_destination_filter(
         template_record: template_record,
         destination_content: destination_content,
         destination_record: destination_record,
         template_receiver: template_receiver,
         destination_receiver: destination_receiver
+      )
+      replacement ||= merge_gemspec_files_assignment_source(
+        merged_record: merged_record,
+        template_record: template_record,
+        destination_record: destination_record
       )
       replacement ||= replacement_for_supported_gemspec_files_assignment(
         template_record: template_record,
@@ -11821,10 +11848,15 @@ module Kettle
           end
         end
       end
-      return unless arguments.length == 1 && variable.is_a?(::Prism::LocalVariableReadNode)
+      candidate_name = if variable.is_a?(::Prism::LocalVariableReadNode)
+        variable.name
+      elsif variable.is_a?(::Prism::CallNode) && variable.receiver.nil? && variable.arguments.nil? && variable.block.nil?
+        variable.name
+      end
+      return unless arguments.length == 1 && candidate_name
 
       candidate_assignment = prism_parse_success(destination_content)&.value&.breadth_first_search_all do |node|
-        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == variable.name
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == candidate_name
       end&.first
       return unless candidate_assignment&.value
 
@@ -12041,6 +12073,9 @@ module Kettle
 
     def gemspec_files_collection_parts(record)
       value_node = record.fetch(:value_node)
+      if value_node.is_a?(::Prism::CallNode) && value_node.name == :grep_v && !value_node.block
+        return gemspec_files_collection_parts(record.merge(value_node: value_node.receiver))
+      end
       if gemspec_files_concat_call_node?(value_node)
         return gemspec_files_concat_collection_parts(record, value_node)
       end
@@ -17326,6 +17361,20 @@ module Kettle
       end
     end
 
+    def existing_version_constant_path(project_root, relative_path, namespace)
+      content = read_project_file(project_root, relative_path)
+      return "Version::VERSION" unless content
+
+      nested_version = ruby_namespace_declaration_node(content, "#{namespace}::Version")
+      return "Version::VERSION" if nested_version
+
+      namespace_node = ruby_namespace_declaration_node(content, namespace)
+      direct_version = namespace_node&.body&.body&.any? do |node|
+        node.is_a?(::Prism::ConstantWriteNode) && node.name == :VERSION
+      end
+      direct_version ? "VERSION" : "Version::VERSION"
+    end
+
     def existing_version_namespace_superclasses(project_root, relative_path, namespace, entrypoint_path: nil)
       contents = [read_project_file(project_root, relative_path)]
       contents << read_project_file(project_root, entrypoint_path) if entrypoint_path
@@ -19719,7 +19768,7 @@ module Kettle
     end
 
     def template_strategy_config(config, target_path)
-      template_file_strategy_config(config, target_path) || template_pattern_strategy_config(config, target_path)
+      template_file_strategy_config(config, target_path) || template_preference_only_file_config(config, target_path) || template_pattern_strategy_config(config, target_path)
     end
 
     def template_file_strategy_config(config, target_path)
@@ -19739,6 +19788,22 @@ module Kettle
       template_strategy_entry(config, nil, current)
     end
 
+    def template_preference_only_file_config(config, target_path)
+      files = config["files"]
+      return unless files.is_a?(Hash)
+
+      current = files
+      target_path.to_s.delete_prefix("./").split("/").each do |part|
+        return unless current.is_a?(Hash) && current.key?(part)
+
+        current = current[part]
+      end
+      return unless current.is_a?(Hash) && !current.key?("strategy")
+      return unless current.keys.any? { |key| %w[preference add_template_only_nodes file_type].include?(key) }
+
+      template_strategy_entry(config, nil, current.merge("strategy" => "merge"))
+    end
+
     def template_pattern_strategy_config(config, target_path)
       patterns = config["patterns"]
       return unless patterns.is_a?(Array)
@@ -19754,6 +19819,7 @@ module Kettle
 
     def template_strategy_entry(config, path, entry)
       strategy = entry["strategy"].to_s.strip.downcase.to_sym
+      strategy = :merge if strategy == :""
       raise ArgumentError, "unknown kettle-jem template strategy: #{entry["strategy"]}" unless SUPPORTED_TEMPLATE_STRATEGIES.include?(strategy)
 
       result = {strategy: strategy}
