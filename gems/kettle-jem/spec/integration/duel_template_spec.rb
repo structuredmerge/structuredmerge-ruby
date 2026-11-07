@@ -131,7 +131,7 @@ RSpec.describe Kettle::Jem, "Duel performance regression guards" do
 
       expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.4")))
       expect_gem_dependency_declared(files.fetch(:"gemfiles/modular/duel.gemfile"), "duel")
-      expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(gem "duel", "~> 0.1", ">= 0.1.1"))
+      expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(gem "duel", "~> 0.1", ">= 0.1.4"))
       expect_gem_dependency_declared(files.fetch(:"gemfiles/modular/duel.gemfile"), "stackprof")
       expect(files.fetch(:".duel.rb")).to include("c.ruby = :version_file", "c.watch += %w[.github/workflows/perf.yml]\n", "# c.comment = :failures\n")
       expect(files.fetch(:Gemfile).scan(%(eval_gemfile "gemfiles/modular/duel.gemfile")).size).to eq(1)
