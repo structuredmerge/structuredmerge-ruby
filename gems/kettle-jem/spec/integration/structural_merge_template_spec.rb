@@ -2340,9 +2340,8 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
         "structuredmerge_core.gemspec" => 'Gem::Specification.new { |spec| spec.name = "structuredmerge-core" }',
         ".kettle-jem.yml" => <<~YAML,
           templates:
-            root: packaged
+            root: template
             apply: true
-            profile: monorepo-subgem-release
             entries:
               - Rakefile
           files:
@@ -2351,7 +2350,8 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
               preference: destination
               add_template_only_nodes: true
         YAML
-        "Rakefile" => File.read(File.expand_path("../fixtures/alef/Rakefile", __dir__))
+        "Rakefile" => File.read(File.expand_path("../fixtures/alef/Rakefile", __dir__)),
+        "template/Rakefile.example" => File.read(File.expand_path("../../lib/kettle/jem/templates/Rakefile.example", __dir__))
       })
 
       described_class.apply_project(root, env: {}, run_options: {skip_commit: true})

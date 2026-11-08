@@ -3433,7 +3433,10 @@ module Kettle
           facts: %w[templates shim]
         )
       end
-      unless shim_template_profile?(facts)
+      rakefile_template = recipes.any? do |recipe|
+        TEMPLATE_SOURCE_APPLICATION_RECIPE.match?(recipe.fetch(:name)) && recipe.fetch(:target_path) == "Rakefile"
+      end
+      unless shim_template_profile?(facts) || rakefile_template
         recipes << recipe_entry(
           "rakefile_scaffold_cleanup",
           "Rakefile",
