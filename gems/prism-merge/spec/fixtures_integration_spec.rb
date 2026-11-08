@@ -69,6 +69,40 @@ RSpec.describe 'Prism::Merge' do
     expect(result[:output]).to include('gem "rake"')
   end
 
+  it 'keeps Rake descriptions stable across formatting differences and repeated merges' do
+    template = <<~RUBY
+      desc "Default tasks aggregator"
+      task :default do
+        puts :template
+      end
+
+      desc "Generate YARD documentation"
+      task :yard do
+        puts :yard
+      end
+    RUBY
+    destination = <<~RUBY
+      desc("Default tasks aggregator")
+      task :default do
+        puts :destination
+      end
+
+      # Alef-generated content
+      task :alef do
+        puts :alef
+      end
+    RUBY
+    options = { preference: :destination, add_template_only_nodes: true,
+                signature_generator: PRISM_MERGE.ruby_dsl_signature_generator }
+    once = PRISM_MERGE.merge_ruby(template, destination, 'ruby', **options).fetch(:output)
+    twice = PRISM_MERGE.merge_ruby(template, once, 'ruby', **options).fetch(:output)
+
+    expect(twice).to eq(once)
+    expect(once.scan('Default tasks aggregator').size).to eq(1)
+    expect(once.scan('Generate YARD documentation').size).to eq(1)
+    expect(once).to include('puts :destination', '# Alef-generated content', 'puts :alef', 'task :yard')
+  end
+
   it 'adds template-only top-level nodes at their template anchor' do
     result = PRISM_MERGE.merge_ruby(
       <<~RUBY,

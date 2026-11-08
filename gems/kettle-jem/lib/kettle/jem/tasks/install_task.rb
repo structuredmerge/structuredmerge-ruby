@@ -1862,7 +1862,7 @@ module Kettle
 
           commands = []
           commands << %w[git add -A -- .]
-          commands << ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
+          commands << ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
           {
             name: "bootstrap_commit",
             status: "ready",

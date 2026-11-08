@@ -540,14 +540,14 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         status: "succeeded",
         commands: [
           %w[git add -A -- .],
-          ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
+          ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
         ],
         reason: "executed",
         duration_ms: be >= 0
       )
       expect(bootstrap_step.fetch(:command_results)).to contain_exactly(
         hash_including(command: %w[git add -A -- .], exitstatus: 0, duration_ms: be >= 0),
-        hash_including(command: ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0, duration_ms: be >= 0)
+        hash_including(command: ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0, duration_ms: be >= 0)
       )
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
 

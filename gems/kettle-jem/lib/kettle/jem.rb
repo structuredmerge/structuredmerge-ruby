@@ -289,6 +289,7 @@ module Kettle
       MONOREPO_SUBGEM_TEMPLATE_ENTRIES + [
         "Gemfile",
         "Rakefile",
+        ".gitignore",
         ".rspec",
         ".simplecov",
         ".yard-lint.yml",
@@ -3433,7 +3434,13 @@ module Kettle
           facts: %w[templates shim]
         )
       end
-      unless shim_template_profile?(facts)
+      # Cleanup plans against the original file and would overwrite a merged
+      # Rakefile when both recipes change it. The template merge owns that
+      # file whenever it is selected; retain cleanup for standalone runs.
+      rakefile_template = recipes.any? do |recipe|
+        TEMPLATE_SOURCE_APPLICATION_RECIPE.match?(recipe.fetch(:name)) && recipe.fetch(:target_path) == "Rakefile"
+      end
+      unless shim_template_profile?(facts) || rakefile_template
         recipes << recipe_entry(
           "rakefile_scaffold_cleanup",
           "Rakefile",
@@ -6056,7 +6063,7 @@ module Kettle
         "feature.appraisals" => File.file?(File.join(project_root, "Appraisals")),
         "feature.rubyforum" => !rubyforum_facts(config, env, package_name: transfer_changelog_package_name(project_root)).empty?,
         "feature.rubyforum_project_tag" => !normalize_rubyforum_tag(project_tag).empty?,
-        "feature.corporate_sponsors" => sponsors.any?,
+        "feature.corporate_sponsors" => sponsors.any? { |sponsor| readme_corporate_sponsor_active?(sponsor, Date.today) || readme_corporate_sponsor_past?(sponsor, Date.today) },
         "feature.organization_logo" => readme_top_logo_options(config).any? || readme_h2_synopsis_logo_options(config).any?,
         "feature.structuredmerge_driver" => config.fetch("git_drivers", "semantic-diff").to_s == "semantic-diff",
         "feature.dedicated_version_gem" => version_gem_mode == "dedicated" || File.file?(File.join(project_root, "lib", entrypoint, "version_gem.rb")),
@@ -7782,6 +7789,12 @@ module Kettle
         return merge_changelog_template_source(template_content, destination_content, facts: facts) if recipe.fetch(:target_path) == "CHANGELOG.md"
 
         merge_result = Ast::Template::MergeDispatch.dispatch(:markdown, template_content, destination_content)
+        # A successful structural merge can still produce no document (for
+        # example, a license containing only unheaded prose). Never replace a
+        # nonempty destination with that empty result.
+        if merge_result[:ok] && merge_result.fetch(:output).strip.empty? && !destination_content.strip.empty?
+          return destination_content
+        end
       when :dotenv
         merge_result = merge_dotenv_template_source(template_content, destination_content, recipe)
       when :rbs
@@ -9445,12 +9458,14 @@ module Kettle
     end
 
     def merge_prism_gemfile_template_source(template_content, destination_content, recipe)
+      template_preference = recipe.fetch(:template_preference, {})
+      add_template_only_nodes = DecisionPolicy.value_to_boolean(template_preference[:add_template_only_nodes])
       Prism::Merge.merge_ruby(
         template_content,
         destination_content,
         "ruby",
-        preference: :template,
-        add_template_only_nodes: true,
+        preference: (template_preference[:preference] || "template").to_sym,
+        add_template_only_nodes: add_template_only_nodes.nil? ? true : add_template_only_nodes,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator,
         freeze_token: ruby_merge_freeze_token(recipe)
       )
@@ -13824,6 +13839,14 @@ module Kettle
         "  Rakefile:",
         "    strategy: accept_template"
       ]
+      if normalize_template_profile(profile) == MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE
+        override_lines.concat([
+          "  .gitignore:",
+          "    strategy: merge",
+          "    preference: destination",
+          "    add_template_only_nodes: true"
+        ])
+      end
       gemspec = gemspec_path.to_s.strip
       unless gemspec.empty?
         override_lines.concat([
@@ -17859,10 +17882,39 @@ module Kettle
 
     def readme_corporate_sponsors_facts(config, env)
       sponsors = readme_corporate_sponsors(config, env)
+      today = Date.today
+      active = sponsors.select { |sponsor| readme_corporate_sponsor_active?(sponsor, today) }.map do |sponsor|
+        next sponsor unless sponsor[:members]
+
+        sponsor.merge(members: sponsor[:members].select { |member| readme_corporate_sponsor_active?(member, today) })
+      end
+      past = sponsors.select { |sponsor| readme_corporate_sponsor_past?(sponsor, today) }
+      past_links = past.map do |sponsor|
+        link = "[#{sponsor.fetch(:name)}](#{sponsor.fetch(:url)})"
+        members = Array(sponsor[:members]).select { |member| !member[:since] || member[:since] <= today }
+        unless members.empty?
+          links = members.map { |member| "[#{member.fetch(:name)}](#{member.fetch(:url)})" }.join(", ")
+          link = "#{link} (backed by #{links})"
+        end
+        link
+      end
+      sponsors.each do |sponsor|
+        next unless readme_corporate_sponsor_active?(sponsor, today)
+
+        members = Array(sponsor[:members]).select { |member| readme_corporate_sponsor_past?(member, today) }
+        next if members.empty?
+
+        links = members.map { |member| "[#{member.fetch(:name)}](#{member.fetch(:url)})" }.join(", ")
+        past_links << "#{links} (formerly backing [#{sponsor.fetch(:name)}](#{sponsor.fetch(:url)}))"
+      end
+      detail = readme_corporate_sponsors_detail(active)
+      past_detail = past_links.empty? ? "" : "Past sponsors: #{past_links.join(', ')}"
       compact_hash(
-        entries: sponsors,
-        row: readme_corporate_sponsors_row(sponsors),
-        detail: readme_corporate_sponsors_detail(sponsors)
+        entries: active,
+        past_entries: past,
+        row: readme_corporate_sponsors_row(active),
+        detail: [detail, past_detail].reject(&:empty?).join("\n\n"),
+        past_detail: past_detail
       )
     end
 
@@ -17872,15 +17924,11 @@ module Kettle
         readme_config["corporate_sponsors"] || readme_config["sponsors"]
       )
       inherited = normalize_readme_corporate_sponsors_json(env["KETTLE_JEM_CORPORATE_SPONSORS_JSON"])
-      sponsors = deduplicate_readme_corporate_sponsors(configured + inherited)
-      today = Date.today
-      sponsors
-        .select { |sponsor| readme_corporate_sponsor_active?(sponsor, today) }
-        .map do |sponsor|
-          next sponsor unless sponsor[:members]
+      deduplicate_readme_corporate_sponsors(configured + inherited)
+    end
 
-          sponsor.merge(members: sponsor[:members].select { |member| readme_corporate_sponsor_active?(member, today) })
-        end
+    def readme_corporate_sponsor_past?(sponsor, today)
+      (!sponsor[:since] || sponsor[:since] <= today) && sponsor[:until] && sponsor[:until] < today
     end
 
     def readme_corporate_sponsor_active?(sponsor, today)

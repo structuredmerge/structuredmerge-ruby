@@ -24,7 +24,7 @@ Follow these instructions:
 2. Fork the repository
 3. Create your feature branch (`git checkout -b my-new-feature`)
 4. Make some fixes.
-5. Commit your changes (`git commit -am 'Added some feature'`)
+5. Commit your changes (`git commit -am 'feat(core): ✨ add feature'`)
 6. Push to the branch (`git push origin my-new-feature`)
 7. Make sure to add tests for it. This is important, so it doesn't break in a future release.
 8. Create new Pull Request.
@@ -112,6 +112,10 @@ Releasing and signing
   - Not needed on bundler >= 2.7.0, as reproducible builds have become the default.
 
 Git hooks and commit message helpers (exe/kettle-commit-msg)
+
+Start commit subjects with a Conventional Commit prefix followed by a Gitmoji,
+for example `feat(core): ✨ add feature`. Emoji-first subjects remain supported.
+
 - GIT_HOOK_BRANCH_VALIDATE: Branch name validation mode (e.g., `jira`) or `false` to disable
 - GIT_HOOK_FOOTER_APPEND: Append a footer to commit messages when goalie allows (true/false)
 - GIT_HOOK_FOOTER_SENTINEL: Required when footer append is enabled — a unique first-line sentinel to prevent duplicates

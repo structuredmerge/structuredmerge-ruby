@@ -550,11 +550,36 @@ files:
   Rakefile:
     strategy: merge
     preference: destination     # keep your custom tasks
+    add_template_only_nodes: true
   certs/my.pem:
     strategy: raw_copy          # binary file, no merging
   generated/report.md:
     strategy: keep_destination  # never touch this file
 ```
+
+### Alef-generated Ruby packages
+
+For an Alef-generated monorepo subgem, generate the package first, then hand
+the Rakefile over to Kettle Jem by adding its repository-relative path to
+`[workspace.ownership].user_owned` in `alef.toml`. Keep any existing entries:
+
+```toml
+[workspace.ownership]
+user_owned = [
+  "packages/ruby/Rakefile",
+  "packages/ruby/structuredmerge_core.gemspec",
+]
+```
+
+Use the Rakefile override above in the package's Kettle Jem configuration.
+The monorepo subgem profile seeds `accept_template` for a new configuration;
+an explicit `merge` strategy survives subsequent profile synchronization.
+Destination preference retains native build tasks and `rb_sys` configuration,
+while template-only nodes add Kettle's tasks. Once handed off, Alef no longer
+regenerates or verifies that file. Run `alef verify --exit-code` after the
+handoff, and rerun Alef generation and Kettle templating to check convergence.
+Configure the package as a member of `kettle-family` for its local-template
+and release workflows.
 
 ### Environment Variables & CLI Options
 

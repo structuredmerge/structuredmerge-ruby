@@ -1073,6 +1073,28 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "preserves a complete existing AGPL license when templating a monorepo subgem" do
+    Dir.mktmpdir("kettle-jem-agpl-license") do |root|
+      license = File.read(File.expand_path("../../lib/kettle/jem/templates/AGPL-3.0-only.md.example", __dir__))
+      destination = license.sub("GNU AFFERO GENERAL PUBLIC LICENSE", "GNU Affero General Public License")
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.licenses = ["AGPL-3.0-only"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        "AGPL-3.0-only.md" => destination
+      })
+      described_class.setup_project(root, env: {}, run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem-release", skip_commit: true})
+      described_class.apply_project(root, env: {}, run_options: {only: "AGPL-3.0-only.md", accept: true, skip_commit: true})
+
+      expect(File.read(File.join(root, "AGPL-3.0-only.md"))).to eq(destination)
+    end
+  end
+
   it "bootstraps a monorepo subgem release profile with per-gem harness entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1101,6 +1123,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config_yaml.dig("templates", "entries")).to include(
         "Gemfile",
         "Rakefile",
+        ".gitignore",
         ".rspec",
         ".simplecov",
         ".yard-lint.yml",
@@ -1111,7 +1134,12 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         "spec/spec_helper.rb",
         "gemfiles/modular/documentation.gemfile"
       )
+      expect(config_yaml.dig("files", ".gitignore")).to include(
+        "strategy" => "merge", "preference" => "destination", "add_template_only_nodes" => true
+      )
       expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
+
+      File.write(File.join(root, ".gitignore"), "/custom-artifact/\n")
 
       configure_dependency_conflicts(root, [
         {"gem" => "version_gem", "direct" => "tree_haver.gemspec", "modular" => "gemfiles/modular/runtime_heads.gemfile", "action" => "keep_both", "reason" => "The runtime gemspec and HEAD appraisal intentionally share this dependency."}
@@ -1121,6 +1149,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup", "spec/README.md")
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
+      expect(File.read(File.join(root, ".gitignore"))).to include("/custom-artifact/", "/coverage/")
       expect(File.read(File.join(root, ".rspec"))).to include("--exclude-pattern spec/tmp/**/*_spec.rb")
       expect(File.read(File.join(root, "spec", "README.md"))).to include("stub_env")
       expect(File.read(File.join(root, "spec", "README.md"))).to include("include_context \"with rake\"")
@@ -1134,7 +1163,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, "gemfiles", "modular", "documentation.gemfile"))).to include('gem "yard-lint"')
       updated_config = YAML.safe_load_file(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       expect(updated_config.dig("templates", "profile")).to eq("monorepo-subgem-release")
-      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yard-lint.yml", ".yardopts")
+      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".gitignore", ".yard-lint.yml", ".yardopts")
+      expect(updated_config.dig("files", ".gitignore")).to include("strategy" => "merge", "preference" => "destination")
     end
   end
 

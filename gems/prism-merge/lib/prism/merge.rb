@@ -742,7 +742,12 @@ module Prism
       when :git_source, :gem, :eval_gemfile, :platform, :group, :task
         [:ruby_dsl_call, call.name, ruby_dsl_first_argument(call)]
       when :desc
-        [:ruby_dsl_desc, call.slice]
+        argument = call.arguments&.arguments
+        if call.receiver.nil? && call.block.nil? && argument&.one? && argument.first.is_a?(::Prism::StringNode)
+          [:ruby_dsl_desc, argument.first.unescaped]
+        else
+          [:ruby_dsl_desc, call.slice]
+        end
       end
     end
 

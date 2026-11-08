@@ -1286,7 +1286,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-  it "filters corporate sponsors by their since/until window" do
+  it "renders expired corporate sponsors separately and hides future sponsors" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-readme-sponsor-window-slice", tmp_root) do |root|
@@ -1330,6 +1330,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           {KJ|README:CORPORATE_SPONSORS}
 
           ## 🦷 FLOSS Funding
+          {KJ|README:CORPORATE_SPONSORS_DETAIL}
         MARKDOWN
       })
 
@@ -1341,9 +1342,28 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
       expect(final_content).to include("Corporate sponsor:")
       expect(final_content).to include(%(<img alt="Active Corp"))
-      expect(final_content).not_to include("Expired Corp")
+      expect(final_content).to include("Past sponsors: [Expired Corp](https://expired.example)")
+      expect(final_content).not_to include(%(<img alt="Expired Corp"))
       expect(final_content).not_to include("Future Corp")
     end
+  end
+
+  it "renders inherited past sponsors without a current logo row" do
+    yesterday = (Date.today - 1).iso8601
+    tomorrow = (Date.today + 1).iso8601
+    inherited = [{
+      "name" => "Former Fund", "url" => "https://former.example", "img_src" => "https://former.example/logo.svg", "until" => yesterday,
+      "members" => [
+        {"name" => "Former Member", "url" => "https://member.example", "until" => yesterday},
+        {"name" => "Future Member", "url" => "https://future.example", "since" => tomorrow}
+      ]
+    }]
+    facts = described_class.send(:readme_corporate_sponsors_facts, {}, {"KETTLE_JEM_CORPORATE_SPONSORS_JSON" => JSON.generate(inherited)})
+
+    expect(facts[:row].to_s).to be_empty
+    expect(facts[:detail]).to include("Past sponsors: [Former Fund](https://former.example) (backed by [Former Member](https://member.example))")
+    expect(facts[:detail]).not_to include("Future Member")
+    expect(facts[:past_entries].size).to eq(1)
   end
 
   it "rejects corporate sponsor entries with invalid since/until dates" do
@@ -1410,7 +1430,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content).to include(
         %(- <a href="https://umbrella.example"><img alt="Umbrella Fund" src="https://umbrella.example/logo.svg" height="32"/></a> [Umbrella Fund](https://umbrella.example) — backed by [Member One](https://one.example), [Member Two](https://two.example))
       )
-      expect(final_content).not_to include("Lapsed Member")
+      expect(final_content).to include("Past sponsors: [Lapsed Member](https://lapsed.example) (formerly backing [Umbrella Fund](https://umbrella.example))")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|README:CORPORATE_SPONSORS_DETAIL" => a_string_including("backed by")
       )
