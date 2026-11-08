@@ -1073,6 +1073,28 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
+  it "preserves a complete existing AGPL license when templating a monorepo subgem" do
+    Dir.mktmpdir("kettle-jem-agpl-license") do |root|
+      license = File.read(File.expand_path("../../lib/kettle/jem/templates/AGPL-3.0-only.md.example", __dir__))
+      destination = license.sub("GNU AFFERO GENERAL PUBLIC LICENSE", "GNU Affero General Public License")
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.licenses = ["AGPL-3.0-only"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        "AGPL-3.0-only.md" => destination
+      })
+      described_class.setup_project(root, env: {}, run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem-release", skip_commit: true})
+      described_class.apply_project(root, env: {}, run_options: {only: "AGPL-3.0-only.md", accept: true, skip_commit: true})
+
+      expect(File.read(File.join(root, "AGPL-3.0-only.md"))).to eq(destination)
+    end
+  end
+
   it "bootstraps a monorepo subgem release profile with per-gem harness entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

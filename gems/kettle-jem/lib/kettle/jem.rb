@@ -7782,6 +7782,12 @@ module Kettle
         return merge_changelog_template_source(template_content, destination_content, facts: facts) if recipe.fetch(:target_path) == "CHANGELOG.md"
 
         merge_result = Ast::Template::MergeDispatch.dispatch(:markdown, template_content, destination_content)
+        # A successful structural merge can still produce no document (for
+        # example, a license containing only unheaded prose). Never replace a
+        # nonempty destination with that empty result.
+        if merge_result[:ok] && merge_result.fetch(:output).strip.empty? && !destination_content.strip.empty?
+          return destination_content
+        end
       when :dotenv
         merge_result = merge_dotenv_template_source(template_content, destination_content, recipe)
       when :rbs
