@@ -91,7 +91,7 @@ Gem::Specification.new do |spec|
   ]
   # {KJ|FREEZE_TOKEN}:freeze
   # Keep locally built native binaries out of release packages.
-  spec.files.reject! { |path| path.match?(%r{\.(?:bundle|so|dylib|dll|o|a)\z}) }
+  spec.files.reject! { |path| path.end_with?(".bundle", ".so", ".dylib", ".dll", ".o", ".a") }
   # {KJ|FREEZE_TOKEN}:unfreeze
   spec.rdoc_options += [
     "--title",
