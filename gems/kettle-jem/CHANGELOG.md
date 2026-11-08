@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Remove the Style/SafeNavigation offense from the generated gemfiles/modular/style_local.gemfile (spec&.version in the local_gem_satisfies? gemspec guard), so templated projects no longer carry a .rubocop_gradual.lock baseline entry for it
 
+- Wire every configured StructuredMerge family gem in local templating bundles to prevent mixed local and registry dependency versions.
+
 ### Security
 
 ## [7.1.42] - 2026-10-31
