@@ -3433,6 +3433,9 @@ module Kettle
           facts: %w[templates shim]
         )
       end
+      # Cleanup plans against the original file and would overwrite a merged
+      # Rakefile when both recipes change it. The template merge owns that
+      # file whenever it is selected; retain cleanup for standalone runs.
       rakefile_template = recipes.any? do |recipe|
         TEMPLATE_SOURCE_APPLICATION_RECIPE.match?(recipe.fetch(:name)) && recipe.fetch(:target_path) == "Rakefile"
       end
