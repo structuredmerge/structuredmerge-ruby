@@ -45,6 +45,9 @@ RSpec.describe Kettle::Jem do
       first_files = Dir.chdir(root) { Gem::Specification.load("example.gemspec").files }
       described_class.apply_project(root, env: {})
       second = File.read(File.join(root, "example.gemspec"))
+      files_record = described_class.gemspec_assignment_records(second, receiver: "spec").find { |record| record[:field] == "files" }
+      expect(files_record[:value_node]).to be_a(Prism::ArrayNode)
+      expect(second.scan("spec.files.reject!").length).to eq(1)
       expect(second.scan("data/**/*.json").length).to eq(1)
       expect(Dir.chdir(root) { Gem::Specification.load("example.gemspec").files }).to eq(first_files)
       spec = Dir.chdir(root) { Gem::Specification.load("example.gemspec") }
