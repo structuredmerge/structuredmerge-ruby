@@ -149,17 +149,17 @@ run = "bundle exec kettle-family bex --execute --no-commit -- bin/rake rubocop_g
 [bup]
 description = "Update dependencies and commit lockfiles; pass gems or options after --"
 raw = true
-run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false TSLP_DEV=false bundle exec kettle-family bup --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env K_JEM_TEMPLATING=true"
+run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false STRUCTUREDMERGE_CORE_DEV=false TSLP_DEV=false bundle exec kettle-family bup --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env K_JEM_TEMPLATING=true"
 
 [bupb]
 description = "Install latest stable Bundler and update family lockfiles; pass options after --"
 raw = true
-run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false TSLP_DEV=false bundle exec kettle-family update-bundler --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env K_JEM_TEMPLATING=true"
+run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false STRUCTUREDMERGE_CORE_DEV=false TSLP_DEV=false bundle exec kettle-family update-bundler --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env K_JEM_TEMPLATING=true"
 
 [update-bundler]
 description = "Install latest stable Bundler and update family lockfiles; pass options after --"
 raw = true
-run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false TSLP_DEV=false bundle exec kettle-family update-bundler --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env K_JEM_TEMPLATING=true"
+run = "env -- STRUCTUREDMERGE_DEV=false K_JEM_TEMPLATING=false STRUCTUREDMERGE_CORE_DEV=false TSLP_DEV=false bundle exec kettle-family update-bundler --execute --commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env K_JEM_TEMPLATING=true"
 
 [local-template]
 description = "Apply templates using member-local Nomono and local workspace gems"

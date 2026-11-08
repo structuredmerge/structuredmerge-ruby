@@ -7,21 +7,25 @@ FORGE_ORG = "structuredmerge"
 KJ_HOMEPAGE_URI = "https://structuredmerge.org"
 KJ_REPOSITORY_TOPOLOGY = "monorepo-subproject"
 KETTLE_JEM_TEMPLATE_PROFILE = "monorepo-subgem"
+# structuredmerge-core is on no registry; members resolve tree_haver from
+# local source (monorepo isolation), and local tree_haver deps core ~> 0.2.
+# Release/bup tasks neutralize this to false alongside STRUCTUREDMERGE_DEV.
+STRUCTUREDMERGE_CORE_DEV = "{{config_root}}/../structuredmerge"
 
 [tasks.deps-local]
 raw = true
 description = "Test unreleased StructuredMerge and Kettle sources without committing"
-run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --no-commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env KETTLE_DEV_DEV={{config_root}}/../../kettle-dev --env K_JEM_TEMPLATING=true"
+run = "STRUCTUREDMERGE_DEV=false STRUCTUREDMERGE_CORE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --no-commit --env STRUCTUREDMERGE_DEV={{config_root}}/gems --env KETTLE_DEV_DEV={{config_root}}/../../kettle-dev --env K_JEM_TEMPLATING=true"
 
 [tasks.deps-release]
 raw = true
 description = "Update dependencies from released sources and commit lockfiles"
-run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
+run = "STRUCTUREDMERGE_DEV=false STRUCTUREDMERGE_CORE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
 
 [tasks.bup-release]
 raw = true
 description = "Update dependencies from released sources and commit lockfiles"
-run = "STRUCTUREDMERGE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
+run = "STRUCTUREDMERGE_DEV=false STRUCTUREDMERGE_CORE_DEV=false KETTLE_DEV_DEV=false K_JEM_TEMPLATING=false bundle exec kettle-family bup --execute --commit"
 
 [tasks.release]
 description = "Publish dependency waves with the local templating graph available to aggregate coverage"

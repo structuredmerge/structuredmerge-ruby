@@ -182,11 +182,13 @@ release:
     - [smorg-rb]
   disable_local_path_env:
     - K_JEM_TEMPLATING
+    - STRUCTUREDMERGE_CORE_DEV
     - TSLP_DEV
   env:
     GALTZO_FLOSS_DEV: false
     KETTLE_DEV_DEV: false
     STRUCTUREDMERGE_DEV: false
+    STRUCTUREDMERGE_CORE_DEV: false
     TSLP_DEV: ""
   family_changelog:
     enabled: true
