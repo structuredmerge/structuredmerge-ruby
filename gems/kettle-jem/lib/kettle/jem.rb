@@ -68,7 +68,7 @@ module Kettle
       {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.27"], bootstrap: true},
       {
         name: "kettle-changelog",
-        requirements: ["~> 1.0", ">= 1.0.16"],
+        requirements: ["~> 1.0", ">= 1.0.17"],
         bootstrap: true,
         ruby_requirement: ">= 4.0.0"
       }
