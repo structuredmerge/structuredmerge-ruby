@@ -33,7 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-changelog (>= 1.0.16 -> >= 1.0.17)
+  - kettle-dev (>= 3.1.27 -> >= 3.1.28)
+  - kettle-changelog (>= 1.0.17 -> >= 1.0.18)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)

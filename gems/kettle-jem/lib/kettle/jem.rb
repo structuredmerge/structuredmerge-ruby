@@ -65,10 +65,10 @@ module Kettle
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.18"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.27"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.28"], bootstrap: true},
       {
         name: "kettle-changelog",
-        requirements: ["~> 1.0", ">= 1.0.17"],
+        requirements: ["~> 1.0", ">= 1.0.18"],
         bootstrap: true,
         ruby_requirement: ">= 4.0.0"
       }
@@ -5164,7 +5164,7 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.6"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.27"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.28"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.19"\n)},
         {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.38"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
