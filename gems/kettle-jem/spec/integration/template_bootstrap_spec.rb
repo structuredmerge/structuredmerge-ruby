@@ -1123,6 +1123,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config_yaml.dig("templates", "entries")).to include(
         "Gemfile",
         "Rakefile",
+        ".gitignore",
         ".rspec",
         ".simplecov",
         ".yard-lint.yml",
@@ -1133,7 +1134,12 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         "spec/spec_helper.rb",
         "gemfiles/modular/documentation.gemfile"
       )
+      expect(config_yaml.dig("files", ".gitignore")).to include(
+        "strategy" => "merge", "preference" => "destination", "add_template_only_nodes" => true
+      )
       expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
+
+      File.write(File.join(root, ".gitignore"), "/custom-artifact/\n")
 
       configure_dependency_conflicts(root, [
         {"gem" => "version_gem", "direct" => "tree_haver.gemspec", "modular" => "gemfiles/modular/runtime_heads.gemfile", "action" => "keep_both", "reason" => "The runtime gemspec and HEAD appraisal intentionally share this dependency."}
@@ -1143,6 +1149,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup", "spec/README.md")
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
+      expect(File.read(File.join(root, ".gitignore"))).to include("/custom-artifact/", "/coverage/")
       expect(File.read(File.join(root, ".rspec"))).to include("--exclude-pattern spec/tmp/**/*_spec.rb")
       expect(File.read(File.join(root, "spec", "README.md"))).to include("stub_env")
       expect(File.read(File.join(root, "spec", "README.md"))).to include("include_context \"with rake\"")
@@ -1156,7 +1163,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, "gemfiles", "modular", "documentation.gemfile"))).to include('gem "yard-lint"')
       updated_config = YAML.safe_load_file(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       expect(updated_config.dig("templates", "profile")).to eq("monorepo-subgem-release")
-      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yard-lint.yml", ".yardopts")
+      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".gitignore", ".yard-lint.yml", ".yardopts")
+      expect(updated_config.dig("files", ".gitignore")).to include("strategy" => "merge", "preference" => "destination")
     end
   end
 

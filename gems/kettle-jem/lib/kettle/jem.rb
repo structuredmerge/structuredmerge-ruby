@@ -289,6 +289,7 @@ module Kettle
       MONOREPO_SUBGEM_TEMPLATE_ENTRIES + [
         "Gemfile",
         "Rakefile",
+        ".gitignore",
         ".rspec",
         ".simplecov",
         ".yard-lint.yml",
@@ -13838,6 +13839,14 @@ module Kettle
         "  Rakefile:",
         "    strategy: accept_template"
       ]
+      if normalize_template_profile(profile) == MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE
+        override_lines.concat([
+          "  .gitignore:",
+          "    strategy: merge",
+          "    preference: destination",
+          "    add_template_only_nodes: true"
+        ])
+      end
       gemspec = gemspec_path.to_s.strip
       unless gemspec.empty?
         override_lines.concat([
