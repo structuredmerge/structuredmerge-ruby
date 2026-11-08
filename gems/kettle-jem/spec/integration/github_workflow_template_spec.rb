@@ -283,6 +283,37 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
+  it "honors file-level Gemfile preference for dependency requirements" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemfile-preference", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => 'Gem::Specification.new { |spec| spec.name = "example"; spec.summary = "Example" }',
+        ".kettle-jem.yml" => <<~YAML,
+          defaults:
+            preference: template
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+          files:
+            Gemfile:
+              strategy: merge
+              preference: destination
+              add_template_only_nodes: true
+        YAML
+        "Gemfile" => %(gem "kettle-family", "~> 1.3", ">= 1.3.38"\n),
+        "template/Gemfile.example" => %(gem "kettle-family", "~> 1.3", ">= 1.3.37"\ngem "extra-tool"\n)
+      })
+
+      described_class.apply_project(root, env: {})
+
+      expect(File.read(File.join(root, "Gemfile"))).to include(%(gem "kettle-family", "~> 1.3", ">= 1.3.38"))
+      expect(File.read(File.join(root, "Gemfile"))).to include(%(gem "extra-tool"))
+    end
+  end
+
   it "strictly merges arbitrary top-level Gemfile dependencies from a template directory" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

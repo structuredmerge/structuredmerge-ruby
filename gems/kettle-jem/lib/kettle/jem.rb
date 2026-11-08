@@ -9451,12 +9451,14 @@ module Kettle
     end
 
     def merge_prism_gemfile_template_source(template_content, destination_content, recipe)
+      template_preference = recipe.fetch(:template_preference, {})
+      add_template_only_nodes = DecisionPolicy.value_to_boolean(template_preference[:add_template_only_nodes])
       Prism::Merge.merge_ruby(
         template_content,
         destination_content,
         "ruby",
-        preference: :template,
-        add_template_only_nodes: true,
+        preference: (template_preference[:preference] || "template").to_sym,
+        add_template_only_nodes: add_template_only_nodes.nil? ? true : add_template_only_nodes,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator,
         freeze_token: ruby_merge_freeze_token(recipe)
       )
