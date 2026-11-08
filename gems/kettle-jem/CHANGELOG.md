@@ -33,10 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-changelog (>= 1.0.15 -> >= 1.0.16)
-  - yard-lint (>= 1.13.0 -> >= 1.13.1)
-  - duel (>= 0.1.1 -> >= 0.1.4)
-  - addressable (>= 2.9.1 -> >= 2.9.2)
+  - kettle-dev (>= 3.1.26 -> >= 3.1.27)
+  - kettle-family (>= 1.3.37 -> >= 1.3.38)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)
