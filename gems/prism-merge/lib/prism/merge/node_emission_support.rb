@@ -400,6 +400,8 @@ module Prism
         last_filtered_leading_line = nil
 
         if source == :destination
+          emitted_dest_lines = result.line_metadata.filter_map { |metadata| metadata[:dest_line] }.to_set
+          leading_comments = leading_comments.reject { |comment| emitted_dest_lines.include?(comment.location.start_line) }
           leading_comments, = collapse_matched_template_leading_prefix(
             leading_comments,
             matched_template_node
