@@ -6063,7 +6063,7 @@ module Kettle
         "feature.appraisals" => File.file?(File.join(project_root, "Appraisals")),
         "feature.rubyforum" => !rubyforum_facts(config, env, package_name: transfer_changelog_package_name(project_root)).empty?,
         "feature.rubyforum_project_tag" => !normalize_rubyforum_tag(project_tag).empty?,
-        "feature.corporate_sponsors" => sponsors.any?,
+        "feature.corporate_sponsors" => sponsors.any? { |sponsor| readme_corporate_sponsor_active?(sponsor, Date.today) || readme_corporate_sponsor_past?(sponsor, Date.today) },
         "feature.organization_logo" => readme_top_logo_options(config).any? || readme_h2_synopsis_logo_options(config).any?,
         "feature.structuredmerge_driver" => config.fetch("git_drivers", "semantic-diff").to_s == "semantic-diff",
         "feature.dedicated_version_gem" => version_gem_mode == "dedicated" || File.file?(File.join(project_root, "lib", entrypoint, "version_gem.rb")),
@@ -17882,10 +17882,39 @@ module Kettle
 
     def readme_corporate_sponsors_facts(config, env)
       sponsors = readme_corporate_sponsors(config, env)
+      today = Date.today
+      active = sponsors.select { |sponsor| readme_corporate_sponsor_active?(sponsor, today) }.map do |sponsor|
+        next sponsor unless sponsor[:members]
+
+        sponsor.merge(members: sponsor[:members].select { |member| readme_corporate_sponsor_active?(member, today) })
+      end
+      past = sponsors.select { |sponsor| readme_corporate_sponsor_past?(sponsor, today) }
+      past_links = past.map do |sponsor|
+        link = "[#{sponsor.fetch(:name)}](#{sponsor.fetch(:url)})"
+        members = Array(sponsor[:members]).select { |member| !member[:since] || member[:since] <= today }
+        unless members.empty?
+          links = members.map { |member| "[#{member.fetch(:name)}](#{member.fetch(:url)})" }.join(", ")
+          link = "#{link} (backed by #{links})"
+        end
+        link
+      end
+      sponsors.each do |sponsor|
+        next unless readme_corporate_sponsor_active?(sponsor, today)
+
+        members = Array(sponsor[:members]).select { |member| readme_corporate_sponsor_past?(member, today) }
+        next if members.empty?
+
+        links = members.map { |member| "[#{member.fetch(:name)}](#{member.fetch(:url)})" }.join(", ")
+        past_links << "#{links} (formerly backing [#{sponsor.fetch(:name)}](#{sponsor.fetch(:url)}))"
+      end
+      detail = readme_corporate_sponsors_detail(active)
+      past_detail = past_links.empty? ? "" : "Past sponsors: #{past_links.join(', ')}"
       compact_hash(
-        entries: sponsors,
-        row: readme_corporate_sponsors_row(sponsors),
-        detail: readme_corporate_sponsors_detail(sponsors)
+        entries: active,
+        past_entries: past,
+        row: readme_corporate_sponsors_row(active),
+        detail: [detail, past_detail].reject(&:empty?).join("\n\n"),
+        past_detail: past_detail
       )
     end
 
@@ -17895,15 +17924,11 @@ module Kettle
         readme_config["corporate_sponsors"] || readme_config["sponsors"]
       )
       inherited = normalize_readme_corporate_sponsors_json(env["KETTLE_JEM_CORPORATE_SPONSORS_JSON"])
-      sponsors = deduplicate_readme_corporate_sponsors(configured + inherited)
-      today = Date.today
-      sponsors
-        .select { |sponsor| readme_corporate_sponsor_active?(sponsor, today) }
-        .map do |sponsor|
-          next sponsor unless sponsor[:members]
+      deduplicate_readme_corporate_sponsors(configured + inherited)
+    end
 
-          sponsor.merge(members: sponsor[:members].select { |member| readme_corporate_sponsor_active?(member, today) })
-        end
+    def readme_corporate_sponsor_past?(sponsor, today)
+      (!sponsor[:since] || sponsor[:since] <= today) && sponsor[:until] && sponsor[:until] < today
     end
 
     def readme_corporate_sponsor_active?(sponsor, today)
