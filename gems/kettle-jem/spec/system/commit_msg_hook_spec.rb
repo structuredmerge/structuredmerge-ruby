@@ -33,3 +33,29 @@ RSpec.describe "generated commit-msg hook", :system do
     end
   end
 end
+
+RSpec.describe "generated commit-subjects-goalie.txt", :system do
+  let(:template) { File.expand_path("../../lib/kettle/jem/templates/.git-hooks/commit-subjects-goalie.txt.example", __dir__) }
+
+  def prefixes
+    File.read(template).lines.map(&:strip).reject { |l| l.empty? || l.start_with?("#") }
+  end
+
+  it "allows footer appending for both legacy emoji-first and prefixed generated subjects" do
+    generated_subjects = [
+      "🔖 Prepare release v1.0.0",
+      "🔒️ Checksums for v1.0.0",
+      "chore(release): 🔖 prepare release v1.0.0",
+      "chore(checksums): 🔒️ update checksums for v1.0.0",
+      "chore(deps): 🔒️ update Bundler lockfiles"
+    ]
+
+    generated_subjects.each do |subject|
+      expect(prefixes.any? { |p| subject.start_with?(p) }).to be(true), subject
+    end
+  end
+
+  it "does not match ordinary feature commits" do
+    expect(prefixes.any? { |p| "feat(core): ✨ add feature".start_with?(p) }).to be(false)
+  end
+end
