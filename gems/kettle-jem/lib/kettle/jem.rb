@@ -9466,7 +9466,7 @@ module Kettle
         destination_content,
         "ruby",
         preference: (template_preference[:preference] || "template").to_sym,
-        add_template_only_nodes: add_template_only_nodes.nil? ? true : add_template_only_nodes,
+        add_template_only_nodes: add_template_only_nodes.nil? || add_template_only_nodes,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator,
         freeze_token: ruby_merge_freeze_token(recipe)
       )
@@ -17912,7 +17912,7 @@ module Kettle
         past_links << "#{links} (formerly backing [#{sponsor.fetch(:name)}](#{sponsor.fetch(:url)}))"
       end
       detail = readme_corporate_sponsors_detail(active)
-      past_detail = past_links.empty? ? "" : "Past sponsors: #{past_links.join(', ')}"
+      past_detail = past_links.empty? ? "" : "Past sponsors: #{past_links.join(", ")}"
       compact_hash(
         entries: active,
         past_entries: past,

@@ -42,6 +42,8 @@ RSpec.describe Kettle::Jem do
         "ext/example/native.log" => "keep"
       })
       described_class.apply_project(root, env: {})
+      # The generated gemspec and gem build resolve paths against the project directory.
+      # rubocop:disable ThreadSafety/DirChdir
       first_files = Dir.chdir(root) { Gem::Specification.load("example.gemspec").files }
       described_class.apply_project(root, env: {})
       second = File.read(File.join(root, "example.gemspec"))
@@ -62,6 +64,7 @@ RSpec.describe Kettle::Jem do
         expect(packaged).to include("ext/example/extconf.rb", "ext/example/native.c", "ext/example/native.log", "data/config.json", "exe/tool")
         expect(packaged.grep(%r{\.(?:so|bundle|dylib|dll|o|a)\z})).to be_empty
       end
+      # rubocop:enable ThreadSafety/DirChdir
     end
   end
 end
