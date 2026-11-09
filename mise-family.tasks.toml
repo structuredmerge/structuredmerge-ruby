@@ -69,7 +69,7 @@ run = "bundle exec kettle-family clean-unreleased --execute"
 [pins]
 description = "Run family pins"
 raw = true
-run = "bundle exec kettle-family gha-sha-pins --execute --upgrade major"
+run = "env KETTLE_GHA_PINS_OFFLINE_FALLBACK=true bundle exec kettle-family gha-sha-pins --execute --upgrade major"
 
 [bex]
 description = "Run family bex"
