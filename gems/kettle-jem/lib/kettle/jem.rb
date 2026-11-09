@@ -65,10 +65,10 @@ module Kettle
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.18"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.26"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.28"], bootstrap: true},
       {
         name: "kettle-changelog",
-        requirements: ["~> 1.0", ">= 1.0.16"],
+        requirements: ["~> 1.0", ">= 1.0.18"],
         bootstrap: true,
         ruby_requirement: ">= 4.0.0"
       }
@@ -619,6 +619,7 @@ module Kettle
     COPYRIGHT_NAME_RE = /\ACopyright \(c\) [\d,\s-]+ (.+)\z/
     BOT_IDENTITY_PATTERN = /\[bot\]/i
     DEFAULT_MACHINE_USERS = ["autobolt", "StepSecurity Bot", "dependabot[bot]", "depfu[bot]"].freeze
+    DEFAULT_AUTHOR_ALIASES = {"erik michaels-ober" => "Erik Berlin"}.freeze
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"
     README_TOP_LOGO_DEFAULTS = %w[org project].freeze
@@ -5163,9 +5164,9 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.6"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.26"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.28"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.19"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.37"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.38"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.29"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
@@ -9465,7 +9466,7 @@ module Kettle
         destination_content,
         "ruby",
         preference: (template_preference[:preference] || "template").to_sym,
-        add_template_only_nodes: add_template_only_nodes.nil? ? true : add_template_only_nodes,
+        add_template_only_nodes: add_template_only_nodes.nil? || add_template_only_nodes,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator,
         freeze_token: ruby_merge_freeze_token(recipe)
       )
@@ -15550,11 +15551,11 @@ module Kettle
       token_config = token_config_values(config)
       author_config = token_config["author"].is_a?(Hash) ? token_config["author"] : {}
       aliases = author_aliases(config)
-      derived_name = Array(gemspec_metadata[:authors]).map { |value| canonical_author_name(value, aliases) }.find do |value|
-        present_template_token_value?(value)
-      end
+      machine_users = copyright_machine_users(config)
+      derived_name = author_names(gemspec_metadata, {}, nil, author_aliases: aliases, machine_users: machine_users).first
       derived_email = Array(gemspec_metadata[:email]).map(&:to_s).find { |value| present_template_token_value?(value) }
       name = preferred_template_token_value(derived_name, author_config["name"], env, "KJ_AUTHOR_NAME").to_s
+      name = "" if copyright_bot_entry?(name: name) || copyright_machine_user_entry?({name: name}, machine_users, author_aliases: aliases)
       email = preferred_template_token_value(derived_email, author_config["email"], env, "KJ_AUTHOR_EMAIL").to_s
       given_names = preferred_template_token_value(author_given_names(name), author_config["given_names"], env, "KJ_AUTHOR_GIVEN_NAMES")
       family_names = preferred_template_token_value(author_family_names(name), author_config["family_names"], env, "KJ_AUTHOR_FAMILY_NAMES")
@@ -15562,7 +15563,7 @@ module Kettle
       orcid = preferred_template_token_value(nil, author_config["orcid"], env, "KJ_AUTHOR_ORCID")
       compact_hash(
         name: name,
-        names: author_names(gemspec_metadata, copyright, name, author_aliases: aliases),
+        names: author_names(gemspec_metadata, copyright, name, author_aliases: aliases, machine_users: machine_users),
         given_names: given_names.to_s,
         family_names: family_names.to_s,
         email: email,
@@ -15597,13 +15598,13 @@ module Kettle
     end
 
     def author_aliases(config)
-      return {} unless config.is_a?(Hash)
+      config = {} unless config.is_a?(Hash)
 
       configured = config["author_aliases"]
       configured = config.dig("copyright", "author_aliases") if configured.nil? && config["copyright"].is_a?(Hash)
-      return {} unless configured.is_a?(Hash)
+      configured = {} unless configured.is_a?(Hash)
 
-      configured.each_with_object({}) do |(alias_name, canonical_name), aliases|
+      configured.each_with_object(DEFAULT_AUTHOR_ALIASES.dup) do |(alias_name, canonical_name), aliases|
         alias_key = alias_name.to_s.strip.downcase
         canonical = canonical_name.to_s.strip
         next if alias_key.empty? || canonical.empty?
@@ -15650,13 +15651,16 @@ module Kettle
       }
     end
 
-    def author_names(gemspec_metadata, copyright, primary_name, author_aliases: {})
+    def author_names(gemspec_metadata, copyright, primary_name, author_aliases: {}, machine_users: DEFAULT_MACHINE_USERS.map(&:downcase))
       names = Array(gemspec_metadata[:authors]).map(&:to_s)
       names += copyright_author_names(copyright)
       names = names
+        .reject { |name| copyright_bot_entry?(name: name) || copyright_machine_user_entry?({name: name}, machine_users, author_aliases: author_aliases) }
         .map { |name| canonical_author_name(name, author_aliases) }
+        .reject { |name| copyright_bot_entry?(name: name) || copyright_machine_user_entry?({name: name}, machine_users, author_aliases: author_aliases) }
         .select { |name| present_template_token_value?(name) }
-      names = [canonical_author_name(primary_name, author_aliases)] if names.empty?
+      fallback = canonical_author_name(primary_name, author_aliases)
+      names = [fallback] if names.empty? && !copyright_bot_entry?(name: fallback) && !copyright_machine_user_entry?({name: fallback}, machine_users, author_aliases: author_aliases)
       names.map(&:strip).reject(&:empty?).uniq
     end
 
@@ -16315,7 +16319,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.3", ">= 1.3.37"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.38"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -17908,7 +17912,7 @@ module Kettle
         past_links << "#{links} (formerly backing [#{sponsor.fetch(:name)}](#{sponsor.fetch(:url)}))"
       end
       detail = readme_corporate_sponsors_detail(active)
-      past_detail = past_links.empty? ? "" : "Past sponsors: #{past_links.join(', ')}"
+      past_detail = past_links.empty? ? "" : "Past sponsors: #{past_links.join(", ")}"
       compact_hash(
         entries: active,
         past_entries: past,

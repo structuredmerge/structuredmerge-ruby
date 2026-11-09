@@ -905,11 +905,13 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-  it "includes the TOML AST owner in local StructuredMerge templating dependencies" do
+  it "matches local StructuredMerge templating dependencies to configured family members" do
     template = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/templating_local.gemfile.example"))
     gems = template[/structuredmerge_local_gems = %w\[(.*?)\]/m, 1].to_s.split
+    family_config = YAML.safe_load_file(project_root.join("..", "..", ".kettle-family.yml"))
+    family_gems = family_config.dig("members", "roots").map { |path| File.basename(path) }
 
-    expect(gems).to include("citrus-toml-merge", "ast-crispr-toml", "toml-merge")
+    expect(gems).to eq(family_gems)
   end
 
   it "serializes legacy Ruby setup-ruby workaround in generated CI workflows" do
@@ -2867,6 +2869,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     resolver = Class.new do
+      # :reek:ControlParameter
+      # :reek:UnusedParameters
       def versions(gem_name, requirements: nil)
         case gem_name
         when "example-shunted-gem"
@@ -2883,6 +2887,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         end
       end
 
+      # :reek:ControlParameter
+      # :reek:UtilityFunction
       def min_ruby_version(gem_name, version)
         case gem_name
         when "example-shunted-gem"
@@ -2894,6 +2900,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         end
       end
 
+      # :reek:UtilityFunction
       def parse_min_ruby(requirement)
         Kettle::Jem::RubyGemsResolver.new.parse_min_ruby(requirement)
       end
@@ -2951,14 +2958,20 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     resolver = Class.new do
+      # :reek:ControlParameter
+      # :reek:UnusedParameters
+      # :reek:UtilityFunction
       def versions(gem_name, requirements: nil)
         (gem_name == "example-shunted-gem") ? [{number: "1.0.0", ruby_version: ">= 2.5"}] : []
       end
 
+      # :reek:UnusedParameters
+      # :reek:UtilityFunction
       def min_ruby_version(gem_name, version)
         Gem::Version.new("2.5")
       end
 
+      # :reek:UtilityFunction
       def parse_min_ruby(requirement)
         Kettle::Jem::RubyGemsResolver.new.parse_min_ruby(requirement)
       end
@@ -3001,14 +3014,20 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     resolver = Class.new do
+      # :reek:ControlParameter
+      # :reek:UnusedParameters
+      # :reek:UtilityFunction
       def versions(gem_name, requirements: nil)
         (gem_name == "example-shunted-gem") ? [{number: "1.9.2", ruby_version: ">= 3.3"}] : []
       end
 
+      # :reek:UnusedParameters
+      # :reek:UtilityFunction
       def min_ruby_version(gem_name, version)
         Gem::Version.new("3.3")
       end
 
+      # :reek:UtilityFunction
       def parse_min_ruby(requirement)
         Kettle::Jem::RubyGemsResolver.new.parse_min_ruby(requirement)
       end

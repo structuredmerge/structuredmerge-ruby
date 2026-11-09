@@ -316,6 +316,27 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     expect(author.fetch(:names)).to eq(["Existing Author", "Ada Lovelace", "Grace Hopper"])
   end
 
+  it "removes known bots from existing authors and honors configured machine users" do
+    author = described_class.send(
+      :author_facts,
+      {"machine_users" => ["Internal Automation"]},
+      {},
+      gemspec_metadata: {authors: ["StepSecurity Bot", "dependabot[bot]", "Internal Automation", "Human Author"]},
+      copyright: {lines: ["Copyright (c) 2020 StepSecurity Bot", "Copyright (c) 2021 Other Human"]}
+    )
+
+    expect(author.fetch(:name)).to eq("Human Author")
+    expect(author.fetch(:names)).to eq(["Human Author", "Other Human"])
+  end
+
+  it "uses Erik Berlin's current name in author metadata" do
+    author = described_class.send(:author_facts, {}, {},
+      gemspec_metadata: {authors: ["Erik Michaels-Ober", "Erik Berlin"]})
+
+    expect(author.fetch(:name)).to eq("Erik Berlin")
+    expect(author.fetch(:names)).to eq(["Erik Berlin"])
+  end
+
   it "consolidates configured author aliases across gemspec and copyright metadata" do
     author = described_class.send(
       :author_facts,
@@ -1444,6 +1465,9 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       commit.call("A. Lovelace", "ada.old@example.test", "first.txt")
       commit.call("Ada Lovelace", "ada@example.test", "second.txt")
       commit.call("autobolt", "automation@example.test", "automation.txt")
+      commit.call("Erik Michaels-Ober", "erik.old@example.test", "erik-old.txt")
+      commit.call("Erik Berlin", "erik@example.test", "erik.txt")
+      commit.call("StepSecurity Bot", "bot@stepsecurity.io", "bot.txt")
 
       facts = described_class.send(
         :copyright_facts,
@@ -1469,7 +1493,7 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
         "depfu[bot]",
         "internal automation"
       ])
-      expect(facts.fetch(:lines)).to eq(["Copyright (c) 2024 Ada Lovelace"])
+      expect(facts.fetch(:lines)).to eq(["Copyright (c) 2024 Ada Lovelace", "Copyright (c) 2024 Erik Berlin"])
     end
   end
 

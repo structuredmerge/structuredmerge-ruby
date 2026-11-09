@@ -33,10 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-changelog (>= 1.0.15 -> >= 1.0.16)
-  - yard-lint (>= 1.13.0 -> >= 1.13.1)
-  - duel (>= 0.1.1 -> >= 0.1.4)
-  - addressable (>= 2.9.1 -> >= 2.9.2)
+  - kettle-dev (>= 3.1.27 -> >= 3.1.28)
+  - kettle-changelog (>= 1.0.17 -> >= 1.0.18)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)
@@ -57,6 +55,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] alef-gemspec-spec-files: Kettle Jem now merges Alef-generated spec.files candidate lists and exclusion filters while retaining destination gem version metadata.
 
 - Remove the Style/SafeNavigation offense from the generated gemfiles/modular/style_local.gemfile (spec&.version in the local_gem_satisfies? gemspec guard), so templated projects no longer carry a .rubocop_gradual.lock baseline entry for it
+
+- Wire every configured StructuredMerge family gem in local templating bundles to prevent mixed local and registry dependency versions.
 
 ### Security
 
