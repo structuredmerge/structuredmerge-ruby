@@ -20,7 +20,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- `workflows.legacy_engines` opts an EOL engine workflow back in, as a list (`- truffleruby-24.2`) or a map keyed by workflow name (values may hold notes such as a tracking URL).
+
 ### Changed
+
+- **Breaking for generated CI:** workflows for EOL engine releases are no longer generated, and existing copies are deleted on the next templating run: `jruby-9.1`, `jruby-9.2`, `jruby-9.3`, `jruby-9.4`, `truffleruby-22.3`, `truffleruby-23.1`, `truffleruby-24.2`, `truffleruby-25.0`. An engine release is EOL when the CRuby it implements is EOL, and the TruffleRuby maintainers have asked projects to stop testing old releases. Their README compatibility badges become the static `(🚫CI)` variant (support is declared via the equivalent MRI job and rubocop-lts rules, as for Ruby < 2.4) instead of being removed. List a workflow under `workflows.legacy_engines` to keep it. See structuredmerge/structuredmerge-ruby#131.
 
 - [kc] kettle-jem/prepare: updated 25 project files:
   - configuration (1)

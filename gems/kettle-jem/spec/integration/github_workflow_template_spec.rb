@@ -1113,6 +1113,40 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
+  describe "EOL engine workflows" do
+    def plan_paths(legacy_engines: nil)
+      tmp_root = File.expand_path("../tmp", __dir__)
+      FileUtils.mkdir_p(tmp_root)
+      Dir.mktmpdir("kettle-jem-eol-engine-workflows", tmp_root) do |root|
+        config = +"engines:\n  - ruby\n  - jruby\n  - truffleruby\n"
+        config << "workflows:\n  legacy_engines:\n#{legacy_engines.map { |name| "    - #{name}\n" }.join}" if legacy_engines
+        write_tree(root, {
+          "example.gemspec" => "Gem::Specification.new { |s| s.name = 'example'; s.summary = 'x'; s.required_ruby_version = '>= 2.3' }\n",
+          ".kettle-jem.yml" => config,
+          ".github/workflows/truffleruby-24.2.yml" => "name: old\n",
+          ".github/workflows/jruby-9.4.yml" => "name: old\n"
+        })
+        plan = described_class.plan_project(root, env: {})
+        plan.fetch(:recipe_reports).to_h { |report| [report.fetch(:relative_path), report] }
+      end
+    end
+
+    it "is neither generated nor kept by default, and deletes an existing file" do
+      reports = plan_paths
+
+      expect(reports[".github/workflows/truffleruby-24.2.yml"].dig(:metadata, :delete_file)).to be(true)
+      expect(reports[".github/workflows/jruby-9.4.yml"].dig(:metadata, :delete_file)).to be(true)
+      expect(reports.keys).not_to include(*%w[truffleruby-22.3 truffleruby-23.1 truffleruby-25.0 jruby-9.1 jruby-9.2 jruby-9.3].map { |name| ".github/workflows/#{name}.yml" })
+    end
+
+    it "is kept when listed in workflows.legacy_engines" do
+      reports = plan_paths(legacy_engines: %w[truffleruby-24.2])
+
+      expect(reports[".github/workflows/truffleruby-24.2.yml"]&.dig(:metadata, :delete_file)).not_to be(true)
+      expect(reports[".github/workflows/jruby-9.4.yml"].dig(:metadata, :delete_file)).to be(true)
+    end
+  end
+
   it "prunes packaged gemfile templates below minimum Ruby" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

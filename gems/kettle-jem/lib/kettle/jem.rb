@@ -88,6 +88,26 @@ module Kettle
       codeql-analysis.yml
       tests.yml
     ].freeze
+    # Versioned engine workflows for engine releases that are end-of-life.
+    # An engine release is EOL when the CRuby it implements is EOL (JRuby 9.x
+    # implement CRuby <= 3.1; TruffleRuby 33+ is numbered by Ruby version and
+    # older GraalVM-numbered releases target CRuby <= 3.3 and are unmaintained
+    # upstream). The upstream TruffleRuby maintainers have asked projects to
+    # stop testing old releases. They are neither generated nor kept by
+    # default; the README badge becomes the static no-CI variant, so support
+    # is still declared (via the equivalent MRI job and rubocop-lts rules).
+    # Opt back in per workflow with `workflows.legacy_engines`.
+    # Explicit list, not date-derived, so templating stays deterministic.
+    EOL_ENGINE_WORKFLOWS = %w[
+      jruby-9.1
+      jruby-9.2
+      jruby-9.3
+      jruby-9.4
+      truffleruby-22.3
+      truffleruby-23.1
+      truffleruby-24.2
+      truffleruby-25.0
+    ].freeze
     OPENCOLLECTIVE_DISABLED_FILES = %w[.opencollective.yml .github/workflows/opencollective.yml].freeze
     OPT_IN_GITHUB_WORKFLOWS = %w[.github/workflows/discord-notifier.yml].freeze
     # Templates that exist only for projects that set `workflows.duel: true`.
@@ -983,11 +1003,36 @@ module Kettle
         existing = Array(workflow_paths).map { |path| path.to_s.delete_prefix("./") }.to_set
         workflow_references(content).each do |label, workflow_path|
           next if existing.include?(workflow_path)
+          # EOL engine badge images are kept (as static no-CI badges) below.
+          next if eol_engine_badge_image_label?(label)
 
-          content = remove_workflow_badge_occurrences(content, label)
+          content = if EOL_ENGINE_WORKFLOWS.include?(File.basename(workflow_path, ".yml"))
+            no_ci_badge(content, label)
+          else
+            remove_workflow_badge_occurrences(content, label)
+          end
         end
 
         content
+      end
+
+      def eol_engine_badge_image_label?(label)
+        match = label.to_s.match(/\A💎(truby|jruby)-(\d+\.\d+)i\z/)
+        return false unless match
+
+        EOL_ENGINE_WORKFLOWS.include?("#{(match[1] == "truby") ? "truffleruby" : "jruby"}-#{match[2]}")
+      end
+
+      # Declares support without CI: drop the workflow link from the badge and
+      # mark its image "(🚫CI)" in neutral grey, like Ruby 2.0-2.3.
+      def no_ci_badge(content, workflow_label)
+        match = workflow_label.match(/\A🚎(truby|jruby)-(\d+\.\d+)-wf\z/)
+        return remove_workflow_badge_occurrences(content, workflow_label) unless match
+
+        image_label = "💎#{match[1]}-#{match[2]}i"
+        processed = content.gsub(/\[(!\[[^\]]*\]\[#{Regexp.escape(image_label)}\])\]\[#{Regexp.escape(workflow_label)}\]/, '\1')
+        processed.sub(/^(\[#{Regexp.escape(image_label)}\]: https:\/\/img\.shields\.io\/badge\/[^-\s]+-#{Regexp.escape(match[2])})-[0-9A-Fa-f]{6}(\?)/,
+          '\1_(%F0%9F%9A%ABCI)-AABBCC\2')
       end
 
       def workflow_references(content)
@@ -19987,6 +20032,8 @@ module Kettle
       engine = Kettle::Rb::CompatMatrix.engine_workflow(basename)
       return true if engine && !enabled_ruby_engines(config).include?(engine)
 
+      return true if EOL_ENGINE_WORKFLOWS.include?(basename) && !legacy_engine_workflow_opted_in?(config, basename)
+
       version = basename[/\Aruby-(\d+\.\d+)\z/, 1]
       return false unless version && min_ruby
       Gem::Version.new(version) < min_ruby
@@ -20468,6 +20515,18 @@ module Kettle
     # A generated workflow normally uses one command for every matrix entry.
     # Legacy engines occasionally need a narrower command while retaining the
     # rest of the generated workflow (setup, retries, cache keys, and pins).
+    # `workflows.legacy_engines` opts EOL engine workflows back in. Accepts a
+    # list of workflow names (`truffleruby-24.2`) or a map keyed by them, whose
+    # values may carry notes such as a tracking URL.
+    def legacy_engine_workflow_opted_in?(config, basename)
+      workflows = config["workflows"]
+      return false unless workflows.is_a?(Hash)
+
+      raw = workflows["legacy_engines"]
+      names = raw.is_a?(Hash) ? raw.keys : Array(raw)
+      names.map { |name| name.to_s.strip.delete_suffix(".yml") }.include?(basename)
+    end
+
     def github_actions_engine_exec_cmds(config)
       workflows = config["workflows"]
       return {} unless workflows.is_a?(Hash)
