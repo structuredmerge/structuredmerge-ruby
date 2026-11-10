@@ -20,7 +20,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
-- `workflows.legacy_engines` opts an EOL engine workflow back in, as a list (`- truffleruby-24.2`) or a map keyed by workflow name (values may hold notes such as a tracking URL).
+- `workflows.legacy_engines` opts an EOL engine workflow back in, as a list (`- truffleruby-24.2`) or a map keyed by workflow name with optional `mode` (`parallel` default, `serial` runs the job with `KETTLE_TEST_RUNNER=rspec`, `experimental` adds `experimental: true` to its matrix entry), `tracking` (issue URL) and `revisit_by` (date; a warning is reported once it has passed). Templating also reports a warning for every EOL workflow it removes, so the deletion is never silent.
 
 ### Changed
 

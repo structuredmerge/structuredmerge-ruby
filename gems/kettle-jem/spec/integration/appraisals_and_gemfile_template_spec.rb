@@ -840,6 +840,89 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(workflow.scan('exec_cmd: "kettle-test"').size).to eq(1)
   end
 
+  describe "legacy_engines modes" do
+    let(:matrix_yaml) do
+      <<~YAML
+        strategy:
+          matrix:
+            include:
+              - ruby: "truffleruby-24.2"
+                appraisal: "ruby-3-3"
+                exec_cmd: "kettle-test"
+                rubygems: default
+      YAML
+    end
+
+    it "parses list and map forms, defaulting to parallel" do
+      config = {"workflows" => {"legacy_engines" => [
+        "truffleruby-23.1.yml"
+      ]}}
+      expect(described_class.send(:legacy_engine_settings, config)).to eq(
+        "truffleruby-23.1" => {mode: "parallel", tracking: "", revisit_by: ""}
+      )
+
+      mapped = {"workflows" => {"legacy_engines" => {
+        "truffleruby-24.2" => {"mode" => "Experimental", "tracking" => "https://example.test/1", "revisit_by" => "2027-03-01"},
+        "jruby-9.4" => {"mode" => "bogus"}
+      }}}
+      settings = described_class.send(:legacy_engine_settings, mapped)
+      expect(settings.fetch("truffleruby-24.2")).to eq(mode: "experimental", tracking: "https://example.test/1", revisit_by: "2027-03-01")
+      expect(settings.fetch("jruby-9.4").fetch(:mode)).to eq("parallel")
+    end
+
+    it "marks experimental engines in the matrix entry, once" do
+      facts = {ci: {legacy_experimental_engines: ["truffleruby-24.2"]}}
+      once = described_class.send(:apply_legacy_engine_experimental, matrix_yaml, facts)
+      twice = described_class.send(:apply_legacy_engine_experimental, once, facts)
+
+      expect(once).to include('exec_cmd: "kettle-test"').and include("experimental: true")
+      expect(twice.scan("experimental: true").size).to eq(1)
+      expect(YAML.safe_load(once).dig("strategy", "matrix", "include", 0, "experimental")).to be(true)
+    end
+
+    it "runs serial engines without the parallel worker pool, unless exec_cmd is explicitly overridden" do
+      config = {"workflows" => {"legacy_engines" => {"truffleruby-24.2" => {"mode" => "serial"}, "jruby-9.4" => {"mode" => "experimental"}}}}
+
+      expect(described_class.send(:legacy_engine_exec_cmds, config, "kettle-test --example-status-log .rspec_status")).to eq(
+        "truffleruby-24.2" => "env KETTLE_TEST_RUNNER=rspec kettle-test --example-status-log .rspec_status"
+      )
+      expect(described_class.send(:legacy_engine_experimental_names, config)).to eq(["jruby-9.4"])
+    end
+
+    it "warns about EOL workflows being removed and about passed revisit_by dates" do
+      config = {"workflows" => {"legacy_engines" => {
+        "truffleruby-23.1" => {"mode" => "experimental", "tracking" => "https://example.test/2", "revisit_by" => "2026-01-01"},
+        "jruby-9.4" => {"revisit_by" => "2999-01-01"}
+      }}}
+
+      warnings = described_class.send(
+        :legacy_engine_warnings, config,
+        [".github/workflows/truffleruby-24.2.yml", ".github/workflows/ruby-3.3.yml"],
+        today: Date.new(2026, 11, 10)
+      )
+
+      expect(warnings.length).to eq(2)
+      expect(warnings.first).to include("truffleruby-24.2 is no longer generated").and include("legacy_engines: [truffleruby-24.2]")
+      expect(warnings.last).to include("truffleruby-23.1: revisit_by 2026-01-01 has passed").and include("https://example.test/2")
+    end
+
+    it "includes experimental engines in the template checksum fingerprint" do
+      report = {
+        recipe_name: "template_source_application_github_workflows_truffleruby_24_2_yml",
+        relative_path: ".github/workflows/truffleruby-24.2.yml",
+        request_envelope: {request: {recipe_name: "supplied_template_source_application", recipe_version: "1",
+          runtime_context: {ci: {legacy_experimental_engines: ["truffleruby-24.2"]}}}},
+        metadata: {template_source_preference: {
+          source_root_path: project_root.to_s,
+          source_relative_path: "lib/kettle/jem/templates/.github/workflows/truffleruby-24.2.yml.example"
+        }}
+      }
+
+      expect(described_class.template_input_fingerprint_payload(project_root, report))
+        .to include(github_workflow_legacy_experimental_engines: ["truffleruby-24.2"])
+    end
+  end
+
   it "includes per-engine workflow commands in the template checksum fingerprint" do
     report = {
       recipe_name: "template_source_application_github_workflows_truffleruby_23_1_yml",
