@@ -88,6 +88,26 @@ module Kettle
       codeql-analysis.yml
       tests.yml
     ].freeze
+    # Versioned engine workflows for engine releases that are end-of-life.
+    # An engine release is EOL when the CRuby it implements is EOL (JRuby 9.x
+    # implement CRuby <= 3.1; TruffleRuby 33+ is numbered by Ruby version and
+    # older GraalVM-numbered releases target CRuby <= 3.3 and are unmaintained
+    # upstream). The upstream TruffleRuby maintainers have asked projects to
+    # stop testing old releases. They are neither generated nor kept by
+    # default; the README badge becomes the static no-CI variant, so support
+    # is still declared (via the equivalent MRI job and rubocop-lts rules).
+    # Opt back in per workflow with `workflows.legacy_engines`.
+    # Explicit list, not date-derived, so templating stays deterministic.
+    EOL_ENGINE_WORKFLOWS = %w[
+      jruby-9.1
+      jruby-9.2
+      jruby-9.3
+      jruby-9.4
+      truffleruby-22.3
+      truffleruby-23.1
+      truffleruby-24.2
+      truffleruby-25.0
+    ].freeze
     OPENCOLLECTIVE_DISABLED_FILES = %w[.opencollective.yml .github/workflows/opencollective.yml].freeze
     OPT_IN_GITHUB_WORKFLOWS = %w[.github/workflows/discord-notifier.yml].freeze
     # Templates that exist only for projects that set `workflows.duel: true`.
@@ -983,11 +1003,36 @@ module Kettle
         existing = Array(workflow_paths).map { |path| path.to_s.delete_prefix("./") }.to_set
         workflow_references(content).each do |label, workflow_path|
           next if existing.include?(workflow_path)
+          # EOL engine badge images are kept (as static no-CI badges) below.
+          next if eol_engine_badge_image_label?(label)
 
-          content = remove_workflow_badge_occurrences(content, label)
+          content = if EOL_ENGINE_WORKFLOWS.include?(File.basename(workflow_path, ".yml"))
+            no_ci_badge(content, label)
+          else
+            remove_workflow_badge_occurrences(content, label)
+          end
         end
 
         content
+      end
+
+      def eol_engine_badge_image_label?(label)
+        match = label.to_s.match(/\A💎(truby|jruby)-(\d+\.\d+)i\z/)
+        return false unless match
+
+        EOL_ENGINE_WORKFLOWS.include?("#{(match[1] == "truby") ? "truffleruby" : "jruby"}-#{match[2]}")
+      end
+
+      # Declares support without CI: drop the workflow link from the badge and
+      # mark its image "(🚫CI)" in neutral grey, like Ruby 2.0-2.3.
+      def no_ci_badge(content, workflow_label)
+        match = workflow_label.match(/\A🚎(truby|jruby)-(\d+\.\d+)-wf\z/)
+        return remove_workflow_badge_occurrences(content, workflow_label) unless match
+
+        image_label = "💎#{match[1]}-#{match[2]}i"
+        processed = content.gsub(/\[(!\[[^\]]*\]\[#{Regexp.escape(image_label)}\])\]\[#{Regexp.escape(workflow_label)}\]/, '\1')
+        processed.sub(/^(\[#{Regexp.escape(image_label)}\]: https:\/\/img\.shields\.io\/badge\/[^-\s]+-#{Regexp.escape(match[2])})-[0-9A-Fa-f]{6}(\?)/,
+          '\1_(%F0%9F%9A%ABCI)-AABBCC\2')
       end
 
       def workflow_references(content)
@@ -3204,11 +3249,14 @@ module Kettle
         include_patterns: template_selection[:include]
       )
       inactive_templates = inactive_packaged_template_cleanup_files(project_root, template_config)
+      legacy_warnings = legacy_engine_warnings(kettle_config, inactive_workflows)
+      facts[:warnings] = Array(facts[:warnings]) + legacy_warnings unless legacy_warnings.empty?
       facts[:ci] = {
         provider: "github_actions",
         default_branch: "main",
         exec_cmd: github_actions_exec_cmd(kettle_config, env),
-        engine_exec_cmds: github_actions_engine_exec_cmds(kettle_config),
+        engine_exec_cmds: legacy_engine_exec_cmds(kettle_config, github_actions_exec_cmd(kettle_config, env))
+          .merge(github_actions_engine_exec_cmds(kettle_config)),
         platforms: ci_os_platforms_facts(kettle_config, project_root),
         recording: project_recording_enabled?(project_root, kettle_config),
         ruby_versions: github_actions_ruby_versions(project_runtime.fetch(:test_min_ruby)),
@@ -3216,6 +3264,9 @@ module Kettle
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
         custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled)
       }
+      # Only present when used, so projects without legacy engines keep identical facts.
+      experimental_legacy_engines = legacy_engine_experimental_names(kettle_config)
+      facts[:ci][:legacy_experimental_engines] = experimental_legacy_engines unless experimental_legacy_engines.empty?
       standard_appraisal_gemfiles = github_actions_standard_appraisal_gemfiles(kettle_config)
       facts[:ci][:duel] = true if template_config["resolved_duel"]
       facts[:ci][:standard_appraisal_gemfiles] = standard_appraisal_gemfiles unless standard_appraisal_gemfiles.empty?
@@ -3893,6 +3944,12 @@ module Kettle
             {}
         )
         payload[:github_workflow_engine_exec_cmds] = engine_exec_cmds unless engine_exec_cmds.empty?
+        # Changes the generated output, so it must change the fingerprint.
+        experimental = Array(
+          report.dig(:request_envelope, :request, :runtime_context, :ci, :legacy_experimental_engines) ||
+            report.dig(:request_envelope, :request, :runtime_context, "ci", "legacy_experimental_engines")
+        ).map(&:to_s).sort
+        payload[:github_workflow_legacy_experimental_engines] = experimental unless experimental.empty?
       end
       payload
     end
@@ -9238,6 +9295,7 @@ module Kettle
 
     def finalize_github_workflow_template(content, facts = nil)
       output = apply_github_actions_engine_exec_cmd_overrides(content, facts)
+      output = apply_legacy_engine_experimental(output, facts)
       inject_framework_matrix_workflow_env(update_github_actions_pins(output), facts)
     end
 
@@ -9257,6 +9315,28 @@ module Kettle
         line_index = exec_cmd_node.start_line
         indent = lines.fetch(line_index).to_s.match(/\A(\s*)/)[1]
         lines[line_index] = "#{indent}exec_cmd: #{yaml_double_quoted_scalar(command)}\n"
+      end
+      lines.join
+    rescue Psych::Exception
+      content
+    end
+
+    # Adds `experimental: true` to the matrix entry of legacy engines configured
+    # with mode: experimental (the job's continue-on-error already honours it).
+    def apply_legacy_engine_experimental(content, facts)
+      names = Array(facts.to_h.dig(:ci, :legacy_experimental_engines))
+      return content if names.empty?
+
+      lines = content.to_s.lines
+      yaml_mapping_nodes(content).sort_by { |mapping| -mapping.start_line }.each do |mapping|
+        next unless names.include?(yaml_mapping_scalar_value(mapping, "ruby"))
+        next if yaml_mapping_scalar_node(mapping, "experimental")
+
+        anchor = yaml_mapping_scalar_node(mapping, "exec_cmd")
+        next unless anchor
+
+        indent = lines.fetch(anchor.start_line).to_s.match(/\A(\s*)/)[1]
+        lines.insert(anchor.start_line + 1, "#{indent}experimental: true\n")
       end
       lines.join
     rescue Psych::Exception
@@ -19987,6 +20067,8 @@ module Kettle
       engine = Kettle::Rb::CompatMatrix.engine_workflow(basename)
       return true if engine && !enabled_ruby_engines(config).include?(engine)
 
+      return true if EOL_ENGINE_WORKFLOWS.include?(basename) && !legacy_engine_workflow_opted_in?(config, basename)
+
       version = basename[/\Aruby-(\d+\.\d+)\z/, 1]
       return false unless version && min_ruby
       Gem::Version.new(version) < min_ruby
@@ -20468,6 +20550,84 @@ module Kettle
     # A generated workflow normally uses one command for every matrix entry.
     # Legacy engines occasionally need a narrower command while retaining the
     # rest of the generated workflow (setup, retries, cache keys, and pins).
+    LEGACY_ENGINE_MODES = %w[parallel serial experimental].freeze
+    SERIAL_TEST_RUNNER_ENV = "env KETTLE_TEST_RUNNER=rspec"
+
+    # `workflows.legacy_engines` opts EOL engine workflows back in. Either a
+    # list of workflow names (`- truffleruby-24.2`) or a map keyed by them:
+    #
+    #   legacy_engines:
+    #     truffleruby-24.2:
+    #       mode: experimental   # parallel (default) | serial | experimental
+    #       tracking: https://github.com/org/repo/issues/1
+    #       revisit_by: 2027-03-01   # warn once this date has passed
+    #
+    # serial runs the engine's job with `KETTLE_TEST_RUNNER=rspec` (no parallel
+    # worker pool); experimental adds `experimental: true` to its matrix entry
+    # so a failure does not fail the workflow.
+    def legacy_engine_settings(config)
+      workflows = config["workflows"]
+      return {} unless workflows.is_a?(Hash)
+
+      raw = workflows["legacy_engines"]
+      entries = raw.is_a?(Hash) ? raw : Array(raw).to_h { |name| [name, {}] }
+      entries.each_with_object({}) do |(name, value), settings|
+        key = name.to_s.strip.delete_suffix(".yml")
+        next if key.empty?
+
+        value = {} unless value.is_a?(Hash)
+        mode = value["mode"].to_s.strip.downcase
+        mode = "parallel" unless LEGACY_ENGINE_MODES.include?(mode)
+        settings[key] = {
+          mode: mode,
+          tracking: value["tracking"].to_s.strip,
+          revisit_by: value["revisit_by"].to_s.strip
+        }
+      end
+    end
+
+    def legacy_engine_workflow_opted_in?(config, basename)
+      legacy_engine_settings(config).key?(basename)
+    end
+
+    # Serial legacy engines become exec_cmd overrides, unless the project set an
+    # explicit `engine_exec_cmds` entry for the same matrix value.
+    def legacy_engine_exec_cmds(config, base_exec_cmd)
+      legacy_engine_settings(config).each_with_object({}) do |(name, setting), overrides|
+        next unless setting.fetch(:mode) == "serial"
+
+        overrides[name] = "#{SERIAL_TEST_RUNNER_ENV} #{base_exec_cmd}".strip
+      end
+    end
+
+    def legacy_engine_experimental_names(config)
+      legacy_engine_settings(config).select { |_name, setting| setting.fetch(:mode) == "experimental" }.keys
+    end
+
+    # Template-run notes: workflows about to be deleted as EOL (so the change is
+    # never silent), and opted-in engines whose revisit_by date has passed.
+    def legacy_engine_warnings(config, removed_workflow_paths, today: Date.today)
+      removed = Array(removed_workflow_paths).filter_map do |path|
+        basename = File.basename(path.to_s, ".yml")
+        next unless EOL_ENGINE_WORKFLOWS.include?(basename)
+
+        "EOL engine workflow #{basename} is no longer generated; #{path} is removed. " \
+          "Keep it with `workflows.legacy_engines: [#{basename}]` if you still want it."
+      end
+      overdue = legacy_engine_settings(config).filter_map do |name, setting|
+        date = begin
+          Date.iso8601(setting.fetch(:revisit_by))
+        rescue ArgumentError, TypeError
+          nil
+        end
+        next unless date && date < today
+
+        tracking = setting.fetch(:tracking).empty? ? "" : " (#{setting.fetch(:tracking)})"
+        "legacy engine #{name}: revisit_by #{date} has passed#{tracking}; drop it from workflows.legacy_engines or extend the date."
+      end
+      removed + overdue
+    end
+
     def github_actions_engine_exec_cmds(config)
       workflows = config["workflows"]
       return {} unless workflows.is_a?(Hash)

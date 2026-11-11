@@ -1918,6 +1918,34 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(processed).not_to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
   end
 
+  it "keeps an EOL engine badge as a static no-CI badge when its workflow is not generated" do
+    readme = <<~MARKDOWN
+      | Works with Truffle Ruby | [![Truffle Ruby 24.2 Compat][💎truby-24.2i]][🚎truby-24.2-wf] [![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf] |
+      | Works with JRuby | [![JRuby 9.4 Compat][💎jruby-9.4i]][🚎jruby-9.4-wf] |
+
+      [🚎truby-24.2-wf]: https://github.com/acme/example/actions/workflows/truffleruby-24.2.yml
+      [🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml
+      [🚎jruby-9.4-wf]: https://github.com/acme/example/actions/workflows/jruby-9.4.yml
+      [💎truby-24.2i]: https://img.shields.io/badge/Truffle_Ruby-24.2-34BCB1?style=for-the-badge&logo=ruby&logoColor=pink
+      [💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1?style=for-the-badge&logo=ruby&logoColor=pink
+      [💎jruby-9.4i]: https://img.shields.io/badge/JRuby-9.4-FBE742?style=for-the-badge&logo=ruby&logoColor=red
+    MARKDOWN
+
+    processed = described_class::ReadmePostProcessor.process(
+      content: readme,
+      min_ruby: Gem::Version.new("3.0"),
+      engines: %w[ruby jruby truffleruby],
+      workflow_paths: %w[.github/workflows/truffleruby-33.0.yml]
+    )
+
+    expect(processed).to include("![Truffle Ruby 24.2 Compat][💎truby-24.2i]")
+    expect(processed).not_to include("[💎truby-24.2i]][🚎truby-24.2-wf]")
+    expect(processed).to include("[💎truby-24.2i]: https://img.shields.io/badge/Truffle_Ruby-24.2_(%F0%9F%9A%ABCI)-AABBCC?style=for-the-badge")
+    expect(processed).to include("![JRuby 9.4 Compat][💎jruby-9.4i]")
+    expect(processed).to include("[💎jruby-9.4i]: https://img.shields.io/badge/JRuby-9.4_(%F0%9F%9A%ABCI)-AABBCC?")
+    expect(processed).not_to include("truffleruby-24.2.yml")
+  end
+
   it "removes disabled engine workflow badges from top-level README references" do
     readme = <<~MARKDOWN
       # Example
