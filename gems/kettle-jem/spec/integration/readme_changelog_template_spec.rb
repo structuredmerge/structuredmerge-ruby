@@ -1913,9 +1913,28 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(processed).to include("[![JRuby 10.0 Compat][💎jruby-10.0i]][🚎jruby-10.0-wf]")
     expect(processed).to include("| Works with Truffle Ruby |")
     expect(processed).to include("[🚎jruby-10.0-wf]: https://github.com/acme/example/actions/workflows/jruby-10.0.yml")
-    expect(processed).not_to include("[🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml")
+    # Truffle Ruby 33.0 is compatible with min_ruby 3.2 and its workflow exists, so it is added too
+    # (previously its image reference was stripped as a "missing workflow" and it never appeared).
+    expect(processed).to include("[![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf]")
+    expect(processed).to include("[🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml")
     expect(processed).to include("[💎jruby-10.0i]: https://img.shields.io/badge/JRuby-10.0-FBE742")
-    expect(processed).not_to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
+    expect(processed).to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
+  end
+
+  it "keeps linked badges for workflows that exist and does not treat badge images as workflow references" do
+    readme = <<~MARKDOWN
+      | Works with Truffle Ruby | [![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf] |
+
+      [🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml
+      [💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1?style=for-the-badge&logo=ruby&logoColor=pink
+    MARKDOWN
+
+    expect(described_class::ReadmePostProcessor.workflow_references(readme)).to eq(
+      "🚎truby-33.0-wf" => ".github/workflows/truffleruby-33.0.yml"
+    )
+    processed = described_class::ReadmePostProcessor.remove_missing_workflow_badges(readme, %w[.github/workflows/truffleruby-33.0.yml])
+
+    expect(processed).to eq(readme)
   end
 
   it "keeps an EOL engine badge as a static no-CI badge when its workflow is not generated" do

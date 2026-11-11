@@ -1003,8 +1003,6 @@ module Kettle
         existing = Array(workflow_paths).map { |path| path.to_s.delete_prefix("./") }.to_set
         workflow_references(content).each do |label, workflow_path|
           next if existing.include?(workflow_path)
-          # EOL engine badge images are kept (as static no-CI badges) below.
-          next if eol_engine_badge_image_label?(label)
 
           content = if EOL_ENGINE_WORKFLOWS.include?(File.basename(workflow_path, ".yml"))
             no_ci_badge(content, label)
@@ -1014,13 +1012,6 @@ module Kettle
         end
 
         content
-      end
-
-      def eol_engine_badge_image_label?(label)
-        match = label.to_s.match(/\A💎(truby|jruby)-(\d+\.\d+)i\z/)
-        return false unless match
-
-        EOL_ENGINE_WORKFLOWS.include?("#{(match[1] == "truby") ? "truffleruby" : "jruby"}-#{match[2]}")
       end
 
       # Declares support without CI: drop the workflow link from the badge and
@@ -1037,9 +1028,12 @@ module Kettle
 
       def workflow_references(content)
         markdown_structural_owners(content, :link_definitions).fetch(:link_definitions).each_with_object({}) do |owner, references|
-          workflow = URI(owner.url.to_s).path.to_s.split("/actions/workflows/", 2).last
-          next unless workflow
-          workflow = workflow.split("/", 2).first
+          path = URI(owner.url.to_s).path.to_s
+          # Only real workflow links: badge image definitions (shields.io URLs)
+          # are not workflow references.
+          next unless path.include?("/actions/workflows/")
+
+          workflow = path.split("/actions/workflows/", 2).last.split("/", 2).first
 
           references[owner.label.to_s] = ".github/workflows/#{workflow}"
         end
