@@ -54,6 +54,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- README post-processing no longer treats badge image definitions (shields.io URLs) as workflow references, which stripped the inline badges that use them on every run. Compatible versioned engine badges (for example Truffle Ruby 33.0) whose workflow exists are now added as intended. (#133)
+
 - Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile's them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.
 
 - [kc] alef-gemspec-spec-files: Kettle Jem now merges Alef-generated spec.files candidate lists and exclusion filters while retaining destination gem version metadata.
