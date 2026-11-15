@@ -11,6 +11,22 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(File.read(base.join("r2.5/recording.gemfile.example"))).to include('gem "vcr", ">= 6"', 'gem "webmock", ">= 3"')
   end
 
+  it "wires the rspec_junit_formatter fork only into Ruby < 3.3 appraisals and released upstream into 3.3+" do
+    content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Appraisals.example"))
+    blocks = content.scan(/^appraise "([^"]+)" do\n(.*?)^end$/m).to_h
+    fork = 'eval_gemfile "modular/rspec_junit_formatter/r2/v0.6.gemfile"'
+    upstream = 'eval_gemfile "modular/rspec_junit_formatter/r3.3/v0.8.gemfile"'
+
+    %w[ruby-2-3 ruby-2-4 ruby-2-5 ruby-2-6 ruby-2-7 ruby-3-0 ruby-3-1 ruby-3-2].each do |name|
+      expect(blocks.fetch(name)).to include(fork)
+      expect(blocks.fetch(name)).not_to include(upstream)
+    end
+    %w[head current ruby-3-3 ruby-3-4].each do |name|
+      expect(blocks.fetch(name)).to include(upstream)
+      expect(blocks.fetch(name)).not_to include(fork)
+    end
+  end
+
   it "keeps the Ruby 2.x StringIO templates on compatible releases" do
     ruby_24_template = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/stringio/r2.4/v0.0.2.gemfile.example"))
     ruby_25_template = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/stringio/r2/v3.0.gemfile.example"))
