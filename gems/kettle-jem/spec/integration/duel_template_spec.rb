@@ -3,7 +3,7 @@
 RSpec.describe Kettle::Jem, "Duel performance regression guards" do
   include_context "with isolated kettle-jem environment"
 
-  let(:duel_paths) { %w[.duel.rb .github/workflows/perf.yml gemfiles/modular/duel.gemfile] }
+  let(:duel_paths) { %w[.duel.rb .github/workflows/perf.yml .github/workflows/perf-comment.yml gemfiles/modular/duel.gemfile] }
   let(:shared_paths) { %w[Appraisals Gemfile Rakefile .rubocop.yml README.md] }
 
   def duel_project(root, duel: nil, files: {})
@@ -105,35 +105,31 @@ RSpec.describe Kettle::Jem, "Duel performance regression guards" do
       workflow = files.fetch(:".github/workflows/perf.yml")
       expect(workflow).to eq(File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/perf.yml.example")))
       workflow_yaml = YAML.safe_load(workflow)
-      expect(workflow_yaml.fetch("permissions")).to eq("contents" => "read")
+      expect(workflow_yaml.fetch("permissions")).to eq("contents" => "read", "pull-requests" => "read")
       expect(workflow_yaml.dig("jobs", "duel", "env", "BUNDLE_GEMFILE")).to eq("${{ github.workspace }}/gemfiles/perf.gemfile")
       expect(workflow_yaml.dig("jobs", "duel")).not_to have_key("permissions")
-      expect(workflow_yaml.dig("jobs", "comment", "permissions")).to eq("pull-requests" => "write")
-      expect(workflow_yaml.dig("jobs", "comment", "steps").map { |step| step["uses"] }.compact).to all(start_with("actions/download-artifact@"))
+      comment_workflow = files.fetch(:".github/workflows/perf-comment.yml")
+      comment_yaml = YAML.safe_load(comment_workflow)
+      expect(comment_yaml.dig("jobs", "comment", "permissions")).to include("pull-requests" => "write", "actions" => "read")
+      expect(comment_yaml.dig("jobs", "again", "permissions")).to eq("actions" => "write")
+      expect(comment_workflow).to include("duel comment --report", "pull_request_target", "~> 0.1.8")
       checkout = workflow_yaml.dig("jobs", "duel", "steps").find { |step| step["uses"].to_s.start_with?("actions/checkout@") }
       expect(checkout.fetch("with")).to include("fetch-depth" => 0, "persist-credentials" => false)
       baseline_ruby = workflow_yaml.dig("jobs", "duel", "steps").find { |step| step["id"] == "baseline-ruby" }
       expect(baseline_ruby.fetch("with")).to include("bundler-cache" => true)
       compare = workflow_yaml.dig("jobs", "duel", "steps").find { |step| step["name"] == "Compare" }
       expect(compare.fetch("id")).to eq("compare")
-      expect(workflow_yaml.dig("jobs", "duel", "outputs")).to eq(
-        "comment" => "${{ steps.compare.outputs.comment }}",
-        "status" => "${{ steps.compare.outputs.status }}"
-      )
-      expect(workflow_yaml.dig("jobs", "comment", "if")).to end_with(" && (needs.duel.outputs.comment == 'post' || needs.duel.outputs.comment == 'change') }}")
-      comment_step = workflow_yaml.dig("jobs", "comment", "steps").find { |step| step["name"] == "Comment on the pull request" }
-      expect(comment_step.fetch("env")).to include("COMMENT" => "${{ needs.duel.outputs.comment }}", "STATUS" => "${{ needs.duel.outputs.status }}")
-      expect(comment_step.fetch("run")).to include(%(marker="<!-- duel"\n), %(echo "$marker status=$STATUS -->"), "--method POST")
-      expect(workflow).not_to include("PATCH")
-      %w[actions/checkout ruby/setup-ruby actions/upload-artifact actions/download-artifact].each do |action|
-        expect_pinned_action(workflow, action)
-      end
+      expect(workflow_yaml.dig("jobs", "duel", "outputs")).to include("passed" => "${{ steps.compare.outputs.passed }}")
+      expect(workflow_yaml.dig("jobs", "passed", "permissions")).to eq("contents" => "write")
+      expect(workflow).to include("DUEL_LABELS:", "DUEL_ACCEPTED:", "merge_group:")
+      %w[actions/checkout ruby/setup-ruby actions/upload-artifact].each { |action| expect_pinned_action(workflow, action) }
+      expect_pinned_action(comment_workflow, "actions/download-artifact")
 
       expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.4")))
       expect_gem_dependency_declared(files.fetch(:"gemfiles/modular/duel.gemfile"), "duel")
-      expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(gem "duel", "~> 0.1", ">= 0.1.4"))
+      expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(gem "duel", "~> 0.1", ">= 0.1.8"))
       expect_gem_dependency_declared(files.fetch(:"gemfiles/modular/duel.gemfile"), "stackprof")
-      expect(files.fetch(:".duel.rb")).to include("c.ruby = :version_file", "c.watch += %w[.github/workflows/perf.yml]\n", "# c.comment = :failures\n")
+      expect(files.fetch(:".duel.rb")).to include("c.ruby = :version_file", "c.watch += %w[.github/workflows/perf.yml]\n", "# c.comment = :failures\n", 'c.accept_label = "duel: accept"', "c.push_base = :last_passed")
       expect(files.fetch(:Gemfile).scan(%(eval_gemfile "gemfiles/modular/duel.gemfile")).size).to eq(1)
       expect(files.fetch(:Gemfile).index("gemfiles/modular/duel.gemfile")).to be < files.fetch(:Gemfile).index("gemfiles/modular/x_std_libs.gemfile")
       expect(appraisals_eval_gemfile_paths(files.fetch(:Appraisals), "perf")).to eq(%w[modular/duel.gemfile modular/x_std_libs.gemfile])

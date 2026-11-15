@@ -113,7 +113,7 @@ module Kettle
     # Templates that exist only for projects that set `workflows.duel: true`.
     # While Duel is off, kettle-jem neither writes nor removes these paths, so a
     # project's own files at them stay exactly as they are.
-    DUEL_TEMPLATE_PATHS = %w[.duel.rb .github/workflows/perf.yml gemfiles/modular/duel.gemfile].freeze
+    DUEL_TEMPLATE_PATHS = %w[.duel.rb .github/workflows/perf.yml .github/workflows/perf-comment.yml gemfiles/modular/duel.gemfile].freeze
     DUEL_MAIN_GEMFILE_EVAL_PATH = "gemfiles/modular/duel.gemfile"
     DUEL_APPRAISAL_NAME = "perf"
     OBSOLETE_APPRAISAL_SPEC_EXEC_CMDS = [

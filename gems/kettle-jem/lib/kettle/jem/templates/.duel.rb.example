@@ -22,4 +22,14 @@ Duel.configure do |c|
   # :results (passed or failed), :failures (failed, or couldn't compare),
   # or :never.
   # c.comment = :failures
+
+  # Which runs a regression fails: :every_run, or :pull_requests.
+  # c.fail_on = :every_run
+
+  # A pull request with this label accepts a regression.
+  c.accept_label = "duel: accept"
+
+  # Compare pushes with the last commit Duel passed, so small regressions
+  # accumulate. To accept one, run: git push origin main:duel/passed/main
+  c.push_base = :last_passed
 end
