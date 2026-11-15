@@ -1,11 +1,7 @@
-# rspec_junit_formatter >= 0.7.1 carries the invalid-UTF-8 fix upstream, but
-# 0.7.0+ requires Ruby >= 3.3. Older Rubies stay on the fork (legacy v0.6.x line
-# plus the invalid-character fix) so CI keeps working down to Ruby 2.4.
-if RUBY_VERSION >= "3.3"
-  gem "rspec_junit_formatter", "~> 0.8"
+### rspec_junit_formatter
+# Appraisals eval the matching variant directly; this loader serves the plain Gemfile.
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")
+  eval_gemfile "rspec_junit_formatter/r3.3/v0.8.gemfile"
 else
-  gem "rspec_junit_formatter",
-    github: "pboling/rspec_junit_formatter",
-    branch: "main",
-    ref: "9e6bcaaedd49477b62878ed568dc4ada5cc7cb5e"
+  eval_gemfile "rspec_junit_formatter/r2/v0.6.gemfile"
 end
