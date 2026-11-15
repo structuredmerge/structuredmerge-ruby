@@ -36,8 +36,12 @@ abort "core package is missing: #{core_package}" unless File.file?(File.join(cor
 
 def run!(env, command, chdir:)
   puts "+ #{command.join(" ")}"
-  output, status = Open3.capture2e(env, *command, chdir: chdir)
-  puts output
+  status = nil
+  Open3.popen2e(env, *command, chdir: chdir) do |stdin, output, wait|
+    stdin.close
+    output.each_line { |line| $stdout.write(line) }
+    status = wait.value
+  end
   raise "command failed: #{command.first(4).join(" ")}" unless status.success?
 end
 

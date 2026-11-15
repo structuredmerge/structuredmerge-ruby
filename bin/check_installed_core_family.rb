@@ -242,6 +242,9 @@ Bundler.with_unbundled_env do
       test_env = {
         "GEM_HOME" => gem_home,
         "GEM_PATH" => ([gem_home] + system_gem_paths).join(File::PATH_SEPARATOR),
+        # Kettle Family starts member commands with a clean environment. Keep
+        # this gate's Ruby executable available when GEM_HOME is isolated.
+        "PATH" => ([File.dirname(RbConfig.ruby), ENV["PATH"]].compact.join(File::PATH_SEPARATOR)),
         "STRUCTUREDMERGE_DEV" => File.join(root, "gems"),
         "STRUCTUREDMERGE_CORE_DEV" => "false",
         "STRUCTUREDMERGE_EXPECT_GEM_HOME" => gem_home,
