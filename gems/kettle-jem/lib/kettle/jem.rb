@@ -57,7 +57,7 @@ module Kettle
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
-      "rspec-stubbed_env" => ">= 1.0.17"
+      "rspec-stubbed_env" => ">= 1.0.18"
     }.freeze
     # Template dependency transitions are location-independent. Prepare finds
     # declarations in the destination and reconciles their complete requirement
@@ -5217,13 +5217,13 @@ module Kettle
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.28"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.19"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.38"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.41"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.29"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
-        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.9"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 4.0", ">= 4.0.0"\n)}
+        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.10"\n)},
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 4.0", ">= 4.0.2"\n)}
       ].freeze
     end
 
@@ -16393,7 +16393,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.3", ">= 1.3.38"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.41"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -21460,7 +21460,7 @@ module Kettle
         steps << <<~YAML
           - name: Upload coverage to QLTY
             if: ${{ !env.ACT }}
-            uses: qltysh/qlty-action/coverage@ebcd284bf32e36a030afe15f1e136c7be08b9506 # v2.5.0
+            uses: qltysh/qlty-action/coverage@0ff2178667bf8eb28ed0013a7ef54857a24d4056 # v2.7.0
             with:
               oidc: true
               files: coverage/lcov.info
@@ -21757,7 +21757,7 @@ module Kettle
         "appraisal-rb/setup-ruby-flash" => "appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14",
         "ruby/setup-ruby" => "ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8",
-        "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@ebcd284bf32e36a030afe15f1e136c7be08b9506 # v2.5.0",
+        "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@0ff2178667bf8eb28ed0013a7ef54857a24d4056 # v2.7.0",
         "codecov/codecov-action" => "codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5",
