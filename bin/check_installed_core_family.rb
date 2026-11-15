@@ -195,6 +195,10 @@ Bundler.with_unbundled_env do
       family_config = YAML.safe_load(File.read(File.join(root, ".kettle-family.yml")), aliases: true)
       family_config["test"] ||= {}
       family_config["test"]["monorepo_mode"] = "worktrees"
+      # Kettle Family's default string runs through a login shell, which may
+      # replace mise's selected Ruby PATH. An argv preserves the same command.
+      family_config["commands"] ||= {}
+      family_config["commands"]["test"] ||= ["bundle", "exec", "kettle-test"]
       File.write(family_config_path, YAML.dump(family_config))
       checker = File.join(stage, "verify-installed-core.rb")
       File.write(checker, <<~'RUBY')
