@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Keep destination-preferred gemspec version loaders aligned with configured Ruby entrypoint paths.
 
+- rspec.gemfile template uses released rspec_junit_formatter ~> 0.8 on Ruby >= 3.3 and keeps the pboling fork (invalid-UTF-8 fix) only for older Rubies ([#136](https://github.com/structuredmerge/structuredmerge-ruby/issues/136))
+
 ### Deprecated
 
 ### Removed
