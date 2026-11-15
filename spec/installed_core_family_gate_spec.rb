@@ -4,6 +4,7 @@ require 'fileutils'
 require 'open3'
 require 'rbconfig'
 require 'tmpdir'
+require_relative '../bin/core_family_checkpoint'
 
 RSpec.describe 'installed core family gate' do
   let(:root) { File.expand_path('..', __dir__) }
@@ -37,6 +38,23 @@ RSpec.describe 'installed core family gate' do
       expect(err).to include('commit or stash Ruby family changes')
       expect(File.read(File.join(project, 'uncommitted'))).to eq('keep me')
       expect(Dir.children(tmp)).to contain_exactly('core', 'ruby')
+    end
+  end
+end
+
+RSpec.describe CoreFamilyCheckpoint do
+  it 'resumes only verified members for the same family and core package' do
+    Dir.mktmpdir('core-gate-checkpoint') do |dir|
+      identity = {'family_revision' => 'abc', 'core_sha256' => '123', 'ruby_version' => RUBY_VERSION}
+      checkpoint = described_class.new(directory: dir, identity: identity, members: %w[one two])
+      checkpoint.record('one')
+
+      resumed = described_class.new(directory: dir, identity: identity, members: %w[one two])
+      expect(resumed.completed).to eq(['one'])
+      expect(described_class.new(directory: dir, identity: identity.merge('core_sha256' => '456'), members: %w[one two]).completed).to be_empty
+      expect { resumed.record('other') }.to raise_error(/unknown family member/)
+      File.write(checkpoint.path, '{invalid')
+      expect { described_class.new(directory: dir, identity: identity, members: %w[one two]) }.to raise_error(JSON::ParserError)
     end
   end
 end

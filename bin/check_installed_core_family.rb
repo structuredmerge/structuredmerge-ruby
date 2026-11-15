@@ -13,12 +13,14 @@ require "rubygems/package"
 require "set"
 require "tmpdir"
 require "yaml"
+require_relative "core_family_checkpoint"
 
 options = {run_family_tests: false}
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: check_installed_core_family.rb --core-gem LOCAL_GEM [--run-family-tests] [--only GEMS]"
   opts.on("--core-gem PATH") { |value| options[:core_gem] = value }
   opts.on("--run-family-tests") { options[:run_family_tests] = true }
+  opts.on("--checkpoint-dir PATH", "Resume verified member suites from this directory") { |value| options[:checkpoint_dir] = value }
   opts.on("--only GEMS", "Run selected member suites (partial verification)") { |value| options[:only] = value.split(",").map(&:strip) }
   opts.on("-h", "--help") { puts opts; exit 0 }
 end
@@ -26,6 +28,7 @@ begin
   parser.parse!
   raise OptionParser::MissingArgument, "--core-gem" if options[:core_gem].to_s.empty?
   raise OptionParser::InvalidArgument, "--only requires --run-family-tests" if options[:only] && !options[:run_family_tests]
+  raise OptionParser::InvalidArgument, "--checkpoint-dir requires --run-family-tests" if options[:checkpoint_dir] && !options[:run_family_tests]
   raise OptionParser::InvalidArgument, "--only must name at least one member" if options[:only]&.empty? || options[:only]&.any?(&:empty?)
   raise OptionParser::InvalidArgument, ARGV.join(" ") unless ARGV.empty?
 rescue OptionParser::ParseError => error
@@ -258,18 +261,28 @@ Bundler.with_unbundled_env do
         "STRUCTUREDMERGE_FAMILY_TEST_LOG" => File.join(stage, "family-tests.log"),
         "STRUCTUREDMERGE_CORE_TEST_LOG" => File.join(stage, "installed-core-tests.log"),
         "K_JEM_TEMPLATING" => "true",
+        "KETTLE_TEST_TURBO_PROCESSES" => ENV.fetch("KETTLE_TEST_TURBO_PROCESSES", "2"),
         "KETTLE_DEV_DEV" => kettle_dev_root,
         "RUBYOPT" => "-r#{checker}"
       }
-      only = selected_names.join(",")
       report_path = File.join(stage, "family-test-report.json")
-      command = [RbConfig.ruby, "-S", "bundle", "exec", "kettle-family", "test",
-        "--execute", "--jobs", "1", "--only=#{only}", "--report=#{report_path}", "--config=#{family_config_path}"]
-      # Kettle Family runs each member through mise with a clean environment.
-      # Forward the installed GEM_HOME and the checker explicitly so the suites
-      # prove they load this package, instead of silently testing other gems.
+      checkpoint = if options[:checkpoint_dir]
+        head, head_status = Open3.capture2("git", "-C", root, "rev-parse", "HEAD")
+        raise "cannot identify family revision" unless head_status.success?
+        CoreFamilyCheckpoint.new(
+          directory: File.expand_path(options.fetch(:checkpoint_dir)),
+          identity: {
+            "schema" => 1, "family_revision" => head.strip,
+            "core_sha256" => Digest::SHA256.file(core_gem).hexdigest,
+            "ruby_engine" => RUBY_ENGINE, "ruby_version" => RUBY_VERSION,
+            "ruby_platform" => RUBY_PLATFORM
+          },
+          members: all_names
+        )
+      end
+      puts "Family checkpoint: #{checkpoint.path}" if checkpoint
+      pending_names = selected_names - (checkpoint&.completed || [])
       command_env = test_env.merge("BUNDLE_GEMFILE" => "Gemfile")
-      command_env.each { |key, value| command << "--env=#{key}=#{value}" }
       mise_configs = [File.join(root, "mise.toml")] + member_roots.filter_map do |member_root|
         path = File.join(member_root, "mise.toml")
         path if File.file?(path)
@@ -282,34 +295,42 @@ Bundler.with_unbundled_env do
           raise "could not trust disposable family config #{config_path}" unless trust_status.success?
           trusted_configs << config_path
         end
-        output, status = Open3.capture2e(test_env, *command, chdir: root)
+        pending_names.each_with_index do |name, index|
+          puts "Testing #{name} (#{index + 1}/#{pending_names.length})"
+          $stdout.flush
+          command = [RbConfig.ruby, "-S", "bundle", "exec", "kettle-family", "test",
+            "--execute", "--jobs", "1", "--only=#{name}", "--report=#{report_path}", "--config=#{family_config_path}"]
+          command_env.each { |key, value| command << "--env=#{key}=#{value}" }
+          output, status = Open3.capture2e(test_env, *command, chdir: root)
+          puts output
+          raise "installed-core suite failed: #{name}" unless status.success?
+          raise "Kettle Family did not write its test report" unless File.file?(report_path)
+          results = JSON.parse(File.read(report_path)).fetch("results")
+          successful = results.select { |result| result["success"] && !result["skipped"] }.map { |result| result.fetch("member") }
+          raise "family suite result mismatch for #{name}: #{successful.inspect}" unless successful == [name]
+          test_log = File.join(stage, "family-tests.log")
+          tested = File.file?(test_log) ? File.readlines(test_log, chomp: true) : []
+          raise "family suite did not start: #{name}" unless tested.include?(name)
+          if consumer_names.include?(name)
+            core_log = File.join(stage, "installed-core-tests.log")
+            verified = File.file?(core_log) ? File.readlines(core_log, chomp: true).map { |line| line.split("\t", 2).first } : []
+            raise "installed core was not verified by #{name}" unless verified.include?(name)
+          end
+          checkpoint&.record(name)
+        end
       ensure
         trusted_configs.each do |config_path|
           untrust_output, untrust_status = Open3.capture2e(test_env, "mise", "trust", "--untrust", config_path, chdir: root)
           warn untrust_output unless untrust_status.success?
         end
       end
-      puts output
-      raise "installed-core full family suite failed" unless status.success?
-      raise "Kettle Family did not write its test report" unless File.file?(report_path)
-      report = JSON.parse(File.read(report_path))
-      results = report.fetch("results")
-      expected_family_tests = selected_names.sort
-      successful_tests = results.select { |result| result["success"] && !result["skipped"] }
-        .map { |result| result.fetch("member") }.sort
-      raise "family suite result mismatch: #{results.length} results, #{successful_tests.length} succeeded" unless
-        successful_tests == expected_family_tests
-      family_tests = File.readlines(File.join(stage, "family-tests.log"), chomp: true).uniq.sort
-      raise "family suite coverage mismatch: #{family_tests.inspect}" unless family_tests == expected_family_tests
-      core_test_log = File.join(stage, "installed-core-tests.log")
-      installed_core_tests = File.file?(core_test_log) ? File.readlines(core_test_log, chomp: true) : []
-      installed_core_names = installed_core_tests.map { |line| line.split("\t", 2).first }.uniq.sort
-      raise "installed core was not verified by every consumer bundle" unless installed_core_names == (consumer_names & selected_names).sort
+      completed = checkpoint ? checkpoint.completed : pending_names
+      full = options[:only].nil? && (all_names - completed).empty?
       puts JSON.generate({
-        "installed_core_consumer_suites" => installed_core_names.length,
-        "family_suites" => family_tests.length,
-        "suite_mode" => (selected_names.sort == all_names.sort ? "all-members" : "partial-members"),
-        "selected_members" => selected_names
+        "family_suites" => completed.length,
+        "suite_mode" => (full ? "all-members" : "partial-members"),
+        "selected_members" => selected_names,
+        "checkpoint" => checkpoint&.path
       })
     end
   end

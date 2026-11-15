@@ -13,6 +13,7 @@ require "tmpdir"
 options = {}
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: test_installed_core_family.rb [--only GEMS] (set STRUCTUREDMERGE_CORE_DEV)"
+  opts.on("--checkpoint-dir PATH", "Store per-member results for resume") { |value| options[:checkpoint_dir] = value }
   opts.on("--only GEMS", "Run selected member suites (partial verification)") { |value| options[:only] = value }
   opts.on("-h", "--help") { puts opts; exit 0 }
 end
@@ -72,6 +73,8 @@ begin
   command = [RbConfig.ruby, File.join(test_root, "bin/check_installed_core_family.rb"),
     "--core-gem", archives.fetch(0), "--run-family-tests"]
   command.concat(["--only", options.fetch(:only)]) if options[:only]
+  checkpoint_dir = File.expand_path(options.fetch(:checkpoint_dir, File.join(root, "tmp/core-family-gate")), Dir.pwd)
+  command.concat(["--checkpoint-dir", checkpoint_dir])
   run!(Bundler.unbundled_env.merge("STRUCTUREDMERGE_CORE_DEV" => core_root,
     "STRUCTUREDMERGE_GATE_WORKTREE" => File.realpath(test_root)), command, chdir: test_root)
 ensure

@@ -66,7 +66,10 @@ an isolated gem home, and runs the family suites sequentially against that
 installed core. It creates a disposable detached worktree and temporary gem home;
 the run can take substantial time and requires the family development dependencies,
 the Rust toolchain, a C compiler, and libclang.
-For a focused rerun, pass `--only gem-name[,gem-name]` to
+Completed member suites are checkpointed under `tmp/core-family-gate`, keyed by
+the committed family revision, core package checksum and Ruby runtime. Rerunning
+the command resumes the remaining members. Use `--checkpoint-dir PATH` to select
+a different location. For a focused rerun, pass `--only gem-name[,gem-name]` to
 `ruby bin/test_installed_core_family.rb`; the result is explicitly partial and
 does not count as a full-family pass. This checks the local package, not a
 registry release.
