@@ -34,3 +34,8 @@ run = "K_JEM_TEMPLATING=true STRUCTUREDMERGE_DEV={{config_root}}/gems KETTLE_DEV
 
 [task_config]
 includes = ["mise-family.tasks.toml"]
+
+[tasks.local-core-package-test]
+raw = true
+description = "Verify an isolated core package against all family gems and suites"
+run = "ruby bin/test_installed_core_family.rb"
