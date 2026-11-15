@@ -24,6 +24,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Update the opt-in Duel integration to 0.1.8, including fork-safe comments, regression acceptance labels, merge queues, and last-passed push baselines. Existing .duel.rb configurations remain project-owned.
+
 - **Breaking for generated CI:** workflows for EOL engine releases are no longer generated, and existing copies are deleted on the next templating run: `jruby-9.1`, `jruby-9.2`, `jruby-9.3`, `jruby-9.4`, `truffleruby-22.3`, `truffleruby-23.1`, `truffleruby-24.2`, `truffleruby-25.0`. An engine release is EOL when the CRuby it implements is EOL, and the TruffleRuby maintainers have asked projects to stop testing old releases. Their README compatibility badges become the static `(🚫CI)` variant (support is declared via the equivalent MRI job and rubocop-lts rules, as for Ruby < 2.4) instead of being removed. List a workflow under `workflows.legacy_engines` to keep it. See structuredmerge/structuredmerge-ruby#131.
 
 - [kc] kettle-jem/prepare: updated 25 project files:
@@ -39,11 +41,20 @@ Please file a bug if you notice a violation of semantic versioning.
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-dev (>= 3.1.27 -> >= 3.1.28)
   - kettle-changelog (>= 1.0.17 -> >= 1.0.18)
+  - rspec-stubbed_env (>= 1.0.17 -> >= 1.0.18)
+  - kettle-family (>= 1.3.38 -> >= 1.3.41)
+  - stone_checksums (>= 1.0.9 -> >= 1.0.10)
+  - turbo_tests2 (>= 4.0.0 -> >= 4.0.2)
+  - gitmoji-regex (>= 2.0.15 -> >= 2.0.16)
+  - yard-fence (>= 0.9.10 -> >= 0.9.11)
+  - yard-timekeeper (>= 0.2.9 -> >= 0.2.10)
+  - duel (>= 0.1.4 -> >= 0.1.8)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)
   - github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)
   - github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)
+  - qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -> v2.7.0 (0ff2178667bf8eb28ed0013a7ef54857a24d4056)
   - ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -> v1.338.0 (b3aaceaef7e0ee231b499e7b5f49c03fc1d32199)
 
 - Keep destination-preferred gemspec version loaders aligned with configured Ruby entrypoint paths.
