@@ -40,6 +40,29 @@ RSpec.describe 'installed core family gate' do
       expect(Dir.children(tmp)).to contain_exactly('core', 'ruby')
     end
   end
+
+  it 'refuses to build from a dirty core checkout without changing either checkout' do
+    Dir.mktmpdir('core-gate-dirty-core') do |tmp|
+      project = File.join(tmp, 'ruby')
+      core = File.join(tmp, 'core')
+      FileUtils.mkdir_p([File.join(project, 'bin'), File.join(core, 'packages/ruby')])
+      FileUtils.cp(File.join(root, 'bin/test_installed_core_family.rb'), File.join(project, 'bin'))
+      File.write(File.join(core, 'packages/ruby/Gemfile'), "source 'https://rubygems.org'\n")
+      system('git', 'init', '--quiet', project, exception: true)
+      system('git', '-C', project, 'add', 'bin', exception: true)
+      system('git', '-C', project, '-c', 'user.name=Test', '-c', 'user.email=test@example.com',
+        'commit', '--quiet', '-m', 'initial', exception: true)
+      system('git', 'init', '--quiet', core, exception: true)
+      _out, err, status = Open3.capture3(clean_env.merge('STRUCTUREDMERGE_CORE_DEV' => core),
+        RbConfig.ruby, File.join(project, 'bin/test_installed_core_family.rb'), chdir: project)
+
+      expect(status).not_to be_success
+      expect(err).to include('commit or stash core checkout changes')
+      expect(File.read(File.join(core, 'packages/ruby/Gemfile'))).to eq("source 'https://rubygems.org'\n")
+      expect(Dir.children(tmp)).to contain_exactly('core', 'ruby')
+    end
+  end
+
 end
 
 RSpec.describe CoreFamilyCheckpoint do

@@ -50,38 +50,59 @@ stdout, stderr, status = Open3.capture3("git", "-C", root, "status", "--porcelai
 abort stderr unless status.success?
 abort "commit or stash Ruby family changes before the isolated installed-core run" unless stdout.empty?
 
-stage = Dir.mktmpdir("structuredmerge-local-core-family-")
+stdout, stderr, status = Open3.capture3("git", "-C", core_root, "status", "--porcelain")
+abort "cannot inspect core checkout: #{stderr}" unless status.success?
+abort "commit or stash core checkout changes before the isolated installed-core run" unless stdout.empty?
+
+checkpoint_dir = File.expand_path(options.fetch(:checkpoint_dir, File.join(root, "tmp/core-family-gate")), Dir.pwd)
+FileUtils.mkdir_p(checkpoint_dir)
 workspace_root = File.dirname(root)
 test_root = File.join(workspace_root, "ruby-core-installed-test-#{Process.pid}")
-abort "temporary test worktree already exists: #{test_root}" if File.exist?(test_root) || File.symlink?(test_root)
+test_core_root = File.join(workspace_root, "core-package-test-#{Process.pid}")
+[test_root, test_core_root].each do |path|
+  abort "temporary test worktree already exists: #{path}" if File.exist?(path) || File.symlink?(path)
+end
+stage = Dir.mktmpdir("structuredmerge-local-core-family-")
+ruby_worktree_added = false
+core_worktree_added = false
 begin
   stdout, stderr, status = Open3.capture3("git", "-C", root, "worktree", "add", "--detach", test_root, "HEAD")
   puts stdout
   abort stderr unless status.success?
+  ruby_worktree_added = true
+  stdout, stderr, status = Open3.capture3("git", "-C", core_root, "worktree", "add", "--detach", test_core_root, "HEAD")
+  puts stdout
+  abort stderr unless status.success?
+  core_worktree_added = true
   artifact_dir = File.join(stage, "artifact")
   FileUtils.mkdir_p(artifact_dir)
+  test_core_package = File.join(test_core_root, "packages/ruby")
   core_env = Bundler.unbundled_env.merge(
-    "BUNDLE_GEMFILE" => File.join(core_package, "Gemfile"),
-    "STRUCTUREDMERGE_CORE_DEV" => core_root
+    "BUNDLE_GEMFILE" => File.join(test_core_package, "Gemfile"),
+    "STRUCTUREDMERGE_CORE_DEV" => test_core_root,
+    "CARGO_TARGET_DIR" => File.join(checkpoint_dir, "cargo-target")
   )
-  run!(core_env, [RbConfig.ruby, "-S", "bundle", "exec", "rake", "compile"], chdir: core_package)
+  run!(core_env, [RbConfig.ruby, "-S", "bundle", "exec", "rake", "compile"], chdir: test_core_package)
   run!(core_env, [RbConfig.ruby, "-S", "bundle", "exec", "ruby",
-    File.join(core_root, "workspace-scripts/check_core_ruby_artifact.rb"),
-    "--package-only", artifact_dir], chdir: core_package)
+    File.join(test_core_root, "workspace-scripts/check_core_ruby_artifact.rb"),
+    "--package-only", artifact_dir], chdir: test_core_package)
   archives = Dir.glob(File.join(artifact_dir, "*.gem"))
   abort "expected exactly one local core package, got #{archives.length}" unless archives.one?
   command = [RbConfig.ruby, File.join(test_root, "bin/check_installed_core_family.rb"),
     "--core-gem", archives.fetch(0), "--run-family-tests"]
   command.concat(["--only", options.fetch(:only)]) if options[:only]
-  checkpoint_dir = File.expand_path(options.fetch(:checkpoint_dir, File.join(root, "tmp/core-family-gate")), Dir.pwd)
   command.concat(["--checkpoint-dir", checkpoint_dir])
-  run!(Bundler.unbundled_env.merge("STRUCTUREDMERGE_CORE_DEV" => core_root,
+  run!(Bundler.unbundled_env.merge("STRUCTUREDMERGE_CORE_DEV" => test_core_root,
     "STRUCTUREDMERGE_GATE_WORKTREE" => File.realpath(test_root)), command, chdir: test_root)
 ensure
-  if File.directory?(test_root)
-    output, status = Open3.capture2e("git", "-C", root, "worktree", "remove", "--force", test_root)
+  cleanup_errors = []
+  [[root, test_root, ruby_worktree_added], [core_root, test_core_root, core_worktree_added]].each do |repo, path, added|
+    next unless added
+
+    output, status = Open3.capture2e("git", "-C", repo, "worktree", "remove", "--force", path)
     puts output
-    raise "failed to remove owned Ruby family test worktree" unless status.success?
+    cleanup_errors << "failed to remove owned test worktree #{path}" unless status.success?
   end
   FileUtils.remove_entry(stage) if File.exist?(stage)
+  raise cleanup_errors.join("; ") unless cleanup_errors.empty?
 end
