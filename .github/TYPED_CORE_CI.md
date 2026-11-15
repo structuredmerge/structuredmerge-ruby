@@ -56,3 +56,21 @@ The obsolete `STRUCTUREDMERGE_RUST_DEV` and
 Every family gem receives the same templated wiring: each depends on `tree_haver`, which
 depends on `structuredmerge-core`, so a local core checkout must be selected for all of them
 when core is not on the registry. There is no per-gem exception.
+
+## Local family package gate
+
+Run `mise run local-core-package-test` from a clean Ruby family checkout with
+`STRUCTUREDMERGE_CORE_DEV` pointing at the core checkout. It builds a platform
+gem, checks the installed family dependency graph and Rust parser provenance in
+an isolated gem home, and runs the family suites sequentially against that
+installed core. It creates disposable detached worktrees for both checkouts and a temporary gem home;
+the run can take substantial time and requires the family development dependencies,
+the Rust toolchain, a C compiler, and libclang.
+Completed member suites are checkpointed under `tmp/core-family-gate`, keyed by
+the committed family revision, core package checksum and Ruby runtime. The same
+directory also contains a reusable Cargo build cache. Rerunning
+the command resumes the remaining members. Use `--checkpoint-dir PATH` to select
+a different location. For a focused rerun, pass `--only gem-name[,gem-name]` to
+`ruby bin/test_installed_core_family.rb`; the result is explicitly partial and
+does not count as a full-family pass. This checks the local package, not a
+registry release.
