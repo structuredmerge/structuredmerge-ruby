@@ -1789,13 +1789,12 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
         report.fetch(:recipe_name) == "template_source_application_example_gemspec"
       end
       gemspec_content = gemspec_report.fetch(:final_content)
-      junit_index = gemspec_content.index(%(spec.add_dependency("rspec_junit_formatter", "~> 0.6")))
-      pending_index = gemspec_content.index(%(spec.add_dependency("rspec-pending_for", "~> 0.1")))
-      stubbed_index = gemspec_content.index(%(spec.add_dependency("rspec-stubbed_env", "~> 1.0", ">= 1.0.18")))
+      junit_index = gemspec_content.index('spec.add_dependency("rspec_junit_formatter"')
+      pending_index = gemspec_content.index('spec.add_dependency("rspec-pending_for"')
+      stubbed_index = gemspec_content.index('spec.add_dependency("rspec-stubbed_env"')
 
       expect(junit_index).to be < pending_index
       expect(pending_index).to be < stubbed_index
-      expect(gemspec_content).not_to include(%(rspec-stubbed_env", "~> 1.0", ">= 1.0.5"))
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
   end

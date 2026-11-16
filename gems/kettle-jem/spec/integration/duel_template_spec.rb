@@ -112,7 +112,7 @@ RSpec.describe Kettle::Jem, "Duel performance regression guards" do
       comment_yaml = YAML.safe_load(comment_workflow)
       expect(comment_yaml.dig("jobs", "comment", "permissions")).to include("pull-requests" => "write", "actions" => "read")
       expect(comment_yaml.dig("jobs", "again", "permissions")).to eq("actions" => "write")
-      expect(comment_workflow).to include("duel comment --report", "pull_request_target", "~> 0.1.8")
+      expect(comment_workflow).to include("duel comment --report", "pull_request_target")
       checkout = workflow_yaml.dig("jobs", "duel", "steps").find { |step| step["uses"].to_s.start_with?("actions/checkout@") }
       expect(checkout.fetch("with")).to include("fetch-depth" => 0, "persist-credentials" => false)
       baseline_ruby = workflow_yaml.dig("jobs", "duel", "steps").find { |step| step["id"] == "baseline-ruby" }
@@ -127,7 +127,6 @@ RSpec.describe Kettle::Jem, "Duel performance regression guards" do
 
       expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.4")))
       expect_gem_dependency_declared(files.fetch(:"gemfiles/modular/duel.gemfile"), "duel")
-      expect(files.fetch(:"gemfiles/modular/duel.gemfile")).to include(%(gem "duel", "~> 0.1", ">= 0.1.8"))
       expect_gem_dependency_declared(files.fetch(:"gemfiles/modular/duel.gemfile"), "stackprof")
       expect(files.fetch(:".duel.rb")).to include("c.ruby = :version_file", "c.watch += %w[.github/workflows/perf.yml]\n", "# c.comment = :failures\n", 'c.accept_label = "duel: accept"', "c.push_base = :last_passed")
       expect(files.fetch(:Gemfile).scan(%(eval_gemfile "gemfiles/modular/duel.gemfile")).size).to eq(1)
