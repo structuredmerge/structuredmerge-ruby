@@ -11,19 +11,59 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(File.read(base.join("r2.5/recording.gemfile.example"))).to include('gem "vcr", ">= 6"', 'gem "webmock", ">= 3"')
   end
 
-  it "wires the rspec_junit_formatter fork only into Ruby < 3.3 appraisals and released upstream into 3.3+" do
+  it "uses canonical formatter buckets for each Ruby series" do
     content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "Appraisals.example"))
     blocks = content.scan(/^appraise "([^"]+)" do\n(.*?)^end$/m).to_h
-    fork = 'eval_gemfile "modular/rspec_junit_formatter/r2/v0.6.gemfile"'
-    upstream = 'eval_gemfile "modular/rspec_junit_formatter/r3.3/v0.8.gemfile"'
-
-    %w[ruby-2-3 ruby-2-4 ruby-2-5 ruby-2-6 ruby-2-7 ruby-3-0 ruby-3-1 ruby-3-2].each do |name|
-      expect(blocks.fetch(name)).to include(fork)
-      expect(blocks.fetch(name)).not_to include(upstream)
+    %w[ruby-2-3 ruby-2-4 ruby-2-5 ruby-2-6 ruby-2-7].each do |name|
+      expect(blocks.fetch(name)).to include("rspec_junit_formatter/r2/v0.6.gemfile")
     end
-    %w[head current ruby-3-3 ruby-3-4].each do |name|
-      expect(blocks.fetch(name)).to include(upstream)
-      expect(blocks.fetch(name)).not_to include(fork)
+    %w[ruby-3-0 ruby-3-1 ruby-3-2].each do |name|
+      expect(blocks.fetch(name)).to include("rspec_junit_formatter/r3.2/v0.6.gemfile")
+    end
+    %w[ruby-3-3 ruby-3-4].each do |name|
+      expect(blocks.fetch(name)).to include("rspec_junit_formatter/r3/v0.8.gemfile")
+    end
+    %w[head current].each { |name| expect(blocks.fetch(name)).to include("modular/rspec.gemfile") }
+  end
+
+  it "retains the formatter bucket containing the floor and prunes older majors" do
+    config = {"ruby" => {"test_minimum" => "4.0.0"}, "rubygems" => {"min_ruby" => "4.0.0"}}
+    %w[r2/v0.6 r3.2/v0.6 r3/v0.8].each do |variant|
+      expect(described_class.send(:skip_packaged_gemfile_template?, "gemfiles/modular/rspec_junit_formatter/#{variant}.gemfile", config)).to be(true)
+    end
+    expect(described_class.send(:skip_packaged_gemfile_template?, "gemfiles/modular/rspec_junit_formatter/r4/v0.8.gemfile", config)).to be(false)
+  end
+
+  it "generates the Ruby 4 formatter for a fresh project and after a floor transition" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    [false, true].each do |existing|
+      Dir.mktmpdir("formatter-floor", tmp_root) do |root|
+        config = <<~YAML
+          rubygems:
+            min_ruby: "4.0.0"
+          ruby:
+            test_minimum: "4.0.0"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/rspec.gemfile
+              - gemfiles/modular/rspec_junit_formatter/r2/v0.6.gemfile
+              - gemfiles/modular/rspec_junit_formatter/r3.2/v0.6.gemfile
+              - gemfiles/modular/rspec_junit_formatter/r3/v0.8.gemfile
+              - gemfiles/modular/rspec_junit_formatter/r4/v0.8.gemfile
+        YAML
+        files = {".kettle-jem.yml" => config, "example.gemspec" => "Gem::Specification.new { |s| s.name = 'example'; s.version = '1.0' }\n"}
+        if existing
+          files["gemfiles/modular/rspec_junit_formatter/r2/v0.6.gemfile"] = "# old fork\n"
+        end
+        write_tree(root, files)
+        described_class.apply_project(root, env: {}, run_options: {accept: true})
+        expect(File).to exist(File.join(root, "gemfiles/modular/rspec_junit_formatter/r4/v0.8.gemfile"))
+        expect(File.read(File.join(root, "gemfiles/modular/rspec.gemfile"))).to include("rspec_junit_formatter/r4/v0.8.gemfile")
+        expect(File).not_to exist(File.join(root, "gemfiles/modular/rspec_junit_formatter/r2/v0.6.gemfile"))
+      end
     end
   end
 

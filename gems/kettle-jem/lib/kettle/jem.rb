@@ -10741,6 +10741,8 @@ module Kettle
       index + 2
     end
 
+    # Normalize paths for merging, without interpreting ranges; see
+    # Kettle::Rb::RubySeriesBuckets for the complete-set bucket rules.
     def normalize_eval_gemfile_ruby_bucket(path)
       segments = path.to_s.split("/", -1)
       bucket_index = segments.index { |segment| ruby_bucket_path_segment?(segment) }
@@ -19659,12 +19661,20 @@ module Kettle
       target.end_with?("/version.rb", "/version.rbs")
     end
 
+    # Cleanup uses the same canonical bucket relevance as template selection and
+    # keeps references reachable from surviving loaders.
     def inactive_packaged_template_cleanup_files(project_root, config = {})
       gemfile_cleanups = Dir.glob(File.join(project_root, "gemfiles/**/*.gemfile")).filter_map do |path|
         relative_path = path.delete_prefix("#{project_root}/")
         next unless preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
 
         {target_path: relative_path} if skip_packaged_gemfile_template?(relative_path, config)
+      end
+      # The old formatter path used r3.3 as a lower bound. It is no longer a
+      # canonical bucket; the reference guard protects existing loaders during migration.
+      legacy_formatter = "gemfiles/modular/rspec_junit_formatter/r3.3/v0.8.gemfile"
+      if File.file?(File.join(project_root, legacy_formatter))
+        gemfile_cleanups << {target_path: legacy_formatter}
       end
       gemfile_cleanups = reject_loader_referenced_gemfile_cleanups(project_root, gemfile_cleanups)
       (gemfile_cleanups + disabled_integration_config_cleanups(project_root, config)).sort_by { |cleanup| cleanup.fetch(:target_path) }
@@ -20086,6 +20096,20 @@ module Kettle
         return !relevant.include?(x_std_bucket)
       end
 
+      # A bucket's range depends on all sibling bucket names, not its name alone.
+      # Kettle::Rb::RubySeriesBuckets is the canonical definition.
+      path = target_path.to_s
+      if (match = path.match(%r{\Agemfiles/modular/([^/]+)/(r\d+(?:\.\d+)?)/}))
+        bucket_root = File.join(template_root_path.to_s, "gemfiles/modular", match[1])
+        buckets = Dir.glob(File.join(bucket_root, "r*")).select { |entry| File.directory?(entry) }
+          .map { |entry| File.basename(entry) }.select { |name| ruby_bucket_path_segment?(name) }
+        if buckets.include?(match[2])
+          minimum = config_test_min_ruby(config)
+          return false unless minimum
+          return !Kettle::Rb::RubySeriesBuckets.relevant_buckets(buckets, minimum: minimum).include?(match[2])
+        end
+      end
+
       version = packaged_gemfile_template_ruby_floor(target_path)
       return false unless version
 
@@ -20095,6 +20119,8 @@ module Kettle
       Gem::Version.new(version) < min_ruby
     end
 
+    # Inventory the complete x_std_lib bucket set for the canonical ranges in
+    # Kettle::Rb::RubySeriesBuckets, including transitively loaded templates.
     def packaged_x_std_lib_template_inventory(template_root_path)
       root_key = File.expand_path(template_root_path.to_s)
       if root_key == File.expand_path(PACKAGED_TEMPLATE_ROOT)
@@ -20170,7 +20196,7 @@ module Kettle
         return "#{match[1]}.#{match[2]}"
       end
 
-      path[%r{(?:\A|/)r(\d+\.\d+)(?:/|\z)}, 1]
+      nil
     end
 
     def enabled_ruby_engines(config)
