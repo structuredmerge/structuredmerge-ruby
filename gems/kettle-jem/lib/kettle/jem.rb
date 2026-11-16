@@ -6352,25 +6352,6 @@ module Kettle
       )
     end
 
-    def remove_excluded_changelog_transfer_entries(content, excluded_keys)
-      excluded = Array(excluded_keys).map(&:to_s).reject(&:empty?).to_set
-      return content if excluded.empty?
-
-      lines = markdown_source_lines(content)
-      removals = changelog_existing_transfer_occurrences(content).filter_map do |occurrence|
-        key = occurrence.fetch(:key).to_s
-        next unless excluded.include?(key)
-
-        (occurrence.fetch(:start_line)..occurrence.fetch(:end_line))
-      end
-      return content if removals.empty?
-
-      lines.each_with_index.reject do |_line, index|
-        line_number = index + 1
-        removals.any? { |range| range.cover?(line_number) }
-      end.map(&:first).join("\n").then { |text| ensure_trailing_newline(text.gsub(/\n{3,}/, "\n\n")) }
-    end
-
     def changelog_existing_transfer_occurrences(content)
       context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "CHANGELOG.md")
       release_sections = context.structural_owners(owner_scope: :heading_sections)

@@ -62,6 +62,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Removed
 
+- Dead remove_excluded_changelog_transfer_entries helper; excluded-key pruning lives in kettle-changelog's TransferMerger, which now only prunes Unreleased (#151).
+
 ### Fixed
 
 - Root Gemfile checksum fingerprints now include the config-derived default test bundle, so changing the default framework version triggers a re-render.
