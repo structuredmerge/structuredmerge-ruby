@@ -39,17 +39,13 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-dev (>= 3.1.27 -> >= 3.1.29)
-  - kettle-changelog (>= 1.0.17 -> >= 1.0.18)
-  - rspec-stubbed_env (>= 1.0.17 -> >= 1.0.18)
-  - kettle-family (>= 1.3.38 -> >= 1.3.43)
-  - stone_checksums (>= 1.0.9 -> >= 1.0.10)
-  - turbo_tests2 (>= 4.0.0 -> >= 4.0.2)
-  - gitmoji-regex (>= 2.0.15 -> >= 2.0.16)
-  - yard-fence (>= 0.9.10 -> >= 0.9.11)
-  - yard-timekeeper (>= 0.2.9 -> >= 0.2.10)
-  - duel (>= 0.1.4 -> >= 0.1.8)
-  - kettle-test (>= 2.0.29 -> >= 2.0.30)
+  - rspec-stubbed_env (>= 1.0.18 -> >= 1.0.19)
+  - kettle-family (>= 1.3.43 -> >= 1.3.44)
+  - stone_checksums (>= 1.0.10 -> >= 1.0.11)
+  - kramdown (>= 2.5.2 -> >= 2.6.1)
+  - yaml-converter (>= 0.2.7 -> >= 0.2.8)
+  - yard-fence (>= 0.9.11 -> >= 0.9.12)
+  - yard-timekeeper (>= 0.2.10 -> >= 0.2.11)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)

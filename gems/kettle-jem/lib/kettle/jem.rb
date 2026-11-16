@@ -57,7 +57,7 @@ module Kettle
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
-      "rspec-stubbed_env" => ">= 1.0.18"
+      "rspec-stubbed_env" => ">= 1.0.19"
     }.freeze
     # Template dependency transitions are location-independent. Prepare finds
     # declarations in the destination and reconciles their complete requirement
@@ -5223,12 +5223,12 @@ module Kettle
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.29"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.19"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.43"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.44"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.30"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
-        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.10"\n)},
+        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.11"\n)},
         {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 4.0", ">= 4.0.2"\n)}
       ].freeze
     end
@@ -16399,7 +16399,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.3", ">= 1.3.43"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.44"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
