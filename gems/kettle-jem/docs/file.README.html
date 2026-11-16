@@ -952,11 +952,35 @@ matrix:
   Rakefile:
     strategy: merge
     preference: destination     # keep your custom tasks
+    add_template_only_nodes: true
   certs/my.pem:
     strategy: raw_copy          # binary file, no merging
   generated/report.md:
     strategy: keep_destination  # never touch this file
 </code></pre>
+
+<h3 id="alef-generated-ruby-packages">Alef-generated Ruby packages</h3>
+
+<p>For an Alef-generated monorepo subgem, generate the package first, then hand<br>
+the Rakefile over to Kettle Jem by adding its repository-relative path to<br>
+<code>[workspace.ownership].user_owned</code> in <code>alef.toml</code>. Keep any existing entries:</p>
+
+<pre class="code language-toml"><code class="language-toml">[workspace.ownership]
+user_owned = [
+  &quot;packages/ruby/Rakefile&quot;,
+  &quot;packages/ruby/structuredmerge_core.gemspec&quot;,
+]
+</code></pre>
+
+<p>Use the Rakefile override above in the package’s Kettle Jem configuration.<br>
+The monorepo subgem profile seeds <code>accept_template</code> for a new configuration;<br>
+an explicit <code>merge</code> strategy survives subsequent profile synchronization.<br>
+Destination preference retains native build tasks and <code>rb_sys</code> configuration,<br>
+while template-only nodes add Kettle’s tasks. Once handed off, Alef no longer<br>
+regenerates or verifies that file. Run <code>alef verify --exit-code</code> after the<br>
+handoff, and rerun Alef generation and Kettle templating to check convergence.<br>
+Configure the package as a member of <code>kettle-family</code> for its local-template<br>
+and release workflows.</p>
 
 <h3 id="environment-variables--cli-options">Environment Variables &amp; CLI Options</h3>
 
@@ -1430,9 +1454,9 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Sep 10 20:23:43 2026 by
+  Generated on Mon Nov 16 08:19:48 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.45 (ruby-4.0.6).
+  0.9.45 (ruby-4.0.9).
 </div>
 
     </div>

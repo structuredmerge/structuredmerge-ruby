@@ -70,17 +70,28 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 and <a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">yes</a>, platform and engine support are part of the <a href="https://github.com/semver/semver/issues/716#issuecomment-869336139">public API</a>.<br>
 Please file a bug if you notice a violation of semantic versioning.</p>
 
-<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.41...HEAD">Unreleased</a></h2>
+<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.42...HEAD">Unreleased</a></h2>
 
 <h3 id="added">Added</h3>
+
+<ul>
+  <li>
+<code>workflows.legacy_engines</code> opts an EOL engine workflow back in, as a list (<code>- truffleruby-24.2</code>) or a map keyed by workflow name with optional <code>mode</code> (<code>parallel</code> default, <code>serial</code> runs the job with <code>KETTLE_TEST_RUNNER=rspec</code>, <code>experimental</code> adds <code>experimental: true</code> to its matrix entry), <code>tracking</code> (issue URL) and <code>revisit_by</code> (date; a warning is reported once it has passed). Templating also reports a warning for every EOL workflow it removes, so the deletion is never silent.</li>
+</ul>
 
 <h3 id="changed">Changed</h3>
 
 <ul>
-  <li>[kc] kettle-jem/prepare: updated 24 project files:
+  <li>
+    <p>Update the opt-in Duel integration to 0.1.8, including fork-safe comments, regression acceptance labels, merge queues, and last-passed push baselines. Existing .duel.rb configurations remain project-owned.</p>
+  </li>
+  <li>
+    <p><strong>Breaking for generated CI:</strong> workflows for EOL engine releases are no longer generated, and existing copies are deleted on the next templating run: <code>jruby-9.1</code>, <code>jruby-9.2</code>, <code>jruby-9.3</code>, <code>jruby-9.4</code>, <code>truffleruby-22.3</code>, <code>truffleruby-23.1</code>, <code>truffleruby-24.2</code>, <code>truffleruby-25.0</code>. An engine release is EOL when the CRuby it implements is EOL, and the TruffleRuby maintainers have asked projects to stop testing old releases. Their README compatibility badges become the static <code>(🚫CI)</code> variant (support is declared via the equivalent MRI job and rubocop-lts rules, as for Ruby &lt; 2.4) instead of being removed. List a workflow under <code>workflows.legacy_engines</code> to keep it. See structuredmerge/structuredmerge-ruby#131.</p>
+  </li>
+  <li>[kc] kettle-jem/prepare: updated 25 project files:
     <ul>
       <li>configuration (1)</li>
-      <li>dependencies (23)</li>
+      <li>dependencies (24)</li>
     </ul>
   </li>
   <li>[kc] kettle-jem/template: updated 5 project files:
@@ -93,14 +104,32 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
     <ul>
-      <li>kettle-family (&gt;= 1.3.36 -&gt; &gt;= 1.3.37)</li>
+      <li>kettle-dev (&gt;= 3.1.27 -&gt; &gt;= 3.1.29)</li>
+      <li>kettle-changelog (&gt;= 1.0.17 -&gt; &gt;= 1.0.18)</li>
+      <li>rspec-stubbed_env (&gt;= 1.0.17 -&gt; &gt;= 1.0.18)</li>
+      <li>kettle-family (&gt;= 1.3.38 -&gt; &gt;= 1.3.43)</li>
+      <li>stone_checksums (&gt;= 1.0.9 -&gt; &gt;= 1.0.10)</li>
+      <li>turbo_tests2 (&gt;= 4.0.0 -&gt; &gt;= 4.0.2)</li>
+      <li>gitmoji-regex (&gt;= 2.0.15 -&gt; &gt;= 2.0.16)</li>
+      <li>yard-fence (&gt;= 0.9.10 -&gt; &gt;= 0.9.11)</li>
+      <li>yard-timekeeper (&gt;= 0.2.9 -&gt; &gt;= 0.2.10)</li>
+      <li>duel (&gt;= 0.1.4 -&gt; &gt;= 0.1.8)</li>
+      <li>kettle-test (&gt;= 2.0.29 -&gt; &gt;= 2.0.30)</li>
     </ul>
   </li>
   <li>[kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
     <ul>
-      <li>ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -&gt; v1.336.0 (de492cf36cbab201753d720ce4f4e336cd688c94)</li>
+      <li>github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)</li>
+      <li>github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)</li>
+      <li>github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)</li>
+      <li>qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -&gt; v2.7.0 (0ff2178667bf8eb28ed0013a7ef54857a24d4056)</li>
+      <li>ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -&gt; v1.338.0 (b3aaceaef7e0ee231b499e7b5f49c03fc1d32199)</li>
     </ul>
   </li>
+  <li>
+    <p>Keep destination-preferred gemspec version loaders aligned with configured Ruby entrypoint paths.</p>
+  </li>
+  <li>rspec.gemfile template uses released rspec_junit_formatter ~&gt; 0.8 on Ruby &gt;= 3.3 and keeps the pboling fork (invalid-UTF-8 fix) only for older Rubies (<a href="https://github.com/structuredmerge/structuredmerge-ruby/issues/136">#136</a>)</li>
 </ul>
 
 <h3 id="deprecated">Deprecated</h3>
@@ -110,10 +139,41 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 <h3 id="fixed">Fixed</h3>
 
 <ul>
-  <li>Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile’s them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.</li>
+  <li>
+    <p>Root Gemfile checksum fingerprints now include the config-derived default test bundle, so changing the default framework version triggers a re-render.</p>
+  </li>
+  <li>
+    <p>README post-processing no longer treats badge image definitions (shields.io URLs) as workflow references, which stripped the inline badges that use them on every run. Compatible versioned engine badges (for example Truffle Ruby 33.0) whose workflow exists are now added as intended. (#133)</p>
+  </li>
+  <li>
+    <p>Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile’s them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.</p>
+  </li>
+  <li>
+    <p>[kc] alef-gemspec-spec-files: Kettle Jem now merges Alef-generated spec.files candidate lists and exclusion filters while retaining destination gem version metadata.</p>
+  </li>
+  <li>
+    <p>Remove the Style/SafeNavigation offense from the generated gemfiles/modular/style_local.gemfile (spec&amp;.version in the local_gem_satisfies? gemspec guard), so templated projects no longer carry a .rubocop_gradual.lock baseline entry for it</p>
+  </li>
+  <li>
+    <p>Wire every configured StructuredMerge family gem in local templating bundles to prevent mixed local and registry dependency versions.</p>
+  </li>
 </ul>
 
 <h3 id="security">Security</h3>
+
+<h2 id="7142---2026-10-31">
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.41...v7.1.42">7.1.42</a> - 2026-10-31</h2>
+
+<ul>
+  <li>TAG: <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.42">v7.1.42</a>
+</li>
+</ul>
+
+<h3 id="changed-1">Changed</h3>
+
+<ul>
+  <li>Historical release notes are unavailable in this changelog.</li>
+</ul>
 
 <h2 id="7141---2026-10-29">
 <a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.40...v7.1.41">7.1.41</a> - 2026-10-29</h2>
@@ -126,7 +186,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>20.48% documented</li>
 </ul>
 
-<h3 id="changed-1">Changed</h3>
+<h3 id="changed-2">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -251,7 +311,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.89% documented</li>
 </ul>
 
-<h3 id="changed-2">Changed</h3>
+<h3 id="changed-3">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -279,7 +339,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.89% documented</li>
 </ul>
 
-<h3 id="changed-3">Changed</h3>
+<h3 id="changed-4">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -332,7 +392,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.89% documented</li>
 </ul>
 
-<h3 id="changed-4">Changed</h3>
+<h3 id="changed-5">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -353,7 +413,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.89% documented</li>
 </ul>
 
-<h3 id="changed-5">Changed</h3>
+<h3 id="changed-6">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem/prepare: updated 6 project files:
@@ -440,7 +500,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.84% documented</li>
 </ul>
 
-<h3 id="changed-6">Changed</h3>
+<h3 id="changed-7">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem/prepare: updated 10 project files:
@@ -505,7 +565,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
 </ul>
 
-<h3 id="changed-7">Changed</h3>
+<h3 id="changed-8">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -550,7 +610,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.72% documented</li>
 </ul>
 
-<h3 id="changed-8">Changed</h3>
+<h3 id="changed-9">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -584,7 +644,7 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>19.72% documented</li>
 </ul>
 
-<h3 id="changed-9">Changed</h3>
+<h3 id="changed-10">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -690,7 +750,7 @@ engine support needs.</p>
   </li>
 </ul>
 
-<h3 id="changed-10">Changed</h3>
+<h3 id="changed-11">Changed</h3>
 
 <ul>
   <li>Require kettle-rb <code>&gt;= 0.1.14</code> (security floor data).</li>
@@ -893,7 +953,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.11% documented</li>
 </ul>
 
-<h3 id="changed-11">Changed</h3>
+<h3 id="changed-12">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -921,7 +981,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.11% documented</li>
 </ul>
 
-<h3 id="changed-12">Changed</h3>
+<h3 id="changed-13">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -949,7 +1009,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>Curated Bundler binstub generation now includes <code>rubocop-gradual</code>.</li>
 </ul>
 
-<h3 id="changed-13">Changed</h3>
+<h3 id="changed-14">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1003,7 +1063,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.14% documented</li>
 </ul>
 
-<h3 id="changed-14">Changed</h3>
+<h3 id="changed-15">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1024,7 +1084,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.14% documented</li>
 </ul>
 
-<h3 id="changed-15">Changed</h3>
+<h3 id="changed-16">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1059,7 +1119,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.13% documented</li>
 </ul>
 
-<h3 id="changed-16">Changed</h3>
+<h3 id="changed-17">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1119,7 +1179,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.01% documented</li>
 </ul>
 
-<h3 id="changed-17">Changed</h3>
+<h3 id="changed-18">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1141,7 +1201,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.01% documented</li>
 </ul>
 
-<h3 id="changed-18">Changed</h3>
+<h3 id="changed-19">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1163,7 +1223,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.01% documented</li>
 </ul>
 
-<h3 id="changed-19">Changed</h3>
+<h3 id="changed-20">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1185,7 +1245,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.01% documented</li>
 </ul>
 
-<h3 id="changed-20">Changed</h3>
+<h3 id="changed-21">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1228,7 +1288,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.92% documented</li>
 </ul>
 
-<h3 id="changed-21">Changed</h3>
+<h3 id="changed-22">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1262,7 +1322,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.92% documented</li>
 </ul>
 
-<h3 id="changed-22">Changed</h3>
+<h3 id="changed-23">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1314,7 +1374,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-23">Changed</h3>
+<h3 id="changed-24">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1348,7 +1408,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-24">Changed</h3>
+<h3 id="changed-25">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1396,7 +1456,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.96% documented</li>
 </ul>
 
-<h3 id="changed-25">Changed</h3>
+<h3 id="changed-26">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem/template: updated 796 project files:
@@ -1444,7 +1504,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-26">Changed</h3>
+<h3 id="changed-27">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1465,7 +1525,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.95% documented</li>
 </ul>
 
-<h3 id="changed-27">Changed</h3>
+<h3 id="changed-28">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem/template: updated 398 project files:
@@ -1510,7 +1570,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.92% documented</li>
 </ul>
 
-<h3 id="changed-28">Changed</h3>
+<h3 id="changed-29">Changed</h3>
 
 <ul>
   <li>
@@ -1594,7 +1654,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>Gemspec author metadata now expands existing authors with Git-derived copyright holders and consolidates configured author aliases, while applying the documented default machine-account filter.</li>
 </ul>
 
-<h3 id="changed-29">Changed</h3>
+<h3 id="changed-30">Changed</h3>
 
 <ul>
   <li>
@@ -1620,7 +1680,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.97% documented</li>
 </ul>
 
-<h3 id="changed-30">Changed</h3>
+<h3 id="changed-31">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1642,7 +1702,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.97% documented</li>
 </ul>
 
-<h3 id="changed-31">Changed</h3>
+<h3 id="changed-32">Changed</h3>
 
 <ul>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
@@ -1677,7 +1737,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>17.97% documented</li>
 </ul>
 
-<h3 id="changed-32">Changed</h3>
+<h3 id="changed-33">Changed</h3>
 
 <ul>
   <li>
@@ -1743,7 +1803,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.00% documented</li>
 </ul>
 
-<h3 id="changed-33">Changed</h3>
+<h3 id="changed-34">Changed</h3>
 
 <ul>
   <li>
@@ -1787,7 +1847,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   <li>18.01% documented</li>
 </ul>
 
-<h3 id="changed-34">Changed</h3>
+<h3 id="changed-35">Changed</h3>
 
 <ul>
   <li>
@@ -1855,7 +1915,7 @@ that require it can run on Rubies where it is no longer bundled by default.</li>
   </li>
 </ul>
 
-<h3 id="changed-35">Changed</h3>
+<h3 id="changed-36">Changed</h3>
 
 <ul>
   <li>
@@ -1971,7 +2031,7 @@ RSpec helpers provided by <code>kettle-test</code>.</p>
   <li>Transfer changelog replay now supports destination applicability filters and filter-aware status reporting.</li>
 </ul>
 
-<h3 id="changed-36">Changed</h3>
+<h3 id="changed-37">Changed</h3>
 
 <ul>
   <li>Runtime dependency metadata now requires <code>kettle-ndjson</code> 0.1.3 or newer and<br>
@@ -3456,9 +3516,9 @@ preserving comments and trailing commas during template updates.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Sep 10 20:23:43 2026 by
+  Generated on Mon Nov 16 08:19:48 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.45 (ruby-4.0.6).
+  0.9.45 (ruby-4.0.9).
 </div>
 
     </div>

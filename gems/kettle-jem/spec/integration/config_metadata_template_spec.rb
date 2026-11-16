@@ -2204,6 +2204,59 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "re-renders the root Gemfile when the framework-matrix default bundle changes" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-default-bundle-checksum", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.version = "0.1.0"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/Gemfile.example" => "source \"https://gem.coop\"\ngemspec\n",
+        ".kettle-jem.yml" => <<~YAML
+          workflows:
+            preset: framework
+            framework_matrix:
+              dimension: rails
+              gem: rails
+              gemfile_pattern: rails_{version}.gemfile
+              versions:
+                - label: "7.2"
+                  slug: "7_2"
+                  requirement: "~> 7.2.2"
+                  default: true
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+          files:
+            Gemfile:
+              strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      gemfile_path = File.join(root, "Gemfile")
+      expect(File.read(gemfile_path)).to include('eval_gemfile "gemfiles/rails_7_2.gemfile"')
+
+      config_path = File.join(root, described_class::KETTLE_CONFIG_PATH)
+      config = YAML.safe_load_file(config_path)
+      version = config.dig("workflows", "framework_matrix", "versions").first
+      version.merge!("label" => "8.0", "slug" => "8_0", "requirement" => "~> 8.0", "default" => true)
+      File.write(config_path, YAML.dump(config))
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+
+      expect(File.read(gemfile_path)).to include('eval_gemfile "gemfiles/rails_8_0.gemfile"')
+      expect(File.read(gemfile_path)).not_to include('eval_gemfile "gemfiles/rails_7_2.gemfile"')
+    end
+  end
+
   it "invalidates modular Gemfile checksum inputs when dependency conflict policy changes" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

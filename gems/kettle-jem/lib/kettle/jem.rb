@@ -65,7 +65,7 @@ module Kettle
     TEMPLATE_MANAGED_DEPENDENCIES = [
       {name: PACKAGE_NAME, requirements: ["~> 7.1", ">= 7.1.28"], bootstrap: false},
       {name: "nomono", requirements: ["~> 1.1", ">= 1.1.18"], bootstrap: true},
-      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.28"], bootstrap: true},
+      {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.29"], bootstrap: true},
       {
         name: "kettle-changelog",
         requirements: ["~> 1.0", ">= 1.0.18"],
@@ -3915,6 +3915,12 @@ module Kettle
       if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :appraisals
         payload[:appraisals_template_policy_fingerprint_version] = APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
+      if report.fetch(:relative_path).to_s == "Gemfile"
+        runtime_context = report.dig(:request_envelope, :request, :runtime_context) || {}
+        ci_context = runtime_context[:ci] || runtime_context["ci"] || {}
+        default_test_bundle = ci_context[:default_test_bundle] || ci_context["default_test_bundle"] || {}
+        payload[:default_test_bundle] = stringify_keys_for_json(default_test_bundle)
+      end
       if report.fetch(:relative_path).to_s.start_with?("gemfiles/modular/")
         conflict_policy = modular_dependency_conflict_decisions(
           kettle_jem_config(project_root)
@@ -5215,11 +5221,11 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.6"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.28"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.29"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.19"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.41"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.43"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
-        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.29"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.30"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.10"\n)},
@@ -16393,7 +16399,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.3", ">= 1.3.41"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.43"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
@@ -19926,11 +19932,10 @@ module Kettle
       files = config["files"]
       return unless files.is_a?(Hash)
 
-      current = files
-      target_path.to_s.delete_prefix("./").split("/").each do |part|
-        return unless current.is_a?(Hash) && current.key?(part)
-
-        current = current[part]
+      current = target_path.to_s.delete_prefix("./").split("/").reduce(files) do |memo, part|
+        if memo.is_a?(Hash) && memo.key?(part)
+          memo[part]
+        end
       end
       return unless current.is_a?(Hash) && !current.key?("strategy")
       return unless current.keys.any? { |key| %w[preference add_template_only_nodes file_type].include?(key) }
