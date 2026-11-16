@@ -927,7 +927,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         recipe_name: "template_source_application_github_workflows_truffleruby_24_2_yml",
         relative_path: ".github/workflows/truffleruby-24.2.yml",
         request_envelope: {request: {recipe_name: "supplied_template_source_application", recipe_version: "1",
-          runtime_context: {ci: {legacy_experimental_engines: ["truffleruby-24.2"]}}}},
+                                     runtime_context: {ci: {legacy_experimental_engines: ["truffleruby-24.2"]}}}},
         metadata: {template_source_preference: {
           source_root_path: project_root.to_s,
           source_relative_path: "lib/kettle/jem/templates/.github/workflows/truffleruby-24.2.yml.example"

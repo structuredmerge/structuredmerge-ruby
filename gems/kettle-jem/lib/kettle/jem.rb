@@ -3915,6 +3915,12 @@ module Kettle
       if template_file_type_for_relative_path(report.fetch(:relative_path).to_s) == :appraisals
         payload[:appraisals_template_policy_fingerprint_version] = APPRAISALS_TEMPLATE_POLICY_FINGERPRINT_VERSION
       end
+      if report.fetch(:relative_path).to_s == "Gemfile"
+        runtime_context = report.dig(:request_envelope, :request, :runtime_context) || {}
+        ci_context = runtime_context[:ci] || runtime_context["ci"] || {}
+        default_test_bundle = ci_context[:default_test_bundle] || ci_context["default_test_bundle"] || {}
+        payload[:default_test_bundle] = stringify_keys_for_json(default_test_bundle)
+      end
       if report.fetch(:relative_path).to_s.start_with?("gemfiles/modular/")
         conflict_policy = modular_dependency_conflict_decisions(
           kettle_jem_config(project_root)
@@ -19926,11 +19932,10 @@ module Kettle
       files = config["files"]
       return unless files.is_a?(Hash)
 
-      current = files
-      target_path.to_s.delete_prefix("./").split("/").each do |part|
-        return unless current.is_a?(Hash) && current.key?(part)
-
-        current = current[part]
+      current = target_path.to_s.delete_prefix("./").split("/").reduce(files) do |memo, part|
+        if memo.is_a?(Hash) && memo.key?(part)
+          memo[part]
+        end
       end
       return unless current.is_a?(Hash) && !current.key?("strategy")
       return unless current.keys.any? { |key| %w[preference add_template_only_nodes file_type].include?(key) }

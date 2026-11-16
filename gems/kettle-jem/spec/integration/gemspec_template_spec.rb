@@ -1192,7 +1192,7 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
 
     rewritten = described_class.send(:rewrite_gemspec_version_loader, gemspec, facts: facts)
 
-    expect(rewritten).to include('}::StructuredmergeCore::VERSION')
+    expect(rewritten).to include("}::StructuredmergeCore::VERSION")
     expect(rewritten).not_to include("StructuredmergeCore::Version::VERSION")
     expect(
       described_class.send(:rewrite_gemspec_version_loader, gemspec, facts: facts.merge(gemspec: {preference: "destination"}))
@@ -1217,9 +1217,9 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
 
     rewritten = described_class.send(:rewrite_gemspec_version_loader, gemspec, facts: facts)
 
-    expect(rewritten).to include('lib/structuredmerge_core/version.rb')
-    expect(rewritten).to include('::StructuredmergeCore::Version::VERSION')
-    expect(rewritten).not_to include('lib/structuredmerge/core/version.rb')
+    expect(rewritten).to include("lib/structuredmerge_core/version.rb")
+    expect(rewritten).to include("::StructuredmergeCore::Version::VERSION")
+    expect(rewritten).not_to include("lib/structuredmerge/core/version.rb")
   end
 
   it "honors a gemspec preference configured without an explicit strategy" do
@@ -1313,10 +1313,19 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
         FileUtils.mkdir_p(File.dirname(absolute))
         File.write(absolute, "fixture")
       end
-      spec = Dir.chdir(root) { eval(merged, TOPLEVEL_BINDING, "demo.gemspec") }
+      gemspec_path = File.join(root, "demo.gemspec")
+      File.write(gemspec_path, merged)
+      stdout, stderr, status = Open3.capture3(
+        RbConfig.ruby,
+        "-e",
+        'require "json"; spec = Gem::Specification.load("demo.gemspec"); abort "Could not load gemspec" unless spec; puts JSON.generate(spec.files)',
+        chdir: root
+      )
 
-      expect(spec.files).to include("README.md", "lib/structuredmerge_core/demo.rb")
-      expect(spec.files.grep(/\.so\z/)).to be_empty
+      expect(status).to be_success, stderr
+      files = JSON.parse(stdout)
+      expect(files).to include("README.md", "lib/structuredmerge_core/demo.rb")
+      expect(files.grep(/\.so\z/)).to be_empty
     end
   end
 

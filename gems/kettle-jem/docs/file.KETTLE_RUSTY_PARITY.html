@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: KETTLE_RUSTY_PARITY
+  
+    &mdash; Documentation by YARD 0.9.45
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "KETTLE_RUSTY_PARITY";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: KETTLE_RUSTY_PARITY</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1 id="kettle-jem--kettle-rusty-parity-inventory">kettle-jem / kettle-rusty parity inventory</h1>
+
+<p>Status: active inventory for phased work in structuredmerge-ruby issues #92 and<br>
+#96. This is not a parity claim. Each surface below has an explicit disposition;<br>
+the remaining audit is to map every behavior test and unsupported path.</p>
+
+<h2 id="scope-distinction">Scope distinction</h2>
+
+<ul>
+  <li>kettle-jem scaffolds and maintains Ruby gems and monorepos.</li>
+  <li>kettle-rusty discovers Cargo projects and applies Rust project, packaged<br>
+template, and README style recipes.</li>
+  <li>Only equivalent planning, ownership, rendering, reporting, and convergence<br>
+semantics are candidates for shared fixtures. Ruby gem metadata and Cargo<br>
+package metadata are ecosystem-specific.</li>
+</ul>
+
+<h2 id="behavior-map">Behavior map</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Surface</th>
+      <th>Ruby behavior and evidence</th>
+      <th>Rust behavior and evidence</th>
+      <th>Disposition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Project discovery</td>
+      <td>GemSpecReader, Gemfile/repository/monorepo facts; kettle/jem_spec_spec.rb and e2e/rubygems_thin_vertical_slice_spec.rb</td>
+      <td>Cargo package/dependency facts and workflows; rust/crates/kettle-rusty/src/lib.rs and tests/thin_slice.rs</td>
+      <td>Similar purpose, ecosystem-specific schemas. Cargo workspace selection is Rust-specific and covered by #97.</td>
+    </tr>
+    <tr>
+      <td>Configuration</td>
+      <td>Current and legacy kettle-jem config, metadata, platform and workflow controls; integration/config_metadata_template_spec.rb and kettle/jem_platforms_config_spec.rb</td>
+      <td>kettle.yml template and README settings; kettle-rusty parser/planner tests</td>
+      <td>Separate schemas. Shared unknown-key/default/precedence semantics remain a comparison candidate; no equivalence claim yet.</td>
+    </tr>
+    <tr>
+      <td>Decisions and ownership</td>
+      <td>DecisionPolicy, file work units, lock/checksum skips, conflicts and per-run decisions; integration/recipe_planning_spec.rb, byte_offset_edit_spec.rb, and integration/structural_merge_template_spec.rb</td>
+      <td>Existing destination preservation and README managed-block conflict diagnostics; tests/thin_slice.rs</td>
+      <td>Shared ownership/convergence fixture for README user-section preservation exists. Broader lock/checksum and conflict semantics remain unpaired.</td>
+    </tr>
+    <tr>
+      <td>Template selection and bootstrap</td>
+      <td>Packaged/local roots, profile filters, include/only patterns, bootstrap; integration/template_bootstrap_spec.rb and integration/recipe_planning_spec.rb</td>
+      <td>Packaged inventory and configured local entries/profile; tests/thin_slice.rs</td>
+      <td>Shared local-template output/path/idempotence fixture exists. Profile/filter parity is unproven; Ruby bootstrap has Ruby-only gem conventions.</td>
+    </tr>
+    <tr>
+      <td>Dependency generation</td>
+      <td>gemspec, Gemfile, Appraisal, dependency floors; integration/gemspec_template_spec.rb, integration/appraisals_and_gemfile_template_spec.rb, integration/appraisal_helper_and_token_spec.rb, bin/kettle_jem_deps_floor_spec.rb</td>
+      <td>Cargo dependency facts and Rust packaging; tests/thin_slice.rs</td>
+      <td>Ecosystem-specific output. Ruby dependency generation is Ruby-only.</td>
+    </tr>
+    <tr>
+      <td>Workflow generation</td>
+      <td>Ruby/platform matrices and workflow pins; integration/github_workflow_template_spec.rb, kettle/jem_style_workflow_template_spec.rb, bin/kettle_jem_workflow_pins_spec.rb</td>
+      <td>Workflow path/fact discovery and Rust CI templates; tests/thin_slice.rs</td>
+      <td>Path/fact reporting is comparable; Ruby runtime matrix and pin policy are Ruby-only unless a Rust counterpart is added.</td>
+    </tr>
+    <tr>
+      <td>README and changelog</td>
+      <td>README generation, badge normalization, package-section sync, changelog transfer; integration/readme_changelog_template_spec.rb and kettle/jem_readme_star_history_template_spec.rb</td>
+      <td>README profile/style renderer, badges, license, managed blocks; tests/thin_slice.rs</td>
+      <td>Shared user-section preservation fixture exists. Ruby changelog and Ruby-runtime badge policy are Ruby-only.</td>
+    </tr>
+    <tr>
+      <td>Apply and convergence</td>
+      <td>Recipe planning/application, bootstrap and selected post-apply tasks; integration/recipe_planning_spec.rb, integration/template_bootstrap_spec.rb, system/install_orchestration_spec.rb</td>
+      <td>Project/template/README plan and apply, second-run no-op; tests/thin_slice.rs</td>
+      <td>Shared local-template convergence fixture exists. Remaining exact report/change-set semantics require paired cases.</td>
+    </tr>
+    <tr>
+      <td>CLI and reporting</td>
+      <td>Commands, options, policy, text/debug/report outputs and statuses; cli_spec.rb and e2e/rubygems_thin_vertical_slice_spec.rb</td>
+      <td>plan/apply/template/README commands and JSON reports; rust/crates/kettle-rusty/tests/cli.rs</td>
+      <td>Contracts differ. Shared process-level failure/status conventions are candidates; no full CLI parity claim.</td>
+    </tr>
+    <tr>
+      <td>Tasks and integrations</td>
+      <td>Rake tasks for install, prepare, template and self-test; rake_tasks_spec.rb, system/install_orchestration_spec.rb, self_test_task_spec.rb</td>
+      <td>No equivalent Rake/task integration</td>
+      <td>Ruby-only orchestration.</td>
+    </tr>
+    <tr>
+      <td>Plugins and hooks</td>
+      <td>Plugin registry/loader/context and pre/post phase hooks; public implementation in lib/kettle/jem.rb</td>
+      <td>No plugin lifecycle equivalent</td>
+      <td>Ruby-only until a Rust extension contract is requested.</td>
+    </tr>
+    <tr>
+      <td>Release and packaging</td>
+      <td>Gem release packaging, require boundaries, docs and scaffold contracts; release_packaging_spec.rb, require_boundary_spec.rb, docs_rake_spec.rb, docs_no_task_control_rake_spec.rb, system/bundle_gem_scaffold_spec.rb</td>
+      <td>Cargo package metadata and CLI packaging</td>
+      <td>Ruby gem packaging rules are Ruby-only; compare only portable file ownership where an existing shared fixture applies.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="ruby-spec-file-disposition-index">Ruby spec-file disposition index</h2>
+
+<p>Every first-party spec file is listed below. Ruby-only means kettle-rusty has no<br>
+equivalent contract; candidate means comparable semantics still need paired<br>
+cases; shared refers only to the fixture IDs listed above.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Spec paths</th>
+      <th>Disposition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>e2e/rubygems_thin_vertical_slice_spec.rb</td>
+      <td>Mixed integration: Ruby gem discovery, recipe application, and CLI; only template convergence overlaps a shared fixture.</td>
+    </tr>
+    <tr>
+      <td>integration/recipe_planning_spec.rb; integration/template_bootstrap_spec.rb</td>
+      <td>Candidate/shared local template convergence; remaining selection and bootstrap behavior is Ruby-only or unpaired.</td>
+    </tr>
+    <tr>
+      <td>integration/structural_merge_template_spec.rb; kettle/jem_template_markdown_merge_spec.rb; byte_offset_edit_spec.rb</td>
+      <td>Shared README preservation fixture for the narrow user-owned-section case; Markdown/byte-offset algorithms are Ruby-only or unpaired.</td>
+    </tr>
+    <tr>
+      <td>integration/config_metadata_template_spec.rb; kettle/jem_platforms_config_spec.rb</td>
+      <td>Ruby config and platform policy; separate schema, semantic comparison deferred.</td>
+    </tr>
+    <tr>
+      <td>integration/gemspec_template_spec.rb; integration/appraisals_and_gemfile_template_spec.rb; integration/appraisal_helper_and_token_spec.rb; bin/kettle_jem_deps_floor_spec.rb</td>
+      <td>Ruby-only gem/dependency generation.</td>
+    </tr>
+    <tr>
+      <td>integration/github_workflow_template_spec.rb; kettle/jem_style_workflow_template_spec.rb; bin/kettle_jem_workflow_pins_spec.rb</td>
+      <td>Ruby runtime matrix and pin policy are Ruby-only; path reporting is a comparison candidate.</td>
+    </tr>
+    <tr>
+      <td>integration/readme_changelog_template_spec.rb; kettle/jem_readme_star_history_template_spec.rb; kettle/jem/maintenance_changelog_spec.rb</td>
+      <td>Shared README preservation only; changelog transfer and Ruby badge policy are Ruby-only.</td>
+    </tr>
+    <tr>
+      <td>integration/coverage_template_spec.rb; integration/duel_template_spec.rb; integration/shim_profile_spec.rb; integration/x_std_libs_sweep_reference_guard_spec.rb; template_version_gem_bootstrap_spec.rb; version_gem_pattern_spec.rb</td>
+      <td>Ruby ecosystem-specific generated artifacts and profile policy.</td>
+    </tr>
+    <tr>
+      <td>kettle/jem_style_template_spec.rb</td>
+      <td>Ruby style-template rendering and defaults; no paired Rust style-template contract is claimed.</td>
+    </tr>
+    <tr>
+      <td>cli_spec.rb</td>
+      <td>Ruby CLI options, policy, stdout/stderr and report behavior; contract differs from Rust CLI; common process failure cases remain candidates.</td>
+    </tr>
+    <tr>
+      <td>kettle/jem_spec.rb; kettle/jem/version_spec.rb; old_public_spec_audit_spec.rb; require_boundary_spec.rb</td>
+      <td>Ruby public API, versioning, compatibility and load-boundary contracts; no equivalent Rust API.</td>
+    </tr>
+    <tr>
+      <td>rake_tasks_spec.rb; kettle/jem_rake_docs_task_spec.rb; docs_rake_spec.rb; docs_no_task_control_rake_spec.rb; self_test_task_spec.rb</td>
+      <td>Ruby Rake and documentation task orchestration; Ruby-only.</td>
+    </tr>
+    <tr>
+      <td>kettle/jem/tasks/install_task_normal_lockfile_env_spec.rb; kettle/jem/tasks/prepare_task_spec.rb; system/install_orchestration_spec.rb</td>
+      <td>Ruby install/prepare orchestration, lockfile environment and side effects; Ruby-only.</td>
+    </tr>
+    <tr>
+      <td>system/bundle_gem_scaffold_spec.rb; release_packaging_spec.rb</td>
+      <td>Ruby bundle/gem scaffold and release archive contracts; Ruby-only.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The machine-readable<br>
+<a href="KETTLE_RUSTY_PARITY_EXAMPLES.json">KETTLE_RUSTY_PARITY_EXAMPLES.json</a> lists all<br>
+727 explicit it/specify declarations plus 9 shared-example invocations across<br>
+these 40 files, with each source path, line, behavior title, and disposition.<br>
+For mixed files, shared fixture cases are individually identified; the<br>
+remaining groups inherit the explicit file-level Ruby-only or distinct-contract<br>
+disposition above. Passing a suite does not establish parity. An unsupported<br>
+Rust operation requires an explicit diagnostic and regression test; it cannot<br>
+be inferred from a missing crate.</p>
+
+<h2 id="mixed-suite-behavior-boundaries">Mixed-suite behavior boundaries</h2>
+
+<ul>
+  <li>integration/recipe_planning_spec.rb: the shared fixture test proves portable<br>
+template bytes, destination path, changed-path reporting, and reapply no-op.<br>
+Recipe worker selection, Ractor/thread equivalence, timings, Ruby write-intent<br>
+scheduling, and Git URL normalization are Ruby implementation details; Rust<br>
+has no matching parallel-planning API.</li>
+  <li>integration/template_bootstrap_spec.rb: packaged gem bootstrap, monorepo<br>
+topology, gemspec/license migration, Ruby/RBS version entrypoints, and Gemfile<br>
+wiring are Ruby-only. The shared local-template convergence fixture does not<br>
+establish parity for the full bootstrap pipeline.</li>
+  <li>integration/structural_merge_template_spec.rb and<br>
+kettle/jem_template_markdown_merge_spec.rb: the shared README fixture proves<br>
+preservation of one user-owned section. Format-specific merge routing,<br>
+parser/provider failures, structural JSON/YAML/Bash/RBS merges, and Markdown<br>
+byte-offset edits belong to structured-merge provider parity, not<br>
+kettle-rusty project templating.</li>
+  <li>integration/readme_changelog_template_spec.rb: README style preservation is<br>
+comparable only for the shared fixture case. Transfer-changelog parsing,<br>
+applicability filters, replay cursors, migration, and release-section<br>
+ordering are Ruby-only.</li>
+  <li>integration/github_workflow_template_spec.rb and<br>
+kettle/jem_style_workflow_template_spec.rb: Rust workflow path discovery does<br>
+not correspond to Ruby runtime matrix generation, workflow pin normalization,<br>
+or Appraisal policy. Only path/report facts are candidates for a future<br>
+portable comparison.</li>
+  <li>cli_spec.rb: Rust and Ruby expose different command trees and option models.<br>
+The tests cover each executable’s own contract; only generic process outcomes<br>
+such as usage failure can be compared, and the existing Rust process tests<br>
+currently cover its own usage and missing-manifest cases.</li>
+</ul>
+
+<h2 id="shared-fixture-records">Shared fixture records</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fixture</th>
+      <th>Consumers</th>
+      <th>Contract</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>fixtures/packaging/kettle-portable-template-convergence.json</td>
+      <td>Ruby kettle-jem recipe planning; Rust kettle-rusty thin-slice</td>
+      <td>Same source/target, expected bytes, changed path, and second-run no-op.</td>
+    </tr>
+    <tr>
+      <td>fixtures/packaging/kettle-readme-preservation.json</td>
+      <td>Ruby kettle-jem structural merge; Rust kettle-rusty thin-slice</td>
+      <td>User-owned README section body survives managed section rendering; heading format is ecosystem-specific.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Separate language-specific fixtures are test inputs, not parity evidence. No<br>
+other cross-language fixture pair is currently claimed.</p>
+
+<h2 id="rust-workspace-selection">Rust workspace selection</h2>
+
+<p>kettle-rusty accepts a root Cargo package, one literal workspace member, or one<br>
+literal default-members entry that is also explicitly present in members.<br>
+Missing/empty workspace package selection, multiple default entries, missing<br>
+selected manifests, globs, and traversal fail closed with diagnostics. Ruby has<br>
+no equivalent Cargo workspace selection surface. Implementation and tests are<br>
+recorded in #97.</p>
+
+<h2 id="evidence-and-remaining-work">Evidence and remaining work</h2>
+
+<ul>
+  <li>Ruby focused suites recorded on #96 pass 173 examples across the e2e thin<br>
+slice, recipe planning, template bootstrap, README/changelog, workflow, and CLI<br>
+groups. This is Ruby implementation evidence, not cross-language parity.</li>
+  <li>Rust cargo test -p kettle-rusty –locked passes 4 unit, 3 CLI, and 22<br>
+thin-slice tests after the #97 workspace selection change and its acceptance<br>
+audit follow-up.</li>
+  <li>Shared fixture contracts are recorded in #98 and in the fixtures repository.</li>
+  <li>The spec audit is complete at the behavior-group level: all 40 first-party<br>
+spec files and 736 explicit examples/shared-example invocations have source<br>
+line evidence and dispositions in the JSON index. The behavior map records<br>
+each public surface family and its Ruby/Rust disposition.</li>
+  <li>Future parity work is limited to new paired fixtures where both tools expose<br>
+the same contract; no broad parity claim is made for Ruby-only features.</li>
+</ul>
+</div></div>
+
+      <div id="footer">
+  Generated on Mon Nov 16 08:09:11 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.45 (ruby-4.0.9).
+</div>
+
+    </div>
+  </body>
+</html>
