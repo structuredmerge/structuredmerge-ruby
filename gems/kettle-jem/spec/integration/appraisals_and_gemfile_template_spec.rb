@@ -4,6 +4,38 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
   include_context "with isolated kettle-jem environment"
   include_context "with kettle-jem fixture contracts"
 
+  it "migrates legacy formatter references even when older Ruby remains supported" do
+    content = <<~RUBY
+      appraise "current" do
+        eval_gemfile "modular/rspec_junit_formatter/r3.3/v0.8.gemfile"
+        eval_gemfile "modular/custom/r3.3/custom.gemfile"
+      end
+    RUBY
+
+    result = described_class.send(:migrate_and_prune_appraisal_buckets, content, "3.0")
+    expect(result).to include('eval_gemfile "modular/rspec.gemfile"', 'eval_gemfile "modular/custom/r3.3/custom.gemfile"')
+    expect(result).not_to include("rspec_junit_formatter/r3.3")
+    expect(described_class.send(:migrate_and_prune_appraisal_buckets, result, "3.0")).to eq(result)
+  end
+
+  it "prunes only obsolete managed bucket references when the Ruby floor rises" do
+    content = <<~RUBY
+      appraise "current" do
+        eval_gemfile "modular/rspec.gemfile"
+        eval_gemfile "modular/rspec_junit_formatter/r3.3/v0.8.gemfile"
+        eval_gemfile "modular/rspec_junit_formatter/r3/v0.8.gemfile"
+        eval_gemfile "modular/rspec_junit_formatter/r4/v0.8.gemfile"
+        eval_gemfile "modular/custom/r3/example.gemfile"
+      end
+    RUBY
+
+    result = described_class.send(:migrate_and_prune_appraisal_buckets, content, "4.0")
+    expect(result.scan('eval_gemfile "modular/rspec.gemfile"').length).to eq(1)
+    expect(result).to include('eval_gemfile "modular/rspec_junit_formatter/r4/v0.8.gemfile"', 'eval_gemfile "modular/custom/r3/example.gemfile"')
+    expect(result).not_to include("rspec_junit_formatter/r3/")
+    expect(result).not_to include("rspec_junit_formatter/r3.3/")
+  end
+
   it "keeps the Ruby 2.x recording templates on floors every Ruby in the lane can resolve" do
     base = project_root.join("lib/kettle/jem/templates/gemfiles/modular/recording")
 

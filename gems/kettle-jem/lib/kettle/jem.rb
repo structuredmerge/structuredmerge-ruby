@@ -10769,11 +10769,61 @@ module Kettle
       with_standard_appraisal_gemfiles = inject_duel_appraisal(with_standard_appraisal_gemfiles, facts) if target_path.to_s == "Appraisals"
       pruned = prune_appraisals_recording_entries(with_standard_appraisal_gemfiles, facts)
       pruned = prune_appraisals_below_min_ruby(pruned, min_ruby)
+      pruned = migrate_and_prune_appraisal_buckets(pruned, min_ruby)
       pruned = remove_managed_stdlib_appraisal_gems(pruned)
       pruned = remove_duplicate_runtime_heads_from_head_appraisal(pruned)
       pruned = migrate_legacy_byebug_appraisal_dependencies(pruned)
       pruned = remove_gemfile_dependency_lines(pruned, [package_name])
       remove_gemfile_percent_w_entries(pruned, [package_name])
+    end
+
+    # Migrate the historically misnamed formatter path before pruning managed
+    # bucket references. Ranges come from kettle-rb's RubySeriesBuckets: rN.M
+    # is an upper bound and rN is the remaining range within major N.
+    def migrate_and_prune_appraisal_buckets(content, min_ruby)
+      parsed = appraisal_blocks(content)
+      blocks = parsed.fetch(:order).map do |name|
+        migrate_and_prune_appraisal_bucket_block(parsed.fetch(:blocks).fetch(name), min_ruby)
+      end
+      ensure_trailing_newline(([parsed.fetch(:prelude).to_s.rstrip] + blocks.map(&:rstrip)).reject(&:empty?).join("\n\n"))
+    end
+
+    def migrate_and_prune_appraisal_bucket_block(block, min_ruby)
+      lines = block.lines
+      calls = ruby_call_records(block, :eval_gemfile)
+      loader = "modular/rspec.gemfile"
+      legacy = "modular/rspec_junit_formatter/r3.3/v0.8.gemfile"
+      has_loader = calls.any? { |call| ruby_string_argument(call) == loader }
+      calls.sort_by { |call| -call.location.start_line }.each do |call|
+        path = ruby_string_argument(call)
+        index = call.location.start_line - 1
+        next unless call.location.start_line == ruby_node_source_end_line(call)
+        next unless lines.fetch(index).strip == call.location.slice.strip
+
+        if path == legacy
+          lines[index] = has_loader ? "" : %(  eval_gemfile "#{loader}"\n)
+          has_loader = true
+        elsif obsolete_managed_appraisal_bucket?(path, min_ruby)
+          lines[index] = ""
+        end
+      end
+      lines.join
+    end
+
+    # Only prune packaged variants; destination-owned paths are not ours to
+    # reinterpret. The complete sibling bucket set determines each range.
+    def obsolete_managed_appraisal_bucket?(path, min_ruby)
+      return false if min_ruby.to_s.empty? || !path.to_s.start_with?("modular/")
+
+      parts = path.split("/")
+      return false unless parts.length >= 4 && ruby_bucket_path_segment?(parts[2])
+
+      source = File.join(PACKAGED_TEMPLATE_ROOT, "gemfiles", "#{path}.example")
+      return false unless File.file?(source)
+
+      root = File.join(PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", parts[1])
+      buckets = Dir.children(root).select { |name| ruby_bucket_path_segment?(name) && File.directory?(File.join(root, name)) }
+      !Kettle::Rb::RubySeriesBuckets.relevant_buckets(buckets, minimum: min_ruby).include?(parts[2])
     end
 
     # Each appraisal has an independent dependency set. Reuse the AST-based
