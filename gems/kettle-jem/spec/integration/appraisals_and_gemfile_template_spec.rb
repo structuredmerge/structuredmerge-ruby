@@ -67,6 +67,22 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "selects the matching standard library bucket for each Ruby series" do
+    loader = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles/modular/x_std_libs.gemfile.example"))
+    {
+      "2.3.8" => "r2.3", "2.4.10" => "r2.4", "2.5.9" => "r2.6",
+      "2.6.10" => "r2.6", "2.7.8" => "r2", "3.0.7" => "r3.1",
+      "3.1.7" => "r3.1", "3.2.9" => "r3", "3.4.1" => "r3", "4.0.0" => "r4"
+    }.each do |version, bucket|
+      stub_const("RUBY_VERSION", version)
+      receiver = Object.new
+      selected = []
+      receiver.define_singleton_method(:eval_gemfile) { |path| selected << path }
+      receiver.instance_eval(loader)
+      expect(selected).to eq(["x_std_libs/#{bucket}/libs.gemfile"]), "Ruby #{version}"
+    end
+  end
+
   it "keeps the Ruby 2.x StringIO templates on compatible releases" do
     ruby_24_template = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/stringio/r2.4/v0.0.2.gemfile.example"))
     ruby_25_template = File.read(project_root.join("lib/kettle/jem/templates/gemfiles/modular/stringio/r2/v3.0.gemfile.example"))
