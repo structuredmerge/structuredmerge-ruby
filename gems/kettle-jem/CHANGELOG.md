@@ -78,6 +78,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Wire every configured StructuredMerge family gem in local templating bundles to prevent mixed local and registry dependency versions.
 
+- Retemplating after an engine or workflow change no longer deletes transfer-keyed entries from released CHANGELOG sections (#150, #151); kettle-jem now requires kettle-changelog >= 1.0.19, which limits excluded-key pruning to `## [Unreleased]`. The spec that asserted the old remove-from-every-section behavior now asserts released history is preserved.
+
 ### Security
 
 ## [7.1.42] - 2026-10-31
