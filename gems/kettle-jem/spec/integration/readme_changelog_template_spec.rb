@@ -720,7 +720,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-  it "removes retroactively excluded transfer entries from every release section" do
+  it "removes retroactively excluded transfer entries from Unreleased only and keeps released history" do
     changelog = <<~MARKDOWN
       # Changelog
 
@@ -735,8 +735,8 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
 
       ### Fixed
 
-      - kettle-jem-template-20260720-004 - Remove this released transfer entry.
-        Continuation.
+      - kettle-jem-template-20260720-004 - Keep this released transfer entry.
+        Released continuation.
 
       - Project-authored released history remains.
     MARKDOWN
@@ -749,7 +749,9 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     )
 
     expect(result).not_to include("Remove this transfer entry.")
-    expect(result).not_to include("Continuation.")
+    expect(result).not_to include("\n  Continuation.")
+    expect(result).to include("Keep this released transfer entry.")
+    expect(result).to include("Released continuation.")
     expect(result).to include("Project-authored released history remains.")
   end
 
