@@ -143,7 +143,7 @@ template:
     STRUCTUREDMERGE_CORE_DEV: "{{config_root}}/../structuredmerge"
     KETTLE_DEV_DEV: "{{config_root}}/../../kettle-dev"
   normalize_lockfiles: true
-  normalize_lockfiles_command: bundle update --bundler
+  normalize_lockfiles_command: bundle lock
 
 install:
   local_dependencies:
