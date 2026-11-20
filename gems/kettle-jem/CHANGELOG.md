@@ -39,10 +39,15 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - rspec-stubbed_env (>= 1.0.18 -> >= 1.0.19)
-  - kettle-family (>= 1.3.43 -> >= 1.3.44)
-  - stone_checksums (>= 1.0.10 -> >= 1.0.11)
+  - duel (>= 0.1.8 -> >= 0.2.0)
+  - gem_bench (>= 2.0.5 -> >= 2.0.6)
+  - gitmoji-regex (>= 2.0.16 -> >= 2.0.17)
+  - kettle-changelog (>= 1.0.18 -> >= 1.0.20)
+  - kettle-family (>= 1.3.43 -> >= 1.3.45)
   - kramdown (>= 2.5.2 -> >= 2.6.1)
+  - require_bench (>= 1.0.4 -> >= 1.0.5)
+  - rspec-stubbed_env (>= 1.0.18 -> >= 1.0.19)
+  - stone_checksums (>= 1.0.10 -> >= 1.0.11)
   - yaml-converter (>= 0.2.7 -> >= 0.2.8)
   - yard-fence (>= 0.9.11 -> >= 0.9.12)
   - yard-timekeeper (>= 0.2.10 -> >= 0.2.11)
