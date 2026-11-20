@@ -43,6 +43,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - gem_bench (>= 2.0.5 -> >= 2.0.6)
   - gitmoji-regex (>= 2.0.16 -> >= 2.0.17)
   - kettle-changelog (>= 1.0.18 -> >= 1.0.20)
+  - kettle-dev (>= 3.1.29 -> >= 3.1.31)
   - kettle-family (>= 1.3.43 -> >= 1.3.45)
   - kramdown (>= 2.5.2 -> >= 2.6.1)
   - require_bench (>= 1.0.4 -> >= 1.0.5)
