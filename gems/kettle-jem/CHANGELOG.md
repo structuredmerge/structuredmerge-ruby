@@ -86,6 +86,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Retemplating after an engine or workflow change no longer deletes transfer-keyed entries from released CHANGELOG sections (#150, #151); kettle-jem now requires kettle-changelog >= 1.0.19, which limits excluded-key pruning to `## [Unreleased]`. The spec that asserted the old remove-from-every-section behavior now asserts released history is preserved.
 
+- README merge no longer duplicates template-owned sections nested inside a preserved destination section: preserved-section bodies now strip nested template-owned subsections, and extra preserved sections anchor only to template sections of equal-or-higher heading level so they are not inserted between a template parent and its nested sections
+
 ### Security
 
 ## [7.1.42] - 2026-10-31

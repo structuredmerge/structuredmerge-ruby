@@ -19349,11 +19349,11 @@ module Kettle
             aliased_readme_destination_section(base, destination_lookup, preserve_config)
           next unless destination_section
 
-          "#{section.fetch(:heading)}\n#{destination_section.fetch(:body)}"
+          "#{section.fetch(:heading)}\n#{readme_preserved_section_body(destination_section, destination_sections, template_bases)}"
         else
           lines[section.fetch(:start)..section.fetch(:end)].join("\n")
         end
-        replacement = ([replacement] + extra_sections.map { |extra| "#{extra.fetch(:heading)}\n#{extra.fetch(:body)}" }).join("\n")
+        replacement = ([replacement] + extra_sections.map { |extra| "#{extra.fetch(:heading)}\n#{readme_preserved_section_body(extra, destination_sections, template_bases)}" }).join("\n")
         lines[section.fetch(:start)..section.fetch(:end)] = replacement
       end
       lines.join("\n")
@@ -19367,13 +19367,35 @@ module Kettle
         next if readme_section_has_preserved_ancestor?(destination_sections, index, preserve_targets)
 
         anchor = destination_sections[0...index].reverse.find do |candidate|
-          template_bases.include?(candidate.fetch(:base))
+          template_bases.include?(candidate.fetch(:base)) &&
+            candidate.fetch(:level).to_i <= section.fetch(:level).to_i
         end
         next unless anchor
 
         result[anchor.fetch(:base)] ||= []
         result[anchor.fetch(:base)] << section
       end
+    end
+
+    # Body of a preserved destination section with any nested template-owned
+    # subsections removed. A section's line range spans its nested children,
+    # so without this the preserved body would re-inject sections the template
+    # also renders, duplicating them on every merge.
+    def readme_preserved_section_body(section, destination_sections, template_bases)
+      nested = destination_sections.select do |candidate|
+        candidate.fetch(:start) > section.fetch(:start) &&
+          candidate.fetch(:end) <= section.fetch(:end) &&
+          candidate.fetch(:level).to_i > section.fetch(:level).to_i &&
+          template_bases.include?(candidate.fetch(:base))
+      end
+      return section.fetch(:body) if nested.empty?
+
+      offset = section.fetch(:start) + 1
+      body_lines = section.fetch(:body).split("\n", -1)
+      nested.reverse_each do |candidate|
+        body_lines[(candidate.fetch(:start) - offset)..(candidate.fetch(:end) - offset)] = []
+      end
+      body_lines.join("\n").gsub(/\n{3,}/, "\n\n").rstrip
     end
 
     def readme_section_has_preserved_ancestor?(sections, index, preserve_targets)

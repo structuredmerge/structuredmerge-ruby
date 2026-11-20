@@ -1756,6 +1756,97 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     )
   end
 
+  it "does not duplicate template-owned sections nested inside a preserved destination section" do
+    template = <<~MARKDOWN
+      # 🔐 OAuth2
+
+      ## 🌻 Synopsis
+
+      Template synopsis.
+
+      ## 💡 Info you can shake a stick at
+
+      Template info.
+
+      ### Compatibility
+
+      Template compatibility.
+
+      ### Federated DVCS
+
+      Template federated dvcs.
+
+      ### Enterprise Support
+
+      Template enterprise support.
+
+      ## ✨ Installation
+
+      Template installation.
+    MARKDOWN
+    destination = <<~MARKDOWN
+      # 🔐 OAuth2
+
+      ## 🌻 Synopsis
+
+      Destination synopsis.
+
+      ## 💡 Info you can shake a stick at
+
+      Destination info.
+
+      ### Compatibility
+
+      Destination compatibility.
+
+      ## Authorization Grants
+
+      Grant usage text.
+
+      ### Federated DVCS
+
+      Destination federated dvcs.
+
+      ### Enterprise Support
+
+      Destination enterprise support.
+
+      ## ✨ Installation
+
+      Destination installation.
+    MARKDOWN
+    preserve_config = {sections: ["synopsis", "authorization grants"]}
+
+    once = described_class.send(
+      :merge_readme_template,
+      template_content: template,
+      destination_content: destination,
+      preserve_config: preserve_config
+    )
+    twice = described_class.send(
+      :merge_readme_template,
+      template_content: template,
+      destination_content: once,
+      preserve_config: preserve_config
+    )
+
+    [once, twice].each do |merged|
+      expect(merged.scan(/^### Federated DVCS$/).length).to eq(1)
+      expect(merged.scan(/^### Enterprise Support$/).length).to eq(1)
+      expect(merged.scan(/^## Authorization Grants$/).length).to eq(1)
+    end
+    # Template-owned copies render from the template, not the destination body.
+    expect(once).to include("### Federated DVCS\n\nTemplate federated dvcs.")
+    expect(once).to include("### Enterprise Support\n\nTemplate enterprise support.")
+    # The preserved section keeps only its own body, not the template-owned children.
+    expect(once).to include("## Authorization Grants\n\nGrant usage text.")
+    expect(once).not_to include("Destination federated dvcs.")
+    expect(once).not_to include("Destination enterprise support.")
+    # Template-owned H3s stay with their template parent instead of being
+    # re-nested under the preserved destination section.
+    expect(once.index("### Federated DVCS")).to be < once.index("## Authorization Grants")
+  end
+
   it "preserves the default Advanced Usage section and its reference definitions" do
     template = <<~MARKDOWN
       # Example
