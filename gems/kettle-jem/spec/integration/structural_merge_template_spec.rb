@@ -2524,6 +2524,73 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     expect(detect.call("task :default do\nend\n")).to be(false)
   end
 
+  it "removes the bundle gem scaffold contact line when overlaying the packaged CODE_OF_CONDUCT" do
+    Dir.mktmpdir("kettle-jem-scaffold-coc") do |root|
+      write_tree(root, {
+        "scaffold_gem.gemspec" => 'Gem::Specification.new { |spec| spec.name = "scaffold-gem" }',
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - CODE_OF_CONDUCT.md
+          files:
+            CODE_OF_CONDUCT.md:
+              strategy: merge
+              preference: destination
+              add_template_only_nodes: true
+        YAML
+        "CODE_OF_CONDUCT.md" => <<~MD,
+          # Contributor Covenant Code of Conduct
+
+          If you have any concerns about behaviour within this project, please contact us at ["peter.boling@gmail.com"](mailto:"peter.boling@gmail.com").
+
+          ## Our Pledge
+
+          We pledge to be decent.
+
+          ## Custom Section
+
+          A destination paragraph that must survive.
+        MD
+        "template/CODE_OF_CONDUCT.md.example" => File.read(File.expand_path("../../lib/kettle/jem/templates/CODE_OF_CONDUCT.md.example", __dir__))
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      first = File.read(File.join(root, "CODE_OF_CONDUCT.md"))
+      described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      second = File.read(File.join(root, "CODE_OF_CONDUCT.md"))
+
+      expect(second).to eq(first)
+      expect(second).not_to include("mailto:")
+      expect(second).not_to include("please contact us at")
+      expect(second).to include("## Our Pledge", "A destination paragraph that must survive.")
+      expect(second).to include("[🚂maint-contact]")
+    end
+  end
+
+  it "removes quoted-mailto scaffold paragraphs and preserves valid contact links" do
+    clean = ->(content) { described_class.send(:delete_quoted_mailto_scaffold_lines, content) }
+
+    scaffold = "# T\n\nPlease contact us at [\"a@b.c\"](mailto:\"a@b.c\").\n\n## Pledge\n"
+    expect(clean.call(scaffold)).to eq("# T\n\n## Pledge\n")
+
+    valid = "Contact [floss@galtzo.com](mailto:floss@galtzo.com) anytime.\n"
+    expect(clean.call(valid)).to eq(valid)
+
+    wrapped = "Intro text\nwrapping into [\"a@b.c\"](mailto:\"a@b.c\") here.\n\nAfter.\n"
+    expect(clean.call(wrapped)).to eq("After.\n")
+
+    expect(clean.call("")).to eq("")
+    expect(clean.call("# T\n\nNo links.\n")).to eq("# T\n\nNo links.\n")
+  end
+
+  it "treats unparsable content as having no quoted-mailto scaffold lines" do
+    allow(Ast::Crispr::Markdown::Markly).to receive(:document_context).and_raise(Ast::Crispr::Error, "boom")
+
+    expect(described_class.send(:delete_quoted_mailto_scaffold_lines, "# T\n")).to eq("# T\n")
+  end
+
   it "normalizes generated Rakefile section spacing after merge" do
     rakefile = described_class.send(:normalize_generated_rakefile, <<~RAKE)
       task :custom do

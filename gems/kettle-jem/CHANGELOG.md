@@ -91,6 +91,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Rakefile templating once again strips proven bundle-gem scaffold content (e.g. an eager require of rubocop/rake_task, which breaks release coverage boots) before merging the Rakefile template, instead of preserving scaffold lines forever as destination content; legitimate non-scaffold Rakefiles (alef/native, hand-maintained) keep their RSpec and default-task wiring. (GH#154)
 
+- Templating now strips the bundle-gem scaffold's malformed contact line (a quoted mailto: href from bundler's CODE_OF_CONDUCT.md.tt .inspect bug) from the CODE_OF_CONDUCT.md merge input via markly AST, so newly scaffolded gems no longer carry an invalid URI that crashes yard-relative_markdown_links during the release changelog yard step. (GH#156)
+
 ### Security
 
 ## [7.1.42] - 2026-10-31
