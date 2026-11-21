@@ -6491,7 +6491,7 @@ module Kettle
       relative_path = recipe.fetch(:target_path)
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
-      merge_source = rakefile_merge_scaffold_source(recipe, original, facts)
+      merge_source = scaffold_cleaned_merge_source(recipe, original, facts)
       deletion = rakefile_scaffold_cleanup_recipe?(recipe) ? rakefile_scaffold_cleanup(original, facts) : nil
       readme_timings = []
       final = with_readme_timing_context(relative_path, readme_timings) do
@@ -6666,6 +6666,86 @@ module Kettle
       return false unless value.is_a?(::Prism::ArrayNode)
 
       value.elements.map { |element| element.is_a?(::Prism::SymbolNode) ? element.unescaped.to_s : nil } == %w[spec rubocop]
+    end
+
+    # Dispatch merge-input scaffold cleaning by target. Each cleaner strips
+    # `bundle gem` scaffold artifacts from the DESTINATION content before the
+    # template merge, because the merge preserves destination-only nodes
+    # forever (see rakefile_merge_scaffold_source). Files without a cleaner
+    # pass through unchanged.
+    def scaffold_cleaned_merge_source(recipe, original, facts)
+      case recipe.fetch(:target_path)
+      when "Rakefile"
+        rakefile_merge_scaffold_source(recipe, original, facts)
+      when "CODE_OF_CONDUCT.md"
+        coc_scaffold_merge_source(recipe, original)
+      else
+        original
+      end
+    end
+
+    # Bundler's newgem CoC template renders the contact line with
+    # config[:email].inspect, embedding literal quotes in the href
+    # (mailto:"..."), which crashes yard-relative_markdown_links during the
+    # release changelog yard step. The packaged CoC template covers contact
+    # via the maintainer badge in the Enforcement section, so the scaffold
+    # line is pure junk. Only merge strategies see cleaning: keep_destination
+    # preserves by contract, accept_template discards the destination anyway.
+    def coc_scaffold_merge_source(recipe, original)
+      return original unless TEMPLATE_SOURCE_APPLICATION_RECIPE.match?(recipe.fetch(:name))
+
+      strategy = recipe.dig(:template_preference, :strategy).to_s
+      return original unless strategy.empty? || strategy == "merge"
+
+      delete_quoted_mailto_scaffold_lines(original)
+    end
+
+    # Delete every paragraph containing a quoted mailto link (the bundler
+    # scaffold artifact). The malformation is the detector: `mailto:"` is
+    # never legitimate, so valid contact links pass through. Node discovery
+    # is AST-based via ast-crispr-markdown-markly; deletion is line-based
+    # over the paragraph's source span, collapsing blank runs, so a wrapped
+    # paragraph is removed whole. Accepted tradeoff: a paragraph mixing the
+    # scaffold link with other sentences loses those sentences too — the
+    # paragraph is definitionally broken (its link is an invalid URI).
+    def delete_quoted_mailto_scaffold_lines(content)
+      text = content.to_s
+      ranges = quoted_mailto_scaffold_line_ranges(text)
+      return text if ranges.empty?
+
+      selectors = ranges.map do |(start_line, end_line)|
+        {
+          selector_id: "coc_scaffold_quoted_mailto_paragraph",
+          selector_family: "structural_owner_range",
+          start_line: start_line,
+          end_line: end_line,
+          reason: "wrapper_selected_scaffold_contact"
+        }
+      end
+      delete_line_ranges(text, selectors).sub(/\A(?:[ \t]*\n)+/, "")
+    end
+
+    def quoted_mailto_scaffold_line_ranges(content)
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "CODE_OF_CONDUCT.md")
+      ranges = []
+      walk_markdown_nodes(context.ast.document) do |node|
+        next unless node.type == "link"
+        next unless node.url.to_s.start_with?(%(mailto:"))
+
+        paragraph = node.parent
+        paragraph = paragraph.parent while paragraph && paragraph.type != "paragraph"
+        next unless paragraph
+
+        ranges << [paragraph.start_line, paragraph.end_line]
+      end
+      ranges.uniq
+    rescue Ast::Crispr::Error
+      []
+    end
+
+    def walk_markdown_nodes(node, &block)
+      yield node
+      node.children.each { |child| walk_markdown_nodes(child, &block) }
     end
 
     def content_recipe_step(recipe)
