@@ -3482,7 +3482,10 @@ module Kettle
       end
       # Cleanup plans against the original file and would overwrite a merged
       # Rakefile when both recipes change it. The template merge owns that
-      # file whenever it is selected; retain cleanup for standalone runs.
+      # file whenever it is selected; the merge path strips proven bundle-gem
+      # scaffold content from the merge input instead (see
+      # rakefile_merge_scaffold_source). Retain this recipe for standalone
+      # runs where no Rakefile template application is selected.
       rakefile_template = recipes.any? do |recipe|
         TEMPLATE_SOURCE_APPLICATION_RECIPE.match?(recipe.fetch(:name)) && recipe.fetch(:target_path) == "Rakefile"
       end
@@ -6488,6 +6491,7 @@ module Kettle
       relative_path = recipe.fetch(:target_path)
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
+      merge_source = rakefile_merge_scaffold_source(recipe, original, facts)
       deletion = rakefile_scaffold_cleanup_recipe?(recipe) ? rakefile_scaffold_cleanup(original, facts) : nil
       readme_timings = []
       final = with_readme_timing_context(relative_path, readme_timings) do
@@ -6531,7 +6535,7 @@ module Kettle
         when TEMPLATE_SOURCE_PREFERENCE_RECIPE
           original
         when TEMPLATE_SOURCE_APPLICATION_RECIPE
-          apply_template_source(project_root, recipe, original, facts: facts, env: env, template_contents: template_contents)
+          apply_template_source(project_root, recipe, merge_source, facts: facts, env: env, template_contents: template_contents)
         when "rakefile_scaffold_cleanup"
           deletion.fetch(:content)
         else
@@ -6602,8 +6606,66 @@ module Kettle
 
     def rakefile_scaffold_cleanup(content, facts)
       return {content: content.to_s, delete_selectors: []} if facts[:template_profile].to_s == MONOREPO_ROOT_TEMPLATE_PROFILE
+      return {content: content.to_s, delete_selectors: []} unless rakefile_scaffold_provenance?(content)
 
       delete_rakefile_scaffold(content)
+    end
+
+    # The Rakefile merge preserves destination-only nodes, so a `bundle gem`
+    # scaffolded Rakefile would keep its scaffold lines (including an eager
+    # `require "rubocop/rake_task"`) forever, and its bare
+    # `require "bundler/gem_tasks"` would win over the template's conditional
+    # form under preference destination. When the destination shows bundle-gem
+    # scaffold provenance, strip the scaffold from the merge INPUT so the
+    # merge adds the template's conditional gem-tasks wiring cleanly. Keep
+    # destination (keep_destination) and wholesale replacement
+    # (accept_template) strategies need no cleaning: one preserves by
+    # contract, the other discards the destination entirely. alef/native
+    # Rakefiles lack the provenance markers and pass through untouched, as do
+    # monorepo-root Rakefiles (matching the standalone cleanup exemption).
+    def rakefile_merge_scaffold_source(recipe, original, facts)
+      return original unless recipe.fetch(:target_path) == "Rakefile"
+      return original unless TEMPLATE_SOURCE_APPLICATION_RECIPE.match?(recipe.fetch(:name))
+      return original if facts[:template_profile].to_s == MONOREPO_ROOT_TEMPLATE_PROFILE
+
+      strategy = recipe.dig(:template_preference, :strategy).to_s
+      return original unless strategy.empty? || strategy == "merge"
+      return original unless rakefile_scaffold_provenance?(original)
+
+      delete_rakefile_scaffold(original).fetch(:content)
+    end
+
+    # True when the content carries markers only a `bundle gem` scaffold
+    # produces: a bare top-level `require "bundler/gem_tasks"` (the template's
+    # own emission is a conditional modifier, which is not a bare top-level
+    # call), a `RuboCop::RakeTask` (templated projects wire rubocop via
+    # rubocop_gradual, never this class), or the scaffold's exact
+    # `task default: %i[spec rubocop]` (alef uses `task default: :spec`).
+    def rakefile_scaffold_provenance?(content)
+      text = content.to_s
+      return false if text.empty?
+
+      rakefile_require_records(text).any? { |record| record.fetch(:name) == "bundler/gem_tasks" } ||
+        rakefile_task_class_records(text).any? { |record| record.fetch(:receiver) == "RuboCop::RakeTask" } ||
+        rakefile_scaffold_default_task?(text)
+    end
+
+    def rakefile_scaffold_default_task?(content)
+      top_level_ruby_call_records(content, :task).any? do |call|
+        argument = call.arguments&.arguments&.first
+        next false unless argument.is_a?(::Prism::KeywordHashNode)
+
+        argument.elements.any? do |element|
+          element.key.is_a?(::Prism::SymbolNode) && element.key.unescaped.to_s == "default" &&
+            rakefile_scaffold_default_task_value?(element.value)
+        end
+      end
+    end
+
+    def rakefile_scaffold_default_task_value?(value)
+      return false unless value.is_a?(::Prism::ArrayNode)
+
+      value.elements.map { |element| element.is_a?(::Prism::SymbolNode) ? element.unescaped.to_s : nil } == %w[spec rubocop]
     end
 
     def content_recipe_step(recipe)

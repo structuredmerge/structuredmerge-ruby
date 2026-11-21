@@ -88,6 +88,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - README merge no longer duplicates template-owned sections nested inside a preserved destination section: preserved-section bodies now strip nested template-owned subsections, and extra preserved sections anchor only to template sections of equal-or-higher heading level so they are not inserted between a template parent and its nested sections
 
+- Rakefile templating once again strips proven bundle-gem scaffold content (e.g. an eager require of rubocop/rake_task, which breaks release coverage boots) before merging the Rakefile template, instead of preserving scaffold lines forever as destination content; legitimate non-scaffold Rakefiles (alef/native, hand-maintained) keep their RSpec and default-task wiring. (GH#154)
+
 ### Security
 
 ## [7.1.42] - 2026-10-31

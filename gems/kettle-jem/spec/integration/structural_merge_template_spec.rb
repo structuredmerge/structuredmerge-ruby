@@ -2457,6 +2457,73 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
+  it "strips bundle gem scaffold lines when overlaying the packaged Rakefile on a scaffolded gem" do
+    Dir.mktmpdir("kettle-jem-scaffold-rakefile") do |root|
+      write_tree(root, {
+        "scaffold_gem.gemspec" => 'Gem::Specification.new { |spec| spec.name = "scaffold-gem" }',
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Rakefile
+          files:
+            Rakefile:
+              strategy: merge
+              preference: destination
+              add_template_only_nodes: true
+        YAML
+        "Rakefile" => <<~RAKE,
+          # frozen_string_literal: true
+
+          require "bundler/gem_tasks"
+          require "rspec/core/rake_task"
+
+          RSpec::Core::RakeTask.new(:spec)
+
+          require "rubocop/rake_task"
+
+          RuboCop::RakeTask.new
+
+          task default: %i[spec rubocop]
+
+          task :custom do
+            puts "custom"
+          end
+        RAKE
+        "template/Rakefile.example" => File.read(File.expand_path("../../lib/kettle/jem/templates/Rakefile.example", __dir__))
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      first = File.read(File.join(root, "Rakefile"))
+      described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      second = File.read(File.join(root, "Rakefile"))
+
+      expect(second).to eq(first)
+      expect(second).to include('require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?')
+      expect(second).to include("task :custom", 'puts "custom"')
+      expect(second.lines.map(&:strip)).not_to include('require "bundler/gem_tasks"')
+      expect(second).not_to include("rubocop/rake_task", "RuboCop::RakeTask", "RSpec::Core::RakeTask", "task default: %i[spec rubocop]")
+    end
+  end
+
+  it "detects bundle gem scaffold provenance only from true scaffold markers" do
+    detect = ->(content) { described_class.send(:rakefile_scaffold_provenance?, content) }
+
+    expect(detect.call("")).to be(false)
+    expect(detect.call(%(require "bundler/gem_tasks"\n))).to be(true)
+    expect(detect.call(%(require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?\n))).to be(false)
+    expect(detect.call("RuboCop::RakeTask.new\n")).to be(true)
+    expect(detect.call("RSpec::Core::RakeTask.new(:spec)\n")).to be(false)
+    expect(detect.call("task default: %i[spec rubocop]\n")).to be(true)
+    expect(detect.call("task default: :spec\n")).to be(false)
+    expect(detect.call("task default: %i[spec lint]\n")).to be(false)
+    expect(detect.call("task default: [spec, rubocop]\n")).to be(false)
+    expect(detect.call(%(task default: "spec"\n))).to be(false)
+    expect(detect.call("task\n")).to be(false)
+    expect(detect.call("task :default do\nend\n")).to be(false)
+  end
+
   it "normalizes generated Rakefile section spacing after merge" do
     rakefile = described_class.send(:normalize_generated_rakefile, <<~RAKE)
       task :custom do
