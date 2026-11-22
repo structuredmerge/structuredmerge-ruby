@@ -21996,7 +21996,7 @@ module Kettle
         "github/codeql-action/analyze" => "github/codeql-action/analyze@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4",
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@d6e511896e5f1d2408e74db74416647d8ff80c8c # v4.1.0",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@a196742f472feaffafea537ce5a2a4c3c53a8de4 # v0.9.0",
-        "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0"
+        "sarisia/actions-status-discord" => "sarisia/actions-status-discord@74e2ad0c4e57ca8b9ba6aee75d5a7841497bbb87 # v1.16.1"
       }
     end
 
