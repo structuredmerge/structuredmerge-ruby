@@ -137,7 +137,6 @@ gem install kettle-jem
 
 ## ⚙️ Configuration
 
-
 Ruby-versioned modular Gemfile directories use the [kettle-rb RubySeriesBuckets rules](https://github.com/kettle-dev/kettle-rb/blob/main/lib/kettle/rb/ruby_series_buckets.rb) as their canonical definition. A named bucket such as `r3.2` ends at Ruby 3.2; it is an upper bound, not a minimum. A bare `r3` covers the remaining newer versions within Ruby 3. Buckets never cross major versions, and their ranges depend on the complete set of names: with `r3.2` and `r3`, the former covers Ruby 3.0 through 3.2 and the latter covers 3.3 onward within major 3. `r4` covers Ruby 4 separately.
 
 Each gem that uses Kettle::Jem has a `.kettle-jem.yml` file at its root. This file controls
