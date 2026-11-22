@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - structuredmerge-core local wiring now uses nomono (`eval_nomono_gems` with `subdirs`, nomono >= 1.1.18) instead of hand-rolled `STRUCTUREDMERGE_CORE_DEV` parsing in every templating gemfile; the kettle-jem templates generate the same wiring. The nomono floor is bumped to >= 1.1.18 across the family.
 
+- tree_haver: structuredmerge-core floor raised to the first released version, 0.2.2; registry resolution now works with STRUCTUREDMERGE_CORE_DEV unset, unblocking family releases
+
 ### Deprecated
 
 ### Removed
