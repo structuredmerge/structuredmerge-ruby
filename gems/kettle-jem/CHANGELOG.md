@@ -39,7 +39,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - other (1)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - duel (>= 0.1.8 -> >= 0.3.0)
+  - addressable (>= 2.9.2 -> >= 2.10.0)
+  - duel (>= 0.1.8 -> >= 0.3.1)
   - gem_bench (>= 2.0.5 -> >= 2.0.6)
   - gitmoji-regex (>= 2.0.16 -> >= 2.0.17)
   - kettle-changelog (>= 1.0.18 -> >= 1.0.20)
