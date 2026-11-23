@@ -16,7 +16,8 @@ RSpec.describe 'Installed Psych parser host for the typed kernel' do
 
       skip 'Optional typed provider requires Psych 5.5.x'
     end
-    expect(StructuredmergeCore.parser_registry_inventory.providers).to be_empty
+    # Other gems' specs may register their own providers in a whole-family run; only ours must be absent.
+    expect(StructuredmergeCore.parser_registry_inventory.providers.map(&:id)).not_to include('ruby.psych')
     if ENV['STRUCTUREDMERGE_TYPED_PSYCH_TEST'] == 'true'
       %w[psych-merge structuredmerge-core].each do |name|
         expect(File.realpath(Gem.loaded_specs.fetch(name).full_gem_path)).to start_with(File.realpath(ENV.fetch('GEM_HOME')) + '/')
