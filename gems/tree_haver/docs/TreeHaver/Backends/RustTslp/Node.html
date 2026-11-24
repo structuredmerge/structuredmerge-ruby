@@ -708,14 +708,14 @@ native names.</p>
       <pre class="lines">
 
 
-207
-208
-209
-210
-211</pre>
+263
+264
+265
+266
+267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>nodes_by_id:</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>language:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span>
@@ -759,12 +759,12 @@ native names.</p>
       <pre class="lines">
 
 
-205
-206
-207</pre>
+261
+262
+263</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 261</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_language'>language</span>
   <span class='ivar'>@language</span>
@@ -796,13 +796,13 @@ native names.</p>
       <pre class="lines">
 
 
-247
-248
-249
-250</pre>
+303
+304
+305
+306</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 247</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 303</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child'>child</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_edge'>edge</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span>
@@ -828,13 +828,13 @@ native names.</p>
       <pre class="lines">
 
 
-256
-257
-258
-259</pre>
+312
+313
+314
+315</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 256</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 312</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_by_field_name'>child_by_field_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_edge'>edge</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_field_name'>field_name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='rbrace'>}</span>
@@ -860,10 +860,10 @@ native names.</p>
       <pre class="lines">
 
 
-223</pre>
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 223</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 279</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_child_count'>child_count</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span></pre>
     </td>
@@ -886,12 +886,12 @@ native names.</p>
       <pre class="lines">
 
 
-252
-253
-254</pre>
+308
+309
+310</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 308</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_children'>children</span>
   <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_edge'>edge</span><span class='op'>|</span> <span class='id identifier rubyid_wrap'>wrap</span><span class='lparen'>(</span><span class='ivar'>@nodes_by_id</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_edge'>edge</span><span class='period'>.</span><span class='id identifier rubyid_node_id'>node_id</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -916,10 +916,10 @@ native names.</p>
       <pre class="lines">
 
 
-220</pre>
+276</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 220</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 276</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_byte'>end_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_range'>range</span><span class='period'>.</span><span class='id identifier rubyid_end_byte'>end_byte</span></pre>
     </td>
@@ -942,10 +942,10 @@ native names.</p>
       <pre class="lines">
 
 
-222</pre>
+278</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 222</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 278</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_end_point'>end_point</span> <span class='op'>=</span> <span class='id identifier rubyid_symbolize_point'>symbolize_point</span><span class='lparen'>(</span><span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_end_point'>end_point</span><span class='rparen'>)</span></pre>
     </td>
@@ -991,10 +991,10 @@ native names.</p>
       <pre class="lines">
 
 
-230</pre>
+286</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 230</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 286</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_error?'>error?</span> <span class='op'>=</span> <span class='id identifier rubyid_has_error?'>has_error?</span></pre>
     </td>
@@ -1053,18 +1053,18 @@ native names.</p>
       <pre class="lines">
 
 
-233
-234
-235
-236
-237
-238
-239
-240
-241</pre>
+289
+290
+291
+292
+293
+294
+295
+296
+297</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 233</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 289</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_extra?'>extra?</span>
   <span class='id identifier rubyid_extension'>extension</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_extensions'>extensions</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span>
@@ -1118,12 +1118,12 @@ native names.</p>
       <pre class="lines">
 
 
-226
-227
-228</pre>
+282
+283
+284</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 226</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 282</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_has_error?'>has_error?</span> <span class='comment'># rubocop:disable Naming/PredicatePrefix
 </span>  <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_has_error'>has_error</span>
@@ -1171,10 +1171,10 @@ native names.</p>
       <pre class="lines">
 
 
-231</pre>
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 287</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_missing?'>missing?</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_missing'>missing</span></pre>
     </td>
@@ -1220,10 +1220,10 @@ native names.</p>
       <pre class="lines">
 
 
-224</pre>
+280</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 224</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 280</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named?'>named?</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_named'>named</span></pre>
     </td>
@@ -1246,10 +1246,10 @@ native names.</p>
       <pre class="lines">
 
 
-217</pre>
+273</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 273</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_native_type'>native_type</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_native_type'>native_type</span></pre>
     </td>
@@ -1272,12 +1272,12 @@ native names.</p>
       <pre class="lines">
 
 
-266
-267
-268</pre>
+322
+323
+324</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 266</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 322</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_next_sibling'>next_sibling</span>
   <span class='id identifier rubyid_sibling_at'>sibling_at</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
@@ -1302,13 +1302,13 @@ native names.</p>
       <pre class="lines">
 
 
-261
-262
-263
-264</pre>
+317
+318
+319
+320</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 261</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parent'>parent</span>
   <span class='id identifier rubyid_parent_id'>parent_id</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_node'>inner_node</span><span class='period'>.</span><span class='id identifier rubyid_parent_id'>parent_id</span>
@@ -1334,12 +1334,12 @@ native names.</p>
       <pre class="lines">
 
 
-270
-271
-272</pre>
+326
+327
+328</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 270</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 326</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prev_sibling'>prev_sibling</span>
   <span class='id identifier rubyid_sibling_at'>sibling_at</span><span class='lparen'>(</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
@@ -1364,10 +1364,10 @@ native names.</p>
       <pre class="lines">
 
 
-219</pre>
+275</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 219</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 275</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_byte'>start_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_range'>range</span><span class='period'>.</span><span class='id identifier rubyid_start_byte'>start_byte</span></pre>
     </td>
@@ -1390,10 +1390,10 @@ native names.</p>
       <pre class="lines">
 
 
-221</pre>
+277</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 221</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 277</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_start_point'>start_point</span> <span class='op'>=</span> <span class='id identifier rubyid_symbolize_point'>symbolize_point</span><span class='lparen'>(</span><span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_start_point'>start_point</span><span class='rparen'>)</span></pre>
     </td>
@@ -1416,12 +1416,12 @@ native names.</p>
       <pre class="lines">
 
 
-243
-244
-245</pre>
+299
+300
+301</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 243</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 299</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_text'>text</span>
   <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_byteslice'>byteslice</span><span class='lparen'>(</span><span class='id identifier rubyid_start_byte'>start_byte</span><span class='op'>...</span><span class='id identifier rubyid_end_byte'>end_byte</span><span class='rparen'>)</span>
@@ -1446,12 +1446,12 @@ native names.</p>
       <pre class="lines">
 
 
-213
-214
-215</pre>
+269
+270
+271</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 213</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 269</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
   <span class='const'><span class='object_link'><a href="#NODE_TYPE_ALIASES-constant" title="TreeHaver::Backends::RustTslp::Node::NODE_TYPE_ALIASES (constant)">NODE_TYPE_ALIASES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_native_type'>native_type</span><span class='comma'>,</span> <span class='id identifier rubyid_native_type'>native_type</span><span class='rparen'>)</span>

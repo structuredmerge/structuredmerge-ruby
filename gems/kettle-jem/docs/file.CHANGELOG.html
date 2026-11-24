@@ -88,42 +88,48 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   <li>
     <p><strong>Breaking for generated CI:</strong> workflows for EOL engine releases are no longer generated, and existing copies are deleted on the next templating run: <code>jruby-9.1</code>, <code>jruby-9.2</code>, <code>jruby-9.3</code>, <code>jruby-9.4</code>, <code>truffleruby-22.3</code>, <code>truffleruby-23.1</code>, <code>truffleruby-24.2</code>, <code>truffleruby-25.0</code>. An engine release is EOL when the CRuby it implements is EOL, and the TruffleRuby maintainers have asked projects to stop testing old releases. Their README compatibility badges become the static <code>(🚫CI)</code> variant (support is declared via the equivalent MRI job and rubocop-lts rules, as for Ruby &lt; 2.4) instead of being removed. List a workflow under <code>workflows.legacy_engines</code> to keep it. See structuredmerge/structuredmerge-ruby#131.</p>
   </li>
-  <li>[kc] kettle-jem/prepare: updated 25 project files:
+  <li>[kc] kettle-jem/prepare: updated 27 project files:
     <ul>
       <li>configuration (1)</li>
-      <li>dependencies (24)</li>
+      <li>dependencies (26)</li>
     </ul>
   </li>
-  <li>[kc] kettle-jem/template: updated 5 project files:
+  <li>[kc] kettle-jem/template: updated 6 project files:
     <ul>
       <li>code and tests (1)</li>
-      <li>dependencies (2)</li>
+      <li>dependencies (3)</li>
       <li>documentation (1)</li>
       <li>other (1)</li>
     </ul>
   </li>
   <li>[kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
     <ul>
-      <li>kettle-dev (&gt;= 3.1.27 -&gt; &gt;= 3.1.29)</li>
-      <li>kettle-changelog (&gt;= 1.0.17 -&gt; &gt;= 1.0.18)</li>
-      <li>rspec-stubbed_env (&gt;= 1.0.17 -&gt; &gt;= 1.0.18)</li>
-      <li>kettle-family (&gt;= 1.3.38 -&gt; &gt;= 1.3.43)</li>
-      <li>stone_checksums (&gt;= 1.0.9 -&gt; &gt;= 1.0.10)</li>
-      <li>turbo_tests2 (&gt;= 4.0.0 -&gt; &gt;= 4.0.2)</li>
-      <li>gitmoji-regex (&gt;= 2.0.15 -&gt; &gt;= 2.0.16)</li>
-      <li>yard-fence (&gt;= 0.9.10 -&gt; &gt;= 0.9.11)</li>
-      <li>yard-timekeeper (&gt;= 0.2.9 -&gt; &gt;= 0.2.10)</li>
-      <li>duel (&gt;= 0.1.4 -&gt; &gt;= 0.1.8)</li>
-      <li>kettle-test (&gt;= 2.0.29 -&gt; &gt;= 2.0.30)</li>
+      <li>addressable (&gt;= 2.9.2 -&gt; &gt;= 2.10.0)</li>
+      <li>duel (&gt;= 0.1.8 -&gt; &gt;= 0.3.1)</li>
+      <li>gem_bench (&gt;= 2.0.5 -&gt; &gt;= 2.0.6)</li>
+      <li>gitmoji-regex (&gt;= 2.0.16 -&gt; &gt;= 2.0.17)</li>
+      <li>kettle-changelog (&gt;= 1.0.18 -&gt; &gt;= 1.0.20)</li>
+      <li>kettle-dev (&gt;= 3.1.29 -&gt; &gt;= 3.1.31)</li>
+      <li>kettle-family (&gt;= 1.3.43 -&gt; &gt;= 1.3.48)</li>
+      <li>kramdown (&gt;= 2.5.2 -&gt; &gt;= 2.6.1)</li>
+      <li>require_bench (&gt;= 1.0.4 -&gt; &gt;= 1.0.5)</li>
+      <li>rspec-stubbed_env (&gt;= 1.0.18 -&gt; &gt;= 1.0.19)</li>
+      <li>stone_checksums (&gt;= 1.0.10 -&gt; &gt;= 1.0.11)</li>
+      <li>yaml-converter (&gt;= 0.2.7 -&gt; &gt;= 0.2.8)</li>
+      <li>yard-fence (&gt;= 0.9.11 -&gt; &gt;= 0.9.12)</li>
+      <li>yard-lint (&gt;= 1.13.1 -&gt; &gt;= 1.15.0)</li>
+      <li>yard-timekeeper (&gt;= 0.2.10 -&gt; &gt;= 0.2.11)</li>
     </ul>
   </li>
   <li>[kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
     <ul>
-      <li>github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)</li>
-      <li>github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)</li>
-      <li>github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.3 (33d7b85da1a04171e211befe2c739303b9a4c066)</li>
-      <li>qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -&gt; v2.7.0 (0ff2178667bf8eb28ed0013a7ef54857a24d4056)</li>
-      <li>ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -&gt; v1.338.0 (b3aaceaef7e0ee231b499e7b5f49c03fc1d32199)</li>
+      <li>actions/dependency-review-action v5.0.0 (a1d282b36b6f3519aa1f3fc636f609c47dddb294) -&gt; v5.0.1 (bbc44d14a204704ccc493733616cd1e93a0321ec)</li>
+      <li>github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)</li>
+      <li>github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)</li>
+      <li>github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -&gt; v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)</li>
+      <li>qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -&gt; v2.8.1 (56bee2d751c94b7bd8de22f64c9b5f398048e13f)</li>
+      <li>ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -&gt; v1.344.0 (78c62f2208e480ce3d5ae4dfd9b9e181acf48b63)</li>
+      <li>sarisia/actions-status-discord v1.16.0 (eb045afee445dc055c18d3d90bd0f244fd062708) -&gt; v1.16.1 (74e2ad0c4e57ca8b9ba6aee75d5a7841497bbb87)</li>
     </ul>
   </li>
   <li>
@@ -135,6 +141,10 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 <h3 id="deprecated">Deprecated</h3>
 
 <h3 id="removed">Removed</h3>
+
+<ul>
+  <li>Dead remove_excluded_changelog_transfer_entries helper; excluded-key pruning lives in kettle-changelog’s TransferMerger, which now only prunes Unreleased (#151).</li>
+</ul>
 
 <h3 id="fixed">Fixed</h3>
 
@@ -156,6 +166,18 @@ Please file a bug if you notice a violation of semantic versioning.</p>
   </li>
   <li>
     <p>Wire every configured StructuredMerge family gem in local templating bundles to prevent mixed local and registry dependency versions.</p>
+  </li>
+  <li>
+    <p>Retemplating after an engine or workflow change no longer deletes transfer-keyed entries from released CHANGELOG sections (#150, #151); kettle-jem now requires kettle-changelog &gt;= 1.0.19, which limits excluded-key pruning to <code>## [Unreleased]</code>. The spec that asserted the old remove-from-every-section behavior now asserts released history is preserved.</p>
+  </li>
+  <li>
+    <p>README merge no longer duplicates template-owned sections nested inside a preserved destination section: preserved-section bodies now strip nested template-owned subsections, and extra preserved sections anchor only to template sections of equal-or-higher heading level so they are not inserted between a template parent and its nested sections</p>
+  </li>
+  <li>
+    <p>Rakefile templating once again strips proven bundle-gem scaffold content (e.g. an eager require of rubocop/rake_task, which breaks release coverage boots) before merging the Rakefile template, instead of preserving scaffold lines forever as destination content; legitimate non-scaffold Rakefiles (alef/native, hand-maintained) keep their RSpec and default-task wiring. (GH#154)</p>
+  </li>
+  <li>
+    <p>Templating now strips the bundle-gem scaffold’s malformed contact line (a quoted mailto: href from bundler’s CODE_OF_CONDUCT.md.tt .inspect bug) from the CODE_OF_CONDUCT.md merge input via markly AST, so newly scaffolded gems no longer carry an invalid URI that crashes yard-relative_markdown_links during the release changelog yard step. (GH#156)</p>
   </li>
 </ul>
 

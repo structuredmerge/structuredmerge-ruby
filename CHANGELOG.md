@@ -20,6 +20,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.19] - 2026-11-23
+
+- TAG: [v7.1.19][7.1.19t]
+- COVERAGE: 0.00% -- 0/0 lines in 0 files
+- BRANCH COVERAGE: 0.00% -- 0/0 branches in 0 files
+- 72.91% documented
+
+### Added
+
 - kettle-jem: the `current.yml` workflow template now removes the eMudhra-related roots that Apple still ships in `/etc/ssl/cert.pem` as its first step (before checkout) on macOS runners, when `macos` is a declared platform. The inlined script, `lib/kettle/jem/ci/harden_macos_ca_bundle.sh`, matches by certificate subject, logs each removed fingerprint and fails if any remains; it is not emitted for destinations without macOS lanes (galadran/we-have-a-problem.com#157)
 
 - ast-crispr-yaml-psych: `Selectors.mapping_entry` and `Selectors.sequence_item` can be used as `Insert` destinations (insert after the matched owner) (#105)
@@ -29,8 +48,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - structuredmerge-core local wiring now uses nomono (`eval_nomono_gems` with `subdirs`, nomono >= 1.1.18) instead of hand-rolled `STRUCTUREDMERGE_CORE_DEV` parsing in every templating gemfile; the kettle-jem templates generate the same wiring. The nomono floor is bumped to >= 1.1.18 across the family.
 
 - tree_haver: structuredmerge-core floor raised to the first released version, 0.2.2; registry resolution now works with STRUCTUREDMERGE_CORE_DEV unset, unblocking family releases
-
-### Deprecated
 
 ### Removed
 
@@ -47,8 +64,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem: Packaged modular ostruct r4 template now declares `~> 0.6`, `>= 0.6.1`, matching the floors destinations add on the Appraisals side; divergent duplicate ostruct declarations across a bundle's eval_gemfile chain are fatal under Bundler 4
 
 - kettle-jem: Ruby and gemfile template merges now pass the configured freeze_token (default kettle-jem) through to Prism::Merge, so freeze blocks in templated Gemfiles and Ruby files are honored uniformly with YAML/JSON/dotenv merges; previously the gemfile path never forwarded the token and Prism::Merge's own default (prism-merge) silently decided ownership, letting template refreshes erase frozen gem declarations
-
-### Security
 
 ## [7.1.18] - 2026-10-30
 
@@ -1003,7 +1018,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.18...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.19...HEAD
+[7.1.19]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.18...v7.1.19
+[7.1.19t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.19
 [7.1.18]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.17...v7.1.18
 [7.1.18t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.18
 [7.1.17]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.16...v7.1.17

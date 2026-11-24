@@ -222,6 +222,29 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#parser_available_for%3F-class_method" title="parser_available_for? (class method)">.<strong>parser_available_for?</strong>(language)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check a specific grammar through the core registry’s provider probe.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#register_language_parser-class_method" title="register_language_parser (class method)">.<strong>register_language_parser</strong>(language)  &#x21d2; Object </a>
     
 
@@ -246,6 +269,29 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
   <span class="summary_signature">
     
       <a href="#reset!-class_method" title="reset! (class method)">.<strong>reset!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unavailable_reason_for-class_method" title="unavailable_reason_for (class method)">.<strong>unavailable_reason_for</strong>(language)  &#x21d2; Object </a>
     
 
     
@@ -396,7 +442,6 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
       <pre class="lines">
 
 
-29
 30
 31
 32
@@ -408,10 +453,13 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
 38
 39
 40
-41</pre>
+41
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
@@ -423,8 +471,116 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
     <span class='label'>incremental:</span> <span class='kw'>false</span><span class='comma'>,</span>
     <span class='label'>comment_support:</span> <span class='symbol'>:nodes_only</span><span class='comma'>,</span>
     <span class='label'>language_pack:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>normalized_tree:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>native_node_access:</span> <span class='kw'>false</span><span class='comma'>,</span>
     <span class='label'>provenance:</span> <span class='symbol'>:rust_tree_haver</span>
   <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parser_available_for?-class_method">
+  
+    .<strong>parser_available_for?</strong>(language)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check a specific grammar through the core registry’s provider probe.<br />
+Probing can load a grammar under the configured language-pack policy.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 48</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parser_available_for?'>parser_available_for?</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
+
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_provider_id'>provider_id</span> <span class='op'>=</span> <span class='id identifier rubyid_register_language_parser'>register_language_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_core'>core</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>StructuredmergeCore</span>
+  <span class='id identifier rubyid_request'>request</span> <span class='op'>=</span> <span class='id identifier rubyid_core'>core</span><span class='op'>::</span><span class='const'>ParserSelectionRequest</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>language:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+    <span class='label'>dialect:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>selection:</span> <span class='id identifier rubyid_core'>core</span><span class='op'>::</span><span class='const'>ParserSelection</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>backend_id:</span> <span class='id identifier rubyid_provider_id'>provider_id</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>required_capabilities:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>options:</span> <span class='id identifier rubyid_core'>core</span><span class='op'>::</span><span class='const'>ParseOptions</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>comments:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>tokens:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='kw'>false</span><span class='comma'>,</span>
+                                    <span class='label'>native_extensions:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_limits'>limits</span> <span class='op'>=</span> <span class='id identifier rubyid_core'>core</span><span class='op'>::</span><span class='const'>ParseLimits</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>max_batch_items:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>max_input_bytes:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>max_nodes:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>max_diagnostics:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_report'>report</span> <span class='op'>=</span> <span class='id identifier rubyid_core'>core</span><span class='period'>.</span><span class='id identifier rubyid_parser_selection_report'>parser_selection_report</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='comma'>,</span> <span class='id identifier rubyid_limits'>limits</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_selected_backend'>selected_backend</span> <span class='op'>==</span> <span class='id identifier rubyid_provider_id'>provider_id</span>
+    <span class='ivar'>@language_unavailable_reasons</span><span class='op'>&amp;.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='kw'>true</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_candidate'>candidate</span> <span class='op'>=</span> <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_candidates'>candidates</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_backend_id'>backend_id</span> <span class='op'>==</span> <span class='id identifier rubyid_provider_id'>provider_id</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_remember_language_failure'>remember_language_failure</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='op'>&amp;.</span><span class='id identifier rubyid_probe_fault'>probe_fault</span> <span class='op'>||</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='op'>&amp;.</span><span class='id identifier rubyid_rejections'>rejections</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>, </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='kw'>false</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_remember_language_failure'>remember_language_failure</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+  <span class='kw'>false</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -446,22 +602,22 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
       <pre class="lines">
 
 
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55</pre>
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register_language_parser'>register_language_parser</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
@@ -500,7 +656,8 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
 24
 25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 23</span>
@@ -509,6 +666,37 @@ does not replace the direct Ruby language-pack or tree_stump backends.</p>
   <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>false</span>
   <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
   <span class='ivar'>@unavailable_reason</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='ivar'>@language_unavailable_reasons</span> <span class='op'>=</span> <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unavailable_reason_for-class_method">
+  
+    .<strong>unavailable_reason_for</strong>(language)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+78
+79
+80</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust_tslp.rb', line 78</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unavailable_reason_for'>unavailable_reason_for</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='rparen'>)</span>
+  <span class='ivar'>@language_unavailable_reasons</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>

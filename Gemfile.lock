@@ -325,7 +325,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.9.2)
+    addressable (2.10.0)
       public_suffix (>= 2.0.2, < 8.0)
     anonymous_loader (0.1.5)
       version_gem (~> 1.1, >= 1.1.17)
@@ -440,7 +440,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.17)
     kettle-drift (1.0.19)
       version_gem (~> 1.1, >= 1.1.17)
-    kettle-family (1.3.46)
+    kettle-family (1.3.47)
       ast-crispr (~> 7.1, >= 7.1.11)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.10)
       ast-crispr-toml (~> 7.1, >= 7.1.11)
@@ -498,15 +498,11 @@ GEM
     lint_roller (1.1.0)
     logger (1.7.0)
     markly (0.19.0)
-    mini_portile2 (2.8.9)
     mister_bin (0.9.0)
       colsole (~> 1.0.0)
       docopt_ng (~> 0.7.1)
       reline (~> 0.6)
     mutex_m (0.3.0)
-    nokogiri (1.19.7)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.19.7-x86_64-linux-gnu)
       racc (~> 1.4)
     openssl (4.0.2)
@@ -734,10 +730,10 @@ GEM
     toml-rb (4.2.2)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.25.0)
+    tree_sitter_language_pack (1.27.1)
       rb_sys (>= 0.9.130, < 0.10)
       sorbet-runtime (~> 0.6)
-    tree_sitter_language_pack (1.25.0-x86_64-linux)
+    tree_sitter_language_pack (1.27.1-x86_64-linux)
       sorbet-runtime (~> 0.6)
     tsort (0.2.0)
     tty-cursor (0.7.1)
@@ -874,7 +870,7 @@ DEPENDENCIES
   zip-merge!
 
 CHECKSUMS
-  addressable (2.9.2) sha256=9117c7e7d6ee07230e75ce41fb9401ae55354dc654fcd0e862ba41d539e9a610
+  addressable (2.10.0) sha256=5e13b9c001adf01dd65ad6e0d2a91d2bc07885c0ff2b83f48cbcd95e08d9de62
   anonymous_loader (0.1.5) sha256=c96a4a1b5f49f320037fae63e931ac15b3823686e4f0ee6f24f75a0ade4227cb
   ansi (1.6.1) sha256=0465a830a375a15f513096d7bbc1ff9fd49e5db94b6c598e5c25e63d1f3e55a9
   appraisal2 (3.2.6) sha256=6664d2404b9fe160dfbbed4dd9b78e7b9146402bc3468ff92ba78c1878bc318a
@@ -938,7 +934,7 @@ CHECKSUMS
   kettle-deps-floor (0.1.3) sha256=82955163a525f029f3b8fc3656a739be8ae3dc8c941a2157bfcab73f3ea0ff9d
   kettle-dev (3.1.31) sha256=54f83525048bc3bf1b8399d1e2df915fe6e8e559ad9e7067be71a94640eef97c
   kettle-drift (1.0.19) sha256=c4947944d84839b01fafffd934210c7cc6b438886ff93a663d609ab620b2eb11
-  kettle-family (1.3.46) sha256=48b67cd85cb42e17c957407a0b0b57ac575b4c9e7e4dd3cb8f940e07745f295b
+  kettle-family (1.3.47) sha256=18df3e02521b95f68ef71b3d57632b8fcf9906f8f6710b125379bda83dbb032b
   kettle-gha-pins (0.3.21) sha256=c0f08ef9fb6065cb1f1b77c44fdb117c7152255aef4ecd385b027312e874e508
   kettle-jem (7.1.43)
   kettle-ndjson (0.1.24) sha256=138b8710a29960e89233e0f5339ac5f2f2bcf6b95e69566b9baaf572f78ef736
@@ -955,10 +951,8 @@ CHECKSUMS
   markdown-merge (7.1.19)
   markly (0.19.0) sha256=cd2c0e86eaf3660ed2a3a94104877f8bd41adda78e7c295c017d03de0d4044ca
   markly-merge (7.1.19)
-  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
   mister_bin (0.9.0) sha256=624fe401db4faf1978e84c17e0b320827697a13a6cba4fe656001269079be7d3
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
-  nokogiri (1.19.7) sha256=abe94507c54cb18f872777b16bdca4aad32b1abdc4c52fe843f1c80fbdf992b8
   nokogiri (1.19.7-x86_64-linux-gnu) sha256=25865ccb462f714e712fdf8906fde07849cb6704a808e3d629d75baa5af5dd3b
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
@@ -1040,7 +1034,7 @@ CHECKSUMS
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   strings-ansi (0.2.0) sha256=90262d760ea4a94cc2ae8d58205277a343409c288cbe7c29416b1826bd511c88
   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
-  structuredmerge-core (0.2.2) sha256=5648c298f54f1f334d7bf9b58c1e1dd4b6bcdda0530eab290d00de71b9e4543f
+  structuredmerge-core (0.2.2)
   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
@@ -1050,8 +1044,8 @@ CHECKSUMS
   toml-merge (7.1.19)
   toml-rb (4.2.2) sha256=b41cf36117bafab84c72017697ab49fe49a065e2bcfa6dffb704389fb7b0a60a
   tree_haver (7.1.19)
-  tree_sitter_language_pack (1.25.0) sha256=924bb9ddf6ee1859cae65e9e9346996b3b642ea23b6ef69167ed2df0e6530223
-  tree_sitter_language_pack (1.25.0-x86_64-linux) sha256=43c46682ecec1093dfbfeefea18859bf56a13ad011b3915d0d70cdfb3ac439ea
+  tree_sitter_language_pack (1.27.1) sha256=1bcdabdb649522da28bf970224baaf5e36dd81662687d286e24d7a6bc862e28d
+  tree_sitter_language_pack (1.27.1-x86_64-linux) sha256=7935f37cf90905dc36df66ee6678617df0977a4c96ba2461b9db405277dac5d6
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   tty-cursor (0.7.1) sha256=79534185e6a777888d88628b14b6a1fdf5154a603f285f80b1753e1908e0bf48
   tty-progressbar (0.18.3) sha256=6cbb4260e55e74a9180d502143eb6a467d2c8e51bf5f3c9509fb5cacc3d4a5f6

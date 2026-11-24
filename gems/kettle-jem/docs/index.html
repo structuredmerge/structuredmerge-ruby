@@ -334,6 +334,8 @@ not covered by the generated CI or Appraisal matrix.</p>
 
 <h2 id="️-configuration">⚙️ Configuration</h2>
 
+<p>Ruby-versioned modular Gemfile directories use the <a href="https://github.com/kettle-dev/kettle-rb/blob/main/lib/kettle/rb/ruby_series_buckets.rb">kettle-rb RubySeriesBuckets rules</a> as their canonical definition. A named bucket such as <code>r3.2</code> ends at Ruby 3.2; it is an upper bound, not a minimum. A bare <code>r3</code> covers the remaining newer versions within Ruby 3. Buckets never cross major versions, and their ranges depend on the complete set of names: with <code>r3.2</code> and <code>r3</code>, the former covers Ruby 3.0 through 3.2 and the latter covers 3.3 onward within major 3. <code>r4</code> covers Ruby 4 separately.</p>
+
 <p>Each gem that uses Kettle::Jem has a <code>.kettle-jem.yml</code> file at its root. This file controls<br>
 every aspect of how the template is applied.</p>
 

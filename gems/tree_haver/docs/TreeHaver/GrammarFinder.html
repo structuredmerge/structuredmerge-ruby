@@ -969,12 +969,12 @@ Other backends (Citrus, Prism, Psych, etc.) don’t use tree-sitter</p>
       <pre class="lines">
 
 
-294
 295
-296</pre>
+296
+297</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 294</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 295</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset_runtime_check!'>reset_runtime_check!</span>
   <span class='id identifier rubyid_remove_instance_variable'>remove_instance_variable</span><span class='lparen'>(</span><span class='symbol'>:@tree_sitter_runtime_usable</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='ivar'>@tree_sitter_runtime_usable</span><span class='rparen'>)</span>
@@ -1029,7 +1029,6 @@ Result is cached since this is expensive and won’t change during runtime.</p>
       <pre class="lines">
 
 
-269
 270
 271
 272
@@ -1049,10 +1048,11 @@ Result is cached since this is expensive and won’t change during runtime.</p>
 286
 287
 288
-289</pre>
+289
+290</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 269</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 270</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_tree_sitter_runtime_usable?'>tree_sitter_runtime_usable?</span>
   <span class='kw'>return</span> <span class='ivar'>@tree_sitter_runtime_usable</span> <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='ivar'>@tree_sitter_runtime_usable</span><span class='rparen'>)</span>
@@ -1146,12 +1146,14 @@ allowing clean fallback to alternative backends like Citrus.</p>
 248
 249
 250
-251</pre>
+251
+252</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 242</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available?'>available?</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_tree_sitter_language_pack_parser_available?'>tree_sitter_language_pack_parser_available?</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_effective_backend'><span class='object_link'><a href="../TreeHaver.html#effective_backend-class_method" title="TreeHaver.effective_backend (method)">effective_backend</a></span></span> <span class='op'>==</span> <span class='symbol'>:rust_tslp</span>
   <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_tree_sitter_language_pack_parser_available?'>tree_sitter_language_pack_parser_available?</span>
 
   <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_find_library_path'>find_library_path</span>
@@ -1215,12 +1217,12 @@ allowing clean fallback to alternative backends like Citrus.</p>
       <pre class="lines">
 
 
-303
 304
-305</pre>
+305
+306</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 303</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 304</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_available_safe?'>available_safe?</span>
   <span class='op'>!</span><span class='id identifier rubyid_find_library_path_safe'>find_library_path_safe</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -1713,13 +1715,6 @@ historical hyphenated form used by some standalone grammar builds.</p>
       <pre class="lines">
 
 
-362
-363
-364
-365
-366
-367
-368
 369
 370
 371
@@ -1729,10 +1724,19 @@ historical hyphenated form used by some standalone grammar builds.</p>
 375
 376
 377
-378</pre>
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 362</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 369</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_not_found_message'>not_found_message</span>
   <span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree-sitter </span><span class='embexpr_beg'>#{</span><span class='ivar'>@language_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> grammar not found.</span><span class='tstring_end'>&quot;</span></span>
@@ -1741,6 +1745,8 @@ historical hyphenated form used by some standalone grammar builds.</p>
 </span>  <span class='id identifier rubyid_env_value'>env_value</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='id identifier rubyid_env_var_name'>env_var_name</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_msg'>msg</span> <span class='op'>+=</span> <span class='kw'>if</span> <span class='id identifier rubyid_env_value'>env_value</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@env_rejection_reason</span>
            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_var_name'>env_var_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is set to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_value'>env_value</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> but </span><span class='embexpr_beg'>#{</span><span class='ivar'>@env_rejection_reason</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span>
+         <span class='kw'>elsif</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_effective_backend'><span class='object_link'><a href="../TreeHaver.html#effective_backend-class_method" title="TreeHaver.effective_backend (method)">effective_backend</a></span></span> <span class='op'>==</span> <span class='symbol'>:rust_tslp</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@tree_sitter_language_pack_rejection_reason</span>
+           <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> Rust TSLP parser probe failed: </span><span class='embexpr_beg'>#{</span><span class='ivar'>@tree_sitter_language_pack_rejection_reason</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span>
          <span class='kw'>elsif</span> <span class='id identifier rubyid_env_value'>env_value</span> <span class='op'>&amp;&amp;</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_env_value'>env_value</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_tree_sitter_runtime_usable?'>tree_sitter_runtime_usable?</span>
            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_var_name'>env_var_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is set and file exists, but no tree-sitter runtime is available. </span><span class='tstring_end'>&quot;</span></span> \
              <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Add ruby_tree_sitter, ffi, or tree_stump gem to your Gemfile.</span><span class='tstring_end'>&#39;</span></span>
@@ -1839,7 +1845,6 @@ historical hyphenated form used by some standalone grammar builds.</p>
       <pre class="lines">
 
 
-315
 316
 317
 318
@@ -1861,12 +1866,25 @@ historical hyphenated form used by some standalone grammar builds.</p>
 334
 335
 336
-337</pre>
+337
+338
+339
+340
+341
+342
+343
+344</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 315</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 316</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register!'>register!</span><span class='lparen'>(</span><span class='label'>raise_on_missing:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_effective_backend'><span class='object_link'><a href="../TreeHaver.html#effective_backend-class_method" title="TreeHaver.effective_backend (method)">effective_backend</a></span></span> <span class='op'>==</span> <span class='symbol'>:rust_tslp</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_tree_sitter_language_pack_parser_available?'>tree_sitter_language_pack_parser_available?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_not_found_message'>not_found_message</span> <span class='kw'>if</span> <span class='id identifier rubyid_raise_on_missing'>raise_on_missing</span>
+
+    <span class='kw'>return</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
   <span class='kw'>if</span> <span class='id identifier rubyid_tree_sitter_language_pack_parser_available?'>tree_sitter_language_pack_parser_available?</span>
     <span class='id identifier rubyid_backend_module'>backend_module</span><span class='comma'>,</span> <span class='id identifier rubyid_backend_type'>backend_type</span><span class='comma'>,</span> <span class='id identifier rubyid_gem_name'>gem_name</span> <span class='op'>=</span> <span class='id identifier rubyid_language_pack_registration'>language_pack_registration</span>
     <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_register_language'><span class='object_link'><a href="../TreeHaver.html#register_language-class_method" title="TreeHaver.register_language (method)">register_language</a></span></span><span class='lparen'>(</span>
@@ -1936,13 +1954,6 @@ historical hyphenated form used by some standalone grammar builds.</p>
       <pre class="lines">
 
 
-342
-343
-344
-345
-346
-347
-348
 349
 350
 351
@@ -1951,10 +1962,17 @@ historical hyphenated form used by some standalone grammar builds.</p>
 354
 355
 356
-357</pre>
+357
+358
+359
+360
+361
+362
+363
+364</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 342</span>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/grammar_finder.rb', line 349</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_search_info'>search_info</span>
   <span class='id identifier rubyid_found'>found</span> <span class='op'>=</span> <span class='id identifier rubyid_find_library_path'>find_library_path</span> <span class='comment'># This populates @env_rejection_reason
@@ -1969,7 +1987,7 @@ historical hyphenated form used by some standalone grammar builds.</p>
     <span class='label'>library_filenames:</span> <span class='id identifier rubyid_library_filenames'>library_filenames</span><span class='comma'>,</span>
     <span class='label'>search_paths:</span> <span class='id identifier rubyid_search_paths'>search_paths</span><span class='comma'>,</span>
     <span class='label'>found_path:</span> <span class='id identifier rubyid_found'>found</span><span class='comma'>,</span>
-    <span class='label'>available:</span> <span class='id identifier rubyid_tree_sitter_language_pack_parser_available?'>tree_sitter_language_pack_parser_available?</span> <span class='op'>||</span> <span class='op'>!</span><span class='id identifier rubyid_found'>found</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='label'>available:</span> <span class='id identifier rubyid_available?'>available?</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
