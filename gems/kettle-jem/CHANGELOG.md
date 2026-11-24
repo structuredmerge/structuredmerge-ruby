@@ -57,9 +57,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
   - actions/dependency-review-action v5.0.0 (a1d282b36b6f3519aa1f3fc636f609c47dddb294) -> v5.0.1 (bbc44d14a204704ccc493733616cd1e93a0321ec)
-  - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.4 (1bd86f2fdb4b86187fa4059f16f31a3202acc9ea)
-  - github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.4 (1bd86f2fdb4b86187fa4059f16f31a3202acc9ea)
-  - github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.4 (1bd86f2fdb4b86187fa4059f16f31a3202acc9ea)
+  - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)
+  - github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)
+  - github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)
   - qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -> v2.8.0 (a46e29cfd54065ae8a2c6b1fd3446aed1b1a4257)
   - ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -> v1.344.0 (78c62f2208e480ce3d5ae4dfd9b9e181acf48b63)
   - sarisia/actions-status-discord v1.16.0 (eb045afee445dc055c18d3d90bd0f244fd062708) -> v1.16.1 (74e2ad0c4e57ca8b9ba6aee75d5a7841497bbb87)

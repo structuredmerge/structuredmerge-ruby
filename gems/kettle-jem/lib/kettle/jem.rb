@@ -21991,9 +21991,9 @@ module Kettle
         "actions/download-artifact" => "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2",
         "amancevice/setup-code-climate" => "amancevice/setup-code-climate@0daf2985a225e8ac15975b4d233010e94d65b76a # v2",
         "actions/dependency-review-action" => "actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1",
-        "github/codeql-action/init" => "github/codeql-action/init@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4",
-        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4",
-        "github/codeql-action/analyze" => "github/codeql-action/analyze@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4",
+        "github/codeql-action/init" => "github/codeql-action/init@915412ff23e8b7659517e607487dbeae018f2934 # v4.39.5",
+        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@915412ff23e8b7659517e607487dbeae018f2934 # v4.39.5",
+        "github/codeql-action/analyze" => "github/codeql-action/analyze@915412ff23e8b7659517e607487dbeae018f2934 # v4.39.5",
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@d6e511896e5f1d2408e74db74416647d8ff80c8c # v4.1.0",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@a196742f472feaffafea537ce5a2a4c3c53a8de4 # v0.9.0",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@74e2ad0c4e57ca8b9ba6aee75d5a7841497bbb87 # v1.16.1"
