@@ -52,6 +52,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - stone_checksums (>= 1.0.10 -> >= 1.0.11)
   - yaml-converter (>= 0.2.7 -> >= 0.2.8)
   - yard-fence (>= 0.9.11 -> >= 0.9.12)
+  - yard-lint (>= 1.13.1 -> >= 1.15.0)
   - yard-timekeeper (>= 0.2.10 -> >= 0.2.11)
 
 - [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
