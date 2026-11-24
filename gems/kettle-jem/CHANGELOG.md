@@ -60,7 +60,7 @@ Please file a bug if you notice a violation of semantic versioning.
   - github/codeql-action/analyze v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)
   - github/codeql-action/autobuild v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)
   - github/codeql-action/init v4.39.1 (9b3254085494b55a0f7c4c2b3d2d52cc712ce370) -> v4.39.5 (915412ff23e8b7659517e607487dbeae018f2934)
-  - qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -> v2.8.0 (a46e29cfd54065ae8a2c6b1fd3446aed1b1a4257)
+  - qltysh/qlty-action/coverage v2.5.0 (ebcd284bf32e36a030afe15f1e136c7be08b9506) -> v2.8.1 (56bee2d751c94b7bd8de22f64c9b5f398048e13f)
   - ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -> v1.344.0 (78c62f2208e480ce3d5ae4dfd9b9e181acf48b63)
   - sarisia/actions-status-discord v1.16.0 (eb045afee445dc055c18d3d90bd0f244fd062708) -> v1.16.1 (74e2ad0c4e57ca8b9ba6aee75d5a7841497bbb87)
 
