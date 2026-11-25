@@ -22,10 +22,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
-  - kettle-changelog (>= 1.0.20 -> >= 1.0.21)
-  - kettle-family (>= 1.3.48 -> >= 1.3.49)
-
 ### Deprecated
 
 ### Removed
@@ -33,6 +29,19 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 ### Security
+
+## [7.1.44] - 2026-11-25
+
+- TAG: [v7.1.44][7.1.44t]
+- COVERAGE: 93.76% -- 11911/12704 lines in 17 files
+- BRANCH COVERAGE: 77.54% -- 5185/6687 branches in 17 files
+- 21.57% documented
+
+### Changed
+
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-changelog (>= 1.0.20 -> >= 1.0.21)
+  - kettle-family (>= 1.3.48 -> >= 1.3.49)
 
 ## [7.1.43] - 2026-11-24
 
@@ -2661,7 +2670,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 
-[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.43...HEAD
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.44...HEAD
+[7.1.44]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.43...v7.1.44
+[7.1.44t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.44
 [7.1.43]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.42...v7.1.43
 [7.1.43t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.1.43
 [7.1.42]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.1.41...v7.1.42
