@@ -99,8 +99,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - README post-processing no longer treats badge image definitions (shields.io URLs) as workflow references, which stripped the inline badges that use them on every run. Compatible versioned engine badges (for example Truffle Ruby 33.0) whose workflow exists are now added as intended. (#133)
 
-- Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile's them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.
-
 - [kc] alef-gemspec-spec-files: Kettle Jem now merges Alef-generated spec.files candidate lists and exclusion filters while retaining destination gem version metadata.
 
 - Remove the Style/SafeNavigation offense from the generated gemfiles/modular/style_local.gemfile (spec&.version in the local_gem_satisfies? gemspec guard), so templated projects no longer carry a .rubocop_gradual.lock baseline entry for it
@@ -123,7 +121,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Historical release notes are unavailable in this changelog.
+- [kc] kettle-jem/prepare: updated 24 project files:
+  - configuration (1)
+  - dependencies (23)
+
+- [kc] kettle-jem/template: updated 5 project files:
+  - code and tests (1)
+  - dependencies (2)
+  - documentation (1)
+  - other (1)
+
+- [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-family (>= 1.3.36 -> >= 1.3.37)
+
+- [kc] kettle-jem-workflow-pins: Update pinned GitHub Actions in kettle-jem templates:
+  - ruby/setup-ruby v1.335.0 (7f797815d8adceb1c412e7abefdd1ab4abc47a5f) -> v1.336.0 (de492cf36cbab201753d720ce4f4e336cd688c94)
+
+### Fixed
+
+- Template sweep no longer deletes per-Ruby-version modular gemfile variants (x_std_libs r2/r3/r3.1 libs.gemfile and the std-lib gem variants they load) while a committed version-split loader still eval_gemfile's them; gemfile sweep deletions now respect the reference closure of the loaders that remain, so only genuinely unreferenced variants are pruned.
 
 ## [7.1.41] - 2026-10-29
 
