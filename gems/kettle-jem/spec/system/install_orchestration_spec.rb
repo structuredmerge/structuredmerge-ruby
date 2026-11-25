@@ -2794,4 +2794,68 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(File.read(File.join(root, "example.gemspec"))).to include('spec.homepage = "https://example.test"')
     end
   end
+
+  describe "local-path Gemfile.lock handling" do
+    let(:tmp_root) { File.expand_path("../tmp", __dir__) }
+    let(:install_task) { Kettle::Jem::Tasks::InstallTask }
+
+    def git!(root, *args)
+      expect(system("git", "-C", root, *args, out: File::NULL, err: File::NULL)).to be(true)
+    end
+
+    def with_locked_repo(lock_content)
+      FileUtils.mkdir_p(tmp_root)
+      Dir.mktmpdir("kettle-jem-lock-restore", tmp_root) do |root|
+        git!(root, "init")
+        git!(root, "config", "user.email", "t@example.test")
+        git!(root, "config", "user.name", "t")
+        File.write(File.join(root, "Gemfile.lock"), "GEM\n  remote: https://gem.coop/\n")
+        git!(root, "add", "-A")
+        git!(root, "commit", "-m", "init")
+        File.write(File.join(root, "Gemfile.lock"), lock_content)
+        yield root
+      end
+    end
+
+    let(:local_lock) { "PATH\n  remote: /home/someone/src/kettle-dev\n  specs:\n" }
+
+    it "restores a lockfile with local PATH sources instead of committing it" do
+      with_locked_repo(local_lock) do |root|
+        File.write(File.join(root, "other.txt"), "x\n")
+        step = install_task.bootstrap_commit_step(root, run_options: {}, env: {"STRUCTUREDMERGE_DEV" => "/x"})
+
+        expect(step).to include(status: "ready", restored_lockfile: "Gemfile.lock")
+        expect(step.fetch(:commands).first).to eq(%w[git checkout -- Gemfile.lock])
+        expect(step.fetch(:commands)).to include(%w[git add -A -- .])
+      end
+    end
+
+    it "only restores when the lockfile is the sole change" do
+      with_locked_repo(local_lock) do |root|
+        step = install_task.bootstrap_commit_step(root, run_options: {}, env: {"STRUCTUREDMERGE_DEV" => "/x"})
+
+        expect(step).to include(status: "ready", reason: "restored_local_path_lockfile_only")
+        expect(step.fetch(:commands)).to eq([%w[git checkout -- Gemfile.lock]])
+      end
+    end
+
+    it "commits the lockfile outside local-path development mode" do
+      with_locked_repo(local_lock) do |root|
+        step = install_task.bootstrap_commit_step(root, run_options: {}, env: {})
+
+        expect(step).not_to have_key(:restored_lockfile)
+        expect(step.fetch(:commands)).to include(%w[git add -A -- .])
+      end
+    end
+
+    it "does not count a restored lockfile, but counts other post-step changes" do
+      with_locked_repo(local_lock) do |root|
+        FileUtils.mkdir_p(File.join(root, "bin"))
+        File.write(File.join(root, "bin", "new-binstub"), "x\n")
+        report = install_task.include_post_step_changed_files({changed_files: ["Gemfile"]}, root, {"STRUCTUREDMERGE_DEV" => "/x"}, [])
+
+        expect(report.fetch(:changed_files)).to eq(%w[Gemfile bin/new-binstub])
+      end
+    end
+  end
 end

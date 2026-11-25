@@ -33,6 +33,7 @@ module Kettle
           effective_run_options = install_run_options(env, run_options)
           config_migration_step = kettle_config_migration_step(project_root)
           effective_run_options = effective_run_options.merge(defer_drift_check: true)
+          predirty_paths = git_dirty_paths(project_root)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           report = followup_apply_after_config_bootstrap(project_root, env: env, run_options: effective_run_options, report: report)
           install_steps = []
@@ -68,6 +69,7 @@ module Kettle
               message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps."
             }]
           )
+          final_report = include_post_step_changed_files(final_report, project_root, env, predirty_paths)
           final_report = Kettle::Jem::MaintenanceChangelog.record_template_run(
             project_root: project_root,
             report: final_report,
@@ -1841,6 +1843,34 @@ module Kettle
           }
         end
 
+        LOCKFILE_PATH = "Gemfile.lock"
+
+        # Files changed by post-template steps (binstubs, lockfiles, ...) that the apply report does not know about.
+        def include_post_step_changed_files(report, project_root, env, predirty_paths)
+          extra = git_dirty_paths(project_root) - predirty_paths
+          extra -= [LOCKFILE_PATH] if local_path_lockfile_to_restore?(project_root, env)
+          return report if extra.empty?
+
+          report.merge(changed_files: (Array(report[:changed_files]) + extra).uniq.sort)
+        end
+
+        def git_dirty_paths(project_root)
+          git_output(project_root, "status", "--porcelain", "-z", "--untracked-files=all")
+            .split("\0").map { |entry| entry[3..] }.compact.reject(&:empty?).sort
+        end
+
+        # A Gemfile.lock resolved in local-path development mode (*_DEV / *_LOCAL env) embeds
+        # absolute `remote: /...` PATH sources from the machine that ran templating. It must not be committed.
+        def local_path_lockfile_to_restore?(project_root, env)
+          return false unless local_path_development_env?(env)
+          return false unless git_success?(project_root, "ls-files", "--error-unmatch", LOCKFILE_PATH)
+          return false if git_success?(project_root, "diff", "--quiet", "--", LOCKFILE_PATH)
+
+          File.foreach(File.join(project_root.to_s, LOCKFILE_PATH)).any? { |line| line.match?(/\A\s+remote: \//) }
+        rescue Errno::ENOENT
+          false
+        end
+
         def commit_phase(env)
           phase = (env || {})[COMMIT_PHASE_ENV_KEY].to_s.strip
           phase.empty? ? DEFAULT_COMMIT_PHASE : phase
@@ -1863,7 +1893,9 @@ module Kettle
             }
           end
 
+          restore_lockfile = local_path_lockfile_to_restore?(project_root, env)
           dirty_entries = git_output(project_root, "status", "--porcelain").lines.map(&:chomp).reject(&:empty?)
+          committable_entries = restore_lockfile ? dirty_entries.reject { |entry| entry[3..] == LOCKFILE_PATH } : dirty_entries
           if dirty_entries.empty?
             return {
               name: "bootstrap_commit",
@@ -1873,6 +1905,17 @@ module Kettle
           end
 
           commands = []
+          commands << ["git", "checkout", "--", LOCKFILE_PATH] if restore_lockfile
+          if committable_entries.empty?
+            return {
+              name: "bootstrap_commit",
+              status: "ready",
+              dirty_entries: dirty_entries,
+              commands: commands,
+              restored_lockfile: LOCKFILE_PATH,
+              reason: "restored_local_path_lockfile_only"
+            }
+          end
           commands << %w[git add -A -- .]
           commands << ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION} [phase: #{commit_phase(env)}]"]
           {
@@ -1881,7 +1924,7 @@ module Kettle
             dirty_entries: dirty_entries,
             commands: commands,
             reason: "ready_for_orchestration"
-          }
+          }.tap { |step| step[:restored_lockfile] = LOCKFILE_PATH if restore_lockfile }
         end
 
         def git_success?(project_root, *args)
