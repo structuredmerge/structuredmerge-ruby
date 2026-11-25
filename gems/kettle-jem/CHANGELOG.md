@@ -20,6 +20,25 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [7.1.43] - 2026-11-24
+
+- TAG: [v7.1.43][7.1.43t]
+- COVERAGE: 93.85% -- 11923/12704 lines in 17 files
+- BRANCH COVERAGE: 77.67% -- 5194/6687 branches in 17 files
+- 21.57% documented
+
+### Added
+
 - `workflows.legacy_engines` opts an EOL engine workflow back in, as a list (`- truffleruby-24.2`) or a map keyed by workflow name with optional `mode` (`parallel` default, `serial` runs the job with `KETTLE_TEST_RUNNER=rspec`, `experimental` adds `experimental: true` to its matrix entry), `tracking` (issue URL) and `revisit_by` (date; a warning is reported once it has passed). Templating also reports a warning for every EOL workflow it removes, so the deletion is never silent.
 
 ### Changed
@@ -97,14 +116,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templating now strips the bundle-gem scaffold's malformed contact line (a quoted mailto: href from bundler's CODE_OF_CONDUCT.md.tt .inspect bug) from the CODE_OF_CONDUCT.md merge input via markly AST, so newly scaffolded gems no longer carry an invalid URI that crashes yard-relative_markdown_links during the release changelog yard step. (GH#156)
 
 ### Security
-
-## [7.1.43] - 2026-11-24
-
-- TAG: [v7.1.43][7.1.43t]
-
-### Changed
-
-- Historical release notes are unavailable in this changelog.
 
 ## [7.1.42] - 2026-10-31
 
