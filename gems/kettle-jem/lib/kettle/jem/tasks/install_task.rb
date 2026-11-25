@@ -22,6 +22,10 @@ module Kettle
           yard
         ].freeze
         GIT_OPERATION_LOCK_ENV_KEYS = %w[KETTLE_JEM_GIT_LOCK KETTLE_JEM_GIT_COMMIT_LOCK].freeze
+        # Identifies which (possibly nested) kettle-jem invocation made a bootstrap commit.
+        # Nested invocations (the bundled handoff) append their phase to the inherited one.
+        COMMIT_PHASE_ENV_KEY = "KETTLE_JEM_COMMIT_PHASE"
+        DEFAULT_COMMIT_PHASE = "install"
         GIT_OPERATION_LOCK_RETRY_ATTEMPTS = 5
         GIT_OPERATION_LOCK_RETRY_SLEEP_SECONDS = 0.25
 
@@ -29,6 +33,7 @@ module Kettle
           effective_run_options = install_run_options(env, run_options)
           config_migration_step = kettle_config_migration_step(project_root)
           effective_run_options = effective_run_options.merge(defer_drift_check: true)
+          predirty_paths = git_dirty_paths(project_root)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           report = followup_apply_after_config_bootstrap(project_root, env: env, run_options: effective_run_options, report: report)
           install_steps = []
@@ -51,6 +56,8 @@ module Kettle
           install_steps << normalize_lockfile_platforms_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options, repository: report.dig(:facts, :repository) || {})
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
+          # Must stay after the handoff: the handoff runs `bundle exec` and needs the (local-path) lock it was given.
+          install_steps << registry_lockfile_refresh_step(project_root, env: setup_env, run_options: effective_run_options, repository: report.dig(:facts, :repository) || {})
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
 
           final_report = report.merge(
@@ -64,6 +71,7 @@ module Kettle
               message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps."
             }]
           )
+          final_report = include_post_step_changed_files(final_report, project_root, env, predirty_paths)
           final_report = Kettle::Jem::MaintenanceChangelog.record_template_run(
             project_root: project_root,
             report: final_report,
@@ -74,7 +82,7 @@ module Kettle
             report: final_report,
             run_options: effective_run_options
           )
-          bootstrap_commit = bootstrap_commit_step(project_root, run_options: effective_run_options)
+          bootstrap_commit = bootstrap_commit_step(project_root, run_options: effective_run_options, env: env)
           install_steps.concat(
             execute_orchestration_steps(
               [bootstrap_commit],
@@ -785,6 +793,40 @@ module Kettle
           }
         end
 
+        # In local-path development mode (*_DEV / *_LOCAL env) the normalization steps above are skipped, and
+        # templating leaves a Gemfile.lock resolved against machine-specific PATH sources. That lock must never
+        # be committed, but dependency pin updates still belong in it. So: reset the lock to what is committed,
+        # then re-resolve against released sources with every *_DEV / *_LOCAL override switched off.
+        def registry_lockfile_refresh_step(project_root, env:, run_options: {}, repository: {})
+          return skipped_lockfile_normalization_step("registry_lockfile_refresh", "skip_lock_normalization") if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
+          return skipped_lockfile_normalization_step("registry_lockfile_refresh", "not_local_path_development_env") unless local_path_development_env?(env)
+          return skipped_lockfile_normalization_step("registry_lockfile_refresh", "untracked_Gemfile.lock") unless git_success?(project_root, "ls-files", "--error-unmatch", LOCKFILE_PATH)
+
+          command_env = normal_lockfile_env(project_root, env, repository: repository)
+          command_env.keys.each { |key| command_env[key] = "false" if key.to_s.end_with?("_DEV", "_LOCAL") }
+          {
+            name: "registry_lockfile_refresh",
+            status: "ready",
+            env: command_env,
+            reason: "reset_lockfile_and_update_from_released_sources"
+          }
+        end
+
+        def execute_registry_lockfile_refresh_step(step, project_root:, quiet:, command_runner:)
+          return step unless step.fetch(:status) == "ready"
+
+          restore = git_success?(project_root, "checkout", "--", LOCKFILE_PATH)
+          return step.merge(status: "failed", reason: "could_not_reset_lockfile") unless restore
+
+          result = run_ready_step_command(step.fetch(:name), lockfile_normalization_command(project_root), project_root: project_root, env: step.fetch(:env), quiet: quiet, command_runner: command_runner)
+          step.merge(status: "succeeded", exitstatus: result[:exitstatus], duration_ms: result.fetch(:duration_ms), reason: "executed")
+        rescue Kettle::Jem::Error => error
+          # Unreleased family floors can make a registry-only resolve impossible. Leave the committed lock untouched
+          # rather than leaving the working tree dirty or committing local paths.
+          git_success?(project_root, "checkout", "--", LOCKFILE_PATH)
+          step.merge(status: "failed", reason: "registry_resolution_failed_lockfile_reset", stderr: error.message)
+        end
+
         def normalize_lockfile_platforms_step(project_root, env:, run_options: {})
           return skipped_lockfile_normalization_step("lockfile_platform_normalization", "skip_lock_normalization") if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
           return skipped_lockfile_normalization_step("lockfile_platform_normalization", "local_path_development_env") if local_path_development_env?(env)
@@ -1264,6 +1306,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "lockfile_platform_normalization"
               execute_lockfile_platform_normalization_step(step, project_root: project_root)
+            when "registry_lockfile_refresh"
+              execute_registry_lockfile_refresh_step(step, project_root: project_root, quiet: quiet, command_runner: command_runner)
             when "rubocop_lts_local_branch"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_install_requested_env"
@@ -1829,12 +1873,48 @@ module Kettle
           {
             name: "bundled_handoff",
             command: bundled_handoff_command(run_options),
+            env: setup_command_env(project_root, env).merge(
+              COMMIT_PHASE_ENV_KEY => "#{commit_phase(env)}>bundled_handoff"
+            ),
             status: "ready",
             reason: "ready_for_orchestration"
           }
         end
 
-        def bootstrap_commit_step(project_root, run_options:)
+        LOCKFILE_PATH = "Gemfile.lock"
+
+        # Files changed by post-template steps (binstubs, lockfiles, ...) that the apply report does not know about.
+        def include_post_step_changed_files(report, project_root, env, predirty_paths)
+          extra = git_dirty_paths(project_root) - predirty_paths
+          extra -= [LOCKFILE_PATH] if local_path_lockfile_to_restore?(project_root, env)
+          return report if extra.empty?
+
+          report.merge(changed_files: (Array(report[:changed_files]) + extra).uniq.sort)
+        end
+
+        def git_dirty_paths(project_root)
+          git_output(project_root, "status", "--porcelain", "-z", "--untracked-files=all")
+            .split("\0").map { |entry| entry[3..] }.compact.reject(&:empty?).sort
+        end
+
+        # A Gemfile.lock resolved in local-path development mode (*_DEV / *_LOCAL env) embeds
+        # absolute `remote: /...` PATH sources from the machine that ran templating. It must not be committed.
+        def local_path_lockfile_to_restore?(project_root, env)
+          return false unless local_path_development_env?(env)
+          return false unless git_success?(project_root, "ls-files", "--error-unmatch", LOCKFILE_PATH)
+          return false if git_success?(project_root, "diff", "--quiet", "--", LOCKFILE_PATH)
+
+          File.foreach(File.join(project_root.to_s, LOCKFILE_PATH)).any? { |line| line.match?(/\A\s+remote: \//) }
+        rescue Errno::ENOENT
+          false
+        end
+
+        def commit_phase(env)
+          phase = (env || {})[COMMIT_PHASE_ENV_KEY].to_s.strip
+          phase.empty? ? DEFAULT_COMMIT_PHASE : phase
+        end
+
+        def bootstrap_commit_step(project_root, run_options:, env: ENV)
           if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_commit])
             return {
               name: "bootstrap_commit",
@@ -1851,7 +1931,9 @@ module Kettle
             }
           end
 
+          restore_lockfile = local_path_lockfile_to_restore?(project_root, env)
           dirty_entries = git_output(project_root, "status", "--porcelain").lines.map(&:chomp).reject(&:empty?)
+          committable_entries = restore_lockfile ? dirty_entries.reject { |entry| entry[3..] == LOCKFILE_PATH } : dirty_entries
           if dirty_entries.empty?
             return {
               name: "bootstrap_commit",
@@ -1861,15 +1943,26 @@ module Kettle
           end
 
           commands = []
+          commands << ["git", "checkout", "--", LOCKFILE_PATH] if restore_lockfile
+          if committable_entries.empty?
+            return {
+              name: "bootstrap_commit",
+              status: "ready",
+              dirty_entries: dirty_entries,
+              commands: commands,
+              restored_lockfile: LOCKFILE_PATH,
+              reason: "restored_local_path_lockfile_only"
+            }
+          end
           commands << %w[git add -A -- .]
-          commands << ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
+          commands << ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION} [phase: #{commit_phase(env)}]"]
           {
             name: "bootstrap_commit",
             status: "ready",
             dirty_entries: dirty_entries,
             commands: commands,
             reason: "ready_for_orchestration"
-          }
+          }.tap { |step| step[:restored_lockfile] = LOCKFILE_PATH if restore_lockfile }
         end
 
         def git_success?(project_root, *args)

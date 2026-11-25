@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated GitHub Actions workflows now pin setup-ruby-flash v2.15, whose nested actions are SHA-pinned so repositories that require full-length SHA pins can run it.
+
 ### Deprecated
 
 ### Removed

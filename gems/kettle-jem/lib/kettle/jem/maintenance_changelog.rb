@@ -141,7 +141,7 @@ module Kettle
         details = counts.sort_by { |category, _count| category.to_s }.map do |category, count|
           "  - #{category.to_s.tr("_", " ")} (#{count})"
         end
-        ["updated #{total} project file#{"s" unless total == 1}:", *details].join("\n")
+        ["updated #{total} project file#{"s" unless total == 1} since the last release:", *details].join("\n")
       end
 
       def template_change_category(path)

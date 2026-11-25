@@ -54,7 +54,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
           project_root: destination_root,
           section: "Changed",
           key: "kettle-jem/template",
-          entry: "updated 1 project file:\n  - documentation (1)"
+          entry: "updated 1 project file since the last release:\n  - documentation (1)"
         )
       ensure
         if previous_path.nil?
@@ -66,7 +66,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
 
         expect(File.read(source_path)).to eq(source_content)
         expect(File.read(destination_path)).to include(
-          "- [kc] kettle-jem/template: updated 1 project file:\n  - documentation (1)"
+          "- [kc] kettle-jem/template: updated 1 project file since the last release:\n  - documentation (1)"
         )
       end
     end
@@ -89,12 +89,12 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
         project_root: root,
         section: "Changed",
         key: "kettle-jem/template",
-        entry: "updated 1 project file:\n  - documentation (1)"
+        entry: "updated 1 project file since the last release:\n  - documentation (1)"
       )
 
       expect(result).to include(status: "updated", key: "kettle-jem/template")
       expect(File.read(File.join(root, "CHANGELOG.md"))).to include(
-        "- [kc] kettle-jem/template: updated 1 project file:\n  - documentation (1)"
+        "- [kc] kettle-jem/template: updated 1 project file since the last release:\n  - documentation (1)"
       )
     end
   end
@@ -133,7 +133,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
           entry: an_instance_of(Proc)
         )
         expect(options.fetch(:entry).call([])).to eq(<<~ENTRY.chomp)
-          updated 4 project files:
+          updated 4 project files since the last release:
             - code and tests (1)
             - dependencies (1)
             - documentation (1)
@@ -213,7 +213,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
         )
 
         expect(result.fetch(:changelog).fetch(:entry)).to include(
-          "updated 3 project files:",
+          "updated 3 project files since the last release:",
           "- code and tests (1)",
           "- dependencies (1)",
           "- documentation (1)"
@@ -242,7 +242,7 @@ RSpec.describe Kettle::Jem::MaintenanceChangelog do
           report: {changed_files: ["lib/example.rb"]}
         )
 
-        expect(result.fetch(:changelog).fetch(:entry)).to include("updated 1 project file:")
+        expect(result.fetch(:changelog).fetch(:entry)).to include("updated 1 project file since the last release:")
         lock = Kettle::Jem::TemplateLock.load(project_root: root)
         expect(lock.dig("template_state", "maintenance_changelog", "kettle-jem/template")).to eq(["lib/example.rb"])
       end
