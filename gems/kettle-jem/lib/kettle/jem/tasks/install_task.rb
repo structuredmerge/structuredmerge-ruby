@@ -56,6 +56,8 @@ module Kettle
           install_steps << normalize_lockfile_platforms_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options, repository: report.dig(:facts, :repository) || {})
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
+          # Must stay after the handoff: the handoff runs `bundle exec` and needs the (local-path) lock it was given.
+          install_steps << registry_lockfile_refresh_step(project_root, env: setup_env, run_options: effective_run_options, repository: report.dig(:facts, :repository) || {})
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
 
           final_report = report.merge(
@@ -791,6 +793,40 @@ module Kettle
           }
         end
 
+        # In local-path development mode (*_DEV / *_LOCAL env) the normalization steps above are skipped, and
+        # templating leaves a Gemfile.lock resolved against machine-specific PATH sources. That lock must never
+        # be committed, but dependency pin updates still belong in it. So: reset the lock to what is committed,
+        # then re-resolve against released sources with every *_DEV / *_LOCAL override switched off.
+        def registry_lockfile_refresh_step(project_root, env:, run_options: {}, repository: {})
+          return skipped_lockfile_normalization_step("registry_lockfile_refresh", "skip_lock_normalization") if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
+          return skipped_lockfile_normalization_step("registry_lockfile_refresh", "not_local_path_development_env") unless local_path_development_env?(env)
+          return skipped_lockfile_normalization_step("registry_lockfile_refresh", "untracked_Gemfile.lock") unless git_success?(project_root, "ls-files", "--error-unmatch", LOCKFILE_PATH)
+
+          command_env = normal_lockfile_env(project_root, env, repository: repository)
+          command_env.keys.each { |key| command_env[key] = "false" if key.to_s.end_with?("_DEV", "_LOCAL") }
+          {
+            name: "registry_lockfile_refresh",
+            status: "ready",
+            env: command_env,
+            reason: "reset_lockfile_and_update_from_released_sources"
+          }
+        end
+
+        def execute_registry_lockfile_refresh_step(step, project_root:, quiet:, command_runner:)
+          return step unless step.fetch(:status) == "ready"
+
+          restore = git_success?(project_root, "checkout", "--", LOCKFILE_PATH)
+          return step.merge(status: "failed", reason: "could_not_reset_lockfile") unless restore
+
+          result = run_ready_step_command(step.fetch(:name), lockfile_normalization_command(project_root), project_root: project_root, env: step.fetch(:env), quiet: quiet, command_runner: command_runner)
+          step.merge(status: "succeeded", exitstatus: result[:exitstatus], duration_ms: result.fetch(:duration_ms), reason: "executed")
+        rescue Kettle::Jem::Error => error
+          # Unreleased family floors can make a registry-only resolve impossible. Leave the committed lock untouched
+          # rather than leaving the working tree dirty or committing local paths.
+          git_success?(project_root, "checkout", "--", LOCKFILE_PATH)
+          step.merge(status: "failed", reason: "registry_resolution_failed_lockfile_reset", stderr: error.message)
+        end
+
         def normalize_lockfile_platforms_step(project_root, env:, run_options: {})
           return skipped_lockfile_normalization_step("lockfile_platform_normalization", "skip_lock_normalization") if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
           return skipped_lockfile_normalization_step("lockfile_platform_normalization", "local_path_development_env") if local_path_development_env?(env)
@@ -1270,6 +1306,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "lockfile_platform_normalization"
               execute_lockfile_platform_normalization_step(step, project_root: project_root)
+            when "registry_lockfile_refresh"
+              execute_registry_lockfile_refresh_step(step, project_root: project_root, quiet: quiet, command_runner: command_runner)
             when "rubocop_lts_local_branch"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_install_requested_env"

@@ -2857,5 +2857,44 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         expect(report.fetch(:changed_files)).to eq(%w[Gemfile bin/new-binstub])
       end
     end
+
+    describe "registry_lockfile_refresh" do
+      it "is planned only in local-path mode, forcing every *_DEV and *_LOCAL override off" do
+        with_locked_repo(local_lock) do |root|
+          env = {"STRUCTUREDMERGE_DEV" => "/x", "OTHER_LOCAL" => "true", "K_JEM_TEMPLATING" => "true"}
+          step = install_task.registry_lockfile_refresh_step(root, env: env)
+
+          expect(step).to include(name: "registry_lockfile_refresh", status: "ready")
+          expect(step.fetch(:env)).to include("STRUCTUREDMERGE_DEV" => "false", "OTHER_LOCAL" => "false", "K_JEM_TEMPLATING" => "false")
+          expect(install_task.registry_lockfile_refresh_step(root, env: {})).to include(status: "skipped", reason: "not_local_path_development_env")
+        end
+      end
+
+      it "resets the lockfile and re-resolves from released sources" do
+        with_locked_repo(local_lock) do |root|
+          step = install_task.registry_lockfile_refresh_step(root, env: {"STRUCTUREDMERGE_DEV" => "/x"})
+          seen = []
+          runner = lambda do |command, chdir:, env:, quiet:|
+            seen << [command.first(2), File.read(File.join(root, "Gemfile.lock")).include?("remote: /")]
+            {success: true, exitstatus: 0}
+          end
+          result = install_task.execute_registry_lockfile_refresh_step(step, project_root: root, quiet: true, command_runner: runner)
+
+          expect(result).to include(status: "succeeded")
+          expect(seen).to eq([[%w[bundle lock], false]])
+        end
+      end
+
+      it "leaves the committed lockfile in place when registry resolution fails" do
+        with_locked_repo(local_lock) do |root|
+          step = install_task.registry_lockfile_refresh_step(root, env: {"STRUCTUREDMERGE_DEV" => "/x"})
+          runner = ->(_command, chdir:, env:, quiet:) { {success: false, exitstatus: 1, stderr: "unresolvable"} }
+          result = install_task.execute_registry_lockfile_refresh_step(step, project_root: root, quiet: true, command_runner: runner)
+
+          expect(result).to include(status: "failed", reason: "registry_resolution_failed_lockfile_reset")
+          expect(system("git", "-C", root, "diff", "--quiet", "--", "Gemfile.lock")).to be(true)
+        end
+      end
+    end
   end
 end
