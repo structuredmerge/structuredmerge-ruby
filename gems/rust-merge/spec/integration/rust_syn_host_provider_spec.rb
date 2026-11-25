@@ -329,15 +329,6 @@ RSpec.describe Rust::Merge::RustHostProvider do
       .to include(*fixture.dig('expected', 'impl_owner_paths'))
   end
 
-  # Older tree-sitter-rust grammars reject trait aliases (the boundary native syn exists to cover); newer
-  # tree_sitter_language_pack releases (1.27+) parse them. Only assert the rejection shape when it happens.
-  def expect_trait_alias_boundary(tree_sitter, fixture)
-    return if tree_sitter.fetch(:ok)
-
-    expect(tree_sitter.dig(:diagnostics, 0, :category).to_s)
-      .to eq(fixture.dig('expected', 'ruby_tree_sitter_boundary', 'diagnostic_category'))
-  end
-
   it 'merges trait aliases with independent edits through native syn' do
     skip 'compiled native syn registration is unavailable' unless
       StructuredmergeCore.respond_to?(:register_rust_syn_parser)
@@ -349,7 +340,7 @@ RSpec.describe Rust::Merge::RustHostProvider do
     fixture = JSON.parse(File.read(fixture_path))
     input = fixture.fetch('input')
     tree_sitter = Rust::Merge::Provider.new.analyze(source: input.fetch('base'))
-    expect_trait_alias_boundary(tree_sitter, fixture)
+    expect(tree_sitter).to include(ok: fixture.dig('expected', 'ruby_tree_sitter_boundary', 'ok'))
 
     StructuredmergeCore.register_rust_syn_parser('rust.syn.ruby.trait-alias')
     provider = described_class.new
