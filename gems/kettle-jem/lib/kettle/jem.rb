@@ -68,7 +68,7 @@ module Kettle
       {name: "kettle-dev", requirements: ["~> 3.1", ">= 3.1.31"], bootstrap: true},
       {
         name: "kettle-changelog",
-        requirements: ["~> 1.0", ">= 1.0.20"],
+        requirements: ["~> 1.0", ">= 1.0.21"],
         bootstrap: true,
         ruby_requirement: ">= 4.0.0"
       }
@@ -5226,7 +5226,7 @@ module Kettle
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 3.1", ">= 3.1.31"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.19"\n)},
-        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.48"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.3", ">= 1.3.49"\n)},
         {name: PACKAGE_NAME, source: kettle_jem_dependency_source},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.30"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
@@ -16574,7 +16574,7 @@ module Kettle
     def main_gemfile_kettle_family_gem(package_name)
       return "" if package_name.to_s == "kettle-family"
 
-      %(gem "kettle-family", "~> 1.3", ">= 1.3.48"\n)
+      %(gem "kettle-family", "~> 1.3", ">= 1.3.49"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)
