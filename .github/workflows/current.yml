@@ -147,7 +147,7 @@ jobs:
           test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
           git -C ../fixtures merge-base --is-ancestor "${fixtures_revision}" "refs/remotes/origin/${fixtures_branch}"
       - name: Setup Ruby
-        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
         with:
           ruby-version: "4.0"
           bundler: latest
@@ -355,7 +355,7 @@ jobs:
           test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
           git -C ../fixtures merge-base --is-ancestor "${fixtures_revision}" "refs/remotes/origin/${fixtures_branch}"
       - name: Setup Ruby
-        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
         with:
           ruby-version: "4.0"
           bundler: latest
@@ -425,7 +425,7 @@ jobs:
           test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
           git -C ../fixtures merge-base --is-ancestor "${fixtures_revision}" "refs/remotes/origin/${fixtures_branch}"
       - name: Setup Ruby
-        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
         with:
           ruby-version: "4.0"
           bundler: latest
@@ -506,7 +506,7 @@ jobs:
           test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
           git -C ../fixtures merge-base --is-ancestor "${fixtures_revision}" "refs/remotes/origin/${fixtures_branch}"
       - name: Setup Ruby
-        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
         with:
           ruby-version: ruby
           bundler: latest
@@ -573,7 +573,7 @@ jobs:
           test "$(git -C ../benchmark-fixtures rev-parse HEAD)" = "${revision}"
           test "$(git -C ../benchmark-fixtures rev-parse "refs/tags/${tag}^{commit}")" = "${revision}"
       - name: Setup Ruby
-        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
         env:
           BUNDLE_GEMFILE: ${{ github.workspace }}/gems/ast-merge-git/Appraisal.root.gemfile
           K_JEM_TEMPLATING: true
@@ -740,7 +740,7 @@ jobs:
           path: kernel
           persist-credentials: false
       - name: Setup Ruby
-        uses: appraisal-rb/setup-ruby-flash@6f8ad36ba7488db591541483afb5464d01e8861b # v2.14
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
         env:
           BUNDLE_GEMFILE: ${{ github.workspace }}/gems/tree_haver/Appraisal.root.gemfile
           K_JEM_TEMPLATING: true
