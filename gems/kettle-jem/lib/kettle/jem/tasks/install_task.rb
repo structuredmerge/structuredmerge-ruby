@@ -22,6 +22,10 @@ module Kettle
           yard
         ].freeze
         GIT_OPERATION_LOCK_ENV_KEYS = %w[KETTLE_JEM_GIT_LOCK KETTLE_JEM_GIT_COMMIT_LOCK].freeze
+        # Identifies which (possibly nested) kettle-jem invocation made a bootstrap commit.
+        # Nested invocations (the bundled handoff) append their phase to the inherited one.
+        COMMIT_PHASE_ENV_KEY = "KETTLE_JEM_COMMIT_PHASE"
+        DEFAULT_COMMIT_PHASE = "install"
         GIT_OPERATION_LOCK_RETRY_ATTEMPTS = 5
         GIT_OPERATION_LOCK_RETRY_SLEEP_SECONDS = 0.25
 
@@ -74,7 +78,7 @@ module Kettle
             report: final_report,
             run_options: effective_run_options
           )
-          bootstrap_commit = bootstrap_commit_step(project_root, run_options: effective_run_options)
+          bootstrap_commit = bootstrap_commit_step(project_root, run_options: effective_run_options, env: env)
           install_steps.concat(
             execute_orchestration_steps(
               [bootstrap_commit],
@@ -1829,12 +1833,20 @@ module Kettle
           {
             name: "bundled_handoff",
             command: bundled_handoff_command(run_options),
+            env: setup_command_env(project_root, env).merge(
+              COMMIT_PHASE_ENV_KEY => "#{commit_phase(env)}>bundled_handoff"
+            ),
             status: "ready",
             reason: "ready_for_orchestration"
           }
         end
 
-        def bootstrap_commit_step(project_root, run_options:)
+        def commit_phase(env)
+          phase = (env || {})[COMMIT_PHASE_ENV_KEY].to_s.strip
+          phase.empty? ? DEFAULT_COMMIT_PHASE : phase
+        end
+
+        def bootstrap_commit_step(project_root, run_options:, env: ENV)
           if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_commit])
             return {
               name: "bootstrap_commit",
@@ -1862,7 +1874,7 @@ module Kettle
 
           commands = []
           commands << %w[git add -A -- .]
-          commands << ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
+          commands << ["git", "commit", "-m", "chore(templates): 🎨 bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION} [phase: #{commit_phase(env)}]"]
           {
             name: "bootstrap_commit",
             status: "ready",
