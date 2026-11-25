@@ -433,9 +433,9 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (3.2.0)
-    kettle-changelog (1.0.20)
+    kettle-changelog (1.0.21)
       ast-crispr-markdown-markly (~> 7.1, >= 7.1.1)
-      kettle-dev (~> 3.1, >= 3.1.29)
+      kettle-dev (~> 3.1, >= 3.1.31)
       version_gem (~> 1.1, >= 1.1.17)
     kettle-deps-floor (0.1.3)
       kettle-changelog (~> 1.0, >= 1.0.19)
@@ -454,13 +454,13 @@ GEM
       version_gem (~> 1.1, >= 1.1.17)
     kettle-drift (1.0.19)
       version_gem (~> 1.1, >= 1.1.17)
-    kettle-family (1.3.48)
+    kettle-family (1.3.49)
       ast-crispr (~> 7.1, >= 7.1.11)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.10)
       ast-crispr-toml (~> 7.1, >= 7.1.11)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
-      kettle-changelog (~> 1.0, >= 1.0.20)
+      kettle-changelog (~> 1.0, >= 1.0.21)
       kettle-deps-floor (~> 0.1, >= 0.1.3)
       kettle-dev (~> 3.1, >= 3.1.31)
       kettle-gha-pins (~> 0.3, >= 0.3.21)
@@ -608,7 +608,7 @@ GEM
       rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.53.0)
+    rubocop-ast (1.54.0)
       ast (~> 2.4)
       parser (>= 3.3.7.2)
       prism (>= 1.7)
@@ -707,7 +707,7 @@ GEM
       simplecov (>= 0.4.1)
     simplecov_lcov_formatter (0.9.0)
       simplecov (>= 0.18)
-    sorbet-runtime (0.6.13724)
+    sorbet-runtime (0.6.13728)
     standard (1.57.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -757,16 +757,16 @@ GEM
     toml-rb (4.2.2)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.27.2)
+    tree_sitter_language_pack (1.27.3)
       rb_sys (>= 0.9.130, < 0.10)
       sorbet-runtime (~> 0.6)
-    tree_sitter_language_pack (1.27.2-aarch64-linux)
+    tree_sitter_language_pack (1.27.3-aarch64-linux)
       sorbet-runtime (~> 0.6)
-    tree_sitter_language_pack (1.27.2-arm64-darwin)
+    tree_sitter_language_pack (1.27.3-arm64-darwin)
       sorbet-runtime (~> 0.6)
-    tree_sitter_language_pack (1.27.2-x86_64-darwin)
+    tree_sitter_language_pack (1.27.3-x86_64-darwin)
       sorbet-runtime (~> 0.6)
-    tree_sitter_language_pack (1.27.2-x86_64-linux)
+    tree_sitter_language_pack (1.27.3-x86_64-linux)
       sorbet-runtime (~> 0.6)
     tsort (0.2.0)
     tty-cursor (0.7.1)
@@ -970,11 +970,11 @@ CHECKSUMS
   irb (1.19.0) sha256=55ee56acbdd6c9fe06a2e6909f46a24e5c41f45f16906bab04e8049cf46f1d27
   json (3.2.0) sha256=4a4e222a9ee6ffb296ab3171b6b39d85fec83afc4e7b57eee17edf68c74aec87
   json-merge (7.1.19)
-  kettle-changelog (1.0.20) sha256=54bbc567120912d9cc1af454dc7ef50ec4107e3ee4d929a16385db92b9f5d6bb
+  kettle-changelog (1.0.21) sha256=a0474aaa550627c63f07e839c2957d4f898c1beeef1ac58fe25a4be5356ac11a
   kettle-deps-floor (0.1.3) sha256=82955163a525f029f3b8fc3656a739be8ae3dc8c941a2157bfcab73f3ea0ff9d
   kettle-dev (3.1.31) sha256=54f83525048bc3bf1b8399d1e2df915fe6e8e559ad9e7067be71a94640eef97c
   kettle-drift (1.0.19) sha256=c4947944d84839b01fafffd934210c7cc6b438886ff93a663d609ab620b2eb11
-  kettle-family (1.3.48) sha256=35efdf269de99629570dc772c20cc1763137b2c04b8289445ea0a97858db1465
+  kettle-family (1.3.49) sha256=42f8664d616e9c44d59e2e6579e5ae5348c0ef83a643c86cb420347a523c28f4
   kettle-gha-pins (0.3.21) sha256=c0f08ef9fb6065cb1f1b77c44fdb117c7152255aef4ecd385b027312e874e508
   kettle-jem (7.1.43)
   kettle-ndjson (0.1.24) sha256=138b8710a29960e89233e0f5339ac5f2f2bcf6b95e69566b9baaf572f78ef736
@@ -1039,7 +1039,7 @@ CHECKSUMS
   rspec-support (3.13.8) sha256=e4160030309b7e3e9d9863dfe720a35dfcc577162f5402cd68fc8c5258a0ffd6
   rspec_junit_formatter (0.8.0) sha256=2c505d4a79713d298bc8361532cc3eb3427d9279ffe3f8ceeeeeb72ffc279a20
   rubocop (1.91.0) sha256=9c82b7bf391c5d7e3798c5b9996e22a1fe3bd7468e351dfdeb96140c058296d0
-  rubocop-ast (1.53.0) sha256=027984d28485d6502ae4c72f9341080f54f538599f5dbb54f81875a4ddcad574
+  rubocop-ast (1.54.0) sha256=11f7cadec54e593e905b1bb78f2b28bdd4b8e13b34cb82fe49c876e3dd5008c1
   rubocop-capybara (2.23.0) sha256=f9ea1ba3a7561ee8e88cf76fc378ce517ce5327155f305ee7b5c2500e5aee357
   rubocop-env (0.1.0) sha256=5ab9a259e71822bf514c8e900a9b68cc2f74ccc87d5493efcd03213f3068e718
   rubocop-factory_bot (2.28.0) sha256=4b17fc02124444173317e131759d195b0d762844a71a29fe8139c1105d92f0cb
@@ -1072,7 +1072,7 @@ CHECKSUMS
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_lcov_formatter (0.9.0) sha256=4c1839bb31dcf7a8f7a6474c94ed228aa03b994e9dd5e1965e58b4121b049bed
   smorg-rb (7.1.19)
-  sorbet-runtime (0.6.13724) sha256=573bf33330a92ddf4ec25b4b8149293959c8c5de10de5198581c833021c46624
+  sorbet-runtime (0.6.13728) sha256=90db0140031c7b06a5dca2ffe06d27872ebe56e39cdd8cba5835dec09e44cd7f
   standard (1.57.0) sha256=4a65ea92421fbaf77fb54da91e16093cf79b335b8f62c35aaa3dd714c8592858
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
@@ -1092,11 +1092,11 @@ CHECKSUMS
   toml-merge (7.1.19)
   toml-rb (4.2.2) sha256=b41cf36117bafab84c72017697ab49fe49a065e2bcfa6dffb704389fb7b0a60a
   tree_haver (7.1.19)
-  tree_sitter_language_pack (1.27.2) sha256=c51ce5f9deb7365ff11ac1ca8629d27f00699af53ff82def94306d317d39dc82
-  tree_sitter_language_pack (1.27.2-aarch64-linux) sha256=6c9e1602ac644f886befa8f98aa16df86caf4fed571c50622a35136ba1485524
-  tree_sitter_language_pack (1.27.2-arm64-darwin) sha256=1c5beddd24f3ba53e2ed068e10fc5ab1923b73c0e40d335f56a8ee5dc4c96983
-  tree_sitter_language_pack (1.27.2-x86_64-darwin) sha256=d2ea9075f1fa6e03344813fe2e0ab1aad4b41507104aea012fb65c9bcd3dfac6
-  tree_sitter_language_pack (1.27.2-x86_64-linux) sha256=c7da8f26109a575ed01d842397e6eced9ab304715f9574a6c25fd89b0cdde7b2
+  tree_sitter_language_pack (1.27.3) sha256=fd48d817d53f01543c3ffaebc4f9a6f50bfab47e8178f8d3fa8134769e27c049
+  tree_sitter_language_pack (1.27.3-aarch64-linux) sha256=5d899edf637e02e36d101cc8f21c47882c8ae4799266d9bf3f6b4fa1f3be6c76
+  tree_sitter_language_pack (1.27.3-arm64-darwin) sha256=73255207b296b58cad1f74c17fe38d4aab56ffc72bec8a661466514d61a30f86
+  tree_sitter_language_pack (1.27.3-x86_64-darwin) sha256=0d84bace5e2c2b2534bc97032bacbf6e4b715e85f08b5abd26bae3a00394852a
+  tree_sitter_language_pack (1.27.3-x86_64-linux) sha256=6fe8aa70b0b41998ff2615ce8ddf9224904d6b24c41ce41fb22f3d617cb99d98
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   tty-cursor (0.7.1) sha256=79534185e6a777888d88628b14b6a1fdf5154a603f285f80b1753e1908e0bf48
   tty-progressbar (0.18.3) sha256=6cbb4260e55e74a9180d502143eb6a467d2c8e51bf5f3c9509fb5cacc3d4a5f6
