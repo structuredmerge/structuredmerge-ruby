@@ -7,9 +7,9 @@ RSpec.describe 'TreeHaver runtime dependencies' do
 
     expect(dependency).not_to be_nil
     expect(dependency.type).to eq(:runtime)
-    expect(dependency.requirement).to(satisfy { |requirement| requirement.satisfied_by?(Gem::Version.new('0.2.2')) })
+    expect(dependency.requirement).to(satisfy { |requirement| requirement.satisfied_by?(Gem::Version.new('0.3.0')) })
     expect(dependency.requirement).not_to(
-      satisfy { |requirement| requirement.satisfied_by?(Gem::Version.new('0.2.0')) }
+      satisfy { |requirement| requirement.satisfied_by?(Gem::Version.new('0.2.3')) }
     )
   end
 end
