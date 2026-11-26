@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
   - ruby/setup-ruby v1.344.0 (78c62f2208e480ce3d5ae4dfd9b9e181acf48b63) -> v1.345.0 (145243922b4465b78e04dd66294782c7de45901f)
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
+  - kettle-dev (>= 3.1.31 -> >= 3.1.32)
+  - kettle-family (>= 1.3.49 -> >= 1.3.50)
   - kettle-soup-cover (>= 3.0.16 -> >= 3.0.17)
 
 ### Deprecated
