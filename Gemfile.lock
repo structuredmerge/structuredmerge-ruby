@@ -1,4 +1,12 @@
 PATH
+  remote: /var/home/pboling/src/my/structuredmerge/structuredmerge/packages/ruby
+  specs:
+    structuredmerge-core (0.3.0)
+      rb_sys (>= 0.9.130, < 0.10)
+      sorbet-runtime (~> 0.6)
+      version_gem (~> 1.1, >= 1.1.17)
+
+PATH
   remote: gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.20)
@@ -429,7 +437,7 @@ GEM
       kettle-ndjson (~> 0.1, >= 0.1.24)
       prism (>= 1.3)
       version_gem (~> 1.1, >= 1.1.17)
-    kettle-dev (3.1.31)
+    kettle-dev (3.1.32)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.21)
       kettle-ndjson (~> 0.1, >= 0.1.24)
@@ -440,7 +448,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.17)
     kettle-drift (1.0.19)
       version_gem (~> 1.1, >= 1.1.17)
-    kettle-family (1.3.49)
+    kettle-family (1.3.50)
       ast-crispr (~> 7.1, >= 7.1.11)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.10)
       ast-crispr-toml (~> 7.1, >= 7.1.11)
@@ -448,7 +456,7 @@ GEM
       command_kit-completion (~> 0.1)
       kettle-changelog (~> 1.0, >= 1.0.21)
       kettle-deps-floor (~> 0.1, >= 0.1.3)
-      kettle-dev (~> 3.1, >= 3.1.31)
+      kettle-dev (~> 3.1, >= 3.1.32)
       kettle-gha-pins (~> 0.3, >= 0.3.21)
       kettle-jem (~> 7.1, >= 7.1.28)
       kettle-ndjson (~> 0.1, >= 0.1.24)
@@ -498,15 +506,11 @@ GEM
     lint_roller (1.1.0)
     logger (1.7.0)
     markly (0.19.0)
-    mini_portile2 (2.8.9)
     mister_bin (0.9.0)
       colsole (~> 1.0.0)
       docopt_ng (~> 0.7.1)
       reline (~> 0.6)
     mutex_m (0.3.0)
-    nokogiri (1.19.7)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.19.7-x86_64-linux-gnu)
       racc (~> 1.4)
     openssl (4.0.2)
@@ -684,7 +688,7 @@ GEM
       simplecov (>= 0.4.1)
     simplecov_lcov_formatter (0.9.0)
       simplecov (>= 0.18)
-    sorbet-runtime (0.6.13728)
+    sorbet-runtime (0.6.13729)
     standard (1.57.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -714,10 +718,6 @@ GEM
     stringio (3.2.0)
     strings-ansi (0.2.0)
     strscan (3.1.8)
-    structuredmerge-core (0.3.0)
-      rb_sys (>= 0.9.130, < 0.10)
-      sorbet-runtime (~> 0.6)
-      version_gem (~> 1.1, >= 1.1.17)
     terminal-table (4.0.0)
       unicode-display_width (>= 1.1.1, < 4)
     thor (1.5.0)
@@ -734,10 +734,10 @@ GEM
     toml-rb (4.2.2)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.27.3)
+    tree_sitter_language_pack (1.28.0)
       rb_sys (>= 0.9.130, < 0.10)
       sorbet-runtime (~> 0.6)
-    tree_sitter_language_pack (1.27.3-x86_64-linux)
+    tree_sitter_language_pack (1.28.0-x86_64-linux)
       sorbet-runtime (~> 0.6)
     tsort (0.2.0)
     tty-cursor (0.7.1)
@@ -853,6 +853,7 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.3, >= 1.0.11)
   stringio (>= 3.0)
+  structuredmerge-core!
   token-resolver (~> 2.0, >= 2.0.4)
   toml (~> 0.3)
   toml-merge!
@@ -893,7 +894,7 @@ CHECKSUMS
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
   binary-merge (7.1.20)
-  bundler (4.1.1) sha256=7a76aebebc2e476cbc1e11314200d7fe83c7398d6930f1d048e4d3dd2d0e93e3
+  bundler (4.1.0) sha256=d7b7a797b988e544a0677a9c6ed78146f2f63d05ae1af8bc7d9426cf88b46377
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   cgi (0.5.2) sha256=61ca30298171190fd4fa0d8018e57ada456eae9b7a2b78526debf7f0a0e6f8bb
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
@@ -936,9 +937,9 @@ CHECKSUMS
   json-merge (7.1.20)
   kettle-changelog (1.0.21) sha256=a0474aaa550627c63f07e839c2957d4f898c1beeef1ac58fe25a4be5356ac11a
   kettle-deps-floor (0.1.3) sha256=82955163a525f029f3b8fc3656a739be8ae3dc8c941a2157bfcab73f3ea0ff9d
-  kettle-dev (3.1.31) sha256=54f83525048bc3bf1b8399d1e2df915fe6e8e559ad9e7067be71a94640eef97c
+  kettle-dev (3.1.32) sha256=3ef772fe9f0339fb0ed48b74bbe94ab4b4c20a347e27183fac14fb89f72241cf
   kettle-drift (1.0.19) sha256=c4947944d84839b01fafffd934210c7cc6b438886ff93a663d609ab620b2eb11
-  kettle-family (1.3.49) sha256=42f8664d616e9c44d59e2e6579e5ae5348c0ef83a643c86cb420347a523c28f4
+  kettle-family (1.3.50) sha256=69fda442fba9f8355af38fd72ff1335fda3c94df9d9cbba2f8308e3ffe8f309d
   kettle-gha-pins (0.3.21) sha256=c0f08ef9fb6065cb1f1b77c44fdb117c7152255aef4ecd385b027312e874e508
   kettle-jem (7.1.44)
   kettle-ndjson (0.1.24) sha256=138b8710a29960e89233e0f5339ac5f2f2bcf6b95e69566b9baaf572f78ef736
@@ -955,10 +956,8 @@ CHECKSUMS
   markdown-merge (7.1.20)
   markly (0.19.0) sha256=cd2c0e86eaf3660ed2a3a94104877f8bd41adda78e7c295c017d03de0d4044ca
   markly-merge (7.1.20)
-  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
   mister_bin (0.9.0) sha256=624fe401db4faf1978e84c17e0b320827697a13a6cba4fe656001269079be7d3
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
-  nokogiri (1.19.7) sha256=abe94507c54cb18f872777b16bdca4aad32b1abdc4c52fe843f1c80fbdf992b8
   nokogiri (1.19.7-x86_64-linux-gnu) sha256=25865ccb462f714e712fdf8906fde07849cb6704a808e3d629d75baa5af5dd3b
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
@@ -1030,7 +1029,7 @@ CHECKSUMS
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_lcov_formatter (0.9.0) sha256=4c1839bb31dcf7a8f7a6474c94ed228aa03b994e9dd5e1965e58b4121b049bed
   smorg-rb (7.1.20)
-  sorbet-runtime (0.6.13728) sha256=90db0140031c7b06a5dca2ffe06d27872ebe56e39cdd8cba5835dec09e44cd7f
+  sorbet-runtime (0.6.13729) sha256=96938487809ede21e6d5a52a9360243995e3a92d9aa2ce610cc741c795865892
   standard (1.57.0) sha256=4a65ea92421fbaf77fb54da91e16093cf79b335b8f62c35aaa3dd714c8592858
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
@@ -1040,7 +1039,7 @@ CHECKSUMS
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   strings-ansi (0.2.0) sha256=90262d760ea4a94cc2ae8d58205277a343409c288cbe7c29416b1826bd511c88
   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
-  structuredmerge-core (0.3.0) sha256=3f6d8f58a001c7bb1dcacba0a6c5a094ff605158e283c29e5c581ac9b3a006e2
+  structuredmerge-core (0.3.0)
   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
@@ -1050,8 +1049,8 @@ CHECKSUMS
   toml-merge (7.1.20)
   toml-rb (4.2.2) sha256=b41cf36117bafab84c72017697ab49fe49a065e2bcfa6dffb704389fb7b0a60a
   tree_haver (7.1.20)
-  tree_sitter_language_pack (1.27.3) sha256=fd48d817d53f01543c3ffaebc4f9a6f50bfab47e8178f8d3fa8134769e27c049
-  tree_sitter_language_pack (1.27.3-x86_64-linux) sha256=6fe8aa70b0b41998ff2615ce8ddf9224904d6b24c41ce41fb22f3d617cb99d98
+  tree_sitter_language_pack (1.28.0) sha256=bc075cb1fe2fe88819d0f3a7d69464b8485e12217312a7b2f341e7d22c12f908
+  tree_sitter_language_pack (1.28.0-x86_64-linux) sha256=a97fbdb098f8b064989bbce626c025b7b1f177d6978a8c27dcbe050ffe390ca5
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   tty-cursor (0.7.1) sha256=79534185e6a777888d88628b14b6a1fdf5154a603f285f80b1753e1908e0bf48
   tty-progressbar (0.18.3) sha256=6cbb4260e55e74a9180d502143eb6a467d2c8e51bf5f3c9509fb5cacc3d4a5f6
@@ -1074,4 +1073,4 @@ CHECKSUMS
   zip-merge (7.1.20)
 
 BUNDLED WITH
-  4.1.1
+  4.1.0
