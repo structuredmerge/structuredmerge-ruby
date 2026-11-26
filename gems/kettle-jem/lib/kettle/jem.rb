@@ -638,7 +638,7 @@ module Kettle
     ].freeze
     COPYRIGHT_NAME_RE = /\ACopyright \(c\) [\d,\s-]+ (.+)\z/
     BOT_IDENTITY_PATTERN = /\[bot\]/i
-    DEFAULT_MACHINE_USERS = ["autobolt", "StepSecurity Bot", "dependabot[bot]", "depfu[bot]"].freeze
+    DEFAULT_MACHINE_USERS = ["autobolt", "fossabot", "StepSecurity Bot", "dependabot[bot]", "depfu[bot]"].freeze
     DEFAULT_AUTHOR_ALIASES = {"erik michaels-ober" => "Erik Berlin"}.freeze
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"

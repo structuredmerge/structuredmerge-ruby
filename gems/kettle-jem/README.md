@@ -421,8 +421,8 @@ Common tokens:
 `machine_users` excludes configured Git author names or email addresses from
 Git-derived copyright output. Any identity containing `[bot]` is filtered
 automatically. The built-in machine-account set includes `autobolt`,
-`StepSecurity Bot`, `dependabot[bot]`, and `depfu[bot]`; configured entries
-extend this set rather than replacing it.
+`fossabot`, `StepSecurity Bot`, `dependabot[bot]`, and `depfu[bot]`; configured
+entries extend this set rather than replacing it.
 
 `author_aliases` consolidates alternate Git author names or email addresses to
 canonical display names. The mapping is case-insensitive and applies to Git

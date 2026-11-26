@@ -321,8 +321,8 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       :author_facts,
       {"machine_users" => ["Internal Automation"]},
       {},
-      gemspec_metadata: {authors: ["StepSecurity Bot", "dependabot[bot]", "Internal Automation", "Human Author"]},
-      copyright: {lines: ["Copyright (c) 2020 StepSecurity Bot", "Copyright (c) 2021 Other Human"]}
+      gemspec_metadata: {authors: ["StepSecurity Bot", "fossabot", "dependabot[bot]", "Internal Automation", "Human Author"]},
+      copyright: {lines: ["Copyright (c) 2020 StepSecurity Bot", "Copyright (c) 2021 fossabot", "Copyright (c) 2021 Other Human"]}
     )
 
     expect(author.fetch(:name)).to eq("Human Author")
@@ -1468,6 +1468,7 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       commit.call("Erik Michaels-Ober", "erik.old@example.test", "erik-old.txt")
       commit.call("Erik Berlin", "erik@example.test", "erik.txt")
       commit.call("StepSecurity Bot", "bot@stepsecurity.io", "bot.txt")
+      commit.call("fossabot", "badges@fossa.com", "fossa.txt")
 
       facts = described_class.send(
         :copyright_facts,
@@ -1482,12 +1483,14 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
 
       expect(described_class.send(:copyright_machine_users, {})).to eq([
         "autobolt",
+        "fossabot",
         "stepsecurity bot",
         "dependabot[bot]",
         "depfu[bot]"
       ])
       expect(described_class.send(:copyright_machine_users, {"machine_users" => ["Internal Automation"]})).to eq([
         "autobolt",
+        "fossabot",
         "stepsecurity bot",
         "dependabot[bot]",
         "depfu[bot]",
