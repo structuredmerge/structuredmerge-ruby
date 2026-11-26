@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- tree_haver: structuredmerge-core requirement raised to ~> 0.3 (first release with the native tree-sitter-rust node shape); merge after structuredmerge-core 0.3.0 is on RubyGems
+
 ### Deprecated
 
 ### Removed
