@@ -9,6 +9,6 @@ SimpleCov.configure do
     track_files '{gems/*/lib/**/*.rb,gems/*/lib/**/*.rake,gems/*/exe/*.rb}'
   end
   Dir.glob('gems/*').each do |dir|
-    add_group File.basename(dir), "#{dir}/"
+    group File.basename(dir), "#{dir}/"
   end
 end

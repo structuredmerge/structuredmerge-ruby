@@ -1,0 +1,91 @@
+name: Coverage
+
+# The family-wide coverage floor. These values are the single source of truth: this
+# workflow enforces them on every push and pull request, and kettle-changelog reads
+# K_SOUP_COV_MIN_LINE / K_SOUP_COV_MIN_BRANCH from this file's top-level `env` when the
+# family release measures coverage, so CI and the release can never disagree.
+#
+# The floor IS the measured aggregate coverage of the root suite (every member's lib/,
+# tracked by the root .simplecov). It only ratchets up: new code needs tests, and
+# improving coverage means raising these numbers. Never lower them.
+#   7.1.19: 37082/60021 lines (61.78%), 13188/26855 branches (49.10%)
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "*"
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+env:
+  K_SOUP_COV_MIN_LINE: "61.78"
+  K_SOUP_COV_MIN_BRANCH: "49.10"
+  K_SOUP_COV_MIN_HARD: "true"
+
+jobs:
+  family-coverage:
+    name: StructuredMerge family aggregate coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Clone sibling fixtures repo
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixtures_repository="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("repository")')"
+          fixtures_branch="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("branch")')"
+          fixtures_revision="$(ruby -ryaml -e 'puts YAML.load_file(".structuredmerge/fixtures.lock").fetch("revision")')"
+          git clone --filter=blob:none --no-checkout "${fixtures_repository}" ../fixtures
+          git -C ../fixtures fetch origin "refs/heads/${fixtures_branch}:refs/remotes/origin/${fixtures_branch}"
+          git -C ../fixtures checkout --detach "${fixtures_revision}"
+          test "$(git -C ../fixtures rev-parse HEAD)" = "${fixtures_revision}"
+          git -C ../fixtures merge-base --is-ancestor "${fixtures_revision}" "refs/remotes/origin/${fixtures_branch}"
+      - name: Setup Ruby
+        uses: appraisal-rb/setup-ruby-flash@b04c0c9f2e443c909968abc828a0b53e77567cf9 # v2.15
+        with:
+          ruby-version: ruby
+          bundler: latest
+          bundler-cache: false
+          pre-bundle-gems: |
+            nomono --source https://gem.coop --source https://rubygems.org
+      - name: Install dependencies
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          bundle config set frozen false
+          for attempt in 1 2 3; do
+            if bundle install --jobs 4 --retry 8; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt 3 ]]; then
+              sleep "$((attempt * 5))"
+            fi
+          done
+
+          exit 1
+      - name: Run the aggregate suite with the coverage floor
+        env:
+          K_JEM_TEMPLATING: true
+          K_SOUP_COV_COMMAND_NAME: Family Coverage
+          K_SOUP_COV_DO: true
+          K_SOUP_COV_FORMATTERS: xml,rcov,lcov,tty
+          K_SOUP_COV_MULTI_FORMATTERS: true
+          KETTLE_FAMILY_BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: timeout 25m bundle exec kettle-test
+      - name: Verify coverage reports
+        run: |
+          test -s coverage/lcov.info
+          test -s coverage/coverage.xml

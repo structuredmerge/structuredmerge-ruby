@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - tree_haver: a release gate spec fails when the family root Gemfile.lock is behind the latest released tree_sitter_language_pack or structuredmerge-core
 
+- family root coverage floor: add .github/workflows/coverage.yml, which enforces the aggregate root suite's measured coverage (61.78% lines, 49.10% branches) as a hard minimum in CI and is the file kettle-changelog reads for the release coverage gate, so coverage can only ratchet up
+
 ### Changed
 
 - tree_haver: structuredmerge-core requirement raised to ~> 0.3 (first release with the native tree-sitter-rust node shape)
