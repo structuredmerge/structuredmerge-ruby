@@ -20,15 +20,19 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- tree_haver: a release gate spec fails when the family root Gemfile.lock is behind the latest released tree_sitter_language_pack or structuredmerge-core
+
 ### Changed
 
-- tree_haver: structuredmerge-core requirement raised to ~> 0.3 (first release with the native tree-sitter-rust node shape); merge after structuredmerge-core 0.3.0 is on RubyGems
+- tree_haver: structuredmerge-core requirement raised to ~> 0.3 (first release with the native tree-sitter-rust node shape)
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- family root coverage: add a root .simplecov that tracks gems/*/lib so release changelogs record the real aggregate coverage; every release since 7.1.6 recorded 0.00% (0/0 lines in 0 files) because the aggregate suite tracked no files
 
 ### Security
 
