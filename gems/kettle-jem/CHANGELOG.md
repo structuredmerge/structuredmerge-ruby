@@ -29,8 +29,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-dev (>= 3.1.31 -> >= 3.1.33)
+  - kettle-drift (>= 1.0.19 -> >= 1.0.20)
   - kettle-family (>= 1.3.49 -> >= 1.3.52)
   - kettle-soup-cover (>= 3.0.16 -> >= 3.0.17)
+  - nomono (>= 1.1.18 -> >= 1.1.19)
   - yard (>= 0.9.45 -> >= 0.9.46)
 
 - [kc] kettle-jem/prepare: updated 7 project files since the last release:
