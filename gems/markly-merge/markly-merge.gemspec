@@ -98,6 +98,11 @@ Gem::Specification.new do |spec|
   spec.executables = []
 
   # kettle-jem:freeze
+  # Keep locally built native binaries out of release packages.
+  spec.files.reject! { |path| path.end_with?('.bundle', '.so', '.dylib', '.dll', '.o', '.a') }
+  # kettle-jem:unfreeze
+
+  # kettle-jem:freeze
   # To retain chunks of comments & code during markly-merge templating:
   # Wrap custom sections with freeze markers (e.g., as above and below this comment chunk).
   # markly-merge will then preserve content between those markers across template runs.
@@ -124,7 +129,7 @@ Gem::Specification.new do |spec|
   #       and preferably a modular one (see gemfiles/modular/*.gemfile).
 
   # Dev, Test, & Release Tasks
-  spec.add_development_dependency('kettle-dev', '~> 3.1', '>= 3.1.31') # ruby >= 4.0.0
+  spec.add_development_dependency('kettle-dev', '~> 3.1', '>= 3.1.33') # ruby >= 4.0.0
 
   # Security
   spec.add_development_dependency('bundler-audit', '~> 0.9.3') # ruby >= 2.0.0
