@@ -1,12 +1,4 @@
 PATH
-  remote: /var/home/pboling/src/my/structuredmerge/structuredmerge/packages/ruby
-  specs:
-    structuredmerge-core (0.3.0)
-      rb_sys (>= 0.9.130, < 0.10)
-      sorbet-runtime (~> 0.6)
-      version_gem (~> 1.1, >= 1.1.17)
-
-PATH
   remote: gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.1.20)
@@ -437,7 +429,7 @@ GEM
       kettle-ndjson (~> 0.1, >= 0.1.24)
       prism (>= 1.3)
       version_gem (~> 1.1, >= 1.1.17)
-    kettle-dev (3.1.32)
+    kettle-dev (3.1.33)
       emoji_regex (>= 15.0)
       kettle-gha-pins (~> 0.3, >= 0.3.21)
       kettle-ndjson (~> 0.1, >= 0.1.24)
@@ -448,7 +440,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.17)
     kettle-drift (1.0.19)
       version_gem (~> 1.1, >= 1.1.17)
-    kettle-family (1.3.50)
+    kettle-family (1.3.52)
       ast-crispr (~> 7.1, >= 7.1.11)
       ast-crispr-ruby-prism (~> 7.1, >= 7.1.10)
       ast-crispr-toml (~> 7.1, >= 7.1.11)
@@ -456,7 +448,7 @@ GEM
       command_kit-completion (~> 0.1)
       kettle-changelog (~> 1.0, >= 1.0.21)
       kettle-deps-floor (~> 0.1, >= 0.1.3)
-      kettle-dev (~> 3.1, >= 3.1.32)
+      kettle-dev (~> 3.1, >= 3.1.33)
       kettle-gha-pins (~> 0.3, >= 0.3.21)
       kettle-jem (~> 7.1, >= 7.1.28)
       kettle-ndjson (~> 0.1, >= 0.1.24)
@@ -506,11 +498,15 @@ GEM
     lint_roller (1.1.0)
     logger (1.7.0)
     markly (0.19.0)
+    mini_portile2 (2.8.9)
     mister_bin (0.9.0)
       colsole (~> 1.0.0)
       docopt_ng (~> 0.7.1)
       reline (~> 0.6)
     mutex_m (0.3.0)
+    nokogiri (1.19.7)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.19.7-x86_64-linux-gnu)
       racc (~> 1.4)
     openssl (4.0.2)
@@ -718,6 +714,10 @@ GEM
     stringio (3.2.0)
     strings-ansi (0.2.0)
     strscan (3.1.8)
+    structuredmerge-core (0.3.0)
+      rb_sys (>= 0.9.130, < 0.10)
+      sorbet-runtime (~> 0.6)
+      version_gem (~> 1.1, >= 1.1.17)
     terminal-table (4.0.0)
       unicode-display_width (>= 1.1.1, < 4)
     thor (1.5.0)
@@ -760,7 +760,7 @@ GEM
       kramdown (>= 2.4, < 3)
       kramdown-parser-gfm (~> 1.1)
       version_gem (~> 1.1, >= 1.1.17)
-    yard (0.9.45)
+    yard (0.9.46)
     yard-fence (0.9.12)
       rdoc (>= 6.11, < 8)
       version_gem (~> 1.1, >= 1.1.17)
@@ -853,7 +853,6 @@ DEPENDENCIES
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.3, >= 1.0.11)
   stringio (>= 3.0)
-  structuredmerge-core!
   token-resolver (~> 2.0, >= 2.0.4)
   toml (~> 0.3)
   toml-merge!
@@ -937,9 +936,9 @@ CHECKSUMS
   json-merge (7.1.20)
   kettle-changelog (1.0.21) sha256=a0474aaa550627c63f07e839c2957d4f898c1beeef1ac58fe25a4be5356ac11a
   kettle-deps-floor (0.1.3) sha256=82955163a525f029f3b8fc3656a739be8ae3dc8c941a2157bfcab73f3ea0ff9d
-  kettle-dev (3.1.32) sha256=3ef772fe9f0339fb0ed48b74bbe94ab4b4c20a347e27183fac14fb89f72241cf
+  kettle-dev (3.1.33) sha256=eb2c2e66478ee41a89346c1c1c7126fe113871ae7750266015e1bbd1d74558c9
   kettle-drift (1.0.19) sha256=c4947944d84839b01fafffd934210c7cc6b438886ff93a663d609ab620b2eb11
-  kettle-family (1.3.50) sha256=69fda442fba9f8355af38fd72ff1335fda3c94df9d9cbba2f8308e3ffe8f309d
+  kettle-family (1.3.52) sha256=4ff4a928a1a86fa23acbc190e9204962ca9013d31e11caae1e428eadf04d8a49
   kettle-gha-pins (0.3.21) sha256=c0f08ef9fb6065cb1f1b77c44fdb117c7152255aef4ecd385b027312e874e508
   kettle-jem (7.1.44)
   kettle-ndjson (0.1.24) sha256=138b8710a29960e89233e0f5339ac5f2f2bcf6b95e69566b9baaf572f78ef736
@@ -956,8 +955,10 @@ CHECKSUMS
   markdown-merge (7.1.20)
   markly (0.19.0) sha256=cd2c0e86eaf3660ed2a3a94104877f8bd41adda78e7c295c017d03de0d4044ca
   markly-merge (7.1.20)
+  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
   mister_bin (0.9.0) sha256=624fe401db4faf1978e84c17e0b320827697a13a6cba4fe656001269079be7d3
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
+  nokogiri (1.19.7) sha256=abe94507c54cb18f872777b16bdca4aad32b1abdc4c52fe843f1c80fbdf992b8
   nokogiri (1.19.7-x86_64-linux-gnu) sha256=25865ccb462f714e712fdf8906fde07849cb6704a808e3d629d75baa5af5dd3b
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
@@ -1039,7 +1040,7 @@ CHECKSUMS
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   strings-ansi (0.2.0) sha256=90262d760ea4a94cc2ae8d58205277a343409c288cbe7c29416b1826bd511c88
   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
-  structuredmerge-core (0.3.0)
+  structuredmerge-core (0.3.0) sha256=3f6d8f58a001c7bb1dcacba0a6c5a094ff605158e283c29e5c581ac9b3a006e2
   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
@@ -1062,7 +1063,7 @@ CHECKSUMS
   webrick (1.9.2) sha256=beb4a15fc474defed24a3bda4ffd88a490d517c9e4e6118c3edce59e45864131
   yaml-converter (0.2.8) sha256=5f0f7a02f6b913669bb48ac0c39d173b529d5d40beb97ed9862fb3e1797fb7d8
   yaml-merge (7.1.20)
-  yard (0.9.45) sha256=52e211493f7cb8a3ebf7e104a25a1e73937a3103092545d34cb88fafebb3dc51
+  yard (0.9.46) sha256=9b1ee37b5da942811dc584d8bb2dfd0efca0a72c44be30bf8282c34955902855
   yard-fence (0.9.12) sha256=5758ddd995b7b1f302d0bf901a1d41e5fe42d802e47c95b10d6c1ce5673894c5
   yard-junk (0.1.0) sha256=e85fe2ec1afa47313decd333447b53458cb1ed49b510b70015fdc3041a94bcdd
   yard-lint (1.15.0) sha256=e96da1b8cd052c5af09616db7729c7e9aa651a984c63ea322f55c9e422e52480
