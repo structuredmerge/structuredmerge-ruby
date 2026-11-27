@@ -29,7 +29,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - [kc] kettle-jem-deps-floor: Update kettle-jem template dependency floors:
   - kettle-dev (>= 3.1.31 -> >= 3.1.32)
-  - kettle-family (>= 1.3.49 -> >= 1.3.50)
+  - kettle-family (>= 1.3.49 -> >= 1.3.51)
   - kettle-soup-cover (>= 3.0.16 -> >= 3.0.17)
 
 ### Deprecated
