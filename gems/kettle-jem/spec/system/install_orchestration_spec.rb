@@ -2798,6 +2798,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
   describe "local-path Gemfile.lock handling" do
     let(:tmp_root) { File.expand_path("../tmp", __dir__) }
     let(:install_task) { Kettle::Jem::Tasks::InstallTask }
+    let(:local_lock) { "PATH\n  remote: /home/someone/src/kettle-dev\n  specs:\n" }
 
     def git!(root, *args)
       expect(system("git", "-C", root, *args, out: File::NULL, err: File::NULL)).to be(true)
@@ -2816,8 +2817,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         yield root
       end
     end
-
-    let(:local_lock) { "PATH\n  remote: /home/someone/src/kettle-dev\n  specs:\n" }
 
     it "restores a lockfile with local PATH sources instead of committing it" do
       with_locked_repo(local_lock) do |root|

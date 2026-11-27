@@ -33,6 +33,15 @@ Please file a bug if you notice a violation of semantic versioning.
   - kettle-soup-cover (>= 3.0.16 -> >= 3.0.17)
   - yard (>= 0.9.45 -> >= 0.9.46)
 
+- [kc] kettle-jem/prepare: updated 7 project files since the last release:
+  - dependencies (7)
+
+- [kc] kettle-jem/template: updated 10 project files since the last release:
+  - code and tests (1)
+  - dependencies (4)
+  - documentation (1)
+  - other (4)
+
 ### Deprecated
 
 ### Removed
