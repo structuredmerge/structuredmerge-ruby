@@ -2,7 +2,7 @@
 
 # 🔧 Config::Merge
 
-[![Version][👽versioni]][👽version] [![Ruby Users Forum][✉️ruby-forum-top-img]][✉️ruby-forum] [![GitHub tag (latest SemVer)][⛳️tag-img]][⛳️tag] [![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0][📄license-img]][📄license] [![Total downloads][👽dl-ranki]][👽dl-rank] [![CI Current][🚎11-c-wfi]][🚎11-c-wf]
+[![Version][👽versioni]][👽version] [![Ruby Users Forum][✉️ruby-forum-top-img]][✉️ruby-forum] [![GitHub tag (latest SemVer)][⛳️tag-img]][⛳️tag] [![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0][📄license-img]][📄license] [![Total downloads][👽dl-ranki]][👽dl-rank] [![CI Current][🚎11-c-wfi]][🚎11-c-wf] [![CI Test Coverage][🚎2-cov-wfi]][🚎2-cov-wf]
 
 `if ci_badges.map(&:color).detect { it != "green"}` ☝️ [let me know on Discord][✉️discord-invite] or [RubyForum][✉️ruby-forum], as I may have missed the notification.
 
@@ -256,6 +256,8 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [👽dl-ranki]: https://img.shields.io/gem/dt/config-merge.svg
 [👽version]: https://clickgems.clickhouse.com/dashboard/config-merge
 [👽versioni]: https://img.shields.io/gem/v/config-merge.svg
+[🚎2-cov-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/coverage.yml
+[🚎2-cov-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/coverage.yml/badge.svg
 [🚎11-c-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml
 [🚎11-c-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml/badge.svg
 [💎ruby-c-i]: https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&logo=ruby&logoColor=green
