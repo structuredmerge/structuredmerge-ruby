@@ -116,6 +116,11 @@ description = "Run family sync"
 raw = true
 run = "bundle exec kettle-family sync --execute"
 
+[fix-remotes]
+description = "Run family fix-remotes"
+raw = true
+run = "bundle exec kettle-family fix-remotes --execute"
+
 [reset]
 description = "Run family reset"
 raw = true
